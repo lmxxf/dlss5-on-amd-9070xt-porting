@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0f1f"/>
+      <stop offset="100%" stop-color="#0a1a1a"/>
+    </linearGradient>
+    <linearGradient id="encBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a2a3a"/>
+      <stop offset="100%" stop-color="#0a1a2a"/>
+    </linearGradient>
+    <linearGradient id="decBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a1a0a"/>
+      <stop offset="100%" stop-color="#1a1005"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', 'WenQuanYi Micro Hei', sans-serif; }
+  </style>
+
+  <rect width="900" height="560" fill="url(#bg)"/>
+
+  <text x="450" y="40" text-anchor="middle" fill="#e2e8f0" font-size="22" font-weight="bold">DLSS 5 模型整体结构：一个 U 形视觉网络</text>
+  <text x="450" y="66" text-anchor="middle" fill="#94a3b8" font-size="13">左边一路压缩读懂画面，右边一路还原重画，中间最窄处全局看一遍</text>
+
+  <!-- 入口卷积 -->
+  <g transform="translate(60 110)">
+    <rect x="0" y="0" width="130" height="50" rx="6" fill="#0a1a1a" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="65" y="22" text-anchor="middle" fill="#5eead4" font-size="13" font-weight="bold">入口卷积</text>
+    <text x="65" y="40" text-anchor="middle" fill="#a7f3d0" font-size="10">画面接进来</text>
+  </g>
+  <text x="125" y="180" text-anchor="middle" fill="#64748b" font-size="20">↓</text>
+
+  <!-- ==== 编码器（左侧下行）==== -->
+  <text x="125" y="205" text-anchor="middle" fill="#93c5fd" font-size="14" font-weight="bold">编码器 · 逐级压缩</text>
+
+  <g transform="translate(50 220)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 1 级 · 32 通道</text>
+    <text x="75" y="34" text-anchor="middle" fill="#bfdbfe" font-size="9">注意力 + 卷积</text>
+  </g>
+  <g transform="translate(65 272)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 2 级 · 64 通道</text>
+  </g>
+  <g transform="translate(80 324)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 3 级 · 128 通道</text>
+  </g>
+  <g transform="translate(95 376)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 4 级 · 256 通道</text>
+  </g>
+
+  <text x="270" y="255" fill="#64748b" font-size="11">通道翻倍</text>
+  <text x="270" y="272" fill="#64748b" font-size="11">尺寸缩小</text>
+  <text x="285" y="300" fill="#64748b" font-size="18">↘</text>
+
+  <!-- ==== 瓶颈（底部中央）==== -->
+  <g transform="translate(360 430)">
+    <rect x="0" y="0" width="180" height="60" rx="8" fill="#2a0a2a" stroke="#c084fc" stroke-width="2"/>
+    <text x="90" y="24" text-anchor="middle" fill="#e9d5ff" font-size="14" font-weight="bold">瓶颈 · 全局注意力</text>
+    <text x="90" y="44" text-anchor="middle" fill="#d8b4fe" font-size="10">最深最窄处，整幅画面看一遍</text>
+  </g>
+
+  <!-- ==== 解码器（右侧上行）==== -->
+  <text x="775" y="205" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="bold">解码器 · 逐级还原</text>
+
+  <g transform="translate(700 220)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 1 级 · 32 通道</text>
+    <text x="75" y="34" text-anchor="middle" fill="#fbbf24" font-size="9">重画输出</text>
+  </g>
+  <g transform="translate(685 272)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 2 级 · 64 通道</text>
+  </g>
+  <g transform="translate(670 324)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 3 级 · 128 通道</text>
+  </g>
+  <g transform="translate(655 376)">
+    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 4 级 · 256 通道</text>
+  </g>
+
+  <text x="605" y="300" fill="#64748b" font-size="18">↗</text>
+
+  <!-- 瓶颈到解码器的连线 -->
+  <path d="M 245 397 Q 320 460 360 460" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 540 460 Q 620 460 700 397" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- ==== 跳线（编码器到解码器）==== -->
+  <g opacity="0.5">
+    <path d="M 200 241 L 700 241" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
+    <path d="M 215 293 L 685 293" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
+    <path d="M 230 345 L 670 345" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
+    <path d="M 245 397 L 655 397" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
+  </g>
+  <text x="450" y="234" text-anchor="middle" fill="#5eead4" font-size="11">跳线：把编码时的细节直接接到解码同一级，防止还原时丢失</text>
+
+  <!-- 出口卷积 -->
+  <g transform="translate(710 110)">
+    <rect x="0" y="0" width="130" height="50" rx="6" fill="#1a1005" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="65" y="22" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="bold">出口卷积</text>
+    <text x="65" y="40" text-anchor="middle" fill="#fbbf24" font-size="10">送出重绘画面</text>
+  </g>
+  <text x="775" y="180" text-anchor="middle" fill="#64748b" font-size="20">↑</text>
+
+  <!-- 底部说明 -->
+  <text x="450" y="530" text-anchor="middle" fill="#94a3b8" font-size="12">这一期只画到"分几大块"；每一块内部怎么运转，下一期展开</text>
+</svg>
