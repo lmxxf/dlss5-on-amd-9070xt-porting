@@ -415,6 +415,37 @@ compute_record_reads: yes (153/153)
 
 至此 RX 9070 XT 已经不仅能承载权重，compute shader 也能按逆向恢复出的 record 布局正确寻址 153/153 条权重。下一步进入 block0：先从其 10,848 个 FP16 标量中恢复内部 tensor 切分和 pre-block 输入通道语义，再写第一个有数学意义的参考 kernel。
 
+### block0 张量闭合与第一张 AMD 可视输出
+
+结合 `weight-names.json` 的内部名字顺序、宽度 32／attention 内宽 16、8×8 window bias，以及 block0 相对普通 1H block 多出的 512 个 FP16 标量，得到完整布局：
+
+```text
+input_adapter_weight  [32,7]      224
+weight1               [64,32]    2048
+weight2               [32,64]    2048
+ffn_cos_skip           [32]       32
+qkv_weight             [48,32]    1536
+attn_scale             [32]       32
+attn_bias              [64,64]    4096
+projection_weight      [32,16]    512
+attn_cos_skip          [32]       32
+dw_weight              [32,3,3]   288
+                                   -----
+                                   10848
+```
+
+普通 1H／32 block 恰好去掉 `input_adapter_weight` 与 `dw_weight`，得到 10,336，和 archive record 精确一致。数据分布边界也吻合：`attn_bias` 的 4,096 个负值从 element 5,920 开始，后接 512-element projection 和 32-element cosine skip。
+
+D3D12 测试宿主新增第二个 compute entry：从 arena 直接用 `f16tof32` 读取 block0 开头的 `[32,7]` 真权重，对 256×144 的七通道程序化输入执行 7→32 投影，将前三个 learned feature 通道写入 UAV，再读回生成 PPM／PNG。实测输出：
+
+```text
+compute_record_reads: yes (153/153)
+block0_preview: C:\Users\lmxxf\block0-input-adapter-preview.ppm (256x144)
+SHA256(PPM)=df0a25ed86e2a8dc33def80368f56a57bcc940ed83988aff7666f7383b0b978b
+```
+
+归档图 `block0-input-adapter-preview.png` 呈连续青绿→深蓝→亮蓝特征场。这是 RX 9070 XT 执行真实模型第一层权重得到的第一张可见输出；输入仍是诊断用程序化七通道，不宣称为完整 DLSSNR 输出。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

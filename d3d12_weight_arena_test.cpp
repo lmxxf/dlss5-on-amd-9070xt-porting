@@ -75,14 +75,16 @@ D3D12_RESOURCE_DESC buffer_desc(uint64_t size) {
 } // namespace
 
 int wmain(int argc, wchar_t **argv) {
-    if (argc != 2 && argc != 3) {
+    if (argc < 2 || argc > 4) {
         std::fwprintf(
-            stderr, L"usage: %ls <weights-fp16.arena> [record-offsets.u32]\n", argv[0]);
+            stderr,
+            L"usage: %ls <weights-fp16.arena> [record-offsets.u32] [preview.ppm]\n",
+            argv[0]);
         return 2;
     }
 
     const std::vector<uint8_t> source = read_file(argv[1]);
-    const std::vector<uint8_t> offset_bytes = argc == 3
+    const std::vector<uint8_t> offset_bytes = argc >= 3
         ? read_file(argv[2])
         : std::vector<uint8_t>{};
     if (source.empty() || source.size() % 512 != 0) {
@@ -214,11 +216,40 @@ int wmain(int argc, wchar_t **argv) {
 ByteAddressBuffer weights : register(t0);
 StructuredBuffer<uint> offsets : register(t1);
 RWStructuredBuffer<uint> results : register(u0);
+RWStructuredBuffer<uint> preview_pixels : register(u1);
 [numthreads(64, 1, 1)]
 void main(uint3 id : SV_DispatchThreadID) {
     if (id.x < 153) {
         results[id.x] = weights.Load(offsets[id.x]);
     }
+}
+
+float load_half(uint element) {
+    uint packed = weights.Load((element >> 1) * 4);
+    uint bits = (element & 1) != 0 ? packed >> 16 : packed & 0xffff;
+    return f16tof32(bits);
+}
+
+[numthreads(8, 8, 1)]
+void preview(uint3 id : SV_DispatchThreadID) {
+    if (id.x >= 256 || id.y >= 144) return;
+    float x = (id.x + 0.5) / 256.0;
+    float y = (id.y + 0.5) / 144.0;
+    float input[7] = {x, y, 0.5 + 0.5 * sin(x * 12.5663706), 1.0,
+                      x * y, x * x, y * y};
+    uint rgb = 0;
+    [unroll]
+    for (uint output_channel = 0; output_channel < 3; ++output_channel) {
+        float value = 0.0;
+        [unroll]
+        for (uint input_channel = 0; input_channel < 7; ++input_channel) {
+            value += input[input_channel] *
+                load_half(output_channel * 7 + input_channel);
+        }
+        uint byte_value = (uint)round(saturate(0.5 + value * 8.0) * 255.0);
+        rgb |= byte_value << (output_channel * 8);
+    }
+    preview_pixels[id.y * 256 + id.x] = rgb;
 }
 )";
         ID3DBlob *shader = nullptr;
@@ -236,6 +267,22 @@ void main(uint3 id : SV_DispatchThreadID) {
         if (errors != nullptr) {
             errors->Release();
         }
+        ID3DBlob *preview_shader = nullptr;
+        errors = nullptr;
+        compile_result = D3DCompile(
+            shader_source, sizeof(shader_source) - 1, "block0-input-adapter-preview",
+            nullptr, nullptr, "preview", "cs_5_1", D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0, &preview_shader, &errors);
+        if (FAILED(compile_result)) {
+            if (errors != nullptr) {
+                std::fprintf(stderr, "%.*s\n", static_cast<int>(errors->GetBufferSize()),
+                    static_cast<const char *>(errors->GetBufferPointer()));
+            }
+            fail("D3DCompile(preview)", compile_result);
+        }
+        if (errors != nullptr) {
+            errors->Release();
+        }
 
         D3D12_DESCRIPTOR_RANGE ranges[2]{};
         ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -243,7 +290,7 @@ void main(uint3 id : SV_DispatchThreadID) {
         ranges[0].BaseShaderRegister = 0;
         ranges[0].OffsetInDescriptorsFromTableStart = 0;
         ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-        ranges[1].NumDescriptors = 1;
+        ranges[1].NumDescriptors = 2;
         ranges[1].BaseShaderRegister = 0;
         ranges[1].OffsetInDescriptorsFromTableStart = 2;
         D3D12_ROOT_PARAMETER root_parameter{};
@@ -276,6 +323,12 @@ void main(uint3 id : SV_DispatchThreadID) {
         check("CreateComputePipelineState", device->CreateComputePipelineState(
             &pipeline_desc, IID_PPV_ARGS(&pipeline)));
         shader->Release();
+        pipeline_desc.CS.pShaderBytecode = preview_shader->GetBufferPointer();
+        pipeline_desc.CS.BytecodeLength = preview_shader->GetBufferSize();
+        ID3D12PipelineState *preview_pipeline = nullptr;
+        check("CreateComputePipelineState(preview)", device->CreateComputePipelineState(
+            &pipeline_desc, IID_PPV_ARGS(&preview_pipeline)));
+        preview_shader->Release();
 
         const auto offset_desc = buffer_desc(offset_bytes.size());
         ID3D12Resource *offset_buffer = nullptr;
@@ -299,9 +352,24 @@ void main(uint3 id : SV_DispatchThreadID) {
             &readback_heap, D3D12_HEAP_FLAG_NONE, &result_readback_desc,
             D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&result_readback)));
 
+        constexpr uint64_t preview_width = 256;
+        constexpr uint64_t preview_height = 144;
+        constexpr uint64_t preview_size = preview_width * preview_height * sizeof(uint32_t);
+        auto preview_desc = buffer_desc(preview_size);
+        preview_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        const auto preview_readback_desc = buffer_desc(preview_size);
+        ID3D12Resource *preview_buffer = nullptr;
+        ID3D12Resource *preview_readback = nullptr;
+        check("CreateCommittedResource(preview)", device->CreateCommittedResource(
+            &default_heap, D3D12_HEAP_FLAG_NONE, &preview_desc,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS, nullptr, IID_PPV_ARGS(&preview_buffer)));
+        check("CreateCommittedResource(preview readback)", device->CreateCommittedResource(
+            &readback_heap, D3D12_HEAP_FLAG_NONE, &preview_readback_desc,
+            D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&preview_readback)));
+
         D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc{};
         descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        descriptor_heap_desc.NumDescriptors = 3;
+        descriptor_heap_desc.NumDescriptors = 4;
         descriptor_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         ID3D12DescriptorHeap *descriptor_heap = nullptr;
         check("CreateDescriptorHeap", device->CreateDescriptorHeap(
@@ -335,6 +403,14 @@ void main(uint3 id : SV_DispatchThreadID) {
         results_uav.Buffer.NumElements = 153;
         results_uav.Buffer.StructureByteStride = sizeof(uint32_t);
         device->CreateUnorderedAccessView(result_buffer, nullptr, &results_uav, descriptor);
+        descriptor.ptr += descriptor_size;
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC preview_uav{};
+        preview_uav.Format = DXGI_FORMAT_UNKNOWN;
+        preview_uav.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+        preview_uav.Buffer.NumElements = static_cast<UINT>(preview_width * preview_height);
+        preview_uav.Buffer.StructureByteStride = sizeof(uint32_t);
+        device->CreateUnorderedAccessView(preview_buffer, nullptr, &preview_uav, descriptor);
 
         check("Reset allocator", allocator->Reset());
         check("Reset command list", commands->Reset(allocator, pipeline));
@@ -351,16 +427,28 @@ void main(uint3 id : SV_DispatchThreadID) {
         commands->SetComputeRootDescriptorTable(
             0, descriptor_heap->GetGPUDescriptorHandleForHeapStart());
         commands->Dispatch(3, 1, 1);
-        D3D12_RESOURCE_BARRIER result_barriers[2]{};
+        commands->SetPipelineState(preview_pipeline);
+        commands->Dispatch(
+            static_cast<UINT>(preview_width / 8),
+            static_cast<UINT>(preview_height / 8), 1);
+        D3D12_RESOURCE_BARRIER result_barriers[4]{};
         result_barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
         result_barriers[0].UAV.pResource = result_buffer;
-        result_barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        result_barriers[1].Transition.pResource = result_buffer;
-        result_barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-        result_barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-        result_barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        commands->ResourceBarrier(2, result_barriers);
+        result_barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        result_barriers[1].UAV.pResource = preview_buffer;
+        result_barriers[2].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        result_barriers[2].Transition.pResource = result_buffer;
+        result_barriers[2].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        result_barriers[2].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        result_barriers[2].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        result_barriers[3].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        result_barriers[3].Transition.pResource = preview_buffer;
+        result_barriers[3].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        result_barriers[3].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        result_barriers[3].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        commands->ResourceBarrier(4, result_barriers);
         commands->CopyBufferRegion(result_readback, 0, result_buffer, 0, result_size);
+        commands->CopyBufferRegion(preview_readback, 0, preview_buffer, 0, preview_size);
         check("Close compute commands", commands->Close());
         queue->ExecuteCommandLists(1, lists);
         check("Signal compute", queue->Signal(fence, 2));
@@ -387,10 +475,42 @@ void main(uint3 id : SV_DispatchThreadID) {
         result_readback->Unmap(0, &no_read);
         std::printf("compute_record_reads: %s (153/153)\n", compute_equal ? "yes" : "no");
 
+        const D3D12_RANGE preview_bytes{0, static_cast<SIZE_T>(preview_size)};
+        check("Map(preview readback)", preview_readback->Map(0, &preview_bytes, &mapped));
+        const auto *preview_values = static_cast<const uint32_t *>(mapped);
+        const wchar_t *preview_path = argc == 4
+            ? argv[3]
+            : L"block0-input-adapter-preview.ppm";
+        FILE *preview_file = _wfopen(preview_path, L"wb");
+        if (preview_file == nullptr) {
+            std::fwprintf(stderr, L"cannot create preview: %ls\n", preview_path);
+            return 1;
+        }
+        std::fprintf(preview_file, "P6\n%llu %llu\n255\n",
+            static_cast<unsigned long long>(preview_width),
+            static_cast<unsigned long long>(preview_height));
+        for (uint64_t index = 0; index < preview_width * preview_height; ++index) {
+            const uint32_t value = preview_values[index];
+            const uint8_t rgb[3] = {
+                static_cast<uint8_t>(value),
+                static_cast<uint8_t>(value >> 8),
+                static_cast<uint8_t>(value >> 16),
+            };
+            std::fwrite(rgb, sizeof(rgb), 1, preview_file);
+        }
+        std::fclose(preview_file);
+        preview_readback->Unmap(0, &no_read);
+        std::wprintf(L"block0_preview: %ls (%llux%llu)\n", preview_path,
+            static_cast<unsigned long long>(preview_width),
+            static_cast<unsigned long long>(preview_height));
+
         descriptor_heap->Release();
+        preview_readback->Release();
+        preview_buffer->Release();
         result_readback->Release();
         result_buffer->Release();
         offset_buffer->Release();
+        preview_pipeline->Release();
         pipeline->Release();
         root_signature->Release();
     }

@@ -1,0 +1,18 @@
+{
+  "record": "block0.layer0.layer",
+  "storage": "float16",
+  "element_count": 10848,
+  "byte_size": 21696,
+  "tensors": [
+    {"name": "input_adapter_weight", "shape": [32, 7], "element_offset": 0, "element_count": 224},
+    {"name": "weight1", "shape": [64, 32], "element_offset": 224, "element_count": 2048},
+    {"name": "weight2", "shape": [32, 64], "element_offset": 2272, "element_count": 2048},
+    {"name": "ffn_cos_skip", "shape": [32], "element_offset": 4320, "element_count": 32},
+    {"name": "qkv_weight", "shape": [48, 32], "element_offset": 4352, "element_count": 1536},
+    {"name": "attn_scale", "shape": [32], "element_offset": 5888, "element_count": 32},
+    {"name": "attn_bias", "shape": [64, 64], "element_offset": 5920, "element_count": 4096},
+    {"name": "projection_weight", "shape": [32, 16], "element_offset": 10016, "element_count": 512},
+    {"name": "attn_cos_skip", "shape": [32], "element_offset": 10528, "element_count": 32},
+    {"name": "dw_weight", "shape": [32, 3, 3], "element_offset": 10560, "element_count": 288}
+  ]
+}
