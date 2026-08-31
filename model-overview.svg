@@ -1,112 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0f1f"/>
-      <stop offset="100%" stop-color="#0a1a1a"/>
+      <stop offset="0" stop-color="#08101f"/>
+      <stop offset="1" stop-color="#071a19"/>
     </linearGradient>
-    <linearGradient id="encBox" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0a2a3a"/>
-      <stop offset="100%" stop-color="#0a1a2a"/>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#123b56"/>
+      <stop offset="1" stop-color="#0b2238"/>
     </linearGradient>
-    <linearGradient id="decBox" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a1a0a"/>
-      <stop offset="100%" stop-color="#1a1005"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b2d0c"/>
+      <stop offset="1" stop-color="#291707"/>
     </linearGradient>
+    <marker id="arrB" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#60a5fa"/>
+    </marker>
+    <marker id="arrG" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b"/>
+    </marker>
   </defs>
 
-  <style>
-    text { font-family: 'Noto Sans CJK SC', 'WenQuanYi Micro Hei', sans-serif; }
-  </style>
+  <rect width="900" height="600" fill="url(#bg)"/>
+  <g font-family="Noto Sans CJK SC, sans-serif">
+    <text x="450" y="40" text-anchor="middle" fill="#e2e8f0" font-size="22" font-weight="700">DLL 暴露出的网络骨架</text>
+    <text x="450" y="65" text-anchor="middle" fill="#94a3b8" font-size="13">kernel 名字证明宽度档位；报错字符串证明 upsample 与 skip</text>
 
-  <rect width="900" height="560" fill="url(#bg)"/>
+    <text x="175" y="105" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">下采样方向</text>
+    <text x="725" y="105" text-anchor="middle" fill="#fbbf24" font-size="15" font-weight="700">上采样方向</text>
 
-  <text x="450" y="40" text-anchor="middle" fill="#e2e8f0" font-size="22" font-weight="bold">DLSS 5 模型整体结构：一个 U 形视觉网络</text>
-  <text x="450" y="66" text-anchor="middle" fill="#94a3b8" font-size="13">左边一路压缩读懂画面，右边一路还原重画，中间最窄处全局看一遍</text>
+    <g fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrB)">
+      <path d="M175 155 L215 198"/><path d="M215 239 L255 282"/>
+      <path d="M255 323 L295 366"/><path d="M295 407 L335 450"/>
+      <path d="M335 491 L405 522"/>
+    </g>
+    <g fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrG)">
+      <path d="M495 522 L565 491"/><path d="M565 450 L605 407"/>
+      <path d="M605 366 L645 323"/><path d="M645 282 L685 239"/>
+      <path d="M685 198 L725 155"/>
+    </g>
 
-  <!-- 入口卷积 -->
-  <g transform="translate(60 110)">
-    <rect x="0" y="0" width="130" height="50" rx="6" fill="#0a1a1a" stroke="#2dd4bf" stroke-width="1.5"/>
-    <text x="65" y="22" text-anchor="middle" fill="#5eead4" font-size="13" font-weight="bold">入口卷积</text>
-    <text x="65" y="40" text-anchor="middle" fill="#a7f3d0" font-size="10">画面接进来</text>
+    <g text-anchor="middle">
+      <g transform="translate(105 118)"><rect width="140" height="42" rx="7" fill="url(#blue)" stroke="#60a5fa"/><text x="70" y="18" fill="#dbeafe" font-size="13" font-weight="700">1 head · 32 通道</text><text x="70" y="34" fill="#93c5fd" font-size="10">fused Swin</text></g>
+      <g transform="translate(145 202)"><rect width="140" height="42" rx="7" fill="url(#blue)" stroke="#60a5fa"/><text x="70" y="18" fill="#dbeafe" font-size="13" font-weight="700">2 heads · 64 通道</text><text x="70" y="34" fill="#93c5fd" font-size="10">fused Swin</text></g>
+      <g transform="translate(185 286)"><rect width="140" height="42" rx="7" fill="url(#blue)" stroke="#60a5fa"/><text x="70" y="18" fill="#dbeafe" font-size="13" font-weight="700">4 heads · 128 通道</text><text x="70" y="34" fill="#93c5fd" font-size="10">fused Swin</text></g>
+      <g transform="translate(225 370)"><rect width="140" height="42" rx="7" fill="url(#blue)" stroke="#60a5fa"/><text x="70" y="18" fill="#dbeafe" font-size="13" font-weight="700">8 heads · 256 通道</text><text x="70" y="34" fill="#93c5fd" font-size="10">fused Swin</text></g>
+      <g transform="translate(265 454)"><rect width="140" height="42" rx="7" fill="#25204d" stroke="#a78bfa"/><text x="70" y="18" fill="#ede9fe" font-size="13" font-weight="700">16 heads · 512 通道</text><text x="70" y="34" fill="#c4b5fd" font-size="10">split Swin</text></g>
+
+      <g transform="translate(395 510)"><rect width="110" height="54" rx="9" fill="#3b174d" stroke="#d8b4fe" stroke-width="2"/><text x="55" y="22" fill="#f3e8ff" font-size="14" font-weight="700">1024 通道</text><text x="55" y="41" fill="#d8b4fe" font-size="11">ViT Attention</text></g>
+
+      <g transform="translate(495 454)"><rect width="140" height="42" rx="7" fill="url(#gold)" stroke="#f59e0b"/><text x="70" y="18" fill="#fef3c7" font-size="13" font-weight="700">1024 → 512</text><text x="70" y="34" fill="#fbbf24" font-size="10">DecInputUpsample</text></g>
+      <g transform="translate(535 370)"><rect width="140" height="42" rx="7" fill="url(#gold)" stroke="#f59e0b"/><text x="70" y="18" fill="#fef3c7" font-size="13" font-weight="700">256 档回程</text><text x="70" y="34" fill="#fbbf24" font-size="10">upsample + skip</text></g>
+      <g transform="translate(575 286)"><rect width="140" height="42" rx="7" fill="url(#gold)" stroke="#f59e0b"/><text x="70" y="18" fill="#fef3c7" font-size="13" font-weight="700">128 档回程</text><text x="70" y="34" fill="#fbbf24" font-size="10">upsample + skip</text></g>
+      <g transform="translate(615 202)"><rect width="140" height="42" rx="7" fill="url(#gold)" stroke="#f59e0b"/><text x="70" y="18" fill="#fef3c7" font-size="13" font-weight="700">64 档回程</text><text x="70" y="34" fill="#fbbf24" font-size="10">upsample + skip</text></g>
+      <g transform="translate(655 118)"><rect width="140" height="42" rx="7" fill="url(#gold)" stroke="#f59e0b"/><text x="70" y="18" fill="#fef3c7" font-size="13" font-weight="700">32 档回程</text><text x="70" y="34" fill="#fbbf24" font-size="10">upsample + enc0 skip</text></g>
+    </g>
+
+    <g fill="none" stroke="#5eead4" stroke-width="1.2" stroke-dasharray="6 5" opacity="0.75">
+      <path d="M245 139 C410 92 520 92 655 139"/><path d="M285 223 C420 178 510 178 615 223"/>
+      <path d="M325 307 C430 263 500 263 575 307"/><path d="M365 391 C440 348 490 348 535 391"/>
+    </g>
+    <text x="450" y="100" text-anchor="middle" fill="#5eead4" font-size="11">main + skip / enc0 skip</text>
+
+    <rect x="55" y="552" width="250" height="28" rx="5" fill="#101827" stroke="#334155"/>
+    <text x="180" y="571" text-anchor="middle" fill="#cbd5e1" font-size="11">权重包：block0 … block70</text>
+    <rect x="595" y="552" width="250" height="28" rx="5" fill="#101827" stroke="#334155"/>
+    <text x="720" y="571" text-anchor="middle" fill="#cbd5e1" font-size="11">尚缺：block → kernel 映射</text>
   </g>
-  <text x="125" y="180" text-anchor="middle" fill="#64748b" font-size="20">↓</text>
-
-  <!-- ==== 编码器（左侧下行）==== -->
-  <text x="125" y="205" text-anchor="middle" fill="#93c5fd" font-size="14" font-weight="bold">编码器 · 逐级压缩</text>
-
-  <g transform="translate(50 220)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 1 级 · 32 通道</text>
-    <text x="75" y="34" text-anchor="middle" fill="#bfdbfe" font-size="9">注意力 + 卷积</text>
-  </g>
-  <g transform="translate(65 272)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 2 级 · 64 通道</text>
-  </g>
-  <g transform="translate(80 324)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 3 级 · 128 通道</text>
-  </g>
-  <g transform="translate(95 376)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#encBox)" stroke="#4a90d9" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="bold">第 4 级 · 256 通道</text>
-  </g>
-
-  <text x="270" y="255" fill="#64748b" font-size="11">通道翻倍</text>
-  <text x="270" y="272" fill="#64748b" font-size="11">尺寸缩小</text>
-  <text x="285" y="300" fill="#64748b" font-size="18">↘</text>
-
-  <!-- ==== 瓶颈（底部中央）==== -->
-  <g transform="translate(360 430)">
-    <rect x="0" y="0" width="180" height="60" rx="8" fill="#2a0a2a" stroke="#c084fc" stroke-width="2"/>
-    <text x="90" y="24" text-anchor="middle" fill="#e9d5ff" font-size="14" font-weight="bold">瓶颈 · 全局注意力</text>
-    <text x="90" y="44" text-anchor="middle" fill="#d8b4fe" font-size="10">最深最窄处，整幅画面看一遍</text>
-  </g>
-
-  <!-- ==== 解码器（右侧上行）==== -->
-  <text x="775" y="205" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="bold">解码器 · 逐级还原</text>
-
-  <g transform="translate(700 220)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 1 级 · 32 通道</text>
-    <text x="75" y="34" text-anchor="middle" fill="#fbbf24" font-size="9">重画输出</text>
-  </g>
-  <g transform="translate(685 272)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 2 级 · 64 通道</text>
-  </g>
-  <g transform="translate(670 324)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 3 级 · 128 通道</text>
-  </g>
-  <g transform="translate(655 376)">
-    <rect x="0" y="0" width="150" height="42" rx="5" fill="url(#decBox)" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="75" y="18" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">第 4 级 · 256 通道</text>
-  </g>
-
-  <text x="605" y="300" fill="#64748b" font-size="18">↗</text>
-
-  <!-- 瓶颈到解码器的连线 -->
-  <path d="M 245 397 Q 320 460 360 460" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.6"/>
-  <path d="M 540 460 Q 620 460 700 397" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.6"/>
-
-  <!-- ==== 跳线（编码器到解码器）==== -->
-  <g opacity="0.5">
-    <path d="M 200 241 L 700 241" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
-    <path d="M 215 293 L 685 293" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
-    <path d="M 230 345 L 670 345" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
-    <path d="M 245 397 L 655 397" stroke="#5eead4" stroke-width="1" stroke-dasharray="5 4"/>
-  </g>
-  <text x="450" y="234" text-anchor="middle" fill="#5eead4" font-size="11">跳线：把编码时的细节直接接到解码同一级，防止还原时丢失</text>
-
-  <!-- 出口卷积 -->
-  <g transform="translate(710 110)">
-    <rect x="0" y="0" width="130" height="50" rx="6" fill="#1a1005" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="65" y="22" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="bold">出口卷积</text>
-    <text x="65" y="40" text-anchor="middle" fill="#fbbf24" font-size="10">送出重绘画面</text>
-  </g>
-  <text x="775" y="180" text-anchor="middle" fill="#64748b" font-size="20">↑</text>
-
-  <!-- 底部说明 -->
-  <text x="450" y="530" text-anchor="middle" fill="#94a3b8" font-size="12">这一期只画到"分几大块"；每一块内部怎么运转，下一期展开</text>
 </svg>
