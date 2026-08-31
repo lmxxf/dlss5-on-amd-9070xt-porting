@@ -108,10 +108,42 @@ def parse_archive(archive: bytes) -> list[dict[str, object]]:
     return records
 
 
+def build_aligned_arena(
+    archive: bytes, records: list[dict[str, object]], alignment: int = 512
+) -> tuple[bytes, list[dict[str, object]]]:
+    """Rebuild the flat GPU-weight arena observed in the NVIDIA runtime."""
+    if alignment <= 0 or alignment & (alignment - 1):
+        raise ValueError("arena alignment must be a positive power of two")
+
+    arena = bytearray()
+    arena_records: list[dict[str, object]] = []
+    for record in records:
+        payload_offset = int(record["payload_offset"])
+        payload_size = int(record["payload_size"])
+        arena_offset = len(arena)
+        arena.extend(archive[payload_offset : payload_offset + payload_size])
+        aligned_size = (payload_size + alignment - 1) & -alignment
+        arena.extend(b"\0" * (aligned_size - payload_size))
+        arena_records.append(
+            {
+                "index": record["index"],
+                "name": record["name"],
+                "arena_offset": arena_offset,
+                "payload_size": payload_size,
+                "aligned_size": aligned_size,
+            }
+        )
+    return bytes(arena), arena_records
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dll", type=Path)
     parser.add_argument("--json", type=Path, help="write the parsed top-level index")
+    parser.add_argument("--arena", type=Path, help="write the 512-byte-aligned FP16 arena")
+    parser.add_argument(
+        "--arena-json", type=Path, help="write record offsets in the aligned arena"
+    )
     args = parser.parse_args()
 
     helpers = load_pe_helpers()
@@ -147,6 +179,24 @@ def main() -> None:
     if args.json:
         args.json.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
         print(f"wrote: {args.json}")
+
+    if args.arena or args.arena_json:
+        arena, arena_records = build_aligned_arena(archive, records)
+        if args.arena:
+            args.arena.write_bytes(arena)
+            print(f"arena alignment: 512")
+            print(f"arena size: {len(arena)}")
+            print(f"wrote: {args.arena}")
+        if args.arena_json:
+            manifest = {
+                "alignment": 512,
+                "arena_size": len(arena),
+                "records": arena_records,
+            }
+            args.arena_json.write_text(
+                json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+            )
+            print(f"wrote: {args.arena_json}")
 
 
 if __name__ == "__main__":

@@ -375,6 +375,36 @@ next_gpu_va = current_gpu_va + align_up(payload_size, 512)
 
 这一步把文件内 FP16 archive 与 NVIDIA 运行时 flat-weight GPU VA 建立了逐 record 的确定映射。AMD loader 可以直接复刻同一 512-byte arena 布局，或在自有 kernel 中使用由 index 计算出的等价偏移。
 
+### RX 9070 XT：D3D12 FP16 权重 arena 跑通
+
+`parse_weights_archive.py` 新增：
+
+- `--arena`：把 153 条 FP16 payload 按 archive 顺序逐条 512-byte 对齐，生成 flat arena；
+- `--arena-json`：生成每条 record 的 `arena_offset`／`payload_size`／`aligned_size`。
+
+当前样本生成结果：
+
+```text
+records=153
+arena_size=147719680
+alignment=512
+```
+
+新增最小 Windows 宿主 `d3d12_weight_arena_test.cpp`。在 AMD 机器的 WSL MinGW-w64 交叉编译，Windows SSH Session 直接运行；程序按名称强制选择 AMD DXGI adapter，创建 D3D12 default/upload/readback 三个 buffer，将整个 arena 上传至 RX 9070 XT 显存并完整读回。
+
+实测：
+
+```text
+adapter: AMD Radeon RX 9070 XT
+dedicated_video_memory: 16974905344
+arena_size: 147719680
+source_fnv1a64: c41a1b1ab59a4dd3
+readback_fnv1a64: c41a1b1ab59a4dd3
+byte_exact: yes
+```
+
+这是 AMD 后端第一个真实执行里程碑：完整模型权重已由 RX 9070 XT 的 D3D12 copy queue 路径成功驻留显存，文件→arena→GPU 的每个字节均已验证。它尚未执行网络计算；下一步是在同一宿主加入最小 HLSL compute kernel，先验证按 `weights-arena-index.json` 的 offset 从 default heap 读取 FP16 权重并产生可核对输出。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
