@@ -420,21 +420,21 @@ compute_record_reads: yes (153/153)
 结合 `weight-names.json` 的内部名字顺序、宽度 32／attention 内宽 16、8×8 window bias，以及 block0 相对普通 1H block 多出的 512 个 FP16 标量，得到完整布局：
 
 ```text
-input_adapter_weight  [32,7]      224
-weight1               [64,32]    2048
-weight2               [32,64]    2048
-ffn_cos_skip           [32]       32
-qkv_weight             [48,32]    1536
-attn_scale             [32]       32
-attn_bias              [64,64]    4096
-projection_weight      [32,16]    512
-attn_cos_skip          [32]       32
-dw_weight              [32,3,3]   288
+input_adapter_weight  [32,7]      224   offset 0
+dw_weight             [32,3,3]   288   offset 224
+weight1               [64,32]    2048  offset 512
+weight2               [32,64]    2048  offset 2560
+ffn_cos_skip           [32]       32    offset 4608
+qkv_weight             [48,32]    1536  offset 4640
+attn_bias              [64,64]    4096  offset 6176
+projection_weight      [32,16]    512   offset 10272
+attn_scale             [32]       32    offset 10784
+attn_cos_skip          [32]       32    offset 10816
                                    -----
                                    10848
 ```
 
-普通 1H／32 block 恰好去掉 `input_adapter_weight` 与 `dw_weight`，得到 10,336，和 archive record 精确一致。数据分布边界也吻合：`attn_bias` 的 4,096 个负值从 element 5,920 开始，后接 512-element projection 和 32-element cosine skip。
+普通 1H／32 block 恰好去掉开头的 `input_adapter_weight` 与 `dw_weight` 共 512 elements，得到 10,336，和 archive record 精确一致。物理排列并不等于 `weight-names.json` 的登记顺序：fused layout 把 `dw_weight` 提到 input adapter 后，把 `attn_scale` 放在 projection 后。数据分布给出精确边界：普通 block 的 4,096-element `attn_bias` 位于 5,664–9,760；block0 全体后移 512，位于 6,176–10,272，随后正好是 512-element projection 和两个 32-element 向量。
 
 D3D12 测试宿主新增第二个 compute entry：从 arena 直接用 `f16tof32` 读取 block0 开头的 `[32,7]` 真权重，对 256×144 的七通道程序化输入执行 7→32 投影，将前三个 learned feature 通道写入 UAV，再读回生成 PPM／PNG。实测输出：
 
