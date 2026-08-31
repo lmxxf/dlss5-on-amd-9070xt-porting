@@ -1,0 +1,227 @@
+result=0x1
+manager=00000003cfa45220
+network=00000000cd6a2100
+block_count=71
+block[0]=000000036f78e960 layer_count=1
+  layer[0]=00000003d052e880 vtable=00007ffbad5c7d38 name=cc_tinlayout_fused_pre_block_swin_1h_32_ds_fp8 state=00000003d05002c0 state_qwords=0x00000003bc000000
+block[1]=000000036f790380 layer_count=1
+  layer[0]=00000003d052e0b0 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_inpview_32_fp8 state=00000003e54917c0 state_qwords=0x00000003bc005600
+block[2]=000000036f790d20 layer_count=1
+  layer[0]=00000003d052bcc0 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_shifted_32_fp8 state=00000003e5490fe0 state_qwords=0x00000003bc44da00
+block[3]=000000036f78fca0 layer_count=1
+  layer[0]=00000003d052da70 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_shifted_32_fp8 state=00000003e5492060 state_qwords=0x00000003bd390400
+block[4]=000000036f78eac0 layer_count=1
+  layer[0]=00000003d052c490 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_ds_shifted_32_fp8 state=00000003e5491a60 state_qwords=0x00000003c3681600
+block[5]=000000036f790fe0 layer_count=1
+  layer[0]=00000003d052b810 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_inpview_64_fp8 state=00000003e5491d60 state_qwords=0x00000003c46fce00
+block[6]=000000036f790e80 layer_count=1
+  layer[0]=00000003d052c940 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_shifted_64_fp8 state=00000003e5490f80 state_qwords=0x00000003c4bc7400
+block[7]=000000036f78de60 layer_count=1
+  layer[0]=00000003d052d5c0 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_shifted_64_fp8 state=00000003e5490980 state_qwords=0x00000003c4c8a600
+block[8]=000000036f790220 layer_count=1
+  layer[0]=00000003d052e6f0 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_ds_shifted_64_fp8 state=00000003e54910a0 state_qwords=0x00000003c4c9f000
+block[9]=000000036f78dfc0 layer_count=1
+  layer[0]=00000003d052e240 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_inpview_128_fp8 state=00000003e5491400 state_qwords=0x00000003c4cb0200
+block[10]=000000036f78e3e0 layer_count=1
+  layer[0]=00000003d052b1d0 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e5491c40 state_qwords=0x00000003bc00a800
+block[11]=000000036f78e120 layer_count=1
+  layer[0]=00000003d052c300 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e5490ec0 state_qwords=0x00000003bc03ac00
+block[12]=000000036f78f5c0 layer_count=1
+  layer[0]=00000003d052cad0 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e5491460 state_qwords=0x00000003bc06b000
+block[13]=000000036f78e280 layer_count=1
+  layer[0]=00000003d052e3d0 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_128_fp8 state=00000003e5491820 state_qwords=0x00000003bc09b400
+block[14]=000000036f7900c0 layer_count=1
+  layer[0]=00000003d052d430 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_ds_shifted_128_fp8 state=00000003e5490f20 state_qwords=0x00000003bc0cb800
+block[15]=000000036f78e540 layer_count=1
+  layer[0]=00000003d052bfe0 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_inpview_256_fp8 state=00000003e5491b80 state_qwords=0x00000003bc103c00
+block[16]=000000036f78ec20 layer_count=1
+  layer[0]=00000003d052dc00 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5492000 state_qwords=0x00000003bc1ac200
+block[17]=000000036f78f1a0 layer_count=1
+  layer[0]=00000003d052cc60 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5490d40 state_qwords=0x00000003bc254800
+block[18]=000000036f7904e0 layer_count=1
+  layer[0]=00000003d052dd90 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e54918e0 state_qwords=0x00000003bc2fce00
+block[19]=000000036f790640 layer_count=1
+  layer[0]=00000003d052cf80 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_256_fp8 state=00000003e5490b00 state_qwords=0x00000003bc3a5400
+block[20]=000000036f78f300 layer_count=1
+  layer[0]=00000003d052cdf0 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5491160 state_qwords=0x00000003bc452c00
+block[21]=000000036f791140 layer_count=1
+  layer[0]=00000003d052e560 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e54911c0 state_qwords=0x00000003bc4fb200
+block[22]=000000036f78f880 layer_count=1
+  layer[0]=00000003d052d110 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_ds_shifted_256_fp8 state=00000003e5490e00 state_qwords=0x00000003bc5a3800
+block[23]=000000036f78ed80 layer_count=4
+  layer[0]=00000003d052df20 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_inpview_512_fp8 state=00000003d04f5830 state_qwords=0x00000003bc66be00
+  layer[1]=00000003d052ea10 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_inpview_512_fp8 state=00000003d04f64b0 state_qwords=0x00000003bc6ebe00
+  layer[2]=00000003d052eba0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_512_fp8 state=00000003d04f5510 state_qwords=0x00000003bc72c200
+  layer[3]=00000003d052ed30 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f58d0 state_qwords=0x00000003bc80c400
+block[24]=000000036f78eee0 layer_count=4
+  layer[0]=00000003d052d2a0 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f59c0 state_qwords=0x00000003bc84c800
+  layer[1]=00000003d052bb30 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6000 state_qwords=0x00000003bc8cc800
+  layer[2]=00000003d052c620 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f5c40 state_qwords=0x00000003bc90cc00
+  layer[3]=00000003d052eec0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f5a10 state_qwords=0x00000003bc9ece00
+block[25]=000000036f78d0a0 layer_count=4
+  layer[0]=00000003d052c170 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f5970 state_qwords=0x00000003bca2d200
+  layer[1]=00000003d052b360 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f5b50 state_qwords=0x00000003bcaad200
+  layer[2]=00000003d052c7b0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f6230 state_qwords=0x00000003bcaed600
+  layer[3]=00000003d052b4f0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f5e70 state_qwords=0x00000003bcbcd800
+block[26]=000000036f78e6a0 layer_count=4
+  layer[0]=00000003d052b680 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f5650 state_qwords=0x00000003bcc0dc00
+  layer[1]=00000003d052b9a0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6500 state_qwords=0x00000003bcc8dc00
+  layer[2]=00000003d0690080 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f6460 state_qwords=0x00000003bccce000
+  layer[3]=00000003d068f720 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f5790 state_qwords=0x00000003bcdae200
+block[27]=000000036f78dd00 layer_count=4
+  layer[0]=00000003d0690210 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f5240 state_qwords=0x00000003bcdee600
+  layer[1]=00000003d06903a0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6050 state_qwords=0x00000003bce6e600
+  layer[2]=00000003d068fd60 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_512_fp8 state=00000003d04f6280 state_qwords=0x00000003bceaea00
+  layer[3]=00000003d068f590 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f60a0 state_qwords=0x00000003bcf8ec00
+block[28]=000000036f7912a0 layer_count=4
+  layer[0]=00000003d068f8b0 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f5fb0 state_qwords=0x00000003bcfcf000
+  layer[1]=00000003d068fa40 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f5880 state_qwords=0x00000003bd04f000
+  layer[2]=00000003d068fbd0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f5420 state_qwords=0x00000003bd08f400
+  layer[3]=00000003d068fef0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f5920 state_qwords=0x00000003bd16f600
+block[29]=000000036f78d200 layer_count=4
+  layer[0]=00000003cffb6ff0 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f56f0 state_qwords=0x00000003bd1afa00
+  layer[1]=00000003cffb7950 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6190 state_qwords=0x00000003bd22fa00
+  layer[2]=00000003cffb6e60 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f63c0 state_qwords=0x00000003bd26fe00
+  layer[3]=00000003cffb7310 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f5a60 state_qwords=0x00000003bd350000
+block[30]=000000036f78e800 layer_count=5
+  layer[0]=00000003cffb7180 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f5330 state_qwords=0x00000003bd395600
+  layer[1]=00000003cffb74a0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f5ab0 state_qwords=0x00000003bd415600
+  layer[2]=00000003cffb7630 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f62d0 state_qwords=0x00000003bd455a00
+  layer[3]=00000003cffb77c0 vtable=00007ffbad5ca348 name=cc_split_swin_16h_proj_pool_512_fp8 state=00000003d04f5560 state_qwords=0x00000003bd535c00
+  layer[4]=00000003cffb6b40 vtable=00007ffbad5ca3a0 name=cc_split_swin_16h_final_head_512_fp8 state=00000003d04f6370 state_qwords=0x00000003bd576000
+block[31]=000000036f790a60 layer_count=5
+  layer[0]=00000003cffb6cd0 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_repack_input_fp8 state=00000003d04f53d0 state_qwords=0x00000003bd5f6200
+  layer[1]=00000003d073fde0 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f5600 state_qwords=0x00000003bd9f6400
+  layer[2]=00000003d073f610 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f5ec0 state_qwords=0x00000003bddf6c00
+  layer[3]=00000003d073efd0 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f5470 state_qwords=0x00000003be0f6e00
+  layer[4]=00000003d073f7a0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f5b00 state_qwords=0x00000003be0f7000
+block[32]=000000036f78f040 layer_count=5
+  layer[0]=00000003d073f2f0 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f51a0 state_qwords=0x00000003be1f7800
+  layer[1]=00000003d073f930 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f6410 state_qwords=0x00000003be5f7a00
+  layer[2]=00000003d073f480 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f60f0 state_qwords=0x00000003be9f8200
+  layer[3]=00000003d073fc50 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f6140 state_qwords=0x00000003becf8400
+  layer[4]=00000003d073fac0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f56a0 state_qwords=0x00000003becf8600
+block[33]=000000036f78fe00 layer_count=5
+  layer[0]=00000003d073f160 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f5ba0 state_qwords=0x00000003bedf8e00
+  layer[1]=00000003cfe96470 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f5bf0 state_qwords=0x00000003bf1f9000
+  layer[2]=00000003cfe96790 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f5c90 state_qwords=0x00000003bf5f9800
+  layer[3]=00000003cfe96dd0 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f5740 state_qwords=0x00000003bf8f9a00
+  layer[4]=00000003cfe96600 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f54c0 state_qwords=0x00000003bf8f9c00
+block[34]=000000036f78f460 layer_count=5
+  layer[0]=00000003cfe96ab0 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f5d80 state_qwords=0x00000003bf9fa400
+  layer[1]=00000003cfe96c40 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f5ce0 state_qwords=0x00000003bfdfa600
+  layer[2]=00000003cfe96f60 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f61e0 state_qwords=0x00000003c01fae00
+  layer[3]=00000003cfe970f0 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f5d30 state_qwords=0x00000003c04fb000
+  layer[4]=00000003cfe97280 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f5dd0 state_qwords=0x00000003c04fb200
+block[35]=000000036f78ff60 layer_count=5
+  layer[0]=00000003cfe96920 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f5290 state_qwords=0x00000003c05fba00
+  layer[1]=00000003cfe95f50 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f55b0 state_qwords=0x00000003c09fbc00
+  layer[2]=00000003cfe960e0 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f5e20 state_qwords=0x00000003c0dfc400
+  layer[3]=00000003cfe96270 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f52e0 state_qwords=0x00000003c10fc600
+  layer[4]=00000003cfe95dc0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f51f0 state_qwords=0x00000003c10fc800
+block[36]=000000036f78f720 layer_count=5
+  layer[0]=00000003cfe95c30 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f5f10 state_qwords=0x00000003c11fd000
+  layer[1]=00000003cfe95460 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f57e0 state_qwords=0x00000003c15fd200
+  layer[2]=00000003cfe955f0 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f5f60 state_qwords=0x00000003c19fda00
+  layer[3]=00000003cfe95780 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f6320 state_qwords=0x00000003c1cfdc00
+  layer[4]=00000003cfe95aa0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f7450 state_qwords=0x00000003c1cfde00
+block[37]=000000036f78f9e0 layer_count=5
+  layer[0]=00000003cfe95910 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f6aa0 state_qwords=0x00000003c1dfe600
+  layer[1]=00000003d02790b0 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f6640 state_qwords=0x00000003c21fe800
+  layer[2]=00000003d0279240 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f7810 state_qwords=0x00000003c25ff000
+  layer[3]=00000003d0279880 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f6d20 state_qwords=0x00000003c28ff200
+  layer[4]=00000003d02793d0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_fp8 state=00000003d04f78b0 state_qwords=0x00000003c28ff400
+block[38]=000000036f7907a0 layer_count=5
+  layer[0]=00000003d0279d30 vtable=00007ffbad5cb998 name=cc_vit_1d_ffn_expand_fp8 state=00000003d04f6c80 state_qwords=0x00000003c29ffc00
+  layer[1]=00000003d0279ec0 vtable=00007ffbad5cb9f0 name=cc_vit_1d_ffn_contract_fp8 state=00000003d04f7720 state_qwords=0x00000003c2dffe00
+  layer[2]=00000003d0279560 vtable=00007ffbad5cba48 name=cc_vit_1d_qkv_fp8 state=00000003d04f6d70 state_qwords=0x00000003c3200600
+  layer[3]=00000003d02796f0 vtable=00007ffbad5cbaa0 name=cc_vit_1d_attention_fp8 state=00000003d04f7540 state_qwords=0x00000003c3500800
+  layer[4]=00000003d0279ba0 vtable=00007ffbad5cbaf8 name=cc_vit_1d_projection_repack_output_fp8 state=00000003d04f6af0 state_qwords=0x00000003c3500a00
+block[39]=000000036f78fb40 layer_count=1
+  layer[0]=00000003d0154720 vtable=00007ffbad5cc2a8 name=cc_dec_input_upsample_1024x512_fp8 state=0000020000000400 state_qwords=0x0000000000000000
+block[40]=000000036f790900 layer_count=4
+  layer[0]=00000003d0279a10 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f6690 state_qwords=0x00000003c3687000
+  layer[1]=00000003d04597a0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6b90 state_qwords=0x00000003c3707000
+  layer[2]=00000003d045a5b0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_512_fp8 state=00000003d04f6cd0 state_qwords=0x00000003c3747400
+  layer[3]=00000003d0459c50 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f70e0 state_qwords=0x00000003c3827600
+block[41]=000000036f78d4c0 layer_count=4
+  layer[0]=00000003d0459930 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f6e60 state_qwords=0x00000003c3867a00
+  layer[1]=00000003d045a290 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f74f0 state_qwords=0x00000003c38e7a00
+  layer[2]=00000003d0459ac0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f7130 state_qwords=0x00000003c3927e00
+  layer[3]=00000003d0459f70 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f6780 state_qwords=0x00000003c3a08000
+block[42]=000000036f790bc0 layer_count=4
+  layer[0]=00000003d0459de0 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f7590 state_qwords=0x00000003c3a48400
+  layer[1]=00000003d045a100 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f67d0 state_qwords=0x00000003c3ac8400
+  layer[2]=00000003d045a420 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f6820 state_qwords=0x00000003c3b08800
+  layer[3]=00000003d073d2d0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f6dc0 state_qwords=0x00000003c3be8a00
+block[43]=000000036f791400 layer_count=4
+  layer[0]=00000003d073d780 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f7360 state_qwords=0x00000003c3c28e00
+  layer[1]=00000003d073daa0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f6910 state_qwords=0x00000003c3ca8e00
+  layer[2]=00000003d073d5f0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f68c0 state_qwords=0x00000003c3ce9200
+  layer[3]=00000003d073d910 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f74a0 state_qwords=0x00000003c3dc9400
+block[44]=000000036f78d780 layer_count=4
+  layer[0]=00000003d073dc30 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f65f0 state_qwords=0x00000003c3e09800
+  layer[1]=00000003d073d140 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f76d0 state_qwords=0x00000003c3e89800
+  layer[2]=00000003d073cfb0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_512_fp8 state=00000003d04f65a0 state_qwords=0x00000003c3ec9c00
+  layer[3]=00000003d073ddc0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f75e0 state_qwords=0x00000003c3fa9e00
+block[45]=000000036f78d8e0 layer_count=4
+  layer[0]=00000003d073d460 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f6960 state_qwords=0x00000003c3fea200
+  layer[1]=00000003d026db30 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f7400 state_qwords=0x00000003c406a200
+  layer[2]=00000003d026d4f0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f7180 state_qwords=0x00000003c40aa600
+  layer[3]=00000003d026d360 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f7680 state_qwords=0x00000003c418a800
+block[46]=000000036f78d360 layer_count=4
+  layer[0]=00000003d026d680 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f6b40 state_qwords=0x00000003c41cac00
+  layer[1]=00000003d026dcc0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f7630 state_qwords=0x00000003c424ac00
+  layer[2]=00000003d026d040 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f7860 state_qwords=0x00000003c428b000
+  layer[3]=00000003d026d810 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_512_fp8 state=00000003d04f7770 state_qwords=0x00000003c436b200
+block[47]=000000036f791560 layer_count=4
+  layer[0]=00000003d026de50 vtable=00007ffbad5ca1e8 name=cc_split_swin_16h_ffwd_512_fp8 state=00000003d04f6870 state_qwords=0x00000003c43ab600
+  layer[1]=00000003d026d1d0 vtable=00007ffbad5ca240 name=cc_split_swin_16h_ffwd_proj_512_fp8 state=00000003d04f77c0 state_qwords=0x00000003c442b600
+  layer[2]=00000003d026d9a0 vtable=00007ffbad5ca298 name=cc_split_swin_16h_qkv_shifted_512_fp8 state=00000003d04f6e10 state_qwords=0x00000003c446ba00
+  layer[3]=00000003d02779f0 vtable=00007ffbad5ca2f0 name=cc_split_swin_16h_proj_outview_512_fp8 state=00000003d04f7900 state_qwords=0x00000003c454bc00
+block[48]=000000036f7916c0 layer_count=1
+  layer[0]=00000003d0277860 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_upsample_256_fp8 state=00000003e5491ca0 state_qwords=0x00000003c458c000
+block[49]=000000036f78d620 layer_count=1
+  layer[0]=00000003d0277d10 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5491e80 state_qwords=0x00000003c4654800
+block[50]=000000036f791820 layer_count=1
+  layer[0]=00000003d0277b80 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5491280 state_qwords=0x00000003c470c000
+block[51]=000000036f791980 layer_count=1
+  layer[0]=00000003d0277ea0 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5490da0 state_qwords=0x00000003c47b4600
+block[52]=000000036f791ae0 layer_count=1
+  layer[0]=00000003d0277090 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_256_fp8 state=00000003e5491580 state_qwords=0x00000003c485cc00
+block[53]=000000036f78da40 layer_count=1
+  layer[0]=00000003d0277220 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e5490bc0 state_qwords=0x00000003c4905200
+block[54]=000000036f791c40 layer_count=1
+  layer[0]=00000003d02773b0 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_shifted_256_fp8 state=00000003e54912e0 state_qwords=0x00000003c49ad800
+block[55]=000000036f78dba0 layer_count=1
+  layer[0]=00000003d0277540 vtable=00007ffbad5c99a8 name=cc_tinlayout_fused_swin_8h_outview_shifted_256_fp8 state=00000003e54915e0 state_qwords=0x00000003c4a55e00
+block[56]=000000036f791da0 layer_count=1
+  layer[0]=00000003d02776d0 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_upsample_shifted_128_fp8 state=00000003e5491640 state_qwords=0x00000003c4afe400
+block[57]=000000036f791f00 layer_count=1
+  layer[0]=00000003d0283410 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e54916a0 state_qwords=0x00000003c4b36800
+block[58]=000000036f792060 layer_count=1
+  layer[0]=00000003d0283280 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_128_fp8 state=00000003e5491760 state_qwords=0x00000003c4b66c00
+block[59]=000000036f7921c0 layer_count=1
+  layer[0]=00000003d0283a50 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e5491dc0 state_qwords=0x00000003c4b97000
+block[60]=000000036f792320 layer_count=1
+  layer[0]=00000003d0283be0 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_shifted_128_fp8 state=00000003e5491880 state_qwords=0x00000003c4bd6600
+block[61]=000000036f792480 layer_count=1
+  layer[0]=00000003d0283730 vtable=00007ffbad5c9168 name=cc_tinlayout_fused_swin_4h_outview_shifted_128_fp8 state=00000003e5491d00 state_qwords=0x00000003c4c06a00
+block[62]=000000036f7925e0 layer_count=1
+  layer[0]=00000003d0283d70 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_upsample_64_fp8 state=00000003e5491ee0 state_qwords=0x00000003c4c36e00
+block[63]=000000036f792740 layer_count=1
+  layer[0]=00000003d02830f0 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_shifted_64_fp8 state=00000003e5491940 state_qwords=0x00000003c4c48000
+block[64]=000000036f793be0 layer_count=1
+  layer[0]=00000003d02835a0 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_shifted_64_fp8 state=00000003e5490e60 state_qwords=0x00000003c4c57200
+block[65]=000000036f794160 layer_count=1
+  layer[0]=00000003d0283f00 vtable=00007ffbad5c8950 name=cc_tinlayout_fused_swin_2h_outview_shifted_64_fp8 state=00000003e54919a0 state_qwords=0x00000003c4c66400
+block[66]=000000036f7946e0 layer_count=1
+  layer[0]=00000003d02838c0 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_upsample_32_fp8 state=00000003e5491a00 state_qwords=0x00000003c4c75600
+block[67]=000000036f794840 layer_count=1
+  layer[0]=00000003d02984a0 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_shifted_32_fp8 state=00000003e5491ac0 state_qwords=0x00000003c4c7b000
+block[68]=000000036f793ea0 layer_count=1
+  layer[0]=00000003d0298180 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_shifted_32_fp8 state=00000003e5491b20 state_qwords=0x00000003c4c80200
+block[69]=000000036f794b00 layer_count=1
+  layer[0]=00000003d0298630 vtable=00007ffbad5c8108 name=cc_tinlayout_fused_swin_1h_outview_shifted_32_fp8 state=00000003e5491f40 state_qwords=0x00000003c4c85400
+block[70]=000000036f7928a0 layer_count=1
+  layer[0]=00000003d0154f40 vtable=00007ffbad5cc530 name=cc_tinlayout_fused_post_block_swin_1h_32_rgb_fp8 state=00000003d0313f90 state_qwords=0x00000003c4c99a00
