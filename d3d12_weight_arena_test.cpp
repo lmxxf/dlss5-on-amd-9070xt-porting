@@ -266,9 +266,9 @@ float uniform01(uint value) {
 [numthreads(8, 8, 1)]
 void preview(uint3 id : SV_DispatchThreadID) {
     if (id.x >= 256 || id.y >= 144) return;
-    uint rgb = 0;
-    [unroll]
-    for (uint output_channel = 0; output_channel < 3; ++output_channel) {
+    float features[32];
+    [loop]
+    for (uint feature_channel = 0; feature_channel < 32; ++feature_channel) {
         float value = 0.0;
         [unroll]
         for (int kernel_y = -1; kernel_y <= 1; ++kernel_y) {
@@ -297,12 +297,40 @@ void preview(uint3 id : SV_DispatchThreadID) {
                 [unroll]
                 for (uint input_channel = 0; input_channel < 7; ++input_channel) {
                     adapter += input[input_channel] *
-                        load_half(output_channel * 7 + input_channel);
+                        load_half(feature_channel * 7 + input_channel);
                 }
                 uint kernel_index = (kernel_y + 1) * 3 + kernel_x + 1;
-                value += adapter * load_half(224 + output_channel * 9 + kernel_index);
+                value += adapter * load_half(224 + feature_channel * 9 + kernel_index);
             }
         }
+        features[feature_channel] = value;
+    }
+
+    float hidden[64];
+    [loop]
+    for (uint hidden_channel = 0; hidden_channel < 64; ++hidden_channel) {
+        float value = 0.0;
+        [loop]
+        for (uint feature_channel = 0; feature_channel < 32; ++feature_channel) {
+            value += features[feature_channel] *
+                load_half(512 + hidden_channel * 32 + feature_channel);
+        }
+        value = clamp(value, -4.0, 4.0);
+        float gate = 0.447265625 - 0.055908203125 * abs(value);
+        gate = 0.89453125 + value * gate;
+        hidden[hidden_channel] = value * gate;
+    }
+
+    uint rgb = 0;
+    [unroll]
+    for (uint output_channel = 0; output_channel < 3; ++output_channel) {
+        float value = 0.0;
+        [loop]
+        for (uint hidden_channel = 0; hidden_channel < 64; ++hidden_channel) {
+            value += hidden[hidden_channel] *
+                load_half(2560 + output_channel * 64 + hidden_channel);
+        }
+        value += features[output_channel] * load_half(4608 + output_channel);
         uint byte_value = (uint)round(saturate(0.5 + value * 40.0) * 255.0);
         rgb |= byte_value << (output_channel * 8);
     }

@@ -491,6 +491,32 @@ y = x * g
 
 因此 FFN 激活不再需要假设常见 GELU；下一步按这条 FP16 多项式实现 `weight1 → activation → weight2`，再从 SASS 恢复 `ffn_cos_skip` 的精确 residual mix。
 
+### FFN branch 与 residual mix 在 AMD 跑通
+
+9070 XT 已执行完整 32-channel depthwise feature → `[64,32] weight1` → 上述 SASS 多项式 → `[32,64] weight2`。单独 branch 的可视化落在 0.5 附近（映射后约 0.498–0.502），说明它是小幅 residual 修正而非独立图像。
+
+为恢复 skip，转而分析较易分离的 `cc_split_swin_16h_ffwd_proj_512_fp8`。其 layer1 payload 为 263,168 FP16 elements／526,336 bytes，精确分成：
+
+```text
+weight3       512×256 = 131072 FP16 = 0x40000 bytes
+ffn_cos_skip  512     =    512 FP16 = 0x00400 bytes
+```
+
+SASS 从 weight pointer `+0x40000` 读取每通道 skip 系数，把 `input * ffn_cos_skip` 预装入 QMMA accumulator，再累加 FFN projection。因此确定公式：
+
+```text
+output = W2 * activation(W1 * input) + input * ffn_cos_skip
+```
+
+将该公式回填 block0 后，RX 9070 XT 生成 `stellar-block0-ffn-residual.png`。固定线性显示范围内为低对比灰色浮雕，输入人物／装备轮廓仍可辨认。原始 PPM：
+
+```text
+SHA256=3babef75fc33ee4c6bd9bfac927da4849cd559d5133f064b7a143fafe6fbd683
+min=0.462745 max=0.529412 mean=0.499949 stddev=0.00237699
+```
+
+block0 下一段为 8×8 cosine attention。它需要让 64 个像素共享 Q/K/V，不能继续在单一像素 shader 中重复整个前端；下一步把当前宿主重构为多 pass FP32 feature buffers：pre+FFN pass 写 `[H,W,32]`，attention pass 按 8×8 window 读取，再做 projection／`attn_cos_skip`。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

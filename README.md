@@ -11,6 +11,7 @@
 - `block0-input-adapter-preview.png`：RX 9070 XT 用真实 `7×32 input_adapter_weight` 执行 HLSL 投影后生成的首张 learned-feature 诊断图。
 - `block0-depthwise-preview.png`：在 input adapter 后继续执行真实 `[32,3,3]` depthwise convolution 的 AMD 输出；颜色变化较弱但非恒定图。
 - `stellar-block0-rgb-only.png`：以《剑星》Steam hero RGB 为输入、Gaussian 四通道置零时，RX 9070 XT 经过 input adapter + depthwise 后的首张可辨认模型中间图。
+- `stellar-block0-ffn-residual.png`：继续执行 SASS 恢复的 FFN 多项式和 `input*ffn_cos_skip + branch` 后的 AMD block0 中间图。
 - `build_network_graph.py`：把 CPU descriptor builder 恢复出的 71-block 顺序与 `weights-index.json` 合并，生成可复现的结构索引。
 - `network-graph.json`：已恢复的 block 类型、layer 家族、宽度、角色、权重记录与 block-to-block 边；block0 的外部纹理绑定尚未恢复，保持 `null`。
 - `weight-names.json`：通过 Windows 直接调用 DLL 内部 descriptor builder 导出的 653 个内部权重名字；从 `input_adapter_weight` 到 `out_conv_weight`／`blend_scale`。
