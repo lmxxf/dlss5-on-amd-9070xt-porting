@@ -205,6 +205,153 @@ descriptor edge vector 已恢复六条双输入边：
 
 当前问题：SASS 的 `desc[...]` 逻辑 offset 不能直接视作 payload 线性字节 offset。下一步解析 Blackwell descriptor/tinlayout addressing，或从最小 1H kernel 的局部数据流反推出八段权重布局。
 
+## 2026-08-31：RTX 5090 原版运行环境
+
+### 设备
+
+- 主机名：`NucBox_EVO-T1`；
+- Spark SSH 别名：`rtx5090`（`seth@192.168.31.50`）；
+- Windows build：26300；
+- GPU：RTX 5090 32 GB，驱动 610.88；
+- 接法：OCuLink 外置；空闲时 PCIe Gen2 ×4，host/system 上限 Gen4，实际链路宽度 ×4；
+- 核显：Intel Arc 140T；
+- 实验目录：`D:\DLSSNR-Lab`。
+
+### 《剑星》现有 NVIDIA 接入
+
+- Steam AppID：3489700；
+- 主程序：`D:\SteamLibrary\steamapps\common\StellarBlade\SB\Binaries\Win64\SB-Win64-Shipping.exe`；
+- DLSS／DLSSD／DLSSG：310.1；
+- Streamline：2.7.3，带 Production 与 Development 两套插件；
+- 原目录无 ReShade、OptiScaler 或其他 addon。
+
+### 最小 DLSSNR 部署
+
+新增 `setup_stellarblade_dlssnr.ps1`，提供 `Status / Install / Restore`：
+
+- 安装前写 `D:\DLSSNR-Lab\backup-stellarblade\manifest.json`；
+- 使用 ReShade 6.8 full add-on support，UE 目录安装为 `d3d12.dll`；
+- 只在主程序目录新增 `renodx-dlss5.addon64`、`nvngx_dlssnr.dll`、`ReShade.ini`；
+- 暂未替换游戏插件目录里的 310.1 DLSS／Streamline；
+- RenoDX addon SHA-256：`e1c28fde0922b12fc10734e58c3d24a36808e575247f4fd4f36226540d7ee023`；
+- DLSSNR runtime SHA-256：`e16bcf15e16e13f527491cdf7845b2fe6521a738d8f7c9c721866a8496e1fc8e`。
+
+首次远程启动曾停在 Steam `ShowEula`；Zero 已在桌面接受，后续可正常启动。
+
+### Smart App Control / WDAC
+
+首次加载 RenoDX addon 失败：
+
+```text
+ReShade: Failed to load add-on ... error code 4551
+CodeIntegrity event 3077
+Policy ID: 0283ac0f-fff1-49ae-ada1-8a933130cad6
+```
+
+诊断结论：
+
+- 文件无 `Zone.Identifier`，不是 Mark-of-the-Web；
+- `VerifiedAndReputablePolicyState=1`，Smart App Control 处于 Enforce；
+- 尝试把注册表切 Evaluation 会被 SAC 服务立即回滚；
+- 曾生成两张仅允许 RenoDX SHA-256 的 supplemental WDAC policy；一张带 Audit、一张删除 Audit，均为 `IsAuthorized=false`，说明 SAC 签名 base 不接受本地 unsigned supplemental；
+- 两张测试 policy 均已用 `CiTool -rp` 删除，没有残留；
+- Zero 最终通过 Windows Security UI 正式关闭 Smart App Control；复核注册表为 `0=Off`，SAC base／flight supplemental 均 `IsEnforced=false`。
+
+关闭后 RenoDX addon 正常注册，未关闭 Defender、未添加杀毒排除项。
+
+### RTX 5090 原版 DLSSNR 已跑通
+
+2026-08-31 23:24 首次成功：
+
+```text
+Registered add-on "DLSS 5 Neural Rendering" API 18
+signed runtime sha256 E16BCF15...E1FC8E (reference match)
+signed DLSSNR 310.8.0 D3D12 runtime initialized
+feature=18 (DLSSNR/reserved-18)
+3840×2160 native → 3840×2160 native
+feature 18 evaluation succeeded count=1
+feature 18 evaluation succeeded count=60
+```
+
+运行时状态：
+
+- GPU 约 97–98%；
+- 显存约 7.2 GiB；
+- 功耗约 527–535 W；
+- OCuLink 自动升至 PCIe Gen4 ×4；
+- 高负载混有首次 shader compilation，不能当稳定 DLSSNR 性能数字；
+- addon 未找到可选 `NVSDK_NGX_D3D12_EvaluateFeature_C` 导出，但普通 D3D12 Create／Evaluate／Release 已成功 hook，不影响 feature18。
+
+这台 5090 已成为原版标准答案机；RX 9070 XT 仍是最终移植靶机。
+
+### PIX 尝试与结论
+
+通过 winget 安装 Microsoft PIX 2603.25。
+
+尝试过：
+
+1. SSH Session 0 直接 `pixtool launch`：无桌面／Present，失败；
+2. Interactive Task Scheduler 启动 pixtool：被 foreground privilege 检查拒绝；
+3. Explorer ShellExecute broker：仍被 foreground privilege 检查拒绝；
+4. 正常启动后 `pixtool attach`：进程未预载 `WinPixGpuCapturer.dll`，PIX 明确拒绝 GPU capture；
+5. 自制 `pix-preload.addon64` 在 ReShade／D3D12 之前加载 capturer：独立 LoadLibrary 测试成功，但与《剑星》／ReShade 启动链不稳定，触发 crash handler。
+
+`pix-preload.addon64` 已删除，`ReShade.ini` 已恢复，游戏随后再次验证 feature18 count1/count60 正常。PIX preload 路线停止；若以后需要 PIX，只走 Zero 在前台 PIX UI 手动 Launch outer `SB.exe` 的方式。
+
+### 自制 DLSSNR runtime probe
+
+新增 `dlssnr_runtime_probe.cpp`，使用 MinHook commit：
+
+```text
+d94c64d32ea37bc4f5ee47d580709f70c6fb6080
+```
+
+probe 行为：
+
+- 正式注册 ReShade API 18；
+- pin 自身 module，防止 ReShade 多 device 阶段卸载 worker；
+- 等待 `nvngx_dlssnr.dll`；
+- hook `CG2RNetworkManager::BuildActiveNetwork`：`module_base + 0x1f570`；
+- 原函数成功返回后读取 `manager + 0x48` 的 `CCNetwork*`；
+- 导出 live Block／Layer／state 到 `D:\DLSSNR-Lab\logs\runtime-network.txt`。
+
+当前 pinned probe SHA-256：
+
+```text
+c2a9c22944c4b4ef0077076ad506e6e050aaa9786a56363f0413352bafa62da9
+```
+
+第一次有效 hook 已取得：
+
+```text
+result=0x1
+network=<valid pointer>
+block_count=71
+```
+
+dump 从 block0 连续走到 block36 layer4，约 28,672 字节；每个 layer 已得到：
+
+- live layer 地址；
+- vtable；
+- 实际 FP8 kernel 名；
+- state 地址；
+- state 第一个 qword（flat weight GPU VA）。
+
+进程在 block36 layer4 dump 中途退出。根因不是 hook 地址／签名：是 probe 把所有异构 Layer state 统一读取 0x50 字节，某些 state 对象较小，越界读取触发访问异常。
+
+### 自动压缩后的精确续点
+
+下一步第一件事：
+
+1. 把 `dlssnr_runtime_probe.cpp` 中 `dump_qwords(file, state, 0x50)` 改成只读 `0x08`；
+2. 重新编译、更新 `deploy_runtime_probe.ps1` 的 SHA；
+3. 部署后重启 Steam／《剑星》；
+4. 目标：安全走到 `block[70]`，得到全部 153 个 live layer 的 flat weight GPU VA；
+5. dump 完整后立即移除 probe，恢复已知稳定的 RenoDX + DLSSNR 游戏状态；
+6. 后续按具体 Layer class 逐个扩展 state 字段，禁止再统一扫未知对象长度。
+
+当前 5090 游戏进程已因第一次 probe 越界退出；probe仍部署在游戏目录，下一轮启动前必须先编译并覆盖修正版，不能直接重启游戏。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
