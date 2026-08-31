@@ -6,7 +6,7 @@
 - `parse_weights_archive.py`：顺序解析 `WEIGHTS_HT` 的 153 条顶层记录，不依赖字符串搜索；验证 FP16 payload、元素数与资源边界闭合，可导出 `weights-index.json`。
 - `weights-index.json`：当前泄露样本的顶层权重索引；记录名字、跨度、payload 偏移／大小、类型码和元素数，不包含权重 payload 本身。
 - `weights-arena-index.json`：按 NVIDIA live GPU VA 验证过的 512-byte 对齐规则生成的 AMD arena 索引；153 条 record 的相对显存偏移，总大小 147,719,680 字节。
-- `d3d12_weight_arena_test.cpp`：最小 Windows D3D12 权重宿主；强制选择 AMD adapter，上传完整 FP16 arena 到 default heap，再读回逐字节校验。
+- `d3d12_weight_arena_test.cpp`：最小 Windows D3D12 权重宿主；强制选择 AMD adapter，上传完整 FP16 arena 到 default heap、读回逐字节校验，并由 HLSL compute shader 按 153 个 record offset 实际读取权重。
 - `build_network_graph.py`：把 CPU descriptor builder 恢复出的 71-block 顺序与 `weights-index.json` 合并，生成可复现的结构索引。
 - `network-graph.json`：已恢复的 block 类型、layer 家族、宽度、角色、权重记录与 block-to-block 边；block0 的外部纹理绑定尚未恢复，保持 `null`。
 - `weight-names.json`：通过 Windows 直接调用 DLL 内部 descriptor builder 导出的 653 个内部权重名字；从 `input_adapter_weight` 到 `out_conv_weight`／`blend_scale`。

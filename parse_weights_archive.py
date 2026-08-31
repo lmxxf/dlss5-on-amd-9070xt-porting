@@ -144,6 +144,9 @@ def main() -> None:
     parser.add_argument(
         "--arena-json", type=Path, help="write record offsets in the aligned arena"
     )
+    parser.add_argument(
+        "--arena-offsets", type=Path, help="write record arena offsets as little-endian u32"
+    )
     args = parser.parse_args()
 
     helpers = load_pe_helpers()
@@ -180,7 +183,7 @@ def main() -> None:
         args.json.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
         print(f"wrote: {args.json}")
 
-    if args.arena or args.arena_json:
+    if args.arena or args.arena_json or args.arena_offsets:
         arena, arena_records = build_aligned_arena(archive, records)
         if args.arena:
             args.arena.write_bytes(arena)
@@ -197,6 +200,14 @@ def main() -> None:
                 json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
             )
             print(f"wrote: {args.arena_json}")
+        if args.arena_offsets:
+            args.arena_offsets.write_bytes(
+                b"".join(
+                    struct.pack("<I", int(record["arena_offset"]))
+                    for record in arena_records
+                )
+            )
+            print(f"wrote: {args.arena_offsets}")
 
 
 if __name__ == "__main__":

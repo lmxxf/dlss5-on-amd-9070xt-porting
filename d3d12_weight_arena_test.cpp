@@ -2,6 +2,7 @@
 #include <windows.h>
 
 #include <d3d12.h>
+#include <d3dcompiler.h>
 #include <dxgi1_6.h>
 
 #include <cstdint>
@@ -74,12 +75,16 @@ D3D12_RESOURCE_DESC buffer_desc(uint64_t size) {
 } // namespace
 
 int wmain(int argc, wchar_t **argv) {
-    if (argc != 2) {
-        std::fwprintf(stderr, L"usage: %ls <weights-fp16.arena>\n", argv[0]);
+    if (argc != 2 && argc != 3) {
+        std::fwprintf(
+            stderr, L"usage: %ls <weights-fp16.arena> [record-offsets.u32]\n", argv[0]);
         return 2;
     }
 
     const std::vector<uint8_t> source = read_file(argv[1]);
+    const std::vector<uint8_t> offset_bytes = argc == 3
+        ? read_file(argv[2])
+        : std::vector<uint8_t>{};
     if (source.empty() || source.size() % 512 != 0) {
         std::fprintf(stderr, "arena must be non-empty and 512-byte aligned\n");
         return 2;
@@ -198,6 +203,198 @@ int wmain(int argc, wchar_t **argv) {
         static_cast<unsigned long long>(returned_hash),
         equal ? "yes" : "no");
 
+    bool compute_equal = true;
+    if (!offset_bytes.empty()) {
+        if (offset_bytes.size() != 153 * sizeof(uint32_t)) {
+            std::fprintf(stderr, "offset table must contain exactly 153 u32 values\n");
+            return 2;
+        }
+
+        static const char shader_source[] = R"(
+ByteAddressBuffer weights : register(t0);
+StructuredBuffer<uint> offsets : register(t1);
+RWStructuredBuffer<uint> results : register(u0);
+[numthreads(64, 1, 1)]
+void main(uint3 id : SV_DispatchThreadID) {
+    if (id.x < 153) {
+        results[id.x] = weights.Load(offsets[id.x]);
+    }
+}
+)";
+        ID3DBlob *shader = nullptr;
+        ID3DBlob *errors = nullptr;
+        HRESULT compile_result = D3DCompile(
+            shader_source, sizeof(shader_source) - 1, "weight-arena-readback", nullptr, nullptr,
+            "main", "cs_5_1", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &shader, &errors);
+        if (FAILED(compile_result)) {
+            if (errors != nullptr) {
+                std::fprintf(stderr, "%.*s\n", static_cast<int>(errors->GetBufferSize()),
+                    static_cast<const char *>(errors->GetBufferPointer()));
+            }
+            fail("D3DCompile", compile_result);
+        }
+        if (errors != nullptr) {
+            errors->Release();
+        }
+
+        D3D12_DESCRIPTOR_RANGE ranges[2]{};
+        ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        ranges[0].NumDescriptors = 2;
+        ranges[0].BaseShaderRegister = 0;
+        ranges[0].OffsetInDescriptorsFromTableStart = 0;
+        ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+        ranges[1].NumDescriptors = 1;
+        ranges[1].BaseShaderRegister = 0;
+        ranges[1].OffsetInDescriptorsFromTableStart = 2;
+        D3D12_ROOT_PARAMETER root_parameter{};
+        root_parameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        root_parameter.DescriptorTable.NumDescriptorRanges = 2;
+        root_parameter.DescriptorTable.pDescriptorRanges = ranges;
+        root_parameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+        D3D12_ROOT_SIGNATURE_DESC root_desc{};
+        root_desc.NumParameters = 1;
+        root_desc.pParameters = &root_parameter;
+
+        ID3DBlob *root_blob = nullptr;
+        ID3DBlob *root_errors = nullptr;
+        check("D3D12SerializeRootSignature", D3D12SerializeRootSignature(
+            &root_desc, D3D_ROOT_SIGNATURE_VERSION_1, &root_blob, &root_errors));
+        if (root_errors != nullptr) {
+            root_errors->Release();
+        }
+        ID3D12RootSignature *root_signature = nullptr;
+        check("CreateRootSignature", device->CreateRootSignature(
+            0, root_blob->GetBufferPointer(), root_blob->GetBufferSize(),
+            IID_PPV_ARGS(&root_signature)));
+        root_blob->Release();
+
+        D3D12_COMPUTE_PIPELINE_STATE_DESC pipeline_desc{};
+        pipeline_desc.pRootSignature = root_signature;
+        pipeline_desc.CS.pShaderBytecode = shader->GetBufferPointer();
+        pipeline_desc.CS.BytecodeLength = shader->GetBufferSize();
+        ID3D12PipelineState *pipeline = nullptr;
+        check("CreateComputePipelineState", device->CreateComputePipelineState(
+            &pipeline_desc, IID_PPV_ARGS(&pipeline)));
+        shader->Release();
+
+        const auto offset_desc = buffer_desc(offset_bytes.size());
+        ID3D12Resource *offset_buffer = nullptr;
+        check("CreateCommittedResource(offsets)", device->CreateCommittedResource(
+            &upload_heap, D3D12_HEAP_FLAG_NONE, &offset_desc,
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&offset_buffer)));
+        check("Map(offsets)", offset_buffer->Map(0, &no_read, &mapped));
+        std::memcpy(mapped, offset_bytes.data(), offset_bytes.size());
+        offset_buffer->Unmap(0, nullptr);
+
+        const uint64_t result_size = offset_bytes.size();
+        auto result_desc = buffer_desc(result_size);
+        result_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        ID3D12Resource *result_buffer = nullptr;
+        ID3D12Resource *result_readback = nullptr;
+        check("CreateCommittedResource(results)", device->CreateCommittedResource(
+            &default_heap, D3D12_HEAP_FLAG_NONE, &result_desc,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS, nullptr, IID_PPV_ARGS(&result_buffer)));
+        const auto result_readback_desc = buffer_desc(result_size);
+        check("CreateCommittedResource(result readback)", device->CreateCommittedResource(
+            &readback_heap, D3D12_HEAP_FLAG_NONE, &result_readback_desc,
+            D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&result_readback)));
+
+        D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc{};
+        descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+        descriptor_heap_desc.NumDescriptors = 3;
+        descriptor_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+        ID3D12DescriptorHeap *descriptor_heap = nullptr;
+        check("CreateDescriptorHeap", device->CreateDescriptorHeap(
+            &descriptor_heap_desc, IID_PPV_ARGS(&descriptor_heap)));
+        const UINT descriptor_size = device->GetDescriptorHandleIncrementSize(
+            D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+        D3D12_CPU_DESCRIPTOR_HANDLE descriptor =
+            descriptor_heap->GetCPUDescriptorHandleForHeapStart();
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC weights_srv{};
+        weights_srv.Format = DXGI_FORMAT_R32_TYPELESS;
+        weights_srv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        weights_srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        weights_srv.Buffer.NumElements = static_cast<UINT>(source.size() / 4);
+        weights_srv.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+        device->CreateShaderResourceView(gpu_arena, &weights_srv, descriptor);
+        descriptor.ptr += descriptor_size;
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC offsets_srv{};
+        offsets_srv.Format = DXGI_FORMAT_UNKNOWN;
+        offsets_srv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        offsets_srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        offsets_srv.Buffer.NumElements = 153;
+        offsets_srv.Buffer.StructureByteStride = sizeof(uint32_t);
+        device->CreateShaderResourceView(offset_buffer, &offsets_srv, descriptor);
+        descriptor.ptr += descriptor_size;
+
+        D3D12_UNORDERED_ACCESS_VIEW_DESC results_uav{};
+        results_uav.Format = DXGI_FORMAT_UNKNOWN;
+        results_uav.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+        results_uav.Buffer.NumElements = 153;
+        results_uav.Buffer.StructureByteStride = sizeof(uint32_t);
+        device->CreateUnorderedAccessView(result_buffer, nullptr, &results_uav, descriptor);
+
+        check("Reset allocator", allocator->Reset());
+        check("Reset command list", commands->Reset(allocator, pipeline));
+        D3D12_RESOURCE_BARRIER arena_barrier{};
+        arena_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        arena_barrier.Transition.pResource = gpu_arena;
+        arena_barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        arena_barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        arena_barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        commands->ResourceBarrier(1, &arena_barrier);
+        ID3D12DescriptorHeap *heaps[] = {descriptor_heap};
+        commands->SetDescriptorHeaps(1, heaps);
+        commands->SetComputeRootSignature(root_signature);
+        commands->SetComputeRootDescriptorTable(
+            0, descriptor_heap->GetGPUDescriptorHandleForHeapStart());
+        commands->Dispatch(3, 1, 1);
+        D3D12_RESOURCE_BARRIER result_barriers[2]{};
+        result_barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        result_barriers[0].UAV.pResource = result_buffer;
+        result_barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        result_barriers[1].Transition.pResource = result_buffer;
+        result_barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        result_barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        result_barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        commands->ResourceBarrier(2, result_barriers);
+        commands->CopyBufferRegion(result_readback, 0, result_buffer, 0, result_size);
+        check("Close compute commands", commands->Close());
+        queue->ExecuteCommandLists(1, lists);
+        check("Signal compute", queue->Signal(fence, 2));
+        HANDLE compute_event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+        check("SetEventOnCompletion compute", fence->SetEventOnCompletion(2, compute_event));
+        WaitForSingleObject(compute_event, INFINITE);
+        CloseHandle(compute_event);
+
+        const D3D12_RANGE result_bytes{0, static_cast<SIZE_T>(result_size)};
+        check("Map(result readback)", result_readback->Map(0, &result_bytes, &mapped));
+        const auto *gpu_values = static_cast<const uint32_t *>(mapped);
+        const auto *offsets = reinterpret_cast<const uint32_t *>(offset_bytes.data());
+        for (size_t index = 0; index < 153; ++index) {
+            uint32_t expected = 0;
+            std::memcpy(&expected, source.data() + offsets[index], sizeof(expected));
+            if (gpu_values[index] != expected) {
+                std::fprintf(stderr,
+                    "compute mismatch at record %zu: offset=%u expected=%08x actual=%08x\n",
+                    index, offsets[index], expected, gpu_values[index]);
+                compute_equal = false;
+                break;
+            }
+        }
+        result_readback->Unmap(0, &no_read);
+        std::printf("compute_record_reads: %s (153/153)\n", compute_equal ? "yes" : "no");
+
+        descriptor_heap->Release();
+        result_readback->Release();
+        result_buffer->Release();
+        offset_buffer->Release();
+        pipeline->Release();
+        root_signature->Release();
+    }
+
     fence->Release();
     readback->Release();
     upload->Release();
@@ -208,5 +405,5 @@ int wmain(int argc, wchar_t **argv) {
     device->Release();
     adapter->Release();
     factory->Release();
-    return equal ? 0 : 1;
+    return equal && compute_equal ? 0 : 1;
 }
