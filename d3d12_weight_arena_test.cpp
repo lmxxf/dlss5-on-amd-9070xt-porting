@@ -553,12 +553,20 @@ void preview(uint3 id : SV_DispatchThreadID) {
         commands->CopyBufferRegion(result_readback, 0, result_buffer, 0, result_size);
         commands->CopyBufferRegion(preview_readback, 0, preview_buffer, 0, preview_size);
         check("Close compute commands", commands->Close());
+        LARGE_INTEGER timer_frequency{}, timer_begin{}, timer_end{};
+        QueryPerformanceFrequency(&timer_frequency);
+        QueryPerformanceCounter(&timer_begin);
         queue->ExecuteCommandLists(1, lists);
         check("Signal compute", queue->Signal(fence, 2));
         HANDLE compute_event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
         check("SetEventOnCompletion compute", fence->SetEventOnCompletion(2, compute_event));
         WaitForSingleObject(compute_event, INFINITE);
+        QueryPerformanceCounter(&timer_end);
         CloseHandle(compute_event);
+        const double submit_to_fence_ms =
+            1000.0 * static_cast<double>(timer_end.QuadPart - timer_begin.QuadPart) /
+            static_cast<double>(timer_frequency.QuadPart);
+        std::printf("compute_submit_to_fence_ms: %.3f\n", submit_to_fence_ms);
 
         const D3D12_RANGE result_bytes{0, static_cast<SIZE_T>(result_size)};
         check("Map(result readback)", result_readback->Map(0, &result_bytes, &mapped));
