@@ -315,7 +315,7 @@ probe 行为：
 - 原函数成功返回后读取 `manager + 0x48` 的 `CCNetwork*`；
 - 导出 live Block／Layer／state 到 `D:\DLSSNR-Lab\logs\runtime-network.txt`。
 
-当前 pinned probe SHA-256：
+第一次 pinned probe SHA-256：
 
 ```text
 c2a9c22944c4b4ef0077076ad506e6e050aaa9786a56363f0413352bafa62da9
@@ -337,20 +337,37 @@ dump 从 block0 连续走到 block36 layer4，约 28,672 字节；每个 layer �
 - state 地址；
 - state 第一个 qword（flat weight GPU VA）。
 
-进程在 block36 layer4 dump 中途退出。根因不是 hook 地址／签名：是 probe 把所有异构 Layer state 统一读取 0x50 字节，某些 state 对象较小，越界读取触发访问异常。
+进程在 block36 layer4 dump 中途退出。根因不是 hook 地址／签名：probe 使用裸指针读取 live object；先把 state 从 0x50 缩到 0x08 后，第二次仍在 block34 附近非固定位置退出，证明还存在页边界／对象生命期竞态。
 
-### 自动压缩后的精确续点
+第三版将所有 live object 读取改为 `ReadProcessMemory(GetCurrentProcess(), ...)`，kernel 名称也先安全复制到本地缓冲区，不再让 CRT 直接解引用游戏指针。SHA-256：
 
-下一步第一件事：
+```text
+5c03355b2cdf62b2bdba0b3b4e4445750bc44b82e77d8cadb4d115a01baa1188
+```
 
-1. 把 `dlssnr_runtime_probe.cpp` 中 `dump_qwords(file, state, 0x50)` 改成只读 `0x08`；
-2. 重新编译、更新 `deploy_runtime_probe.ps1` 的 SHA；
-3. 部署后重启 Steam／《剑星》；
-4. 目标：安全走到 `block[70]`，得到全部 153 个 live layer 的 flat weight GPU VA；
-5. dump 完整后立即移除 probe，恢复已知稳定的 RenoDX + DLSSNR 游戏状态；
-6. 后续按具体 Layer class 逐个扩展 state 字段，禁止再统一扫未知对象长度。
+第三版实测完整成功：
 
-当前 5090 游戏进程已因第一次 probe 越界退出；probe仍部署在游戏目录，下一轮启动前必须先编译并覆盖修正版，不能直接重启游戏。
+```text
+result=0x1
+block_count=71
+最后一项=block[70] / cc_tinlayout_fused_post_block_swin_1h_32_rgb_fp8
+dump_size=25221 bytes
+```
+
+live layer 总数是 **152**，不是此前 descriptor 阶段误记的 153。逐 block 的 `layer_count` 求和为 152，且没有 `<unreadable>`：24 个多 layer block 贡献 105 层，其余 47 个 block 各 1 层。差 1 的原因也已确认：`weights-index.json` 的 153 是 **weight record 数**，`block70.layer0` 同时拥有 `blend_scale` 和 `layer` 两条 record，但运行时仍只有一个 Layer 对象。完整 dump 保存在 5090 的 `D:\DLSSNR-Lab\logs\runtime-network.txt`，Spark 临时副本为 `/tmp/runtime-network-3.txt`。
+
+另一个关键例外：block39 `cc_dec_input_upsample_1024x512_fp8` 的 `layer+0x178` 为 `0x0000020000000400`，显然不是 state 指针；安全读取返回 0。由此确认 `state@+0x178` 也不是所有 Layer class 的统一 ABI，只适用于目前观察到的多数 class。后续必须按 vtable/class 分组，不能把 block39 的首权重地址按 0 处理。
+
+抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
+
+### 2026-09-01 最新续点
+
+完整 live network dump 已取得，探针已移除。下一步：
+
+1. 把 152 个 flat-weight GPU VA 归一化为相对首地址偏移；
+2. 与 `weights-index.json` 的 archive record／block 边界做差分匹配，确定 GPU 权重布局是否保持文件顺序及其对齐规则；
+3. 以 vtable／kernel class 分组，只对已反汇编确认过布局的 class 扩展 state 字段；
+4. AMD 第一版继续坚持 FP16 解码，不复刻 NVIDIA FP8 kernel，只复刻图和张量语义。
 
 ## 工作纪律
 

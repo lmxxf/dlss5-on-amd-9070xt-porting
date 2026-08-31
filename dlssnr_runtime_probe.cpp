@@ -28,17 +28,37 @@ std::atomic<bool> g_dumped{false};
 template <typename T>
 T read_at(const void *base, size_t offset) {
     T value{};
-    std::memcpy(&value, static_cast<const uint8_t *>(base) + offset, sizeof(T));
+    SIZE_T copied = 0;
+    if (base == nullptr ||
+        !ReadProcessMemory(
+            GetCurrentProcess(),
+            static_cast<const uint8_t *>(base) + offset,
+            &value,
+            sizeof(T),
+            &copied) ||
+        copied != sizeof(T)) {
+        return T{};
+    }
     return value;
 }
 
-const char *msvc_string_data(const void *string_object, size_t *length) {
-    *length = read_at<uint64_t>(string_object, 0x10);
+size_t copy_msvc_string(const void *string_object, char *output, size_t output_size) {
+    const size_t length = read_at<uint64_t>(string_object, 0x10);
     const uint64_t capacity = read_at<uint64_t>(string_object, 0x18);
-    if (capacity > 15) {
-        return read_at<const char *>(string_object, 0);
+    const char *source = capacity > 15
+        ? read_at<const char *>(string_object, 0)
+        : static_cast<const char *>(string_object);
+    if (source == nullptr || output_size == 0 || length >= output_size) {
+        return 0;
     }
-    return static_cast<const char *>(string_object);
+    SIZE_T copied = 0;
+    if (!ReadProcessMemory(
+            GetCurrentProcess(), source, output, length, &copied) ||
+        copied != length) {
+        return 0;
+    }
+    output[length] = '\0';
+    return length;
 }
 
 void dump_qwords(FILE *file, const void *address, size_t bytes) {
@@ -73,7 +93,12 @@ void dump_network(void *manager, uint64_t result) {
 
     auto **block_begin = read_at<void **>(network, 0xf8);
     auto **block_end = read_at<void **>(network, 0x100);
-    const ptrdiff_t block_count = block_end - block_begin;
+    const ptrdiff_t block_count = block_begin != nullptr &&
+            reinterpret_cast<uintptr_t>(block_end) >= reinterpret_cast<uintptr_t>(block_begin)
+        ? static_cast<ptrdiff_t>(
+            (reinterpret_cast<uintptr_t>(block_end) - reinterpret_cast<uintptr_t>(block_begin)) /
+            sizeof(void *))
+        : 0;
     std::fprintf(file, "block_count=%lld\n", static_cast<long long>(block_count));
     if (block_count < 1 || block_count > 1024) {
         std::fclose(file);
@@ -81,10 +106,19 @@ void dump_network(void *manager, uint64_t result) {
     }
 
     for (ptrdiff_t block_index = 0; block_index < block_count; ++block_index) {
-        void *block = block_begin[block_index];
+        void *block = read_at<void *>(block_begin, block_index * sizeof(void *));
+        if (block == nullptr) {
+            std::fprintf(file, "block[%lld]=<unreadable>\n", static_cast<long long>(block_index));
+            continue;
+        }
         auto **layer_begin = read_at<void **>(block, 0xe8);
         auto **layer_end = read_at<void **>(block, 0xf0);
-        const ptrdiff_t layer_count = layer_end - layer_begin;
+        const ptrdiff_t layer_count = layer_begin != nullptr &&
+                reinterpret_cast<uintptr_t>(layer_end) >= reinterpret_cast<uintptr_t>(layer_begin)
+            ? static_cast<ptrdiff_t>(
+                (reinterpret_cast<uintptr_t>(layer_end) - reinterpret_cast<uintptr_t>(layer_begin)) /
+                sizeof(void *))
+            : -1;
         std::fprintf(
             file,
             "block[%lld]=%p layer_count=%lld\n",
@@ -96,9 +130,18 @@ void dump_network(void *manager, uint64_t result) {
         }
 
         for (ptrdiff_t layer_index = 0; layer_index < layer_count; ++layer_index) {
-            void *layer = layer_begin[layer_index];
-            size_t name_length = 0;
-            const char *name = msvc_string_data(static_cast<uint8_t *>(layer) + 8, &name_length);
+            void *layer = read_at<void *>(layer_begin, layer_index * sizeof(void *));
+            if (layer == nullptr) {
+                std::fprintf(file, "  layer[%lld]=<unreadable>\n", static_cast<long long>(layer_index));
+                continue;
+            }
+            char name[256]{};
+            const size_t name_length = copy_msvc_string(
+                static_cast<uint8_t *>(layer) + 8, name, sizeof(name));
+            const char *display_name = name_length == 0 ? "<unreadable>" : name;
+            const size_t display_name_length = name_length == 0
+                ? std::strlen(display_name)
+                : name_length;
             void *state = read_at<void *>(layer, 0x178);
             std::fprintf(
                 file,
@@ -106,12 +149,14 @@ void dump_network(void *manager, uint64_t result) {
                 static_cast<long long>(layer_index),
                 layer,
                 read_at<void *>(layer, 0),
-                static_cast<int>(name_length),
-                name,
+                static_cast<int>(display_name_length),
+                display_name,
                 state);
             if (state != nullptr) {
                 std::fprintf(file, " state_qwords=");
-                dump_qwords(file, state, 0x50);
+                // Layer state objects are heterogeneous and some contain only
+                // the leading flat-weight GPU VA. Do not scan past that field.
+                dump_qwords(file, state, sizeof(uint64_t));
             }
             std::fprintf(file, "\n");
         }
