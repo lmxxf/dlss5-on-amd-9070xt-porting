@@ -116,6 +116,95 @@ block0.layer0.layer
 
 这张表比单纯按字符串画 U 形更强：block 编号、参数规模与六档宽度共同形成镜像。但除 `block39` 可与明确的 `1024→512` 名字强对齐外，其余 block type 仍是候选映射，要由 `build_blocks` 的派发表最终确认。
 
+### CPU descriptor builder 已确认候选映射
+
+使用 Ghidra 12.1.3 headless 分析后，调用链已经恢复：
+
+```text
+CG2RNetworkManager::CreateNetwork
+  → 0x18003d670：注册唯一 shipping config 与权重标签
+  → 0x180039780：构造完整 network descriptor
+  → 0x18003f860：确认 backbone 名为 CCNetwork
+  → 0x180036300：CCNetwork::build_blocks
+```
+
+shipping config 的内部名字为 `hnet-vigilant-squid`，architecture variant 为 `crazy-cuckoo`；权重标签为：
+
+```text
+CC_Control_History_Blend_Quantize_With_Teacher_honest_tench_2026_07_04_22_30_weights
+```
+
+`0x180039780` 的构造顺序与上表完全吻合，并确认 1024 瓶颈走 `cc_vit_1d_block` 分支，而不是普通 `cc_vit_block`：
+
+```text
+0       CCTinlayoutFusedPreBlockSwin1H / 32
+1–3     CCTinlayoutFusedSwin1H / 32
+4       CCTinlayoutFusedSwin1H downsample 32→64
+5–7     CCTinlayoutFusedSwin2H / 64
+8       CCTinlayoutFusedSwin2H downsample 64→128
+9–13    CCTinlayoutFusedSwin4H / 128
+14      CCTinlayoutFusedSwin4H downsample 128→256
+15–21   CCTinlayoutFusedSwin8H / 256
+22      CCTinlayoutFusedSwin8H downsample 256→512
+23–30   cc_split_swin_16h_block / 512
+31–38   cc_vit_1d_block / 1024
+39      CCDecInputUpsample / 1024→512
+40–47   cc_split_swin_16h_block / 512
+48      CCTinlayoutFusedSwin8H upsample 512→256
+49–55   CCTinlayoutFusedSwin8H / 256
+56      CCTinlayoutFusedSwin4H upsample 256→128
+57–61   CCTinlayoutFusedSwin4H / 128
+62      CCTinlayoutFusedSwin2H upsample 128→64
+63–65   CCTinlayoutFusedSwin2H / 64
+66      CCTinlayoutFusedSwin1H upsample 64→32
+67–69   CCTinlayoutFusedSwin1H / 32
+70      CCTinlayoutFusedPostBlockSwin1H / output blend
+```
+
+CPU 工厂还直接给出 layer 派发表：外层 block 使用 `single_layer_block` 包装 1H／2H／4H／8H、Pre、Post 与 `CCDecInputUpsample`；512 split-Swin 内部支持 Ffwd、FfwdProj、QKVAttn、Proj、ProjPool、FinalHead；1D ViT 内部固定为 FfnExpand、FfnContract、QKV、Attention、Projection 五族。
+
+`network-graph.json` 已把这 71 个 block 与 153 条权重记录闭合对应。descriptor 中的两组 vector 分别保存 source block index 与 source output index，六条双输入边为：
+
+```text
+39 ← 38.output0 + 30.output1
+48 ← 47.output0 + 22.output1
+56 ← 55.output0 + 14.output1
+62 ← 61.output0 + 8.output1
+66 ← 65.output0 + 4.output1
+70 ← 69.output0 + 0.output1
+```
+
+最后一条与报错字符串里的 `main + enc0 skip` 完全对齐。普通 block 沿前一 block 的 `output0` 串行连接。当前尚未恢复的是 block0 与 Color、MVec、Depth、ControlMask 等外部纹理的精确绑定。
+
+### 运行时直调的独立验证
+
+Windows 探针可直接 `LoadLibrary` DLL，并调用纯 CPU descriptor builder `module_base + 0x39780`。返回对象确认：
+
+- descriptor 大小为 `0xf0`；
+- backbone／config／variant 分别是 `CCNetwork`、`hnet-vigilant-squid`、`crazy-cuckoo`；
+- block vector 步长 `0xe0`、数量 71；
+- layer descriptor 步长 `0x170`、总数 153；
+- 六组 source block／source output vector 与上述 skip 边完全一致；
+- block30 的五层为 Ffwd、FfwdProj、QKVAttn、ProjPool、FinalHead；
+- block31–38 的五层为 1D FfnExpand、FfnContract、QKV、Attention、Projection。
+
+同一 descriptor 还包含 653 个内部权重名字，已导出到 `weight-names.json`。CPU Layer 绑定代码只按顶层 key `layer` 取得整块 flat FP16 blob；内部子权重 offset 不存在于 CPU 侧切片表，而是由 fused GPU kernel 的布局约定解释。
+
+### CUBIN 边界与 weight pointer
+
+DLL `.data` 中共有 15 个 CUDA ELF。`extract_embedded_cubins.py` 同时计算 section table 与位于文件尾的 program header table，得到可被 CUDA 13 `nvdisasm` 正常读取的独立 CUBIN。
+
+普通 1H／32 kernel 的 `.nv.info` 显示参数块：
+
+```text
+constant bank start = 0x380
+parameter block size = 0x60
+```
+
+Layer forward 代码构造的前三个 qword 是 input、output、flat weight pointer，因此 `c[0][0x390]` 是 weight pointer；SASS 开头也以 `R14 = c[0][0x390]` 建立权重地址。
+
+边界：SASS 使用 `desc[...]` 的 tinlayout／descriptor addressing，出现大于原始 blob 线性字节数的逻辑 offset。寄存器复用与 descriptor swizzle 尚未解释完成，不能把 SASS 中所有 `+offset` 直接当作文件 payload 的子张量边界。
+
 ## 7. 三张纸还缺一张映射表
 
 现在掌握的是：

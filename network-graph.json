@@ -1,0 +1,1682 @@
+{
+  "sample_sha256": "e16bcf15e16e13f527491cdf7845b2fe6521a738d8f7c9c721866a8496e1fc8e",
+  "config": "hnet-vigilant-squid",
+  "architecture_variant": "crazy-cuckoo",
+  "descriptor_builder": "0x180039780",
+  "boundary": "Block types, order, and block-to-block edges are recovered; block 0 external texture bindings remain unresolved.",
+  "blocks": [
+    {
+      "block": 0,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedPreBlockSwin1H",
+      "width": 32,
+      "role": "input",
+      "variant": "pre",
+      "inputs": null,
+      "layer_types": [
+        "CCTinlayoutFusedPreBlockSwin1H"
+      ],
+      "weight_records": [
+        "block0.layer0.layer"
+      ],
+      "weight_elements": 10848
+    },
+    {
+      "block": 1,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 0,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block1.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 2,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 1,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block2.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 3,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 2,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block3.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 4,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "encoder",
+      "variant": "downsample_to_64",
+      "inputs": [
+        {
+          "source_block": 3,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block4.layer0.layer"
+      ],
+      "weight_elements": 11360
+    },
+    {
+      "block": 5,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 4,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block5.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 6,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 5,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block6.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 7,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 6,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block7.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 8,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "encoder",
+      "variant": "downsample_to_128",
+      "inputs": [
+        {
+          "source_block": 7,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block8.layer0.layer"
+      ],
+      "weight_elements": 34968
+    },
+    {
+      "block": 9,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 8,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block9.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 10,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 9,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block10.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 11,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 10,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block11.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 12,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 11,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block12.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 13,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 12,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block13.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 14,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "encoder",
+      "variant": "downsample_to_256",
+      "inputs": [
+        {
+          "source_block": 13,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block14.layer0.layer"
+      ],
+      "weight_elements": 114968
+    },
+    {
+      "block": 15,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 14,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block15.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 16,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 15,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block16.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 17,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 16,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block17.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 18,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 17,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block18.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 19,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 18,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block19.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 20,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 19,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block20.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 21,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 20,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block21.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 22,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "encoder",
+      "variant": "downsample_to_512",
+      "inputs": [
+        {
+          "source_block": 21,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block22.layer0.layer"
+      ],
+      "weight_elements": 410144
+    },
+    {
+      "block": 23,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 22,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block23.layer0.layer",
+        "block23.layer1.layer",
+        "block23.layer2.layer",
+        "block23.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 24,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 23,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block24.layer0.layer",
+        "block24.layer1.layer",
+        "block24.layer2.layer",
+        "block24.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 25,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 24,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block25.layer0.layer",
+        "block25.layer1.layer",
+        "block25.layer2.layer",
+        "block25.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 26,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 25,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block26.layer0.layer",
+        "block26.layer1.layer",
+        "block26.layer2.layer",
+        "block26.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 27,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 26,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block27.layer0.layer",
+        "block27.layer1.layer",
+        "block27.layer2.layer",
+        "block27.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 28,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 27,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block28.layer0.layer",
+        "block28.layer1.layer",
+        "block28.layer2.layer",
+        "block28.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 29,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 28,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block29.layer0.layer",
+        "block29.layer1.layer",
+        "block29.layer2.layer",
+        "block29.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 30,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "encoder",
+      "variant": "terminal",
+      "inputs": [
+        {
+          "source_block": 29,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProjPool",
+        "CCSplitSwin16HFinalHead"
+      ],
+      "weight_records": [
+        "block30.layer0.layer",
+        "block30.layer1.layer",
+        "block30.layer2.layer",
+        "block30.layer3.layer",
+        "block30.layer4.layer"
+      ],
+      "weight_elements": 1246248
+    },
+    {
+      "block": 31,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 30,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block31.layer0.layer",
+        "block31.layer1.layer",
+        "block31.layer2.layer",
+        "block31.layer3.layer",
+        "block31.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 32,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 31,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block32.layer0.layer",
+        "block32.layer1.layer",
+        "block32.layer2.layer",
+        "block32.layer3.layer",
+        "block32.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 33,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 32,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block33.layer0.layer",
+        "block33.layer1.layer",
+        "block33.layer2.layer",
+        "block33.layer3.layer",
+        "block33.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 34,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 33,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block34.layer0.layer",
+        "block34.layer1.layer",
+        "block34.layer2.layer",
+        "block34.layer3.layer",
+        "block34.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 35,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 34,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block35.layer0.layer",
+        "block35.layer1.layer",
+        "block35.layer2.layer",
+        "block35.layer3.layer",
+        "block35.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 36,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 35,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block36.layer0.layer",
+        "block36.layer1.layer",
+        "block36.layer2.layer",
+        "block36.layer3.layer",
+        "block36.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 37,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 36,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block37.layer0.layer",
+        "block37.layer1.layer",
+        "block37.layer2.layer",
+        "block37.layer3.layer",
+        "block37.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 38,
+      "block_type": "cc_vit_1d_block",
+      "layer_type": "CCVit1D*",
+      "width": 1024,
+      "role": "bottleneck",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 37,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCVit1DFfnExpand",
+        "CCVit1DFfnContract",
+        "CCVit1DQKV",
+        "CCVit1DAttention",
+        "CCVit1DProjection"
+      ],
+      "weight_records": [
+        "block38.layer0.layer",
+        "block38.layer1.layer",
+        "block38.layer2.layer",
+        "block38.layer3.layer",
+        "block38.layer4.layer"
+      ],
+      "weight_elements": 6293577
+    },
+    {
+      "block": 39,
+      "block_type": "single_layer_block",
+      "layer_type": "CCDecInputUpsample",
+      "width": 512,
+      "role": "decoder",
+      "variant": "upsample_1024_to_512",
+      "inputs": [
+        {
+          "source_block": 38,
+          "source_output": 0
+        },
+        {
+          "source_block": 30,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCDecInputUpsample"
+      ],
+      "weight_records": [
+        "block39.layer0.layer"
+      ],
+      "weight_elements": 262656
+    },
+    {
+      "block": 40,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 39,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block40.layer0.layer",
+        "block40.layer1.layer",
+        "block40.layer2.layer",
+        "block40.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 41,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 40,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block41.layer0.layer",
+        "block41.layer1.layer",
+        "block41.layer2.layer",
+        "block41.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 42,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 41,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block42.layer0.layer",
+        "block42.layer1.layer",
+        "block42.layer2.layer",
+        "block42.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 43,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 42,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block43.layer0.layer",
+        "block43.layer1.layer",
+        "block43.layer2.layer",
+        "block43.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 44,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 43,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block44.layer0.layer",
+        "block44.layer1.layer",
+        "block44.layer2.layer",
+        "block44.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 45,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 44,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block45.layer0.layer",
+        "block45.layer1.layer",
+        "block45.layer2.layer",
+        "block45.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 46,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 45,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block46.layer0.layer",
+        "block46.layer1.layer",
+        "block46.layer2.layer",
+        "block46.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 47,
+      "block_type": "cc_split_swin_16h_block",
+      "layer_type": "CCSplitSwin16H*",
+      "width": 512,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 46,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCSplitSwin16HFfwd",
+        "CCSplitSwin16HFfwdProj",
+        "CCSplitSwin16HQKVAttn",
+        "CCSplitSwin16HProj"
+      ],
+      "weight_records": [
+        "block47.layer0.layer",
+        "block47.layer1.layer",
+        "block47.layer2.layer",
+        "block47.layer3.layer"
+      ],
+      "weight_elements": 984096
+    },
+    {
+      "block": 48,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "upsample_512_to_256",
+      "inputs": [
+        {
+          "source_block": 47,
+          "source_output": 0
+        },
+        {
+          "source_block": 22,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block48.layer0.layer"
+      ],
+      "weight_elements": 410392
+    },
+    {
+      "block": 49,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 48,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block49.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 50,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 49,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block50.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 51,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 50,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block51.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 52,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 51,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block52.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 53,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 52,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block53.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 54,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 53,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block54.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 55,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin8H",
+      "width": 256,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 54,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin8H"
+      ],
+      "weight_records": [
+        "block55.layer0.layer"
+      ],
+      "weight_elements": 344616
+    },
+    {
+      "block": 56,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "upsample_256_to_128",
+      "inputs": [
+        {
+          "source_block": 55,
+          "source_output": 0
+        },
+        {
+          "source_block": 14,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block56.layer0.layer"
+      ],
+      "weight_elements": 115088
+    },
+    {
+      "block": 57,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 56,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block57.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 58,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 57,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block58.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 59,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 58,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block59.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 60,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 59,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block60.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 61,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin4H",
+      "width": 128,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 60,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin4H"
+      ],
+      "weight_records": [
+        "block61.layer0.layer"
+      ],
+      "weight_elements": 98592
+    },
+    {
+      "block": 62,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "decoder",
+      "variant": "upsample_128_to_64",
+      "inputs": [
+        {
+          "source_block": 61,
+          "source_output": 0
+        },
+        {
+          "source_block": 8,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block62.layer0.layer"
+      ],
+      "weight_elements": 35024
+    },
+    {
+      "block": 63,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 62,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block63.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 64,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 63,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block64.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 65,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin2H",
+      "width": 64,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 64,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin2H"
+      ],
+      "weight_records": [
+        "block65.layer0.layer"
+      ],
+      "weight_elements": 30880
+    },
+    {
+      "block": 66,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "decoder",
+      "variant": "upsample_64_to_32",
+      "inputs": [
+        {
+          "source_block": 65,
+          "source_output": 0
+        },
+        {
+          "source_block": 4,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block66.layer0.layer"
+      ],
+      "weight_elements": 11392
+    },
+    {
+      "block": 67,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 66,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block67.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 68,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 67,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block68.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 69,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedSwin1H",
+      "width": 32,
+      "role": "decoder",
+      "variant": "body",
+      "inputs": [
+        {
+          "source_block": 68,
+          "source_output": 0
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedSwin1H"
+      ],
+      "weight_records": [
+        "block69.layer0.layer"
+      ],
+      "weight_elements": 10336
+    },
+    {
+      "block": 70,
+      "block_type": "single_layer_block",
+      "layer_type": "CCTinlayoutFusedPostBlockSwin1H",
+      "width": 32,
+      "role": "output",
+      "variant": "post_blend",
+      "inputs": [
+        {
+          "source_block": 69,
+          "source_output": 0
+        },
+        {
+          "source_block": 0,
+          "source_output": 1
+        }
+      ],
+      "layer_types": [
+        "CCTinlayoutFusedPostBlockSwin1H"
+      ],
+      "weight_records": [
+        "block70.layer0.blend_scale",
+        "block70.layer0.layer"
+      ],
+      "weight_elements": 10905
+    }
+  ]
+}

@@ -40,6 +40,19 @@
 
 2026-08-31 已安装并启用 Windows 原生 OpenSSH Server，完成 Spark 公钥免密登录。Windows 端当前未安装正式 Python、Git、CMake 或 HIP；等参考网络成形后再选择最小工具链，避免提前堆环境。
 
+### WSL 准备状态
+
+- BIOS 虚拟化：已开启（`VirtualizationFirmwareEnabled=True`）；
+- SSH 管理员会话：具有提升权限；
+- 默认 `wsl --install` 下载通道返回 403；
+- 2026-08-31 已通过 DISM 启用 `Microsoft-Windows-Subsystem-Linux` 与 `VirtualMachinePlatform`，重启后生效；
+- 商店更新通道仍返回 403，改从 Microsoft/WSL 官方 GitHub release 安装 `wsl.2.7.3.0.x64.msi`；
+- WSL 版本：2.7.3.0；kernel：6.6.114.1；默认版本：WSL 2；
+- 发行版：Ubuntu 24.04.4 LTS，用户 `lmxxf`，HOME `/home/lmxxf`；
+- `/dev/dxg`、`libdxcore.so`、`libd3d12.so` 已出现，Windows GPU 透传通道存在；
+- Windows AMD 驱动 `32.0.31041.1004` 对应 Adrenalin 26.8.1 WHQL；
+- 尚未安装 ROCm。安装前先确认 26.8.1 与当前 AMD WSL ROCm 包的兼容性，不能只凭 `/dev/dxg` 判定可用。
+
 ## 2026-08-31：Day 1
 
 ### 完成：冻结样本
@@ -133,6 +146,64 @@ payload 按 IEEE FP16 解码时，抽样记录全部为有限数；单元素 `bl
 3. 用 CPU 构图代码确认 `block0…70 → 算子类型 → 输入索引 → 输出索引`。
 4. 解释每条权重记录固定的 40 字节元数据。
 5. 决定第一版参考实现使用 PyTorch、ONNX Runtime 还是独立 C++。
+
+## 2026-08-31：Day 1 追加——CPU 构图链恢复
+
+### WSL 逆向环境
+
+- 安装 Ghidra 12.1.3 到 `/opt/ghidra_12.1.3_PUBLIC`；
+- 官方 zip SHA-256 校验通过，下载包解压后已删除；
+- Java：OpenJDK 21 JDK headless；
+- Ghidra project：`/home/lmxxf/ghidra-projects/dlssnr`；
+- 仓库新增 `ghidra/ExportBuildBlocks.java` 与 `ghidra/ExportFunctions.java`，所有反编译通过 headless 脚本按地址重跑。
+
+### 完成：block type 与执行顺序
+
+从 CPU descriptor builder `0x180039780` 恢复 71 个 block 的生成顺序；与权重规模镜像逐项闭合。关键修正：31–38 是 `cc_vit_1d_block`，不是普通 `cc_vit_block`。
+
+新增：
+
+- `build_network_graph.py`；
+- `network-graph.json`。
+
+JSON 已覆盖全部 71 个 block、153 条记录和 73,841,889 个 FP16 标量。
+
+descriptor edge vector 已恢复六条双输入边：
+
+```text
+39 ← 38.output0 + 30.output1
+48 ← 47.output0 + 22.output1
+56 ← 55.output0 + 14.output1
+62 ← 61.output0 + 8.output1
+66 ← 65.output0 + 4.output1
+70 ← 69.output0 + 0.output1
+```
+
+普通 block 消费前一 block 的 `output0`；block0 的外部纹理输入绑定仍待恢复。
+
+### 运行时 descriptor 探针
+
+新增 `probe_runtime_descriptor.ps1`。Windows 可直接加载 DLL 并调用：
+
+- `0x180039780` descriptor builder；
+- `0x180031c10` CCNetwork CPU 构造函数。
+
+实测成功构造 71 个 live Block、153 个 live Layer；未调用 GPU backend。探针导出 653 个内部权重名，规范化保存为 `weight-names.json`。
+
+临时 DLL 与 runtime JSON 已从 Windows `%TEMP%` 删除；探针本身留在仓库，可随时重跑。
+
+### CUBIN 提取与第一条 SASS 数据流
+
+新增 `extract_embedded_cubins.py`，从 DLL 提取 15 个完整 CUDA ELF。修正过一次边界：CUDA ELF 的 program header 位于 section table 之后，必须同时计入文件长度，否则 `nvdisasm` 会报 truncated ELF。
+
+已确认普通 `cc_tinlayout_fused_swin_1h_32_1`：
+
+- symbol index 77；
+- kernel 参数块位于 constant bank `0x380`，大小 `0x60`；
+- `c[0][0x390]` 对应 flat weight pointer；
+- CPU 只绑定整块 `blockN.layerN.layer`，子权重 offset 硬编码在 fused kernel／tinlayout descriptor 语义中。
+
+当前问题：SASS 的 `desc[...]` 逻辑 offset 不能直接视作 payload 线性字节 offset。下一步解析 Blackwell descriptor/tinlayout addressing，或从最小 1H kernel 的局部数据流反推出八段权重布局。
 
 ## 工作纪律
 
