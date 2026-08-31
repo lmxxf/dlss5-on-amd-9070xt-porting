@@ -233,20 +233,31 @@ float load_half(uint element) {
 [numthreads(8, 8, 1)]
 void preview(uint3 id : SV_DispatchThreadID) {
     if (id.x >= 256 || id.y >= 144) return;
-    float x = (id.x + 0.5) / 256.0;
-    float y = (id.y + 0.5) / 144.0;
-    float input[7] = {x, y, 0.5 + 0.5 * sin(x * 12.5663706), 1.0,
-                      x * y, x * x, y * y};
     uint rgb = 0;
     [unroll]
     for (uint output_channel = 0; output_channel < 3; ++output_channel) {
         float value = 0.0;
         [unroll]
-        for (uint input_channel = 0; input_channel < 7; ++input_channel) {
-            value += input[input_channel] *
-                load_half(output_channel * 7 + input_channel);
+        for (int kernel_y = -1; kernel_y <= 1; ++kernel_y) {
+            [unroll]
+            for (int kernel_x = -1; kernel_x <= 1; ++kernel_x) {
+                uint px = (uint)clamp((int)id.x + kernel_x, 0, 255);
+                uint py = (uint)clamp((int)id.y + kernel_y, 0, 143);
+                float x = (px + 0.5) / 256.0;
+                float y = (py + 0.5) / 144.0;
+                float input[7] = {x, y, 0.5 + 0.5 * sin(x * 12.5663706), 1.0,
+                                  x * y, x * x, y * y};
+                float adapter = 0.0;
+                [unroll]
+                for (uint input_channel = 0; input_channel < 7; ++input_channel) {
+                    adapter += input[input_channel] *
+                        load_half(output_channel * 7 + input_channel);
+                }
+                uint kernel_index = (kernel_y + 1) * 3 + kernel_x + 1;
+                value += adapter * load_half(224 + output_channel * 9 + kernel_index);
+            }
         }
-        uint byte_value = (uint)round(saturate(0.5 + value * 8.0) * 255.0);
+        uint byte_value = (uint)round(saturate(0.5 + value * 40.0) * 255.0);
         rgb |= byte_value << (output_channel * 8);
     }
     preview_pixels[id.y * 256 + id.x] = rgb;
