@@ -6,6 +6,7 @@
 #include <dxgi1_6.h>
 
 #include <cstdint>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
@@ -75,10 +76,10 @@ D3D12_RESOURCE_DESC buffer_desc(uint64_t size) {
 } // namespace
 
 int wmain(int argc, wchar_t **argv) {
-    if (argc < 2 || argc > 4) {
+    if (argc < 2 || argc > 5) {
         std::fwprintf(
             stderr,
-            L"usage: %ls <weights-fp16.arena> [record-offsets.u32] [preview.ppm]\n",
+            L"usage: %ls <weights-fp16.arena> [record-offsets.u32] [preview.ppm] [input.rgba]\n",
             argv[0]);
         return 2;
     }
@@ -87,6 +88,21 @@ int wmain(int argc, wchar_t **argv) {
     const std::vector<uint8_t> offset_bytes = argc >= 3
         ? read_file(argv[2])
         : std::vector<uint8_t>{};
+    std::vector<uint8_t> preview_input;
+    if (argc == 5) {
+        preview_input = read_file(argv[4]);
+    } else if (argc >= 3) {
+        preview_input.resize(256 * 144 * 4);
+        for (uint32_t y = 0; y < 144; ++y) {
+            for (uint32_t x = 0; x < 256; ++x) {
+                uint8_t *pixel = preview_input.data() + (y * 256 + x) * 4;
+                pixel[0] = static_cast<uint8_t>(x);
+                pixel[1] = static_cast<uint8_t>(y * 255 / 143);
+                pixel[2] = static_cast<uint8_t>(128 + 127 * std::sin(x * 0.049087385));
+                pixel[3] = 255;
+            }
+        }
+    }
     if (source.empty() || source.size() % 512 != 0) {
         std::fprintf(stderr, "arena must be non-empty and 512-byte aligned\n");
         return 2;
@@ -211,10 +227,15 @@ int wmain(int argc, wchar_t **argv) {
             std::fprintf(stderr, "offset table must contain exactly 153 u32 values\n");
             return 2;
         }
+        if (preview_input.size() != 256 * 144 * 4) {
+            std::fprintf(stderr, "preview input must be 256x144 RGBA8 (147456 bytes)\n");
+            return 2;
+        }
 
         static const char shader_source[] = R"(
 ByteAddressBuffer weights : register(t0);
 StructuredBuffer<uint> offsets : register(t1);
+StructuredBuffer<uint> input_pixels : register(t2);
 RWStructuredBuffer<uint> results : register(u0);
 RWStructuredBuffer<uint> preview_pixels : register(u1);
 [numthreads(64, 1, 1)]
@@ -230,6 +251,18 @@ float load_half(uint element) {
     return f16tof32(bits);
 }
 
+uint hash_u32(uint value) {
+    value ^= value >> 16;
+    value *= 0x7feb352d;
+    value ^= value >> 15;
+    value *= 0x846ca68b;
+    return value ^ (value >> 16);
+}
+
+float uniform01(uint value) {
+    return (hash_u32(value) + 1.0) / 4294967297.0;
+}
+
 [numthreads(8, 8, 1)]
 void preview(uint3 id : SV_DispatchThreadID) {
     if (id.x >= 256 || id.y >= 144) return;
@@ -243,10 +276,23 @@ void preview(uint3 id : SV_DispatchThreadID) {
             for (int kernel_x = -1; kernel_x <= 1; ++kernel_x) {
                 uint px = (uint)clamp((int)id.x + kernel_x, 0, 255);
                 uint py = (uint)clamp((int)id.y + kernel_y, 0, 143);
-                float x = (px + 0.5) / 256.0;
-                float y = (py + 0.5) / 144.0;
-                float input[7] = {x, y, 0.5 + 0.5 * sin(x * 12.5663706), 1.0,
-                                  x * y, x * x, y * y};
+                uint pixel = input_pixels[py * 256 + px];
+                float3 color = float3(pixel & 255, (pixel >> 8) & 255,
+                                      (pixel >> 16) & 255) / 255.0;
+                uint seed = py * 256 + px;
+                float u0 = uniform01(seed * 4 + 0);
+                float u1 = uniform01(seed * 4 + 1);
+                float u2 = uniform01(seed * 4 + 2);
+                float u3 = uniform01(seed * 4 + 3);
+                float r0 = sqrt(-2.0 * log(u0));
+                float r1 = sqrt(-2.0 * log(u2));
+                float input[7] = {
+                    color.r, color.g, color.b,
+                    0.0 * r0 * cos(6.28318530718 * u1),
+                    0.0 * r0 * sin(6.28318530718 * u1),
+                    0.0 * r1 * cos(6.28318530718 * u3),
+                    0.0 * r1 * sin(6.28318530718 * u3)
+                };
                 float adapter = 0.0;
                 [unroll]
                 for (uint input_channel = 0; input_channel < 7; ++input_channel) {
@@ -297,13 +343,13 @@ void preview(uint3 id : SV_DispatchThreadID) {
 
         D3D12_DESCRIPTOR_RANGE ranges[2]{};
         ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-        ranges[0].NumDescriptors = 2;
+        ranges[0].NumDescriptors = 3;
         ranges[0].BaseShaderRegister = 0;
         ranges[0].OffsetInDescriptorsFromTableStart = 0;
         ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
         ranges[1].NumDescriptors = 2;
         ranges[1].BaseShaderRegister = 0;
-        ranges[1].OffsetInDescriptorsFromTableStart = 2;
+        ranges[1].OffsetInDescriptorsFromTableStart = 3;
         D3D12_ROOT_PARAMETER root_parameter{};
         root_parameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
         root_parameter.DescriptorTable.NumDescriptorRanges = 2;
@@ -350,6 +396,15 @@ void preview(uint3 id : SV_DispatchThreadID) {
         std::memcpy(mapped, offset_bytes.data(), offset_bytes.size());
         offset_buffer->Unmap(0, nullptr);
 
+        const auto input_desc = buffer_desc(preview_input.size());
+        ID3D12Resource *input_buffer = nullptr;
+        check("CreateCommittedResource(input)", device->CreateCommittedResource(
+            &upload_heap, D3D12_HEAP_FLAG_NONE, &input_desc,
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&input_buffer)));
+        check("Map(input)", input_buffer->Map(0, &no_read, &mapped));
+        std::memcpy(mapped, preview_input.data(), preview_input.size());
+        input_buffer->Unmap(0, nullptr);
+
         const uint64_t result_size = offset_bytes.size();
         auto result_desc = buffer_desc(result_size);
         result_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -380,7 +435,7 @@ void preview(uint3 id : SV_DispatchThreadID) {
 
         D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc{};
         descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        descriptor_heap_desc.NumDescriptors = 4;
+        descriptor_heap_desc.NumDescriptors = 5;
         descriptor_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         ID3D12DescriptorHeap *descriptor_heap = nullptr;
         check("CreateDescriptorHeap", device->CreateDescriptorHeap(
@@ -406,6 +461,15 @@ void preview(uint3 id : SV_DispatchThreadID) {
         offsets_srv.Buffer.NumElements = 153;
         offsets_srv.Buffer.StructureByteStride = sizeof(uint32_t);
         device->CreateShaderResourceView(offset_buffer, &offsets_srv, descriptor);
+        descriptor.ptr += descriptor_size;
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC input_srv{};
+        input_srv.Format = DXGI_FORMAT_UNKNOWN;
+        input_srv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        input_srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        input_srv.Buffer.NumElements = 256 * 144;
+        input_srv.Buffer.StructureByteStride = sizeof(uint32_t);
+        device->CreateShaderResourceView(input_buffer, &input_srv, descriptor);
         descriptor.ptr += descriptor_size;
 
         D3D12_UNORDERED_ACCESS_VIEW_DESC results_uav{};
@@ -489,7 +553,7 @@ void preview(uint3 id : SV_DispatchThreadID) {
         const D3D12_RANGE preview_bytes{0, static_cast<SIZE_T>(preview_size)};
         check("Map(preview readback)", preview_readback->Map(0, &preview_bytes, &mapped));
         const auto *preview_values = static_cast<const uint32_t *>(mapped);
-        const wchar_t *preview_path = argc == 4
+        const wchar_t *preview_path = argc >= 4
             ? argv[3]
             : L"block0-input-adapter-preview.ppm";
         FILE *preview_file = _wfopen(preview_path, L"wb");
@@ -520,6 +584,7 @@ void preview(uint3 id : SV_DispatchThreadID) {
         preview_buffer->Release();
         result_readback->Release();
         result_buffer->Release();
+        input_buffer->Release();
         offset_buffer->Release();
         preview_pipeline->Release();
         pipeline->Release();
