@@ -789,6 +789,15 @@ stage3 tensor   144×256×32, all finite, range [-88,80]
 
 PCA 投影已能看见人物轮廓，同时存在规则的 physical-tile 条纹，不能冒充最终 RGB。这个结果的意义是第一张真实图已进入 AMD 计算主干；下一步恢复 block4 的 32→64 downsample，使 activation 首次跨越 encoder stage。
 
+block4 的真实权重 record 为 22,720 bytes。直接启动原 `cc_tinlayout_fused_swin_1h_32_1_ds_fp8`，输入一个 8×8×32 physical tile，`Params.output` 得到连续 `512` 个非零 E4M3 bytes，Compute Sanitizer 为零错误。这说明 stage 边界不是直接吐 4×4×64；block4 先输出 4×4×32 compact view，随后由 block5 的 2H inpview／`weight0` 完成 32→64 expansion。这个结果修正了早期把 downsample 与 channel expansion 合成一个矩阵的假设，也把下一个 oracle 边界收窄为：
+
+```text
+block4 DS: 8×8×32 → 4×4×32 (2048 → 512 E4M3 bytes)
+block5 inpview: compact 32 → 64-channel 2H stage
+```
+
+下一步批量化 block4 CUBIN runner并拟合 compact DS，再直跑 block5 原 2H kernel。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
