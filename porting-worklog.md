@@ -901,6 +901,8 @@ FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从
 
 完整地址公式最终表明 `+0x7010` 是同一 global tinlayout 中的邻近 spatial tile，而不是 scale metadata。此前逐 tile runner 只填一个 tile，其余邻居为零，因此 block5 以后的所有逐 tile 数值只能作边界诊断，不能代表正式 runtime。改为全图启动：block5 inpview 使用 `grid=(16,9)`、dims `(72,128)`，安全写出 `128×72×64=589824` bytes；同一全局 view 上串 block6→7→8 后，block8 main 非零589,814 bytes、last589,823，compact 非零73,728 bytes、last220,159，Compute Sanitizer 零错误。`stage2-distilled`、`block8-downsample-effective` 与 per-tile 4H effective manifests 已明确降级为 diagnostic-only。后续唯一数值真值是 global runner。
 
+block8 compact global view 随后直接输入 block9 4H inpview：`grid=(8,5)`、dims `(40,64)`，输出非零323,766 bytes、last327,679。保持完整4MB view 依次全图启动 block10–13，四层分别非零327,667／327,673／327,674／327,675 bytes，last 均为327,679。Compute Sanitizer 对 block9 链零错误。至此 64→128 的正式 global CUBIN 数值路径已闭合；下一步以这些全图 view 重新生成 AMD 校准数据，旧 per-tile correlations 只保留为结构诊断。
+
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。
