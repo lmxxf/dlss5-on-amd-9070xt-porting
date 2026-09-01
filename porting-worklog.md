@@ -1007,6 +1007,87 @@ QKV forward 可在 state flag 与 vector 长度同时满足时，从 inputs[1]�
 
 实测随后否决“缺 auxiliary 就是根因”：给 FfwdProj 的 `+0x28/+0x30/+0x38` 全部分配有效 buffer 后，只有主输出 `b0` 写入 30,952 个非零 bytes，`b1/b2/b3` 全零。QKV 的第二 view 是接口能力，不等于这个 block 实际使用。当前确定断点仍是 block23.layer2，但下一步必须读取该 live layer state 的真实 flag／输入输出 vector 数量，或从 QKV SASS 直接确认 `+0x28/+0x30` 是否被当前 kernel 读取；不能再由 forward 的条件分支直接宣布根因。
 
+稳定 runtime descriptor probe 已扩展并在 5090 重跑，取得 block23.layer2 的 0x200-byte layer/state 快照；live state `+0x18=1`，只证明双-view 分支可用。随后尝试直接 hook 推定的 QKV forward RVA `0x6d260` 读取 vector 长度：原版 feature18 仍成功到 count=60，但未落探针文件，几秒后游戏退出。该 probe 已立即移除；其签名／hook 时机未验证，不能用退出反推网络行为，也不再沿这条前台注入路线试错。下一步回到 NvAPI backend `+0x88` 上传语义与 QKV SASS 实际 load，优先取得无需注入游戏的证据。
+
+### block23–29 数值恢复：archive 是混合运行布局，旧 runner 接错层间 view
+
+用两个最小 sm_120 对照 kernel 判定 SASS 转换方向：`fp8_to_half` 编译为 `F2FP.F16.E4M3.UNPACK_B`，`half_to_fp8` 编译为 `F2FP.SATFINITE.E4M3.F16...`。因此原 QKV 的权重 load 确实消费 E4M3。但 archive 不是“全 FP16”：block23.layer2 的 `0xe0040` bytes 精确分为：
+
+```text
+0x00000–0xbffff  packed E4M3 QKV
+0xc0000–0xdffff  FP16 attention bias
+0xe0000–0xe003f  16 × float32 attention scale
+```
+
+这与 QKV SASS 的 `+0xc0000` bias、`+0xe0000` scale load 逐字节闭合。外层 `element_count×2` 只是 record framing，不是全 payload dtype；“加载阶段另有全局 FP16→FP8 packer”撤回。
+
+真正错误在 split-Swin runner 的 layer 拓扑。5090 vtable forward 反汇编给出：FfwdProj 参数 `+0=inputs[1] residual`、`+8=inputs[0] branch`、`+0x10=output`、`+0x18=weights`；QKV launch 的 `grid.z=4`，SASS 以 `CTAID.Z×4+TID.Y` 覆盖16 heads。旧 runner 把 residual 与 branch 都指向同一基址，且 QKV 只发 `grid.z=2`。
+
+修正并丢弃污染的旧中间文件后：block23 layer0/1/QKV/projection 分别恢复到 254/246/152/245 种 E4M3 byte，全部零 NaN，Compute Sanitizer 零错误。新增 `run_original_split_global.cpp`，按真实 `z=2/1/4/1` 顺序统一运行四层。block24–29 连续结果均零 NaN，最终每层保持235–254种 byte。当前正确数值链已从 block0 推进到 block29；下一步恢复 block30 的 ProjPool/FinalHead，再重跑 ViT 31–38。
+
+block30 随后也校正：ProjPool forward 的参数对象实际为 `0x50`，含 QKV/FFN 双输入、main/pool 双输出，正式 launch 坐标为 `(2,4,1)`；旧 `(2,2,2)` 虽 CTA 总数相同但坐标语义错误。修正后 FinalHead 得到193种 byte、零 NaN，Compute Sanitizer 零错误。正确链推进到 block30。
+
+### ViT 三路 view：离线 descriptor 与 5090 live VA
+
+`probe_runtime_descriptor.ps1` 已扩展为导出小型 candidate vector 的实际 qword。block31 内部连接向量确认：Attention 的三路输入都来自 QKV layer2 的 outputs 0/1/2；Projection 同时读取 Attention layer3 与 Contract layer1。旧 ViT runner 把 Q/K/V 和所有 auxiliary 全绑到同一地址，结构无效。
+
+稳定 runtime probe 随后只读 hook ViT QKV/Contract forward，未读取 GPU memory。5090 原版在实际 `width=36,height=60` 时给出：
+
+```text
+Contract inputs=3, outputs=4
+QKV inputs=2, outputs=6
+QKV input0 = Contract output0
+QKV input1 = Contract output2
+QKV output0/2/1 三个主 VA 依次相隔 0x220000（Q/K/V）
+QKV output3/4 位于 auxiliary arena +0x400/+0xa00
+```
+
+因此 QKV 的第二输入不是可随意省略的接口装饰；旧 runner 清零它会让 QKV 全 NaN。Contract wrapper 的 kernel 参数顺序也已确认：`+0=residual input1`、`+8=expanded input0`，旧脚本反接。当前 direct runner 已能把错误从 QKV 收窄到 Contract/Expand 的 auxiliary alias：Expand main 零 NaN，但旧 Contract 只写 workspace view，并缺 live input2 auxiliary。下一步抓 Expand/Contract 的完整 live vector alias 或在同一 backend command chain 内复制该小 auxiliary arena，不能继续把所有 view 指向同一 buffer。
+
+后续 backend launch hook 已直接导出真实参数 blob。最终确认 block31 的逻辑尺寸不是16×16而是8×8：输入256×144经四次下采样得到16×9，padding到16×16，再由 block30 ProjPool 得8×8；4K原版对应120×68→120×72→60×36，与5090 live `width=36,height=60`完全一致。按8×8重跑后，Contract main、Q/K/V、Attention、Projection全部零NaN，block31正确输出65,407 bytes。
+
+ViT使用Z向CTA cluster：Contract/Projection `gridZ=clusterZ=4`，QKV `gridZ=clusterZ=2`；`cuLaunchKernelEx`恢复了普通launch不写main output的问题。完整flat weight arena也成为必要条件，单record allocation会被tensor layout的对齐读取越过数百字节。新增 `run_original_vit1d_global.cpp` 与 `run_original_vit1d_chain.cpp`。block32可单独零NaN运行，但block33起仍依赖NvAPI `flag=1` command sync；standard/chained/publish与cluster policy的控制变量均已排除，当前精确缺口只剩跨ViT block的NvAPI sync原语。
+
+为继续验证全链，第一版暂以block31 residual近似替代blocks32–38，并执行正式 `repack_1d_to_2d_fp8`。block39只产生34个E4M3 NaN；明确作为近似桥用 `sanitize_e4m3.py` 饱和到最大有限值后，blocks40–47连续零NaN。随后从5090 live blob修正8H fused的0x58 ABI（旧runner字段错8bytes、缺halo）：block48按32×24 physical padding写满147,456 bytes；49–55用halo grid5×4全部零NaN；block56、57–61、62、63–65、精确block66 ABI、67–69全部零NaN。当前decoder已完整贯通。
+
+当前block69 activation经 `e4m3_to_f32.py` 后，RX9070XT运行 `d3d12_final_readout.cpp` 成功输出256×144 RGB，submit→fence `1.665 ms`。画面能清楚辨认Eve，但有严重tinlayout条纹；与旧clean AMD诊断图PSNR 17.61 dB。因同一readout在旧activation上清晰，条纹已定位到跳过32–38造成的activation偏差，不是AMD readout。完成标准仍未满足；下一步继续复刻NvAPI `flag=1`同步或以可验证的ViT stage bridge替代七层identity近似。
+
+### 自建5090 NVAPI chain宿主
+
+官方NVAPI header公开了实验接口 `CreateCuModule/CreateCuFunction/LaunchCuKernelChainEx`。新增 `d3d12_nvapi_repack_test.cpp`，用自有D3D12 default/readback buffers直接启动泄露CUBIN；最小 `repack_2d_to_1d` 与Spark CUDA结果达到 `2,097,152/2,097,152`逐字节一致，证明可绕过游戏runtime并安全readback任意中间层。
+
+新增 `d3d12_nvapi_vit_chain.cpp`，已能创建42-kernel ViT链并逐层limit readback：repack、Expand、Contract、Attention均在5090自建buffer上输出零NaN；QKV standard写两路、chained写另一组，Projection输出仍待按真实 `CCMultiCubinBackend` 子kernel数组组合。单独排列standard/chained会使驱动kernel等待，因此停止盲试。
+
+为直接取得真相，新增 `nvapi_chain_probe.cpp`：hook官方 `CreateCuFunction` 记录handle→symbol，再hook `LaunchCuKernelChainEx`记录每次实际kernel数组、grid/block与参数blob。probe已在AMD WSL静态编译完成（SHA-256 `0b668b93a87138ef21ab7f7f58fd500a8a4e2275eac4511d917711fef5285b22`）。两次错误NVAPI组合令5090出现两个WDDM不可中断测试进程，管理员taskkill也无法结束；系统最终进入真实重启，SSH暂未恢复。机器上线后第一动作是部署该只读probe，不再运行排列测试。
+
+5090硬重启后于 `2026-09-01 22:02:29` 恢复，残留测试进程已清空。首版probe暴露两个宿主生命周期错误：`hookCreate`在持有非递归SRW锁时再次进入日志锁，以及ReShade枚举D3D12设备时卸载addon、后台worker继续执行已卸载代码。前者已拆锁，后者改成独立resident hook DLL，并新增 `inject_probe.cpp`，在游戏进程建立后通过remote `LoadLibraryW`加载，彻底脱离ReShade addon反复装卸周期。所有测试均未再提交猜测的CUDA链，5090未再次出现WDDM锁死。
+
+只读hook已成功记录当前runtime的96个 `CreateCuFunction` handle→symbol，包括ViT的standard/chained/wait全组；证明NVAPI接口ID与hook签名有效。实际 `LaunchCuKernelChainEx` 尚未出现：硬重启后的游戏进入长时间无窗口初始化，同一现象在完全移除probe后也可复现；恢复此前验证过的Win+R `steam://rungameid/3489700`前台启动后能显示Stellar Blade splash，但随后仍进入该初始化阶段。测试进程与probe已干净移除，不能把这个启动状态误判成GPU死锁。
+
+同时复查已有 `/tmp/vit-kernelobj.txt`，确认原版runtime每个ViT block的外层调用并非一条42-kernel大链，而是五个phase逐层调用：Expand首block `flag=0`、后续block以及Contract/QKV/Attention/Projection均为 `flag=1`；实测4K grid依次为 `544×1×1 / 136×1×4 / 272×1×2 / 32×9×1 / 136×1×4`。`CubinBackendNGX::launch`反汇编也闭合：flag先触发context sync，再把kernel对象、参数blob和grid交给context vtable `+0x140`；真正standard/chained子数组在该下一层构造，不在外层42层调度器。下一步改为解该vtable实现或在游戏恢复正常前台后延迟注入，避免再盲排子kernel。
+
+### NVAPI ViT宿主纠错与block31精确分组
+
+复查 `d3d12_nvapi_vit_chain.cpp` 抓到两处足以伪造“kernel排列错误／GPU死锁”的宿主bug：
+
+1. `blobs.reserve(42)`，但旧实现实际生成58个kernel；第43个开始vector扩容，先前所有 `KP::pParams` 成为悬空指针。
+2. `chain()` 名义上调用 `LaunchCuKernelChainEx`，实际循环 `count=1`，每个kernel之间再插UAV barrier。带 `SYNCS.EXCH` 的协作kernel因此永远等不到同组伙伴。
+
+修正为预留96个blob，并把同层kernel一次性以 `count=N` 提交后，5090不再卡死，block31逐层闭合：
+
+```text
+repack                 单kernel
+Expand                 standard
+Contract               standard + chained（同一次NVAPI chain）
+QKV                    standard + chained（同一次NVAPI chain）
+Attention              standard + chained（同一次NVAPI chain）
+Projection             standard（wait/chained加入后会清零整组资源）
+```
+
+层间采用独立command-list提交与fence后，block31最终输出稳定为约65,4xx个非零E4M3 bytes、零NaN（一次记录为65,489，last=65,535）；Contract/QKV/Attention分别验证为28,595／28,662／65,526个非零bytes。另确认只transition/copy单一NVAPI写入buffer会出现假零，全11个UAV统一transition后读回正常，后续诊断统一使用全资源barrier/dump。
+
+block32的首个Expand仍是当前唯一ViT断点：同device连续提交时，standard与 `prev=0` 会在第二block触发device removal；改为chained并传上一block `a38` 也未恢复，最后一次返回 `DXGI_ERROR_DEVICE_HUNG (0x887a0006)`，但测试进程正常退出、未再造成整机WDDM锁死。此处停止5090排列实验。当前证据说明缺的不是矩阵参数或block31数值，而是runtime `flag=1` 在block边界实施的专用同步/状态发布语义。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
