@@ -911,6 +911,8 @@ global decoder 同样重跑：block39 读取新的 block38 main 与 block30 skip
 
 从该正式 block4 output0 重新跑完整 block5–38 encoder，再重跑 block39–65 decoder；block66 bridge 也改用新的 block3 global view，block67–69 全图完成。至此当前最完整路径为 block0–65 exact-global + block66 explicit bridge + block67–69 exact-global。旧链中最后一处逐tile上游污染已消除。剩余硬缺口严格收敛为 block66 1H upsample 与 block70 `0xb8` post ABI。
 
+block70 原 CUBIN 已成功写 CUDA RGBA32F surface。核心字段：main `+0`、skip `+8`、surface object `+0x10`、weights `+0x18`、RGB mode `+0x34=1`、RGB texture object `+0xa0`；width bound 需在 `+0x24` 写256，否则只覆盖144×144。启用后147,456/147,456 floats非零，范围0.130127–1.0。当前输出 `stellar-global-cubin-post-abi.png` 为灰色纹理，说明 c400–c428 的 live color reconstruction/coordinate coefficients 尚缺；静态零/单位猜值不足。下一步从5090 live block70 layer state 扩展读取完整0xb8配置，而不是继续枚举浮点系数。
+
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。
