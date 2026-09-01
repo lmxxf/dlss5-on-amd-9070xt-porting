@@ -935,6 +935,12 @@ NVIDIA PTX ISA 9.1 §9.7.14.5.10 给出 E4M3 matrix-B fragment 的官方坐标�
 
 一次性 post-forward/CUDA launch hook 在feature18首次evaluate时触发Fatal Error，且未落出参数文件。该探针已立即从游戏目录移除；稳定的runtime state探针保留。崩溃发生前feature18 create成功，前一轮无post hook时已稳定运行60帧，故故障明确归于新增hook签名/层级，不归于DLSSNR本体。后续不再注入该hook，改用`0x758a0`反汇编与live state离线重建参数包。
 
+移除故障探针后再次启动，feature18恢复并连续成功到count=60，确认游戏环境无残留损坏。
+
+block66 的真实 forward RVA `0x637b0` 已完整反汇编，纠正了此前最关键的参数方向错误：`rdx` 是outputs、`r8`是inputs；upsample参数实际为 `+0/+8=output`、`+0x10=weights`、`+0x40=main input`、`+0x50=enc0 skip`、`+0x48/+0x4c=half dims`、`+0x58/+0x5c=override dims`。按该ABI以block3作为downsample前enc0 skip运行，block66输出非零654,065、last655,355，Compute Sanitizer零错误；block67–69随后均全图执行，block69非零645,115、last912,383。此前把block4 auxiliary当skip的结论撤回：U-Net enc0 skip应为block3。
+
+但数值语义检查否决了把这条链称作exact：block65进入block66之前，589,824个有效bytes恰好一半为0、一半为0x7f，已经是明显饱和值；新block66–69的held-out readout correlation约为0。根因是archive FP16序列化权重被直接喂给要求runtime E4M3 packed/swizzled arena的原CUBIN。故当前成果只闭合了kernel图、全局view与ABI，不闭合真实数值。旧`block0–69 exact-global`措辞统一降级为`original-CUBIN structural-global`。真正端到端主线必须恢复runtime weight packer，或在AMD上按archive FP16直接重写张量语义；噪声图与无效readout已移到`/tmp`，不进入仓库。
+
 ### 2026-09-01 最新续点
 
 完整 live network dump 已取得，探针已移除。下一步：
