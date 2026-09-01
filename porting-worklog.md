@@ -758,6 +758,16 @@ ds SHA-256:   2e489d1a7c1558ca9575ffdf7bd8cf2f1ffcfa98ac05f1138dda510bca53c784
 
 这使 block0 的完整 fused 结果成为本地可批量采样的 NVIDIA oracle；早期 adapter／depthwise／FFN 的 row-major 预览不再承担数值真值角色。下一步从随机 RGBA tiles 直接拟合 `RGBA → main activation`，并用同一 launch 的 downsample 输出恢复 pre-block DS 分支。
 
+runner 已扩展为同一 CUDA context／module 连续处理任意数量的 8×8 tiles，并可分别绑定四个 texture slots。slot0 与 slot3 对输入敏感；结合 SASS 中 slot0 的四分量 TEX、slot3 的单分量 TEX，当前 RGB 路径绑定 slot0，同时把 Gaussian scale 设为零。9,216 tiles 的原 CUBIN 采样仅耗时 `0.73 s`。
+
+pre-block 输出是 NVIDIA physical tile view，不能直接 reshape 成普通空间卷积目标；为先接通 AMD 主链，首版采用端到端 tile distillation：`192 → 256 → 256 → 2048`、两层 SiLU，训练 8,192 tiles，held-out 1,024 tiles：
+
+```text
+MAE=0.6909643 RMSE=1.5175923 correlation=0.9616113
+```
+
+FP32 参数与 per-output mean/std 共 2,582,528 bytes，保存为 `block0-distilled.bin`。这不是最终精确解：原 CUBIN 仍是权威 oracle，后续恢复 exact unswizzle 后可替换；它的当前用途是让 9070 XT 立即获得可接 block1–3 的真实 pre-block 分布，继续向 32→64 与全网推进。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

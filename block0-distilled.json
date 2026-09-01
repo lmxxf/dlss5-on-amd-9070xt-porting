@@ -1,0 +1,30 @@
+{
+  "file": "block0-distilled.bin",
+  "sha256": "0e632bdd70622066be298622d37db3332dbe78f354ebdb1fdccc973f33e6f04c",
+  "storage": "float32_little_endian",
+  "byte_size": 2582528,
+  "input": "one 8x8 RGB32F tile flattened to 192 values; alpha ignored",
+  "output": "one 8x8x32 physical E4M3-view tile represented as 2048 float values",
+  "activation": "SiLU",
+  "tensor_layout": [
+    ["l1.weight", [256, 192], 0, 49152],
+    ["l1.bias", [256], 49152, 256],
+    ["l2.weight", [256, 256], 49408, 65536],
+    ["l2.bias", [256], 114944, 256],
+    ["l3.weight", [2048, 256], 115200, 524288],
+    ["l3.bias", [2048], 639488, 2048],
+    ["output_mean", [2048], 641536, 2048],
+    ["output_std", [2048], 643584, 2048]
+  ],
+  "training": {
+    "oracle": "cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8",
+    "random_train_tiles": 8192,
+    "heldout_tiles": 1024,
+    "gaussian_scale": 0,
+    "texture_slot": 0,
+    "heldout_mae": 0.6909643,
+    "heldout_rmse": 1.5175923,
+    "heldout_correlation": 0.9616113
+  },
+  "status": "first portable surrogate; retain the original CUBIN oracle as authority and replace when exact physical unswizzle is recovered"
+}

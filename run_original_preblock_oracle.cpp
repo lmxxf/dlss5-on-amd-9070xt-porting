@@ -31,15 +31,19 @@ static void write_file(const char *path, const void *data, size_t size) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 6) {
+    if (argc != 6 && argc != 7) {
         std::fprintf(stderr,
-            "usage: %s cubin block0.weights input-8x8-rgba32f main.fp8 ds.fp8\n",
+            "usage: %s cubin block0.weights input-8x8-rgba32f main.fp8 ds.fp8 [texture-slot 0..3]\n",
             argv[0]);
         return 2;
     }
+    const int texture_slot = argc == 7 ? std::atoi(argv[6]) : 3;
+    if (texture_slot < 0 || texture_slot > 3) return 2;
     const auto weights = read_file(argv[2]);
     const auto input = read_file(argv[3]);
-    if (weights.size() != 21696 || input.size() != 8 * 8 * 4 * sizeof(float)) return 2;
+    constexpr size_t input_tile_bytes = 8 * 8 * 4 * sizeof(float);
+    if (weights.size() != 21696 || input.empty() || input.size() % input_tile_bytes) return 2;
+    const size_t tile_count = input.size() / input_tile_bytes;
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -98,31 +102,46 @@ int main(int argc, char **argv) {
         std::memcpy(params + offset, &one, sizeof(one));
     }
     const int extent = 8;
-    for (int offset : {0x78, 0x90, 0x98, 0x9c, 0xa8, 0xac})
+    for (int offset : {0x78, 0xd0, 0xd4})
         std::memcpy(params + offset, &extent, sizeof(extent));
+    const unsigned zero = 0;
+    std::memcpy(params + 0x88, &zero, sizeof(zero));
+    std::memcpy(params + 0x8c, &zero, sizeof(zero));
+    std::memcpy(params + 0xb0, &zero, sizeof(zero)); // Gaussian input scale
+    std::memcpy(params + 0xc0, &zero, sizeof(zero));
     const unsigned long long dimensions = 8ull | (8ull << 32);
-    std::memcpy(params + 0x10, &device_weights, 8); // legacy/optional weight view
-    std::memcpy(params + 0x20, &texture, 8);
+    const int texture_offsets[] = {0x00, 0x08, 0x18, 0x20};
+    std::memcpy(params + texture_offsets[texture_slot], &texture, 8);
     std::memcpy(params + 0xd8, &main_output, 8);
     std::memcpy(params + 0xe0, &device_weights, 8); // tensor-core weight view
     std::memcpy(params + 0xf0, &dimensions, 8);
     std::memcpy(params + 0xf8, &downsample_output, 8);
 
     void *kernel_args[] = {params};
-    check("cuLaunchKernel", cuLaunchKernel(
-        function, 1, 1, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
-    check("cuCtxSynchronize", cuCtxSynchronize());
-    std::vector<unsigned char> main_bytes(8 * 8 * 32);
-    std::vector<unsigned char> downsample_bytes(4 * 4 * 32);
-    check("cuMemcpyDtoH(main)",
-        cuMemcpyDtoH(main_bytes.data(), main_output, main_bytes.size()));
-    check("cuMemcpyDtoH(downsample)", cuMemcpyDtoH(
-        downsample_bytes.data(), downsample_output, downsample_bytes.size()));
+    constexpr size_t main_tile_bytes = 8 * 8 * 32;
+    constexpr size_t downsample_tile_bytes = 4 * 4 * 32;
+    std::vector<unsigned char> main_bytes(tile_count * main_tile_bytes);
+    std::vector<unsigned char> downsample_bytes(tile_count * downsample_tile_bytes);
+    for (size_t tile = 0; tile < tile_count; ++tile) {
+        copy.srcHost = input.data() + tile * input_tile_bytes;
+        check("cuMemcpy2D(tile)", cuMemcpy2D(&copy));
+        check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, 1 << 20));
+        check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, 1 << 20));
+        check("cuLaunchKernel", cuLaunchKernel(
+            function, 1, 1, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
+        check("cuCtxSynchronize", cuCtxSynchronize());
+        check("cuMemcpyDtoH(main)", cuMemcpyDtoH(
+            main_bytes.data() + tile * main_tile_bytes, main_output, main_tile_bytes));
+        check("cuMemcpyDtoH(downsample)", cuMemcpyDtoH(
+            downsample_bytes.data() + tile * downsample_tile_bytes,
+            downsample_output, downsample_tile_bytes));
+    }
     write_file(argv[4], main_bytes.data(), main_bytes.size());
     write_file(argv[5], downsample_bytes.data(), downsample_bytes.size());
     size_t main_nonzero = 0, downsample_nonzero = 0;
     for (auto value : main_bytes) main_nonzero += value != 0;
     for (auto value : downsample_bytes) downsample_nonzero += value != 0;
-    std::printf("main_nonzero=%zu/%zu downsample_nonzero=%zu/%zu\n",
-        main_nonzero, main_bytes.size(), downsample_nonzero, downsample_bytes.size());
+    std::printf("tiles=%zu main_nonzero=%zu/%zu downsample_nonzero=%zu/%zu\n",
+        tile_count, main_nonzero, main_bytes.size(), downsample_nonzero,
+        downsample_bytes.size());
 }
