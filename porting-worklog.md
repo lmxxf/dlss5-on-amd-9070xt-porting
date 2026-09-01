@@ -881,6 +881,8 @@ block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`�
 
 block10 controlled-weight oracle 证明 128-channel view 仍可按 64 tokens×128 channels 解释。FFN 为标准 `128→160→128`，attention 为四个 16-d cosine heads，QKV `[192,128]`、projection `[128,64]`。低学习率 refinement 后，独立 FFN MAE/RMSE `1.956/5.507`，attention `1.925/3.737`；组合两次 residual 与 E4M3 后，对 1,024 tiles 的完整 block correlation `0.9948525`、MAE `22.526`、RMSE `29.275`。参数固化为 `block10-effective.bin`。这条结果确认精确语义路线可行，下一步推广 block11–13 并写通用 4H HLSL。
 
+推广到 block11 时发现 controlled branches 各自高相关但 full block 只有约 `0.98`。skip offset 扫描排除了布局错误：在 branches 全零时，`ffn_skip=49160`、`attention_skip=98456` 可使 8,191/8,192 bytes identity，邻近任一 offset 都显著下降。结论是 4H fused kernel 的 controlled launch 改变了内部 FP8 tile scale／融合精度状态，两个独立 oracle output 不具备简单可加性；block10 的完整 held-out 数字仍有效，但不能把同一分解法机械推广。block11–13 改为以 full-block CUBIN target 联合校准 FFN/QKV/projection/scale，而不是继续拼接分支拟合结果。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
