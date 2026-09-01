@@ -865,6 +865,12 @@ block56 进一步确认 upsample dimensions 顺序为 `(height,width)`。写入 
 
 block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`；它额外读取 `+0x50/+0x58`。当前基础布局安全但全零，直接把 skip/dims 复制到尾字段会导致 weight addressing 越界，因此不能沿用高宽度 upsample 的结构，下一步按 SASS 分别识别这两个尾字段。
 
+为避免最后一个特殊 ABI 阻断整条验证链，暂以同尺度的 block3 physical skip 作为 block66 bridge，原 block67／68 shifted 与 block69 outview 随后全部运行，得到 576×2048-byte final activation。block70 原 post kernel 参数为 `0xb8`，包含多 texture/surface bindings；在精确 ABI 完成前先验证 activation 是否仍保留图像信息。
+
+以 460 tiles 拟合固定 physical-tile linear readout，116 held-out tiles 得到 correlation `0.68753`、PSNR `12.87 dB`。泄露 archive 的真实 `blend_scale` 为 FP16 `0.7397`；用 `original RGB*0.7397 + network readout*0.2603` 构造第一版 post scaffold 后，`stellar-end-to-end-first.png` 已得到清晰可辨的《剑星》人物画面。readout 参数保存为 `final-readout.bin`。
+
+边界必须明确：这证明 block69 activation 包含可恢复画面，并给出可移植的 end-to-end 诊断输出；它还不是原 `0xb8` post CUBIN 的精确结果，也尚未证明 block4 之后的全部计算已迁到 AMD。下一步一面把 readout/blend 落到 RX 9070 XT HLSL，一面继续回填 block66 与 post ABI。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

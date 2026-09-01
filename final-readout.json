@@ -1,0 +1,11 @@
+{
+  "file":"final-readout.bin",
+  "sha256":"59b57cfbf7d6ce87fa694821260a8645c7f716f20faaff7e990922449e920ecb",
+  "storage":"float32_little_endian",
+  "byte_size":1581824,
+  "tensor_layout":[["input_mean",[2048],0,2048],["output_mean",[192],2048,192],["weight",[2048,192],2240,393216]],
+  "mapping":"one 8x8x32 physical E4M3 tile to one 8x8 RGB tile",
+  "heldout":{"tiles":116,"mae":0.13359113,"rmse":0.2273632,"psnr_db":12.865597,"correlation":0.6875297},
+  "blend":{"archive_blend_scale":0.7397,"diagnostic_formula":"rgb*0.7397 + readout*0.2603"},
+  "status":"first end-to-end diagnostic readout, not an exact replacement for the original 0xb8-byte post CUBIN"
+}
