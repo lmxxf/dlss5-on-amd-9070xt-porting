@@ -527,6 +527,79 @@ compute_submit_to_fence_ms: 0.334
 
 该数字不含 147.7 MB 权重读盘／上传校验、HLSL 编译、资源创建和 PPM 写盘，也不代表完整网络帧时间；只用于确认当前算子本身没有形成性能障碍。
 
+## 2026-09-01：端到端目标升级与 tinlayout 阻塞点
+
+Zero 将完成标准收紧为：RX 9070 XT 走完 71 blocks 并输出最终 RGB；中间图不再作为交付点。
+
+### Fused layout 容量公式
+
+`infer_fused_layouts.py` 对所有普通 32／64／128／256-channel fused blocks 建立重复布局公式并逐 record 验证：
+
+```text
+d=32: hidden=64, 无 weight0
+d>=64: weight0=[d,d/2], hidden=d+32
+weight1=[hidden,d]
+weight2=[d,hidden]
+ffn_cos_skip=[d]
+qkv=[3d/2,d]
+attn_bias=[heads,64,64]
+projection=[d,d/2]
+attn_cos_skip=[d]
+```
+
+所有 36 个普通 fused records 闭合；256-channel records 另有 8-element tail。这个闭合证明张量容量正确，但**不证明矩阵在 blob 中是 row-major**。
+
+### Attention scale 混合格式
+
+修正早期把 32 个槽位全当 FP16 的错误。物理顺序为：
+
+```text
+QKV
+logical attn_bias
+16 FP16 slots padding
+固定 32-byte scale region：前 heads 个值为 float32，其余 padding
+projection
+attn_cos_skip
+```
+
+实测 scale：block1 单 head `0.4087961`；block11 四 heads 为 `11.468388, 5.140335, 5.264631, 9.623281`。scale 是 per-head scalar，作用于 QK cosine logits。修正后 CPU oracle 可无 NaN 走到 block21。
+
+### Row-major 假设被反证
+
+CPU oracle 用标准 row-major matmul 串 encoder 时，feature 幅度在每次 stage conversion 后指数衰减，到 block21 约 `1e-10`；启用正式 Gaussian×4 输入仍相同。结合 SASS 以 lane-dependent `desc[...] + 0x200` tile offsets向 HMMA／QMMA 供数，结论是 archive 内大矩阵已采用 NVIDIA tinlayout／tensor-core tile 排列，不能直接 `.reshape()`。
+
+`block0_reference.py` 默认只跑到 block3；`--end-block 7/13/21` 明确标为等待 unswizzle 的实验路径，防止把灰图误报成端到端结果。
+
+### 5090 live oracle
+
+第一条普通 1H forward 已定位到 RVA `0x637b0`，真实运行参数：
+
+```text
+width=1088
+height=1920
+input GPU VA  ≈ 0x3df...2800
+output GPU VA ≈ 0x3e3...2800
+```
+
+网络不是直接在 3840×2160 张量上执行；宽高参数为 1088×1920（方向按 kernel ABI 记录，尚未重命名）。ReShade resource 事件记录到 79 个 D3D12 buffers；block1 input/output 位于同一个 activation arena resource：
+
+```text
+input_offset  = 0x10042800
+output_offset = 0x14002800
+```
+
+backend 链完整恢复：
+
+```text
+CCTinlayoutFusedSwin1H forward RVA 0x637b0
+  -> CubinBackendNGX::launch RVA 0x449a0
+  -> NGXCubinD3D12/NvAPI dispatch RVA 0x5d3d0
+```
+
+公开 CUDA `cuMemcpyDtoH` 不可用：runtime 走 NvAPI D3D12 CUBIN backend，不建立可供探针使用的 CUDA context。尝试在外部 D3D12 queue 对私有 activation arena 做 `CopyBufferRegion` 导致进程在首次 evaluate 后退出，说明其 resource state／ownership 由 NvAPI 私有 dispatch 管理；失败源码已放入 stash `DLSSNR D3D12外部readback失败实验`，游戏目录中的 probe 已移除。
+
+下一步只走原 dispatch 链内部的 copy：复用 DLL 已有 `NGXCubinParameterStruct<CG2RCopyParams>`／copy CUBIN，把 activation VA 复制到 backend 正式创建的可读 staging resource；不再从外部 D3D12 queue 强拷。取得 block1 input/output oracle 后，求 32-channel tile permutation，再推广到 64／128／256 和 split/ViT kernels。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

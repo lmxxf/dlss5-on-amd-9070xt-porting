@@ -9,6 +9,9 @@
 - `d3d12_weight_arena_test.cpp`：最小 Windows D3D12 权重宿主；强制选择 AMD adapter，上传完整 FP16 arena 到 default heap、读回逐字节校验，并由 HLSL compute shader 按 153 个 record offset 实际读取权重。
 - `block0-tensor-layout.json`：block0 的 10 个内部 FP16 张量边界与形状；元素数精确闭合到 10,848。
 - `block0_reference.py`：block0 的可读 FP32 参考实现；覆盖 adapter、depthwise、FFN 多项式／skip 和当前待 NVIDIA 中间层校准的 8×8 cosine attention。
+- `infer_fused_layouts.py` / `fused-layouts.json`：自动闭合 32／64／128／256-channel fused-Swin record 的重复张量容量；明确区分容量闭合与尚待 unswizzle 的 tensor-core 物理排列。
+- `dlssnr_layer_oracle_probe.cpp`：安全 hook 第一条 1H forward，导出真实网络尺寸、GPU VA、CubinBackendNGX／kernel backend live object 链，供定位 NvAPI dispatch。
+- `read_process_pointer.ps1`：从 SSH 只读解析 live object/vtable 指针及所属模块 RVA。
 - `block0-input-adapter-preview.png`：RX 9070 XT 用真实 `7×32 input_adapter_weight` 执行 HLSL 投影后生成的首张 learned-feature 诊断图。
 - `block0-depthwise-preview.png`：在 input adapter 后继续执行真实 `[32,3,3]` depthwise convolution 的 AMD 输出；颜色变化较弱但非恒定图。
 - `stellar-block0-rgb-only.png`：以《剑星》Steam hero RGB 为输入、Gaussian 四通道置零时，RX 9070 XT 经过 input adapter + depthwise 后的首张可辨认模型中间图。

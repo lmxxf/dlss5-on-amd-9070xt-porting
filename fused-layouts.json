@@ -1,0 +1,411 @@
+{
+  "stages": {
+    "32": {
+      "width": 32,
+      "inferred_elements": 10336,
+      "tensors": [
+        {
+          "name": "weight1",
+          "element_offset": 0,
+          "element_count": 2048
+        },
+        {
+          "name": "weight2",
+          "element_offset": 2048,
+          "element_count": 2048
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 4096,
+          "element_count": 32
+        },
+        {
+          "name": "qkv_weight",
+          "element_offset": 4128,
+          "element_count": 1536
+        },
+        {
+          "name": "attn_bias",
+          "element_offset": 5664,
+          "element_count": 4096
+        },
+        {
+          "name": "attn_bias_padding",
+          "element_offset": 9760,
+          "element_count": 16
+        },
+        {
+          "name": "attn_scale_float32_storage",
+          "element_offset": 9776,
+          "element_count": 16
+        },
+        {
+          "name": "projection_weight",
+          "element_offset": 9792,
+          "element_count": 512
+        },
+        {
+          "name": "attn_cos_skip",
+          "element_offset": 10304,
+          "element_count": 32
+        }
+      ],
+      "blocks": [
+        {
+          "block": 1,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        },
+        {
+          "block": 2,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        },
+        {
+          "block": 3,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        },
+        {
+          "block": 67,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        },
+        {
+          "block": 68,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        },
+        {
+          "block": 69,
+          "actual_elements": 10336,
+          "tail_padding": 0
+        }
+      ]
+    },
+    "64": {
+      "width": 64,
+      "inferred_elements": 30880,
+      "tensors": [
+        {
+          "name": "weight0",
+          "element_offset": 0,
+          "element_count": 2048
+        },
+        {
+          "name": "weight1",
+          "element_offset": 2048,
+          "element_count": 6144
+        },
+        {
+          "name": "weight2",
+          "element_offset": 8192,
+          "element_count": 6144
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 14336,
+          "element_count": 64
+        },
+        {
+          "name": "qkv_weight",
+          "element_offset": 14400,
+          "element_count": 6144
+        },
+        {
+          "name": "attn_bias",
+          "element_offset": 20544,
+          "element_count": 8192
+        },
+        {
+          "name": "attn_bias_padding",
+          "element_offset": 28736,
+          "element_count": 16
+        },
+        {
+          "name": "attn_scale_float32_storage",
+          "element_offset": 28752,
+          "element_count": 16
+        },
+        {
+          "name": "projection_weight",
+          "element_offset": 28768,
+          "element_count": 2048
+        },
+        {
+          "name": "attn_cos_skip",
+          "element_offset": 30816,
+          "element_count": 64
+        }
+      ],
+      "blocks": [
+        {
+          "block": 5,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        },
+        {
+          "block": 6,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        },
+        {
+          "block": 7,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        },
+        {
+          "block": 63,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        },
+        {
+          "block": 64,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        },
+        {
+          "block": 65,
+          "actual_elements": 30880,
+          "tail_padding": 0
+        }
+      ]
+    },
+    "128": {
+      "width": 128,
+      "inferred_elements": 98592,
+      "tensors": [
+        {
+          "name": "weight0",
+          "element_offset": 0,
+          "element_count": 8192
+        },
+        {
+          "name": "weight1",
+          "element_offset": 8192,
+          "element_count": 20480
+        },
+        {
+          "name": "weight2",
+          "element_offset": 28672,
+          "element_count": 20480
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 49152,
+          "element_count": 128
+        },
+        {
+          "name": "qkv_weight",
+          "element_offset": 49280,
+          "element_count": 24576
+        },
+        {
+          "name": "attn_bias",
+          "element_offset": 73856,
+          "element_count": 16384
+        },
+        {
+          "name": "attn_bias_padding",
+          "element_offset": 90240,
+          "element_count": 16
+        },
+        {
+          "name": "attn_scale_float32_storage",
+          "element_offset": 90256,
+          "element_count": 16
+        },
+        {
+          "name": "projection_weight",
+          "element_offset": 90272,
+          "element_count": 8192
+        },
+        {
+          "name": "attn_cos_skip",
+          "element_offset": 98464,
+          "element_count": 128
+        }
+      ],
+      "blocks": [
+        {
+          "block": 9,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 10,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 11,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 12,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 13,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 57,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 58,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 59,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 60,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        },
+        {
+          "block": 61,
+          "actual_elements": 98592,
+          "tail_padding": 0
+        }
+      ]
+    },
+    "256": {
+      "width": 256,
+      "inferred_elements": 344608,
+      "tensors": [
+        {
+          "name": "weight0",
+          "element_offset": 0,
+          "element_count": 32768
+        },
+        {
+          "name": "weight1",
+          "element_offset": 32768,
+          "element_count": 73728
+        },
+        {
+          "name": "weight2",
+          "element_offset": 106496,
+          "element_count": 73728
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 180224,
+          "element_count": 256
+        },
+        {
+          "name": "qkv_weight",
+          "element_offset": 180480,
+          "element_count": 98304
+        },
+        {
+          "name": "attn_bias",
+          "element_offset": 278784,
+          "element_count": 32768
+        },
+        {
+          "name": "attn_bias_padding",
+          "element_offset": 311552,
+          "element_count": 16
+        },
+        {
+          "name": "attn_scale_float32_storage",
+          "element_offset": 311568,
+          "element_count": 16
+        },
+        {
+          "name": "projection_weight",
+          "element_offset": 311584,
+          "element_count": 32768
+        },
+        {
+          "name": "attn_cos_skip",
+          "element_offset": 344352,
+          "element_count": 256
+        }
+      ],
+      "blocks": [
+        {
+          "block": 15,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 16,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 17,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 18,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 19,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 20,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 21,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 49,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 50,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 51,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 52,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 53,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 54,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        },
+        {
+          "block": 55,
+          "actual_elements": 344616,
+          "tail_padding": 8
+        }
+      ]
+    }
+  }
+}
