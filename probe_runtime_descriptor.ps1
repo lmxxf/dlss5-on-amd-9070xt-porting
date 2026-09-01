@@ -75,6 +75,18 @@ function Read-U64Vector([IntPtr]$Address) {
     return $values
 }
 
+function Read-QwordHexVector([IntPtr]$Address) {
+    $begin = Read-U64 $Address 0
+    $end = Read-U64 $Address 8
+    if ($end -lt $begin -or (($end - $begin) % 8) -ne 0) { return @() }
+    $values = @()
+    for ($index = 0; $index -lt [int](($end - $begin) / 8); $index++) {
+        $value = [System.Runtime.InteropServices.Marshal]::ReadInt64([IntPtr][long]$begin, $index * 8)
+        $values += ('0x{0:x16}' -f $value)
+    }
+    return $values
+}
+
 function Read-MsvcStringVector([IntPtr]$Address) {
     $begin = Read-U64 $Address 0
     $end = Read-U64 $Address 8
@@ -159,6 +171,12 @@ try {
                         capacity = ('0x{0:x}' -f $candidateCapacity)
                         used_bytes = $candidateEnd - $candidateBegin
                         capacity_bytes = $candidateCapacity - $candidateBegin
+                        values = if (
+                            (($candidateEnd - $candidateBegin) % 8) -eq 0 -and
+                            ($candidateEnd - $candidateBegin) -le 0x100
+                        ) {
+                            @(Read-QwordHexVector ([IntPtr]($layerAddress.ToInt64() + $candidateOffset)))
+                        } else { @() }
                     }
                 }
             }
@@ -232,6 +250,12 @@ try {
                             capacity = ('0x{0:x}' -f $candidateCapacity)
                             used_bytes = $candidateEnd - $candidateBegin
                             capacity_bytes = $candidateCapacity - $candidateBegin
+                            values = if (
+                                (($candidateEnd - $candidateBegin) % 8) -eq 0 -and
+                                ($candidateEnd - $candidateBegin) -le 0x100
+                            ) {
+                                @(Read-QwordHexVector ([IntPtr]($liveLayerAddress.ToInt64() + $candidateOffset)))
+                            } else { @() }
                         }
                     }
                 }

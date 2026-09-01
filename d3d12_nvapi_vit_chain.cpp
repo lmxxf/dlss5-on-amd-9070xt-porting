@@ -214,14 +214,29 @@ int wmain(int ac, wchar_t **av) {
   for (auto &x : r)
     x = make(A, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+  std::vector<ID3D12Resource *> extraScratch(7 * 7);
+  for (auto &x : extraScratch)
+    x = make(A, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
+             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   ID3D12Resource *wr = make(WA, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
                             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   for (auto *x : r)
+    cl->CopyBufferRegion(x, 0, zero, 0, A);
+  for (auto *x : extraScratch)
     cl->CopyBufferRegion(x, 0, zero, 0, A);
   cl->CopyBufferRegion(r[0], 0, upIn, 0, A);
   cl->CopyBufferRegion(wr, 0, upW, 0, WA);
   std::vector<D3D12_RESOURCE_BARRIER> bars;
   for (auto *x : r) {
+    D3D12_RESOURCE_BARRIER b{};
+    b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    b.Transition.pResource = x;
+    b.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    b.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    b.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    bars.push_back(b);
+  }
+  for (auto *x : extraScratch) {
     D3D12_RESOURCE_BARRIER b{};
     b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     b.Transition.pResource = x;
@@ -308,13 +323,24 @@ int wmain(int ac, wchar_t **av) {
   const int beginBlock = singleMode ? singleBlock - 31 : 0;
   const int endBlock = singleMode ? beginBlock + 1 : 8;
   for (int bi = beginBlock; bi < endBlock; ++bi) {
+    uint64_t blockBranch = branch, blockMain = mainv, blockAttn = attn,
+             blockWork = work, blockQ[3] = {qv[0], qv[1], qv[2]};
+    if (bi > 0) {
+      const size_t si = static_cast<size_t>(bi - 1) * 7;
+      blockBranch = extraScratch[si + 0]->GetGPUVirtualAddress();
+      blockMain = extraScratch[si + 1]->GetGPUVirtualAddress();
+      blockAttn = extraScratch[si + 2]->GetGPUVirtualAddress();
+      blockWork = extraScratch[si + 3]->GetGPUVirtualAddress();
+      for (int qi = 0; qi < 3; ++qi)
+        blockQ[qi] = extraScratch[si + 4 + qi]->GetGPUVirtualAddress();
+    }
     uint64_t base = aux + bi * 0x3000, prev = bi ? base - 0x400 : 0,
              a1 = base + 0xa00, a2 = base + 0xe00, a3 = base + 0x1200,
              a4 = base + 0x1800, a5 = base + 0x1e00, a20 = base + 0x2800,
              a38 = base + 0x2c00;
     std::vector<uint8_t> e(0x48);
     p64(e, 0, cur);
-    p64(e, 16, branch);
+    p64(e, 16, blockBranch);
     p64(e, 24, wva + ws[bi].e);
     p64(e, 48, prev);
     p64(e, 56, base);
@@ -323,12 +349,12 @@ int wmain(int ac, wchar_t **av) {
         std::move(e));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> c(0x48);
-    p64(c, 0, branch);
+    p64(c, 0, blockBranch);
     p64(c, 8, cur);
-    p64(c, 16, mainv);
+    p64(c, 16, blockMain);
     p64(c, 24, wva + ws[bi].c);
     p64(c, 32, a1);
-    p64(c, 40, work);
+    p64(c, 40, blockWork);
     p64(c, 48, base);
     p64(c, 56, a2);
     std::memcpy(c.data() + 64, &tokens, 8);
@@ -337,13 +363,13 @@ int wmain(int ac, wchar_t **av) {
     add(chainedFn[1], {8, 1, 4}, {32, 4, 1}, std::move(c2));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> qq(0x50);
-    p64(qq, 0, mainv);
-    p64(qq, 8, qv[0]);
-    p64(qq, 16, qv[1]);
-    p64(qq, 24, qv[2]);
+    p64(qq, 0, blockMain);
+    p64(qq, 8, blockQ[0]);
+    p64(qq, 16, blockQ[1]);
+    p64(qq, 24, blockQ[2]);
     p64(qq, 32, wva + ws[bi].q);
     p64(qq, 40, a3);
-    p64(qq, 48, work);
+    p64(qq, 48, blockWork);
     p64(qq, 56, a2);
     p64(qq, 64, a4);
     std::memcpy(qq.data() + 72, &dims, 8);
@@ -352,11 +378,11 @@ int wmain(int ac, wchar_t **av) {
     add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> a(0x40);
-    p64(a, 0, qv[0]);
-    p64(a, 8, qv[1]);
-    p64(a, 16, qv[2]);
-    p64(a, 24, attn);
-    p64(a, 32, work);
+    p64(a, 0, blockQ[0]);
+    p64(a, 8, blockQ[1]);
+    p64(a, 16, blockQ[2]);
+    p64(a, 24, blockAttn);
+    p64(a, 32, blockWork);
     p64(a, 40, a4);
     p64(a, 48, a5);
     std::memcpy(a.data() + 56, &dims, 8);
@@ -365,12 +391,12 @@ int wmain(int ac, wchar_t **av) {
     add(chainedFn[3], {32, 1, 1}, {32, 4, 1}, std::move(a2blob));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> pr(0x48);
-    p64(pr, 0, attn);
-    p64(pr, 8, mainv);
+    p64(pr, 0, blockAttn);
+    p64(pr, 8, blockMain);
     p64(pr, 16, next);
     p64(pr, 24, wva + ws[bi].p);
     p64(pr, 32, a20);
-    p64(pr, 40, work);
+    p64(pr, 40, blockWork);
     p64(pr, 48, a5);
     p64(pr, 56, a38);
     std::memcpy(pr.data() + 64, &dims, 8);

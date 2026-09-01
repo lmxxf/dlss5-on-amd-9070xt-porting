@@ -18,6 +18,10 @@
 - `run_original_downsample_oracle.cpp`：批量直跑 block4 原始 shifted DS CUBIN；把 8×8×32 physical tiles 转为 4×4×32 compact E4M3 view，并提供 kernel 必需的 auxiliary scratch。
 - `run_original_2h_inpview_oracle.cpp`：批量直跑 block5 原始 2H inpview CUBIN；每四个 compact tiles 扩展成一个 8×8×64 E4M3 tile。
 - `run_original_fused_global.cpp`：统一的全图 CUBIN runner；支持 plain／inpview／1H-DS／multihead-DS、global grid、shift 与 main/aux 双 view，取代已降级的逐 tile 数值 runner。
+- `run_original_split_global.cpp`：按真实 `2/1/4/1` launch 拓扑执行512-channel split-Swin四层。
+- `run_original_vit1d_global.cpp` / `run_original_vit1d_chain.cpp`：8×8 ViT 的cluster-aware runner；已闭合单block，跨block仍缺NvAPI `flag=1`同步原语。
+- `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
+- `export_weight_records.py` / `e4m3_to_f32.py` / `sanitize_e4m3.py`：权重record导出、E4M3物理view转换与近似桥NaN饱和工具。
 - `block0-distilled.bin` / `block0-distilled.json`：由 8,192 个原 CUBIN tiles 蒸馏出的首版 portable pre-block MLP；直接输出 NVIDIA physical tile view，供 RX 9070 XT 接入 block1–3。它是推进端到端链路的近似入口，不替代原 CUBIN oracle。
 - `block4-distilled.bin` / `block4-distilled.json`：围绕真实 stage3 activation 蒸馏的 `2048→512` compact-downsample bridge；held-out correlation 0.9939，等待 HLSL 落地。
 - `d3d12_block4_bridge.cpp`：RX 9070 XT 三 pass compact-downsample bridge；held-out correlation 0.9940，真图对原 block4 CUBIN correlation 0.9972。
@@ -39,6 +43,9 @@
 - `stellar-block0-ffn-residual.png`：继续执行 SASS 恢复的 FFN 多项式和 `input*ffn_cos_skip + branch` 后的 AMD block0 中间图。
 - `stellar-end-to-end-first.png` / `final-readout.bin` / `final-readout.json`：block69 physical activation 的首张清晰 end-to-end 诊断图及可移植 linear readout；使用真实 `blend_scale=0.7397`，但尚非原 post CUBIN 的精确输出。
 - `d3d12_final_readout.cpp` / `stellar-end-to-end-amd.png`：RX 9070 XT 直接执行 physical-tile linear readout、真实 blend 与 packed-RGB 输出；256×144 submit→fence 0.976 ms。
+- `d3d12_nvapi_repack_test.cpp` / `d3d12_nvapi_vit_chain.cpp`：自建5090 D3D12/NVAPI CUBIN宿主；最小repack已与Spark逐字节一致，完整ViT chain用于恢复blocks31–38精确输出。
+- `nvapi_chain_probe.cpp`：只读记录NVAPI `CreateCuFunction` handle映射和`LaunchCuKernelChainEx`真实子kernel数组，取代standard/chained排列猜测。
+- `stellar-amd-current.png`：新恢复链在RX9070XT上的当前RGB；decoder已零NaN贯通，但因blocks32–38暂用identity近似仍有明显tile条纹，不能视为最终验收图。
 - `stellar-global-cubin-post-abi.png`：block0–69 global CUBIN/bridge activation 经原 block70 kernel 写出的 RGBA surface；当前因缺 live color-transform state 呈灰色纹理，仅作 post ABI 已通的证据。
 - `build_network_graph.py`：把 CPU descriptor builder 恢复出的 71-block 顺序与 `weights-index.json` 合并，生成可复现的结构索引。
 - `network-graph.json`：已恢复的 block 类型、layer 家族、宽度、角色、权重记录与 block-to-block 边；block0 的外部纹理绑定尚未恢复，保持 `null`。
