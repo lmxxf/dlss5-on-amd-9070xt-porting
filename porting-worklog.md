@@ -897,6 +897,10 @@ block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935
 
 FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从 packed E4M3 解码，再从 weight base `+0x7010` 载入 FP16 scale，以 `HMUL2` 乘回。`+0x7010` 的首批 half 值为 `0.8071, 0.9570, 0.9819, 0.9893...`，明确是有限 scale。故 `payload_size == element_count*2` 只证明 archive framing/capacity，不能推出 FP8 kernel 把矩阵当 FP16；此前按 half slot 扫 W2 同时改动两个 E4M3 bytes 并破坏 scale 配对，结果无效。后续 weight unswizzle 必须按 byte-level E4M3 tiles + FP16 scale 恢复。
 
+修正：上句把 `+0x7010` 错归到 weight base。寄存器回溯确认 `R160=c[0][0x390]` 才是 weights；载入 `+0x7010` 的 `R20/R24/...` 源于 `c[0][0x380]` input view。显式分配并清零 32,768-byte input/output 后，线性 output `+0x7010` 仍全零且前4,096 bytes 与旧 runner 完全相同，故 scale plane 也不是简单附在 output 尾部。此前读取 `weights[0x7010]` 得到的0.8～0.99属于巧合误读，已从证据 manifest 撤回。下一步必须恢复 `R20` 的 view-origin 地址公式。
+
+完整地址公式最终表明 `+0x7010` 是同一 global tinlayout 中的邻近 spatial tile，而不是 scale metadata。此前逐 tile runner 只填一个 tile，其余邻居为零，因此 block5 以后的所有逐 tile 数值只能作边界诊断，不能代表正式 runtime。改为全图启动：block5 inpview 使用 `grid=(16,9)`、dims `(72,128)`，安全写出 `128×72×64=589824` bytes；同一全局 view 上串 block6→7→8 后，block8 main 非零589,814 bytes、last589,823，compact 非零73,728 bytes、last220,159，Compute Sanitizer 零错误。`stage2-distilled`、`block8-downsample-effective` 与 per-tile 4H effective manifests 已明确降级为 diagnostic-only。后续唯一数值真值是 global runner。
+
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。

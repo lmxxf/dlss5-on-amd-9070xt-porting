@@ -4,5 +4,5 @@
   "tensor_layout":[["input_mean",[2048],0,2048],["input_std",[2048],2048,2048],["l1.weight",[256,2048],4096,524288],["l1.bias",[256],528384,256],["l2.weight",[4096,256],528640,1048576],["l2.bias",[4096],1577216,4096],["output_mean",[4096],1581312,4096],["output_std",[4096],1585408,4096]],
   "heldout":{"groups":512,"mae":4.9250931,"rmse":9.5192541,"correlation":0.9926007},
   "real_chain":{"mae":5.5275542,"rmse":10.9485377,"correlation":0.9904226},
-  "status":"distribution-specific AMD bridge for blocks5-7; original CUBIN remains authoritative"
+  "status":"deprecated numeric authority: per-tile launches zeroed neighboring global tinlayout view; diagnostic only"
 }
