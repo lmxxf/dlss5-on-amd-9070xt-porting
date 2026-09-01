@@ -8,12 +8,13 @@
     {"name": "dw_weight", "shape": [32, 3, 3], "element_offset": 224, "element_count": 288},
     {"name": "weight1", "shape": [64, 32], "element_offset": 512, "element_count": 2048},
     {"name": "weight2", "shape": [32, 64], "element_offset": 2560, "element_count": 2048},
-    {"name": "ffn_cos_skip", "shape": [32], "element_offset": 4608, "element_count": 32},
-    {"name": "qkv_weight", "shape": [48, 32], "element_offset": 4640, "element_count": 1536},
-    {"name": "attn_bias", "shape": [1, 64, 64], "element_offset": 6176, "element_count": 4096},
-    {"name": "attn_bias_padding", "shape": [16], "element_offset": 10272, "element_count": 16},
-    {"name": "attn_scale", "shape": [1], "storage": "float32_packed", "element_offset": 10288, "storage_half_count": 16},
-    {"name": "projection_weight", "shape": [32, 16], "element_offset": 10304, "element_count": 512},
-    {"name": "attn_cos_skip", "shape": [32], "element_offset": 10816, "element_count": 32}
+    {"name": "pre_ffn_padding", "shape": [8], "element_offset": 4608, "element_count": 8},
+    {"name": "ffn_cos_skip", "shape": [32], "element_offset": 4616, "element_count": 32},
+    {"name": "qkv_weight", "shape": [48, 32], "element_offset": 4648, "element_count": 1536},
+    {"name": "attn_bias", "shape": [1, 64, 64], "element_offset": 6184, "element_count": 4096},
+    {"name": "attn_scale", "shape": [1], "storage": "float32_packed", "element_offset": 10280, "storage_half_count": 16},
+    {"name": "projection_weight", "shape": [32, 16], "element_offset": 10296, "element_count": 512},
+    {"name": "attn_cos_skip", "shape": [32], "element_offset": 10808, "element_count": 32},
+    {"name": "tail_padding", "shape": [8], "element_offset": 10840, "element_count": 8}
   ]
 }

@@ -39,7 +39,7 @@ def load_block0(
     tensors: dict[str, torch.Tensor] = {}
     for item in layout["tensors"]:
         begin = int(item["element_offset"])
-        if item["name"] == "attn_bias_padding":
+        if item["name"].endswith("padding"):
             continue
         if item.get("storage") == "float32_packed":
             count = int(np.prod(item["shape"]))
@@ -74,9 +74,6 @@ def load_fused_block(
         [
             ("weight1", (hidden, width)),
             ("weight2", (width, hidden)),
-            ("ffn_cos_skip", (width,)),
-            ("qkv_weight", (3 * width // 2, width)),
-            ("attn_bias", (heads, 64, 64)),
         ]
     )
     tensors: dict[str, torch.Tensor] = {}
@@ -87,7 +84,21 @@ def load_fused_block(
             values[offset : offset + count].astype(np.float32)
         ).reshape(shape)
         offset += count
-    offset += 16  # physical padding after the logical relative-attention bias
+    offset += 8
+    tensors["ffn_cos_skip"] = torch.from_numpy(
+        values[offset : offset + width].astype(np.float32)
+    )
+    offset += width
+    qkv_count = 3 * (width // 2) * width
+    tensors["qkv_weight"] = torch.from_numpy(
+        values[offset : offset + qkv_count].astype(np.float32)
+    ).reshape(3 * width // 2, width)
+    offset += qkv_count
+    bias_count = heads * 64 * 64
+    tensors["attn_bias"] = torch.from_numpy(
+        values[offset : offset + bias_count].astype(np.float32)
+    ).reshape(heads, 64, 64)
+    offset += bias_count
     scale = np.frombuffer(values[offset : offset + 16].tobytes(), dtype="<f4", count=heads).copy()
     tensors["attn_scale"] = torch.from_numpy(scale)
     offset += 16
@@ -101,10 +112,13 @@ def load_fused_block(
     )
     offset += width
     tail = values.size - offset
-    if tail not in (0, 8, allowed_extra):
+    padding = 16 if width == 256 else 8
+    if tail not in (padding, padding + allowed_extra):
         raise ValueError(f"block{block}: unexplained fused tail {values.size - offset}")
-    if tail == allowed_extra and allowed_extra:
-        tensors["_extra"] = torch.from_numpy(values[offset:].astype(np.float32))
+    if tail == padding + allowed_extra and allowed_extra:
+        tensors["_extra"] = torch.from_numpy(
+            values[offset : values.size - padding].astype(np.float32)
+        )
     return tensors
 
 

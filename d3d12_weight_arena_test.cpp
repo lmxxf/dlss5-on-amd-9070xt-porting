@@ -330,7 +330,7 @@ void preview(uint3 id : SV_DispatchThreadID) {
             value += hidden[hidden_channel] *
                 load_half(2560 + output_channel * 64 + hidden_channel);
         }
-        value += features[output_channel] * load_half(4608 + output_channel);
+        value += features[output_channel] * load_half(4616 + output_channel);
         uint byte_value = (uint)round(saturate(0.5 + value * 40.0) * 255.0);
         rgb |= byte_value << (output_channel * 8);
     }

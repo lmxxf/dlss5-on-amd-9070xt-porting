@@ -20,13 +20,14 @@ def layout(width: int) -> list[tuple[str, int]]:
         [
             ("weight1", hidden * width),
             ("weight2", width * hidden),
+            ("pre_ffn_padding", 8),
             ("ffn_cos_skip", width),
             ("qkv_weight", 3 * (width // 2) * width),
             ("attn_bias", heads * 64 * 64),
-            ("attn_bias_padding", 16),
             ("attn_scale_float32_storage", 16),
             ("projection_weight", width * (width // 2)),
             ("attn_cos_skip", width),
+            ("tail_padding", 16 if width == 256 else 8),
         ]
     )
     return tensors
@@ -56,7 +57,7 @@ def main() -> None:
         for block in blocks:
             actual = int(by_name[f"block{block}.layer0.layer"]["element_count"])
             padding = actual - inferred
-            if padding not in (0, 8):
+            if padding != 0:
                 raise ValueError(
                     f"block{block} width {width}: actual={actual}, inferred={inferred}"
                 )

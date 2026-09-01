@@ -15,39 +15,44 @@
           "element_count": 2048
         },
         {
-          "name": "ffn_cos_skip",
+          "name": "pre_ffn_padding",
           "element_offset": 4096,
+          "element_count": 8
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 4104,
           "element_count": 32
         },
         {
           "name": "qkv_weight",
-          "element_offset": 4128,
+          "element_offset": 4136,
           "element_count": 1536
         },
         {
           "name": "attn_bias",
-          "element_offset": 5664,
+          "element_offset": 5672,
           "element_count": 4096
         },
         {
-          "name": "attn_bias_padding",
-          "element_offset": 9760,
-          "element_count": 16
-        },
-        {
           "name": "attn_scale_float32_storage",
-          "element_offset": 9776,
+          "element_offset": 9768,
           "element_count": 16
         },
         {
           "name": "projection_weight",
-          "element_offset": 9792,
+          "element_offset": 9784,
           "element_count": 512
         },
         {
           "name": "attn_cos_skip",
-          "element_offset": 10304,
+          "element_offset": 10296,
           "element_count": 32
+        },
+        {
+          "name": "tail_padding",
+          "element_offset": 10328,
+          "element_count": 8
         }
       ],
       "blocks": [
@@ -103,39 +108,44 @@
           "element_count": 6144
         },
         {
-          "name": "ffn_cos_skip",
+          "name": "pre_ffn_padding",
           "element_offset": 14336,
+          "element_count": 8
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 14344,
           "element_count": 64
         },
         {
           "name": "qkv_weight",
-          "element_offset": 14400,
+          "element_offset": 14408,
           "element_count": 6144
         },
         {
           "name": "attn_bias",
-          "element_offset": 20544,
+          "element_offset": 20552,
           "element_count": 8192
         },
         {
-          "name": "attn_bias_padding",
-          "element_offset": 28736,
-          "element_count": 16
-        },
-        {
           "name": "attn_scale_float32_storage",
-          "element_offset": 28752,
+          "element_offset": 28744,
           "element_count": 16
         },
         {
           "name": "projection_weight",
-          "element_offset": 28768,
+          "element_offset": 28760,
           "element_count": 2048
         },
         {
           "name": "attn_cos_skip",
-          "element_offset": 30816,
+          "element_offset": 30808,
           "element_count": 64
+        },
+        {
+          "name": "tail_padding",
+          "element_offset": 30872,
+          "element_count": 8
         }
       ],
       "blocks": [
@@ -191,39 +201,44 @@
           "element_count": 20480
         },
         {
-          "name": "ffn_cos_skip",
+          "name": "pre_ffn_padding",
           "element_offset": 49152,
+          "element_count": 8
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 49160,
           "element_count": 128
         },
         {
           "name": "qkv_weight",
-          "element_offset": 49280,
+          "element_offset": 49288,
           "element_count": 24576
         },
         {
           "name": "attn_bias",
-          "element_offset": 73856,
+          "element_offset": 73864,
           "element_count": 16384
         },
         {
-          "name": "attn_bias_padding",
-          "element_offset": 90240,
-          "element_count": 16
-        },
-        {
           "name": "attn_scale_float32_storage",
-          "element_offset": 90256,
+          "element_offset": 90248,
           "element_count": 16
         },
         {
           "name": "projection_weight",
-          "element_offset": 90272,
+          "element_offset": 90264,
           "element_count": 8192
         },
         {
           "name": "attn_cos_skip",
-          "element_offset": 98464,
+          "element_offset": 98456,
           "element_count": 128
+        },
+        {
+          "name": "tail_padding",
+          "element_offset": 98584,
+          "element_count": 8
         }
       ],
       "blocks": [
@@ -281,7 +296,7 @@
     },
     "256": {
       "width": 256,
-      "inferred_elements": 344608,
+      "inferred_elements": 344616,
       "tensors": [
         {
           "name": "weight0",
@@ -299,111 +314,116 @@
           "element_count": 73728
         },
         {
-          "name": "ffn_cos_skip",
+          "name": "pre_ffn_padding",
           "element_offset": 180224,
+          "element_count": 8
+        },
+        {
+          "name": "ffn_cos_skip",
+          "element_offset": 180232,
           "element_count": 256
         },
         {
           "name": "qkv_weight",
-          "element_offset": 180480,
+          "element_offset": 180488,
           "element_count": 98304
         },
         {
           "name": "attn_bias",
-          "element_offset": 278784,
+          "element_offset": 278792,
           "element_count": 32768
         },
         {
-          "name": "attn_bias_padding",
-          "element_offset": 311552,
-          "element_count": 16
-        },
-        {
           "name": "attn_scale_float32_storage",
-          "element_offset": 311568,
+          "element_offset": 311560,
           "element_count": 16
         },
         {
           "name": "projection_weight",
-          "element_offset": 311584,
+          "element_offset": 311576,
           "element_count": 32768
         },
         {
           "name": "attn_cos_skip",
-          "element_offset": 344352,
+          "element_offset": 344344,
           "element_count": 256
+        },
+        {
+          "name": "tail_padding",
+          "element_offset": 344600,
+          "element_count": 16
         }
       ],
       "blocks": [
         {
           "block": 15,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 16,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 17,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 18,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 19,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 20,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 21,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 49,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 50,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 51,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 52,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 53,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 54,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         },
         {
           "block": 55,
           "actual_elements": 344616,
-          "tail_padding": 8
+          "tail_padding": 0
         }
       ]
     }

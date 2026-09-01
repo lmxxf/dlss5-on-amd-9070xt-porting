@@ -508,11 +508,11 @@ SASS 从 weight pointer `+0x40000` 读取每通道 skip 系数，把 `input * ff
 output = W2 * activation(W1 * input) + input * ffn_cos_skip
 ```
 
-将该公式回填 block0 后，RX 9070 XT 生成 `stellar-block0-ffn-residual.png`。固定线性显示范围内为低对比灰色浮雕，输入人物／装备轮廓仍可辨认。原始 PPM：
+将该公式回填 block0 后，basis oracle 又把 `ffn_cos_skip` 的物理起点从早期误判的 element 4608 校正为 4616（前置 8-element padding）。RX 9070 XT 用正确 offset 重跑并覆盖 `stellar-block0-ffn-residual.png`；固定线性显示范围内人物／装备轮廓明显可辨认。原始 PPM：
 
 ```text
-SHA256=3babef75fc33ee4c6bd9bfac927da4849cd559d5133f064b7a143fafe6fbd683
-min=0.462745 max=0.529412 mean=0.499949 stddev=0.00237699
+SHA256=ea6127936fdf88886f1981f0f430d08e20927e1a63ef412ff65b60798d13fff1
+min=0.368627 max=0.662745 mean=0.501223 stddev=0.00780887
 ```
 
 block0 下一段为 8×8 cosine attention。它需要让 64 个像素共享 Q/K/V，不能继续在单一像素 shader 中重复整个前端；下一步把当前宿主重构为多 pass FP32 feature buffers：pre+FFN pass 写 `[H,W,32]`，attention pass 按 8×8 window 读取，再做 projection／`attn_cos_skip`。
@@ -641,6 +641,24 @@ non-FP8 variant 不能直接消费该混合格式 blob；runtime 实际 FP8 vari
 - 因此「把 blob reshape 成 `[H,W,C]`」在 activation 和 matrix 两侧都不成立。
 
 这条本地 oracle 取代 5090 中间层 readback：后续在 Spark 用 finite basis + controlled weights 求完整 input/output/weight permutation，再把 unswizzle 规则用于 PyTorch 和 AMD HLSL。5090 只保留最终真实游戏帧验收用途。
+
+identity-weight basis scan 随后把 1H／32 flat layout 的 padding 与两个 skip 向量逐 element 钉死：
+
+```text
+weight1 + weight2     0..4095
+padding               4096..4103
+ffn_cos_skip          4104..4135
+qkv                   4136..5671
+attn_bias             5672..9767
+attn_scale region     9768..9783   (16 half slots; float32 per head)
+projection            9784..10295
+attn_cos_skip         10296..10327
+tail padding          10328..10335
+```
+
+scan 方法：保留真实 FFN prefix、清零 attention branch，逐个 FP16 weight slot 置 1；只有 10296–10327 各自控制 64 个 output bytes。反向固定 attention skip 后扫描 FFN 区，只有 4104–4135 命中。block0 在最前面多 512 elements（input adapter + depthwise），其余 offset 整体后移 512。`block0-tensor-layout.json`、通用 `fused-layouts.json` 和 AMD HLSL offset 已同步修正。
+
+修正后的 256×144 AMD adapter+depthwise+FFN residual submit→fence 为 `0.395 ms`；此数字仍不含初始化与完整 attention/network。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
