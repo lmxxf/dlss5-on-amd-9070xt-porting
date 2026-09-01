@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     std::puts("basis,nonzero,output,value");
     for (unsigned basis = 0; basis < 2048; ++basis) {
         std::memset(input.data(), 0, input.size());
-        input[basis] = 0x3f;
+        input[basis] = 0x38; // E4M3 1.0
         ck("copy input", cuMemcpyHtoD(di, input.data(), 2048));
         ck("zero output", cuMemsetD8(dout, 0, buffer_size));
         ck("cuLaunchKernel", cuLaunchKernel(function, 1, 1, 1, 32, 1, 1, 0, nullptr, kernel_args, nullptr));

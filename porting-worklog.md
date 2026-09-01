@@ -660,6 +660,53 @@ scan 方法：保留真实 FFN prefix、清零 attention branch，逐个 FP16 we
 
 修正后的 256×144 AMD adapter+depthwise+FFN residual submit→fence 为 `0.395 ms`；此数字仍不含初始化与完整 attention/network。
 
+### 1H/32 原 CUBIN oracle → AMD 完整 block1
+
+sm_120 原 kernel 直接运行后，用 controlled weights/basis 恢复：
+
+- activation 是 32-channel E4M3，每个 8×8 tile 为 2,048 bytes；body identity 时 2,048/2,048 byte positions一对一保持；
+- W1／W2 物理矩阵各 2,048 FP16 slots，bit permutation 可拆成逻辑 `[64,32]` 与 `[32,64]`；
+- FFN 是 SASS 多项式 `fast_activation(W1*x)`，不是早期误判的 gated A/B；
+- Q/K/V 各由 even／odd 两个 `[16,16]` 分支组成，合成 16-d one-head cosine attention；projection 为 `[32,16]`；
+- attention bias 为 `[64,64]`，scale 为单 float32；两个 skip 向量均为 32 channels。
+
+全局 batch launch 的 width/height stride 会打乱简单 tile 切片；oracle dataset 最终采用同一进程逐 tile launch，1024 个训练 tiles 与 256 个 held-out tiles。任意抽取 tile 与单独 launch output byte-for-byte 相等。
+
+FFN 等效 row-major 参数 held-out：
+
+```text
+MAE=0.0099954 RMSE=0.0156062 correlation=0.9997198
+```
+
+attention 等效参数 held-out：
+
+```text
+MAE=0.0017183 RMSE=0.0034460 correlation=0.9986987
+```
+
+组合真实 FFN／attention／两次 skip／中间与最终 E4M3 quantization，对原 block1 CUBIN held-out：
+
+```text
+MAE=0.010776959
+RMSE=0.025441187
+exact E4M3 fraction=0.63224983
+correlation=0.99899703
+```
+
+参数以 FP32 little-endian 固化到 `block1-effective.bin`（41,220 bytes，SHA-256 `551d47badd48f0bbf6346f3bbc280c3ebe2f5c9d8b4864c38c647ff34d1564c8`），布局见 JSON manifest。
+
+`d3d12_block1_test.cpp` 在 RX 9070 XT 上用两个 HLSL compute passes 执行相同 pipeline。256 tiles／16,384 tokens 实测：
+
+```text
+adapter: AMD Radeon RX 9070 XT
+submit_to_fence_ms: 2.425
+MAE: 0.010776959
+RMSE: 0.025441188
+exact: 0.632250
+```
+
+AMD 与 CPU 等效模型误差一致，证明 D3D12/HLSL 没有引入额外偏差。下一步将 oracle dataset／fitter 参数化到 block2、block3；shifted-window 通过输入 tile 重排和 mask 单独校准。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

@@ -1,0 +1,31 @@
+{
+  "source_record": "block1.layer0.layer",
+  "oracle_kernel": "cc_tinlayout_fused_swin_1h_32_1_fp8",
+  "storage": "float32_little_endian",
+  "sha256": "551d47badd48f0bbf6346f3bbc280c3ebe2f5c9d8b4864c38c647ff34d1564c8",
+  "byte_size": 41220,
+  "tensors": [
+    {"name":"W1","shape":[64,32],"byte_offset":0,"byte_size":8192},
+    {"name":"W2","shape":[32,64],"byte_offset":8192,"byte_size":8192},
+    {"name":"Qe","shape":[16,16],"byte_offset":16384,"byte_size":1024},
+    {"name":"Qo","shape":[16,16],"byte_offset":17408,"byte_size":1024},
+    {"name":"Ke","shape":[16,16],"byte_offset":18432,"byte_size":1024},
+    {"name":"Ko","shape":[16,16],"byte_offset":19456,"byte_size":1024},
+    {"name":"Ve","shape":[16,16],"byte_offset":20480,"byte_size":1024},
+    {"name":"Vo","shape":[16,16],"byte_offset":21504,"byte_size":1024},
+    {"name":"P","shape":[32,16],"byte_offset":22528,"byte_size":2048},
+    {"name":"bias","shape":[64,64],"byte_offset":24576,"byte_size":16384},
+    {"name":"scale","shape":[1],"byte_offset":40960,"byte_size":4},
+    {"name":"ffn_cos_skip","shape":[32],"byte_offset":40964,"byte_size":128},
+    {"name":"attn_cos_skip","shape":[32],"byte_offset":41092,"byte_size":128}
+  ],
+  "heldout": {
+    "tiles": 256,
+    "pixels": 16384,
+    "mae": 0.010776959,
+    "rmse": 0.025441187,
+    "exact_e4m3_fraction": 0.63224983,
+    "correlation": 0.99899703
+  },
+  "boundary": "Equivalent row-major parameters for fixed block1; fitted against original sm_120 CUBIN oracle and validated on held-out tiles."
+}
