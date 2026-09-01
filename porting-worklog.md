@@ -952,6 +952,61 @@ block66 的真实 forward RVA `0x637b0` 已完整反汇编，纠正了此前最�
 3. 以 vtable／kernel class 分组，只对已反汇编确认过布局的 class 扩展 state 字段；
 4. AMD 第一版继续坚持 FP16 解码，不复刻 NVIDIA FP8 kernel，只复刻图和张量语义。
 
+### 2026-09-01 续点校正：CPU 权重路径没有找到 packer
+
+Codex 中断后重新从 PE `.pdata` 函数表与 RIP-relative 字符串引用恢复关键 CPU 函数边界；不依赖已丢失的 Ghidra project：
+
+```text
+CG2RNetworkManager::BuildActiveNetwork  RVA 0x1f570–0x20628
+CG2RNetworkManager::LoadWeights         RVA 0x22a80–0x22c19
+CG2RLoadWeightBlob                      RVA 0x23ac0–0x23ba8
+archive record parser                   RVA 0x44ee0–0x45314
+```
+
+`LoadWeights` 的数据流为：Windows resource API 取得 `WEIGHTS_HT` 指针／大小，复制整块 blob 到普通 host vector，再调用 `0x44ee0`。`0x44ee0` 顺序读取 record name/body，并把 payload 指针、payload byte count 与元数据写进按名字索引的树；该路径没有 FP16→FP8 算术。
+
+`BuildActiveNetwork` 随后遍历这棵 weight map。对每条记录，调用 backend vtable `+0x88` 时，`r8=host payload pointer`、`r9=payload byte count`；失败日志就是：
+
+```text
+CopyHostToDeviceBuffer weight '%s' size=%zu offset=%zu failed NvAPI_Status=%d
+```
+
+CPU 调用点没有传入 tensor shape，也没有生成不同大小的转换结果。现有静态证据因此**不支持“DLL CPU loader 里另有一个按张量量化／重排的 packer”**。但 backend `+0x88` 属于 NvAPI 私有实现，仅凭调用点还不能证明它绝对是纯 memcpy。
+
+工作假设随之调整：
+
+1. 优先验证 archive payload 是否本来就是 CUBIN 可消费的混合 packed 格式；外层 `payload_size = element_count × 2` 与部分值可按 FP16 解码，不能单独证明每个 matrix byte 都是线性 FP16 tensor。
+2. 同时审计 global runner 缺失的 auxiliary／dynamic-scale view。单 block 高相关而长链到 block65 才饱和，也可能是运行时 view 状态没有完整复刻，不应继续只归因于 weight packer。
+3. 在取得 runtime weight bytes 或 backend `+0x88` 实现的直接证据前，保留 `fp8-weight-layout-evidence.json` 的“archive 与 runtime 解释不同”现象，但撤回“加载阶段必须存在已确认 packer”的强表述。
+
+### split-Swin 首个数值断点：QKV 缺了双 view
+
+重新统计保留在 `/tmp` 的 global activation，数值不是到 block65 才逐渐坏：block1–21 的有效区各有 225–254 种 E4M3 byte；block23 前两层仍分别有 254／255 种。第一次坍缩发生在首个 512-channel split-Swin 的 layer2：
+
+```text
+block23.layer0 FfwdInpview   正常多值
+block23.layer1 FfwdProj      正常多值
+block23.layer2 QKVAttn       只剩 0x00 / 0x7f
+block23.layer3 Projection    继承 0x00 / 0x7f
+```
+
+由 5090 live vtable（module base `0x7ffbad510000`）反推静态函数：QKV forward RVA 为 `0x6d260`。反汇编恢复出的正式 `0x38` 参数包支持：
+
+```text
++0x00 main input
++0x08 main output
++0x10 weights
++0x18 width
++0x1c height
++0x20/+0x24 shift/origin
++0x28 auxiliary input
++0x30 auxiliary output
+```
+
+QKV forward 可在 state flag 与 vector 长度同时满足时，从 inputs[1]／outputs[1] 填入 `+0x28/+0x30`。这首先暴露出旧 runner 没检查多 view 的缺口，但是否为当前 preset 的实因必须实测。
+
+实测随后否决“缺 auxiliary 就是根因”：给 FfwdProj 的 `+0x28/+0x30/+0x38` 全部分配有效 buffer 后，只有主输出 `b0` 写入 30,952 个非零 bytes，`b1/b2/b3` 全零。QKV 的第二 view 是接口能力，不等于这个 block 实际使用。当前确定断点仍是 block23.layer2，但下一步必须读取该 live layer state 的真实 flag／输入输出 vector 数量，或从 QKV SASS 直接确认 `+0x28/+0x30` 是否被当前 kernel 读取；不能再由 forward 的条件分支直接宣布根因。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
