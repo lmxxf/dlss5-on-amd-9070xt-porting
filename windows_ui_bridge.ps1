@@ -1,21 +1,22 @@
 param(
-    [ValidateSet('Screenshot', 'Click', 'Key', 'Text', 'ClickText')]
+    [ValidateSet('Screenshot', 'Click', 'Wheel', 'Key', 'Text', 'ClickText')]
     [string]$Action = 'Screenshot',
     [int]$X = 0,
     [int]$Y = 0,
     [int]$VirtualKey = 0,
-    [string]$Text = ''
+    [string]$Text = '',
+    [int]$Delta = 0
 )
 
 $ErrorActionPreference = 'Stop'
 $Output = 'D:\DLSSNR-Lab\logs\desktop.png'
 
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
 Add-Type @'
 using System;
 using System.Runtime.InteropServices;
 public static class DesktopInput {
+    [DllImport("user32.dll")]
+    public static extern bool SetProcessDpiAwarenessContext(IntPtr value);
     [DllImport("user32.dll")]
     public static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")]
@@ -24,6 +25,9 @@ public static class DesktopInput {
     public static extern void keybd_event(byte key, byte scan, uint flags, UIntPtr extra);
 }
 '@
+[void][DesktopInput]::SetProcessDpiAwarenessContext([IntPtr](-4))
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 if ($Action -eq 'Screenshot') {
     $bounds = [Windows.Forms.SystemInformation]::VirtualScreen
@@ -41,6 +45,12 @@ if ($Action -eq 'Click') {
     Start-Sleep -Milliseconds 150
     [DesktopInput]::mouse_event(0x0002, 0, 0, 0, [UIntPtr]::Zero)
     [DesktopInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
+    exit 0
+}
+
+if ($Action -eq 'Wheel') {
+    [void][DesktopInput]::SetCursorPos($X, $Y)
+    [DesktopInput]::mouse_event(0x0800, 0, 0, [uint32]$Delta, [UIntPtr]::Zero)
     exit 0
 }
 

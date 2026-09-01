@@ -18,6 +18,14 @@ constexpr uint64_t kMaximumCapturedBytes = 512ull * 1024 * 1024;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\weight-upload-probe.txt)";
 std::atomic<uint64_t> g_captured_bytes{0};
 SRWLOCK g_file_lock = SRWLOCK_INIT;
+struct ActiveMap {
+    reshade::api::device *device = nullptr;
+    reshade::api::resource resource{};
+    uint64_t offset = 0;
+    uint64_t size = 0;
+    const void *data = nullptr;
+};
+ActiveMap g_active_maps[16]{};
 
 bool is_candidate(reshade::api::device *device, reshade::api::resource resource) {
     const reshade::api::resource_desc desc = device->get_resource_desc(resource);
@@ -112,17 +120,45 @@ bool on_copy_buffer_region(
     }
     const reshade::api::resource_desc dest_desc = device->get_resource_desc(dest);
     append_log("copy", dest, dest_desc.buffer.size, dest_offset, size, nullptr);
-    void *mapped = nullptr;
-    if (device->map_buffer_region(
-            source, source_offset, size,
-            reshade::api::map_access::read_only, &mapped)) {
-        capture_upload("copy_source", device, dest, dest_offset, size, mapped);
-        device->unmap_buffer_region(source);
-    } else {
-        append_log("copy_source_unmappable", dest, dest_desc.buffer.size,
-            dest_offset, size, nullptr);
-    }
     return false;
+}
+
+void on_map_buffer_region(
+    reshade::api::device *device, reshade::api::resource resource,
+    uint64_t offset, uint64_t size, reshade::api::map_access,
+    void **data) {
+    if (data == nullptr || *data == nullptr || !is_candidate(device, resource)) {
+        return;
+    }
+    AcquireSRWLockExclusive(&g_file_lock);
+    for (ActiveMap &entry : g_active_maps) {
+        if (entry.data == nullptr) {
+            entry = {device, resource, offset, size, *data};
+            break;
+        }
+    }
+    ReleaseSRWLockExclusive(&g_file_lock);
+}
+
+void on_unmap_buffer_region(
+    reshade::api::device *device, reshade::api::resource resource) {
+    ActiveMap captured{};
+    AcquireSRWLockExclusive(&g_file_lock);
+    for (ActiveMap &entry : g_active_maps) {
+        if (entry.data != nullptr && entry.resource == resource) {
+            captured = entry;
+            entry = {};
+            break;
+        }
+    }
+    ReleaseSRWLockExclusive(&g_file_lock);
+    if (captured.data != nullptr) {
+        const reshade::api::resource_desc desc = device->get_resource_desc(resource);
+        const uint64_t bytes = captured.size == UINT64_MAX
+            ? desc.buffer.size - captured.offset
+            : captured.size;
+        capture_upload("unmap", device, resource, captured.offset, bytes, captured.data);
+    }
 }
 } // namespace
 
@@ -138,7 +174,15 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
             on_update_buffer_region);
         reshade::register_event<reshade::addon_event::copy_buffer_region>(
             on_copy_buffer_region);
+        reshade::register_event<reshade::addon_event::map_buffer_region>(
+            on_map_buffer_region);
+        reshade::register_event<reshade::addon_event::unmap_buffer_region>(
+            on_unmap_buffer_region);
     } else if (reason == DLL_PROCESS_DETACH) {
+        reshade::unregister_event<reshade::addon_event::unmap_buffer_region>(
+            on_unmap_buffer_region);
+        reshade::unregister_event<reshade::addon_event::map_buffer_region>(
+            on_map_buffer_region);
         reshade::unregister_event<reshade::addon_event::copy_buffer_region>(
             on_copy_buffer_region);
         reshade::unregister_event<reshade::addon_event::update_buffer_region>(
