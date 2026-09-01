@@ -101,6 +101,29 @@ bool on_update_buffer_region(
     capture_upload("update", device, dest, dest_offset, size, data);
     return false;
 }
+
+bool on_copy_buffer_region(
+    reshade::api::command_list *command_list,
+    reshade::api::resource source, uint64_t source_offset,
+    reshade::api::resource dest, uint64_t dest_offset, uint64_t size) {
+    reshade::api::device *device = command_list->get_device();
+    if (!is_candidate(device, dest) || size == 0) {
+        return false;
+    }
+    const reshade::api::resource_desc dest_desc = device->get_resource_desc(dest);
+    append_log("copy", dest, dest_desc.buffer.size, dest_offset, size, nullptr);
+    void *mapped = nullptr;
+    if (device->map_buffer_region(
+            source, source_offset, size,
+            reshade::api::map_access::read_only, &mapped)) {
+        capture_upload("copy_source", device, dest, dest_offset, size, mapped);
+        device->unmap_buffer_region(source);
+    } else {
+        append_log("copy_source_unmappable", dest, dest_desc.buffer.size,
+            dest_offset, size, nullptr);
+    }
+    return false;
+}
 } // namespace
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
@@ -113,7 +136,11 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
         reshade::register_event<reshade::addon_event::init_resource>(on_init_resource);
         reshade::register_event<reshade::addon_event::update_buffer_region>(
             on_update_buffer_region);
+        reshade::register_event<reshade::addon_event::copy_buffer_region>(
+            on_copy_buffer_region);
     } else if (reason == DLL_PROCESS_DETACH) {
+        reshade::unregister_event<reshade::addon_event::copy_buffer_region>(
+            on_copy_buffer_region);
         reshade::unregister_event<reshade::addon_event::update_buffer_region>(
             on_update_buffer_region);
         reshade::unregister_event<reshade::addon_event::init_resource>(on_init_resource);
