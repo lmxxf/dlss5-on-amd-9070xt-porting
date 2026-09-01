@@ -816,6 +816,21 @@ block7 shifted: 589799/589824 bytes nonzero
 
 因此原 CUBIN 权威路径已推进到 block7。block8 的 2H DS 进一步揭示 multi-head compact layout：downsample pointer 在参数 `+0x48`，两组 32-channel head 分别写到 `[0,512)` 与 `[1024,1536)`，中间保留 512-byte gap；本次输出总计 512 个非零 bytes，Compute Sanitizer 零错误。下一步按这个 head-strided view 启动 block9 4H inpview，并把 block4 bridge 落到 AMD。
 
+multi-head compact 规则随后推广成功，真图权威路径连续通过：
+
+```text
+block9  4H inpview: 40 × 8×8×128 tiles
+block10–13:       128-channel body
+block14 4H DS:    40 × 3584-byte compact views
+block15 8H inpview: 12 × 8×8×256 tiles
+block16–21:       256-channel body
+block22 8H DS:    12 × 7680-byte compact views
+```
+
+输入高度不是 8 的幂次倍数时按真实 stage 尺寸补零：4H stage 为 8×5 tiles，补到 8×6 后组成 12 个 8H tiles。所有 direct launches 均由 Compute Sanitizer 验证零越界。至此原 CUBIN encoder 已从 block0 连续运行到 block22。
+
+block23 split-Swin 的第一层 `cc_split_swin_16h_ffwd_inpview_512_fp8` 参数缩为 `0x38`；输入／输出／权重仍在 `+0/+8/+0x10`，空间字段在 `+0x18`。资源约束表明正确分解不是 `(32,16)` 单 CTA，而是 `(32,4)` 配合 grid-z 分片；`grid.z=2` 安全并写到 physical offset 24575，`grid.z=4` 会越过 layer0 权重边界。下一步以 `(32,4), grid.z=2` 固定第一层输出，再恢复 FfwdProj／QKVAttn／Proj 三层 ABI。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
