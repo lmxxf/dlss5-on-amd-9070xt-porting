@@ -895,6 +895,8 @@ block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935
 
 另测试同 CUBIN 的 non-FP8 `cc_tinlayout_fused_swin_2h_64_2_ds`：输入／输出需要 halo padding；消除越界后，kernel 仍会读取约 131KB weight view，而 archive block8 只有 69,936 bytes。把后半权重补零可安全执行但输出全零，证明 non-FP8 variant 依赖 runtime 预转换／扩展后的另一种 weight arena，不能直接消费泄露 archive FP16 blob。这条“绕过 FP8 scale”捷径已排除，后续不再重试同一布局。
 
+FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从 packed E4M3 解码，再从 weight base `+0x7010` 载入 FP16 scale，以 `HMUL2` 乘回。`+0x7010` 的首批 half 值为 `0.8071, 0.9570, 0.9819, 0.9893...`，明确是有限 scale。故 `payload_size == element_count*2` 只证明 archive framing/capacity，不能推出 FP8 kernel 把矩阵当 FP16；此前按 half slot 扫 W2 同时改动两个 E4M3 bytes 并破坏 scale 配对，结果无效。后续 weight unswizzle 必须按 byte-level E4M3 tiles + FP16 scale 恢复。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
