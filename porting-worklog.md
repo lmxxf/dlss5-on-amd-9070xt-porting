@@ -844,6 +844,15 @@ FfnContract: params 0x48, grid.x=8,  output 65508/65536 bytes nonzero
 
 FfnExpand 布局为 `input +0 / output +0x10 / weights +0x18 / token_count +0x40`。FfnContract 另要求 `+0x20` 与 `+0x28` auxiliary views；留空会写零地址，绑定后 Compute Sanitizer 零错误。下一步恢复 QKV／Attention／Projection，再把相同五层 ABI 推广到 block32–38。
 
+ViT 五层现已全部闭合。QKV 的 `+0x48` 是 packed `(width,height)` 而非单一 token count；对 16×16 tokens 必须写 `16 | (16<<32)`。QKV 会把 Q/K/V 与辅助 view 写入同一 1,179,648-byte physical arena。Attention 无权重 record，参数为 `QKV base +0/+8/+0x10 / output +0x18 / dims +0x38`，输出 131,072 个非零 bytes。Projection 沿用 Contract 的 residual/auxiliary 布局，最终：
+
+```text
+block31 Projection: 262112 bytes nonzero, last physical offset 507903
+physical capacity: 524288 bytes
+```
+
+同一套五层 ABI 已顺序运行 block32–38，每层均输出完整 524,288-byte physical view。至此原 CUBIN 权威路径已跑完整个 encoder 与 8 个 1024-channel ViT blocks，当前来到 block39 `CCDecInputUpsample 1024→512`。block39 kernel 位于独立的 `dlssnr-06.cubin`，参数大小 `0x50`；SASS 初步确认 main input `+0`、skip input `+8`、output `+0x10`、weights `+0x38`。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
