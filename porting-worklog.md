@@ -723,6 +723,16 @@ block3 MAE=0.001823118 RMSE=0.003214159 correlation=0.99851406
 
 原 shifted kernel 的 controlled corner impulse 显示边界被切成 4×4 connectivity，与标准 Swin 的 `roll(-4,-4) → 8×8 window + region mask → roll(+4,+4)` 一致。两个 41,220-byte FP32 等效参数文件及共同布局已写入 `block2-effective.bin`、`block3-effective.bin`、`effective-1h32.json`。下一个 AMD 验收点不是单 block，而是把 block1→2→3 以六个 HLSL pass 串成完整 32-channel stage，block2／3 在全幅 row-major 坐标上执行 shifted-window。
 
+`d3d12_block1_test.cpp` 已扩展为兼容原 held-out 模式与全幅 stage 模式。后者读取正常 `[H,W,32]` row-major FP32，block2／3 在 shader 内完成 roll、8×8 分窗、边界 region mask 与 inverse roll。RX 9070 XT 用同一份 256×64 输入顺序运行 block1→2→3，三个输出全部 finite；逐层与独立 NumPy reference 对比：
+
+```text
+block1 MAE=2.98e-08 RMSE=2.16e-05 exact=0.9999981 corr=0.9999999994
+block2 MAE=7.45e-08 RMSE=2.85e-05 exact=0.9999924 corr=0.9999999998
+block3 MAE=1.90e-06 RMSE=5.67e-04 exact=0.9999752 corr=0.9999999880
+```
+
+每个 block 两个 HLSL pass 的 submit→fence 为 2.47–2.66 ms；当前命令逐 block 新建 D3D12 device，初始化与进程开销不计入也不应据此外推完整网络。这个结果把 32-channel stage 的数值核和 shifted-window 拓扑同时闭环，下一步接 block0 的真实《剑星》feature，并开始恢复 32→64 downsample。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
