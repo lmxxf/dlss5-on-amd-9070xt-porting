@@ -859,6 +859,12 @@ block40–47 复用已恢复的 split-Swin 四层 ABI，16 个 8×8 decoder tile
 
 为进入 block48，重新运行 block22 DS 并保留其 main/skip output，得到 12×8×8×256 = 196,608 bytes，196,606 bytes 非零。block48 原 upsample kernel 已安全启动但当前字段组合输出全零；下一步依据 SASS 校正 upsample 的空间字段／skip pointer 语义，然后继续 block49–55。
 
+block48 的 `0x58` 参数布局已修正为 `main +0 / output +8 / weights +0x10 / skip +0x18 / dimensions +0x20`，block dimensions `(32,8,1)`。全图输出 147,456/147,456 bytes 非零，精确对应真实 `32×18×256`；block49–55 随后全部通过。
+
+block56 进一步确认 upsample dimensions 顺序为 `(height,width)`。写入 `(40,64)` 后得到 padded `64×40×128` 共 327,680 bytes，block57–61 全部通过。block62 使用 `(72,128)`，输出 589,824/589,824 bytes，block63–65 也全部通过。至此权威 decoder 已推进到 block65。
+
+block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`；它额外读取 `+0x50/+0x58`。当前基础布局安全但全零，直接把 skip/dims 复制到尾字段会导致 weight addressing 越界，因此不能沿用高宽度 upsample 的结构，下一步按 SASS 分别识别这两个尾字段。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
