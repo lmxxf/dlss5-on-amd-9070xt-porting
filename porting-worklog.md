@@ -798,6 +798,24 @@ block5 inpview: compact 32 → 64-channel 2H stage
 
 下一步批量化 block4 CUBIN runner并拟合 compact DS，再直跑 block5 原 2H kernel。
 
+block4 batch oracle 已通过 Compute Sanitizer。通用宽分布拟合只有 correlation `0.84`，未进入主线；改用 576 个真实 stage3 tiles 周围 `σ=1.5` 的扰动分布后，8,192 train／1,024 held-out 得到：
+
+```text
+MAE=1.4714363 RMSE=2.1836541 correlation=0.9939110
+```
+
+首版 bridge 固化为 `block4-distilled.bin`。原 CUBIN 同时为当前真图产生 576 个权威 compact outputs。
+
+block5 的 2H inpview ABI 也已直接跑通：参数 `+0x28` 是 spatial origin 而非 pointer，必须清零；`+0x50` 保存 packed dimensions。kernel block 为 `(32,2,1)`，四个 `4×4×32` compact tiles 合成一个 `8×8×64` tile。真图 576 compact tiles 分为 144 groups 后：
+
+```text
+block5 inpview: 589587/589824 bytes nonzero
+block6 shifted: 589770/589824 bytes nonzero
+block7 shifted: 589799/589824 bytes nonzero
+```
+
+因此原 CUBIN 权威路径已推进到 block7。block8 的 2H DS 进一步揭示 multi-head compact layout：downsample pointer 在参数 `+0x48`，两组 32-channel head 分别写到 `[0,512)` 与 `[1024,1536)`，中间保留 512-byte gap；本次输出总计 512 个非零 bytes，Compute Sanitizer 零错误。下一步按这个 head-strided view 启动 block9 4H inpview，并把 block4 bridge 落到 AMD。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点

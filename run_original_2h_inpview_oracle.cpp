@@ -1,0 +1,10 @@
+#include <cuda.h>
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <vector>
+struct Params{CUdeviceptr input,output,weights;int width,height,dim_y,dim_x;CUdeviceptr origin,optional1,optional2,optional3;unsigned long long optional_dims;CUdeviceptr dimensions;int override_width,override_height;};
+static_assert(sizeof(Params)==0x60);
+static void ck(const char*n,CUresult r){if(r){const char*s=nullptr;cuGetErrorString(r,&s);std::fprintf(stderr,"%s=%d %s\n",n,r,s?s:"?");std::exit(1);}}
+static std::vector<unsigned char> read(const char*p){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)std::exit(2);size_t n=(size_t)f.tellg();f.seekg(0);std::vector<unsigned char>b(n);f.read((char*)b.data(),n);return b;}
+int main(int ac,char**av){if(ac!=5){std::fprintf(stderr,"usage: %s cubin block5.weights grouped-compact.fp8 output.fp8\n",av[0]);return 2;}auto w=read(av[2]),in=read(av[3]);if(w.size()!=61760||in.empty()||in.size()%2048)return 2;size_t groups=in.size()/2048;std::vector<unsigned char>out(groups*4096);ck("init",cuInit(0));CUdevice d;ck("device",cuDeviceGet(&d,0));CUcontext c;ck("context",cuDevicePrimaryCtxRetain(&c,d));ck("current",cuCtxSetCurrent(c));CUmodule m;ck("module",cuModuleLoad(&m,av[1]));CUfunction f;ck("function",cuModuleGetFunction(&f,m,"cc_tinlayout_fused_swin_2h_64_2_inpview_fp8"));CUdeviceptr di,doo,dw;ck("input alloc",cuMemAlloc(&di,8192));ck("output alloc",cuMemAlloc(&doo,8192));ck("weight alloc",cuMemAlloc(&dw,w.size()));ck("weights",cuMemcpyHtoD(dw,w.data(),w.size()));Params p{};p.input=di;p.output=doo;p.weights=dw;p.width=p.height=8;p.dim_y=p.dim_x=8;p.dimensions=(CUdeviceptr)(8ull|(8ull<<32));void*args[]={&p};for(size_t g=0;g<groups;g++){ck("input",cuMemcpyHtoD(di,in.data()+g*2048,2048));ck("zero",cuMemsetD8(doo,0,8192));ck("launch",cuLaunchKernel(f,1,1,1,32,2,1,0,nullptr,args,nullptr));ck("sync",cuCtxSynchronize());ck("output",cuMemcpyDtoH(out.data()+g*4096,doo,4096));}std::ofstream(av[4],std::ios::binary).write((char*)out.data(),out.size());size_t nz=0;for(auto x:out)nz+=x!=0;std::printf("groups=%zu nonzero=%zu/%zu\n",groups,nz,out.size());}

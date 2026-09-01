@@ -1,0 +1,14 @@
+{
+  "file":"block4-distilled.bin",
+  "sha256":"2f0982b80051014ebc26f4bae3c51839b28b279a7b5c6205611840eaa3382101",
+  "storage":"float32_little_endian",
+  "byte_size":5267456,
+  "tensor_layout":[
+    ["input_mean",[2048],0,2048],["input_std",[2048],2048,2048],
+    ["l1.weight",[512,2048],4096,1048576],["l1.bias",[512],1052672,512],
+    ["l2.weight",[512,512],1053184,262144],["l2.bias",[512],1315328,512],
+    ["output_mean",[512],1315840,512],["output_std",[512],1316352,512]
+  ],
+  "training":{"real_stage3_tiles":576,"augmented_train_tiles":8192,"heldout_tiles":1024,"noise_std":1.5,"heldout_mae":1.4714363,"heldout_rmse":2.1836541,"heldout_correlation":0.9939110},
+  "status":"distribution-specific bridge for the current real-frame path; original block4 CUBIN remains authoritative"
+}
