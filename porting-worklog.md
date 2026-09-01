@@ -1088,6 +1088,10 @@ Projection             standard（wait/chained加入后会清零整组资源）
 
 block32的首个Expand仍是当前唯一ViT断点：同device连续提交时，standard与 `prev=0` 会在第二block触发device removal；改为chained并传上一block `a38` 也未恢复，最后一次返回 `DXGI_ERROR_DEVICE_HUNG (0x887a0006)`，但测试进程正常退出、未再造成整机WDDM锁死。此处停止5090排列实验。当前证据说明缺的不是矩阵参数或block31数值，而是runtime `flag=1` 在block边界实施的专用同步/状态发布语义。
 
+随后把外层 `flag=1` 进一步按D3D12提交语义复刻：同一device中每个真实layer group分别 `Close → Execute → Fence → 新command list`，而不是只在一个command list内插barrier。该路径稳定跑完block31，最终65,489个非零bytes、零NaN；但进入block32时仍在第二block边界触发device removal。尝试按CUDA runner清零复用workspace时，普通Copy状态转换本身会触发hung；改为为blocks32–38各自预分配独立的branch/main/attention/work/Q/K/V（额外约98MB）也未消除断点。因此“复用脏scratch”被排除，block32剩余变量只剩runtime私有的跨block同步发布。
+
+读回诊断同时纠正一处假象：NVAPI私有写入后只transition/copy单一目标资源可能读到全零；把全部UAV统一transition并dump后，block31各view均存在。当前可信分层计数为Expand 114,443、Contract 28,595、QKV主view约28,6xx、Attention 65,526、Projection 65,4xx，均零NaN。旧 `/tmp/block31–38-global-view.bin` 的512KiB文件逐字节全为 `0x7f/0xff`，确认是早期16×16错误路径，不能重新当“已闭合ViT”使用；20:21后生成的2MiB `block31/32/33-global-correct.bin` 才是8×8零NaN证据。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
