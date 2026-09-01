@@ -877,6 +877,8 @@ block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`�
 
 第二座 AMD bridge 覆盖 block5 inpview + block6–7：输入四个 512-value compact tiles，输出一个 4,096-value 8×8×64 physical tile。512 held-out groups 在 RX 9070 XT 上 correlation `0.9926007`、MAE `4.9250931`、RMSE `9.5192541`，耗时 `5.597 ms`。把第一座 block4 AMD 真图输出直接串入第二座后，对原 block7 CUBIN correlation `0.9904226`，144 groups 耗时 `1.933 ms`。这条链首次在 AMD 上从 32-channel stage 真正跨入并跑完 64-channel stage。
 
+第三座候选 bridge 尝试把四个 4,096-value 64-channel tiles 一次映射到 block13 的 8,192-value 128-channel tile。2,048 组 CUBIN oracle 已生成，但 128-wide、共享 tile encoder 与 512-wide direct MLP 的 held-out correlation 都停在约 `0.91–0.92`；扩大模型不再改善，说明此级 physical view／attention 对输入扰动不能被低秩 stage distillation 忠实压缩。该方案明确拒绝进入主线。后续从 64→128 起改走精确 tensor layout／逐 kernel HLSL，不再用更大的 surrogate 掩盖误差。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
