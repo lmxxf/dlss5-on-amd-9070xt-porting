@@ -891,6 +891,8 @@ block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935
 
 2H Swin body 的 raw 4096 bytes 不能直接 reshape 为 `[64,64]`。用 4,096 个单字节 basis 在同一进程跑 controlled FFN，构造输入／输出二分图后，恰好得到 64 个 connected components，每组64 bytes。组内顺序再用 basis Jacobian 行列指纹与 Hungarian matching 对齐到 token0；64 个对齐后的 64×64 Jacobian correlation 最小值与中位数均为 `1.0`。最终 input/output permutation 完全相同，SHA-256 均为 `115f77...a5418`。这恢复了完整 activation unswizzle；下一步按 canonical channel 顺序恢复 raw W1/W2 的 tensor-core permutation。
 
+在真实非零 tile 上逐 byte 改一个 E4M3 mantissa，3,547/4,096 次只影响一个 canonical token，545 次因未跨量化阈值而无输出变化，仅极少数边界事件扩散全 tile；因此 FFN 主体仍是 pointwise，跨-token 现象来自动态量化边界而非隐藏 attention。直接把单个 W2 slot 或整个16-slot tile 置1会让输出全零，保留真实 W2 后逐 slot 置零又会因 tile scale 重算而几乎全局变化，证明 weight payload 的有效值与 tile-scale 状态不可分离。线性、per-token MLP、byte embedding 与全局统计 FiLM 均不足以忠实拟合，已停止扩大 surrogate。下一步必须从 SASS 的 FP16→FP8 tile conversion 恢复 scale 规则，或在 controlled scan 中同时保持每个 weight tile 的 scale invariant。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
