@@ -705,7 +705,23 @@ RMSE: 0.025441188
 exact: 0.632250
 ```
 
-AMD 与 CPU 等效模型误差一致，证明 D3D12/HLSL 没有引入额外偏差。下一步将 oracle dataset／fitter 参数化到 block2、block3；shifted-window 通过输入 tile 重排和 mask 单独校准。
+AMD 与 CPU 等效模型误差一致，证明 D3D12/HLSL 没有引入额外偏差。
+
+block2／block3 随后也以同进程逐 tile oracle 完成拟合。FFN held-out 为：
+
+```text
+block2 MAE=0.009939259 RMSE=0.016203228 correlation=0.99947166
+block3 MAE=0.011638313 RMSE=0.020279855 correlation=0.99961811
+```
+
+为了把数值核与窗口拓扑分开校准，attention fit 使用原 CUBIN 的单个未平移 8×8 tile：
+
+```text
+block2 MAE=0.003320482 RMSE=0.007155899 correlation=0.99775976
+block3 MAE=0.001823118 RMSE=0.003214159 correlation=0.99851406
+```
+
+原 shifted kernel 的 controlled corner impulse 显示边界被切成 4×4 connectivity，与标准 Swin 的 `roll(-4,-4) → 8×8 window + region mask → roll(+4,+4)` 一致。两个 41,220-byte FP32 等效参数文件及共同布局已写入 `block2-effective.bin`、`block3-effective.bin`、`effective-1h32.json`。下一个 AMD 验收点不是单 block，而是把 block1→2→3 以六个 HLSL pass 串成完整 32-channel stage，block2／3 在全幅 row-major 坐标上执行 shifted-window。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 

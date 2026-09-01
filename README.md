@@ -15,6 +15,7 @@
 - `capture_raw_buffer.cu` / `capture_raw_buffer_cubin.inc`：Spark CUDA 13 编译的 sm_120 `uint4` raw-copy kernel 及 5,680-byte 嵌入版本；用于在原 NvAPI CUBIN command chain 内复制私有 activation VA。
 - `run_original_1h_oracle.cpp` / `make_1h_identity_weights.py`：在 DGX Spark sm_121 上直接加载泄露 sm_120 CUBIN，以 identity-skip 权重逐 byte 扫描 8×8×32 FP8 tinlayout。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
+- `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。
 - `block0-input-adapter-preview.png`：RX 9070 XT 用真实 `7×32 input_adapter_weight` 执行 HLSL 投影后生成的首张 learned-feature 诊断图。
 - `block0-depthwise-preview.png`：在 input adapter 后继续执行真实 `[32,3,3]` depthwise convolution 的 AMD 输出；颜色变化较弱但非恒定图。

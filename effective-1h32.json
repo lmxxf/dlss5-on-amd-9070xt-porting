@@ -1,0 +1,36 @@
+{
+  "storage": "float32_little_endian",
+  "byte_size_per_block": 41220,
+  "tensor_layout": [
+    ["W1", [64,32], 0, 8192], ["W2", [32,64], 8192, 8192],
+    ["Qe", [16,16], 16384, 1024], ["Qo", [16,16], 17408, 1024],
+    ["Ke", [16,16], 18432, 1024], ["Ko", [16,16], 19456, 1024],
+    ["Ve", [16,16], 20480, 1024], ["Vo", [16,16], 21504, 1024],
+    ["P", [32,16], 22528, 2048], ["bias", [64,64], 24576, 16384],
+    ["scale", [1], 40960, 4], ["ffn_cos_skip", [32], 40964, 128],
+    ["attn_cos_skip", [32], 41092, 128]
+  ],
+  "blocks": {
+    "1": {
+      "file":"block1-effective.bin",
+      "sha256":"551d47badd48f0bbf6346f3bbc280c3ebe2f5c9d8b4864c38c647ff34d1564c8",
+      "shifted":false,
+      "full_heldout":{"mae":0.010776959,"rmse":0.025441187,"exact_e4m3":0.63224983,"correlation":0.99899703}
+    },
+    "2": {
+      "file":"block2-effective.bin",
+      "sha256":"c4759e27d9dbc5db94af18dd494caee4653226e8df4b420f4c4173b84691d89f",
+      "shifted":true,
+      "ffn_heldout":{"mae":0.009939259,"rmse":0.016203228,"correlation":0.99947166},
+      "attention_unshifted_heldout":{"mae":0.003320482,"rmse":0.007155899,"correlation":0.99775976}
+    },
+    "3": {
+      "file":"block3-effective.bin",
+      "sha256":"fa8206c55d6da7a47d06b12ab6571845af7c19240b17027183d5b11bf2ce96fa",
+      "shifted":true,
+      "ffn_heldout":{"mae":0.011638313,"rmse":0.020279855,"correlation":0.99961811},
+      "attention_unshifted_heldout":{"mae":0.001823118,"rmse":0.003214159,"correlation":0.99851406}
+    }
+  },
+  "shift_rule": "roll(-4,-4), 8x8 windows, region mask, roll(+4,+4); corner 4x4 connectivity verified with controlled original CUBIN."
+}
