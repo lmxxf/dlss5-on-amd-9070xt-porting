@@ -19,6 +19,7 @@
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。
+- `d3d12_preblock_test.cpp`：RX 9070 XT 三 pass HLSL pre-block surrogate runner；支持 held-out CUBIN 验收与输出 physical-view FP32 activation。
 - `block0-input-adapter-preview.png`：RX 9070 XT 用真实 `7×32 input_adapter_weight` 执行 HLSL 投影后生成的首张 learned-feature 诊断图。
 - `block0-depthwise-preview.png`：在 input adapter 后继续执行真实 `[32,3,3]` depthwise convolution 的 AMD 输出；颜色变化较弱但非恒定图。
 - `stellar-block0-rgb-only.png`：以《剑星》Steam hero RGB 为输入、Gaussian 四通道置零时，RX 9070 XT 经过 input adapter + depthwise 后的首张可辨认模型中间图。

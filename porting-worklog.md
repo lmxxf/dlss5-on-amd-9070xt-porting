@@ -768,6 +768,27 @@ MAE=0.6909643 RMSE=1.5175923 correlation=0.9616113
 
 FP32 参数与 per-output mean/std 共 2,582,528 bytes，保存为 `block0-distilled.bin`。这不是最终精确解：原 CUBIN 仍是权威 oracle，后续恢复 exact unswizzle 后可替换；它的当前用途是让 9070 XT 立即获得可接 block1–3 的真实 pre-block 分布，继续向 32→64 与全网推进。
 
+### RX 9070 XT 真图贯通 block0→3
+
+`d3d12_preblock_test.cpp` 用三次 HLSL dispatch 实现 distilled MLP。1,024 个 held-out tiles 对原 CUBIN：
+
+```text
+submit→fence=4.550 ms
+MAE=0.6909643 RMSE=1.5175922 correlation=0.9615260
+```
+
+AMD 与 CPU surrogate 的 held-out 数字相同，未引入额外实现误差。随后把 256×144《剑星》hero RGBA 按 8×8 分成 576 tiles，在 RX 9070 XT 顺序执行 pre-block 与 block1→2→3：
+
+```text
+pre-block       3.031 ms
+block1          5.521 ms
+block2 shifted  4.295 ms
+block3 shifted  3.718 ms
+stage3 tensor   144×256×32, all finite, range [-88,80]
+```
+
+PCA 投影已能看见人物轮廓，同时存在规则的 physical-tile 条纹，不能冒充最终 RGB。这个结果的意义是第一张真实图已进入 AMD 计算主干；下一步恢复 block4 的 32→64 downsample，使 activation 首次跨越 encoder stage。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
