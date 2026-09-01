@@ -897,6 +897,8 @@ block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935
 
 FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从 packed E4M3 解码，再从 weight base `+0x7010` 载入 FP16 scale，以 `HMUL2` 乘回。`+0x7010` 的首批 half 值为 `0.8071, 0.9570, 0.9819, 0.9893...`，明确是有限 scale。故 `payload_size == element_count*2` 只证明 archive framing/capacity，不能推出 FP8 kernel 把矩阵当 FP16；此前按 half slot 扫 W2 同时改动两个 E4M3 bytes 并破坏 scale 配对，结果无效。后续 weight unswizzle 必须按 byte-level E4M3 tiles + FP16 scale 恢复。
 
+继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
