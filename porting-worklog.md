@@ -927,6 +927,10 @@ NVIDIA PTX ISA 9.1 §9.7.14.5.10 给出 E4M3 matrix-B fragment 的官方坐标�
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
+再次启动5090《剑星》后，`SB-Win64-Shipping.exe` 的 ReShade 日志确认 signed DLSSNR 310.8.0 初始化成功，feature 18 在3840×2160 native输入上连续运行（至少记录到 count=60）。由此确认5090基准链稳定，Steam 提示的 `SB` 是游戏自身二段启动参数，并非探针参数。
+
+运行时探针现只对剩余两个缺口做定点深抓：block66（1H upsample）与block70（RGB post）的layer对象和state各导出0x200 bytes；其余层仍只读首个qword，避免异构对象越界。新版探针SHA-256为`12FE49282780272A8043C6F3FB5B7FC8FB6C2D5A28F2D8CAAB4C9E8CE3D67237`，已编译并部署到5090游戏目录，等待下一次进程启动加载。
+
 ### 2026-09-01 最新续点
 
 完整 live network dump 已取得，探针已移除。下一步：

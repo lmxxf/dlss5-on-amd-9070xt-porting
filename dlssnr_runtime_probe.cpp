@@ -72,6 +72,21 @@ void dump_qwords(FILE *file, const void *address, size_t bytes) {
     }
 }
 
+void dump_region(FILE *file, const char *label, const void *address, size_t bytes) {
+    std::fprintf(file, "    %s=%p bytes=%zu\n", label, address, bytes);
+    for (size_t offset = 0; offset < bytes; offset += 32) {
+        std::fprintf(file, "      +%04zx:", offset);
+        const size_t row_bytes = bytes - offset < 32 ? bytes - offset : 32;
+        for (size_t index = 0; index < row_bytes; ++index) {
+            std::fprintf(
+                file,
+                " %02x",
+                static_cast<unsigned>(read_at<uint8_t>(address, offset + index)));
+        }
+        std::fprintf(file, "\n");
+    }
+}
+
 void dump_network(void *manager, uint64_t result) {
     if (g_dumped.exchange(true)) {
         return;
@@ -159,6 +174,16 @@ void dump_network(void *manager, uint64_t result) {
                 dump_qwords(file, state, sizeof(uint64_t));
             }
             std::fprintf(file, "\n");
+            // These are the two remaining porting gaps: the final 1H
+            // upsample bridge (block 66) and RGB post layer (block 70).
+            // Keep the broad network walk conservative, but snapshot the
+            // complete small host-side objects for these two known layers.
+            if ((block_index == 66 || block_index == 70) && layer_index == 0) {
+                dump_region(file, "layer_object", layer, 0x200);
+                if (state != nullptr) {
+                    dump_region(file, "layer_state", state, 0x200);
+                }
+            }
         }
     }
     std::fflush(file);

@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $Source = 'D:\DLSSNR-Lab\tools\dlssnr-runtime-probe.addon64'
 $Target = 'D:\SteamLibrary\steamapps\common\StellarBlade\SB\Binaries\Win64\dlssnr-runtime-probe.addon64'
 $Dump = 'D:\DLSSNR-Lab\logs\runtime-network.txt'
-$ExpectedHash = '5C03355B2CDF62B2BDBA0B3B4E4445750BC44B82E77D8CADB4D115A01BAA1188'
+$ExpectedHash = '12FE49282780272A8043C6F3FB5B7FC8FB6C2D5A28F2D8CAAB4C9E8CE3D67237'
 
 if ($Action -eq 'Status') {
     [ordered]@{
