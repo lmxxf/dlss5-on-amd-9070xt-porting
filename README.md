@@ -17,6 +17,7 @@
 - `run_original_preblock_oracle.cpp`：直接启动 0x108-byte ABI 的原始 pre-block DS CUBIN；输入 8×8 RGBA32F texture，并同时导出 8×8×32 主 FP8 activation 与 4×4×32 downsample activation。
 - `run_original_downsample_oracle.cpp`：批量直跑 block4 原始 shifted DS CUBIN；把 8×8×32 physical tiles 转为 4×4×32 compact E4M3 view，并提供 kernel 必需的 auxiliary scratch。
 - `run_original_2h_inpview_oracle.cpp`：批量直跑 block5 原始 2H inpview CUBIN；每四个 compact tiles 扩展成一个 8×8×64 E4M3 tile。
+- `run_original_fused_global.cpp`：统一的全图 CUBIN runner；支持 plain／inpview／1H-DS／multihead-DS、global grid、shift 与 main/aux 双 view，取代已降级的逐 tile 数值 runner。
 - `block0-distilled.bin` / `block0-distilled.json`：由 8,192 个原 CUBIN tiles 蒸馏出的首版 portable pre-block MLP；直接输出 NVIDIA physical tile view，供 RX 9070 XT 接入 block1–3。它是推进端到端链路的近似入口，不替代原 CUBIN oracle。
 - `block4-distilled.bin` / `block4-distilled.json`：围绕真实 stage3 activation 蒸馏的 `2048→512` compact-downsample bridge；held-out correlation 0.9939，等待 HLSL 落地。
 - `d3d12_block4_bridge.cpp`：RX 9070 XT 三 pass compact-downsample bridge；held-out correlation 0.9940，真图对原 block4 CUBIN correlation 0.9972。
