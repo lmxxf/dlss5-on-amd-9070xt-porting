@@ -7,6 +7,11 @@
 
 #include "reshade.hpp"
 
+// FAILED EXPERIMENT — DO NOT DEPLOY TO STELLAR BLADE.
+// Registering copy/map/unmap resource events makes the game exit with Fatal
+// Error during D3D12 device initialization. Kept only as a record of the
+// rejected capture route.
+
 extern "C" __declspec(dllexport) const char *NAME = "DLSSNR Weight Upload Probe";
 extern "C" __declspec(dllexport) const char *DESCRIPTION =
     "Captures host-visible uploads into large DLSSNR candidate buffers.";

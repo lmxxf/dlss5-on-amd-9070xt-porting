@@ -941,6 +941,8 @@ block66 的真实 forward RVA `0x637b0` 已完整反汇编，纠正了此前最�
 
 但数值语义检查否决了把这条链称作exact：block65进入block66之前，589,824个有效bytes恰好一半为0、一半为0x7f，已经是明显饱和值；新block66–69的held-out readout correlation约为0。根因是archive FP16序列化权重被直接喂给要求runtime E4M3 packed/swizzled arena的原CUBIN。故当前成果只闭合了kernel图、全局view与ABI，不闭合真实数值。旧`block0–69 exact-global`措辞统一降级为`original-CUBIN structural-global`。真正端到端主线必须恢复runtime weight packer，或在AMD上按archive FP16直接重写张量语义；噪声图与无效readout已移到`/tmp`，不进入仓库。
 
+尝试通过ReShade官方resource events捕获两个147,719,680-byte runtime weight candidate buffers：init_resource可安全记录其创建，但update路径不经过`update_buffer_region`；在`copy_buffer_region`内重入map会Fatal Error，改为正常map/unmap事件旁路复制后仍在D3D12设备初始化阶段Fatal Error，且未落出任何bytes。两种实现均已从游戏目录移除，`runtime_weight_upload_probe.cpp`仅保留为失败记录并明确禁止部署。该路线停止，不再让前台游戏反复承担探针试错。
+
 ### 2026-09-01 最新续点
 
 完整 live network dump 已取得，探针已移除。下一步：
