@@ -1,0 +1,7 @@
+{
+  "file":"block10-effective.bin","sha256":"b0c4867725220ea66d0e6b33f2715b337c4b23e2c7b1023f22bf8f01697e765c","storage":"float32_little_endian","byte_size":361488,
+  "tensor_layout":[["W1",[160,128],0,20480],["W2",[128,160],20480,20480],["QKV",[192,128],40960,24576],["projection",[128,64],65536,8192],["attention_bias",[4,64,64],73728,16384],["attention_scale",[4],90112,4],["ffn_skip",[128],90116,128],["attention_skip",[128],90244,128]],
+  "controlled_oracle":{"ffn_mae":1.95627,"ffn_rmse":5.50682,"attention_mae":1.92534,"attention_rmse":3.73705},
+  "full_block":{"tiles":1024,"mae":22.52595,"rmse":29.27475,"correlation":0.9948525,"exact_e4m3":0.0247089},
+  "status":"semantic 4-head block reconstruction; pending generic 4H HLSL validation"
+}

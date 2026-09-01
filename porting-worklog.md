@@ -879,6 +879,8 @@ block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`�
 
 第三座候选 bridge 尝试把四个 4,096-value 64-channel tiles 一次映射到 block13 的 8,192-value 128-channel tile。2,048 组 CUBIN oracle 已生成，但 128-wide、共享 tile encoder 与 512-wide direct MLP 的 held-out correlation 都停在约 `0.91–0.92`；扩大模型不再改善，说明此级 physical view／attention 对输入扰动不能被低秩 stage distillation 忠实压缩。该方案明确拒绝进入主线。后续从 64→128 起改走精确 tensor layout／逐 kernel HLSL，不再用更大的 surrogate 掩盖误差。
 
+block10 controlled-weight oracle 证明 128-channel view 仍可按 64 tokens×128 channels 解释。FFN 为标准 `128→160→128`，attention 为四个 16-d cosine heads，QKV `[192,128]`、projection `[128,64]`。低学习率 refinement 后，独立 FFN MAE/RMSE `1.956/5.507`，attention `1.925/3.737`；组合两次 residual 与 E4M3 后，对 1,024 tiles 的完整 block correlation `0.9948525`、MAE `22.526`、RMSE `29.275`。参数固化为 `block10-effective.bin`。这条结果确认精确语义路线可行，下一步推广 block11–13 并写通用 4H HLSL。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
