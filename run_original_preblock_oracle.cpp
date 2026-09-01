@@ -1,0 +1,128 @@
+#include <cuda.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <vector>
+
+static void check(const char *name, CUresult result) {
+    if (result != CUDA_SUCCESS) {
+        const char *text = nullptr;
+        cuGetErrorString(result, &text);
+        std::fprintf(stderr, "%s=%d %s\n", name, result, text ? text : "?");
+        std::exit(1);
+    }
+}
+
+static std::vector<unsigned char> read_file(const char *path) {
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (!file) std::exit(2);
+    const size_t size = static_cast<size_t>(file.tellg());
+    file.seekg(0);
+    std::vector<unsigned char> bytes(size);
+    file.read(reinterpret_cast<char *>(bytes.data()), size);
+    return bytes;
+}
+
+static void write_file(const char *path, const void *data, size_t size) {
+    std::ofstream file(path, std::ios::binary);
+    if (!file) std::exit(2);
+    file.write(static_cast<const char *>(data), size);
+}
+
+int main(int argc, char **argv) {
+    if (argc != 6) {
+        std::fprintf(stderr,
+            "usage: %s cubin block0.weights input-8x8-rgba32f main.fp8 ds.fp8\n",
+            argv[0]);
+        return 2;
+    }
+    const auto weights = read_file(argv[2]);
+    const auto input = read_file(argv[3]);
+    if (weights.size() != 21696 || input.size() != 8 * 8 * 4 * sizeof(float)) return 2;
+
+    check("cuInit", cuInit(0));
+    CUdevice device;
+    check("cuDeviceGet", cuDeviceGet(&device, 0));
+    CUcontext context;
+    check("cuDevicePrimaryCtxRetain", cuDevicePrimaryCtxRetain(&context, device));
+    check("cuCtxSetCurrent", cuCtxSetCurrent(context));
+    CUmodule module;
+    check("cuModuleLoad", cuModuleLoad(&module, argv[1]));
+    CUfunction function;
+    check("cuModuleGetFunction", cuModuleGetFunction(&function, module,
+        "cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8"));
+
+    CUdeviceptr device_weights, main_output, downsample_output;
+    check("cuMemAlloc(weights)", cuMemAlloc(&device_weights, weights.size()));
+    check("cuMemcpyHtoD(weights)",
+        cuMemcpyHtoD(device_weights, weights.data(), weights.size()));
+    check("cuMemAlloc(main)", cuMemAlloc(&main_output, 1 << 20));
+    check("cuMemAlloc(downsample)", cuMemAlloc(&downsample_output, 1 << 20));
+    check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, 1 << 20));
+    check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, 1 << 20));
+
+    CUDA_ARRAY3D_DESCRIPTOR array_desc{};
+    array_desc.Width = 8;
+    array_desc.Height = 8;
+    array_desc.Format = CU_AD_FORMAT_FLOAT;
+    array_desc.NumChannels = 4;
+    CUarray array;
+    check("cuArray3DCreate", cuArray3DCreate(&array, &array_desc));
+    CUDA_MEMCPY2D copy{};
+    copy.srcMemoryType = CU_MEMORYTYPE_HOST;
+    copy.srcHost = input.data();
+    copy.srcPitch = 8 * 4 * sizeof(float);
+    copy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
+    copy.dstArray = array;
+    copy.WidthInBytes = copy.srcPitch;
+    copy.Height = 8;
+    check("cuMemcpy2D", cuMemcpy2D(&copy));
+
+    CUDA_RESOURCE_DESC resource_desc{};
+    resource_desc.resType = CU_RESOURCE_TYPE_ARRAY;
+    resource_desc.res.array.hArray = array;
+    CUDA_TEXTURE_DESC texture_desc{};
+    texture_desc.addressMode[0] = CU_TR_ADDRESS_MODE_CLAMP;
+    texture_desc.addressMode[1] = CU_TR_ADDRESS_MODE_CLAMP;
+    texture_desc.filterMode = CU_TR_FILTER_MODE_LINEAR;
+    texture_desc.flags = CU_TRSF_NORMALIZED_COORDINATES;
+    CUtexObject texture;
+    check("cuTexObjectCreate", cuTexObjectCreate(
+        &texture, &resource_desc, &texture_desc, nullptr));
+
+    // Kernel metadata: one by-value parameter object, size 0x108, cbank start 0x380.
+    alignas(8) unsigned char params[0x108]{};
+    for (int offset = 0x48; offset < 0xd8; offset += 4) {
+        const float one = 1.0f;
+        std::memcpy(params + offset, &one, sizeof(one));
+    }
+    const int extent = 8;
+    for (int offset : {0x78, 0x90, 0x98, 0x9c, 0xa8, 0xac})
+        std::memcpy(params + offset, &extent, sizeof(extent));
+    const unsigned long long dimensions = 8ull | (8ull << 32);
+    std::memcpy(params + 0x10, &device_weights, 8); // legacy/optional weight view
+    std::memcpy(params + 0x20, &texture, 8);
+    std::memcpy(params + 0xd8, &main_output, 8);
+    std::memcpy(params + 0xe0, &device_weights, 8); // tensor-core weight view
+    std::memcpy(params + 0xf0, &dimensions, 8);
+    std::memcpy(params + 0xf8, &downsample_output, 8);
+
+    void *kernel_args[] = {params};
+    check("cuLaunchKernel", cuLaunchKernel(
+        function, 1, 1, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
+    check("cuCtxSynchronize", cuCtxSynchronize());
+    std::vector<unsigned char> main_bytes(8 * 8 * 32);
+    std::vector<unsigned char> downsample_bytes(4 * 4 * 32);
+    check("cuMemcpyDtoH(main)",
+        cuMemcpyDtoH(main_bytes.data(), main_output, main_bytes.size()));
+    check("cuMemcpyDtoH(downsample)", cuMemcpyDtoH(
+        downsample_bytes.data(), downsample_output, downsample_bytes.size()));
+    write_file(argv[4], main_bytes.data(), main_bytes.size());
+    write_file(argv[5], downsample_bytes.data(), downsample_bytes.size());
+    size_t main_nonzero = 0, downsample_nonzero = 0;
+    for (auto value : main_bytes) main_nonzero += value != 0;
+    for (auto value : downsample_bytes) downsample_nonzero += value != 0;
+    std::printf("main_nonzero=%zu/%zu downsample_nonzero=%zu/%zu\n",
+        main_nonzero, main_bytes.size(), downsample_nonzero, downsample_bytes.size());
+}

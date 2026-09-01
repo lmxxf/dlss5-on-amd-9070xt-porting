@@ -733,6 +733,31 @@ block3 MAE=1.90e-06 RMSE=5.67e-04 exact=0.9999752 corr=0.9999999880
 
 每个 block 两个 HLSL pass 的 submit→fence 为 2.47–2.66 ms；当前命令逐 block 新建 D3D12 device，初始化与进程开销不计入也不应据此外推完整网络。这个结果把 32-channel stage 的数值核和 shifted-window 拓扑同时闭环，下一步接 block0 的真实《剑星》feature，并开始恢复 32→64 downsample。
 
+### 原始 pre-block／downsample CUBIN 已独立启动
+
+`.nv.info` 给出 pre-block 的单个 by-value 参数对象为 `0x108` bytes（普通 1H block 为 `0x60`）。结合 SASS 的 constant-bank load 与 Compute Sanitizer 逐次校正，已确认当前直接启动所需的关键 ABI：
+
+```text
+texture object          +0x20
+main output             +0xd8
+flat/tensor weight view +0xe0
+packed output dims      +0xf0
+downsample output       +0xf8
+block dimensions        (32,2,1)
+```
+
+`run_original_preblock_oracle.cpp` 在 Spark sm_121 直接运行泄露的 `cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8`。以 8×8 RGBA32F gradient texture 和真实 block0 21,696-byte 权重输入，一次 launch 同时取得：
+
+```text
+main:       8×8×32 E4M3, 2048/2048 bytes nonzero
+downsample: 4×4×32 E4M3,  512/512 bytes nonzero
+Compute Sanitizer: ERROR SUMMARY: 0 errors
+main SHA-256: e5fc9f996acfcb0303b3efc6da7dd47d9f2a2869472db42e21aa4032bd18b2d2
+ds SHA-256:   2e489d1a7c1558ca9575ffdf7bd8cf2f1ffcfa98ac05f1138dda510bca53c784
+```
+
+这使 block0 的完整 fused 结果成为本地可批量采样的 NVIDIA oracle；早期 adapter／depthwise／FFN 的 row-major 预览不再承担数值真值角色。下一步从随机 RGBA tiles 直接拟合 `RGBA → main activation`，并用同一 launch 的 downsample 输出恢复 pre-block DS 分支。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
