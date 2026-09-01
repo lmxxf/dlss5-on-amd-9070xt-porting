@@ -893,6 +893,8 @@ block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935
 
 在真实非零 tile 上逐 byte 改一个 E4M3 mantissa，3,547/4,096 次只影响一个 canonical token，545 次因未跨量化阈值而无输出变化，仅极少数边界事件扩散全 tile；因此 FFN 主体仍是 pointwise，跨-token 现象来自动态量化边界而非隐藏 attention。直接把单个 W2 slot 或整个16-slot tile 置1会让输出全零，保留真实 W2 后逐 slot 置零又会因 tile scale 重算而几乎全局变化，证明 weight payload 的有效值与 tile-scale 状态不可分离。线性、per-token MLP、byte embedding 与全局统计 FiLM 均不足以忠实拟合，已停止扩大 surrogate。下一步必须从 SASS 的 FP16→FP8 tile conversion 恢复 scale 规则，或在 controlled scan 中同时保持每个 weight tile 的 scale invariant。
 
+另测试同 CUBIN 的 non-FP8 `cc_tinlayout_fused_swin_2h_64_2_ds`：输入／输出需要 halo padding；消除越界后，kernel 仍会读取约 131KB weight view，而 archive block8 只有 69,936 bytes。把后半权重补零可安全执行但输出全零，证明 non-FP8 variant 依赖 runtime 预转换／扩展后的另一种 weight arena，不能直接消费泄露 archive FP16 blob。这条“绕过 FP8 scale”捷径已排除，后续不再重试同一布局。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
