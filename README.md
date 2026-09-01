@@ -27,6 +27,7 @@
 - `block8-downsample-effective.bin` / `block8-downsample-effective.json`：block8 的 main→compact 线性 downsample；含 physical token/channel mixing，held-out correlation 0.9988。
 - `tinlayout-2h64-input-permutation.i32` / `tinlayout-2h64-output-permutation.i32` / `tinlayout-2h64-permutation.json`：4096-basis CUBIN scan 恢复的完整 2H/64-channel token+channel unswizzle；64 个对齐 Jacobian correlation 全为 1.0。
 - `fp8-weight-layout-evidence.json`：2H SASS 对 archive matrix payload 执行 E4M3 unpack、再乘 FP16 scale 的直接证据；纠正“payload 容量闭合即 FP16 matrix”的误读。
+- `unpack_mma_fragments.py`：按 NVIDIA PTX 9.1 `mma.m16n8k32` matrix-B 官方公式解包／回包 lane-major E4M3 subtiles；block8 W1 的 8,192 loaded bytes 可逐 byte roundtrip。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。

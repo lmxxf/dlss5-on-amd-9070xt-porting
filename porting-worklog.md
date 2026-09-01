@@ -901,6 +901,8 @@ FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。
 
+NVIDIA PTX ISA 9.1 §9.7.14.5.10 给出 E4M3 matrix-B fragment 的官方坐标：`group=lane>>2`、`thread=lane&3`，每 lane 的 byte `i` 映射到 `K=thread*4+(i&3)+(i>=4?16:0)`、`N=group`；前后8 bytes 是两张 K32×N8 tiles。`unpack_mma_fragments.py` 已实现双向映射，并对 block8 W1 的 `2×8×512=8192` 个实际 load bytes 做到逐 byte roundtrip。高层 K/N tile 拼接仍待按 QMMA accumulator chain 恢复，但 lane 内 fragment 映射已闭合且不再依赖猜测。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
