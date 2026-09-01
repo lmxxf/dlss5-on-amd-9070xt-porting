@@ -875,6 +875,8 @@ block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`�
 
 `d3d12_block4_bridge.cpp` 随后把第一座 encoder stage bridge 落到 RX 9070 XT。1,024 held-out tiles 对原 CUBIN：MAE `1.4714362`、RMSE `2.1836541`、correlation `0.9940212`，与 CPU surrogate 一致，submit→fence `12.449 ms`。真实《剑星》576 tiles 对原 block4 CUBIN correlation `0.9971679`，耗时 `9.458 ms`，并导出 294,912 个 compact FP32 values。至此 AMD 路径不再只包含 block0–3 和最终 readout，已跨过首个 32-channel downsample stage。
 
+第二座 AMD bridge 覆盖 block5 inpview + block6–7：输入四个 512-value compact tiles，输出一个 4,096-value 8×8×64 physical tile。512 held-out groups 在 RX 9070 XT 上 correlation `0.9926007`、MAE `4.9250931`、RMSE `9.5192541`，耗时 `5.597 ms`。把第一座 block4 AMD 真图输出直接串入第二座后，对原 block7 CUBIN correlation `0.9904226`，144 groups 耗时 `1.933 ms`。这条链首次在 AMD 上从 32-channel stage 真正跨入并跑完 64-channel stage。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
