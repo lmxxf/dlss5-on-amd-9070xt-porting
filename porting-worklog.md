@@ -614,6 +614,34 @@ launch                         RVA 0x449a0
 
 自制 CUBIN oracle probe 已编译但尚未进入游戏验证：前一轮 device removal 后重启 Steam，客户端的 SSH `-applaunch` 状态机不再拉起游戏，direct `SB.exe` 又被 Steam DRM 返回 1。probe 未部署，源码与 direct-launch 尝试放在 stash `DLSSNR自制CUBIN oracle待5090前台重测`；需在 5090 桌面手动点一次开始游戏恢复前台状态后再测。
 
+### DGX Spark 直接成为 NVIDIA kernel oracle
+
+GB10 为 compute capability 12.1。实测 CUDA driver 可直接加载泄露的 sm_120 CUBIN：
+
+```text
+cuModuleLoad(dlssnr-00.cubin) = CUDA_SUCCESS
+cuModuleGetFunction(cc_tinlayout_fused_swin_1h_32_1_fp8) = CUDA_SUCCESS
+```
+
+普通 1H init 函数确认 kernel block dimensions 为 `(32,1,1)`；forward 的单一 by-value 参数 struct 为 0x60 bytes。`run_original_1h_oracle.cpp` 已在 Spark 原生 launch：
+
+```text
+grid=(1,1,1), block=(32,1,1)
+logical tile=8×8
+weights=block1 原始 20672 bytes
+kernel=cc_tinlayout_fused_swin_1h_32_1_inpview_fp8
+output=2048 E4M3 bytes = 8×8×32
+```
+
+non-FP8 variant 不能直接消费该混合格式 blob；runtime 实际 FP8 variant 正常输出。构造零矩阵 + unit FFN/attention skip 的 diagnostic weights 后做 basis scan，确认 activation 是 E4M3 packed view，不是 row-major FP16／FP32。当前 observations：
+
+- input 每个 32-bit slot 的部分 lanes 为有效 chain view；
+- identity residual 只覆盖部分 output channels，其余由 FFN/attention branch 生成；
+- 第一个 mapping 序列为 input basis `0..15 → output byte 3,19,35,...,243`，之后按 0x100／0x200 tile swizzle 跳转；
+- 因此「把 blob reshape 成 `[H,W,C]`」在 activation 和 matrix 两侧都不成立。
+
+这条本地 oracle 取代 5090 中间层 readback：后续在 Spark 用 finite basis + controlled weights 求完整 input/output/weight permutation，再把 unswizzle 规则用于 PyTorch 和 AMD HLSL。5090 只保留最终真实游戏帧验收用途。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
