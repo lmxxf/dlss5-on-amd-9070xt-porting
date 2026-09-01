@@ -12,6 +12,7 @@
 - `infer_fused_layouts.py` / `fused-layouts.json`：自动闭合 32／64／128／256-channel fused-Swin record 的重复张量容量；明确区分容量闭合与尚待 unswizzle 的 tensor-core 物理排列。
 - `dlssnr_layer_oracle_probe.cpp`：安全 hook 第一条 1H forward，导出真实网络尺寸、GPU VA、CubinBackendNGX／kernel backend live object 链，供定位 NvAPI dispatch。
 - `read_process_pointer.ps1`：从 SSH 只读解析 live object/vtable 指针及所属模块 RVA。
+- `capture_raw_buffer.cu` / `capture_raw_buffer_cubin.inc`：Spark CUDA 13 编译的 sm_120 `uint4` raw-copy kernel 及 5,680-byte 嵌入版本；用于在原 NvAPI CUBIN command chain 内复制私有 activation VA。
 - `block0-input-adapter-preview.png`：RX 9070 XT 用真实 `7×32 input_adapter_weight` 执行 HLSL 投影后生成的首张 learned-feature 诊断图。
 - `block0-depthwise-preview.png`：在 input adapter 后继续执行真实 `[32,3,3]` depthwise convolution 的 AMD 输出；颜色变化较弱但非恒定图。
 - `stellar-block0-rgb-only.png`：以《剑星》Steam hero RGB 为输入、Gaussian 四通道置零时，RX 9070 XT 经过 input adapter + depthwise 后的首张可辨认模型中间图。
