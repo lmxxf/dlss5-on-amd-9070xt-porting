@@ -887,6 +887,8 @@ full-block straight-through E4M3 联合校准显示最佳点就在 controlled �
 
 `d3d12_block128_test.cpp` 已在 RX 9070 XT 执行完整 `128→160→128 FFN + 4-head cosine attention + projection + residual + E4M3`。16 held-out tiles 对原 block10 CUBIN correlation `0.9953363`、MAE `22.194`、RMSE `28.724`，全部 finite，与 CPU effective 模型一致。首版 shader 每个 query/key 重算 QKV，16 tiles submit→fence `28.845 ms`，只作为 correctness runner；优化版应拆成 QKV 预计算、attention、projection 三 pass。
 
+block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935`，均拒绝进入主线。把原 DS kernel 的 full main 与 compact 双输出分离后，downsample 可表示为 `64→64, kernel2, stride2` 加 physical token/channel mixing；1,024 held-out tiles correlation `0.9988018`、MAE `2.760`、RMSE `5.421`。参数固化为 `block8-downsample-effective.bin`。block8 剩余缺口收窄为标准两头 64-channel Swin body，后续按 block10 的 full-block 联合校准方式恢复。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
