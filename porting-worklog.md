@@ -889,6 +889,8 @@ full-block straight-through E4M3 联合校准显示最佳点就在 controlled �
 
 block8 整 kernel 与单独 Swin-main 的低秩蒸馏分别只有约 `0.94/0.935`，均拒绝进入主线。把原 DS kernel 的 full main 与 compact 双输出分离后，downsample 可表示为 `64→64, kernel2, stride2` 加 physical token/channel mixing；1,024 held-out tiles correlation `0.9988018`、MAE `2.760`、RMSE `5.421`。参数固化为 `block8-downsample-effective.bin`。block8 剩余缺口收窄为标准两头 64-channel Swin body，后续按 block10 的 full-block 联合校准方式恢复。
 
+2H Swin body 的 raw 4096 bytes 不能直接 reshape 为 `[64,64]`。用 4,096 个单字节 basis 在同一进程跑 controlled FFN，构造输入／输出二分图后，恰好得到 64 个 connected components，每组64 bytes。组内顺序再用 basis Jacobian 行列指纹与 Hungarian matching 对齐到 token0；64 个对齐后的 64×64 Jacobian correlation 最小值与中位数均为 `1.0`。最终 input/output permutation 完全相同，SHA-256 均为 `115f77...a5418`。这恢复了完整 activation unswizzle；下一步按 canonical channel 顺序恢复 raw W1/W2 的 tensor-core permutation。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
