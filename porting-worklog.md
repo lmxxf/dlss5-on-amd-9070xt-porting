@@ -907,6 +907,10 @@ global encoder 继续闭合：block14 main 非零327,675、compact非零40,960�
 
 global decoder 同样重跑：block39 读取新的 block38 main 与 block30 skip；block40–47 使用 `grid=(4,4,2)`、dims32×32；block48 upsample 输出147,456 bytes；block49–55 全图通过；block56 输出327,680 bytes；block57–61 全图通过；block62 输出589,824 bytes；block63–65 全图通过。block66 仍以 block3 physical view 作明确 bridge。1H shifted kernels 的全图参数需 `width=256,height=144,shift=(-4,-4)`；block67／68 均非零645,07x bytes，block69 outview 非零645,051、last912,383。至此 global CUBIN/bridge 路径推进到 block69；剩余硬缺口仍是 block0–4 global view、block66 精确 upsample 与 block70 post。
 
+前端缺口随后闭合。pre-block 以 256×144 RGBA32F texture、`grid=(32,18)` 全图启动，main 非零1,179,590，secondary非零294,897；block1 inpview、block2/3 shifted 全图通过。block4 `Params.output` 是 output0 compact global view（非零645,118、last645,119），auxiliary 是 output1/skip（非零234,862、last523,007）；用 output0 输入 block5 后恢复589,821 nonzero、last589,823，确认角色。
+
+从该正式 block4 output0 重新跑完整 block5–38 encoder，再重跑 block39–65 decoder；block66 bridge 也改用新的 block3 global view，block67–69 全图完成。至此当前最完整路径为 block0–65 exact-global + block66 explicit bridge + block67–69 exact-global。旧链中最后一处逐tile上游污染已消除。剩余硬缺口严格收敛为 block66 1H upsample 与 block70 `0xb8` post ABI。
+
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。
