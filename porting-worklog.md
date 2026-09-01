@@ -1094,6 +1094,10 @@ block32的首个Expand仍是当前唯一ViT断点：同device连续提交时，s
 
 新增 `run_original_vit_repack.cpp`，可独立把8×8 1D ViT activation执行原始 `repack_1d_to_2d_fp8`。为验证“已有block33零NaN文件能否比block31 identity更接近最终画面”，把 `block33-global-correct.bin` 暂代blocks34–38，经原repack、block39、40–69全链重跑：block39出现62个NaN并显式饱和，blocks40–69随后全部零NaN；RX9070XT readout耗时1.690ms。输出仍能辨认原图，但点阵/条纹更重，对旧clean诊断图PSNR仅16.76dB，低于block31 identity版本的17.61dB，因此该分支被数值验收否决，未替换仓库当前图。结论：block32/33“零NaN”只证明kernel输出有限，不能代替block38语义正确性；必须继续补齐34–38或直接重写AMD ViT语义。
 
+继续缩减层内chain后取得关键突破：Contract必须以 `standard + chained` 同组提交；QKV与Attention反而只需standard，给它们追加chained会引发device hung；Projection也只需standard。用该组合从已保存的block33零NaN activation独立启动block34，得到65,390个非零bytes、last=65,535、零NaN，`block34-single-standard.bin` 已取回本机。随后block35首轮因5090在多次device-removal后的驱动状态再次于QKV阶段hung，未继续消耗WDDM稳定性；block35–38仍待同组合在干净驱动状态下顺序运行。
+
+把block34临时代替35–38重跑decoder，block39 NaN从62降到53，block40–65全程零NaN；但block66输出与block33桥逐字节完全相同，说明当前block66 live-ABI路径把两条不同decoder主干坍缩为同一结果（主输入贡献丢失或被skip覆盖）。因此两条分支的block69与RX9070XT RGB也逐字节相同，PSNR仍16.76dB。该实验揭示最终画面目前同时被两个独立缺口控制：ViT 35–38同步，以及block66主干/skip融合语义；只补ViT而不修block66，最终图无法作为ViT验收信号。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

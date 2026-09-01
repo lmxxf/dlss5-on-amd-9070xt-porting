@@ -60,29 +60,14 @@ int main(int ac, char **av) {
   CUcontext ctx;
   ck("ctx", cuDevicePrimaryCtxRetain(&ctx, d));
   ck("set", cuCtxSetCurrent(ctx));
-  CUstream stream_standard, stream_chained;
-  int least_priority = 0, greatest_priority = 0;
-  ck("priority_range",
-     cuCtxGetStreamPriorityRange(&least_priority, &greatest_priority));
-  ck("stream_standard", cuStreamCreateWithPriority(
-                            &stream_standard, CU_STREAM_NON_BLOCKING,
-                            least_priority));
-  ck("stream_chained", cuStreamCreateWithPriority(
-                           &stream_chained, CU_STREAM_NON_BLOCKING,
-                           greatest_priority));
   CUmodule m;
   ck("module", cuModuleLoad(&m, "/tmp/dlssnr-cubins/dlssnr-05.cubin"));
-  CUfunction fe, fc, fc_chained, fq, fa, fp, fp_wait;
+  CUfunction fe, fc, fq, fa, fp;
   ck("fe", cuModuleGetFunction(&fe, m, "cc_vit_1d_ffn_expand_fp8"));
   ck("fc", cuModuleGetFunction(&fc, m, "cc_vit_1d_ffn_contract_fp8"));
-  ck("fc_chained", cuModuleGetFunction(
-                         &fc_chained, m,
-                         "cc_vit_1d_ffn_contract_chained_fp8"));
   ck("fq", cuModuleGetFunction(&fq, m, "cc_vit_1d_qkv_fp8"));
   ck("fa", cuModuleGetFunction(&fa, m, "cc_vit_1d_attention_fp8"));
   ck("fp", cuModuleGetFunction(&fp, m, "cc_vit_1d_projection_fp8"));
-  ck("fp_wait", cuModuleGetFunction(&fp_wait, m,
-                                     "cc_vit_1d_projection_wait_fp8"));
   CUdeviceptr din, branch, main, attn, out, work, aux, dwa, q[3];
   for (auto p :
        {&din, &branch, &main, &attn, &out, &work, &aux, &q[0], &q[1], &q[2]}) {
@@ -121,11 +106,6 @@ int main(int ac, char **av) {
   CUlaunchAttribute ca{};
   CUlaunchConfig cfg{};
   cluster(cfg, ca, 8, 4);
-  CUlaunchConfig chained_cfg = cfg;
-  cfg.hStream = stream_standard;
-  chained_cfg.hStream = stream_chained;
-  ck("contract_chained",
-     cuLaunchKernelEx(&chained_cfg, fc_chained, cc, nullptr));
   ck("contract", cuLaunchKernelEx(&cfg, fc, cc, nullptr));
   ck("sc", cuCtxSynchronize());
   unsigned char pq[0x50]{};
@@ -169,11 +149,7 @@ int main(int ac, char **av) {
   void *ap[] = {pp};
   CUlaunchAttribute pca{};
   cluster(cfg, pca, 8, 4);
-  cfg.hStream = stream_standard;
-  chained_cfg = cfg;
-  chained_cfg.hStream = stream_chained;
   ck("projection", cuLaunchKernelEx(&cfg, fp, ap, nullptr));
-  ck("projection_wait", cuLaunchKernelEx(&chained_cfg, fp_wait, ap, nullptr));
   ck("sp", cuCtxSynchronize());
   std::vector<unsigned char> x(A);
   ck("read", cuMemcpyDtoH(x.data(), out, A));

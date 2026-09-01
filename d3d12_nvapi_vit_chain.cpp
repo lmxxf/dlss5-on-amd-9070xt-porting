@@ -375,7 +375,6 @@ int wmain(int ac, wchar_t **av) {
     std::memcpy(qq.data() + 72, &dims, 8);
     std::vector<uint8_t> qq2 = qq;
     add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
-    add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> a(0x40);
     p64(a, 0, blockQ[0]);
@@ -387,8 +386,6 @@ int wmain(int ac, wchar_t **av) {
     p64(a, 48, a5);
     std::memcpy(a.data() + 56, &dims, 8);
     add(fn[4], {32, 1, 1}, {32, 4, 1}, std::move(a));
-    std::vector<uint8_t> a2blob = blobs.back();
-    add(chainedFn[3], {32, 1, 1}, {32, 4, 1}, std::move(a2blob));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> pr(0x48);
     p64(pr, 0, blockAttn);
