@@ -915,6 +915,8 @@ block70 原 CUBIN 已成功写 CUDA RGBA32F surface。核心字段：main `+0`�
 
 block66 已改用执行图要求的真实 `block4.output1` global auxiliary skip，而非旧 block3 bridge 输入；plain upsample 仍全零。SASS 确认 `c398` 是 X/Y 两个 boundary modes、`c3a0` 是 CTA origin、`c3d0` 为 skip pointer、`c3d8` 为 override dimensions；mode 0–3 全组合与 input/output dims 两种顺序均未打开 plain store。切换 `upsample_tilesync_fp8` 后 kernel 开始写 sync 地址，但因 sync pointer 未绑定而访问低地址，证明 runtime 实际可能依赖 tilesync scheduler。下一步需从 live layer state 取得 sync object/pointer，与 block70 color coefficients 一并抓取。
 
+`probe_runtime_descriptor.ps1` 已扩展为只对 block70 导出完整0x170-byte raw layer descriptor。离线 builder 的0xc0–0x168全零，仅在0x70/0x78看到静态布尔 flags、0x80看到float 1.0；不存在 post kernel c400–c428 所需的 color/coordinate coefficients。故这些值确实在 live network/evaluate state 中生成，无法从静态 descriptor 恢复。5090 未运行 `SB.exe` 时无法完成该读取。
+
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
 地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。

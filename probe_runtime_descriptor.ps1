@@ -162,12 +162,19 @@ try {
                     }
                 }
             }
+            $layerRawHex = $null
+            if ($blockIndex -eq 70) {
+                $layerRaw = New-Object byte[] 0x170
+                [System.Runtime.InteropServices.Marshal]::Copy($layerAddress, $layerRaw, 0, $layerRaw.Length)
+                $layerRawHex = [BitConverter]::ToString($layerRaw).Replace('-', '').ToLowerInvariant()
+            }
             $layers += [ordered]@{
                 index = $layerIndex
                 address = ('0x{0:x}' -f $layerAddress.ToInt64())
                 name = Read-MsvcString $layerAddress
                 type = Read-MsvcString ([IntPtr]($layerAddress.ToInt64() + 0x20))
                 candidate_vectors = $candidateVectors
+                raw_hex = $layerRawHex
             }
         }
         $blocks += [ordered]@{
