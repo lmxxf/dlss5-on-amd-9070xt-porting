@@ -885,6 +885,8 @@ block10 controlled-weight oracle 证明 128-channel view 仍可按 64 tokens×12
 
 full-block straight-through E4M3 联合校准显示最佳点就在 controlled 解附近：第一个 epoch 后继续训练会迅速发散，因此每个 block 只保留一次小步更新的最佳 checkpoint。最终 block11／12／13 correlation 分别为 `0.9956585 / 0.9951163 / 0.9958712`，MAE 为 `21.010 / 22.394 / 21.224`。四个 4H effective blobs 的共同布局写入 `effective-4h128.json`；下一步用一个通用 HLSL runner 在 RX 9070 XT 验证。
 
+`d3d12_block128_test.cpp` 已在 RX 9070 XT 执行完整 `128→160→128 FFN + 4-head cosine attention + projection + residual + E4M3`。16 held-out tiles 对原 block10 CUBIN correlation `0.9953363`、MAE `22.194`、RMSE `28.724`，全部 finite，与 CPU effective 模型一致。首版 shader 每个 query/key 重算 QKV，16 tiles submit→fence `28.845 ms`，只作为 correctness runner；优化版应拆成 QKV 预计算、attention、projection 三 pass。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
