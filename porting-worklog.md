@@ -931,6 +931,10 @@ NVIDIA PTX ISA 9.1 §9.7.14.5.10 给出 E4M3 matrix-B fragment 的官方坐标�
 
 运行时探针现只对剩余两个缺口做定点深抓：block66（1H upsample）与block70（RGB post）的layer对象和state各导出0x200 bytes；其余层仍只读首个qword，避免异构对象越界。新版探针SHA-256为`12FE49282780272A8043C6F3FB5B7FC8FB6C2D5A28F2D8CAAB4C9E8CE3D67237`，已编译并部署到5090游戏目录，等待下一次进程启动加载。
 
+新版 live dump 已取得。block66 与 block70 的 layer/state 各512 bytes 均已固化到 `runtime-network-5090.txt`。block70 vtable 第1项为 RVA `0x758a0`；完整反汇编确认 forward 在栈上构造0xb8-byte launch blob。参数来源已可逐指令映射：state `+0x48..+0x57` 复制到参数 `+0x40..+0x4f`（四个float 1.0），state `+0x90/+0x94` 复制到参数 `+0xa4/+0xa8`（均为1.0），state `+0x44/+0x40` 覆盖参数 `+0xac/+0xb0`（3840/2160）；额外输入资源依次位于参数 `+0x38/+0x58/+0x60`。此前把 `+0xa0` 猜作RGB texture object的结论错误，live state对应位置为零。
+
+一次性 post-forward/CUDA launch hook 在feature18首次evaluate时触发Fatal Error，且未落出参数文件。该探针已立即从游戏目录移除；稳定的runtime state探针保留。崩溃发生前feature18 create成功，前一轮无post hook时已稳定运行60帧，故故障明确归于新增hook签名/层级，不归于DLSSNR本体。后续不再注入该hook，改用`0x758a0`反汇编与live state离线重建参数包。
+
 ### 2026-09-01 最新续点
 
 完整 live network dump 已取得，探针已移除。下一步：
