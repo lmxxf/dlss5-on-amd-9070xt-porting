@@ -899,6 +899,8 @@ FP8 SASS 随后给出直接证据：matrix tile 经 `F2FP.F16.E4M3.UNPACK_B` 从
 
 继续追踪 `R160=weights` 的地址计算，W1 load 覆盖 `+0x0000..+0x17ff`，正好 6,144 个 E4M3 bytes；W2 从 `+0x4000` 开始，scale 在 `+0x7010`。这再次反证 serialization half tensor offset 可直接用于 FP8 kernel。三块2048-byte tile 的简单顺序枚举仍无显著相关，说明 tile 内 row/column 映射还包含 lane-dependent `R97/R99/R158` swizzle；下一步直接翻译这些整数地址公式，不再枚举高层矩阵块。
 
+地址公式现已展开：`R10=TID.Y+tile_offset`，W1 base 为 `weights + R10*0x2000 + lane*16`，再读取 `0x000/0x200/0x400/0x600/0x1000/0x1200/0x1400/0x1600` 八个 subtiles；W2 base 为 `weights+0x4000+R10*0x1000+lane*16`。因此 2H kernel 按 `TID.Y=0/1` 选择不同量化副本／scale，而不是共享一份 row-major 矩阵。下一步按每个 LDG 后的 `F2FP ... UNPACK_B` 寄存器顺序生成 byte→QMMA-fragment 映射。
+
 首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
 
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
