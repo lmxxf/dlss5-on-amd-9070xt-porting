@@ -853,6 +853,12 @@ physical capacity: 524288 bytes
 
 同一套五层 ABI 已顺序运行 block32–38，每层均输出完整 524,288-byte physical view。至此原 CUBIN 权威路径已跑完整个 encoder 与 8 个 1024-channel ViT blocks，当前来到 block39 `CCDecInputUpsample 1024→512`。block39 kernel 位于独立的 `dlssnr-06.cubin`，参数大小 `0x50`；SASS 初步确认 main input `+0`、skip input `+8`、output `+0x10`、weights `+0x38`。
 
+block39 全图 upsample 已跑通。正确 block dimensions 为 `(32,2,1)`；`(32,4)` 会越过 kernel 的 3,088-byte shared memory。参数 `+0x10` 实为 scratch，真正 512-channel output 在 `+0x30`；以 block38 main + block30 skip 输入，输出容量 524,288 bytes、65,536 bytes 非零、last offset 434,175，Compute Sanitizer 零错误。
+
+block40–47 复用已恢复的 split-Swin 四层 ABI，16 个 8×8 decoder tiles 已逐 block 全部运行，每个 block 保持 524,288-byte physical view。权威真图路径因此推进到 block47。
+
+为进入 block48，重新运行 block22 DS 并保留其 main/skip output，得到 12×8×8×256 = 196,608 bytes，196,606 bytes 非零。block48 原 upsample kernel 已安全启动但当前字段组合输出全零；下一步依据 SASS 校正 upsample 的空间字段／skip pointer 语义，然后继续 block49–55。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
