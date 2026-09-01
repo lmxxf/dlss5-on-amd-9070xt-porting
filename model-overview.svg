@@ -58,12 +58,13 @@
     <g fill="none" stroke="#5eead4" stroke-width="1.2" stroke-dasharray="6 5" opacity="0.75">
       <path d="M245 139 C410 92 520 92 655 139"/><path d="M285 223 C420 178 510 178 615 223"/>
       <path d="M325 307 C430 263 500 263 575 307"/><path d="M365 391 C440 348 490 348 535 391"/>
+      <path d="M405 475 C450 440 490 440 535 475"/>
     </g>
-    <text x="450" y="100" text-anchor="middle" fill="#5eead4" font-size="11">main + skip / enc0 skip</text>
+    <text x="450" y="100" text-anchor="middle" fill="#5eead4" font-size="11">六条 skip：编码端把细节抄给对面同高度的解码端（含 enc0→输出）</text>
 
-    <rect x="55" y="552" width="250" height="28" rx="5" fill="#101827" stroke="#334155"/>
-    <text x="180" y="571" text-anchor="middle" fill="#cbd5e1" font-size="11">权重包：block0 … block70</text>
-    <rect x="595" y="552" width="250" height="28" rx="5" fill="#101827" stroke="#334155"/>
-    <text x="720" y="571" text-anchor="middle" fill="#cbd5e1" font-size="11">尚缺：block → kernel 映射</text>
+    <rect x="40" y="552" width="360" height="28" rx="5" fill="#0c2016" stroke="#2dd4bf"/>
+    <text x="220" y="571" text-anchor="middle" fill="#5eead4" font-size="11">已读通：71-block 执行图 + 六条 skip</text>
+    <rect x="500" y="552" width="360" height="28" rx="5" fill="#201010" stroke="#ef4444"/>
+    <text x="680" y="571" text-anchor="middle" fill="#fca5a5" font-size="11">尚缺：FP8 权重打包 / 张量物理布局</text>
   </g>
 </svg>
