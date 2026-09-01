@@ -1092,6 +1092,8 @@ block32的首个Expand仍是当前唯一ViT断点：同device连续提交时，s
 
 读回诊断同时纠正一处假象：NVAPI私有写入后只transition/copy单一目标资源可能读到全零；把全部UAV统一transition并dump后，block31各view均存在。当前可信分层计数为Expand 114,443、Contract 28,595、QKV主view约28,6xx、Attention 65,526、Projection 65,4xx，均零NaN。旧 `/tmp/block31–38-global-view.bin` 的512KiB文件逐字节全为 `0x7f/0xff`，确认是早期16×16错误路径，不能重新当“已闭合ViT”使用；20:21后生成的2MiB `block31/32/33-global-correct.bin` 才是8×8零NaN证据。
 
+新增 `run_original_vit_repack.cpp`，可独立把8×8 1D ViT activation执行原始 `repack_1d_to_2d_fp8`。为验证“已有block33零NaN文件能否比block31 identity更接近最终画面”，把 `block33-global-correct.bin` 暂代blocks34–38，经原repack、block39、40–69全链重跑：block39出现62个NaN并显式饱和，blocks40–69随后全部零NaN；RX9070XT readout耗时1.690ms。输出仍能辨认原图，但点阵/条纹更重，对旧clean诊断图PSNR仅16.76dB，低于block31 identity版本的17.61dB，因此该分支被数值验收否决，未替换仓库当前图。结论：block32/33“零NaN”只证明kernel输出有限，不能代替block38语义正确性；必须继续补齐34–38或直接重写AMD ViT语义。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
