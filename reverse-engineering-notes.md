@@ -76,6 +76,8 @@ block0.layer0.layer
 
 因此，当前样本的**存储权重是 FP16**；文件中的 `_fp8` kernel 名称描述 GPU 执行路径，不能反推嵌入权重也按 FP8 保存。全部记录合计约 7380 万个 FP16 标量。加载阶段如何把 FP16 权重转换／重排给 FP8 kernel，仍需从 CPU 初始化逻辑确认。
 
+运行格式与存储格式必须分开：SASS 的 `F2FP.F16.E4M3.UNPACK_B` 证明原 FP8 CUBIN 消费的是加载阶段生成的 E4M3 packed/swizzled runtime arena，不是上述 archive payload。把 archive FP16 bytes 直接绑定为 `c[0][0x390]` 虽可安全启动多数 kernel，但实测 block65 饱和为0/0x7f、图像 held-out correlation 归零，只能证明结构ABI，不构成数值复现。
+
 这说明权重包至少有 71 个序列化分组，但不能写成“模型有 71 层”：
 
 - serialization block 可能对应一个算子、一组融合算子或一个复合模块；
