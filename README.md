@@ -19,6 +19,7 @@
 - `run_original_2h_inpview_oracle.cpp`：批量直跑 block5 原始 2H inpview CUBIN；每四个 compact tiles 扩展成一个 8×8×64 E4M3 tile。
 - `block0-distilled.bin` / `block0-distilled.json`：由 8,192 个原 CUBIN tiles 蒸馏出的首版 portable pre-block MLP；直接输出 NVIDIA physical tile view，供 RX 9070 XT 接入 block1–3。它是推进端到端链路的近似入口，不替代原 CUBIN oracle。
 - `block4-distilled.bin` / `block4-distilled.json`：围绕真实 stage3 activation 蒸馏的 `2048→512` compact-downsample bridge；held-out correlation 0.9939，等待 HLSL 落地。
+- `d3d12_block4_bridge.cpp`：RX 9070 XT 三 pass compact-downsample bridge；held-out correlation 0.9940，真图对原 block4 CUBIN correlation 0.9972。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。
