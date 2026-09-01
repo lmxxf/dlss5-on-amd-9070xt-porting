@@ -831,6 +831,19 @@ block22 8H DS:    12 × 7680-byte compact views
 
 block23 split-Swin 的第一层 `cc_split_swin_16h_ffwd_inpview_512_fp8` 参数缩为 `0x38`；输入／输出／权重仍在 `+0/+8/+0x10`，空间字段在 `+0x18`。资源约束表明正确分解不是 `(32,16)` 单 CTA，而是 `(32,4)` 配合 grid-z 分片；`grid.z=2` 安全并写到 physical offset 24575，`grid.z=4` 会越过 layer0 权重边界。下一步以 `(32,4), grid.z=2` 固定第一层输出，再恢复 FfwdProj／QKVAttn／Proj 三层 ABI。
 
+split-Swin 四层 ABI 随后闭合：Ffwd inpview 与 QKVAttn 使用三指针布局；FfwdProj／Proj 使用 `input +0 / residual +8 / output +0x10 / weights +0x18`。block23–29 的四个 16×16 spatial tiles 已全部跑过四层原 CUBIN，单 tile 最终为 8,192 个非零 bytes、last physical offset 12,287。
+
+block30 的 ProjPool 例外地把 weights 放在 `+0x20`，并要求以完整 16×16 feature map 启动 `grid=(2,2,2)`；逐 tile 启动在右下边界会越界。全图 launch 后 65,536 bytes 非零、last offset 126,975。FinalHead 使用 `0x28` 参数对象和普通三指针布局，全图输出容量 262,144 bytes（256 tokens × 1024 channels），32,768 bytes 非零、last offset 184,319。所有结果均经 Compute Sanitizer 验证。
+
+block31 ViT 入口也已启动：
+
+```text
+FfnExpand:   params 0x48, grid.x=32, output 131072 bytes nonzero
+FfnContract: params 0x48, grid.x=8,  output 65508/65536 bytes nonzero
+```
+
+FfnExpand 布局为 `input +0 / output +0x10 / weights +0x18 / token_count +0x40`。FfnContract 另要求 `+0x20` 与 `+0x28` auxiliary views；留空会写零地址，绑定后 Compute Sanitizer 零错误。下一步恢复 QKV／Attention／Projection，再把相同五层 ABI 推广到 block32–38。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
