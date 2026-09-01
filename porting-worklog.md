@@ -871,6 +871,10 @@ block66 的 1H upsample 参数大小为 `0x60`，不同于 2H/4H/8H 的 `0x58`�
 
 边界必须明确：这证明 block69 activation 包含可恢复画面，并给出可移植的 end-to-end 诊断输出；它还不是原 `0xb8` post CUBIN 的精确结果，也尚未证明 block4 之后的全部计算已迁到 AMD。下一步一面把 readout/blend 落到 RX 9070 XT HLSL，一面继续回填 block66 与 post ABI。
 
+`d3d12_final_readout.cpp` 已把最后的 `2048→192` readout、`blend_scale=0.7397` 与 packed RGB 全部移到 RX 9070 XT。256×144 实测 submit→fence `0.976 ms`，输出 `stellar-end-to-end-amd.png`。与 NumPy/CPU 版本相比，channel MAE `0.1469/255`、最大误差 1 LSB、85.31% channels exact，差异仅来自浮点累加／rounding。
+
+首轮 exe 曾在 PPM 已写完后返回 `0xc000001d`；根因不是 GPU，而是 MinGW 不把 `wmain` 视作标准 `main`，函数末尾缺 `return 0` 被编译成 `UD2`。补 return 后正常退出并打印计时。
+
 抓取完成后已退出游戏并从游戏目录移除 probe；`probe_exists=false`。RenoDX + DLSSNR 主测试环境未改动。
 
 ### 2026-09-01 最新续点
