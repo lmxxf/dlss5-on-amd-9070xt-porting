@@ -22,6 +22,7 @@
 - `run_original_vit1d_global.cpp` / `run_original_vit1d_chain.cpp`：8×8 ViT 的cluster-aware runner；已闭合单block，跨block仍缺NvAPI `flag=1`同步原语。
 - `run_original_vit_repack.cpp`：独立执行原始8×8 ViT 1D→2D repack，用于把任意ViT断点接回decoder做画面级验收。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
+- `run_original_1h_upsample.cpp`：按block66真实0x60 ABI执行1H upsample；`+0`绑定decoder主输入、`+8`绑定输出，保留enc0 skip与override dimensions。
 - `export_weight_records.py` / `e4m3_to_f32.py` / `sanitize_e4m3.py`：权重record导出、E4M3物理view转换与近似桥NaN饱和工具。
 - `block0-distilled.bin` / `block0-distilled.json`：由 8,192 个原 CUBIN tiles 蒸馏出的首版 portable pre-block MLP；直接输出 NVIDIA physical tile view，供 RX 9070 XT 接入 block1–3。它是推进端到端链路的近似入口，不替代原 CUBIN oracle。
 - `block4-distilled.bin` / `block4-distilled.json`：围绕真实 stage3 activation 蒸馏的 `2048→512` compact-downsample bridge；held-out correlation 0.9939，等待 HLSL 落地。

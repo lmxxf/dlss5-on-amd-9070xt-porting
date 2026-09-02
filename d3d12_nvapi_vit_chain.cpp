@@ -375,6 +375,8 @@ int wmain(int ac, wchar_t **av) {
     std::memcpy(qq.data() + 72, &dims, 8);
     std::vector<uint8_t> qq2 = qq;
     add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
+    if (bi >= 4)
+      add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
     groupEnds.push_back(ks.size());
     std::vector<uint8_t> a(0x40);
     p64(a, 0, blockQ[0]);

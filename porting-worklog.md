@@ -1098,6 +1098,10 @@ block32的首个Expand仍是当前唯一ViT断点：同device连续提交时，s
 
 把block34临时代替35–38重跑decoder，block39 NaN从62降到53，block40–65全程零NaN；但block66输出与block33桥逐字节完全相同，说明当前block66 live-ABI路径把两条不同decoder主干坍缩为同一结果（主输入贡献丢失或被skip覆盖）。因此两条分支的block69与RX9070XT RGB也逐字节相同，PSNR仍16.76dB。该实验揭示最终画面目前同时被两个独立缺口控制：ViT 35–38同步，以及block66主干/skip融合语义；只补ViT而不修block66，最终图无法作为ViT验收信号。
 
+block66坍缩随后由SASS直接破案。`cc_tinlayout_fused_swin_1h_32_1_upsample_fp8` 在 `c[0][0x380]`（kernel参数 `+0x00`）执行真实 `LDG`，旧runner却把 `+0x00/+0x08` 都绑成清零后的output；因此decoder主输入从未进入kernel。修正为 `+0x00=main input / +0x08=output`，并保留 `+0x40=main auxiliary view / +0x50=enc0 skip` 后，block66输出达到1,179,63x/1,179,648非零、零NaN；block33与block34两条主干产生不同SHA-256，差分验收通过。新增 `run_original_1h_upsample.cpp` 固化该0x60 ABI。
+
+用修正block66重跑67–69与RX9070XT readout：block67/68/69分别约645,11x/645,11x/645,109非零、零NaN，AMD submit→fence 0.896ms。对clean诊断图PSNR由16.76提升到17.26dB，说明主干恢复确实改善结果；但仍低于block31旧近似的17.61dB，最终图依然有规则点阵与横向色带，不能验收。当前画面瓶颈重新收敛到尚缺的ViT blocks35–38以及更早的portable AMD语义实现。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
