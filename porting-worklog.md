@@ -1273,6 +1273,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 受控E4M3 impulse开始恢复block70两路spatial layout。main offset 0–63都只影响左上8×8窗；offset `+64/+128/+256/+512/+1024`分别把响应平移到x=8/16/32/64/128，offset `+8192/+16384/.../+131072`分别把响应平移到y=8/16/.../128。skip同样局部，但offset `+2048`把响应移到x=16，`+8192`移到x=64，吻合其半解析度输入经upsample进入full-resolution post。单独保留真实main或真实skip时，对完整post的MAE分别为0.02295与0.03414，二者都不是可忽略支路，且完整输出不是两次单支路残差的线性相加。下一步因此使用8×8单tile ABI批量生成main+skip联合随机dataset，不再对全图4 MiB地址做黑盒回归。
 
+`run_original_post_dataset.cpp`把单tile oracle改为复用同一CUDA context/module、weights、texture与surface，只逐样本上传2048-byte main和512-byte skip。128组输出与原逐进程runner逐float exact，耗时从约40秒降为0.42秒；9,216组联合样本仅0.70秒。独立held-out同时否决无结构MLP：128样本时correlation约0.04，8,192 train＋1,024 held-out、2560→512→192模型也只有0.292，MAE 0.0913，甚至不如零残差baseline MAE 0.0725。archive前10,336 FP16直接当row-major 1H Swin再拟合out head也只有correlation约0.13，证明前段虽然容量等于标准1H block，tensor-core physical pack仍必须用controlled weights/basis恢复；黑盒蒸馏不进入AMD主线。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

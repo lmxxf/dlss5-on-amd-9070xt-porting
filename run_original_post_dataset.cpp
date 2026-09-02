@@ -1,0 +1,162 @@
+#include <cuda.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <vector>
+
+static void check(const char *name, CUresult result) {
+    if (result != CUDA_SUCCESS) {
+        const char *message = nullptr;
+        cuGetErrorString(result, &message);
+        std::fprintf(stderr, "%s: %d %s\n", name, result,
+                     message ? message : "?");
+        std::exit(1);
+    }
+}
+
+static std::vector<unsigned char> read_file(const char *path) {
+    std::ifstream stream(path, std::ios::binary | std::ios::ate);
+    if (!stream) std::exit(2);
+    size_t size = static_cast<size_t>(stream.tellg());
+    stream.seekg(0);
+    std::vector<unsigned char> bytes(size);
+    stream.read(reinterpret_cast<char *>(bytes.data()), size);
+    return bytes;
+}
+
+int main(int argc, char **argv) {
+    if (argc != 7) {
+        std::fprintf(stderr,
+            "usage: %s cubin symbol weights blend samples.u8 output.rgba32f\n"
+            "samples: repeated [2048-byte main][512-byte skip] records\n",
+            argv[0]);
+        return 2;
+    }
+    auto weights = read_file(argv[3]);
+    auto blend = read_file(argv[4]);
+    auto samples = read_file(argv[5]);
+    constexpr size_t main_bytes = 2048;
+    constexpr size_t skip_bytes = 512;
+    constexpr size_t sample_bytes = main_bytes + skip_bytes;
+    if (weights.size() != 21808 || blend.size() != 2 || samples.empty() ||
+        samples.size() % sample_bytes) return 2;
+    const size_t count = samples.size() / sample_bytes;
+
+    check("cuInit", cuInit(0));
+    CUdevice device;
+    check("cuDeviceGet", cuDeviceGet(&device, 0));
+    CUcontext context;
+    check("cuDevicePrimaryCtxRetain", cuDevicePrimaryCtxRetain(&context, device));
+    check("cuCtxSetCurrent", cuCtxSetCurrent(context));
+    CUmodule module;
+    check("cuModuleLoad", cuModuleLoad(&module, argv[1]));
+    CUfunction function;
+    check("cuModuleGetFunction", cuModuleGetFunction(&function, module, argv[2]));
+
+    CUdeviceptr main_device, skip_device, weights_device, blend_device;
+    check("main alloc", cuMemAlloc(&main_device, 1 << 20));
+    check("skip alloc", cuMemAlloc(&skip_device, 1 << 20));
+    check("weights alloc", cuMemAlloc(&weights_device, weights.size()));
+    check("blend alloc", cuMemAlloc(&blend_device, 512));
+    check("weights upload", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
+    check("blend upload", cuMemcpyHtoD(blend_device, blend.data(), blend.size()));
+
+    CUDA_ARRAY3D_DESCRIPTOR output_desc{};
+    output_desc.Width = output_desc.Height = 8;
+    output_desc.Format = CU_AD_FORMAT_FLOAT;
+    output_desc.NumChannels = 4;
+    output_desc.Flags = CUDA_ARRAY3D_SURFACE_LDST;
+    CUarray output_array;
+    check("output array", cuArray3DCreate(&output_array, &output_desc));
+    CUDA_RESOURCE_DESC output_resource{};
+    output_resource.resType = CU_RESOURCE_TYPE_ARRAY;
+    output_resource.res.array.hArray = output_array;
+    CUsurfObject output_surface;
+    check("output surface", cuSurfObjectCreate(&output_surface, &output_resource));
+
+    std::vector<float> color(8 * 8 * 4, 0.5f);
+    for (size_t pixel = 0; pixel < 64; ++pixel) color[pixel * 4 + 3] = 1.0f;
+    CUDA_ARRAY3D_DESCRIPTOR texture_desc{};
+    texture_desc.Width = texture_desc.Height = 8;
+    texture_desc.Format = CU_AD_FORMAT_FLOAT;
+    texture_desc.NumChannels = 4;
+    CUarray texture_array;
+    check("texture array", cuArray3DCreate(&texture_array, &texture_desc));
+    CUDA_MEMCPY2D texture_copy{};
+    texture_copy.srcMemoryType = CU_MEMORYTYPE_HOST;
+    texture_copy.srcHost = color.data();
+    texture_copy.srcPitch = 8 * 16;
+    texture_copy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
+    texture_copy.dstArray = texture_array;
+    texture_copy.WidthInBytes = 8 * 16;
+    texture_copy.Height = 8;
+    check("texture upload", cuMemcpy2D(&texture_copy));
+    CUDA_RESOURCE_DESC texture_resource{};
+    texture_resource.resType = CU_RESOURCE_TYPE_ARRAY;
+    texture_resource.res.array.hArray = texture_array;
+    CUDA_TEXTURE_DESC texture_options{};
+    texture_options.addressMode[0] = CU_TR_ADDRESS_MODE_CLAMP;
+    texture_options.addressMode[1] = CU_TR_ADDRESS_MODE_CLAMP;
+    texture_options.filterMode = CU_TR_FILTER_MODE_LINEAR;
+    texture_options.flags = CU_TRSF_NORMALIZED_COORDINATES;
+    CUtexObject texture;
+    check("texture object", cuTexObjectCreate(
+        &texture, &texture_resource, &texture_options, nullptr));
+
+    alignas(8) unsigned char params[0xb8]{};
+    std::memcpy(params + 0x00, &main_device, 8);
+    std::memcpy(params + 0x08, &skip_device, 8);
+    std::memcpy(params + 0x10, &output_surface, 8);
+    std::memcpy(params + 0x18, &weights_device, 8);
+    const int extent = 8;
+    std::memcpy(params + 0x20, &extent, 4);
+    std::memcpy(params + 0x24, &extent, 4);
+    const float input_scale = 0.03125f;
+    const int rgb_mode = 1;
+    std::memcpy(params + 0x30, &input_scale, 4);
+    std::memcpy(params + 0x34, &rgb_mode, 4);
+    std::memcpy(params + 0x38, &texture, 8);
+    const float transform[6] = {0, 0, 1, 1, 1, 1};
+    std::memcpy(params + 0x40, transform, sizeof(transform));
+    std::memcpy(params + 0x68, &blend_device, 8);
+    const float one = 1.0f;
+    std::memcpy(params + 0xa4, &one, 4);
+    std::memcpy(params + 0xa8, &one, 4);
+    std::memcpy(params + 0xac, &extent, 4);
+    std::memcpy(params + 0xb0, &extent, 4);
+    void *arguments[] = {params};
+
+    std::vector<float> output(count * 8 * 8 * 4);
+    CUDA_MEMCPY2D download{};
+    download.srcMemoryType = CU_MEMORYTYPE_ARRAY;
+    download.srcArray = output_array;
+    download.dstMemoryType = CU_MEMORYTYPE_HOST;
+    download.dstPitch = 8 * 16;
+    download.WidthInBytes = 8 * 16;
+    download.Height = 8;
+    for (size_t sample = 0; sample < count; ++sample) {
+        const auto *record = samples.data() + sample * sample_bytes;
+        check("main clear", cuMemsetD8(main_device, 0, 1 << 20));
+        check("skip clear", cuMemsetD8(skip_device, 0, 1 << 20));
+        check("main upload", cuMemcpyHtoD(main_device, record, main_bytes));
+        check("skip upload", cuMemcpyHtoD(skip_device, record + main_bytes, skip_bytes));
+        check("launch", cuLaunchKernel(
+            function, 1, 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
+        check("sync", cuCtxSynchronize());
+        download.dstHost = output.data() + sample * 8 * 8 * 4;
+        check("download", cuMemcpy2D(&download));
+    }
+    std::ofstream stream(argv[6], std::ios::binary);
+    stream.write(reinterpret_cast<const char *>(output.data()),
+                 output.size() * sizeof(float));
+    const auto [low, high] = std::minmax_element(output.begin(), output.end());
+    size_t finite = 0;
+    for (float value : output) finite += std::isfinite(value);
+    std::printf("samples=%zu finite=%zu/%zu range=%.9g..%.9g\n",
+                count, finite, output.size(), *low, *high);
+    return stream ? 0 : 3;
+}
