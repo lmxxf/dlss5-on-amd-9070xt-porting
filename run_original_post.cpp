@@ -29,10 +29,11 @@ static std::vector<unsigned char> read_file(const char *path, size_t bytes) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 11 || argc > 14) {
+    if (argc < 11 || argc > 15) {
         std::fprintf(stderr,
             "usage: %s cubin symbol main skip weights blend color output "
-            "width height [texture-mask=1] [rgb-mode=1] [input-scale=0.03125]\n",
+            "width height [texture-mask=1] [rgb-mode=1] [input-scale=0.03125] "
+            "[features]\n",
             argv[0]);
         return 2;
     }
@@ -46,6 +47,8 @@ int main(int argc, char **argv) {
     const int rgb_mode = argc > 12 ? std::atoi(argv[12]) : 1;
     const float input_scale = argc > 13 ? std::strtof(argv[13], nullptr)
                                         : 0.03125f;
+    const bool feature_mode = argc > 14 && !std::strcmp(argv[14], "features");
+    if (argc > 14 && !feature_mode) return 2;
     if (width <= 0 || height <= 0) {
         std::fprintf(stderr, "invalid dimensions %dx%d\n", width, height);
         return 2;
@@ -144,10 +147,6 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0xb0, &height, 4);
 
     void *arguments[] = {params};
-    check("launch", cuLaunchKernel(function, (width + 7) / 8, (height + 7) / 8,
-                                    1, 32, 2, 1, 0, nullptr, arguments, nullptr));
-    check("sync", cuCtxSynchronize());
-
     std::vector<float> output(static_cast<size_t>(width) * height * 4);
     CUDA_MEMCPY2D download{};
     download.srcMemoryType = CU_MEMORYTYPE_ARRAY;
@@ -157,7 +156,60 @@ int main(int argc, char **argv) {
     download.dstPitch = width * 16;
     download.WidthInBytes = width * 16;
     download.Height = height;
-    check("download", cuMemcpy2D(&download));
+    const auto launch_and_download = [&]() {
+        check("launch", cuLaunchKernel(function, (width + 7) / 8,
+            (height + 7) / 8, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
+        check("sync", cuCtxSynchronize());
+        check("download", cuMemcpy2D(&download));
+    };
+    if (feature_mode) {
+        std::vector<unsigned char> controlled(weights.size(), 0);
+        std::copy(weights.begin(), weights.begin() + 10392 * 2,
+                  controlled.begin());
+        std::vector<float> features(static_cast<size_t>(width) * height * 32);
+        std::vector<float> positive(static_cast<size_t>(width) * height);
+        constexpr unsigned short positive_half = 0x1400; // FP16 1/1024
+        constexpr unsigned short negative_half = 0x9400; // FP16 -1/1024
+        constexpr unsigned short zero_half = 0;
+        constexpr float probe = 1.0f / 1024.0f;
+        for (size_t channel = 0; channel < 32; ++channel) {
+            const size_t block = channel < 16 ? 10392 : 10648;
+            const size_t local = channel & 15;
+            const size_t slot = block + (local / 4) * 8 + local % 4;
+            std::memcpy(controlled.data() + slot * 2, &positive_half, 2);
+            check("controlled weights", cuMemcpyHtoD(
+                weights_device, controlled.data(), controlled.size()));
+            launch_and_download();
+            for (size_t pixel = 0; pixel < static_cast<size_t>(width) * height;
+                 ++pixel)
+                positive[pixel] = output[pixel * 4];
+            std::memcpy(controlled.data() + slot * 2, &negative_half, 2);
+            check("controlled weights", cuMemcpyHtoD(
+                weights_device, controlled.data(), controlled.size()));
+            launch_and_download();
+            for (size_t pixel = 0; pixel < static_cast<size_t>(width) * height;
+                 ++pixel) {
+                const float source =
+                    reinterpret_cast<const float *>(rgba.data())[pixel * 4];
+                const float from_positive = (positive[pixel] - source) / probe;
+                const float from_negative = (source - output[pixel * 4]) / probe;
+                features[pixel * 32 + channel] =
+                    std::abs(from_positive) >= std::abs(from_negative)
+                    ? from_positive : from_negative;
+            }
+            std::memcpy(controlled.data() + slot * 2, &zero_half, 2);
+        }
+        std::ofstream stream(output_path, std::ios::binary);
+        stream.write(reinterpret_cast<const char *>(features.data()),
+                     features.size() * sizeof(float));
+        const auto [low, high] = std::minmax_element(features.begin(), features.end());
+        size_t finite = 0;
+        for (float value : features) finite += std::isfinite(value);
+        std::printf("features=%zu finite=%zu range=%.9g..%.9g output=%s\n",
+                    features.size(), finite, *low, *high, output_path);
+        return stream ? 0 : 3;
+    }
+    launch_and_download();
     std::ofstream stream(output_path, std::ios::binary);
     stream.write(reinterpret_cast<const char *>(output.data()),
                  output.size() * sizeof(float));

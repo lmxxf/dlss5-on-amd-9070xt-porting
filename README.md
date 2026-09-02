@@ -39,7 +39,7 @@
 - `run_original_post_dataset.cpp`：复用单一CUDA context批量执行8×8 block70 main+skip联合样本；输入record为2048-byte main＋512-byte skip。128组与逐进程oracle逐float exact，耗时0.42秒；9,216组耗时0.70秒。另支持body weight one-hot／逐slot ablation及`features`模式；后者借controlled RGB head导出64×32 body feature，9,216组耗时5.47秒。
 - block70 input impulse结论：main分配的2048 bytes中只有前512 bytes有效，skip为512/512有效；两路Jacobian rank均512，对应两路`4×4×32`输入共同upsample到`8×8×32`，不是先前假设的full-resolution main。
 - `fit_post_outconv.py` / `block70-outconv-effective.bin` / `.json`：从controlled head basis恢复block70最后的32→RGB矩阵；两组16-channel packed block各占256 FP16 slots、每组仅48个有效。独立held-out correlation 0.9999991、MAE 2.88e-7。
-- `d3d12_post_outconv_test.cpp`：RX9070XT直接执行portable 32→RGB与`Color + residual`；独立held-out tile submit→fence 0.334 ms，对NVIDIA oracle MAE 2.17e-7、max error 2.83e-6。
+- `d3d12_post_outconv_test.cpp`：RX9070XT直接执行portable 32→RGB与`Color + residual`；独立held-out tile MAE 2.17e-7。256×144全图用controlled body feature对NVIDIA oracle：1.060 ms、RGBA MAE 4.95e-5、max error 0.001531；8-bit RGB 98.32% channels exact、最大1 LSB。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。

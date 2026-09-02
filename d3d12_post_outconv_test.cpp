@@ -46,18 +46,21 @@ static D3D12_RESOURCE_DESC buffer(UINT64 bytes, D3D12_RESOURCE_FLAGS flags = D3D
 }
 
 int wmain(int argc, wchar_t **argv) {
-    if (argc != 6) {
+    if (argc != 8) {
         std::fwprintf(stderr,
-            L"usage: %ls matrix.f32 feature-64x32.f32 source-64x4.f32 "
-            L"oracle-64x4.f32 output.f32\n", argv[0]);
+            L"usage: %ls matrix.f32 feature.f32 source.f32 oracle.f32 "
+            L"output.f32 width height\n", argv[0]);
         return 2;
     }
     auto matrix = read_file(argv[1]);
     auto feature = read_file(argv[2]);
     auto source = read_file(argv[3]);
     auto oracle = read_file(argv[4]);
-    if (matrix.size() != 32 * 3 * 4 || feature.size() != 64 * 32 * 4 ||
-        source.size() != 64 * 4 * 4 || oracle.size() != 64 * 4 * 4) return 2;
+    const UINT width = _wtoi(argv[6]), height = _wtoi(argv[7]);
+    const UINT64 pixels = static_cast<UINT64>(width) * height;
+    if (!pixels || matrix.size() != 32 * 3 * 4 ||
+        feature.size() != pixels * 32 * 4 || source.size() != pixels * 4 * 4 ||
+        oracle.size() != pixels * 4 * 4) return 2;
 
     IDXGIFactory6 *factory = nullptr;
     check("factory", CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)));
@@ -101,7 +104,7 @@ StructuredBuffer<float> feature:register(t1);
 StructuredBuffer<float> source:register(t2);
 RWStructuredBuffer<float> output:register(u0);
 [numthreads(64,1,1)] void main(uint3 id:SV_DispatchThreadID) {
-    uint pixel=id.x;if(pixel>=64)return;
+    uint pixel=id.x;if(pixel>=PIXELS)return;
     [unroll]for(uint color=0;color<3;color++) {
         float residual=0;
         [unroll]for(uint channel=0;channel<32;channel++)
@@ -111,7 +114,11 @@ RWStructuredBuffer<float> output:register(u0);
     output[pixel*4+3]=1.0;
 })";
     ID3DBlob *code = nullptr, *error = nullptr;
-    check("compile", D3DCompile(shader, sizeof(shader) - 1, nullptr, nullptr,
+    char pixel_count[32];
+    std::snprintf(pixel_count, sizeof(pixel_count), "%llu",
+                  static_cast<unsigned long long>(pixels));
+    D3D_SHADER_MACRO macros[] = {{"PIXELS", pixel_count}, {nullptr, nullptr}};
+    check("compile", D3DCompile(shader, sizeof(shader) - 1, nullptr, macros,
         nullptr, "main", "cs_5_1", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0,
         &code, &error));
     D3D12_DESCRIPTOR_RANGE ranges[2]{};
@@ -153,7 +160,7 @@ RWStructuredBuffer<float> output:register(u0);
         std::memcpy(mapped, bytes[index]->data(), bytes[index]->size());
         inputs[index]->Unmap(0, nullptr);
     }
-    constexpr UINT64 output_bytes = 64 * 4 * 4;
+    const UINT64 output_bytes = pixels * 4 * 4;
     auto output_desc = buffer(output_bytes, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
     auto readback_desc = buffer(output_bytes);
     ID3D12Resource *output = nullptr, *readback = nullptr;
@@ -194,7 +201,7 @@ RWStructuredBuffer<float> output:register(u0);
     commands->SetComputeRootDescriptorTable(
         0, descriptors->GetGPUDescriptorHandleForHeapStart());
     commands->SetPipelineState(pipeline);
-    commands->Dispatch(1, 1, 1);
+    commands->Dispatch(static_cast<UINT>((pixels + 63) / 64), 1, 1);
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Transition.pResource = output;

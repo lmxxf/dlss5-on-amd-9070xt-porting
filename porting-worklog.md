@@ -1287,6 +1287,10 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 对2048-byte main＋512-byte skip逐输入slot施加E4M3 `0.03125` impulse，再经`features`模式导出完整64×32 Jacobian，2,560组仅耗时1.80秒。main只有offset 0–511响应，后1,536 bytes严格为零，rank 512；skip的512/512 slots全部响应，rank同为512。这把真实输入合同修正为两路`4×4×32`，共同upsample为`8×8×32` body feature；此前把main当8×8×32的假设作废。零点Jacobian在线性小幅随机held-out上correlation 0.879／0.908、MAE 0.00197／0.00284，但对大幅iid FP8饱和样本仅0.522，不能直接当完整body。它当前用于恢复physical token/channel与局部upsample，不提升为最终AMD参数。
 
+`run_original_post.cpp`新增完整256×144 controlled-feature导出。初版单向`+1/32` probe受output saturation污染，重建只有correlation 0.9864；改为每channel执行FP16 `±1/1024`双向probe，并逐像素选择未撞0/1边界的一侧后，1,179,648个body feature全部有限，范围-26.84375..31.125。用portable out-conv重建原post达到correlation 0.999999844、RGB MAE 6.60e-5、max error 0.001531。
+
+全尺寸`d3d12_post_outconv_test.cpp`随后在RX9070XT直接消费该controlled body feature、原Color与portable 32→RGB矩阵：256×144 submit→fence 1.060 ms，对NVIDIA完整post RGBA MAE 4.95e-5、RMSE 1.30e-4、max error 0.001531、cosine 0.999999974。量化到8-bit RGB后98.3218% channels逐值一致，剩余差异最大1 LSB。这完成了block70最终head的全画面AMD验收；严格边界仍是body feature来自NVIDIA controlled oracle，故71-block全移植尚未完成，不能用该图宣称end-to-end AMD。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

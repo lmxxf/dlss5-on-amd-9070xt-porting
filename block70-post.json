@@ -27,7 +27,14 @@
     "source_activation_output_correlation": 0.95876,
     "source_activation_output_mae": 0.03328,
     "portable_block69_output_correlation": 0.8713,
-    "portable_block69_output_mae": 0.0768
+    "portable_block69_output_mae": 0.0768,
+    "controlled_feature_reconstruction_correlation": 0.999999844,
+    "controlled_feature_reconstruction_rgb_mae": 0.0000660,
+    "amd_full_frame_outconv_mae_rgba": 0.00004950,
+    "amd_full_frame_outconv_max_error": 0.00153121,
+    "amd_full_frame_outconv_submit_ms": 1.060,
+    "amd_vs_nvidia_png_exact_channel_fraction": 0.9832176,
+    "amd_vs_nvidia_png_max_lsb": 1
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }
