@@ -107,9 +107,9 @@ static void put64(std::array<uint8_t, 0x50> &blob, size_t offset,
 }
 
 int wmain(int argc, wchar_t **argv) {
-  if (argc != 11 && argc != 12) {
+  if (argc < 11 || argc > 13) {
     std::fwprintf(stderr, L"usage: %ls cubin arena main work aux input-offs "
-                           L"q-offs k-offs v-offs output [token-map|state|fp16-basis]\n", argv[0]);
+                           L"q-offs k-offs v-offs output [basis|token-map|state|fp16-basis [weight-offset]]\n", argv[0]);
     return 2;
   }
   constexpr UINT64 A = 2 * 1024 * 1024, WA = 147719680;
@@ -128,9 +128,11 @@ int wmain(int argc, wchar_t **argv) {
       reinterpret_cast<const uint32_t *>(qOffsetBytes.data()),
       reinterpret_cast<const uint32_t *>(kOffsetBytes.data()),
       reinterpret_cast<const uint32_t *>(vOffsetBytes.data())};
-  const bool tokenMap = argc == 12 && wcscmp(argv[11], L"token-map") == 0;
-  const bool stateDump = argc == 12 && wcscmp(argv[11], L"state") == 0;
-  const bool fp16Basis = argc == 12 && wcscmp(argv[11], L"fp16-basis") == 0;
+  const bool tokenMap = argc >= 12 && wcscmp(argv[11], L"token-map") == 0;
+  const bool stateDump = argc >= 12 && wcscmp(argv[11], L"state") == 0;
+  const bool fp16Basis = argc >= 12 && wcscmp(argv[11], L"fp16-basis") == 0;
+  const uint64_t qkvWeightOffset =
+      argc == 13 ? _wcstoui64(argv[12], nullptr, 0) : 0x1df6c00ull;
   const bool includeState = tokenMap || stateDump || fp16Basis;
 
   IDXGIFactory6 *factory = nullptr;
@@ -275,7 +277,7 @@ int wmain(int argc, wchar_t **argv) {
   put64(params, 8, outputs[0]->GetGPUVirtualAddress());
   put64(params, 16, outputs[1]->GetGPUVirtualAddress());
   put64(params, 24, outputs[2]->GetGPUVirtualAddress());
-  put64(params, 32, weightResource->GetGPUVirtualAddress() + 0x1df6c00);
+  put64(params, 32, weightResource->GetGPUVirtualAddress() + qkvWeightOffset);
   put64(params, 40, auxResource->GetGPUVirtualAddress() + 0x1200);
   put64(params, 48, workResource->GetGPUVirtualAddress());
   put64(params, 56, auxResource->GetGPUVirtualAddress() + 0xe00);

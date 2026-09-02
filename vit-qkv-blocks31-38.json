@@ -1,0 +1,117 @@
+{
+  "status": "blocks31-38 authoritative NVAPI-pair basis parameters",
+  "shape": {
+    "main": [
+      1024,
+      3,
+      1024
+    ],
+    "work": [
+      1024,
+      3,
+      1024
+    ]
+  },
+  "storage": {
+    "main": "E4M3 bytes",
+    "work": "FP16 little endian"
+  },
+  "blocks": {
+    "31": {
+      "main": {
+        "file": "block31-qkv-effective.fp8",
+        "bytes": 3145728,
+        "sha256": "d7b1ef6315c1208ce3d8e059f8bfd22253a1634a38198e15455155fefbaacb9b"
+      },
+      "work": {
+        "file": "block31-qkv-work-effective.f16",
+        "bytes": 6291456,
+        "sha256": "55577cc22f6344294ffb2e21183f61af9ba3f1aa43345cb7cca79a3a13d90e76"
+      }
+    },
+    "32": {
+      "main": {
+        "file": "block32-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "abc977f410249bd7ebedc8e8622dc5437cd145840fa83f0a3af806e7d72584bc"
+      },
+      "work": {
+        "file": "block32-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "70b2bfb2c4ca2a2d68b3a97cb4dc6cb0c4121b21ffbd3fb71212baa708ea3124"
+      }
+    },
+    "33": {
+      "main": {
+        "file": "block33-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "c0da76e21d0b741a091afc10d217cd8acaa8af5732beee5086ee17d1d4e94475"
+      },
+      "work": {
+        "file": "block33-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "103851d3bcb19524042a3704bb04d6d0ace9e9f7da8a3b57bff4e8ef53b0f705"
+      }
+    },
+    "34": {
+      "main": {
+        "file": "block34-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "bd18b08c90de3867f7191429f7a3142bf9a38fff292b2e4e27acda4ecd14e85e"
+      },
+      "work": {
+        "file": "block34-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "6b63e433a4835501fecd5022db93c40f3ed4b5b1b75b16330e1de2c6e3bb0f20"
+      }
+    },
+    "35": {
+      "main": {
+        "file": "block35-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "11a046493e8984b2714f82d790da7db91da1a772f5c9a93a94029e5a35ec373d"
+      },
+      "work": {
+        "file": "block35-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "85b58df839a3f01204d845b07f58f7713dda5700969f7b807af8b8aabc10126d"
+      }
+    },
+    "36": {
+      "main": {
+        "file": "block36-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "4af1191e0fc36439f987004c96774ad07beedfe3ef7c397e12dc1873abb7ba07"
+      },
+      "work": {
+        "file": "block36-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "d69e37e77061605745fa6abac962e89c9263b28dc28d0d82c68d0e75de5f3bd5"
+      }
+    },
+    "37": {
+      "main": {
+        "file": "block37-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "a494a5663c8276ce7efd3091abc9e93f63fad4987f659e7718c386215b294915"
+      },
+      "work": {
+        "file": "block37-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "8ddd90bd41e0e711b99df1db86b22e897be29b7d9bb5aefe80c8007fa00a2b39"
+      }
+    },
+    "38": {
+      "main": {
+        "file": "block38-qkv-main.fp8",
+        "bytes": 3145728,
+        "sha256": "1f42186c46dbe16555926f62e99ac26e858cd4863ee51f76472d76efaa9a02bb"
+      },
+      "work": {
+        "file": "block38-qkv-work.f16",
+        "bytes": 6291456,
+        "sha256": "baff4af42324eaee904abc2496fb8d57468a0b73a5fa68b50829712138027607"
+      }
+    }
+  }
+}

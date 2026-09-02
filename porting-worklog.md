@@ -1237,9 +1237,15 @@ QKV state dump揭示work的0/2/4 plane各为65,536-byte FP16张量，全部值�
 
 新增`vit_block31_reference.py`把所有portable参数串成64-token完整block31：Expand→SASS多项式→Contract+skip→QKV main/work→64-key Attention→Projection+skip。对5090 authoritative r1最终输出correlation 0.83870995、MAE 0.904428、RMSE 1.403726；六段串联未数值坍缩。下一步以该脚本为CPU oracle，在同一D3D12 device内实现多pass block31。
 
-`d3d12_vit_block31_test.cpp`现已把同一公式放进单个RX9070XT D3D12 device：一个packed weight SRV、canonical input/scales两个SRV、branch/hidden/QKV/attention/output五个UAV，五个PSO之间只插UAV barrier，最终一次Execute/Fence并统一readback。实测submit→fence 14.035 ms，对5090 r1 correlation 0.83870409、MAE 0.904437、RMSE 1.403742，与CPU portable结果一致。
+`d3d12_vit_block31_test.cpp`现已把同一公式放进单个RX9070XT D3D12 device：一个packed weight SRV、canonical input/scales两个SRV、branch/hidden/QKV/attention/output五个UAV，五个PSO之间只插UAV barrier，最终一次Execute/Fence并统一readback。logit scale校准为0.25后，实测submit→fence 14.195 ms，对5090 r1 correlation 0.84113222、MAE 0.898641、RMSE 1.395983，与CPU portable 0.84113233一致。
 
 五pass逐层对CPU reference：Expand与Contract逐float exact 100%；QKV correlation 0.99999999998、Attention 0.999999871、Projection 0.999999094。最终0.25 max差来自E4M3量化边界和浮点累加顺序，不是D3D12实现错误。block31的portable AMD执行至此闭合，下一步把同一PSO推广到blocks32–38。
+
+`d3d12_nvapi_qkv_matrix.cpp`增加可选weight offset后，在5090连续生成blocks32–38的14套QKV main/work basis，共63 MiB；每block main为3 MiB E4M3、work为6 MiB FP16，全程零device removal。参数哈希汇总于`vit-qkv-blocks31-38.json`。
+
+blocks32–38另各生成unit-basis与±0.03125 Hadamard两套Expand oracle，按block31已验证的0.6/0.4融合为FP16矩阵，汇总于`vit-expand-blocks31-38.json`。`vit_blocks31_38_reference.py`将八层串联后，block31→38 std从1.95平滑降至1.10，所有block finite、无NaN/饱和坍缩；并可导出原`repack_1d_to_2d`直接消费的2 MiB physical E4M3。
+
+portable block38经原repack接回decoder后，block39产生少量38–76个E4M3 NaN并按既定规则饱和；blocks40–69随后全部零NaN贯通。RX9070XT final readout 1.15–1.43 ms，生成`stellar-amd-portable-vit.png`。人物与机械结构清晰可辨，但规则点阵与横向色带仍明显，未达到完成标准；相对旧`stellar-amd-current.png` PSNR 19.54 dB。Expand effective与Attention scale 0.25只令不同portable版本间约1.2 MAE变化，条纹基本不动，下一主线转向跨层Contract/QKV误差，而非继续调这两个旋钮。
 
 ## 工作纪律
 

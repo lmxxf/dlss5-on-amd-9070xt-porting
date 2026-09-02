@@ -1,0 +1,50 @@
+{
+  "status": "unit-basis 0.6 + small-Hadamard 0.4 portable Expand matrices",
+  "shape": [
+    1024,
+    4096
+  ],
+  "storage": "float16_little_endian",
+  "blocks": {
+    "31": {
+      "file": "block31-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "68db91e06b417c727b3b220bae93ffa1f02fdcea899827136113e3d0fa526171"
+    },
+    "32": {
+      "file": "block32-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "21800c01205677a0532ead191b7fcf8c0f2aabd5e2e9cc927b0f76ec05ff486f"
+    },
+    "33": {
+      "file": "block33-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "303cde97f3aa8935785354656d0470d755d5d18b25bd74963fd1a94396052302"
+    },
+    "34": {
+      "file": "block34-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "78ed3724724baadd3afa2b5cf7be3591da32fd9511bc658b7297dfa07e948b93"
+    },
+    "35": {
+      "file": "block35-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "2043eebf9c137d4fa4b213fbbc40fbc6a7e18f465a1e210b0f3cd5d1111932c1"
+    },
+    "36": {
+      "file": "block36-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "a96de73eaf61cb702c5adae65abc363a95d79162d28b4dd730fefd8c7f33b287"
+    },
+    "37": {
+      "file": "block37-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "a60bf23389026de02f84d58796f0146df2c9ccf69e561266b128b13f4c1cf471"
+    },
+    "38": {
+      "file": "block38-vit-expand-effective.f16",
+      "bytes": 8388608,
+      "sha256": "c0fa9b21d2aab7a0a5e86ec3bea1c784b20b1618bddc5b6b8d325dce019830d7"
+    }
+  }
+}

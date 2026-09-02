@@ -5,16 +5,16 @@
   "pipeline": ["Expand", "fast activation", "Contract+skip", "QKV main/work", "64-key Attention", "Projection+skip"],
   "heldout_against_5090": {
     "contract_main_correlation": 0.938930563,
-    "final_projection_correlation": 0.838709954,
-    "final_mae": 0.90442824,
-    "final_rmse": 1.4037256
+    "final_projection_correlation": 0.841132331,
+    "final_mae": 0.898640633,
+    "final_rmse": 1.395982742
   },
   "rx9070xt": {
     "runner": "d3d12_vit_block31_test.cpp",
-    "final_correlation_against_5090": 0.838704090,
-    "final_mae": 0.904436827,
-    "final_rmse": 1.403742484,
-    "submit_to_fence_ms": 14.035,
+    "final_correlation_against_5090": 0.841132221,
+    "final_mae": 0.898640811,
+    "final_rmse": 1.395983213,
+    "submit_to_fence_ms": 14.195,
     "pass_correlation_against_cpu": {
       "expand": 1.0,
       "contract": 1.0,
