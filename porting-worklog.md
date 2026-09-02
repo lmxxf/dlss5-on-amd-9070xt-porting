@@ -1293,6 +1293,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 按修正后的`+56` body offsets，用block1已验证的tensor-core bit permutation可直接解出W1/W2、QKV、bias、scale与projection；scale从旧误读的-56.19恢复为9.93816。controlled FFN identity＋diagonal self-attention＋V/P identity已能输出有限feature，证明矩阵pack与新offset可执行；但简单把两路512-byte输入reshape为4×4×32再nearest upsample，与oracle correlation仍接近零。逐input impulse进一步显示该输入变换含独立physical permutation／插值，不能用普通reshape替代。该结果把剩余缺口严格压到4104–4159的56-half post input/upsample语义，而非整个1H body权重。
 
+56-half区可由weight地址与SASS常量直接对齐：half 4104对应byte `0x2010`，4136对应`0x2050`，而后续FFN skip内部4168对应`0x2090`；post SASS同一输入准备段确实从`weights+0x2010/+0x2050/+0x2090`交错读取。按名字顺序暂分成32/8/16只是候选，尚未提升为shape结论。三段分别清零的controlled feature correlation为0.6996／0.9677／0.7776，证明三段均参与输入变换。controlled self-attention只让396/1024个输入impulse穿过，说明当前V/P identity尚未覆盖全部physical channel，不足以反演完整upsample；该失败不回退已验证的out-conv与全图AMD head。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
