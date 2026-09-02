@@ -27,6 +27,7 @@ constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
 constexpr UINT64 kCaptureBytes = 3 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
+constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt)";
 
 using Forward1H = void (*)(void *, void *, void *, void *, int, int);
 using CreateBackend = void *(*)(void *);
@@ -66,6 +67,11 @@ UINT64 g_live_input = 0;
 UINT64 g_live_optional2 = 0;
 uint8_t g_live_params[0x100]{};
 uint64_t g_live_param_bytes = 0;
+UINT64 g_arena_base = 0;
+std::atomic<unsigned> g_trace_count{0};
+SRWLOCK g_trace_lock = SRWLOCK_INIT;
+std::atomic<bool> g_copy_ready{false};
+void *g_copy_kernel = nullptr;
 
 void log_line(const char *text, long value = 0) {
     FILE *file = _wfopen(kLogPath, L"ab");
@@ -105,18 +111,40 @@ void on_init_device(reshade::api::device *device) {
 
 DWORD WINAPI readback_worker(void *parameter);
 
+int dispatch_raw_copy(UINT64 source, UINT64 destination, UINT64 bytes) {
+    if (!g_copy_ready.load() || g_copy_kernel == nullptr) return -1;
+    CopyParams params{source, destination, static_cast<uint32_t>(bytes / 16), 0};
+    void **vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+    auto bind = reinterpret_cast<BindKernel>(vtable[0xd8 / 8]);
+    auto dispatch = reinterpret_cast<DispatchKernel>(vtable[0x140 / 8]);
+    const int bind_result = bind(g_live_ngx_context, g_copy_kernel);
+    if (bind_result != 0) return bind_result;
+    struct ParameterDescriptor {
+        void *vtable;
+        void *blob;
+        uint32_t bytes;
+        uint32_t padding;
+    } descriptor{
+        reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(g_runtime) + 0xb28b8),
+        &params, sizeof(params), 0,
+    };
+    return dispatch(
+        g_live_ngx_context, &descriptor, g_live_command_context,
+        (params.uint4_count + 255) / 256, 1, 1);
+}
+
 int64_t hook_backend_launch(
     void *self, void *kernel, uint32_t gx, uint32_t gy, uint32_t gz,
     void *wrapper, uint64_t bytes, uint8_t flag) {
-    if (g_launch_armed.load() && !g_launch_captured.exchange(true) && wrapper != nullptr) {
+    void *blob = nullptr;
+    if (wrapper != nullptr) std::memcpy(&blob, wrapper, sizeof(blob));
+    if (g_launch_armed.load() && !g_launch_captured.exchange(true) && blob != nullptr) {
         std::memcpy(
             &g_live_ngx_context, static_cast<const uint8_t *>(self) + 0x08,
             sizeof(g_live_ngx_context));
         std::memcpy(
             &g_live_command_context, static_cast<const uint8_t *>(self) + 0x10,
             sizeof(g_live_command_context));
-        void *blob = nullptr;
-        std::memcpy(&blob, wrapper, sizeof(blob));
         if (blob != nullptr && bytes >= 16) {
             g_live_param_bytes = bytes < sizeof(g_live_params) ? bytes : sizeof(g_live_params);
             std::memcpy(g_live_params, blob, static_cast<size_t>(g_live_param_bytes));
@@ -127,9 +155,83 @@ int64_t hook_backend_launch(
                 std::memcpy(&g_live_optional2, static_cast<const uint8_t *>(blob) + 0x38,
                     sizeof(g_live_optional2));
             }
+            UINT64 weight = 0;
+            std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, sizeof(weight));
+            if (weight >= 22016) g_arena_base = weight - 22016;
         }
     }
-    return g_original_backend_launch(self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    const int64_t result = g_original_backend_launch(
+        self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x50) {
+        UINT64 weight = 0;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        const UINT64 offset = g_arena_base != 0 ? weight - g_arena_base : UINT64_MAX;
+        UINT64 source = 0, atlas_offset = 0, copy_bytes = 0;
+        if (offset == 124261888) {
+            std::memcpy(&source, static_cast<const uint8_t *>(blob) + 0x40, 8);
+            atlas_offset = 0; copy_bytes = 64ull << 20;
+        } else if (offset == 147451904) {
+            std::memcpy(&source, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            atlas_offset = 64ull << 20; copy_bytes = 32ull << 20;
+        } else if (offset == 833536) {
+            std::memcpy(&source, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            atlas_offset = 96ull << 20; copy_bytes = 16ull << 20;
+        } else if (offset == 5912576) {
+            std::memcpy(&source, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            atlas_offset = 112ull << 20; copy_bytes = 8ull << 20;
+        }
+        if (source != 0 && copy_bytes != 0) {
+            const int copy_result = dispatch_raw_copy(
+                source - 0x2800,
+                g_destination->GetGPUVirtualAddress() + atlas_offset,
+                copy_bytes);
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "skip_copy weight_offset=%llu source=0x%llx atlas_offset=%llu bytes=%llu result=%d\n",
+                    static_cast<unsigned long long>(offset),
+                    static_cast<unsigned long long>(source),
+                    static_cast<unsigned long long>(atlas_offset),
+                    static_cast<unsigned long long>(copy_bytes), copy_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+            if (offset == 5912576 && copy_result == 0 &&
+                g_queue != nullptr && !g_finished.exchange(true)) {
+                g_queue->AddRef();
+                if (HANDLE thread = CreateThread(
+                        nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                    CloseHandle(thread);
+                }
+            }
+        }
+    }
+    const unsigned trace = g_trace_count.fetch_add(1);
+    if (trace < 256 && blob != nullptr && bytes <= 0x100) {
+        UINT64 weight = 0;
+        if (bytes >= 0x18) std::memcpy(
+            &weight, static_cast<const uint8_t *>(blob) + 0x10, sizeof(weight));
+        const bool arena_weight = g_arena_base != 0 &&
+            weight >= g_arena_base && weight < g_arena_base + 147719680;
+        if (arena_weight) {
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kTracePath, L"ab")) {
+                std::fprintf(file,
+                    "seq=%u weight_offset=%llu grid=%u,%u,%u bytes=%llu flag=%u qwords=",
+                    trace, static_cast<unsigned long long>(weight - g_arena_base),
+                    gx, gy, gz, static_cast<unsigned long long>(bytes), flag);
+                for (uint64_t offset = 0; offset + 8 <= bytes; offset += 8) {
+                    unsigned long long value = 0;
+                    std::memcpy(&value, static_cast<const uint8_t *>(blob) + offset, 8);
+                    std::fprintf(file, "%s0x%llx", offset == 0 ? "" : ",", value);
+                }
+                std::fprintf(file, "\n");
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+    }
+    return result;
 }
 
 bool create_destination() {
@@ -206,6 +308,7 @@ void hook_forward(
     void *kernel = get_kernel(backend, "capture_raw_buffer", 256, 1, 1, 0);
     log_line("after_get_kernel", kernel == nullptr ? 0 : 1);
     if (kernel == nullptr) return;
+    g_copy_kernel = kernel;
 
     CopyParams input_params{
         input_source,
@@ -264,6 +367,7 @@ void hook_forward(
         (optional2_params.uint4_count + 255) / 256, 1, 1);
     log_line("after_optional2_dispatch", optional2_dispatch_result);
     if (optional2_dispatch_result != 0) return;
+    g_copy_ready.store(true);
 
     FILE *file = _wfopen(kLogPath, L"ab");
     if (file != nullptr) {
@@ -284,11 +388,6 @@ void hook_forward(
         std::fclose(file);
     }
     g_pending.store(true);
-    if (g_queue != nullptr && !g_finished.exchange(true)) {
-        g_queue->AddRef();
-        HANDLE thread = CreateThread(nullptr, 0, readback_worker, g_queue, 0, nullptr);
-        if (thread != nullptr) CloseHandle(thread);
-    }
 }
 
 bool wait_queue(ID3D12CommandQueue *queue, ID3D12Fence *fence, UINT64 value) {
@@ -395,6 +494,7 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
                 GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
                 reinterpret_cast<LPCWSTR>(&hook_worker), &pinned)) return FALSE;
         if (!reshade::register_addon(instance)) return FALSE;
+        DeleteFileW(kTracePath);
         reshade::register_event<reshade::addon_event::init_device>(on_init_device);
         HANDLE thread = CreateThread(nullptr, 0, &hook_worker, nullptr, 0, nullptr);
         if (thread != nullptr) CloseHandle(thread);

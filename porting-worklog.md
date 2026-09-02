@@ -1399,6 +1399,8 @@ arena版addon已在AMD WSL用MinHook静态编译为349,012 bytes，部署到5090
 
 live block1参数包96 bytes：input/output/weight位于`+0/+8/+0x10`，`+0x18`为1088×1920，field均0，唯一额外输入为`+0x38 optional2`。GPUVA显示三个物理view：input resource `+0x42800`、output resource `+0x2800`、optional2基址对齐；input/output资源基址严格相差64MiB。最初只抓32MiB并在runner allocation起点放view，FP8 correlation仅0.18；扩为完整64MiB三段并在Spark重放时恢复`input+0x42800/output+0x2800`后，live 5090 vs Spark原CUBIN block1全64MiB correlation 0.99991518、MAE 1.4243e-4，从有效output view开始correlation 0.99995811、MAE 8.77e-5，仅50,848/67,108,864 bytes不同。根因正式闭环：旧encoder衰减来自不完整物理bank容量与错误view基址，不是权重或动态scale。`run_original_fused_global.cpp`现支持动态arena、完整weight arena offset、optional2输入及input/output view offsets。
 
+backend trace随后覆盖首帧117条权重launch，并按arena offset闭合四条encoder下采样ABI：block4 offset124,261,888的skip在blob `+0x40`；block8/14/22 offsets147,451,904／833,536／5,912,576的下采样前skip均在`+0x08`，`+0x48`是继续向encoder深处的compact main。probe在原launch返回后以同一context追加四次raw copy，按64/32/16/8MiB写入单一atlas的0/64/96/112MiB，四次dispatch均返回0，最终readback返回0。权威live skip已导出为`/tmp/block{4,8,14,22}-output1-live.bin`；下一步是恢复global bank/token到decoder canonical空间的精确gather，而非再拟合数值权重。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
