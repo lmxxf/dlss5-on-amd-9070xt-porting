@@ -1281,6 +1281,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 `fit_post_outconv.py`用第一组小幅随机main+skip tile的32张basis feature拟合32→RGB矩阵，train correlation 0.999999983、MAE 2.27e-8；第二组独立随机tile held-out correlation 0.999999105、MAE 2.88e-7、max error 2.82e-6。参数固化为`block70-outconv-effective.bin`与manifest。该结果把最终RGB head从packed runtime bytes提升为可直接写HLSL的portable FP32矩阵；block70剩余数值缺口只在产生这32张feature的body路径。
 
+`d3d12_post_outconv_test.cpp`已在RX9070XT执行同一32→RGB矩阵与`saturate(Color + residual)`。用第二组独立随机tile的controlled basis feature作输入，对原NVIDIA完整post oracle：submit→fence 0.334 ms，MAE 2.17e-7、RMSE 4.20e-7、max error 2.83e-6、cosine 0.999999999867。该层至此完成“参数portable＋AMD GPU执行＋独立NVIDIA数值验收”三重闭合；后续不再改RGB head，集中恢复body的32-channel feature。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
