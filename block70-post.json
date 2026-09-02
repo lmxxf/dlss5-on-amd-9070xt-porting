@@ -1,0 +1,33 @@
+{
+  "block": 70,
+  "parameter_bytes": 184,
+  "kernel": "cc_tinlayout_fused_post_block_swin_1h_32_fp8",
+  "live_parameter_map": {
+    "0x00": "main activation device pointer",
+    "0x08": "encoder skip device pointer",
+    "0x10": "RGBA32F output surface",
+    "0x18": "21808-byte layer weight record",
+    "0x20": "height",
+    "0x24": "width",
+    "0x30": "input scale = 0.03125",
+    "0x34": "RGB mode = 1",
+    "0x38": "Color RGBA texture object",
+    "0x40": "six-float texture transform = [0, 0, 1, 1, 1, 1]",
+    "0x58": "optional RGBA texture object; null for captured preset",
+    "0x60": "optional auxiliary texture object; null for captured preset",
+    "0x68": "device pointer to FP16 blend_scale record",
+    "0xa4": "output coordinate scale X = 1",
+    "0xa8": "output coordinate scale Y = 1",
+    "0xac": "output width",
+    "0xb0": "output height"
+  },
+  "blend_scale_fp16": 0.73974609375,
+  "fixed_frame_validation": {
+    "zero_activation_source_exact_mae": 1.54e-09,
+    "source_activation_output_correlation": 0.95876,
+    "source_activation_output_mae": 0.03328,
+    "portable_block69_output_correlation": 0.8713,
+    "portable_block69_output_mae": 0.0768
+  },
+  "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
+}

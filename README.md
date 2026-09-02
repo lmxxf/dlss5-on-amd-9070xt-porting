@@ -35,6 +35,7 @@
 - `run_original_vit_attention_match.cpp`：受控Q/K/V impulse通断扫描；精确恢复Attention的Q/K channel、Q→output token和K→V token bit对应。
 - `block0-real-calibrated.bin` / `block4-real-calibrated.bin` / `stage2-real-calibrated.bin` / `encoder-real-calibration.json`：围绕当前《剑星》固定帧做checkerboard held-out校准的portable encoder桥；RX相关分别0.811/0.997/0.874，仅作真实分布校准证据，不冒充通用模型。
 - `nvapi_chain_probe.cpp` / `inject_probe.cpp`：5090 resident只读NVAPI chain参数探针与延迟注入器；用于抓取block70真实0xb8 blob，当前等待交互式console会话恢复。
+- `run_original_post.cpp` / `block70-post.json`：可重放block70原始0xb8 ABI；当前preset绑定`+0x38=Color RGBA`、`rgb_mode=1`、`input_scale=1/32`与独立FP16 `blend_scale=0.739746`，原始activation输出对source correlation 0.95876，portable block69输出对source correlation 0.8713。它取代灰色ABI图，成为最终画面验收oracle。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
@@ -67,11 +68,11 @@
 - `stellar-block0-rgb-only.png`：以《剑星》Steam hero RGB 为输入、Gaussian 四通道置零时，RX 9070 XT 经过 input adapter + depthwise 后的首张可辨认模型中间图。
 - `stellar-block0-ffn-residual.png`：继续执行 SASS 恢复的 FFN 多项式和 `input*ffn_cos_skip + branch` 后的 AMD block0 中间图。
 - `stellar-end-to-end-first.png` / `final-readout.bin` / `final-readout.json`：block69 physical activation 的首张清晰 end-to-end 诊断图及可移植 linear readout；使用真实 `blend_scale=0.7397`，但尚非原 post CUBIN 的精确输出。
-- `d3d12_final_readout.cpp` / `stellar-end-to-end-amd.png`：RX 9070 XT 直接执行 physical-tile linear readout、真实 blend 与 packed-RGB 输出；256×144 submit→fence 0.976 ms。
+- `d3d12_final_readout.cpp` / `stellar-end-to-end-amd.png`：RX 9070 XT 的旧physical-tile linear诊断读出；256×144 submit→fence 0.976 ms。block70零activation实验已证明其blend公式不是真实post合同，不能用于最终验收。
 - `d3d12_nvapi_repack_test.cpp` / `d3d12_nvapi_vit_chain.cpp`：自建5090 D3D12/NVAPI CUBIN宿主；最小repack已与Spark逐字节一致，完整ViT chain用于恢复blocks31–38精确输出。
 - `nvapi_chain_probe.cpp`：只读记录NVAPI `CreateCuFunction` handle映射和`LaunchCuKernelChainEx`真实子kernel数组，取代standard/chained排列猜测。
 - `stellar-amd-current.png`：新恢复链在RX9070XT上的当前RGB；decoder已零NaN贯通，但因blocks32–38暂用identity近似仍有明显tile条纹，不能视为最终验收图。
-- `stellar-global-cubin-post-abi.png`：block0–69 global CUBIN/bridge activation 经原 block70 kernel 写出的 RGBA surface；当前因缺 live color-transform state 呈灰色纹理，仅作 post ABI 已通的证据。
+- `stellar-global-cubin-post-abi.png`：旧的灰色block70 ABI诊断图；真实颜色路径现已由`run_original_post.cpp`恢复，本图仅保留为故障过程证据。
 - `build_network_graph.py`：把 CPU descriptor builder 恢复出的 71-block 顺序与 `weights-index.json` 合并，生成可复现的结构索引。
 - `network-graph.json`：已恢复的 block 类型、layer 家族、宽度、角色、权重记录与 block-to-block 边；block0 的外部纹理绑定尚未恢复，保持 `null`。
 - `weight-names.json`：通过 Windows 直接调用 DLL 内部 descriptor builder 导出的 653 个内部权重名字；从 `input_adapter_weight` 到 `out_conv_weight`／`blend_scale`。

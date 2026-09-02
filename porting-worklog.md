@@ -1267,6 +1267,10 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 真实encoder校准的逐层结果也被重新核实：随机tile preblock在同一RGB-only/Gaussian=0合同下对当前帧仅0.317；576 tile空间checkerboard微调后RX block0 correlation 0.8113，传播到原blocks1–3后block3 correlation 0.83965。block4按当前calibrated block3重新生成原CUBIN target并微调，RX correlation 0.99658；stage2→block7围绕当前block4输入校准后RX correlation 0.87380。block8 main因上游误差与仅144 tiles，checkerboard held-out仍只有约0.51、全帧拟合上限0.877，说明后续要用多帧/增强数据，不能继续单帧硬过拟合。
 
+继续沿post SASS数据流排除可选纹理后，当前preset的真实组合已经闭合为`+0x38=Color RGBA`、`+0x58=null`、`+0x60=null`、`rgb_mode=1`。在`+0x68`绑定FP16 `blend_scale=0.739746`、`+0x30=0.03125`并写入live六浮点transform `[0,0,1,1,1,1]`后，原始activation的block70输出对source correlation 0.95876、MAE 0.03328；portable block69同一路径输出correlation 0.8713、MAE 0.0768。`run_original_post.cpp`把该0xb8 ABI改成参数化可重放工具，`block70-post.json`固化字段与数值。至此最终画面oracle不再依赖旧linear readout，剩余工作是把post语义落到AMD并提高上游portable activation精度。
+
+把block70的main与skip activation同时清零后，输出与Color source逐float MAE仅`1.54e-9`、correlation在浮点精度内为1，alpha恒为1。由此钉死post的高层合同是“原Color直通＋神经残差”，而不是旧`d3d12_final_readout.cpp`假设的`source*blend + prediction*(1-blend)`；旧readout继续只作诊断，不得复用其混合公式。把blend record内容改零但保留合法device pointer时输出不变，说明当前symbol不直接消费该首个FP16值，或该值已经编译进其它state；目前只提升“必须绑定合法record地址”，不提升“运行时按0.739746线性缩放”的结论。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
