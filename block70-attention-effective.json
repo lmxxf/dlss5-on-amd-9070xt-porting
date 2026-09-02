@@ -89,5 +89,12 @@
     "mae": 0.2903989255,
     "rmse": 0.7130783796
   },
+  "amd_single_tile": {
+    "submit_ms": 1.806,
+    "nvidia_correlation": 0.972518887,
+    "nvidia_mae": 0.2515995,
+    "cpu_effective_correlation": 0.999615196,
+    "cpu_effective_mae": 0.03467544
+  },
   "boundary": "attention-only oracle with exact NVIDIA five-operation prefix input"
 }

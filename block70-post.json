@@ -57,7 +57,9 @@
     "portable_prefix_real_amplitude_correlation": 0.999999938,
     "amd_prefix_real_amplitude_cosine": 0.999999931,
     "amd_prefix_submit_ms": 0.531,
-    "portable_attention_only_heldout_correlation": 0.9770278
+    "portable_attention_only_heldout_correlation": 0.9770278,
+    "amd_attention_single_tile_correlation": 0.9725189,
+    "amd_attention_submit_ms": 1.806
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }

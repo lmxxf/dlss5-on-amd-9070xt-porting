@@ -1313,6 +1313,8 @@ CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续
 
 权威prefix也修复了attention分层。构造attention-only weights：W1/W2归零、FFN skip置1，保留原QKV/bias/scale/projection与post suffix；其target范围-109.25..75.625。运算图与容量共同表明half10352的32-vector同时进入标准attention residual和post suffix首个mul，因此effective公式为`(projection + input*skip)*skip`。用旧odd controlled坐标时模型停在0.294；换成完整prefix exact输入后raw初始化即0.5988，训练100 epoch达0.97622，低学习率refinement最终held-out correlation 0.977028、MAE 0.2904、RMSE 0.7131。参数固化为`block70-attention-effective.bin/.json`，包含Qe/Qo/Ke/Ko/Ve/Vo/P/bias/shared skip/scale共24,708 bytes。该层已闭合CPU portable语义，下一验收点是AMD attention runner与FFN串联。
 
+无需新增attention shader即可做AMD验收：把shared skip吸收到标准block1公式，令`P'=P×skip`、`attention_residual_skip'=skip²`，同时FFN branch归零、FFN skip置1，即严格等价于post的`(projection + input×skip)×skip`。`make_post_attention_compatible.py`生成41,220-byte兼容blob后，RX9070XT单tile submit→fence 1.806 ms；对NVIDIA attention-only held-out correlation 0.972519、MAE 0.2516、RMSE 0.6193；对CPU effective correlation 0.999615、MAE 0.03468。AMD增加的误差很小，主要误差仍来自0.977级effective近似。下一步只剩FFN完整32-channel target及prefix→FFN→attention串联。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
