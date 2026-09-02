@@ -44,6 +44,24 @@ static void cluster(CUlaunchConfig &c, CUlaunchAttribute &a, unsigned gx,
   c.attrs = &a;
   c.numAttrs = 1;
 }
+static void launch_cluster_pair(CUfunction first, CUfunction second,
+                                void **arguments, unsigned grid_x,
+                                unsigned cluster_z) {
+  CUstream streams[2]{};
+  for (auto &stream : streams)
+    ck("pair_stream", cuStreamCreate(&stream, CU_STREAM_NON_BLOCKING));
+  CUlaunchAttribute attrs[2]{};
+  CUlaunchConfig configs[2]{};
+  for (int i = 0; i < 2; ++i) {
+    cluster(configs[i], attrs[i], 2, cluster_z);
+    configs[i].hStream = streams[i];
+  }
+  ck("pair_first", cuLaunchKernelEx(&configs[0], first, arguments, nullptr));
+  ck("pair_second", cuLaunchKernelEx(&configs[1], second, arguments, nullptr));
+  ck("pair_sync", cuCtxSynchronize());
+  for (auto stream : streams)
+    cuStreamDestroy(stream);
+}
 int main(int ac, char **av) {
   if (ac != 8) {
     std::fprintf(stderr, "usage: %s input output off0 off1 off2 off4 arena\n",
@@ -62,9 +80,12 @@ int main(int ac, char **av) {
   ck("set", cuCtxSetCurrent(ctx));
   CUmodule m;
   ck("module", cuModuleLoad(&m, "/tmp/dlssnr-cubins/dlssnr-05.cubin"));
-  CUfunction fe, fc, fq, fa, fp;
+  CUfunction fe, fc, fc_chained, fq, fa, fp;
   ck("fe", cuModuleGetFunction(&fe, m, "cc_vit_1d_ffn_expand_fp8"));
   ck("fc", cuModuleGetFunction(&fc, m, "cc_vit_1d_ffn_contract_fp8"));
+  ck("fc_chained", cuModuleGetFunction(
+                         &fc_chained, m,
+                         "cc_vit_1d_ffn_contract_chained_fp8"));
   ck("fq", cuModuleGetFunction(&fq, m, "cc_vit_1d_qkv_fp8"));
   ck("fa", cuModuleGetFunction(&fa, m, "cc_vit_1d_attention_fp8"));
   ck("fp", cuModuleGetFunction(&fp, m, "cc_vit_1d_projection_fp8"));
@@ -106,8 +127,7 @@ int main(int ac, char **av) {
   CUlaunchAttribute ca{};
   CUlaunchConfig cfg{};
   cluster(cfg, ca, 8, 4);
-  ck("contract", cuLaunchKernelEx(&cfg, fc, cc, nullptr));
-  ck("sc", cuCtxSynchronize());
+  launch_cluster_pair(fc, fc_chained, cc, 8, 4);
   unsigned char pq[0x50]{};
   p64(pq, 0, main);
   p64(pq, 8, q[0]);
@@ -148,7 +168,7 @@ int main(int ac, char **av) {
   std::memcpy(pp + 64, &dims, 8);
   void *ap[] = {pp};
   CUlaunchAttribute pca{};
-  cluster(cfg, pca, 8, 4);
+  cluster(cfg, pca, 4, 4);
   ck("projection", cuLaunchKernelEx(&cfg, fp, ap, nullptr));
   ck("sp", cuCtxSynchronize());
   std::vector<unsigned char> x(A);

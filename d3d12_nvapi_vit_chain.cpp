@@ -110,14 +110,23 @@ struct W {
   uint64_t e, c, q, p;
 };
 int wmain(int ac, wchar_t **av) {
-  if (ac < 5 || ac > 8) {
-    std::fwprintf(stderr, L"usage: %ls cubin input weights output [limit [result-index [single-block]]]\n", av[0]);
+  if (ac < 5 || ac > 9) {
+    std::fwprintf(stderr, L"usage: %ls cubin input weights output [limit [result-index [single-block [aux-input]]]]\n", av[0]);
     return 2;
   }
   constexpr UINT64 A = 2097152, WA = 147719680;
   auto cubin = rd(av[1]), input = rd(av[2]), weights = rd(av[3]);
   if (input.size() != A || weights.size() != WA)
     return 2;
+  const int singleBlock = ac >= 8 ? _wtoi(av[7]) : -1;
+  const bool singleMode = singleBlock >= 31 && singleBlock <= 38;
+  const bool rangeMode = singleBlock >= 131 && singleBlock <= 138;
+  std::vector<uint8_t> auxInput;
+  if (ac >= 9) {
+    auxInput = rd(av[8]);
+    if (auxInput.size() != A)
+      return 2;
+  }
   IDXGIFactory6 *fac = nullptr;
   hr("factory", CreateDXGIFactory2(0, IID_PPV_ARGS(&fac)));
   IDXGIAdapter1 *ad = nullptr;
@@ -214,17 +223,29 @@ int wmain(int ac, wchar_t **av) {
   for (auto &x : r)
     x = make(A, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-  std::vector<ID3D12Resource *> extraScratch(7 * 7);
+  const size_t extraScratchCount =
+      (singleMode || rangeMode) ? 0 : 7 * 7;
+  std::vector<ID3D12Resource *> extraScratch(extraScratchCount);
   for (auto &x : extraScratch)
     x = make(A, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   ID3D12Resource *wr = make(WA, &defh, D3D12_RESOURCE_STATE_COPY_DEST,
                             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+  ID3D12Resource *upAux = nullptr;
+  if (!auxInput.empty()) {
+    upAux = make(A, &uph, D3D12_RESOURCE_STATE_GENERIC_READ,
+                 D3D12_RESOURCE_FLAG_NONE);
+    upAux->Map(0, &z, &p);
+    std::memcpy(p, auxInput.data(), A);
+    upAux->Unmap(0, nullptr);
+  }
   for (auto *x : r)
     cl->CopyBufferRegion(x, 0, zero, 0, A);
   for (auto *x : extraScratch)
     cl->CopyBufferRegion(x, 0, zero, 0, A);
   cl->CopyBufferRegion(r[0], 0, upIn, 0, A);
+  if (upAux)
+    cl->CopyBufferRegion(r[6], 0, upAux, 0, A);
   cl->CopyBufferRegion(wr, 0, upW, 0, WA);
   std::vector<D3D12_RESOURCE_BARRIER> bars;
   for (auto *x : r) {
@@ -306,27 +327,42 @@ int wmain(int ac, wchar_t **av) {
     k.paramSize = (NvU32)blobs.back().size();
     ks.push_back(k);
   };
+  size_t executedKernels = 0;
+  auto finishGroup = [&]() {
+    if (!rangeMode) {
+      groupEnds.push_back(ks.size());
+      return;
+    }
+    nv("chain", chain(cl, ks.data() + executedKernels,
+                      static_cast<NvU32>(ks.size() - executedKernels)));
+    D3D12_RESOURCE_BARRIER uav{};
+    uav.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    cl->ResourceBarrier(1, &uav);
+    submitAndReset();
+    executedKernels = ks.size();
+  };
   int eight = 8;
-  const int singleBlock = ac >= 8 ? _wtoi(av[7]) : -1;
-  const bool singleMode = singleBlock >= 31 && singleBlock <= 38;
-  if (!singleMode) {
+  if (!singleMode && !rangeMode) {
     std::vector<uint8_t> rp(0x18);
     p64(rp, 0, cur);
     p64(rp, 8, next);
     std::memcpy(rp.data() + 16, &eight, 4);
     std::memcpy(rp.data() + 20, &eight, 4);
     add(fn[0], {80, 1, 1}, {32, 4, 1}, std::move(rp));
-    groupEnds.push_back(ks.size());
+    finishGroup();
     cur = next;
     next = va(0);
   }
-  const int beginBlock = singleMode ? singleBlock - 31 : 0;
+  const int beginBlock = rangeMode ? singleBlock - 131
+                                   : (singleMode ? singleBlock - 31 : 0);
   const int endBlock = singleMode ? beginBlock + 1 : 8;
   for (int bi = beginBlock; bi < endBlock; ++bi) {
     uint64_t blockBranch = branch, blockMain = mainv, blockAttn = attn,
              blockWork = work, blockQ[3] = {qv[0], qv[1], qv[2]};
-    if (bi > 0) {
-      const size_t si = static_cast<size_t>(bi - 1) * 7;
+    if (bi > beginBlock && !singleMode && !rangeMode) {
+      const size_t si = static_cast<size_t>(rangeMode ? bi - beginBlock - 1
+                                                      : bi - 1) *
+                        7;
       blockBranch = extraScratch[si + 0]->GetGPUVirtualAddress();
       blockMain = extraScratch[si + 1]->GetGPUVirtualAddress();
       blockAttn = extraScratch[si + 2]->GetGPUVirtualAddress();
@@ -334,7 +370,8 @@ int wmain(int ac, wchar_t **av) {
       for (int qi = 0; qi < 3; ++qi)
         blockQ[qi] = extraScratch[si + 4 + qi]->GetGPUVirtualAddress();
     }
-    uint64_t base = aux + bi * 0x3000, prev = bi ? base - 0x400 : 0,
+    uint64_t base = aux + bi * 0x3000,
+             prev = bi > beginBlock ? base - 0x400 : 0,
              a1 = base + 0xa00, a2 = base + 0xe00, a3 = base + 0x1200,
              a4 = base + 0x1800, a5 = base + 0x1e00, a20 = base + 0x2800,
              a38 = base + 0x2c00;
@@ -347,7 +384,7 @@ int wmain(int ac, wchar_t **av) {
     std::memcpy(e.data() + 64, &tokens, 8);
     add(bi == 0 ? fn[1] : chainedFn[0], {32, 1, 1}, {32, 4, 1},
         std::move(e));
-    groupEnds.push_back(ks.size());
+    finishGroup();
     std::vector<uint8_t> c(0x48);
     p64(c, 0, blockBranch);
     p64(c, 8, cur);
@@ -358,10 +395,14 @@ int wmain(int ac, wchar_t **av) {
     p64(c, 48, base);
     p64(c, 56, a2);
     std::memcpy(c.data() + 64, &tokens, 8);
-    add(fn[2], {8, 1, 4}, {32, 4, 1}, std::move(c));
-    std::vector<uint8_t> c2 = blobs.back();
-    add(chainedFn[1], {8, 1, 4}, {32, 4, 1}, std::move(c2));
-    groupEnds.push_back(ks.size());
+    std::vector<uint8_t> c2 = c;
+    if (singleMode && singleBlock == 37)
+      add(chainedFn[1], {8, 1, 4}, {32, 4, 1}, std::move(c2));
+    else {
+      add(fn[2], {8, 1, 4}, {32, 4, 1}, std::move(c));
+      add(chainedFn[1], {8, 1, 4}, {32, 4, 1}, std::move(c2));
+    }
+    finishGroup();
     std::vector<uint8_t> qq(0x50);
     p64(qq, 0, blockMain);
     p64(qq, 8, blockQ[0]);
@@ -374,10 +415,16 @@ int wmain(int ac, wchar_t **av) {
     p64(qq, 64, a4);
     std::memcpy(qq.data() + 72, &dims, 8);
     std::vector<uint8_t> qq2 = qq;
-    add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
-    if (bi >= 4)
+    if (singleMode && singleBlock == 37) {
       add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
-    groupEnds.push_back(ks.size());
+      add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
+    } else {
+      add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
+      if ((singleMode && singleBlock >= 35 && singleBlock <= 36) ||
+          (rangeMode && bi >= 4 && bi <= 5))
+        add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
+    }
+    finishGroup();
     std::vector<uint8_t> a(0x40);
     p64(a, 0, blockQ[0]);
     p64(a, 8, blockQ[1]);
@@ -388,7 +435,7 @@ int wmain(int ac, wchar_t **av) {
     p64(a, 48, a5);
     std::memcpy(a.data() + 56, &dims, 8);
     add(fn[4], {32, 1, 1}, {32, 4, 1}, std::move(a));
-    groupEnds.push_back(ks.size());
+    finishGroup();
     std::vector<uint8_t> pr(0x48);
     p64(pr, 0, blockAttn);
     p64(pr, 8, blockMain);
@@ -402,36 +449,38 @@ int wmain(int ac, wchar_t **av) {
     std::vector<uint8_t> pr2 = pr;
     std::vector<uint8_t> pr3 = pr;
     add(fn[5], {8, 1, 4}, {32, 4, 1}, std::move(pr));
-    groupEnds.push_back(ks.size());
+    finishGroup();
     std::swap(cur, next);
   }
-  if (!singleMode) {
+  if (!singleMode && !rangeMode) {
     std::vector<uint8_t> ro(0x18);
     p64(ro, 0, cur);
     p64(ro, 8, out2d);
     std::memcpy(ro.data() + 16, &eight, 4);
     std::memcpy(ro.data() + 20, &eight, 4);
     add(fn[6], {64, 1, 1}, {32, 4, 1}, std::move(ro));
-    groupEnds.push_back(ks.size());
+    finishGroup();
   }
-  NvU32 limit = singleMode ? static_cast<NvU32>(ks.size())
-                           : (ac >= 6 ? (NvU32)_wtoi(av[5])
-                                      : (NvU32)ks.size());
+  const NvU32 requestedLimit = ac >= 6 ? (NvU32)_wtoi(av[5]) : 0;
+  NvU32 limit = requestedLimit ? requestedLimit
+                               : static_cast<NvU32>(ks.size());
   if (limit == 0 || limit > ks.size())
     return 2;
   size_t groupStart = 0;
-  bool foundBoundary = false;
-  for (size_t groupEnd : groupEnds) {
-    if (groupEnd > limit)
-      break;
-    nv("chain", chain(cl, ks.data() + groupStart,
-                      static_cast<NvU32>(groupEnd - groupStart)));
-    D3D12_RESOURCE_BARRIER uav{};
-    uav.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-    cl->ResourceBarrier(1, &uav);
-    submitAndReset();
-    groupStart = groupEnd;
-    foundBoundary = groupEnd == limit;
+  bool foundBoundary = rangeMode;
+  if (!rangeMode) {
+    for (size_t groupEnd : groupEnds) {
+      if (groupEnd > limit)
+        break;
+      nv("chain", chain(cl, ks.data() + groupStart,
+                        static_cast<NvU32>(groupEnd - groupStart)));
+      D3D12_RESOURCE_BARRIER uav{};
+      uav.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+      cl->ResourceBarrier(1, &uav);
+      submitAndReset();
+      groupStart = groupEnd;
+      foundBoundary = groupEnd == limit;
+    }
   }
   if (!foundBoundary)
     return 2;
@@ -443,9 +492,13 @@ int wmain(int ac, wchar_t **av) {
   else if (limit == 5) resultIndex = 4;
   else if (limit == 6) resultIndex = 0;
   if (ac == 7) resultIndex = _wtoi(av[6]);
-  if (singleMode) resultIndex = ac >= 7 ? _wtoi(av[6]) : 1;
+  if (singleMode || rangeMode)
+    resultIndex = ac >= 7 ? _wtoi(av[6]) : 1;
   const bool dumpAll = resultIndex == 99;
-  if (!dumpAll && (resultIndex < 0 || resultIndex >= (int)r.size())) return 2;
+  const bool dumpState = resultIndex == 98;
+  if (!dumpAll && !dumpState &&
+      (resultIndex < 0 || resultIndex >= (int)r.size()))
+    return 2;
   if (dumpAll) {
     std::vector<D3D12_RESOURCE_BARRIER> obs;
     for (auto *resource : r) {
@@ -468,7 +521,12 @@ int wmain(int ac, wchar_t **av) {
       obs.push_back(b);
     }
     cl->ResourceBarrier((UINT)obs.size(), obs.data());
-    cl->CopyBufferRegion(rb, 0, r[resultIndex], 0, A);
+    if (dumpState) {
+      cl->CopyBufferRegion(rb, 0, r[1], 0, A);
+      cl->CopyBufferRegion(rb, A, r[6], 0, A);
+    } else {
+      cl->CopyBufferRegion(rb, 0, r[resultIndex], 0, A);
+    }
   }
   hr("close", cl->Close());
   ID3D12CommandList *ls[] = {cl};
@@ -476,9 +534,10 @@ int wmain(int ac, wchar_t **av) {
   q->Signal(fence, ++fenceValue);
   fence->SetEventOnCompletion(fenceValue, ev);
   WaitForSingleObject(ev, INFINITE);
-  const UINT64 readBytes = dumpAll ? A*11 : A;
+  const UINT64 readBytes = dumpAll ? A * 11 : (dumpState ? A * 2 : A);
   D3D12_RANGE all{0, readBytes};
-  rb->Map(0, &all, &p);
+  p = nullptr;
+  hr("readback_map", rb->Map(0, &all, &p));
   std::vector<uint8_t> got(readBytes);
   std::memcpy(got.data(), p, readBytes);
   rb->Unmap(0, nullptr);
