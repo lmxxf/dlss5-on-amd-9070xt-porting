@@ -1401,6 +1401,10 @@ live block1参数包96 bytes：input/output/weight位于`+0/+8/+0x10`，`+0x18`�
 
 backend trace随后覆盖首帧117条权重launch，并按arena offset闭合四条encoder下采样ABI：block4 offset124,261,888的skip在blob `+0x40`；block8/14/22 offsets147,451,904／833,536／5,912,576的下采样前skip均在`+0x08`，`+0x48`是继续向encoder深处的compact main。probe在原launch返回后以同一context追加四次raw copy，按64/32/16/8MiB写入单一atlas的0/64/96/112MiB，四次dispatch均返回0，最终readback返回0。权威live skip已导出为`/tmp/block{4,8,14,22}-output1-live.bin`；下一步是恢复global bank/token到decoder canonical空间的精确gather，而非再拟合数值权重。
 
+global tinlayout进一步确认以4×4 microcell为外层存储单元；`tinlayout-2h64-output-permutation.i32`内部offset的`//1024`恰好把8×8窗口分为四个4×4 cell。`decode_tinlayout_global.py`可按任意head-specific token-bit候选生成bijective cell-local gather，但2H/4H/8H token位序仍是诊断候选，不能标为exact。基于多层空间连续性筛选8H候选后，block22 skip接入RX block48使AMD与CPU portable保持corr0.99935，但对旧CUBIN physical解码仅约0.56；后续发现该`/tmp/block48-decoder.bin`只有98,304非零且不是worklog记录的147,456-byte完整输出，故该对比降级，不再作为最终oracle。
+
+block49 controlled分支给出更可靠的body证据。双residual权重下，修正为bijective 16KiB input scatter后，15,872/16,384 output bytes与input exact，其余512为固定无效槽。单token 256-channel basis一次进程导出4MiB Jacobian；按候选canonical gather后，archive-logical `256→288→256` FFN对原CUBIN correlation0.96121、MAE0.004742，Hungarian channel重排仅升至0.96710。将record矩阵误解成full-width E4M3 `256→576→256`反而降至0.532，因此该路线再次否决，临时代码已撤回。block48 skip scale可微诊断：window/head 0.680、cell/head 0.754、token×32ch 0.757、16ch 0.768、8ch 0.795、4ch 0.836、2ch 0.891、逐值上界0.964；逐值scale最大1264明显过拟合。结论是archive body主体成立，误差混合了physical scale/gather与旧main/output文件谱系；下一步必须从5090同一live frame同时抓block48 main/skip/output/aux再闭合，不再用旧临时文件交叉拟合。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
