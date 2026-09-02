@@ -18,7 +18,7 @@ def physical(values):
             offset=tb|sum(((channel>>i)&1)<<bit for i,bit in enumerate(cbits));out[offset]=encoded[token,channel]
     return out
 def main():
-    p=argparse.ArgumentParser();p.add_argument("arena",type=Path);p.add_argument("index",type=Path);p.add_argument("input",type=Path);p.add_argument("output",type=Path);p.add_argument("--assets",type=Path,default=Path(__file__).parent);p.add_argument("--expand-dir",type=Path);p.add_argument("--physical",type=Path);a=p.parse_args();arena=a.arena.read_bytes();records=json.loads(a.index.read_text());records=records["records"] if isinstance(records,dict) else records;records={r["name"]:r for r in records};x=unswizzle(a.input.read_bytes()[:65536],[2,6,7,8,14,15],[0,1,3,4,5,9,10,11,12,13]);order=bit_perm((1,8,16,2,4,32,64,128,256,512));expand_dir=a.expand_dir or a.assets
+    p=argparse.ArgumentParser();p.add_argument("arena",type=Path);p.add_argument("index",type=Path);p.add_argument("input",type=Path);p.add_argument("output",type=Path);p.add_argument("--assets",type=Path,default=Path(__file__).parent);p.add_argument("--expand-dir",type=Path);p.add_argument("--physical",type=Path);p.add_argument("--qkv-mode",choices=["mixed","main"],default="main");p.add_argument("--attention-scale",type=float,default=1.0);a=p.parse_args();arena=a.arena.read_bytes();records=json.loads(a.index.read_text());records=records["records"] if isinstance(records,dict) else records;records={r["name"]:r for r in records};x=unswizzle(a.input.read_bytes()[:65536],[2,6,7,8,14,15],[0,1,3,4,5,9,10,11,12,13]);order=bit_perm((1,8,16,2,4,32,64,128,256,512));expand_dir=a.expand_dir or a.assets
     for block in range(31,39):
         def payload(layer):
             r=records[f"block{block}.layer{layer}.layer"];return arena[r["arena_offset"]:r["arena_offset"]+r["payload_size"]]
@@ -32,7 +32,7 @@ def main():
             scale=np.median(np.linalg.norm(qkv[:,group].reshape(1024,32,32),axis=2),axis=0);main[:,group]=(main[:,group].reshape(64,32,32)/(np.linalg.norm(main[:,group].reshape(64,32,32),axis=2,keepdims=True)+1e-9)*scale[None,:,None]).reshape(64,1024);scales.append(scale)
         aux=np.einsum("ti,igo->tgo",hidden,work)
         for group in (0,1):aux[:,group]=(aux[:,group].reshape(64,32,32)/(np.linalg.norm(aux[:,group].reshape(64,32,32),axis=2,keepdims=True)+1e-9)*scales[group][None,:,None]).reshape(64,1024)
-        combined=np.concatenate([main[:32],aux[32:]],axis=0);q,k,v=[combined[:,g].reshape(64,32,32) for g in range(3)];scores=np.einsum("thd,shd->hts",q,k)*.25;scores-=scores.max(2,keepdims=True);weights=np.exp(scores);weights/=weights.sum(2,keepdims=True);attention=fp8(np.einsum("hts,shd->thd",weights,v).reshape(64,1024));x=fp8(attention@projection+hidden*projection_skip);print(f"block{block} finite={np.isfinite(x).all()} min={x.min():.6g} max={x.max():.6g} std={x.std():.6g}")
+        combined=main if a.qkv_mode=="main" else np.concatenate([main[:32],aux[32:]],axis=0);q,k,v=[combined[:,g].reshape(64,32,32) for g in range(3)];scores=np.einsum("thd,shd->hts",q,k)*a.attention_scale;scores-=scores.max(2,keepdims=True);weights=np.exp(scores);weights/=weights.sum(2,keepdims=True);attention=fp8(np.einsum("hts,shd->thd",weights,v).reshape(64,1024));x=fp8(attention@projection+hidden*projection_skip);print(f"block{block} finite={np.isfinite(x).all()} min={x.min():.6g} max={x.max():.6g} std={x.std():.6g}")
     x.astype(np.float32).tofile(a.output)
     if a.physical:physical(x).tofile(a.physical)
 if __name__=="__main__":main()

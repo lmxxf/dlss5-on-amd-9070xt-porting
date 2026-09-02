@@ -5,10 +5,11 @@
   "heads": 32,
   "head_dimension": 32,
   "input_views": {
-    "main": "32 tokens of E4M3 Q/K/V",
-    "work": "32 tokens of FP16 Q/K/V"
+    "main": "32 active tokens of E4M3 Q/K/V",
+    "padding": "32 zero tokens in the single-block oracle",
+    "work": "internal FP16 scratch; not a second token half"
   },
-  "work_qk_operation": "per-token per-head normalize to mean main-view head norm",
+  "portable_operation": "main Q/K/V plus 32 zero keys; 64-key softmax with logit scale 1",
   "work_to_main_channel_bits": {
     "q": [0, 1, 3, 4, 2, 5, 6, 7, 8, 9],
     "k": [0, 1, 3, 4, 2, 5, 6, 7, 8, 9],
@@ -20,7 +21,6 @@
   },
   "rx9070xt": {
     "runner": "d3d12_vit_attention_test.cpp",
-    "logit_scale_0_5": {"correlation": 0.879619763, "mae": 0.792811383, "rmse": 1.043571287, "submit_to_fence_ms": 2.133},
-    "logit_scale_0_25": {"correlation": 0.878221460, "mae": 0.789029631, "rmse": 1.028587219, "submit_to_fence_ms": 0.689}
+    "main_plus_zero_scale_1": {"correlation": 0.962745340, "mae": 0.280473931, "rmse": 0.454943536, "submit_to_fence_ms": 1.557}
   }
 }

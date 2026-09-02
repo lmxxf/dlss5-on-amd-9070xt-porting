@@ -1247,6 +1247,12 @@ blocks32–38另各生成unit-basis与±0.03125 Hadamard两套Expand oracle，�
 
 portable block38经原repack接回decoder后，block39产生少量38–76个E4M3 NaN并按既定规则饱和；blocks40–69随后全部零NaN贯通。RX9070XT final readout 1.15–1.43 ms，生成`stellar-amd-portable-vit.png`。人物与机械结构清晰可辨，但规则点阵与横向色带仍明显，未达到完成标准；相对旧`stellar-amd-current.png` PSNR 19.54 dB。Expand effective与Attention scale 0.25只令不同portable版本间约1.2 MAE变化，条纹基本不动，下一主线转向跨层Contract/QKV误差，而非继续调这两个旋钮。
 
+受控Attention impulse随后修正了work语义。Q=K=0、单V impulse时输出64个精确`1/64`；逐bit通断矩阵证明Q/K低5 dim bits与高5 head bits均identity，Q→output query token bits identity，K→V key token bit映射为`[1,0,3,4,2]`，对应V physical token bits`[1,0,4,5,2]`。main V随机输入对原Attention correlation 0.9977，而只写work plane4时输出全零：work FP16是内部scratch，不是另32 tokens。
+
+语义正确的Attention因此是32个main tokens＋32个zero padding keys、logit scale 1；对原kernel correlation 0.9627453、MAE 0.280474，RX9070XT submit→fence 1.557 ms。`prepare_vit_attention_case.py`、`vit_block31_reference.py`、`vit_blocks31_38_reference.py`与D3D12 block runner均改为main路径默认。完整block31受Projection近似影响，CPU/AMD最终correlation为0.8252302/0.8252317，二者仍逐层一致。
+
+最终条纹经skip消融定位：四条skip全零时横向色带消失，只剩主干点阵；只恢复block48/56高层skip或只恢复block62/66低层skip都会分别重新产生色带。故横带来自整个encoder skip physical布局，不是ViT。尝试用现存AMD block3与distilled block8 main替换低层skip仍有色带，说明值域之外还存在skip view permutation／布局不匹配。下一主线转为重建blocks0–22的portable skip物理布局。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
