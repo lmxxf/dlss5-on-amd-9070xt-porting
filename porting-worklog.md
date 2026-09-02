@@ -1355,6 +1355,10 @@ block48 descriptor operation vector共有36步：4步upsample前缀`convolution�
 
 504-half区随后由数值分布切开：245,760–246,015的256值集中在约0.82–1.0，是FFN skip；246,016–246,255的240值分布0–0.79，是prefix dw/sin；246,256–246,263为8个padding slots（序列化内容不保证清零）。block48全部learned tensor边界至此闭合，剩余变量只在512→256 prefix如何把64个main tokens与block22 skip展开到576个256-channel tokens。
 
+空间尺度校准进一步修正decoder：block39应把ViT 8×8上采样至16×16并融合block30未池化skip；blocks40–47处理4个window；block48再由16×16裁剪／上采样到真实32×18并融合block22 output1。按此重跑的16×16 AMD链已在前文记录。
+
+尝试把block48 fused record在已闭合offset上直接按row-major archive矩阵执行，输出虽finite但std约297、范围达到±1e4，明确否决。prefix 256×256矩阵本身分布正常，爆炸来自W/QKV/projection段：这些fused tensor仍是tensor-core physical pack，和split-Swin四record的row-major archive不同。实验脚本已删除，未进入主线。block48后续必须复用`unpack_mma_fragments.py`／controlled effective方法恢复256-channel fused body；不能机械套`block0_reference.load_fused_block`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
