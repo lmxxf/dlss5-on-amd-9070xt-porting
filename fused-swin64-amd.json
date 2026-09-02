@@ -1,0 +1,12 @@
+{
+  "packer": "pack_fused_swin64_archive.py",
+  "runner": "d3d12_block128_test.cpp fused64 mode with QKV precompute",
+  "scope": "main-only; canonical block8 skip pending",
+  "blocks": [
+    {"block": 62, "submit_ms": 2.118, "correlation": 0.70274746, "mae": 1.3769e-05, "rmse": 6.2990e-05},
+    {"block": 63, "submit_ms": 2.440, "correlation": 0.66372155, "mae": 1.0478e-05, "rmse": 5.3921e-05},
+    {"block": 64, "submit_ms": 2.340, "correlation": 0.65189079, "mae": 7.0684e-06, "rmse": 4.1850e-05},
+    {"block": 65, "submit_ms": 1.898, "correlation": 0.62943115, "mae": 5.4174e-06, "rmse": 3.4539e-05}
+  ],
+  "note": "correlation is dominated by quantization because signal std falls from 8.2e-5 to 4.0e-5; absolute errors remain small"
+}

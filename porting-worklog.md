@@ -1367,6 +1367,10 @@ block56–61按相同尾对齐恢复128-channel archive布局。普通block57 re
 
 main-only固定帧由block55 18×32×256 grouped投影并2×上采样到36×64×128；block56–61 CPU archive logical全部finite，std 0.00210→0.000854。128-channel AMD模式也改为QKV预计算；block56 padded40×64 submit→fence 38.709 ms，对CPU correlation0.991979、MAE1.13e-4、RMSE2.78e-4、max error0.00649。因信号std仅约0.0021，绝对误差比correlation更有解释力。canonical block14 skip仍待上游提供；57–61下一步用单device多block宿主避免每层重复D3DCompile。
 
+block62–65同样由普通block63尾布局对齐。normal record 30,880 halves：W0 2,048、W1/W2各6,144、padding16、FFN skip64、QKV6,144、2-head bias8,192、2个FP32 scales、projection2,048、attention skip64、tail12；block62额外64×64 prefix conv与64-value prefix aux，corrected QKV起点18,560。`pack_fused_swin64_archive.py`统一生成28,802-float blob。
+
+main-only CPU固定帧把block61 36×64×128 grouped投影后2×上采样到72×128×64；blocks62–65全部finite，std 8.20e-5→3.95e-5。AMD fused64模式复用QKV预计算，耗时2.118/2.440/2.340/1.898 ms；对CPU MAE 1.38e-5/1.05e-5/7.07e-6/5.42e-6。correlation从0.703降到0.629主要因信号已接近FP8量化步长，AMD/CPU std仍一致。canonical block8 skip待接入，数值kernel本身已闭合。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
