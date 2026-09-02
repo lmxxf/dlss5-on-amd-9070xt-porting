@@ -1303,6 +1303,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 进一步分层修正了上一句“只剩标准1H”的过强结论。保留原W1/W2＋FFN skip、把attention改成diagonal identity后，odd-half可读出FFN相关target；用portable controlled input map训练时held-out correlation 0.741，换成NVIDIA controlled input的精确值后升至0.8846，证明输入桥误差确会被FFN放大。加入E4M3 straight-through量化仍约0.8835；改用block1 effective全套参数初始化再联合训练完整body也只到0.292。故剩余差异不只是dynamic scale：56-half post专用区按名字还含`out_gain`，controlled head basis读到的32维坐标可能已经经过projection后的post gain/正弦变换。`block70-upsample-effective`的边界改称controlled input-path map，不再声称它是纯pre-FFN upsample值。下一步必须把input-side与output-gain分别受控，标准Swin body才能独立验收。
 
+SASS进一步把post输出侧定位到weight byte `0x50e0`（half 10352）：四路load发生在PC 0x8450–0x87e0，紧接着才读取两块out-conv `+0x5130/+0x5330`。普通1H把10352附近视作attention skip，但post这里更符合`out_gain`消费时序；它很可能是同一32-value storage在post中的角色复用。把该向量作为`projection * gain`补入连续模型后raw预测量级仍不足，联合训练最高约0.294，线性32→32后校正也不改善，说明controlled head basis坐标还含kernel内部FP8 dynamic scale／非线性，而非单纯漏乘一个向量。当前最可靠的分层结果仍是：controlled精确输入下FFN odd-half可达0.8846；full projected坐标需另建attention branch oracle，不能从最终head feature反推全部中间层。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
