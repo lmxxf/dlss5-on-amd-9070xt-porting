@@ -1375,6 +1375,10 @@ block66–69 corrected 32-channel layout继续闭合。normal record：W1/W2各2
 
 main-only CPU链把block65 72×128×64上采样至144×256×32，blocks66–69全部finite，但std仅1.36e-6→3.67e-7。RX9070XT block66耗时5.801 ms并把全部1,179,648 values量化为零；对continuous CPU MAE2.62e-7、RMSE1.36e-6。这不是kernel失败，而是正确的E4M3下溢行为，明确证明最终decoder数值由block4 canonical skip主导。至此66–69数值核／pack已恢复，但在encoder skips接入前继续跑67–69没有信息量，主线应立即转回block4/block8/block14/block22四条canonical skip。
 
+为生成四条skip，先修正`block0_reference.load_fused_block`长期存在的archive offsets：FFN skip前padding应为16 halves；scale storage为1-head时8 halves、其余`2×heads`；64-channel record尾padding12，其余8。修正后blocks1/4/5/8/9/14/15/49/57/63/67的record容量全部精确闭合，block22 extra相应修正为65,528。
+
+但按该archive row-major CPU encoder从RGB重算得到决定性反例：block4/8/14/22 downsample前main std依次仅2.53e-4/3.29e-6/5.31e-9/4.68e-12，层级间指数衰减，与NVIDIA physical skips约几十量级完全不符。故offset闭合只证明tensor边界，不证明fused matrices已具备runtime dynamic scale；naive archive encoder不能提供canonical skips。decoder main-only在66处E4M3下溢是同一缺口的下游症状。下一主线必须把已恢复的block1–3、block10–13 effective方法推广到encoder downsample main branches4/8/14/22，而不是继续拼接naive archive值。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -84,7 +84,8 @@ def load_fused_block(
             values[offset : offset + count].astype(np.float32)
         ).reshape(shape)
         offset += count
-    offset += 8
+    # Fused records align the FFN skip after a 16-half pre-skip pad.
+    offset += 16
     tensors["ffn_cos_skip"] = torch.from_numpy(
         values[offset : offset + width].astype(np.float32)
     )
@@ -99,9 +100,12 @@ def load_fused_block(
         values[offset : offset + bias_count].astype(np.float32)
     ).reshape(heads, 64, 64)
     offset += bias_count
-    scale = np.frombuffer(values[offset : offset + 16].tobytes(), dtype="<f4", count=heads).copy()
+    scale_half_count = 8 if heads == 1 else 2 * heads
+    scale = np.frombuffer(
+        values[offset : offset + scale_half_count].tobytes(),
+        dtype="<f4", count=heads).copy()
     tensors["attn_scale"] = torch.from_numpy(scale)
-    offset += 16
+    offset += scale_half_count
     projection_count = width * (width // 2)
     tensors["projection_weight"] = torch.from_numpy(
         values[offset : offset + projection_count].astype(np.float32)
@@ -112,7 +116,7 @@ def load_fused_block(
     )
     offset += width
     tail = values.size - offset
-    padding = 16 if width == 256 else 8
+    padding = 12 if width == 64 else 8
     if tail not in (padding, padding + allowed_extra):
         raise ValueError(f"block{block}: unexplained fused tail {values.size - offset}")
     if tail == padding + allowed_extra and allowed_extra:
