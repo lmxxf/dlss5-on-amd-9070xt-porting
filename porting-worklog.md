@@ -1329,9 +1329,13 @@ skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[
 
 通用AMD matrix runner扩展为batch `input_dim→output_dim`。RX9070XT一次处理576 tiles后，main prefix与skip prefix各自对CPU portable逐float 100% exact；CPU只执行E4M3解码、physical gather、两路相加及tile-major→row-major重排。合并prefix对NVIDIA correlation 0.999996278。随后AMD body耗时3.030 ms、RGB head 0.774 ms，得到从block69 main＋block0 skip原始physical buffers起算的完整AMD block70：最终RGB correlation 0.945358、RGB MAE 0.035245。至此block70本身已端到端移植完成；71-block总目标剩余上游portable block0–69的统一AMD串联与最终验收。
 
-上游主线转入decoder39–69。block39 CPU descriptor的128-byte operation vector解码为四步`convolution→convolution→mul→add`；archive record为262,656 halves，其中524,288恰等于1024×512主卷积，剩余1,024 halves供第二卷积／scale路径。结构与容量固化为`block39-operation-graph.json`。这证明block39是线性双输入decoder入口，不需要复制Swin；下一步分别以main-only/skip-only controlled oracle恢复两支effective映射，再复用batch AMD matrix runner。
+上游主线转入decoder39–69。block39 CPU descriptor的128-byte operation vector解码为四步`convolution→convolution→mul→add`。容量初读曾把525,312 bytes误当成同数目的halves；修正后record实际是262,656 FP16 elements，主体262,144=`512×512`，更符合两组512输入的grouped 1024→512卷积，剩余512供第二卷积／scale路径。结构与容量固化为`block39-operation-graph.json`。
 
 旧`probe_b39y2`的main/skip消融被重新执行后不具备数值权威性：a1虽写32,632 bytes，但全是E4M3 NaN哨兵，解码／sanitize后方差为零；skip-only也全零。它只证明旧0x50 ABI能store，不能用于判断第二输入无贡献或做线性basis。后续block39 oracle必须改用当前portable block38 finite输入、完整arena与正确block30 skip，且在采样前先通过“零NaN＋非零方差”门槛。
+
+随后用正确`blocks31-38-portable-2d.fp8`与执行图要求的`block30.output1=block30-pool-correct.bin`重跑，逐byte复现18:46的portable block39：32,681 nonzero、55–76个NaN（不同保存长度计数），sanitize后才finite。skip-only仍全零，full与main-only一致；但这不是“模型skip权重为零”的充分证据，因为原CUBIN要求runtime packed weights，当前仍直喂archive FP16。
+
+`run_original_block39_basis.cpp`以0.52–0.71秒完成1,024/8,192 basis。物理拓扑清楚：四个16KiB banks（0/16384/32768/49152），每bank仅前8KiB输入有效并写同base的8KiB输出；bank0二分图精确分成16个`512 input→512 output` components，各component按原地址排序的basis矩阵correlation 0.9994+。然而single-impulse与dense Hadamard矩阵对真实portable输入correlation都约0.01，证明dynamic FP8/runtime weight pack使该CUBIN数值不可作为archive语义oracle。block39数值恢复正式改走archive逻辑grouped convolution与descriptor参数，不再蒸馏错误CUBIN。
 
 ## 工作纪律
 
