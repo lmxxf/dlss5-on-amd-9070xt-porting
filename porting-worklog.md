@@ -1193,6 +1193,8 @@ Contract: raw K=branch, N=main
 
 block31两张FP16矩阵各8 MiB，导出耗时低于1秒。RX9070XT已直接执行raw-unswizzled Expand；实现无故障，但32-channel held-out MAE 0.00915，反而高于effective bridge的0.00664。原因不是unswizzle错误，而是原CUBIN仍有尚未复刻的dynamic E4M3 scale/auxiliary state；raw矩阵恢复解决权重坐标，scale view仍是下一数值缺口。
 
+Contract 单次真实分布 oracle 随后纠正了A/B命名：矩阵输入轴固定使用A排列，输出轴固定使用B排列，与buffer被叫作main还是branch无关。对`K/N order × A/B/identity input × A/B/identity output × 三种skip排列`全部54个候选穷举，唯一最优为`KN + K:A + N:B + skip:B`，correlation 0.9916288、MAE 0.0091401；第二类错误轴组合下降到0.84以下。`unpack_vit_matrices.py`已统一修正为所有线性矩阵`K=matrix_input(A), N=matrix_output(B)`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

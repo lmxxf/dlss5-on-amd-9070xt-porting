@@ -39,9 +39,10 @@ def axis_permutation(size: int, low_bit_targets: tuple[int, ...]) -> np.ndarray:
     return result
 
 
-# effective physical-channel index -> raw matrix axis index
-MAIN_TO_RAW = (1, 2, 16, 4, 8)
-BRANCH_TO_RAW = (1, 8, 16, 2, 4)
+# Kernel physical-channel index -> raw matrix axis index.  These are fixed
+# matrix input/output layouts, not persistent names for an activation buffer.
+MATRIX_INPUT_TO_RAW = (1, 2, 16, 4, 8)
+MATRIX_OUTPUT_TO_RAW = (1, 8, 16, 2, 4)
 
 
 def unpack_matrix(raw: bytes, input_size: int, output_size: int,
@@ -59,7 +60,8 @@ def unpack_matrix(raw: bytes, input_size: int, output_size: int,
                 fragments[:, half, k, group] = lanes[:, lane, half * 8 + index]
     matrix = fragments.reshape(input_size // 32, output_size // 8, 32, 8)
     matrix = matrix.transpose(0, 2, 1, 3).reshape(input_size, output_size)
-    layouts = {"main": MAIN_TO_RAW, "branch": BRANCH_TO_RAW}
+    layouts = {"matrix_input": MATRIX_INPUT_TO_RAW,
+               "matrix_output": MATRIX_OUTPUT_TO_RAW}
     input_order = axis_permutation(input_size, layouts[input_layout])
     output_order = axis_permutation(output_size, layouts[output_layout])
     return e4m3_to_float(matrix[input_order][:, output_order]).astype(np.float16)
@@ -83,8 +85,8 @@ def main() -> None:
     for block in range(first, last + 1):
         outputs = {}
         specifications = {
-            "expand": (0, 1024, 4096, "main", "branch"),
-            "contract": (1, 4096, 1024, "branch", "main"),
+            "expand": (0, 1024, 4096, "matrix_input", "matrix_output"),
+            "contract": (1, 4096, 1024, "matrix_input", "matrix_output"),
         }
         for kind, (layer, inputs, outputs_count, input_layout,
                    output_layout) in specifications.items():
