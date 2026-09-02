@@ -23,7 +23,10 @@
 - `run_original_vit_repack.cpp`：独立执行原始8×8 ViT 1D→2D repack，用于把任意ViT断点接回decoder做画面级验收。
 - `run_original_vit_contract.cpp` / `run_original_vit_qkv.cpp`：独立执行 ViT Contract 与 QKV，并显式携带 main/work/aux 三路状态；用于绕开跨block同步、逐层恢复数值 view。
 - `run_original_vit_qkv_matrix.cpp` / `run_original_vit_qkv_dataset.cpp`：复用同一 CUDA context 的 QKV basis 与 dataset oracle；前者恢复三套 physical output view，后者验证 Q/K per-head normalization 与 V 线性语义。
-- `block31-qkv-effective.fp8` / `.json` / `vit-{q,k,v}-offsets.i32`：block31 QKV standard-only 的 1024-basis诊断矩阵、三套 offset 及地址 bit公式；offset/support仍有效，数值已被NVAPI pair对照降级，不能进入AMD最终参数。
+- `d3d12_nvapi_qkv_matrix.cpp`：5090专用QKV basis宿主；每轮恢复Contract main/work/aux并同组提交standard+chained，1024 basis约5.8秒完成。
+- `block31-qkv-effective.fp8` / `.json` / `vit-{q,k,v}-offsets.i32`：block31权威NVAPI-pair 1024-basis矩阵、三套offset及地址bit公式；真实held-out Q/K归一化correlation 0.9826/0.9716，V线性correlation 0.9922。
+- `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
+- `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
 - `run_original_1h_upsample.cpp`：按block66真实0x60 ABI执行1H upsample；`+0`绑定decoder主输入、`+8`绑定输出，保留enc0 skip与override dimensions。

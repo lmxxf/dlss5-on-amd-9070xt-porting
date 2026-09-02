@@ -1211,6 +1211,18 @@ QKV record 已按三个独立1 MiB矩阵的group-major顺序加入unpacker，Pro
 
 权威NVAPI pair Q/K/V与Spark standard-only输出的support集合几乎一致（Q/K/V仅16/144/59个support差异），所以basis恢复的offset与GF(2)地址公式仍成立；但活跃值逐byte exact仅13.36%／17.19%／17.67%。因此`block31-qkv-effective.fp8`正式降级为standard-only结构诊断，V=0.9980等数值不再提升为AMD参数。下一步必须用专用5090 NVAPI pair宿主批量重做QKV basis。
 
+新增`d3d12_nvapi_qkv_matrix.cpp`：只加载一次CUBIN与147.7 MB arena；每个basis恢复Contract main/work/aux、清零三路输出，并把QKV standard+chained作为同一NVAPI chain提交，按已恢复offset只保存3,072 bytes。RTX5090连续1,024 basis在5.8秒内完成，零device removal，矩阵SHA-256为`d7b1ef63...baacb9b`。
+
+权威pair basis替换旧standard-only文件后，对真实NVAPI held-out：Q按32组×32维归一化correlation 0.9825706、K为0.9715692、V线性预测为0.9922434。Q/K线性和的std分别比归一化输出大279.8×／264.8×，与SASS的平方和→RSQ路径闭合。该矩阵现可进入AMD bring-up；standard-only数值结论作废但physical offset/bit公式保持不变。
+
+`d3d12_vit_qkv_test.cpp`已在RX9070XT执行同一physical basis矩阵：每个thread负责一个head，Q/K完成32维平方和归一化并乘basis head scale，V保持线性，最后统一E4M3量化。对5090 authoritative r7/r8/r9：Q/K/V correlation为0.9819528／0.9717176／0.9918323，submit→fence 10.082 ms；与CPU模型一致，AMD未引入额外误差。当前shader为correctness版，尚未做QKV预排与wave优化。
+
+Projection无需basis即可由authoritative r4 attention、r3 residual、r1 output判定raw布局。54个`KN/NK × A/B/I × A/B/I × skip`候选中唯一最优仍为`KN + K:A + N:B + skip:B`，correlation 0.9729131。由此确认ViT线性矩阵统一使用A输入轴、B输出轴，Projection record的首1 MiB可直接unswizzle为1024×1024。
+
+新增`d3d12_vit_linear_test.cpp`，同一HLSL runner覆盖Contract与Projection：Contract启用SASS多项式后执行4096→1024，Projection直接执行1024→1024，两者均叠加真实FP16 skip。RX9070XT对5090 view实测：Contract correlation 0.9298485、3.527 ms；Projection correlation 0.9724985、0.509 ms。Projection与CPU候选一致；Contract低于此前单standard样本，说明NVAPI chained／dynamic scale仍有数值贡献，下一步需重做Contract pair basis。
+
+为Projection尝试过两条basis路线：跨进程复制r5/r6到新resource会立即device hung；完整宿主result97保持同构resource地址并注入保存状态可运行少数basis，但sync phase累积后仍device removal。结论：Projection同步状态包含驱动内部phase，不能靠bytes恢复；独立probe源码已删除，result97仅保留为失败诊断入口，不作为生产路线。最终移植使用已闭合的raw矩阵语义，不再追Projection basis。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

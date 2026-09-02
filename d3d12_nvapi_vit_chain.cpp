@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <fstream>
+#include <array>
 #include <utility>
 #include <vector>
 #include <windows.h>
@@ -110,8 +111,8 @@ struct W {
   uint64_t e, c, q, p;
 };
 int wmain(int ac, wchar_t **av) {
-  if (ac < 5 || ac > 9) {
-    std::fwprintf(stderr, L"usage: %ls cubin input weights output [limit [result-index [single-block [aux-input]]]]\n", av[0]);
+  if (ac < 5 || ac > 12) {
+    std::fwprintf(stderr, L"usage: %ls cubin input weights output [limit [result-index [single-block [aux-input | attention residual work aux]]]]\n", av[0]);
     return 2;
   }
   constexpr UINT64 A = 2097152, WA = 147719680;
@@ -121,8 +122,17 @@ int wmain(int ac, wchar_t **av) {
   const int singleBlock = ac >= 8 ? _wtoi(av[7]) : -1;
   const bool singleMode = singleBlock >= 31 && singleBlock <= 38;
   const bool rangeMode = singleBlock >= 131 && singleBlock <= 138;
+  const bool projectionInject = ac == 12 && singleBlock == 31 &&
+                                _wtoi(av[6]) == 97;
   std::vector<uint8_t> auxInput;
-  if (ac >= 9) {
+  std::array<std::vector<uint8_t>, 4> projectionState;
+  if (projectionInject) {
+    for (int i = 0; i < 4; ++i) {
+      projectionState[i] = rd(av[8 + i]);
+      if (projectionState[i].size() != A)
+        return 2;
+    }
+  } else if (ac >= 9) {
     auxInput = rd(av[8]);
     if (auxInput.size() != A)
       return 2;
@@ -246,6 +256,19 @@ int wmain(int ac, wchar_t **av) {
   cl->CopyBufferRegion(r[0], 0, upIn, 0, A);
   if (upAux)
     cl->CopyBufferRegion(r[6], 0, upAux, 0, A);
+  std::array<ID3D12Resource *, 4> projectionUploads{};
+  if (projectionInject) {
+    const int targets[4] = {4, 3, 5, 6};
+    for (int i = 0; i < 4; ++i) {
+      projectionUploads[i] = make(
+          A, &uph, D3D12_RESOURCE_STATE_GENERIC_READ,
+          D3D12_RESOURCE_FLAG_NONE);
+      projectionUploads[i]->Map(0, &z, &p);
+      std::memcpy(p, projectionState[i].data(), A);
+      projectionUploads[i]->Unmap(0, nullptr);
+      cl->CopyBufferRegion(r[targets[i]], 0, projectionUploads[i], 0, A);
+    }
+  }
   cl->CopyBufferRegion(wr, 0, upW, 0, WA);
   std::vector<D3D12_RESOURCE_BARRIER> bars;
   for (auto *x : r) {
@@ -468,8 +491,10 @@ int wmain(int ac, wchar_t **av) {
   if (limit == 0 || limit > ks.size())
     return 2;
   size_t groupStart = 0;
-  bool foundBoundary = rangeMode;
-  if (!rangeMode) {
+  bool foundBoundary = rangeMode || projectionInject;
+  if (projectionInject) {
+    groupStart = 6;
+  } else if (!rangeMode) {
     for (size_t groupEnd : groupEnds) {
       if (groupEnd > limit)
         break;
@@ -495,6 +520,117 @@ int wmain(int ac, wchar_t **av) {
   if (ac == 7) resultIndex = _wtoi(av[6]);
   if (singleMode || rangeMode)
     resultIndex = ac >= 7 ? _wtoi(av[6]) : 1;
+  const bool projectionProbe = resultIndex == 97 && singleMode &&
+                               singleBlock == 31 && limit == 6 &&
+                               groupStart == 6 && ks.size() >= 7;
+  if (projectionProbe) {
+    // Preserve the exact GPU virtual addresses and synchronization objects
+    // created by the successful block31 prefix.  Projection embeds/uses this
+    // live state and cannot consume work/aux bytes copied into a new process.
+    std::vector<D3D12_RESOURCE_BARRIER> captureBars;
+    for (int index : {3, 5, 6}) {
+      D3D12_RESOURCE_BARRIER b{};
+      b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+      b.Transition.pResource = r[index];
+      b.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+      b.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+      b.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+      captureBars.push_back(b);
+    }
+    cl->ResourceBarrier((UINT)captureBars.size(), captureBars.data());
+    cl->CopyBufferRegion(rb, 0, r[3], 0, A);
+    cl->CopyBufferRegion(rb, A, r[5], 0, A);
+    cl->CopyBufferRegion(rb, 2 * A, r[6], 0, A);
+    submitAndReset();
+    D3D12_RANGE captureRange{0, 3 * A};
+    p = nullptr;
+    hr("probe_capture_map", rb->Map(0, &captureRange, &p));
+    std::vector<uint8_t> saved(3 * A);
+    std::memcpy(saved.data(), p, saved.size());
+    rb->Unmap(0, nullptr);
+
+    ID3D12Resource *probeUpload = make(
+        4 * A, &uph, D3D12_RESOURCE_STATE_GENERIC_READ,
+        D3D12_RESOURCE_FLAG_NONE);
+    p = nullptr;
+    probeUpload->Map(0, &z, &p);
+    auto *probeBytes = static_cast<uint8_t *>(p);
+    std::memset(probeBytes, 0, A);
+    std::memcpy(probeBytes + A, saved.data(), 3 * A);
+    std::ofstream probeOutput(av[4], std::ios::binary);
+    for (UINT basis = 0; basis < 1024; ++basis) {
+      if (basis)
+        probeBytes[basis - 1] = 0;
+      probeBytes[basis] = 0x38;
+      std::vector<D3D12_RESOURCE_BARRIER> toCopy;
+      auto addTransition = [&](ID3D12Resource *resource,
+                               D3D12_RESOURCE_STATES before,
+                               D3D12_RESOURCE_STATES after) {
+        D3D12_RESOURCE_BARRIER b{};
+        b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        b.Transition.pResource = resource;
+        b.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        b.Transition.StateBefore = before;
+        b.Transition.StateAfter = after;
+        toCopy.push_back(b);
+      };
+      addTransition(r[4], D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_RESOURCE_STATE_COPY_DEST);
+      addTransition(r[3], basis ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+                                : D3D12_RESOURCE_STATE_COPY_SOURCE,
+                    D3D12_RESOURCE_STATE_COPY_DEST);
+      addTransition(r[5], basis ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+                                : D3D12_RESOURCE_STATE_COPY_SOURCE,
+                    D3D12_RESOURCE_STATE_COPY_DEST);
+      addTransition(r[6], basis ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+                                : D3D12_RESOURCE_STATE_COPY_SOURCE,
+                    D3D12_RESOURCE_STATE_COPY_DEST);
+      addTransition(r[1], basis ? D3D12_RESOURCE_STATE_COPY_SOURCE
+                                : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                    D3D12_RESOURCE_STATE_COPY_DEST);
+      cl->ResourceBarrier((UINT)toCopy.size(), toCopy.data());
+      cl->CopyBufferRegion(r[4], 0, probeUpload, 0, A);
+      cl->CopyBufferRegion(r[3], 0, probeUpload, A, A);
+      cl->CopyBufferRegion(r[5], 0, probeUpload, 2 * A, A);
+      cl->CopyBufferRegion(r[6], 0, probeUpload, 3 * A, A);
+      cl->CopyBufferRegion(r[1], 0, zero, 0, A);
+      std::vector<D3D12_RESOURCE_BARRIER> toUav;
+      for (int index : {4, 3, 5, 6, 1}) {
+        D3D12_RESOURCE_BARRIER b{};
+        b.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        b.Transition.pResource = r[index];
+        b.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        b.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        b.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        toUav.push_back(b);
+      }
+      cl->ResourceBarrier((UINT)toUav.size(), toUav.data());
+      nv("projection_probe", chain(cl, &ks[6], 1));
+      D3D12_RESOURCE_BARRIER uav{};
+      uav.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+      cl->ResourceBarrier(1, &uav);
+      D3D12_RESOURCE_BARRIER outputBar{};
+      outputBar.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+      outputBar.Transition.pResource = r[1];
+      outputBar.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+      outputBar.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+      outputBar.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+      cl->ResourceBarrier(1, &outputBar);
+      cl->CopyBufferRegion(rb, 0, r[1], 0, A);
+      submitAndReset();
+      D3D12_RANGE probeRange{0, A};
+      p = nullptr;
+      hr("projection_probe_map", rb->Map(0, &probeRange, &p));
+      probeOutput.write(static_cast<const char *>(p), 65536);
+      rb->Unmap(0, nullptr);
+      if ((basis & 127) == 127)
+        std::fprintf(stderr, "projection_basis=%u/1024\n", basis + 1);
+    }
+    probeUpload->Unmap(0, nullptr);
+    std::printf("adapter=%ls projection_basis=1024 output_bytes=%u\n",
+                dd.Description, 1024 * 65536);
+    return 0;
+  }
   const bool dumpAll = resultIndex == 99;
   const bool dumpState = resultIndex == 98;
   if (!dumpAll && !dumpState &&
