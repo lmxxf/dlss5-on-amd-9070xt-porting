@@ -36,6 +36,10 @@
 - `fp8-weight-layout-evidence.json`：2H SASS 把 weight view 当 E4M3 packed/swizzled 数据消费的直接证据；archive 外层按两字节计数且 `blend_scale` 确为 FP16，但矩阵 payload 是否由 NvAPI 上传时转换仍待与 auxiliary-view 缺口一起判定。
 - `unpack_mma_fragments.py`：按 NVIDIA PTX 9.1 `mma.m16n8k32` matrix-B 官方公式解包／回包 lane-major E4M3 subtiles；block8 W1 的 8,192 loaded bytes 可逐 byte roundtrip。
 - `infer_vit_layouts.py` / `vit-layouts.json`：闭合 blocks31–38 五类 ViT record 的字节分区；把 4 MiB Expand、4 MiB Contract、3 MiB QKV、1 MiB Projection 主体明确标为 packed E4M3，并分离 FP16 residual skip、padding 与尚待 SASS 定位的 128-byte attention scale region。
+- `run_original_vit_repack_permutation.cpp` / `vit-repack-output-to-input.i32`：用 21 个地址位平面在 22 次原 CUBIN launch 内恢复完整 8×8×1024 ViT 2D→1D physical byte permutation；65,536 个源地址一一对应。
+- `run_original_vit_expand_basis.cpp` / `run_original_vit_expand_matrix.cpp` / `run_original_vit_expand.cpp`：ViT Expand 的稀疏 basis、完整矩阵提取与任意输入 held-out oracle；basis 支持集恢复出 32-token main view 的 token/channel 物理位分解。
+- `block31-vit-expand-effective.f16` / `.json`：unit-basis 与小幅 Hadamard 联合恢复的首个 1024→4096 portable ViT Expand 矩阵；8 组稀疏到稠密 held-out correlation 0.9840，仅作 AMD bring-up bridge，不替代 raw packed-weight exact unswizzle。
+- `d3d12_vit_expand_test.cpp`：RX 9070 XT 的 1024→4096 ViT Expand correctness runner；直接读取 portable FP16 matrix，首个 Spark CUBIN held-out MAE 0.00664、submit→fence 0.600 ms。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。

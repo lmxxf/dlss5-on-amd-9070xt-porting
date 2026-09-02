@@ -1130,6 +1130,35 @@ layer4 Projection: 0x100000 packed E4M3 + 0x800 FP16 attn_cos_skip
 
 这一步把 AMD ViT 的问题从“解析 12.6 MB 不透明 blob”收窄为四类 packed E4M3 矩阵 unswizzle + 两条已知 FP16 skip。下一步沿 ViT SASS 中的 weight LDG 地址、lane id 与 `QMMA.16832` fragment 顺序恢复矩阵 tile 拼接；不再把 record 外层的 `element_count×2` 当作线性 FP16 张量。
 
+### ViT activation permutation 与首张 portable Expand 矩阵
+
+新增 `run_original_vit_repack_permutation.cpp`。对 2 MiB physical input 依次写入全1基线与21个地址位平面，只需22次原始 `repack_2d_to_1d_fp8` launch，即恢复65,536条 output→input byte映射。映射为一一对应，source min/max恰为0/65535；说明8×8×1024 ViT主activation是封闭的64 KiB payload，不依赖隐藏halo。映射固化为 `vit-repack-output-to-input.i32`。
+
+对 block31 Expand 做1,024个连续 basis 后，输出支持集自动分成16组、每组64个输入byte；再跨physical地址高位采样，恢复main view位分解：
+
+```text
+token bits   = physical bit 2, bits 6–8, bit 14
+channel bits = physical bits 0–1, 3–5, bits 9–13
+```
+
+因此可直接枚举一个token的1,024个channel地址。`run_original_vit_expand_matrix.cpp` 用1,024次launch抽出完整`4096×1024`有效矩阵；token0与token1结果逐byte一致，证明FFN权重跨token共享。unit-basis矩阵在32-channel随机held-out上correlation 0.9960。
+
+为平均E4M3量化误差，又以±0.03125执行1,024行Hadamard正交探测并做逆变换。unit-basis与small-Hadamard误差互补；按0.6/0.4融合后，在8组8→1024非零channel held-out上平均correlation 0.9840434、MAE 0.0351728。结果以FP16固化为`block31-vit-expand-effective.f16`。
+
+边界：这是可在AMD上立即执行的bring-up矩阵，不是exact unswizzle。稠密输入的动态E4M3量化令effective线性化误差明显高于稀疏输入；最终验收仍需恢复raw matrix tile排列或做真实activation分布校准。
+
+`d3d12_vit_expand_test.cpp` 随后把该矩阵移到 RX 9070 XT。runner 在 CPU 侧只做 physical offset gather 与 oracle 解码；`1024×4096` matmul、FP16 weight decode 和 E4M3 requantization 全由 HLSL compute shader执行。32-channel随机held-out实测：
+
+```text
+adapter: AMD Radeon RX 9070 XT
+submit_to_fence_ms: 0.600
+MAE: 0.006635189
+RMSE: 0.010752889
+exact E4M3 fraction: 0.313477
+```
+
+误差与同一effective matrix的CPU预测一致，证明D3D12/HLSL没有引入额外实现误差。这是1024-wide ViT在AMD上的第一条真实算子；下一步按相同physical basis方法恢复Contract、QKV与Projection。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

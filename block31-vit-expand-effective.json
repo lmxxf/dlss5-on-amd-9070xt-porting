@@ -1,0 +1,35 @@
+{
+  "status": "approximate bring-up bridge; not exact raw-weight unswizzle",
+  "matrix_file": "block31-vit-expand-effective.f16",
+  "matrix_sha256": "68db91e06b417c727b3b220bae93ffa1f02fdcea899827136113e3d0fa526171",
+  "storage": "float16_little_endian",
+  "shape": [1024, 4096],
+  "orientation": "input_channel_major, output_channel_minor",
+  "blend": {
+    "unit_basis": 0.6,
+    "small_hadamard": 0.4,
+    "hadamard_amplitude": 0.03125
+  },
+  "physical_views": {
+    "input_offsets": "vit-expand-input-offsets.i32",
+    "input_offsets_sha256": "c1588991940c0318e8333e92bb549908324b78459d77e7391c68046c4b876e1d",
+    "output_offsets": "vit-expand-output-offsets.i32",
+    "output_offsets_sha256": "830e7878af6028eb6776ed70aa10dc09656c8b026909dd3344ffb310c86fd707"
+  },
+  "heldout": {
+    "sets": 8,
+    "nonzero_input_channels": [8, 16, 32, 64, 128, 256, 512, 1024],
+    "mean_exact_e4m3_fraction": 0.29153,
+    "mean_correlation": 0.9840434,
+    "mean_mae": 0.0351728
+  },
+  "amd_rx9070xt": {
+    "runner": "d3d12_vit_expand_test.cpp",
+    "sparse_32_channel_submit_to_fence_ms": 0.600,
+    "sparse_32_channel_mae": 0.006635189,
+    "sparse_32_channel_rmse": 0.010752889,
+    "sparse_32_channel_exact_e4m3_fraction": 0.313477,
+    "implementation_error": "none observed beyond effective-matrix approximation"
+  },
+  "token_invariance": "token0 and token1 unit-basis matrices byte-identical"
+}
