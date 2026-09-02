@@ -1201,6 +1201,16 @@ QKV record 已按三个独立1 MiB矩阵的group-major顺序加入unpacker，Pro
 
 `run_original_vit_contract.cpp`与`run_original_vit_qkv.cpp`已改为显式导出／接收main、work、aux。把5090的r3/r5/r6原样喂给Spark QKV后，Q/K/V分别得到28,663／28,596／28,642个nonzero，全部零NaN，证明第二输入链闭合。与此同时，QKV main与三路输出的channel view不属于FFN已恢复的A/B有限候选；54种tile/axis/group候选最高相关仅0.083。QKV/Projection继续保持structural-only，下一步用复用context的1,024-channel QKV basis直接恢复三套physical permutation与effective matrices。
 
+`run_original_vit_qkv_matrix.cpp`随后在1.1秒内完成1,024个basis，输出3,145,728-byte effective matrix；Q/K/V三套token0 offset各1,024项。行为分解为：V对真实main输入保持线性（basis预测correlation 0.9980）；K是32组×32维归一化，basis方向求和后逐head normalize可达0.9574；Q同样归一化并额外乘per-head scale，head norm范围2.51–19.56，但仅靠basis方向达到0.8844，仍缺归一化前行幅度。
+
+对32个输入token执行5个token-id位平面，并以全1,024 channel避免偶然量化为零后，Q/K/V的32,768-byte physical view均闭合。GF(2) RANSAC恢复地址公式：Q token low5取physical bits `[2,6,7,8,14]`，K取`[3,6,7,8,14]`，V取`[1,0,4,5,2]`；其余各10bit slot映射见`block31-qkv-effective.json`，全view token/slot code均32,768/32,768唯一。Q有24个量化边界误标，但bit公式生成后每token严格1,024项；K/V观察误差为0。
+
+`run_original_vit_attention.cpp`已携带QKV更新后的work/aux独立运行，输出65,536/65,536 bytes、零NaN。直接把Q/K/V连续buffer reshape为32×1024做softmax与oracle不相关，证明Attention前必须按上述physical bit公式unswizzle。当前唯一结构歧义是slot10表示1024逻辑维，还是两套512-wide physical view；下一步通过Projection basis/ABI判别。
+
+5090在clean reboot后把single block31的QKV改回`standard+chained`同组提交，limit6稳定通过Attention，limit7在再次clean reboot后稳定通过Projection。11-view authoritative dump中：r7/r8/r9为Q/K/V，r4为Attention（65,495 nonzero），r1为Projection output（65,398 nonzero），全部主输出零NaN。该组合也消除了此前QKV阶段device hung，`d3d12_nvapi_vit_chain.cpp`已把single block31纳入QKV pair条件。
+
+权威NVAPI pair Q/K/V与Spark standard-only输出的support集合几乎一致（Q/K/V仅16/144/59个support差异），所以basis恢复的offset与GF(2)地址公式仍成立；但活跃值逐byte exact仅13.36%／17.19%／17.67%。因此`block31-qkv-effective.fp8`正式降级为standard-only结构诊断，V=0.9980等数值不再提升为AMD参数。下一步必须用专用5090 NVAPI pair宿主批量重做QKV basis。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

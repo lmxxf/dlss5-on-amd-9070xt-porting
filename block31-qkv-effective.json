@@ -1,0 +1,33 @@
+{
+  "status": "standard-only structural oracle; numeric values are not authoritative NVAPI pair output",
+  "matrix_file": "block31-qkv-effective.fp8",
+  "matrix_sha256": "d774f8323004a418f863c9773bf6a586f2ba757240904d189383b5f47790a3ee",
+  "shape": [1024, 3, 1024],
+  "orientation": "input physical channel, Q/K/V group, output physical slot",
+  "basis": "E4M3 1.0 with authoritative Contract work/aux state but Spark standard-only QKV launch",
+  "offsets": {
+    "q": {"file": "vit-q-offsets.i32", "sha256": "c1588991940c0318e8333e92bb549908324b78459d77e7391c68046c4b876e1d"},
+    "k": {"file": "vit-k-offsets.i32", "sha256": "bcb2aa439e438dd20f6690c47743258c4c6c1e7bfa6dd5a961cb7eefbbf20be5"},
+    "v": {"file": "vit-v-offsets.i32", "sha256": "8d940bc10108909c792b50673102950ccbb9b19fe4dd402a141662c3d1c43769"}
+  },
+  "physical_address_bits": {
+    "q": {"token_low5": [2, 6, 7, 8, 14], "slot10": [0, 1, 3, 4, 5, 9, 10, 11, 12, 13]},
+    "k": {"token_low5": [3, 6, 7, 8, 14], "slot10": [0, 1, 2, 4, 5, 9, 10, 11, 12, 13]},
+    "v": {"token_low5": [1, 0, 4, 5, 2], "slot10": [3, 6, 7, 8, 9, 10, 11, 12, 13, 14]}
+  },
+  "standard_only_behavior": {
+    "head_partition_candidate": [32, 32],
+    "q_head_norm_range": [2.5078, 19.5581],
+    "k_head_norm_range": [0.9989, 1.0005],
+    "v_linear_heldout_correlation": 0.9980085,
+    "k_normalized_basis_heldout_correlation": 0.9573994,
+    "q_normalized_basis_heldout_correlation": 0.8843777
+  },
+  "nvapi_pair_comparison": {
+    "q_active_exact_fraction": 0.13365,
+    "k_active_exact_fraction": 0.17192,
+    "v_active_exact_fraction": 0.17666,
+    "support_sets_nearly_identical": true
+  },
+  "unresolved": "numeric basis must be regenerated with NVAPI standard+chained; offsets and address-bit formulas remain structural evidence"
+}

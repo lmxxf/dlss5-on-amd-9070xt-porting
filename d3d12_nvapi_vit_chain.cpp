@@ -420,7 +420,8 @@ int wmain(int ac, wchar_t **av) {
       add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
     } else {
       add(fn[3], {16, 1, 2}, {32, 4, 1}, std::move(qq));
-      if ((singleMode && singleBlock >= 35 && singleBlock <= 36) ||
+      if ((singleMode && (singleBlock == 31 ||
+                          (singleBlock >= 35 && singleBlock <= 36))) ||
           (rangeMode && bi >= 4 && bi <= 5))
         add(chainedFn[2], {16, 1, 2}, {32, 4, 1}, std::move(qq2));
     }

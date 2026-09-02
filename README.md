@@ -22,6 +22,9 @@
 - `run_original_vit1d_global.cpp` / `run_original_vit1d_chain.cpp`：8×8 ViT 的cluster-aware runner；已闭合单block，跨block仍缺NvAPI `flag=1`同步原语。
 - `run_original_vit_repack.cpp`：独立执行原始8×8 ViT 1D→2D repack，用于把任意ViT断点接回decoder做画面级验收。
 - `run_original_vit_contract.cpp` / `run_original_vit_qkv.cpp`：独立执行 ViT Contract 与 QKV，并显式携带 main/work/aux 三路状态；用于绕开跨block同步、逐层恢复数值 view。
+- `run_original_vit_qkv_matrix.cpp` / `run_original_vit_qkv_dataset.cpp`：复用同一 CUDA context 的 QKV basis 与 dataset oracle；前者恢复三套 physical output view，后者验证 Q/K per-head normalization 与 V 线性语义。
+- `block31-qkv-effective.fp8` / `.json` / `vit-{q,k,v}-offsets.i32`：block31 QKV standard-only 的 1024-basis诊断矩阵、三套 offset 及地址 bit公式；offset/support仍有效，数值已被NVAPI pair对照降级，不能进入AMD最终参数。
+- `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
 - `run_original_1h_upsample.cpp`：按block66真实0x60 ABI执行1H upsample；`+0`绑定decoder主输入、`+8`绑定输出，保留enc0 skip与override dimensions。
 - `export_weight_records.py` / `e4m3_to_f32.py` / `sanitize_e4m3.py`：权重record导出、E4M3物理view转换与近似桥NaN饱和工具。
