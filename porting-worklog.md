@@ -1329,6 +1329,8 @@ skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[
 
 通用AMD matrix runner扩展为batch `input_dim→output_dim`。RX9070XT一次处理576 tiles后，main prefix与skip prefix各自对CPU portable逐float 100% exact；CPU只执行E4M3解码、physical gather、两路相加及tile-major→row-major重排。合并prefix对NVIDIA correlation 0.999996278。随后AMD body耗时3.030 ms、RGB head 0.774 ms，得到从block69 main＋block0 skip原始physical buffers起算的完整AMD block70：最终RGB correlation 0.945358、RGB MAE 0.035245。至此block70本身已端到端移植完成；71-block总目标剩余上游portable block0–69的统一AMD串联与最终验收。
 
+上游主线转入decoder39–69。block39 CPU descriptor的128-byte operation vector解码为四步`convolution→convolution→mul→add`；archive record为262,656 halves，其中524,288恰等于1024×512主卷积，剩余1,024 halves供第二卷积／scale路径。结构与容量固化为`block39-operation-graph.json`。这证明block39是线性双输入decoder入口，不需要复制Swin；下一步分别以main-only/skip-only controlled oracle恢复两支effective映射，再复用batch AMD matrix runner。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

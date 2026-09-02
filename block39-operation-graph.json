@@ -1,0 +1,16 @@
+{
+  "source": "CPU descriptor builder operation-name vector",
+  "block": 39,
+  "layer_type": "CCDecInputUpsample",
+  "operations": ["convolution", "convolution", "mul", "add"],
+  "inputs": [
+    {"source_block": 38, "source_output": 0, "role": "1024-channel decoder main"},
+    {"source_block": 30, "source_output": 3, "role": "encoder skip"}
+  ],
+  "weight_half_count": 262656,
+  "capacity_evidence": {
+    "main_1024_to_512": 524288,
+    "remaining_half_count": 1024
+  },
+  "status": "exact operation order and capacity split; physical matrix permutation pending"
+}

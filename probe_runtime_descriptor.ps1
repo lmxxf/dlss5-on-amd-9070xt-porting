@@ -190,7 +190,8 @@ try {
                             }
                             [BitConverter]::ToString($candidateRaw).Replace('-', '').ToLowerInvariant()
                         } else { $null }
-                        strings = if (($blockIndex -eq 1 -or $blockIndex -eq 70) -and
+                        strings = if (($blockIndex -eq 1 -or $blockIndex -eq 39 -or
+                            $blockIndex -eq 70) -and
                             (($candidateEnd - $candidateBegin) % 0x20) -eq 0 -and
                             ($candidateEnd - $candidateBegin) -le 0x10000) {
                             $candidateStrings = @()
