@@ -107,9 +107,9 @@ static void put64(std::array<uint8_t, 0x50> &blob, size_t offset,
 }
 
 int wmain(int argc, wchar_t **argv) {
-  if (argc != 11) {
+  if (argc != 11 && argc != 12) {
     std::fwprintf(stderr, L"usage: %ls cubin arena main work aux input-offs "
-                           L"q-offs k-offs v-offs output\n", argv[0]);
+                           L"q-offs k-offs v-offs output [token-map|state|fp16-basis]\n", argv[0]);
     return 2;
   }
   constexpr UINT64 A = 2 * 1024 * 1024, WA = 147719680;
@@ -128,6 +128,10 @@ int wmain(int argc, wchar_t **argv) {
       reinterpret_cast<const uint32_t *>(qOffsetBytes.data()),
       reinterpret_cast<const uint32_t *>(kOffsetBytes.data()),
       reinterpret_cast<const uint32_t *>(vOffsetBytes.data())};
+  const bool tokenMap = argc == 12 && wcscmp(argv[11], L"token-map") == 0;
+  const bool stateDump = argc == 12 && wcscmp(argv[11], L"state") == 0;
+  const bool fp16Basis = argc == 12 && wcscmp(argv[11], L"fp16-basis") == 0;
+  const bool includeState = tokenMap || stateDump || fp16Basis;
 
   IDXGIFactory6 *factory = nullptr;
   hr("factory", CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)));
@@ -221,7 +225,7 @@ int wmain(int argc, wchar_t **argv) {
     output = make(A, &defaultHeap, D3D12_RESOURCE_STATE_COPY_DEST,
                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   ID3D12Resource *readback = make(
-      3 * A, &readbackHeap, D3D12_RESOURCE_STATE_COPY_DEST,
+      5 * A, &readbackHeap, D3D12_RESOURCE_STATE_COPY_DEST,
       D3D12_RESOURCE_FLAG_NONE);
 
   auto submit = [&](ID3D12GraphicsCommandList *commands) {
@@ -281,11 +285,27 @@ int wmain(int argc, wchar_t **argv) {
       {standard, {16, 1, 2}, {32, 4, 1}, 0, params.data(), 0x50},
       {chained, {16, 1, 2}, {32, 4, 1}, 0, params.data(), 0x50}};
   std::ofstream destination(argv[10], std::ios::binary);
-  std::vector<uint8_t> hostReadback(3 * A);
+  std::vector<uint8_t> hostReadback(5 * A);
   bool first = true;
-  for (unsigned basis = 0; basis < 1024; ++basis) {
-    if (basis) mappedMain[inputOffsets[basis - 1]] = 0;
-    mappedMain[inputOffsets[basis]] = 0x38;
+  const unsigned iterations = stateDump ? 1 : (tokenMap ? 7 : 1024);
+  for (unsigned basis = 0; basis < iterations; ++basis) {
+    if (stateDump) {
+      std::memcpy(mappedMain, mainState.data(), A);
+    } else if (tokenMap) {
+      std::memset(mappedMain, 0, A);
+      constexpr unsigned tokenBits[6] = {2, 6, 7, 8, 14, 13};
+      for (unsigned offset = 0; offset < 32768; ++offset) {
+        unsigned token = 0;
+        for (unsigned bit = 0; bit < 6; ++bit)
+          token |= ((offset >> tokenBits[bit]) & 1) << bit;
+        if (basis == 0 || ((token >> (basis - 1)) & 1))
+          mappedMain[offset] = 0x30;
+      }
+    } else {
+      if (basis)
+        mappedMain[inputOffsets[basis - 1]] = 0;
+      mappedMain[inputOffsets[basis]] = 0x38;
+    }
     hr("allocator", device->CreateCommandAllocator(
                         D3D12_COMMAND_LIST_TYPE_DIRECT,
                         IID_PPV_ARGS(&allocator)));
@@ -307,9 +327,11 @@ int wmain(int argc, wchar_t **argv) {
     if (!first) {
       transition(mainResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                  D3D12_RESOURCE_STATE_COPY_DEST);
-      transition(workResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+      transition(workResource, includeState ? D3D12_RESOURCE_STATE_COPY_SOURCE
+                                            : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                  D3D12_RESOURCE_STATE_COPY_DEST);
-      transition(auxResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+      transition(auxResource, includeState ? D3D12_RESOURCE_STATE_COPY_SOURCE
+                                           : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                  D3D12_RESOURCE_STATE_COPY_DEST);
       for (auto output : outputs)
         transition(output, D3D12_RESOURCE_STATE_COPY_SOURCE,
@@ -354,23 +376,59 @@ int wmain(int argc, wchar_t **argv) {
     commands->ResourceBarrier(static_cast<UINT>(toRead.size()), toRead.data());
     for (int group = 0; group < 3; ++group)
       commands->CopyBufferRegion(readback, group * A, outputs[group], 0, A);
+    if (includeState) {
+      D3D12_RESOURCE_BARRIER states[2]{};
+      for (int i = 0; i < 2; ++i) {
+        states[i].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        states[i].Transition.pResource = i ? auxResource : workResource;
+        states[i].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        states[i].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        states[i].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+      }
+      commands->ResourceBarrier(2, states);
+      commands->CopyBufferRegion(readback, 3 * A, workResource, 0, A);
+      commands->CopyBufferRegion(readback, 4 * A, auxResource, 0, A);
+    }
     submit(commands);
     commands->Release();
     allocator->Release();
-    D3D12_RANGE range{0, 3 * A};
+    const UINT64 readBytes = includeState ? 5 * A : 3 * A;
+    D3D12_RANGE range{0, readBytes};
     readback->Map(0, &range, &mapped);
-    std::memcpy(hostReadback.data(), mapped, 3 * A);
+    std::memcpy(hostReadback.data(), mapped, readBytes);
     readback->Unmap(0, &empty);
-    for (int group = 0; group < 3; ++group)
-      for (int output = 0; output < 1024; ++output)
-        destination.put(static_cast<char>(
-            hostReadback[group * A + outputOffsets[group][output]]));
+    if (fp16Basis) {
+      constexpr UINT64 planes[3] = {0, 2 * 65536, 4 * 65536};
+      for (int group = 0; group < 3; ++group)
+        for (int output = 0; output < 1024; ++output) {
+          const UINT64 byteOffset =
+              3 * A + planes[group] + 2ull * outputOffsets[group][output];
+          destination.write(reinterpret_cast<const char *>(
+                                hostReadback.data() + byteOffset), 2);
+        }
+    } else if (tokenMap || stateDump) {
+      destination.write(reinterpret_cast<const char *>(hostReadback.data()),
+                        readBytes);
+    } else {
+      for (int group = 0; group < 3; ++group)
+        for (int output = 0; output < 1024; ++output)
+          destination.put(static_cast<char>(
+              hostReadback[group * A + outputOffsets[group][output]]));
+    }
     first = false;
-    if ((basis & 127) == 127)
+    if (!tokenMap && (basis & 127) == 127)
       std::fprintf(stderr, "basis=%u/1024\n", basis + 1);
   }
   uploadMain->Unmap(0, nullptr);
-  std::printf("adapter=%ls basis=1024 output_bytes=%u\n",
-              adapterDesc.Description, 1024 * 3 * 1024);
+  std::printf("adapter=%ls mode=%s iterations=%u output_bytes=%llu\n",
+              adapterDesc.Description,
+              stateDump ? "state"
+                        : (tokenMap ? "token-map"
+                                    : (fp16Basis ? "fp16-basis" : "basis")),
+              iterations,
+              stateDump ? 5ull * A
+                        : (fp16Basis ? 1024ull * 3 * 1024 * 2
+                                     : (tokenMap ? iterations * 5ull * A
+                                                 : 1024ull * 3 * 1024)));
   return 0;
 }

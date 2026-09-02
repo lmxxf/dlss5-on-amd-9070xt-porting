@@ -1223,6 +1223,16 @@ Projection无需basis即可由authoritative r4 attention、r3 residual、r1 outp
 
 为Projection尝试过两条basis路线：跨进程复制r5/r6到新resource会立即device hung；完整宿主result97保持同构resource地址并注入保存状态可运行少数basis，但sync phase累积后仍device removal。结论：Projection同步状态包含驱动内部phase，不能靠bytes恢复；独立probe源码已删除，result97仅保留为失败诊断入口，不作为生产路线。最终移植使用已闭合的raw矩阵语义，不再追Projection basis。
 
+QKV state dump揭示work的0/2/4 plane各为65,536-byte FP16张量，全部值有限；每plane正好32 tokens×1024，分别是另半序列的Q/K/V，main r7/r8/r9则是前32 tokens的E4M3 view。work token bits为physical element bits`[1,5,6,7,14]`，余10bit为channel；每token严格1,024项。
+
+`d3d12_nvapi_qkv_matrix.cpp`新增`state`、`token-map`与`fp16-basis`模式。FP16 basis连续1,024轮约7.6秒完成；扣除zero-main baseline后，对真实work Q/K/V held-out correlation分别为0.99999978／0.99999976／0.99999977，MAE 0.00245–0.00291。三张矩阵固化为`block31-qkv-work-effective.f16`。
+
+跨view列指纹匹配恢复出work→main channel bit permutation：Q/K为`[0,1,3,4,2,5,6,7,8,9]`，V为`[1,0,2,3,4,5,6,7,8,9]`，1024/1024一一对应。将work Q/K重排后逐head归一化到main head scale，再合并两半32-token序列做64-key softmax，Attention对原CUBIN correlation升至0.87962、MAE 0.79281；K相对Q的5!低bit排列穷举以identity唯一最优。当前portable attention公式已闭合，剩余误差来自head scale／FP16融合细节。
+
+受控Attention进一步钉死序列拓扑：Q=K=0、单个V E4M3 impulse时，原kernel恰输出64个`1/64`。逐physical bit翻转恢复V main的5个token bits`[0,1,2,4,5]`与10个channel bits；main承载32 tokens，work FP16承载另32 tokens，Attention合并为64-key序列。输出view token bits为`[2,6,7,8,14,15]`，V channel到output channel的bit映射为`[1,0,4,5,3,9,10,11,12,13]`。
+
+新增`prepare_vit_attention_case.py`将main E4M3与work FP16按上述公式生成64×1024 canonical Q/K/V，并将原Attention E4M3输出重排为canonical oracle。`d3d12_vit_attention_test.cpp`在RX9070XT执行64-key、32-head、head_dim=32的softmax与weighted-V：logit scale 0.5时correlation 0.8796198、MAE 0.7928114、submit→fence 2.133 ms；scale 0.25时correlation 0.8782215、MAE 0.7890296、0.689 ms。AMD与CPU公式逐项一致。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

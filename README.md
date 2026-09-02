@@ -25,6 +25,8 @@
 - `run_original_vit_qkv_matrix.cpp` / `run_original_vit_qkv_dataset.cpp`：复用同一 CUDA context 的 QKV basis 与 dataset oracle；前者恢复三套 physical output view，后者验证 Q/K per-head normalization 与 V 线性语义。
 - `d3d12_nvapi_qkv_matrix.cpp`：5090专用QKV basis宿主；每轮恢复Contract main/work/aux并同组提交standard+chained，1024 basis约5.8秒完成。
 - `block31-qkv-effective.fp8` / `.json` / `vit-{q,k,v}-offsets.i32`：block31权威NVAPI-pair 1024-basis矩阵、三套offset及地址bit公式；真实held-out Q/K归一化correlation 0.9826/0.9716，V线性correlation 0.9922。
+- `block31-qkv-work-effective.f16` / `.json`：QKV写入work planes 0/2/4的三张FP16 auxiliary矩阵；held-out correlation均超过0.9999997，补齐Attention需要的另外32个token。
+- `prepare_vit_attention_case.py` / `d3d12_vit_attention_test.cpp` / `block31-attention-effective.json`：把main E4M3与work FP16两半序列重排成64×1024 canonical Q/K/V，并在RX9070XT执行32-head softmax attention；correlation 0.8796。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
