@@ -34,6 +34,7 @@
 - `stellar-amd-portable-vit.png`：portable blocks31–38→原decoder39–69→RX9070XT readout的当前诊断图；人物可辨但仍有点阵/横向色带，明确未达到最终验收。
 - `run_original_vit_attention_match.cpp`：受控Q/K/V impulse通断扫描；精确恢复Attention的Q/K channel、Q→output token和K→V token bit对应。
 - `block0-real-calibrated.bin` / `block4-real-calibrated.bin` / `stage2-real-calibrated.bin` / `encoder-real-calibration.json`：围绕当前《剑星》固定帧做checkerboard held-out校准的portable encoder桥；RX相关分别0.811/0.997/0.874，仅作真实分布校准证据，不冒充通用模型。
+- `nvapi_chain_probe.cpp` / `inject_probe.cpp`：5090 resident只读NVAPI chain参数探针与延迟注入器；用于抓取block70真实0xb8 blob，当前等待交互式console会话恢复。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。

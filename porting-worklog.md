@@ -1263,6 +1263,10 @@ portable block38经原repack接回decoder后，block39产生少量38–76个E4M3
 
 block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU VA恰比layer weight base早0x200，对应独立`blend_scale` record；param`+0x30`来自DLL常量0x1800bc9a8，值为0.03125。绑定FP16 blend_scale=0.739746并填入0.03125后，post输出chroma从0恢复到951–3247，证明真实颜色路径已打开。剩余缺口严格收敛为param`+0x38/+0x58/+0x60`三路texture object语义；SASS确认三者均被TEX读取，不能再用同一个RGBA texture冒充。
 
+同一CUBIN中的base／simple_blend／simple_blend_full_rect／control_mask／control_mask_full_rect五个FP8 symbol在相同0xb8参数下输出逐字节等价，排除“选错post kernel variant”。SASS数据流进一步确认：`+0x38`和`+0x58`均按RGBA 2D texture读取，`+0x60`按较少分量的2D texture读取并参与坐标/control-mask分支；三者不是可互换的同一Color纹理。5090重启后console session无登录用户，Steam从SSH Session 0无法启动，resident `LaunchCuKernelChainEx` probe已部署但等待交互式桌面恢复。
+
+真实encoder校准的逐层结果也被重新核实：随机tile preblock在同一RGB-only/Gaussian=0合同下对当前帧仅0.317；576 tile空间checkerboard微调后RX block0 correlation 0.8113，传播到原blocks1–3后block3 correlation 0.83965。block4按当前calibrated block3重新生成原CUBIN target并微调，RX correlation 0.99658；stage2→block7围绕当前block4输入校准后RX correlation 0.87380。block8 main因上游误差与仅144 tiles，checkerboard held-out仍只有约0.51、全帧拟合上限0.877，说明后续要用多帧/增强数据，不能继续单帧硬过拟合。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
