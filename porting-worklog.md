@@ -1110,6 +1110,10 @@ block66坍缩随后由SASS直接破案。`cc_tinlayout_fused_swin_1h_32_1_upsamp
 
 5090测试纪律再次收紧：每次 `DXGI_ERROR_DEVICE_HUNG` 后立即重启、只跑一个控制变量；无游戏/测试进程时才重启。Spark CUDA Graph、双stream以及缩小grid均不能替代NVAPI chain，证实这是驱动专用共驻/同步原语而非普通occupancy问题。
 
+后续控制变量补充：低内存single-mode下，block35与36曾连续成功，分别输出65,326与65,335个非零bytes、零NaN；35–36需要QKV `standard→chained` pair。block37从QKV回溯到Contract后，Contract standard/chained/pair与QKV三种组合均失败。为携带状态，先尝试main+aux跨进程状态包，再尝试同device动态range（每完成一个group立即提交/fence，之后才构造下一group）；两者都会因资源分配顺序或NVAPI调度非确定性在首个Contract触发device hung。即使恢复提交 `3efa01d` 的隔离基线，成功也不可稳定复现。
+
+因此自建5090宿主路线的结论已足够明确：它可稳定验证单block和ABI，但不能作为35–38生产流水线；继续用重启抽样不具收敛性。blocks31–36的有限输出、block66主输入修正均保留；35–38剩余工作转向解析已保存runtime kernel/aux对象，或在AMD上按archive矩阵语义重写，不再依赖WDDM私有chain调度。实验性range/aux代码留在工作树，未提升为稳定实现。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
