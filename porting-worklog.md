@@ -1159,6 +1159,40 @@ exact E4M3 fraction: 0.313477
 
 误差与同一effective matrix的CPU预测一致，证明D3D12/HLSL没有引入额外实现误差。这是1024-wide ViT在AMD上的第一条真实算子；下一步按相同physical basis方法恢复Contract、QKV与Projection。
 
+### ViT packed E4M3 exact unswizzle
+
+Contract 的 cluster-aware basis 扫描在原生 CUDA 下仍有秒级同步成本，不适合作为4,096列生产提取器；该慢路线已停止，未保留无收敛价值的 runner。转而用 block31 Expand 的4 MiB basis矩阵对齐 raw archive。
+
+每个512-byte raw tile 按 PTX 9.1 matrix-B fragment 公式解成两张`K32×N8`；8,192个physical tile正好得到16,384个逻辑subtile。确定全局顺序为：
+
+```text
+K-block major → N-block minor → two fragments → K32×N8
+```
+
+两条effective physical axis到raw matrix axis的映射均为纯bit permutation：
+
+```text
+main   effective→raw low bits: [bit0, bit1, bit4, bit2, bit3]
+branch effective→raw low bits: [bit0, bit3, bit4, bit1, bit2]
+bit5以上保持原位
+```
+
+输入轴映射经1,024行Hungarian distribution match后，1024/1024可被上述线性bit permutation精确解释；输出轴抽样列对齐correlation均约0.9993–0.99945。整张raw Expand重排后对CUBIN unit-basis矩阵：
+
+```text
+global correlation = 0.99939859097
+MAE                = 0.0026031593
+```
+
+新增`unpack_vit_matrices.py`，可直接从147.7 MB arena为blocks31–38导出：
+
+```text
+Expand:   raw K=main,   N=branch
+Contract: raw K=branch, N=main
+```
+
+block31两张FP16矩阵各8 MiB，导出耗时低于1秒。RX9070XT已直接执行raw-unswizzled Expand；实现无故障，但32-channel held-out MAE 0.00915，反而高于effective bridge的0.00664。原因不是unswizzle错误，而是原CUBIN仍有尚未复刻的dynamic E4M3 scale/auxiliary state；raw矩阵恢复解决权重坐标，scale view仍是下一数值缺口。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

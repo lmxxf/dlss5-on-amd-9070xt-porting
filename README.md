@@ -40,6 +40,7 @@
 - `run_original_vit_expand_basis.cpp` / `run_original_vit_expand_matrix.cpp` / `run_original_vit_expand.cpp`：ViT Expand 的稀疏 basis、完整矩阵提取与任意输入 held-out oracle；basis 支持集恢复出 32-token main view 的 token/channel 物理位分解。
 - `block31-vit-expand-effective.f16` / `.json`：unit-basis 与小幅 Hadamard 联合恢复的首个 1024→4096 portable ViT Expand 矩阵；8 组稀疏到稠密 held-out correlation 0.9840，仅作 AMD bring-up bridge，不替代 raw packed-weight exact unswizzle。
 - `d3d12_vit_expand_test.cpp`：RX 9070 XT 的 1024→4096 ViT Expand correctness runner；直接读取 portable FP16 matrix，首个 Spark CUBIN held-out MAE 0.00664、submit→fence 0.600 ms。
+- `unpack_vit_matrices.py`：按 PTX matrix-B fragment 公式、K-block-major/N-block-minor tile 顺序及两套 channel bit permutation，直接把 blocks31–38 的 Expand／Contract packed E4M3 解成 portable FP16；block31 raw Expand 对 CUBIN basis 全矩阵 correlation 0.999399。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。
