@@ -370,6 +370,32 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+    }
+    if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes == 0xb8 &&
+        g_arena_base != 0) {
+        UINT64 output = 0, weight = 0;
+        std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x18, 8);
+        if (weight - g_arena_base == 147429888) {
+            const int copy_result = dispatch_raw_copy(
+                output - 0x2800,
+                g_destination->GetGPUVirtualAddress() + (464ull << 20),
+                64ull << 20);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block70_same_frame output=0x%llx weight=0x%llx atlas_offset=%llu bytes=%llu copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(output),
+                    static_cast<unsigned long long>(weight), 464ull << 20,
+                    64ull << 20, copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
             if (sync_result == 0 && g_queue != nullptr && !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -380,18 +406,18 @@ int64_t hook_backend_launch(
         }
     }
     const unsigned trace = g_trace_count.fetch_add(1);
-    if (trace < 256 && blob != nullptr && bytes <= 0x100) {
+    if (trace < 512 && blob != nullptr && bytes <= 0x200) {
         UINT64 weight = 0;
         if (bytes >= 0x18) std::memcpy(
             &weight, static_cast<const uint8_t *>(blob) + 0x10, sizeof(weight));
         const bool arena_weight = g_arena_base != 0 &&
             weight >= g_arena_base && weight < g_arena_base + 147719680;
-        if (arena_weight) {
-            AcquireSRWLockExclusive(&g_trace_lock);
-            if (FILE *file = _wfopen(kTracePath, L"ab")) {
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kTracePath, L"ab")) {
                 std::fprintf(file,
-                    "seq=%u weight_offset=%llu grid=%u,%u,%u bytes=%llu flag=%u qwords=",
-                    trace, static_cast<unsigned long long>(weight - g_arena_base),
+                    "seq=%u weight=0x%llx arena=%u weight_offset=%llu grid=%u,%u,%u bytes=%llu flag=%u qwords=",
+                    trace, static_cast<unsigned long long>(weight), arena_weight ? 1u : 0u,
+                    arena_weight ? static_cast<unsigned long long>(weight - g_arena_base) : UINT64_MAX,
                     gx, gy, gz, static_cast<unsigned long long>(bytes), flag);
                 for (uint64_t offset = 0; offset + 8 <= bytes; offset += 8) {
                     unsigned long long value = 0;
@@ -400,9 +426,8 @@ int64_t hook_backend_launch(
                 }
                 std::fprintf(file, "\n");
                 std::fclose(file);
-            }
-            ReleaseSRWLockExclusive(&g_trace_lock);
         }
+        ReleaseSRWLockExclusive(&g_trace_lock);
     }
     return result;
 }

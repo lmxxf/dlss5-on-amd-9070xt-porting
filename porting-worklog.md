@@ -1431,6 +1431,8 @@ block70复核同时抓出两项错误。第一，`block70-prefix-skip-amd.f32`�
 
 `nvapi_chain_probe`通过配套loader提前加载，能记录全部post CUBIN handle建立；只挂旧Chain ID会在首次提交前崩溃，恢复ChainEx后游戏稳定运行但没有LAUNCH事件。结合此前公开NvAPI独立宿主无法复现live状态，正式路径不经过可hook的公开launch入口。下一步扩展已稳定命中的`CubinBackendNGX::launch` trace，去掉arena-weight过滤并记录block69之后的所有launch，以找到post block的非arena weight/0xb8参数。
 
+内部backend trace移除`arena_weight`与`bytes<=0x100`过滤后，真实post立即出现为seq154：grid481×273×1、blob 184 bytes。其`qword0=0x3eb182800`与seq153 block69 output完全同址，`qword1=0x3cf342800`为post output view，`qword2=0xa003`是resource handle，真正layer weight在`qword3=0x3c6299a00=arena+147,429,888`，blend scale在`qword13=arena+147,429,376`。此前通用trace固定把`+0x10`解释成weight，才漏掉block70。probe已增加post返回后将`qword1-0x2800`完整64MiB复制到atlas 464MiB，并把统一readback从block69延后到post；下一轮现场只需验证该copy/sync和592MiB输出。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
