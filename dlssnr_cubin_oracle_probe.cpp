@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 3 * kPerCaptureBytes;
+constexpr UINT64 kCaptureBytes = 5 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
 constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt)";
@@ -160,6 +160,61 @@ int64_t hook_backend_launch(
             if (weight >= 22016) g_arena_base = weight - 22016;
         }
     }
+    bool block48_inputs_pre_ok = false;
+    if (g_copy_ready.load() && blob != nullptr && bytes >= 0x50 && g_arena_base != 0) {
+        UINT64 weight = 0;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        if (weight - g_arena_base == 140034048) {
+            auto get_kernel = reinterpret_cast<GetKernel>(
+                reinterpret_cast<uintptr_t>(g_runtime) + kGetKernelRva);
+            void *plain_kernel = get_kernel(
+                self, "cc_tinlayout_fused_swin_8h_256_8_upsample_fp8",
+                32, 8, 1, 0);
+            void *tilesync_kernel = get_kernel(
+                self, "cc_tinlayout_fused_swin_8h_256_8_upsample_tilesync_fp8",
+                32, 8, 1, 0);
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block48_kernel live=%p plain=%p tilesync=%p\n",
+                    kernel, plain_kernel, tilesync_kernel);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0);
+            log_line("block48_pre_sync", sync_result);
+            struct PreCapture { size_t source_offset; UINT64 atlas_offset; UINT64 prefix; const char *name; } captures[] = {
+                {0x00, 0, 0x2800, "main_pre"},
+                {0x18, 128ull << 20, 0x2800, "skip_pre"},
+                {0x40, 192ull << 20, 0, "aux_pre"},
+            };
+            block48_inputs_pre_ok = sync_result == 0;
+            for (const PreCapture &capture : captures) {
+                UINT64 source = 0;
+                std::memcpy(&source, static_cast<const uint8_t *>(blob) + capture.source_offset, 8);
+                const int copy_result = source != 0 ? dispatch_raw_copy(
+                    source - capture.prefix,
+                    g_destination->GetGPUVirtualAddress() + capture.atlas_offset,
+                    (capture.source_offset == 0x40 ? 128ull : 64ull) << 20) : -1;
+                block48_inputs_pre_ok = block48_inputs_pre_ok && copy_result == 0;
+                AcquireSRWLockExclusive(&g_trace_lock);
+                if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                    std::fprintf(file,
+                        "block48_%s source=0x%llx prefix=0x%llx atlas_offset=%llu bytes=%llu result=%d\n",
+                        capture.name, static_cast<unsigned long long>(source),
+                        static_cast<unsigned long long>(capture.prefix),
+                        static_cast<unsigned long long>(capture.atlas_offset),
+                        (capture.source_offset == 0x40 ? 128ull : 64ull) << 20,
+                        copy_result);
+                    std::fclose(file);
+                }
+                ReleaseSRWLockExclusive(&g_trace_lock);
+            }
+        }
+    }
     const int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
     if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x50) {
@@ -196,8 +251,39 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (offset == 5912576 && copy_result == 0 &&
-                g_queue != nullptr && !g_finished.exchange(true)) {
+        }
+    }
+    if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x50 &&
+        g_arena_base != 0) {
+        UINT64 weight = 0;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        if (weight - g_arena_base == 140034048) {
+            struct Capture { size_t source_offset; UINT64 atlas_offset; UINT64 bytes; const char *name; } captures[] = {
+                {0x08, 64ull << 20, 64ull << 20, "output"},
+            };
+            bool success = block48_inputs_pre_ok;
+            for (const Capture &capture : captures) {
+                UINT64 source = 0;
+                std::memcpy(&source, static_cast<const uint8_t *>(blob) + capture.source_offset, 8);
+                const UINT64 prefix = capture.source_offset == 0x40 ? 0 : 0x2800;
+                const int copy_result = source != 0 ? dispatch_raw_copy(
+                    source - prefix,
+                    g_destination->GetGPUVirtualAddress() + capture.atlas_offset,
+                    capture.bytes) : -1;
+                AcquireSRWLockExclusive(&g_trace_lock);
+                if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                    std::fprintf(file,
+                        "block48_%s source=0x%llx prefix=0x%llx atlas_offset=%llu bytes=%llu result=%d\n",
+                        capture.name, static_cast<unsigned long long>(source),
+                        static_cast<unsigned long long>(prefix),
+                        static_cast<unsigned long long>(capture.atlas_offset),
+                        static_cast<unsigned long long>(capture.bytes), copy_result);
+                    std::fclose(file);
+                }
+                ReleaseSRWLockExclusive(&g_trace_lock);
+                success = success && copy_result == 0;
+            }
+            if (success && g_queue != nullptr && !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
                         nullptr, 0, readback_worker, g_queue, 0, nullptr)) {

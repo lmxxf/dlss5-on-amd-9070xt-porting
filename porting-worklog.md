@@ -1405,6 +1405,10 @@ global tinlayout进一步确认以4×4 microcell为外层存储单元；`tinlayo
 
 block49 controlled分支给出更可靠的body证据。双residual权重下，修正为bijective 16KiB input scatter后，15,872/16,384 output bytes与input exact，其余512为固定无效槽。单token 256-channel basis一次进程导出4MiB Jacobian；按候选canonical gather后，archive-logical `256→288→256` FFN对原CUBIN correlation0.96121、MAE0.004742，Hungarian channel重排仅升至0.96710。将record矩阵误解成full-width E4M3 `256→576→256`反而降至0.532，因此该路线再次否决，临时代码已撤回。block48 skip scale可微诊断：window/head 0.680、cell/head 0.754、token×32ch 0.757、16ch 0.768、8ch 0.795、4ch 0.836、2ch 0.891、逐值上界0.964；逐值scale最大1264明显过拟合。结论是archive body主体成立，误差混合了physical scale/gather与旧main/output文件谱系；下一步必须从5090同一live frame同时抓block48 main/skip/output/aux再闭合，不再用旧临时文件交叉拟合。
 
+同帧block48四路随后由live backend直接导出。block22 output1与block48 skip input从view `+0x2800`起的前102个64KiB pages逐byte exact，确认skip绑定与生产/消费链正确。probe在block48 `flag=0`前显式调用context sync，再捕获main/skip/aux pre-state，launch后捕获output；written-mask由两次不同output init的Spark重放交集恢复，精确为8,355,840=`136×240×256` bytes，范围`[0x2800,0x7fa800)`。标准CUDA重放前5MiB逐byte exact，后3.36MiB分叉；main、skip、aux分别从64扩到128MiB均逐byte不改变结果，排除资源截断与时序旧值。
+
+live backend对象查询最终确认block48传入kernel指针与`cc_tinlayout_fused_swin_8h_256_8_upsample_tilesync_fp8`对象完全相同，与plain对象不同。plain/tilesync SASS确实不同，但两者用标准`cuLaunchKernel`时输出相同；`cuFuncGetAttribute`显示required cluster三维全0、cluster_must_be_set=0、nonportable_cluster=0。故后段差异不是CUDA cluster配置，而是NvAPI context/`LaunchCuKernelChain`的tile-sync执行协议，与此前ViT跨block `flag=1`缺口同源。下一主线改为扩展现有`d3d12_nvapi_repack_test.cpp`式5090宿主，直接以CreateCuFunction+LaunchCuKernelChain运行block48 live快照，再生成controlled calibration dataset；停止继续调整标准CUDA runner。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
