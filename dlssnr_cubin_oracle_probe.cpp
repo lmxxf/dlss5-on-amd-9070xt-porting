@@ -24,8 +24,8 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 400ull << 20;
-constexpr UINT64 kProbeBytes = 9 * kPerCaptureBytes;
+constexpr UINT64 kCaptureBytes = 592ull << 20;
+constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
 constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt)";
@@ -333,7 +333,6 @@ int64_t hook_backend_launch(
             operations[6] = operations[5] == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             block48_replay_ok = operations[6] == 0;
-            const bool success = block48_replay_ok;
             AcquireSRWLockExclusive(&g_trace_lock);
             if (FILE *file = _wfopen(kLogPath, L"ab")) {
                 std::fprintf(file,
@@ -343,7 +342,35 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (success && g_queue != nullptr && !g_finished.exchange(true)) {
+        }
+    }
+    // Keep the block48 identity-prefix and the final decoder activation in one
+    // atlas/readback.  block69 is the last raw-buffer layer before the separate
+    // post backend, so this also gives a frame-coherent block70 main source.
+    if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x18 &&
+        g_arena_base != 0) {
+        UINT64 weight = 0;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        if (weight - g_arena_base == 147346432) {
+            UINT64 output = 0;
+            std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            const UINT64 atlas = g_destination->GetGPUVirtualAddress();
+            const int copy_result = dispatch_raw_copy(
+                output - 0x2800, atlas + (400ull << 20), 64ull << 20);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block69_same_frame output=0x%llx atlas_offset=%llu bytes=%llu copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(output), 400ull << 20,
+                    64ull << 20, copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+            if (sync_result == 0 && g_queue != nullptr && !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
                         nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
@@ -460,7 +487,7 @@ void hook_forward(
 
     CopyParams input_params{
         input_source,
-        g_destination->GetGPUVirtualAddress(),
+        g_destination->GetGPUVirtualAddress() + (528ull << 20),
         static_cast<uint32_t>(kPerCaptureBytes / 16),
         0,
     };

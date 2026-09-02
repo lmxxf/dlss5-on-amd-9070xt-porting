@@ -1425,6 +1425,12 @@ block56布局诊断同时修复了`run_original_fused_view_permutation.cpp`的AB
 
 block70复核同时抓出两项错误。第一，`block70-prefix-skip-amd.f32`仍是`(tile_y,tile_x,8,8,32)`，必须与main在tile-major先相加再共同transpose；旧组件按该合同可100%重建`block70-prefix-full-amd.f32`，证明布局闭合。第二，更关键的是当前decoder层级oracle来自09-03的新live frame，而`post-repro.bin`与`block70-prefix-main-amd.f32`来自09-02旧frame；即使补回32-channel `encode_tinlayout_global`与双bank gather，二者仍零空间相关，确认是跨帧谱系而非可拟合数值误差。因此本轮0.83066最终RGB只保留跨帧诊断，不能作为完成验收。下一步让游戏同一帧同时导出block48与block70边界，建立唯一coherent fixed-input oracle后再做最终相关性。
 
+同帧atlas随后闭合。probe不再在block48立即readback，而是在block69（arena offset147,346,432）返回后把`output-0x2800`的完整64MiB复制到atlas 400MiB，再统一读回；初版host readback仍截在400MiB，修为464MiB后成功。为保留会被block48覆盖的入口资源，最终版把初始block1 input另存atlas 528MiB并把readback扩为592MiB。文件长度620,756,992 bytes；block69两次独立游戏启动SHA-256均为`735c39e10976de273a7b3c9e631e14922eb3622e5b688368ff9cde89170c8494`，block1 input亦与旧live capture逐byte exact，证明固定场景稳定，前述零相关应修正为“旧standalone文件谱系/错误view”，而非游戏画面跨帧。
+
+远程启动故障也已定位：PlayStation Studios `Report Problem`窗口让Steam长期显示“剑星－正在运行”。`windows_ui_bridge.ps1`在互动Session 1点击`Don't Report`并送Enter后解除锁；`launch_stellarblade_test.ps1`改用`steam://rungameid/3489700`。Steam冷启动时URI可能早到，需在7个steamwebhelper就绪后再提交一次，整个过程无需重启5090。
+
+`nvapi_chain_probe`通过配套loader提前加载，能记录全部post CUBIN handle建立；只挂旧Chain ID会在首次提交前崩溃，恢复ChainEx后游戏稳定运行但没有LAUNCH事件。结合此前公开NvAPI独立宿主无法复现live状态，正式路径不经过可hook的公开launch入口。下一步扩展已稳定命中的`CubinBackendNGX::launch` trace，去掉arena-weight过滤并记录block69之后的所有launch，以找到post block的非arena weight/0xb8参数。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

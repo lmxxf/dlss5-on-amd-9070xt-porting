@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
 $TaskName = 'DLSSNR-StellarBlade-Test'
-$Steam = 'C:\Program Files (x86)\Steam\steam.exe'
+$Launcher = "$env:ComSpec"
 $UserId = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
 
-$action = New-ScheduledTaskAction -Execute $Steam -Argument '-applaunch 3489700'
+$action = New-ScheduledTaskAction -Execute $Launcher -Argument '/c start "" "steam://rungameid/3489700"'
 $principal = New-ScheduledTaskPrincipal `
     -UserId $UserId `
     -LogonType Interactive `
@@ -26,4 +26,4 @@ Start-Sleep -Seconds 5
 $task = Get-ScheduledTask -TaskName $TaskName
 $info = Get-ScheduledTaskInfo -TaskName $TaskName
 Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
-Write-Output "Steam launch task state: $($task.State); result: $($info.LastTaskResult)"
+Write-Output "Steam URI task state: $($task.State); result: $($info.LastTaskResult)"
