@@ -1,0 +1,25 @@
+{
+  "file": "block70-upsample-effective.bin",
+  "sha256": "2695d287c06ac9997ad96e43eff5a0a516cd6dbc5bea41202540f65fc65ab678",
+  "storage": "float32_little_endian",
+  "shape": [
+    1024,
+    1024
+  ],
+  "input": "main[0:512] concatenated with skip[0:512], E4M3 decoded",
+  "output": "8x8x16 pre-FFN values carried by the odd half of the 32-channel body",
+  "recovery": "1024-row Rademacher Hadamard at +/-0.5",
+  "small_heldout": {
+    "correlation": 0.9987747643648968,
+    "mae": 0.0003091637045145035,
+    "rmse": 0.0003890784573741257,
+    "max_abs_error": 0.0014190673828125
+  },
+  "real_amplitude_heldout": {
+    "correlation": 0.99848208964716,
+    "mae": 0.04364079236984253,
+    "rmse": 0.07512688636779785,
+    "max_abs_error": 0.46234130859375
+  },
+  "boundary": "portable effective input/upsample map; standard Swin body remains separate"
+}

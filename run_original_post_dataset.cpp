@@ -172,6 +172,7 @@ int main(int argc, char **argv) {
     download.WidthInBytes = 8 * 16;
     download.Height = 8;
     std::vector<float> rgba_tile(8 * 8 * 4);
+    std::vector<float> positive_tile(8 * 8);
     for (size_t sample = 0; sample < count; ++sample) {
         const auto *record = samples.data() +
             (scan_weights ? 0 : sample) * sample_bytes;
@@ -201,8 +202,11 @@ int main(int argc, char **argv) {
                 const size_t block = channel < 16 ? 10392 : 10648;
                 const size_t local = channel & 15;
                 const size_t slot = block + (local / 4) * 8 + local % 4;
-                const unsigned short one_half = 0x3c00, zero_half = 0;
-                std::memcpy(scan_weight.data() + slot * 2, &one_half, 2);
+                const unsigned short positive_half = 0x1400;
+                const unsigned short negative_half = 0x9400;
+                const unsigned short zero_half = 0;
+                constexpr float probe = 1.0f / 1024.0f;
+                std::memcpy(scan_weight.data() + slot * 2, &positive_half, 2);
                 check("feature weight upload", cuMemcpyHtoD(
                     weights_device, scan_weight.data(), scan_weight.size()));
                 check("feature launch", cuLaunchKernel(
@@ -211,8 +215,20 @@ int main(int argc, char **argv) {
                 download.dstHost = rgba_tile.data();
                 check("feature download", cuMemcpy2D(&download));
                 for (size_t pixel = 0; pixel < 64; ++pixel)
+                    positive_tile[pixel] = rgba_tile[pixel * 4];
+                std::memcpy(scan_weight.data() + slot * 2, &negative_half, 2);
+                check("feature weight upload", cuMemcpyHtoD(
+                    weights_device, scan_weight.data(), scan_weight.size()));
+                check("feature launch", cuLaunchKernel(
+                    function, 1, 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
+                check("feature sync", cuCtxSynchronize());
+                check("feature download", cuMemcpy2D(&download));
+                for (size_t pixel = 0; pixel < 64; ++pixel)
                     output[(sample * 64 + pixel) * 32 + channel] =
-                        rgba_tile[pixel * 4] - 0.5f;
+                        std::abs(positive_tile[pixel] - 0.5f) >=
+                        std::abs(0.5f - rgba_tile[pixel * 4])
+                        ? (positive_tile[pixel] - 0.5f) / probe
+                        : (0.5f - rgba_tile[pixel * 4]) / probe;
                 std::memcpy(scan_weight.data() + slot * 2, &zero_half, 2);
             }
             continue;

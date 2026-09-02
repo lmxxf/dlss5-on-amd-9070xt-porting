@@ -1295,6 +1295,10 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 56-half区可由weight地址与SASS常量直接对齐：half 4104对应byte `0x2010`，4136对应`0x2050`，而后续FFN skip内部4168对应`0x2090`；post SASS同一输入准备段确实从`weights+0x2010/+0x2050/+0x2090`交错读取。按名字顺序暂分成32/8/16只是候选，尚未提升为shape结论。三段分别清零的controlled feature correlation为0.6996／0.9677／0.7776，证明三段均参与输入变换。controlled self-attention只让396/1024个输入impulse穿过，说明当前V/P identity尚未覆盖全部physical channel，不足以反演完整upsample；该失败不回退已验证的out-conv与全图AMD head。
 
+单impulse失败随后被Hadamard信号密度修正：controlled self-attention的even V分支对所有输入严格为零，odd分支承载完整`8×8×16`，说明upsample输出本来就是16-channel并写入32-channel body的odd half；396/1024只是unit impulse被量化吃掉的数量，不是结构秩。对main前512＋skip512施加1024×1024 Rademacher Hadamard（幅度±0.5），由`HᵀY/(1024×0.5)`直接恢复`1024→1024`矩阵。小幅独立held-out correlation 0.998775、MAE 3.09e-4；改用双向小probe解除feature读口饱和后，真实幅度held-out correlation 0.998482，预测/oracle std 1.2669/1.2893。矩阵与生成器固化为`block70-upsample-effective.bin`、`.json`和`fit_post_upsample.py`。
+
+尝试把portable upsample直接接raw-unpacked W1/W2/QKV/projection并做full-body联合训练，2,048个iid样本上held-out correlation只到0.254，明确否决。原因是标准1H矩阵仍包含dynamic FP8 scale造成的effective差异；block1历史数据也显示raw projection与effective projection仅correlation 0.391、std相差9.33倍。后续沿已成功的block1路线分别生成FFN branch与attention branch oracle，不用full-block梯度掩盖scale缺口。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -49,7 +49,9 @@
     "amd_full_frame_outconv_max_error": 0.00153121,
     "amd_full_frame_outconv_submit_ms": 1.060,
     "amd_vs_nvidia_png_exact_channel_fraction": 0.9832176,
-    "amd_vs_nvidia_png_max_lsb": 1
+    "amd_vs_nvidia_png_max_lsb": 1,
+    "portable_upsample_small_heldout_correlation": 0.9987748,
+    "portable_upsample_real_amplitude_correlation": 0.9984821
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }
