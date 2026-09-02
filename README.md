@@ -39,6 +39,7 @@
 - `run_original_post_dataset.cpp`：复用单一CUDA context批量执行8×8 block70 main+skip联合样本；输入record为2048-byte main＋512-byte skip。128组与逐进程oracle逐float exact，耗时0.42秒；9,216组耗时0.70秒。另支持body weight one-hot／逐slot ablation及`features`模式；后者借controlled RGB head导出64×32 body feature，9,216组耗时5.47秒。
 - block70 input impulse结论：main分配的2048 bytes中只有前512 bytes有效，skip为512/512有效；两路Jacobian rank均512，对应两路`4×4×32`输入共同upsample到`8×8×32`，不是先前假设的full-resolution main。
 - `block70-operation-graph.json`：CPU descriptor builder直接导出的42步post运算图，并与普通block1的31步图逐项对齐；精确分解为5步post前缀＋标准Swin body（QKV前多padding）＋5步post后缀。
+- `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。尚待AMD执行及与FFN串联。
 - `fit_post_outconv.py` / `block70-outconv-effective.bin` / `.json`：从controlled head basis恢复block70最后的32→RGB矩阵；两组16-channel packed block各占256 FP16 slots、每组仅48个有效。独立held-out correlation 0.9999991、MAE 2.88e-7。
 - `fit_post_upsample.py` / `block70-upsample-effective.bin` / `.json`：以1024-row Hadamard恢复两路`4×4×32`到`8×8×16` controlled-identity odd-half映射；小幅／真实幅度held-out correlation 0.998775／0.998482。该坐标可能已含post `out_gain`，不再过度命名为纯upsample内部值。
 - `fit_post_prefix.py` / `block70-prefix-effective.bin` / `.json`：以双residual identity读口恢复权威5步post前缀的`1024→2048`稀疏矩阵；小幅／真实幅度held-out correlation 0.9999987／0.99999994。它取代旧odd-half map，输出可直接进入标准1H body。

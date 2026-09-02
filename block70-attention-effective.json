@@ -1,0 +1,93 @@
+{
+  "file": "block70-attention-effective.bin",
+  "sha256": "7207915c346dae95093af8bdd8b164e4c9a89a86c2c9861f7aa2ba6eca158940",
+  "storage": "float32_little_endian",
+  "byte_size": 24708,
+  "tensors": {
+    "Qe": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 0,
+      "byte_size": 1024
+    },
+    "Qo": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 1024,
+      "byte_size": 1024
+    },
+    "Ke": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 2048,
+      "byte_size": 1024
+    },
+    "Ko": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 3072,
+      "byte_size": 1024
+    },
+    "Ve": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 4096,
+      "byte_size": 1024
+    },
+    "Vo": {
+      "shape": [
+        16,
+        16
+      ],
+      "byte_offset": 5120,
+      "byte_size": 1024
+    },
+    "P": {
+      "shape": [
+        32,
+        16
+      ],
+      "byte_offset": 6144,
+      "byte_size": 2048
+    },
+    "bias": {
+      "shape": [
+        64,
+        64
+      ],
+      "byte_offset": 8192,
+      "byte_size": 16384
+    },
+    "skip": {
+      "shape": [
+        32
+      ],
+      "byte_offset": 24576,
+      "byte_size": 128
+    },
+    "scale": {
+      "shape": [
+        1
+      ],
+      "byte_offset": 24704,
+      "byte_size": 4
+    }
+  },
+  "formula": "((softmax(normalize(Q) @ normalize(K)^T * scale + bias) @ V) @ P + input * skip) * skip",
+  "heldout": {
+    "correlation": 0.9770277739,
+    "mae": 0.2903989255,
+    "rmse": 0.7130783796
+  },
+  "boundary": "attention-only oracle with exact NVIDIA five-operation prefix input"
+}

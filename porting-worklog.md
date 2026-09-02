@@ -1311,6 +1311,8 @@ CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续
 
 通用化后的`d3d12_post_upsample_test.cpp`已在RX9070XT执行该权威prefix：1024→2048 submit→fence 0.531 ms，对NVIDIA真实幅度oracle MAE 3.073e-4、RMSE 0.001049、max error 0.009033、cosine 0.999999931。block70输入侧至此不再依赖含混的controlled odd坐标，AMD输出可直接作为普通1H body的32-channel输入。
 
+权威prefix也修复了attention分层。构造attention-only weights：W1/W2归零、FFN skip置1，保留原QKV/bias/scale/projection与post suffix；其target范围-109.25..75.625。运算图与容量共同表明half10352的32-vector同时进入标准attention residual和post suffix首个mul，因此effective公式为`(projection + input*skip)*skip`。用旧odd controlled坐标时模型停在0.294；换成完整prefix exact输入后raw初始化即0.5988，训练100 epoch达0.97622，低学习率refinement最终held-out correlation 0.977028、MAE 0.2904、RMSE 0.7131。参数固化为`block70-attention-effective.bin/.json`，包含Qe/Qo/Ke/Ko/Ve/Vo/P/bias/shared skip/scale共24,708 bytes。该层已闭合CPU portable语义，下一验收点是AMD attention runner与FFN串联。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
