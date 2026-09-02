@@ -1345,6 +1345,10 @@ block40四个CPU operation vectors与record容量随后闭合全部逻辑张量�
 
 `split_swin512_reference.py`直接读取四条archive FP16 records执行上述公式。以block39 logical 64×512输出起步，blocks40–47全部finite且无NaN，std依次为1.5972/1.5023/1.4190/1.3355/1.2571/1.0897/1.0088/0.9524，范围连续收敛而非坍缩。decoder 512-channel CPU logical主链至此贯通；下一验收点是把同一两pass gated-FFN＋16-head attention HLSL跑在RX9070XT。
 
+AMD 512-channel correctness runner在`d3d12_block128_test.cpp`新增split512模式。首版在每个query/key/head重算完整QKV，运行超过一分钟被主动终止；head-local改写仍过慢。最终实现为三pass：gated FFN→一次性QKV预计算UAV→16-head attention/projection。把head循环从compile-time unroll改为runtime loop后，D3DCompile与执行均稳定。
+
+`pack_split_swin512.py`把四条archive records整理为统一3,936,320-byte FP32 blob。RX9070XT连续执行blocks40–47，每层submit→fence 20.512–25.745 ms；逐层对CPU archive logical correlation为0.99933/0.99872/0.99792/0.99687/0.99554/0.99413/0.99334/0.99271，最终MAE 0.03120、RMSE 0.13928。AMD block47 std1.0244、CPU0.9524，误差累积但无爆炸／坍缩。decoder39–47至此全部以archive真权重在AMD执行；下一段进入block48 8H upsample与49–55。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

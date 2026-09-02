@@ -1,0 +1,16 @@
+{
+  "runner": "d3d12_block128_test.cpp split512 mode",
+  "input": "block39 archive-logical 64x512 output",
+  "implementation": "gated FFN, precomputed QKV, 16-head attention, projection and residuals",
+  "blocks": [
+    {"block": 40, "submit_ms": 20.512, "correlation": 0.99933250, "mae": 0.01632482, "rmse": 0.05836524},
+    {"block": 41, "submit_ms": 24.473, "correlation": 0.99871526, "mae": 0.02135885, "rmse": 0.07728966},
+    {"block": 42, "submit_ms": 23.462, "correlation": 0.99791731, "mae": 0.02603870, "rmse": 0.09463539},
+    {"block": 43, "submit_ms": 22.120, "correlation": 0.99686615, "mae": 0.02984194, "rmse": 0.10994411},
+    {"block": 44, "submit_ms": 23.498, "correlation": 0.99554467, "mae": 0.03310504, "rmse": 0.12583761},
+    {"block": 45, "submit_ms": 22.203, "correlation": 0.99412529, "mae": 0.03159486, "rmse": 0.12989481},
+    {"block": 46, "submit_ms": 24.090, "correlation": 0.99333743, "mae": 0.03120656, "rmse": 0.13386077},
+    {"block": 47, "submit_ms": 25.745, "correlation": 0.99271458, "mae": 0.03119797, "rmse": 0.13927592}
+  ],
+  "boundary": "correctness implementation; QKV is precomputed but attention/projection is not performance optimized"
+}
