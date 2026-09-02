@@ -1411,6 +1411,12 @@ live backend对象查询最终确认block48传入kernel指针与`cc_tinlayout_fu
 
 独立`d3d12_nvapi_fused_live.cpp`随后分别使用旧Chain ID `0x24973538`与游戏probe确认的ChainEx ID `0x846a9bf0`，两者均只能得到与标准CUDA相同的written exact 5,588,179/8,355,840=66.8775%。游戏内进一步做原backend自重放：main/skip/aux分别扩至128MiB无变化，只替换output VA、保持四路相对VA拓扑、再到完全复用原wrapper与原output资源，nested replay仍固定产出同一个plain hash `a3587b...`；随后外层正常调用稳定产出live hash `865778...`，并与未插入replay的上一轮正常live逐byte exact。正常backend trace仅有一条block48 launch，故不是两相双launch。结论是live tilesync状态绑定高层唯一正常调用路径/TLS，而非参数内容、资源VA、公开NvAPI接口或CUDA属性。批量controlled oracle必须改为在这唯一正常调用前原位备份/替换原资源内容，调用后捕获并恢复；不能额外nested launch。
 
+原位controlled transaction随后成功。probe在block48前sync并备份main/skip/output，以自制`fill_raw_buffer`把原output填`0xA5`、main/skip清零；唯一正常外层launch后保存controlled output，再恢复三路资源并sync，补跑一次正常block48供游戏下游消费。backup/zero/fill/capture/restore/normal/final-sync全部返回0，恢复后的live written hash `865778...`与未注入轮次100% exact。controlled输出精确显示：32,640个256-byte rows中21,760行全写0、10,880行完整保留`0xA5`，即update/preserve严格2:1；无channel内mask。用该exact mask复核，标准CUDA replay在5,570,560个updated bytes上与live逐byte100% exact，全部2,767,661历史差异只来自preserved bank。backend trace同时确认block1 input与block48 output GPUVA完全相同，preserved区是allocator复用/物理hole，不是动态权重或数值误差。
+
+曾由2/3比例推测固定active rectangle为16×24并在RX诊断跑通blocks48–69；接回block70几何时发现该解释与正式256×144宽度阶梯冲突，已撤回，相关输出只保留诊断。正确边界是full block48逻辑仍按18×32处理，physical storage内2/3 update与1/3 alias holes不能直接reshape成canonical。对full18×32 candidate做per-channel skip scale最多corr0.661，证明hole不是scale。下一步在原位transaction中临时替换block48权重为“prefix保留、body identity”，直接导出NVIDIA真实prefix坐标，避免把physical holes误作canonical值。
+
+AMD空间runner独立修正仍成立：旧HLSL以`tile=t/64`取attention key，只适用于预先window-major的单tile数据；现新增HWC `query_index/key_token`，unshifted按8×8窗口、shifted按roll(-4)窗口再映回原HWC。block48新旧路径对CPU均保持corr0.99934；诊断active链在RX9070XT实际跑到block69，8H约16–19ms、4H约38ms、2H约2–2.5ms、1H约2.7–3ms，证明空间寻址与跨层文件协议可运行，但尺寸/skip尚未达到最终验收，不能称完成。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

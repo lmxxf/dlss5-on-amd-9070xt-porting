@@ -23,14 +23,15 @@ static std::vector<unsigned char> read(const char *path, size_t size) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 5) {
-    std::fprintf(stderr, "usage: %s input skip weights output\n", argv[0]);
+  if (argc != 5 && argc != 7) {
+    std::fprintf(stderr, "usage: %s input skip weights output [width height]\n", argv[0]);
     return 2;
   }
   constexpr size_t arenaBytes = 4 * 1024 * 1024;
   constexpr size_t skipBytes = 8 * 1024 * 1024;
   constexpr size_t weightBytes = 22784;
-  constexpr int width = 256, height = 144;
+  const int width = argc == 7 ? std::atoi(argv[5]) : 256;
+  const int height = argc == 7 ? std::atoi(argv[6]) : 144;
   auto input = read(argv[1], arenaBytes);
   auto skip = read(argv[2], skipBytes);
   auto weights = read(argv[3], weightBytes);
@@ -64,14 +65,14 @@ int main(int argc, char **argv) {
   std::memcpy(params + 0x18, &height, 4);
   std::memcpy(params + 0x1c, &width, 4);
   std::memcpy(params + 0x40, &inputDevice, 8);
-  const int halfHeight = 72, halfWidth = 128;
+  const int halfHeight = height / 2, halfWidth = width / 2;
   std::memcpy(params + 0x48, &halfHeight, 4);
   std::memcpy(params + 0x4c, &halfWidth, 4);
   std::memcpy(params + 0x50, &skipDevice, 8);
   std::memcpy(params + 0x58, &height, 4);
   std::memcpy(params + 0x5c, &width, 4);
   void *arguments[] = {params};
-  check("launch", cuLaunchKernel(function, 32, 18, 1, 32, 1, 1, 0,
+  check("launch", cuLaunchKernel(function, (width + 7) / 8, (height + 7) / 8, 1, 32, 1, 1, 0,
                                    nullptr, arguments, nullptr));
   check("sync", cuCtxSynchronize());
   std::vector<unsigned char> output(arenaBytes);

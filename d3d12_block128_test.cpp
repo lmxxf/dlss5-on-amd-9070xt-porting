@@ -84,7 +84,20 @@ float fast(float a){a=clamp(a,-4.,4.);return a*(.89453125+a*(.447265625-.0559082
 void qkv_head(uint t,uint head,out float q[16],out float k[16],out float v[16]){[unroll]for(uint o=0;o<16;o++){uint row=head*16+o;q[o]=qkv_in[t*96+row];k[o]=qkv_in[t*96+32+row];v[o]=qkv_in[t*96+64+row];}}
 [numthreads(64,1,1)]void attention(uint3 id:SV_DispatchThreadID){uint t=id.x;if(t>=tokens)return;uint tile=t/64,qi=t%64;float acc[32];[loop]for(uint i=0;i<32;i++)acc[i]=0;[loop]for(uint head=0;head<2;head++){float q[16],k0[16],v0[16];qkv_head(t,head,q,k0,v0);float qq=0;[unroll]for(uint d=0;d<16;d++)qq+=q[d]*q[d];float mx=-3.4e38;[loop]for(uint key=0;key<64;key++){float tq[16],k[16],v[16];qkv_head(tile*64+key,head,tq,k,v);float kk=0,dot=0;[unroll]for(uint d=0;d<16;d++){kk+=k[d]*k[d];dot+=q[d]*k[d];}mx=max(mx,dot*rsqrt(max(qq,1e-12))*rsqrt(max(kk,1e-12))*W(26688+head)+W(18496+head*4096+qi*64+key));}float den=0,tmp[16];[unroll]for(uint d=0;d<16;d++)tmp[d]=0;[loop]for(uint key=0;key<64;key++){float tq[16],k[16],v[16];qkv_head(tile*64+key,head,tq,k,v);float kk=0,dot=0;[unroll]for(uint d=0;d<16;d++){kk+=k[d]*k[d];dot+=q[d]*k[d];}float e=exp(dot*rsqrt(max(qq,1e-12))*rsqrt(max(kk,1e-12))*W(26688+head)+W(18496+head*4096+qi*64+key)-mx);den+=e;[unroll]for(uint d=0;d<16;d++)tmp[d]+=e*v[d];}[unroll]for(uint d=0;d<16;d++)acc[head*16+d]=tmp[d]/den;}[loop]for(uint c=0;c<64;c++){float z=0;[loop]for(uint i=0;i<32;i++)z+=acc[i]*W(26690+c*32+i);outp[t*64+c]=fp8(z+feat_in[t*64+c]*W(28738+c));}}
 )";
-    const char *shader=split512?shader512:(fused256?shader256:(fused64?shader64:shader128));
+    std::string shader_storage=split512?shader512:(fused256?shader256:(fused64?shader64:shader128));
+    auto replace_all = [&](const char *from, const char *to) {
+        size_t position=0;
+        while((position=shader_storage.find(from,position))!=std::string::npos){shader_storage.replace(position,std::strlen(from),to);position+=std::strlen(to);}
+    };
+    replace_all(
+        "static const uint tokens=WIDTH*HEIGHT;",
+        "static const uint tokens=WIDTH*HEIGHT;"
+        "uint query_index(uint t){uint y=t/WIDTH,x=t%WIDTH;uint ry=SHIFTED?((y+HEIGHT-4)%HEIGHT):y;uint rx=SHIFTED?((x+WIDTH-4)%WIDTH):x;return (ry%8)*8+(rx%8);}"
+        "uint key_token(uint t,uint key){uint y=t/WIDTH,x=t%WIDTH;uint ry=SHIFTED?((y+HEIGHT-4)%HEIGHT):y;uint rx=SHIFTED?((x+WIDTH-4)%WIDTH):x;uint ky=(ry/8)*8+key/8,kx=(rx/8)*8+key%8;if(SHIFTED){ky=(ky+4)%HEIGHT;kx=(kx+4)%WIDTH;}return ky*WIDTH+kx;}"
+    );
+    replace_all("uint tile=t/64,qi=t%64;","uint qi=query_index(t);");
+    replace_all("tile*64+key","key_token(t,key)");
+    const char *shader=shader_storage.c_str();
     char ws[16],hs[16],ss[4];std::snprintf(ws,sizeof(ws),"%u",width);std::snprintf(hs,sizeof(hs),"%u",height);std::snprintf(ss,sizeof(ss),"%u",shifted);D3D_SHADER_MACRO macros[]={{"WIDTH",ws},{"HEIGHT",hs},{"SHIFTED",ss},{nullptr,nullptr}};
     ID3DBlob *b1=nullptr,*b2=nullptr,*b3=nullptr,*err=nullptr;check("compile ffn",D3DCompile(shader,std::strlen(shader),nullptr,macros,nullptr,"ffn","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&b1,&err));if(err)err->Release();err=nullptr;if(precomputed){check("compile qkv",D3DCompile(shader,std::strlen(shader),nullptr,macros,nullptr,"qkv_precompute","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&b3,&err));if(err)err->Release();err=nullptr;}check("compile attention",D3DCompile(shader,std::strlen(shader),nullptr,macros,nullptr,"attention","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&b2,&err));if(err)err->Release();
     D3D12_DESCRIPTOR_RANGE ranges[2]{};ranges[0]={D3D12_DESCRIPTOR_RANGE_TYPE_SRV,precomputed?4u:3u,0,0,0};ranges[1]={D3D12_DESCRIPTOR_RANGE_TYPE_UAV,precomputed?3u:2u,0,0,precomputed?4u:3u};D3D12_ROOT_PARAMETER rp{};rp.ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;rp.DescriptorTable={2,ranges};D3D12_ROOT_SIGNATURE_DESC rsd{};rsd.NumParameters=1;rsd.pParameters=&rp;ID3DBlob*rsb=nullptr;check("serialize",D3D12SerializeRootSignature(&rsd,D3D_ROOT_SIGNATURE_VERSION_1,&rsb,&err));ID3D12RootSignature*rs=nullptr;check("rootsig",dev->CreateRootSignature(0,rsb->GetBufferPointer(),rsb->GetBufferSize(),IID_PPV_ARGS(&rs)));rsb->Release();

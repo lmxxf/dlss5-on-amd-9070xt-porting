@@ -7,3 +7,11 @@ extern "C" __global__ void capture_raw_buffer(
         destination[index] = source[index];
     }
 }
+
+extern "C" __global__ void fill_raw_buffer(
+    uint32_t *destination, uint32_t count, uint32_t value) {
+    const uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index < count) {
+        destination[index] = value;
+    }
+}
