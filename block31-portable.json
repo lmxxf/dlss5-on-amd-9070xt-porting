@@ -1,5 +1,5 @@
 {
-  "status": "portable full-block CPU reference validated; D3D12 multi-pass pending",
+  "status": "portable CPU reference and RX9070XT single-device multi-pass validated",
   "runner": "vit_block31_reference.py",
   "input_contract": "already-repacked 64 KiB 1D physical view; do not repack twice",
   "pipeline": ["Expand", "fast activation", "Contract+skip", "QKV main/work", "64-key Attention", "Projection+skip"],
@@ -8,5 +8,19 @@
     "final_projection_correlation": 0.838709954,
     "final_mae": 0.90442824,
     "final_rmse": 1.4037256
+  },
+  "rx9070xt": {
+    "runner": "d3d12_vit_block31_test.cpp",
+    "final_correlation_against_5090": 0.838704090,
+    "final_mae": 0.904436827,
+    "final_rmse": 1.403742484,
+    "submit_to_fence_ms": 14.035,
+    "pass_correlation_against_cpu": {
+      "expand": 1.0,
+      "contract": 1.0,
+      "qkv": 0.99999999998,
+      "attention": 0.999999871,
+      "projection": 0.999999094
+    }
   }
 }

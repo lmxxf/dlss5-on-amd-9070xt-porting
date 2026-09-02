@@ -17,7 +17,7 @@ def unswizzle(raw,tbits,cbits):
 def bit_perm(columns):
     return np.array([sum(target for bit,target in enumerate(columns) if value>>bit&1) for value in range(1024)])
 def main():
-    p=argparse.ArgumentParser();p.add_argument("arena",type=Path);p.add_argument("index",type=Path);p.add_argument("input",type=Path);p.add_argument("oracle",type=Path);p.add_argument("--assets",type=Path,default=Path(__file__).parent);p.add_argument("--output",type=Path);a=p.parse_args();arena=a.arena.read_bytes();records=json.loads(a.index.read_text());records=records["records"] if isinstance(records,dict) else records;records={r["name"]:r for r in records}
+    p=argparse.ArgumentParser();p.add_argument("arena",type=Path);p.add_argument("index",type=Path);p.add_argument("input",type=Path);p.add_argument("oracle",type=Path);p.add_argument("--assets",type=Path,default=Path(__file__).parent);p.add_argument("--output",type=Path);p.add_argument("--case-prefix",type=Path);a=p.parse_args();arena=a.arena.read_bytes();records=json.loads(a.index.read_text());records=records["records"] if isinstance(records,dict) else records;records={r["name"]:r for r in records}
     def payload(layer):
         r=records[f"block31.layer{layer}.layer"];return arena[r["arena_offset"]:r["arena_offset"]+r["payload_size"]]
     contract=unpack_matrix(payload(1)[:4096*1024],4096,1024,"matrix_input","matrix_output").astype(np.float32);projection=unpack_matrix(payload(4)[:1024*1024],1024,1024,"matrix_input","matrix_output").astype(np.float32);order=bit_perm((1,8,16,2,4,32,64,128,256,512));contract_skip=np.frombuffer(payload(1)[4096*1024:4096*1024+2048],np.float16).astype(np.float32)[order];projection_skip=np.frombuffer(payload(4)[1024*1024:1024*1024+2048],np.float16).astype(np.float32)[order]
@@ -29,4 +29,7 @@ def main():
     for group in (0,1):aux[:,group]=(aux[:,group].reshape(64,32,32)/(np.linalg.norm(aux[:,group].reshape(64,32,32),axis=2,keepdims=True)+1e-9)*scales[group][None,:,None]).reshape(64,1024)
     combined=np.concatenate([main[:32],aux[32:]],axis=0);q,k,v=[combined[:,g].reshape(64,32,32) for g in range(3)];scores=np.einsum("thd,shd->hts",q,k)*.5;scores-=scores.max(2,keepdims=True);weights=np.exp(scores);weights/=weights.sum(2,keepdims=True);attention=fp8(np.einsum("hts,shd->thd",weights,v).reshape(64,1024));output=fp8(attention@projection+hidden*projection_skip);oracle=unswizzle(a.oracle.read_bytes()[:65536],[2,6,7,8,14,15],[0,1,3,4,5,9,10,11,12,13]);corr=float(np.corrcoef(output.ravel(),oracle.ravel())[0,1]);mae=float(np.mean(abs(output-oracle)));rmse=float(np.sqrt(np.mean((output-oracle)**2)));print(f"correlation={corr:.9f} MAE={mae:.9f} RMSE={rmse:.9f}")
     if a.output:output.tofile(a.output)
+    if a.case_prefix:
+        for name,value in {"input":x,"branch":branch,"hidden":hidden,"qkv":combined.reshape(64,3,1024),"attention":attention,"output":output,"oracle":oracle}.items():
+            value.astype(np.float32).tofile(str(a.case_prefix)+f"-{name}.f32")
 if __name__=="__main__":main()

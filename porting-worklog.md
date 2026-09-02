@@ -1237,6 +1237,10 @@ QKV state dump揭示work的0/2/4 plane各为65,536-byte FP16张量，全部值�
 
 新增`vit_block31_reference.py`把所有portable参数串成64-token完整block31：Expand→SASS多项式→Contract+skip→QKV main/work→64-key Attention→Projection+skip。对5090 authoritative r1最终输出correlation 0.83870995、MAE 0.904428、RMSE 1.403726；六段串联未数值坍缩。下一步以该脚本为CPU oracle，在同一D3D12 device内实现多pass block31。
 
+`d3d12_vit_block31_test.cpp`现已把同一公式放进单个RX9070XT D3D12 device：一个packed weight SRV、canonical input/scales两个SRV、branch/hidden/QKV/attention/output五个UAV，五个PSO之间只插UAV barrier，最终一次Execute/Fence并统一readback。实测submit→fence 14.035 ms，对5090 r1 correlation 0.83870409、MAE 0.904437、RMSE 1.403742，与CPU portable结果一致。
+
+五pass逐层对CPU reference：Expand与Contract逐float exact 100%；QKV correlation 0.99999999998、Attention 0.999999871、Projection 0.999999094。最终0.25 max差来自E4M3量化边界和浮点累加顺序，不是D3D12实现错误。block31的portable AMD执行至此闭合，下一步把同一PSO推广到blocks32–38。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
