@@ -1,0 +1,48 @@
+{
+  "file": "block39-logical-effective.bin",
+  "sha256": "c51059f1ee1841dcd8232fa1338b3ab92ff336fe896785be7df840a01426a5cf",
+  "storage": "float32_little_endian",
+  "shape": [
+    1536,
+    512
+  ],
+  "input_layout": [
+    {
+      "name": "decoder_main",
+      "shape": [
+        1024
+      ],
+      "range": [
+        0,
+        1024
+      ]
+    },
+    {
+      "name": "block30_output1_skip",
+      "shape": [
+        512
+      ],
+      "range": [
+        1024,
+        1536
+      ]
+    }
+  ],
+  "formula": "concat(main[:512] @ W[:256]^T, main[512:] @ W[256:]^T) + skip * depthwise_skip",
+  "operation_graph": [
+    "convolution",
+    "convolution",
+    "mul",
+    "add"
+  ],
+  "amd_fixed_input": {
+    "samples": 64,
+    "submit_ms": 0.836,
+    "cpu_mae": 1.4258e-09,
+    "cpu_max_abs_error": 4.7684e-07,
+    "cpu_cosine": 0.999999999993,
+    "output_range": [-21.00995, 25.660254],
+    "output_std": 1.9459782
+  },
+  "boundary": "archive logical semantics; original CUBIN numerical output is invalid without runtime weight packing"
+}

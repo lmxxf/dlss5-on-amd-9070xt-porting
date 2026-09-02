@@ -1339,6 +1339,8 @@ skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[
 
 descriptor探针进一步导出block39完整0x170 layer object。稳定整数域为`+0x40..0x4c=[1,1,8,32]`、`+0x50=1024`、`+0x54=512`，`+0x80`为float 1.0、`+0x84=3`。与262,144-element主体联立后，主卷积容量唯一自然闭合为`in=1024,out=512,groups=2,in_per_group=512`（逻辑weight可视为512×512），而不是dense 1024×512。basis物理图每bank16个512→512 components也与“两组输入＋空间展开”一致。下一步实现archive FP16 grouped convolution reference，并只用CUBIN components恢复token/channel physical permutation。
 
+`build_block39_logical.py`按PyTorch convolution标准layout把record展开为1536→512稀疏矩阵：main前/后512 channels分别乘W前/后256 output rows，block30 output1的512 channels逐通道乘record尾部512 depthwise weights后相加。固定输入使用`blocks31-38-portable.f32`的64×1024 canonical main与`block30-pool-correct.bin`解码后的64×512 skip；CPU输出finite，范围-21.01..25.66、std1.946。通用AMD batch matrix runner在RX9070XT执行64 samples耗时0.836 ms，对CPU logical oracle MAE 1.43e-9、max error 4.77e-7、cosine 0.999999999993。block39 archive逻辑语义至此在AMD闭合；下一层转入block40 split-Swin。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

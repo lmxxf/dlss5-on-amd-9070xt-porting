@@ -41,6 +41,7 @@
 - `block70-operation-graph.json`：CPU descriptor builder直接导出的42步post运算图，并与普通block1的31步图逐项对齐；精确分解为5步post前缀＋标准Swin body（QKV前多padding）＋5步post后缀。
 - `block39-operation-graph.json`：decoder入口的权威4步图`convolution→convolution→mul→add`；record含262,656 FP16 elements，主体262,144=`512×512`，更符合两组512输入的grouped 1024→512卷积，剩余512属于skip/scale支路。
 - `run_original_block39_basis.cpp`：同context结构basis/Hadamard runner；恢复出每16KiB bank前8KiB有效、16个512→512 connected components。由于原CUBIN消费的runtime packed weights与archive FP16不一致，其数值输出明确降级为结构证据。
+- `build_block39_logical.py` / `block39-logical-effective.bin` / `.json`：按descriptor groups=2把archive FP16展开为1536→512稀疏矩阵，覆盖1024-channel main与512-channel depthwise skip；RX9070XT固定输入0.836 ms，对CPU logical oracle cosine 0.999999999993。
 - `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。
 - `make_post_attention_compatible.py` / `block70-attention-block1-compatible.bin`：把shared skip代数吸收为`P'=P×skip`、`residual'=skip²`，直接复用AMD 1H runner；RX单tile对NVIDIA correlation 0.97252，对CPU effective 0.999615，1.806 ms。
 - `block70-ffn-effective.bin` / `.json` / `pack_post_ffn.py`：双residual identity读口恢复的完整32-channel FFN；held-out correlation 0.93751。
