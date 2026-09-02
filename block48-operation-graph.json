@@ -22,11 +22,13 @@
     "prefix_conv_256x256": [0, 65536],
     "standard_weight0_weight1_weight2": [65536, 245760],
     "ffn_skip": [245760, 246016],
-    "prefix_dw_sin": [246016, 246256],
-    "pre_qkv_padding": [246256, 246264],
-    "qkv": [246264, 344568],
-    "attention_bias": [344568, 377336],
-    "scale_projection_attention_skip_and_tail": [377336, 410392]
+    "prefix_dw_sin": [246016, 246272],
+    "qkv": [246272, 344576],
+    "attention_bias": [344576, 377344],
+    "attention_scale_float32": [377344, 377360],
+    "projection": [377360, 410128],
+    "attention_skip": [410128, 410384],
+    "tail_padding": [410384, 410392]
   },
-  "status": "all learned tensor ranges closed; prefix spatial/token topology pending"
+  "status": "all tensor ranges and archive-logical body closed; canonical encoder skip pending"
 }

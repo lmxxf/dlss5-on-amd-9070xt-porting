@@ -45,7 +45,7 @@
 - `block39_spatial_reference.py`：固定帧8×8→16×16 decoder入口；grouped main投影后2×上采样，并融合block30未池化16×16 skip，供真实256-token blocks40–47链使用。
 - `block40-operation-graph.json` / `split_swin512_reference.py`：闭合decoder blocks40–47的gated FFN与16-head attention archive逻辑；从block39 logical输出串行跑完八层全部finite，std由1.597平滑降至0.952。
 - `pack_split_swin512.py` / `d3d12_block128_test.cpp` split512 mode / `split-swin512-amd.json`：RX9070XT三pass执行blocks40–47；完整16×16空间链每层22–24.6 ms，最终block47对CPU archive logical correlation 0.99207。
-- `block48-operation-graph.json`：恢复512→256 upsample＋8H Swin的36步图、live通道字段与主权重分区；prefix 256×256矩阵、W0/W1/W2及QKV以后尾部均已定位，剩余504-half dw/sin/skip区待细分。
+- `block48-operation-graph.json` / `block48_reference.py`：恢复512→256 upsample＋8H Swin全部archive tensor；修正QKV后字段+8-half偏移后main-only logical输出finite、std0.0877。canonical block22 skip尚待上游AMD提供。
 - `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。
 - `make_post_attention_compatible.py` / `block70-attention-block1-compatible.bin`：把shared skip代数吸收为`P'=P×skip`、`residual'=skip²`，直接复用AMD 1H runner；RX单tile对NVIDIA correlation 0.97252，对CPU effective 0.999615，1.806 ms。
 - `block70-ffn-effective.bin` / `.json` / `pack_post_ffn.py`：双residual identity读口恢复的完整32-channel FFN；held-out correlation 0.93751。

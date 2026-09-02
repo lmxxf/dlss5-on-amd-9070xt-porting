@@ -1353,11 +1353,11 @@ AMD 512-channel correctness runner在`d3d12_block128_test.cpp`新增split512模�
 
 block48 descriptor operation vector共有36步：4步upsample前缀`convolution→convolution→mul→add`，随后是带额外input convolution的标准8H Swin。live字段给出in/out=512/256、`+0x40..=[0,0,8,32]`、boundary flags1/1、scale1.0、mode3。record 410,392 halves，比普通8H block49多65,776；按尾部QKV/bias/projection结构反向对齐得到：前65,536为256×256 prefix conv，随后W0/W1/W2占65,536–245,759，245,760–246,263为504-half dw/sin/padding/FFN-skip区，QKV从246,264开始，之后全部与普通8H尾布局同构。结构固化为`block48-operation-graph.json`；下一步细分504-half区并实现archive logical upsample。
 
-504-half区随后由数值分布切开：245,760–246,015的256值集中在约0.82–1.0，是FFN skip；246,016–246,255的240值分布0–0.79，是prefix dw/sin；246,256–246,263为8个padding slots（序列化内容不保证清零）。block48全部learned tensor边界至此闭合，剩余变量只在512→256 prefix如何把64个main tokens与block22 skip展开到576个256-channel tokens。
+中段最初按504 halves切分仍差8。对bias尾部逐half解释FP32后，真正8-head scale位于377,344，值为8.844/8.513/19.578/8.507/10.010/11.181/11.822/19.821；普通block49也在对应+8位置得到正常scale。由尾部反推，正确分区为：FFN skip245,760–246,015；prefix dw/sin完整256值246,016–246,271；QKV246,272–344,575；bias344,576–377,343；scale16 halves；projection377,360–410,127；attention skip256；tail padding8。
 
 空间尺度校准进一步修正decoder：block39应把ViT 8×8上采样至16×16并融合block30未池化skip；blocks40–47处理4个window；block48再由16×16裁剪／上采样到真实32×18并融合block22 output1。按此重跑的16×16 AMD链已在前文记录。
 
-尝试把block48 fused record在已闭合offset上直接按row-major archive矩阵执行，输出虽finite但std约297、范围达到±1e4，明确否决。prefix 256×256矩阵本身分布正常，爆炸来自W/QKV/projection段：这些fused tensor仍是tensor-core physical pack，和split-Swin四record的row-major archive不同。实验脚本已删除，未进入主线。block48后续必须复用`unpack_mma_fragments.py`／controlled effective方法恢复256-channel fused body；不能机械套`block0_reference.load_fused_block`。
+前述“fused tensor必须MMA unpack”的结论被offset修正推翻：±1e4爆炸来自把bias尾巴当scale并把scale bytes吃进projection。按正确+8 offsets重跑，main-only 16×16→32×18 prefix std0.1129，完整8H body finite、范围-1.66..1.42、std0.08768。真正尚未闭合的是block22 output1 canonical skip；直接把其NVIDIA physical E4 view reshape会产生std52并污染结果。`block48_reference.py`因此只接受canonical FP32 skip，缺省可用zero-skip验证main/body，不再隐式误读physical view。
 
 ## 工作纪律
 
