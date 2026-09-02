@@ -1,0 +1,27 @@
+{
+  "source": "CPU descriptor builder operation-name vector",
+  "block1_reference": [
+    "convolution", "clamp", "abs", "mul", "rsub", "mul", "add", "mul",
+    "convolution", "mul", "add", "convolution", "linalg_vector_norm",
+    "clamp_min", "div", "linalg_vector_norm", "clamp_min", "div", "mul",
+    "stack", "bmm", "add", "clamp", "_softmax", "sub", "detach", "add",
+    "bmm", "convolution", "mul", "add"
+  ],
+  "block70": [
+    "convolution", "alias", "mul", "mul", "add",
+    "convolution", "clamp", "abs", "mul", "rsub", "mul", "add", "mul",
+    "convolution", "mul", "add", "constant_pad_nd", "convolution",
+    "linalg_vector_norm", "clamp_min", "div", "linalg_vector_norm",
+    "clamp_min", "div", "mul", "stack", "bmm", "add", "clamp",
+    "_softmax", "sub", "detach", "add", "bmm", "convolution", "mul",
+    "add", "mul", "convolution", "mul", "mul", "add"
+  ],
+  "alignment": {
+    "post_prefix_only": ["convolution", "alias", "mul", "mul", "add"],
+    "standard_body_block70_range_inclusive": [5, 36],
+    "standard_body_block1_range_inclusive": [0, 30],
+    "extra_inside_body": {"block70_index": 16, "operation": "constant_pad_nd"},
+    "post_suffix_only": ["mul", "convolution", "mul", "mul", "add"]
+  },
+  "status": "exact operation ordering; tensor arguments and dynamic scales remain under recovery"
+}

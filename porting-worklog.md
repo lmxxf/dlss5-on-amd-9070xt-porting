@@ -1305,6 +1305,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 SASS进一步把post输出侧定位到weight byte `0x50e0`（half 10352）：四路load发生在PC 0x8450–0x87e0，紧接着才读取两块out-conv `+0x5130/+0x5330`。普通1H把10352附近视作attention skip，但post这里更符合`out_gain`消费时序；它很可能是同一32-value storage在post中的角色复用。把该向量作为`projection * gain`补入连续模型后raw预测量级仍不足，联合训练最高约0.294，线性32→32后校正也不改善，说明controlled head basis坐标还含kernel内部FP8 dynamic scale／非线性，而非单纯漏乘一个向量。当前最可靠的分层结果仍是：controlled精确输入下FFN odd-half可达0.8846；full projected坐标需另建attention branch oracle，不能从最终head feature反推全部中间层。
 
+CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续MSVC string，而非weight descriptors；探针现直接解码operation names。与普通block1的31步图对齐结果是精确的：post独有5步前缀`convolution→alias→mul→mul→add`；随后完整复用block1运算序列，但QKV convolution前多`constant_pad_nd`；末尾再加5步`mul→convolution→mul→mul→add`。标准body自身的末两步仍是`mul→add`，即attention residual没有消失；post后缀首个mul才是独立输出调制。图固化为`block70-operation-graph.json`。按该图补回residual与独立gain后attention-only连续模型仍停在0.294，说明controlled输入坐标不是标准body的直接h值；后续必须在图的5步前缀出口建立新读口，而不是继续把最终head basis当中间activation。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -177,6 +177,34 @@ try {
                         ) {
                             @(Read-QwordHexVector ([IntPtr]($layerAddress.ToInt64() + $candidateOffset)))
                         } else { @() }
+                        raw_hex = if ($blockIndex -eq 70 -and
+                            ($candidateEnd - $candidateBegin) -le 0x10000) {
+                            $candidateRaw = New-Object byte[] ([int]($candidateEnd - $candidateBegin))
+                            if ($candidateRaw.Length -gt 0) {
+                                [System.Runtime.InteropServices.Marshal]::Copy(
+                                    [IntPtr][long]$candidateBegin,
+                                    $candidateRaw,
+                                    0,
+                                    $candidateRaw.Length
+                                )
+                            }
+                            [BitConverter]::ToString($candidateRaw).Replace('-', '').ToLowerInvariant()
+                        } else { $null }
+                        strings = if (($blockIndex -eq 1 -or $blockIndex -eq 70) -and
+                            (($candidateEnd - $candidateBegin) % 0x20) -eq 0 -and
+                            ($candidateEnd - $candidateBegin) -le 0x10000) {
+                            $candidateStrings = @()
+                            for (
+                                $stringOffset = 0;
+                                $stringOffset -lt ($candidateEnd - $candidateBegin);
+                                $stringOffset += 0x20
+                            ) {
+                                $candidateStrings += (Read-MsvcString (
+                                    [IntPtr][long]($candidateBegin + $stringOffset)
+                                )).value
+                            }
+                            $candidateStrings
+                        } else { @() }
                     }
                 }
             }

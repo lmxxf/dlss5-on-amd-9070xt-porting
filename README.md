@@ -38,6 +38,7 @@
 - `run_original_post.cpp` / `block70-post.json`：可重放block70原始0xb8 ABI；当前preset绑定`+0x38=Color RGBA`、`rgb_mode=1`、`input_scale=1/32`与独立FP16 `blend_scale=0.739746`，原始activation输出对source correlation 0.95876，portable block69输出对source correlation 0.8713。它取代灰色ABI图，成为最终画面验收oracle。
 - `run_original_post_dataset.cpp`：复用单一CUDA context批量执行8×8 block70 main+skip联合样本；输入record为2048-byte main＋512-byte skip。128组与逐进程oracle逐float exact，耗时0.42秒；9,216组耗时0.70秒。另支持body weight one-hot／逐slot ablation及`features`模式；后者借controlled RGB head导出64×32 body feature，9,216组耗时5.47秒。
 - block70 input impulse结论：main分配的2048 bytes中只有前512 bytes有效，skip为512/512有效；两路Jacobian rank均512，对应两路`4×4×32`输入共同upsample到`8×8×32`，不是先前假设的full-resolution main。
+- `block70-operation-graph.json`：CPU descriptor builder直接导出的42步post运算图，并与普通block1的31步图逐项对齐；精确分解为5步post前缀＋标准Swin body（QKV前多padding）＋5步post后缀。
 - `fit_post_outconv.py` / `block70-outconv-effective.bin` / `.json`：从controlled head basis恢复block70最后的32→RGB矩阵；两组16-channel packed block各占256 FP16 slots、每组仅48个有效。独立held-out correlation 0.9999991、MAE 2.88e-7。
 - `fit_post_upsample.py` / `block70-upsample-effective.bin` / `.json`：以1024-row Hadamard恢复两路`4×4×32`到`8×8×16` controlled-identity odd-half映射；小幅／真实幅度held-out correlation 0.998775／0.998482。该坐标可能已含post `out_gain`，不再过度命名为纯upsample内部值。
 - `d3d12_post_upsample_test.cpp`：RX9070XT执行portable 1024→1024 upsample矩阵；真实幅度held-out submit→fence 0.565 ms、cosine 0.998683，误差与CPU effective模型一致。
