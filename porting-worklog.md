@@ -1315,6 +1315,10 @@ CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续
 
 无需新增attention shader即可做AMD验收：把shared skip吸收到标准block1公式，令`P'=P×skip`、`attention_residual_skip'=skip²`，同时FFN branch归零、FFN skip置1，即严格等价于post的`(projection + input×skip)×skip`。`make_post_attention_compatible.py`生成41,220-byte兼容blob后，RX9070XT单tile submit→fence 1.806 ms；对NVIDIA attention-only held-out correlation 0.972519、MAE 0.2516、RMSE 0.6193；对CPU effective correlation 0.999615、MAE 0.03468。AMD增加的误差很小，主要误差仍来自0.977级effective近似。下一步只剩FFN完整32-channel target及prefix→FFN→attention串联。
 
+同一双residual identity方法也建立了干净的完整FFN读口：保留原W1/W2/FFN skip，attention branch归零，attention skip置1，head直接读出32-channel FFN target。2,048样本范围-78.5..96.9375；raw初始化correlation 0.306，训练120 epoch后held-out correlation 0.937505、MAE 0.6877、RMSE 1.4417。参数固化为`block70-ffn-effective.bin/.json`。
+
+`make_post_body_compatible.py`把FFN与attention effective合并为标准41,220-byte 1H layout，并继续使用`P'=P×skip`、`residual'=skip²`。RX9070XT从exact prefix输入一次跑完整FFN＋attention＋shared suffix gain：单tilesubmit→fence 1.038 ms，对NVIDIA full-body correlation 0.903772、MAE 0.9031、RMSE 1.4713、max error 9.117。错误的continuous joint refinement无法复现同参数shader（CPU单tile仅约0.18），已中止且未写回；当前权威是分层effective与AMD实跑结果。block70结构链至此完整落到AMD，剩余是提升FFN effective精度并接全图physical view。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

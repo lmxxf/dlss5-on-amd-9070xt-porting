@@ -41,6 +41,8 @@
 - `block70-operation-graph.json`：CPU descriptor builder直接导出的42步post运算图，并与普通block1的31步图逐项对齐；精确分解为5步post前缀＋标准Swin body（QKV前多padding）＋5步post后缀。
 - `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。
 - `make_post_attention_compatible.py` / `block70-attention-block1-compatible.bin`：把shared skip代数吸收为`P'=P×skip`、`residual'=skip²`，直接复用AMD 1H runner；RX单tile对NVIDIA correlation 0.97252，对CPU effective 0.999615，1.806 ms。
+- `block70-ffn-effective.bin` / `.json` / `pack_post_ffn.py`：双residual identity读口恢复的完整32-channel FFN；held-out correlation 0.93751。
+- `make_post_body_compatible.py` / `block70-body-compatible.bin` / `.json`：合并FFN与attention后由RX9070XT完整执行post body；单tile1.038 ms，对NVIDIA full-body correlation 0.90377。
 - `fit_post_outconv.py` / `block70-outconv-effective.bin` / `.json`：从controlled head basis恢复block70最后的32→RGB矩阵；两组16-channel packed block各占256 FP16 slots、每组仅48个有效。独立held-out correlation 0.9999991、MAE 2.88e-7。
 - `fit_post_upsample.py` / `block70-upsample-effective.bin` / `.json`：以1024-row Hadamard恢复两路`4×4×32`到`8×8×16` controlled-identity odd-half映射；小幅／真实幅度held-out correlation 0.998775／0.998482。该坐标可能已含post `out_gain`，不再过度命名为纯upsample内部值。
 - `fit_post_prefix.py` / `block70-prefix-effective.bin` / `.json`：以双residual identity读口恢复权威5步post前缀的`1024→2048`稀疏矩阵；小幅／真实幅度held-out correlation 0.9999987／0.99999994。它取代旧odd-half map，输出可直接进入标准1H body。

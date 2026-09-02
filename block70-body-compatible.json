@@ -1,0 +1,20 @@
+{
+  "file": "block70-body-compatible.bin",
+  "sha256": "b1655af9c24f03b9513855999c87f71583797f715ebe6bccf737a7ba2829ee56",
+  "storage": "float32_little_endian",
+  "byte_size": 41220,
+  "runner": "d3d12_block1_test.cpp stage mode, width=8 height=8 shift=0",
+  "construction": {
+    "ffn": "block70-ffn-effective.bin",
+    "attention": "block70-attention-effective.bin",
+    "shared_skip_rewrite": "P'=P*skip; residual_skip'=skip^2"
+  },
+  "amd_single_tile": {
+    "submit_ms": 1.038,
+    "nvidia_correlation": 0.90377165,
+    "nvidia_mae": 0.90308964,
+    "nvidia_rmse": 1.4713033,
+    "nvidia_max_abs_error": 9.1171875
+  },
+  "boundary": "portable full post body after exact prefix; final 32-to-RGB head is separate"
+}

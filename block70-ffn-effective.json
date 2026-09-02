@@ -1,0 +1,37 @@
+{
+  "file": "block70-ffn-effective.bin",
+  "sha256": "81f8c8d75a1970cf8e7f8f7ae2b9839a76c060f083583d9cbbbf70206a8c214e",
+  "storage": "float32_little_endian",
+  "byte_size": 16512,
+  "tensors": {
+    "W1": {
+      "shape": [
+        64,
+        32
+      ],
+      "byte_offset": 0,
+      "byte_size": 8192
+    },
+    "W2": {
+      "shape": [
+        32,
+        64
+      ],
+      "byte_offset": 8192,
+      "byte_size": 8192
+    },
+    "skip": {
+      "shape": [
+        32
+      ],
+      "byte_offset": 16384,
+      "byte_size": 128
+    }
+  },
+  "heldout": {
+    "correlation": 0.9375053644,
+    "mae": 0.6877285242,
+    "rmse": 1.4416607618
+  },
+  "boundary": "FFN-only residual oracle with exact NVIDIA five-operation prefix input"
+}
