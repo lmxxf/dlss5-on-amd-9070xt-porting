@@ -1409,6 +1409,8 @@ block49 controlled分支给出更可靠的body证据。双residual权重下，�
 
 live backend对象查询最终确认block48传入kernel指针与`cc_tinlayout_fused_swin_8h_256_8_upsample_tilesync_fp8`对象完全相同，与plain对象不同。plain/tilesync SASS确实不同，但两者用标准`cuLaunchKernel`时输出相同；`cuFuncGetAttribute`显示required cluster三维全0、cluster_must_be_set=0、nonportable_cluster=0。故后段差异不是CUDA cluster配置，而是NvAPI context/`LaunchCuKernelChain`的tile-sync执行协议，与此前ViT跨block `flag=1`缺口同源。下一主线改为扩展现有`d3d12_nvapi_repack_test.cpp`式5090宿主，直接以CreateCuFunction+LaunchCuKernelChain运行block48 live快照，再生成controlled calibration dataset；停止继续调整标准CUDA runner。
 
+独立`d3d12_nvapi_fused_live.cpp`随后分别使用旧Chain ID `0x24973538`与游戏probe确认的ChainEx ID `0x846a9bf0`，两者均只能得到与标准CUDA相同的written exact 5,588,179/8,355,840=66.8775%。游戏内进一步做原backend自重放：main/skip/aux分别扩至128MiB无变化，只替换output VA、保持四路相对VA拓扑、再到完全复用原wrapper与原output资源，nested replay仍固定产出同一个plain hash `a3587b...`；随后外层正常调用稳定产出live hash `865778...`，并与未插入replay的上一轮正常live逐byte exact。正常backend trace仅有一条block48 launch，故不是两相双launch。结论是live tilesync状态绑定高层唯一正常调用路径/TLS，而非参数内容、资源VA、公开NvAPI接口或CUDA属性。批量controlled oracle必须改为在这唯一正常调用前原位备份/替换原资源内容，调用后捕获并恢复；不能额外nested launch。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
