@@ -1421,6 +1421,10 @@ AMD空间runner独立修正仍成立：旧HLSL以`tile=t/64`取attention key，�
 
 block56布局诊断同时修复了`run_original_fused_view_permutation.cpp`的ABI遗漏：原runner没有为`Params.skip`分配／绑定资源，4H upsample prefix会直接CUDA illegal access。补齐独立zero skip后，进一步穷举128-channel的全部720种token-bit排列；现用`(3,0,1,4,5,2)`仍是并列最优（抽样corr0.59274），排除空间bit位序错误。固定帧采用129→128带bias ridge校正prefix/body输出，checkerboard held-out correlation0.93016；全图拟合输出对NVIDIA correlation0.945554、MAE13.8702。该矩阵在RX9070XT耗时0.810ms，对CPU结果MAE6.88e-6、max3.36e-4。边界：这是目标明确要求的fixed-input校正，尚未证明跨帧通用；下一步从该输出重跑57–70并复核最终RGB增益。
 
+校正后的block56已在RX9070XT继续跑完57–61，block61 std由旧链11.94升至17.93；到block62后新旧输出仍corr0.99950，证明block8 skip压倒上游main。`d3d12_post_upsample_test.cpp`因此增加可选`spatial-width/phase-period`，由GPU按窗口内坐标选择独立affine。block62的8×8 phase fixed-frame校正在RX9070XT耗时0.789ms、对CPU MAE6.80e-6、对同层NVIDIA corr0.86294；block66相同方法耗时0.684ms、空间留出corr0.94208、全图corr0.96993。修正后67–69全部在AMD重跑。
+
+block70复核同时抓出两项错误。第一，`block70-prefix-skip-amd.f32`仍是`(tile_y,tile_x,8,8,32)`，必须与main在tile-major先相加再共同transpose；旧组件按该合同可100%重建`block70-prefix-full-amd.f32`，证明布局闭合。第二，更关键的是当前decoder层级oracle来自09-03的新live frame，而`post-repro.bin`与`block70-prefix-main-amd.f32`来自09-02旧frame；即使补回32-channel `encode_tinlayout_global`与双bank gather，二者仍零空间相关，确认是跨帧谱系而非可拟合数值误差。因此本轮0.83066最终RGB只保留跨帧诊断，不能作为完成验收。下一步让游戏同一帧同时导出block48与block70边界，建立唯一coherent fixed-input oracle后再做最终相关性。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

@@ -69,6 +69,7 @@
 - `fit_post_upsample.py` / `block70-upsample-effective.bin` / `.json`：以1024-row Hadamard恢复两路`4×4×32`到`8×8×16` controlled-identity odd-half映射；小幅／真实幅度held-out correlation 0.998775／0.998482。该坐标可能已含post `out_gain`，不再过度命名为纯upsample内部值。
 - `fit_post_prefix.py` / `block70-prefix-effective.bin` / `.json`：以双residual identity读口恢复权威5步post前缀的`1024→2048`稀疏矩阵；小幅／真实幅度held-out correlation 0.9999987／0.99999994。它取代旧odd-half map，输出可直接进入标准1H body。
 - `d3d12_post_upsample_test.cpp`：RX9070XT通用执行portable `1024→N`矩阵；权威5步prefix的N=2048真实幅度held-out为0.531 ms、cosine 0.999999931。
+- `d3d12_post_upsample_test.cpp`现亦支持`[spatial-width phase-period]`，按样本的窗口内phase选择独立矩阵。block62的8×8 phase校正在RX9070XT为0.789 ms，block66为0.684 ms；分别对同帧层级oracle达到0.86294与0.96993。该模式用于恢复physical dynamic-scale的固定帧残差。
 - `d3d12_post_outconv_test.cpp`：RX9070XT直接执行portable 32→RGB与`Color + residual`；独立held-out tile MAE 2.17e-7。256×144全图用controlled body feature对NVIDIA oracle：1.060 ms、RGBA MAE 4.95e-5、max error 0.001531；8-bit RGB 98.32% channels exact、最大1 LSB。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
