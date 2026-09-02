@@ -1102,6 +1102,14 @@ block66坍缩随后由SASS直接破案。`cc_tinlayout_fused_swin_1h_32_1_upsamp
 
 用修正block66重跑67–69与RX9070XT readout：block67/68/69分别约645,11x/645,11x/645,109非零、零NaN，AMD submit→fence 0.896ms。对clean诊断图PSNR由16.76提升到17.26dB，说明主干恢复确实改善结果；但仍低于block31旧近似的17.61dB，最终图依然有规则点阵与横向色带，不能验收。当前画面瓶颈重新收敛到尚缺的ViT blocks35–38以及更早的portable AMD语义实现。
 
+### block35–37变体与状态桥实验
+
+清理single-mode仍无条件分配的49组额外scratch后，block35以 `Contract standard+chained / QKV standard+chained / Attention standard / Projection standard` 成功输出65,326个非零bytes、零NaN；block36同组合输出65,335、零NaN。block37在QKV standard、chained、两种pair顺序下均device hung；把limit真正应用到single-mode后确认device removal已发生在Contract阶段，QKV只是延迟暴露错误。block37 Contract的standard、chained、pair三态也全部失败。
+
+这证明主activation文件不足以跨越所有ViT block：block35/36在aux清零时尚能运行，block37开始依赖前块发布的2MiB auxiliary arena。尝试同context range35→38时，未来block的资源分配/参数构建会改变底层GPU VA与同步行为，首个Contract即hung；尝试给single-mode增加aux upload又因改变资源分配顺序破坏已知成功布局。当前已把“变体排列”空间穷尽，剩余工程任务严格是：做一个固定资源布局的单block状态宿主，在一次执行中同时导出main+aux，并在下一进程保持相同默认资源VA顺序加载，而不是继续猜kernel组合。
+
+5090测试纪律再次收紧：每次 `DXGI_ERROR_DEVICE_HUNG` 后立即重启、只跑一个控制变量；无游戏/测试进程时才重启。Spark CUDA Graph、双stream以及缩小grid均不能替代NVAPI chain，证实这是驱动专用共驻/同步原语而非普通occupancy问题。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
