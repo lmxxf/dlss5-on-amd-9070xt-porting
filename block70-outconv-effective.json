@@ -1,0 +1,27 @@
+{
+  "file": "block70-outconv-effective.bin",
+  "sha256": "fe348266f65ecb4c4d809cb261e4bc66608d9d509d746949abaa6dedc598c653",
+  "storage": "float32_little_endian",
+  "shape": [
+    32,
+    3
+  ],
+  "physical_blocks": {
+    "channels_0_15_base_half": 10392,
+    "channels_16_31_base_half": 10648,
+    "active_slot_formula": "base + color*32 + (channel//4)*8 + channel%4"
+  },
+  "train": {
+    "correlation": 0.9999999834799586,
+    "mae": 2.2651208908541776e-08,
+    "rmse": 3.337769882705288e-08,
+    "max_abs_error": 1.4439683582168072e-07
+  },
+  "heldout": {
+    "correlation": 0.9999991053629266,
+    "mae": 2.881662624076853e-07,
+    "rmse": 4.851942208006221e-07,
+    "max_abs_error": 2.8219656087458134e-06
+  },
+  "boundary": "portable block70 RGB head; body feature recovery remains separate"
+}

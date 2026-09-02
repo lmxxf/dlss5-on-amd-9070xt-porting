@@ -1277,6 +1277,10 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 批量runner继续增加body weight one-hot与逐slot ablation scan。10,336个body slots在0.69秒内扫完；4096–4103恰为无响应padding，其余10256个slot对当前随机样本有可测影响，与标准1H容量边界一致。结构性branch ablation给出更关键的输出拓扑：清零FFN W1/W2后RGB residual仍有std 0.0871；清零QKV与projection后RGB residual精确归零；单独清零attention skip只令完整输出MAE 0.00566。故post RGB head主要消费attention/projected branch，而非标准block最终residual，identity-skip实验输出为零并不否定body offsets。下一步只需恢复FFN→QKV/attention→projection→RGB head有效路径，无需把未进入RGB head的residual误当输出。
 
+完整10,904-slot ablation随后闭合post专用568-half尾部：`10336–10383`为48个有效input/gain值，随后8 padding；`10392–10647`与`10648–10903`是两块各256-half的out-conv pack，每块恰有48个有效slot。active地址公式为`base + color*32 + (channel//4)*8 + channel%4`，对应两张`3×16`矩阵。保留body与前48 gain、清零out-conv后逐slot置1，可直接读出32张feature maps；同一physical slot对R/G/B路由完全一致。
+
+`fit_post_outconv.py`用第一组小幅随机main+skip tile的32张basis feature拟合32→RGB矩阵，train correlation 0.999999983、MAE 2.27e-8；第二组独立随机tile held-out correlation 0.999999105、MAE 2.88e-7、max error 2.82e-6。参数固化为`block70-outconv-effective.bin`与manifest。该结果把最终RGB head从packed runtime bytes提升为可直接写HLSL的portable FP32矩阵；block70剩余数值缺口只在产生这32张feature的body路径。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

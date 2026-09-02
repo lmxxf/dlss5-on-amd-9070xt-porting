@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     if (argc < 7 || argc > 9) {
         std::fprintf(stderr,
             "usage: %s cubin symbol weights blend samples.u8 output.rgba32f "
-            "[scan-half-count [ablate]]\n"
+            "[scan-half-count [ablate|head]]\n"
             "samples: repeated [2048-byte main][512-byte skip] records\n",
             argv[0]);
         return 2;
@@ -47,11 +47,13 @@ int main(int argc, char **argv) {
         samples.size() % sample_bytes) return 2;
     const bool scan_weights = argc >= 8;
     const bool ablate_weights = argc == 9 && !std::strcmp(argv[8], "ablate");
-    if (argc == 9 && !ablate_weights) return 2;
+    const bool head_weights = argc == 9 && !std::strcmp(argv[8], "head");
+    if (argc == 9 && !ablate_weights && !head_weights) return 2;
     const size_t input_count = samples.size() / sample_bytes;
     const size_t count = scan_weights ? std::strtoull(argv[7], nullptr, 0)
                                       : input_count;
-    if (!count || (scan_weights && (input_count != 1 || count > 10336))) return 2;
+    const size_t scan_limit = ablate_weights ? 10904 : (head_weights ? 512 : 10336);
+    if (!count || (scan_weights && (input_count != 1 || count > scan_limit))) return 2;
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -143,6 +145,12 @@ int main(int argc, char **argv) {
     if (scan_weights) {
         if (ablate_weights) {
             scan_weight = weights;
+        } else if (head_weights) {
+            scan_weight.assign(weights.size(), 0);
+            // Preserve the body plus the 48-value input/gain region and its
+            // eight-slot padding; scan only the two packed out-conv blocks.
+            std::copy(weights.begin(), weights.begin() + 10392 * 2,
+                      scan_weight.begin());
         } else {
             scan_weight.assign(weights.size(), 0);
             // The last 568 FP16 slots are the post-specific output head. Keep
@@ -161,15 +169,17 @@ int main(int argc, char **argv) {
         const auto *record = samples.data() +
             (scan_weights ? 0 : sample) * sample_bytes;
         if (scan_weights) {
+            const size_t weight_slot = (head_weights ? 10392 : 0) + sample;
             const unsigned short value = ablate_weights ? 0 : 0x3c00;
-            std::memcpy(scan_weight.data() + sample * 2, &value, 2);
+            std::memcpy(scan_weight.data() + weight_slot * 2, &value, 2);
             if (sample) {
+                const size_t previous_slot = weight_slot - 1;
                 if (ablate_weights) {
-                    std::memcpy(scan_weight.data() + (sample - 1) * 2,
-                                weights.data() + (sample - 1) * 2, 2);
+                    std::memcpy(scan_weight.data() + previous_slot * 2,
+                                weights.data() + previous_slot * 2, 2);
                 } else {
                     const unsigned short zero = 0;
-                    std::memcpy(scan_weight.data() + (sample - 1) * 2, &zero, 2);
+                    std::memcpy(scan_weight.data() + previous_slot * 2, &zero, 2);
                 }
             }
             check("scan weight upload", cuMemcpyHtoD(
