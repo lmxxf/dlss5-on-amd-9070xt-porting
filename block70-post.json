@@ -62,7 +62,10 @@
     "amd_attention_submit_ms": 1.806,
     "portable_ffn_heldout_correlation": 0.9375054,
     "amd_full_body_single_tile_correlation": 0.9037716,
-    "amd_full_body_submit_ms": 1.038
+    "amd_full_body_submit_ms": 1.038,
+    "amd_full_frame_body_submit_ms": 5.553,
+    "amd_full_frame_body_head_rgb_correlation": 0.9453700,
+    "amd_full_frame_head_submit_ms": 0.650
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }

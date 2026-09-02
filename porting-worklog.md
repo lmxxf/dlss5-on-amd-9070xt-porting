@@ -1319,6 +1319,10 @@ CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续
 
 `make_post_body_compatible.py`把FFN与attention effective合并为标准41,220-byte 1H layout，并继续使用`P'=P×skip`、`residual'=skip²`。RX9070XT从exact prefix输入一次跑完整FFN＋attention＋shared suffix gain：单tilesubmit→fence 1.038 ms，对NVIDIA full-body correlation 0.903772、MAE 0.9031、RMSE 1.4713、max error 9.117。错误的continuous joint refinement无法复现同参数shader（CPU单tile仅约0.18），已中止且未写回；当前权威是分层effective与AMD实跑结果。block70结构链至此完整落到AMD，剩余是提升FFN effective精度并接全图physical view。
 
+全图后半链随后贯通：原CUBIN只用双residual identity导出256×144×32 prefix，RX9070XT用同一`block70-body-compatible.bin`在width256/height144下执行完整FFN＋attention＋shared gain，submit→fence 5.553 ms；portable RGB head再耗时0.650 ms。最终画面对NVIDIA原post RGB correlation 0.945370、RGB MAE 0.03524，RGBA cosine 0.991158；人物、机甲与背景几何完整，差异主要是高频条纹幅度。严格边界是prefix仍来自NVIDIA controlled oracle，故不能称end-to-end AMD。
+
+prefix global physical mapping开始用impulse指纹恢复。main global offsets0–63逐一匹配local matrix columns0–63（cosine 0.99999+）；`+2048/+4096/+6144`对应local64/128/192，`+8192`进入下一output tile row，main tile-x stride为64。full geometry只消费每CTA前256个main local columns；extent8 oracle的后256 columns不是full模式简单连续切片。skip布局不同：offset0–15匹配local0–15，`+64/+128/+256`匹配local64/128/256，而`+1024`进入下一output tile x，skip tile-x stride为1024。剩余prefix工作已从数值语义缩到两路global view的halo／boundary地址公式。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
