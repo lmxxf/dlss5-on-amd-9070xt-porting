@@ -1285,6 +1285,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 批量runner新增`features`模式：保留body与48-value input/gain区，依次给两块out-conv的32个逻辑channel置unit weight，从R通道直接读回64×32 body feature。单tile结果与旧512-launch完整head basis逐float exact；9,216组联合main+skip只耗时5.47秒，18,874,368个值全部有限。无结构body MLP再次被held-out否决：8,192 train＋1,024 held-out的2560→512→2048模型correlation仅0.377、MAE 0.401，几乎等于均值baseline 0.413。原因是独立同分布FP8随机byte把attention推入大量±0.5饱和区，既不代表真实activation流形，也无法学习高维窗口结构。该dataset保留作受控分支证据，不作为portable参数；下一步用feature读口逐段恢复FFN与attention，而不是扩大黑盒网络。
 
+对2048-byte main＋512-byte skip逐输入slot施加E4M3 `0.03125` impulse，再经`features`模式导出完整64×32 Jacobian，2,560组仅耗时1.80秒。main只有offset 0–511响应，后1,536 bytes严格为零，rank 512；skip的512/512 slots全部响应，rank同为512。这把真实输入合同修正为两路`4×4×32`，共同upsample为`8×8×32` body feature；此前把main当8×8×32的假设作废。零点Jacobian在线性小幅随机held-out上correlation 0.879／0.908、MAE 0.00197／0.00284，但对大幅iid FP8饱和样本仅0.522，不能直接当完整body。它当前用于恢复physical token/channel与局部upsample，不提升为最终AMD参数。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
