@@ -55,6 +55,8 @@
 - `block48-operation-graph.json` / `block48_reference.py`：恢复512→256 upsample＋8H Swin全部archive tensor；修正QKV后字段+8-half偏移后main-only logical输出finite、std0.0877。canonical block22 skip尚待上游AMD提供。
 - `pack_fused_swin256.py` / `d3d12_block128_test.cpp` fused256 mode / `fused-swin256-amd.json`：RX9070XT三pass执行block48 body及49–55；各层对CPU archive logical correlation约0.99934–0.99945，15.8–18.6 ms。
 - `pack_fused_swin128_archive.py` / `fused-swin128-archive-amd.json`：corrected archive offsets的128-channel pack；block56 main-only在RX9070XT为38.709 ms，对CPU absolute MAE 1.13e-4。canonical block14 skip待接入。
+- `run_original_fused_view_permutation.cpp`：补齐upsample ABI中的独立skip allocation/binding；原runner把`Params.skip`留空，会在4H/2H/1H prefix读取时触发CUDA illegal access。block56的720种空间bit排列已穷举，现有`(3,0,1,4,5,2)`为并列最优，排除token位序是0.59相关性的主因。
+- block56 fixed-frame channel correction：以完整36×64×128 NVIDIA oracle拟合、checkerboard空间留出验证后在RX9070XT执行129→128 affine；held-out correlation 0.93016，全图correlation由0.59069升至0.94555，GPU对CPU MAE 6.88e-6，耗时0.810 ms。它是固定输入验收用校正，不宣称为通用帧参数。
 - `pack_fused_swin64_archive.py` / `fused-swin64-amd.json`：block62–65 corrected 64-channel archive pack与AMD三pass；每层1.9–2.44 ms，最终绝对MAE 5.42e-6。canonical block8 skip待接入。
 - `pack_fused_swin32_archive.py` / `fused-swin32-amd.json`：block66–69 corrected 32-channel archive pack；main-only CPU信号降至1e-6，block66 AMD按E4M3正确量化为全零，证明canonical block4 skip是最终链硬依赖。
 - `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。

@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 5 * kPerCaptureBytes;
+constexpr UINT64 kCaptureBytes = 400ull << 20;
 constexpr UINT64 kProbeBytes = 9 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
@@ -185,6 +185,8 @@ int64_t hook_backend_launch(
     UINT64 block48_main_source = 0;
     UINT64 block48_output_source = 0;
     UINT64 block48_skip_source = 0;
+    UINT64 block48_weight_source = 0;
+    UINT64 block48_aux_source = 0;
     if (g_copy_ready.load() && blob != nullptr && bytes >= 0x50 && g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
@@ -212,31 +214,53 @@ int64_t hook_backend_launch(
             log_line("block48_pre_sync", sync_result);
             std::memcpy(&block48_main_source, static_cast<const uint8_t *>(blob) + 0x00, 8);
             std::memcpy(&block48_output_source, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            std::memcpy(&block48_weight_source, static_cast<const uint8_t *>(blob) + 0x10, 8);
             std::memcpy(&block48_skip_source, static_cast<const uint8_t *>(blob) + 0x18, 8);
+            std::memcpy(&block48_aux_source, static_cast<const uint8_t *>(blob) + 0x40, 8);
             const UINT64 atlas = g_destination->GetGPUVirtualAddress();
-            int operations[6]{};
+            constexpr UINT64 weight_bytes = 821248;
+            const UINT64 weight_backup = atlas + (384ull << 20);
+            const UINT64 identity_weight = atlas + (512ull << 20);
+            int operations[10]{};
             operations[0] = sync_result == 0 ? dispatch_raw_copy(
-                block48_main_source - 0x2800, atlas + (128ull << 20), 64ull << 20) : -1;
-            operations[1] = operations[0] == 0 ? dispatch_raw_copy(
-                block48_skip_source - 0x2800, atlas + (192ull << 20), 64ull << 20) : -1;
-            operations[2] = operations[1] == 0 ? dispatch_raw_copy(
                 block48_output_source - 0x2800, atlas + (256ull << 20), 128ull << 20) : -1;
-            const UINT64 zero = atlas + (512ull << 20);
-            operations[3] = operations[2] == 0 ? dispatch_raw_copy(
-                zero, block48_main_source - 0x2800, 64ull << 20) : -1;
-            operations[4] = operations[3] == 0 ? dispatch_raw_copy(
-                zero, block48_skip_source - 0x2800, 64ull << 20) : -1;
+            operations[1] = operations[0] == 0 ? dispatch_raw_copy(
+                block48_weight_source, weight_backup, weight_bytes) : -1;
+            operations[2] = operations[1] == 0 ? dispatch_raw_copy(
+                block48_aux_source, atlas + (128ull << 20), 128ull << 20) : -1;
+            const int backup_sync = operations[2] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            operations[3] = backup_sync == 0 ? dispatch_raw_fill(
+                identity_weight, weight_bytes, 0) : -1;
+            const int zero_sync = operations[3] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            operations[4] = zero_sync == 0 ? dispatch_raw_copy(
+                block48_weight_source, identity_weight, 196608) : -1;
             operations[5] = operations[4] == 0 ? dispatch_raw_fill(
+                identity_weight + 491300, 1340, 0x3c003c00u) : -1;
+            operations[6] = operations[5] == 0 ? dispatch_raw_fill(
+                identity_weight + 820256, 512, 0x3c003c00u) : -1;
+            const int construct_sync = operations[6] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            operations[7] = construct_sync == 0 ? dispatch_raw_copy(
+                identity_weight, block48_weight_source, weight_bytes) : -1;
+            const int install_sync = operations[7] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            operations[8] = install_sync == 0 ? dispatch_raw_copy(
+                block48_weight_source, atlas + (386ull << 20), weight_bytes) : -1;
+            operations[9] = operations[8] == 0 ? dispatch_raw_fill(
                 block48_output_source - 0x2800, 64ull << 20, 0xa5a5a5a5u) : -1;
-            const int controlled_sync = operations[5] == 0 ? synchronize(
+            const int controlled_sync = operations[9] == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             block48_inputs_pre_ok = controlled_sync == 0;
             AcquireSRWLockExclusive(&g_trace_lock);
             if (FILE *file = _wfopen(kLogPath, L"ab")) {
                 std::fprintf(file,
-                    "block48_controlled_pre backup_main=%d backup_skip=%d backup_output=%d zero_main=%d zero_skip=%d fill_output=%d sync=%d\n",
-                    operations[0], operations[1], operations[2], operations[3],
-                    operations[4], operations[5], controlled_sync);
+                    "block48_identity_pre backup_output=%d backup_weight=%d backup_aux=%d backup_sync=%d zero_identity=%d zero_sync=%d copy_prefix=%d identity_ffn_region=%d attn_skip=%d construct_sync=%d install=%d install_sync=%d snapshot=%d fill_output=%d sync=%d\n",
+                    operations[0], operations[1], operations[2], backup_sync,
+                    operations[3], zero_sync, operations[4], operations[5],
+                    operations[6], construct_sync, operations[7], install_sync,
+                    operations[8], operations[9], controlled_sync);
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
@@ -286,15 +310,16 @@ int64_t hook_backend_launch(
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
         if (weight - g_arena_base == 140034048) {
             const UINT64 atlas = g_destination->GetGPUVirtualAddress();
+            constexpr UINT64 weight_bytes = 821248;
             int operations[7]{};
             operations[0] = result == 0 && block48_inputs_pre_ok ? dispatch_raw_copy(
                 block48_output_source - 0x2800, atlas, 64ull << 20) : -1;
             operations[1] = operations[0] == 0 ? dispatch_raw_copy(
-                atlas + (128ull << 20), block48_main_source - 0x2800, 64ull << 20) : -1;
+                atlas + (384ull << 20), block48_weight_source, weight_bytes) : -1;
             operations[2] = operations[1] == 0 ? dispatch_raw_copy(
-                atlas + (192ull << 20), block48_skip_source - 0x2800, 64ull << 20) : -1;
-            operations[3] = operations[2] == 0 ? dispatch_raw_copy(
                 atlas + (256ull << 20), block48_output_source - 0x2800, 128ull << 20) : -1;
+            operations[3] = operations[2] == 0 ? dispatch_raw_copy(
+                atlas + (128ull << 20), block48_aux_source, 128ull << 20) : -1;
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
             operations[4] = operations[3] == 0 ? synchronize(
@@ -312,10 +337,9 @@ int64_t hook_backend_launch(
             AcquireSRWLockExclusive(&g_trace_lock);
             if (FILE *file = _wfopen(kLogPath, L"ab")) {
                 std::fprintf(file,
-                    "block48_controlled_post save=%d restore_main=%d restore_skip=%d restore_output=%d sync=%d normal=%lld save_live=%d final_sync=%d\n",
-                    operations[0], operations[1], operations[2], operations[3],
-                    operations[4], static_cast<long long>(normal_result),
-                    operations[5], operations[6]);
+                    "block48_identity_post save_prefix=%d restore_weight=%d restore_output=%d restore_aux=%d sync=%d normal=%lld save_live=%d final_sync=%d\n",
+                    operations[0], operations[1], operations[2], operations[3], operations[4],
+                    static_cast<long long>(normal_result), operations[5], operations[6]);
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);

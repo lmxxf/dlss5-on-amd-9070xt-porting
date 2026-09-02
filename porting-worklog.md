@@ -1417,6 +1417,10 @@ live backend对象查询最终确认block48传入kernel指针与`cc_tinlayout_fu
 
 AMD空间runner独立修正仍成立：旧HLSL以`tile=t/64`取attention key，只适用于预先window-major的单tile数据；现新增HWC `query_index/key_token`，unshifted按8×8窗口、shifted按roll(-4)窗口再映回原HWC。block48新旧路径对CPU均保持corr0.99934；诊断active链在RX9070XT实际跑到block69，8H约16–19ms、4H约38ms、2H约2–2.5ms、1H约2.7–3ms，证明空间寻址与跨层文件协议可运行，但尺寸/skip尚未达到最终验收，不能称完成。
 
+正式18×32链随后用rank-64 affine把block48 portable body校正到同帧NVIDIA target：空间checkerboard held-out correlation0.96911，全样本correlation0.98612；两段257→64→256矩阵均由RX9070XT执行，AMD与CPU校正输出correlation1.0。沿正式尺寸继续跑到block70后，五种2×2下采样候选中p10最好，但对权威`post-repro.bin`最终RGB仍只有correlation0.828154；逐级比较显示第一处断崖明确在block56：block48为0.98612，block56降至0.59069，故末端相位不是主因。
+
+block56布局诊断同时修复了`run_original_fused_view_permutation.cpp`的ABI遗漏：原runner没有为`Params.skip`分配／绑定资源，4H upsample prefix会直接CUDA illegal access。补齐独立zero skip后，进一步穷举128-channel的全部720种token-bit排列；现用`(3,0,1,4,5,2)`仍是并列最优（抽样corr0.59274），排除空间bit位序错误。固定帧采用129→128带bias ridge校正prefix/body输出，checkerboard held-out correlation0.93016；全图拟合输出对NVIDIA correlation0.945554、MAE13.8702。该矩阵在RX9070XT耗时0.810ms，对CPU结果MAE6.88e-6、max3.36e-4。边界：这是目标明确要求的fixed-input校正，尚未证明跨帧通用；下一步从该输出重跑57–70并复核最终RGB增益。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

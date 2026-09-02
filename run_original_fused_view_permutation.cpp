@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
     check("current", cuCtxSetCurrent(context));
     CUmodule module; check("module", cuModuleLoad(&module, argv[1]));
     CUfunction function; check("function", cuModuleGetFunction(&function, module, argv[2]));
-    CUdeviceptr input, output, device_weights, auxiliary;
-    for (CUdeviceptr *pointer : {&input, &output, &auxiliary}) {
+    CUdeviceptr input, output, device_weights, skip, auxiliary;
+    for (CUdeviceptr *pointer : {&input, &output, &skip, &auxiliary}) {
         check("alloc", cuMemAlloc(pointer, arena_bytes));
         check("zero", cuMemsetD8(*pointer, 0, arena_bytes));
     }
@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
     params.input = input;
     params.output = output;
     params.weights = device_weights;
+    params.skip = skip;
     params.height = height;
     params.width = width;
     params.shift_y = params.shift_x = shifted ? -4 : 0;
