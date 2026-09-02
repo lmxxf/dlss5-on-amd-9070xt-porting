@@ -19,6 +19,9 @@ def load_half(path: Path) -> np.ndarray:
 
 
 def split_swin(feature: np.ndarray, paths: list[Path]) -> np.ndarray:
+    if feature.ndim != 2 or feature.shape[1] != 512 or feature.shape[0] % 64:
+        raise ValueError("feature must be [multiple-of-64, 512]")
+    windows = feature.shape[0] // 64
     ffwd = load_half(paths[0])
     ffwd_proj = load_half(paths[1])
     qkv_attn = load_half(paths[2])
@@ -33,18 +36,21 @@ def split_swin(feature: np.ndarray, paths: list[Path]) -> np.ndarray:
     feature = projected + feature * ffwd_proj[131072:]
 
     qkv = feature @ qkv_attn[:393216].reshape(3, 256, 512).transpose(0, 2, 1)
-    q, k, v = (item.reshape(64, 16, 16).transpose(1, 0, 2) for item in qkv)
+    q, k, v = (
+        item.reshape(windows, 64, 16, 16).transpose(0, 2, 1, 3)
+        for item in qkv
+    )
     q /= np.maximum(np.linalg.norm(q, axis=-1, keepdims=True), 1e-12)
     k /= np.maximum(np.linalg.norm(k, axis=-1, keepdims=True), 1e-12)
     bias = qkv_attn[393216:458752].reshape(16, 64, 64)
     scale = np.frombuffer(
         qkv_attn[458752:458784].astype("<f2").tobytes(), dtype="<f4", count=16
-    ).reshape(16, 1, 1)
-    logits = np.einsum("hqd,hkd->hqk", q, k) * scale + bias
+    ).reshape(1, 16, 1, 1)
+    logits = np.einsum("whqd,whkd->whqk", q, k) * scale + bias[None]
     logits -= logits.max(axis=-1, keepdims=True)
     attention = np.exp(logits)
     attention /= attention.sum(axis=-1, keepdims=True)
-    attended = np.einsum("hqk,hkd->qhd", attention, v).reshape(64, 256)
+    attended = np.einsum("whqk,whkd->wqhd", attention, v).reshape(-1, 256)
     output = attended @ projection[:131072].reshape(512, 256).T
     return output + feature * projection[131072:]
 
@@ -55,7 +61,7 @@ def main() -> None:
     parser.add_argument("output", type=Path)
     parser.add_argument("weights", type=Path, nargs=4)
     args = parser.parse_args()
-    feature = np.fromfile(args.input, dtype="<f4").reshape(64, 512)
+    feature = np.fromfile(args.input, dtype="<f4").reshape(-1, 512)
     result = split_swin(feature, args.weights)
     result.astype("<f4").tofile(args.output)
     print(

@@ -12,5 +12,15 @@
     {"block": 46, "submit_ms": 24.090, "correlation": 0.99333743, "mae": 0.03120656, "rmse": 0.13386077},
     {"block": 47, "submit_ms": 25.745, "correlation": 0.99271458, "mae": 0.03119797, "rmse": 0.13927592}
   ],
+  "spatial_16x16_fixed_input": [
+    {"block": 40, "submit_ms": 22.471, "correlation": 0.99931576, "mae": 0.01978314},
+    {"block": 41, "submit_ms": 22.680, "correlation": 0.99865293, "mae": 0.02550507},
+    {"block": 42, "submit_ms": 22.501, "correlation": 0.99776551, "mae": 0.03093059},
+    {"block": 43, "submit_ms": 24.631, "correlation": 0.99670096, "mae": 0.03518156},
+    {"block": 44, "submit_ms": 22.737, "correlation": 0.99530737, "mae": 0.03873998},
+    {"block": 45, "submit_ms": 22.485, "correlation": 0.99373498, "mae": 0.03717972},
+    {"block": 46, "submit_ms": 24.044, "correlation": 0.99272636, "mae": 0.03682848},
+    {"block": 47, "submit_ms": 22.518, "correlation": 0.99206752, "mae": 0.03669442}
+  ],
   "boundary": "correctness implementation; QKV is precomputed but attention/projection is not performance optimized"
 }

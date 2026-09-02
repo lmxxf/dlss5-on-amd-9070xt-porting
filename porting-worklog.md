@@ -1349,6 +1349,8 @@ AMD 512-channel correctness runner在`d3d12_block128_test.cpp`新增split512模�
 
 `pack_split_swin512.py`把四条archive records整理为统一3,936,320-byte FP32 blob。RX9070XT连续执行blocks40–47，每层submit→fence 20.512–25.745 ms；逐层对CPU archive logical correlation为0.99933/0.99872/0.99792/0.99687/0.99554/0.99413/0.99334/0.99271，最终MAE 0.03120、RMSE 0.13928。AMD block47 std1.0244、CPU0.9524，误差累积但无爆炸／坍缩。decoder39–47至此全部以archive真权重在AMD执行；下一段进入block48 8H upsample与49–55。
 
+空间尺度复核后，前述64-token链被保留为单window correctness，正式固定帧改为：ViT 8×8×1024经`block39_spatial_reference.py` grouped投影与2×nearest上采样到16×16×512，并融合`block30-main-correct.bin`未池化skip；blocks40–47在width/height16下处理4个8×8 windows。CPU std由block39的3.400平滑降到block47的1.626。RX9070XT八层耗时22.471–24.631 ms，逐层correlation 0.999316/0.998653/0.997766/0.996701/0.995307/0.993735/0.992726/0.992068，最终MAE0.03669。decoder39–47完整16×16空间链至此闭合。
+
 block48 descriptor operation vector共有36步：4步upsample前缀`convolution→convolution→mul→add`，随后是带额外input convolution的标准8H Swin。live字段给出in/out=512/256、`+0x40..=[0,0,8,32]`、boundary flags1/1、scale1.0、mode3。record 410,392 halves，比普通8H block49多65,776；按尾部QKV/bias/projection结构反向对齐得到：前65,536为256×256 prefix conv，随后W0/W1/W2占65,536–245,759，245,760–246,263为504-half dw/sin/padding/FFN-skip区，QKV从246,264开始，之后全部与普通8H尾布局同构。结构固化为`block48-operation-graph.json`；下一步细分504-half区并实现archive logical upsample。
 
 504-half区随后由数值分布切开：245,760–246,015的256值集中在约0.82–1.0，是FFN skip；246,016–246,255的240值分布0–0.79，是prefix dw/sin；246,256–246,263为8个padding slots（序列化内容不保证清零）。block48全部learned tensor边界至此闭合，剩余变量只在512→256 prefix如何把64个main tokens与block22 skip展开到576个256-channel tokens。
