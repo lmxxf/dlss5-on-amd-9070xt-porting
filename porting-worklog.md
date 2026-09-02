@@ -1323,6 +1323,12 @@ CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续
 
 prefix global physical mapping开始用impulse指纹恢复。main global offsets0–63逐一匹配local matrix columns0–63（cosine 0.99999+）；`+2048/+4096/+6144`对应local64/128/192，`+8192`进入下一output tile row，main tile-x stride为64。full geometry只消费每CTA前256个main local columns；extent8 oracle的后256 columns不是full模式简单连续切片。skip布局不同：offset0–15匹配local0–15，`+64/+128/+256`匹配local64/128/256，而`+1024`进入下一output tile x，skip tile-x stride为1024。剩余prefix工作已从数值语义缩到两路global view的halo／boundary地址公式。
 
+高位bank扫描补齐main：第一bank base0、第二bank base`18×8192=147456`，每bank含四个64-byte planes、plane stride2048；CTA base为`ty×8192+tx×64`，两bank分别映射local columns0–255/256–511。按此gather后main-only prefix对NVIDIA correlation 0.999996044、MAE 4.31e-4、std 3.30428/3.30442。
+
+skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[32768,33792)`，CTA x/y strides为1024/65536。`run_original_post_dataset.cpp`新增`global-skip-features`，在full dimensions只launch CTA0并scatter两bank；2048-row Hadamard恢复2048→2048矩阵。全图skip-only prefix correlation 0.999999972、MAE 3.83e-5、max error 0.005875。参数固化为`block70-prefix-global-skip-effective.bin/.json`，地址gather与AMD输出合并固化为`prepare_post_global_prefix.py`。
+
+通用AMD matrix runner扩展为batch `input_dim→output_dim`。RX9070XT一次处理576 tiles后，main prefix与skip prefix各自对CPU portable逐float 100% exact；CPU只执行E4M3解码、physical gather、两路相加及tile-major→row-major重排。合并prefix对NVIDIA correlation 0.999996278。随后AMD body耗时3.030 ms、RGB head 0.774 ms，得到从block69 main＋block0 skip原始physical buffers起算的完整AMD block70：最终RGB correlation 0.945358、RGB MAE 0.035245。至此block70本身已端到端移植完成；71-block总目标剩余上游portable block0–69的统一AMD串联与最终验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

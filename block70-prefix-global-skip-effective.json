@@ -1,0 +1,27 @@
+{
+  "file": "block70-prefix-global-skip-effective.bin",
+  "sha256": "0dddda54077a365156e1e7a441a35b9d4d3a858b88d6f463daa99a57da095eed",
+  "storage": "float32_little_endian",
+  "shape": [
+    2048,
+    2048
+  ],
+  "input_banks": [
+    [
+      0,
+      1024
+    ],
+    [
+      32768,
+      33792
+    ]
+  ],
+  "tile_x_stride_bytes": 1024,
+  "tile_y_stride_bytes": 65536,
+  "recovery": "2048-row Rademacher Hadamard at +/-0.5 in full dimensions",
+  "fixed_frame_validation": {
+    "correlation": 0.9999999718,
+    "mae": 3.82751e-05,
+    "max_abs_error": 0.005874634
+  }
+}

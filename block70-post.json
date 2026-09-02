@@ -65,7 +65,13 @@
     "amd_full_body_submit_ms": 1.038,
     "amd_full_frame_body_submit_ms": 5.553,
     "amd_full_frame_body_head_rgb_correlation": 0.9453700,
-    "amd_full_frame_head_submit_ms": 0.650
+    "amd_full_frame_head_submit_ms": 0.650,
+    "portable_global_main_prefix_correlation": 0.99999604,
+    "portable_global_skip_prefix_correlation": 0.99999997,
+    "amd_global_main_prefix_exact_fraction": 1.0,
+    "amd_global_skip_prefix_exact_fraction": 1.0,
+    "amd_block70_end_to_end_rgb_correlation": 0.9453583,
+    "amd_block70_end_to_end_rgb_mae": 0.0352449
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }

@@ -34,8 +34,9 @@ int main(int argc, char **argv) {
             "usage: %s cubin symbol weights blend samples.u8 output.rgba32f "
             "[scan-half-count [ablate|head]]\n"
             "       %s cubin symbol weights blend samples.u8 features.f32 features\n"
+            "       %s cubin symbol weights blend samples.u8 features.f32 global-skip-features\n"
             "samples: repeated [2048-byte main][512-byte skip] records\n",
-            argv[0], argv[0]);
+            argv[0], argv[0], argv[0]);
         return 2;
     }
     auto weights = read_file(argv[3]);
@@ -46,7 +47,10 @@ int main(int argc, char **argv) {
     constexpr size_t sample_bytes = main_bytes + skip_bytes;
     if (weights.size() != 21808 || blend.size() != 2 || samples.empty() ||
         samples.size() % sample_bytes) return 2;
-    const bool feature_mode = argc == 8 && !std::strcmp(argv[7], "features");
+    const bool global_skip_features =
+        argc == 8 && !std::strcmp(argv[7], "global-skip-features");
+    const bool feature_mode = argc == 8 &&
+        (!std::strcmp(argv[7], "features") || global_skip_features);
     const bool scan_weights = argc >= 8 && !feature_mode;
     const bool ablate_weights = argc == 9 && !std::strcmp(argv[8], "ablate");
     const bool head_weights = argc == 9 && !std::strcmp(argv[8], "head");
@@ -124,9 +128,10 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0x08, &skip_device, 8);
     std::memcpy(params + 0x10, &output_surface, 8);
     std::memcpy(params + 0x18, &weights_device, 8);
-    const int extent = 8;
-    std::memcpy(params + 0x20, &extent, 4);
-    std::memcpy(params + 0x24, &extent, 4);
+    const int width = global_skip_features ? 256 : 8;
+    const int height = global_skip_features ? 144 : 8;
+    std::memcpy(params + 0x20, &height, 4);
+    std::memcpy(params + 0x24, &width, 4);
     const float input_scale = 0.03125f;
     const int rgb_mode = 1;
     std::memcpy(params + 0x30, &input_scale, 4);
@@ -138,8 +143,8 @@ int main(int argc, char **argv) {
     const float one = 1.0f;
     std::memcpy(params + 0xa4, &one, 4);
     std::memcpy(params + 0xa8, &one, 4);
-    std::memcpy(params + 0xac, &extent, 4);
-    std::memcpy(params + 0xb0, &extent, 4);
+    std::memcpy(params + 0xac, &width, 4);
+    std::memcpy(params + 0xb0, &height, 4);
     void *arguments[] = {params};
 
     std::vector<float> output(count * 8 * 8 * (feature_mode ? 32 : 4));
@@ -195,8 +200,14 @@ int main(int argc, char **argv) {
         }
         check("main clear", cuMemsetD8(main_device, 0, 1 << 20));
         check("skip clear", cuMemsetD8(skip_device, 0, 1 << 20));
-        check("main upload", cuMemcpyHtoD(main_device, record, main_bytes));
-        check("skip upload", cuMemcpyHtoD(skip_device, record + main_bytes, skip_bytes));
+        if (global_skip_features) {
+            check("global skip bank0", cuMemcpyHtoD(skip_device, record, 1024));
+            check("global skip bank1", cuMemcpyHtoD(
+                skip_device + 32768, record + 1024, 1024));
+        } else {
+            check("main upload", cuMemcpyHtoD(main_device, record, main_bytes));
+            check("skip upload", cuMemcpyHtoD(skip_device, record + main_bytes, skip_bytes));
+        }
         if (feature_mode) {
             for (size_t channel = 0; channel < 32; ++channel) {
                 const size_t block = channel < 16 ? 10392 : 10648;
