@@ -35,6 +35,7 @@
 - `tinlayout-2h64-input-permutation.i32` / `tinlayout-2h64-output-permutation.i32` / `tinlayout-2h64-permutation.json`：4096-basis CUBIN scan 恢复的完整 2H/64-channel token+channel unswizzle；64 个对齐 Jacobian correlation 全为 1.0。
 - `fp8-weight-layout-evidence.json`：2H SASS 把 weight view 当 E4M3 packed/swizzled 数据消费的直接证据；archive 外层按两字节计数且 `blend_scale` 确为 FP16，但矩阵 payload 是否由 NvAPI 上传时转换仍待与 auxiliary-view 缺口一起判定。
 - `unpack_mma_fragments.py`：按 NVIDIA PTX 9.1 `mma.m16n8k32` matrix-B 官方公式解包／回包 lane-major E4M3 subtiles；block8 W1 的 8,192 loaded bytes 可逐 byte roundtrip。
+- `infer_vit_layouts.py` / `vit-layouts.json`：闭合 blocks31–38 五类 ViT record 的字节分区；把 4 MiB Expand、4 MiB Contract、3 MiB QKV、1 MiB Projection 主体明确标为 packed E4M3，并分离 FP16 residual skip、padding 与尚待 SASS 定位的 128-byte attention scale region。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。

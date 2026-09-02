@@ -1114,6 +1114,22 @@ block66坍缩随后由SASS直接破案。`cc_tinlayout_fused_swin_1h_32_1_upsamp
 
 因此自建5090宿主路线的结论已足够明确：它可稳定验证单block和ABI，但不能作为35–38生产流水线；继续用重启抽样不具收敛性。blocks31–36的有限输出、block66主输入修正均保留；35–38剩余工作转向解析已保存runtime kernel/aux对象，或在AMD上按archive矩阵语义重写，不再依赖WDDM私有chain调度。实验性range/aux代码留在工作树，未提升为稳定实现。
 
+### ViT record 字节布局闭合：AMD 语义重写入口
+
+新增 `infer_vit_layouts.py` 与 `vit-layouts.json`，对 blocks31–38 的五条 record 逐字节闭合。八个 block 完全同构：
+
+```text
+layer0 Expand:     0x400000 packed E4M3 + 0x10 zero padding
+layer1 Contract:   0x400000 packed E4M3 + 0x800 FP16 ffn_cos_skip
+layer2 QKV:        0x300000 packed E4M3 + 0x80 unresolved scale region
+layer3 Attention:  0x2-byte scalar record
+layer4 Projection: 0x100000 packed E4M3 + 0x800 FP16 attn_cos_skip
+```
+
+两条 residual 尾区已有直接 SASS 地址证据：Contract 从 weight base `+0x400000` 读取，Projection 从 `+0x100000` 读取；尾部各 1,024 个 FP16 值也落在约 0.5–1.0 的合理范围。Expand 的 16-byte 尾区在八个 block 中均为 alignment padding。QKV 的 128-byte 尾区虽由内部名字标为 `attn_scale`，但直接按 FP16／FP32 解码不成立，在恢复精确 load 地址前保持 `unresolved_mixed_region`，不再凭名字指定 dtype。
+
+这一步把 AMD ViT 的问题从“解析 12.6 MB 不透明 blob”收窄为四类 packed E4M3 矩阵 unswizzle + 两条已知 FP16 skip。下一步沿 ViT SASS 中的 weight LDG 地址、lane id 与 `QMMA.16832` fragment 顺序恢复矩阵 tile 拼接；不再把 record 外层的 `element_count×2` 当作线性 FP16 张量。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

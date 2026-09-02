@@ -1,0 +1,1064 @@
+{
+  "status": "byte regions closed; packed matrices still require unswizzle",
+  "width": 1024,
+  "tokens_at_256x144": 64,
+  "content_validated": true,
+  "blocks": {
+    "31": [
+      {
+        "record": "block31.layer0.layer",
+        "arena_offset": 23028224,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block31.layer1.layer",
+        "arena_offset": 27223040,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.53515625,
+          "residual_skip_max": 1.0
+        }
+      },
+      {
+        "record": "block31.layer2.layer",
+        "arena_offset": 31419392,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block31.layer3.layer",
+        "arena_offset": 34565632,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block31.layer4.layer",
+        "arena_offset": 34566144,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.51806640625,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "32": [
+      {
+        "record": "block32.layer0.layer",
+        "arena_offset": 35616768,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block32.layer1.layer",
+        "arena_offset": 39811584,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.398193359375,
+          "residual_skip_max": 0.99951171875
+        }
+      },
+      {
+        "record": "block32.layer2.layer",
+        "arena_offset": 44007936,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block32.layer3.layer",
+        "arena_offset": 47154176,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block32.layer4.layer",
+        "arena_offset": 47154688,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.42236328125,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "33": [
+      {
+        "record": "block33.layer0.layer",
+        "arena_offset": 48205312,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block33.layer1.layer",
+        "arena_offset": 52400128,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.389404296875,
+          "residual_skip_max": 0.9990234375
+        }
+      },
+      {
+        "record": "block33.layer2.layer",
+        "arena_offset": 56596480,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block33.layer3.layer",
+        "arena_offset": 59742720,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block33.layer4.layer",
+        "arena_offset": 59743232,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.389404296875,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "34": [
+      {
+        "record": "block34.layer0.layer",
+        "arena_offset": 60793856,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block34.layer1.layer",
+        "arena_offset": 64988672,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.405517578125,
+          "residual_skip_max": 0.9990234375
+        }
+      },
+      {
+        "record": "block34.layer2.layer",
+        "arena_offset": 69185024,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block34.layer3.layer",
+        "arena_offset": 72331264,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block34.layer4.layer",
+        "arena_offset": 72331776,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.330078125,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "35": [
+      {
+        "record": "block35.layer0.layer",
+        "arena_offset": 73382400,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block35.layer1.layer",
+        "arena_offset": 77577216,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.2469482421875,
+          "residual_skip_max": 0.99951171875
+        }
+      },
+      {
+        "record": "block35.layer2.layer",
+        "arena_offset": 81773568,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block35.layer3.layer",
+        "arena_offset": 84919808,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block35.layer4.layer",
+        "arena_offset": 84920320,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.326416015625,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "36": [
+      {
+        "record": "block36.layer0.layer",
+        "arena_offset": 85970944,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block36.layer1.layer",
+        "arena_offset": 90165760,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.40185546875,
+          "residual_skip_max": 1.0
+        }
+      },
+      {
+        "record": "block36.layer2.layer",
+        "arena_offset": 94362112,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block36.layer3.layer",
+        "arena_offset": 97508352,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block36.layer4.layer",
+        "arena_offset": 97508864,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.39208984375,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "37": [
+      {
+        "record": "block37.layer0.layer",
+        "arena_offset": 98559488,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block37.layer1.layer",
+        "arena_offset": 102754304,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.2318115234375,
+          "residual_skip_max": 0.99853515625
+        }
+      },
+      {
+        "record": "block37.layer2.layer",
+        "arena_offset": 106950656,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block37.layer3.layer",
+        "arena_offset": 110096896,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block37.layer4.layer",
+        "arena_offset": 110097408,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.2364501953125,
+          "residual_skip_max": 1.0
+        }
+      }
+    ],
+    "38": [
+      {
+        "record": "block38.layer0.layer",
+        "arena_offset": 111148032,
+        "payload_size": 4194320,
+        "sections": [
+          {
+            "name": "ffn_expand_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              4096,
+              1024
+            ]
+          },
+          {
+            "name": "alignment_padding",
+            "byte_offset": 4194304,
+            "byte_size": 16,
+            "storage": "zero_padding"
+          }
+        ],
+        "content_checks": {
+          "padding_all_zero": true
+        }
+      },
+      {
+        "record": "block38.layer1.layer",
+        "arena_offset": 115342848,
+        "payload_size": 4196352,
+        "sections": [
+          {
+            "name": "ffn_contract_weight",
+            "byte_offset": 0,
+            "byte_size": 4194304,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              4096
+            ]
+          },
+          {
+            "name": "ffn_cos_skip",
+            "byte_offset": 4194304,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x400000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.252685546875,
+          "residual_skip_max": 1.0
+        }
+      },
+      {
+        "record": "block38.layer2.layer",
+        "arena_offset": 119539200,
+        "payload_size": 3145856,
+        "sections": [
+          {
+            "name": "qkv_weight",
+            "byte_offset": 0,
+            "byte_size": 3145728,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              3072,
+              1024
+            ]
+          },
+          {
+            "name": "attention_scale_region",
+            "byte_offset": 3145728,
+            "byte_size": 128,
+            "storage": "unresolved_mixed_region",
+            "evidence": "weight-names calls this attn_scale; exact scalar packing still requires SASS address recovery"
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block38.layer3.layer",
+        "arena_offset": 122685440,
+        "payload_size": 2,
+        "sections": [
+          {
+            "name": "attention_record",
+            "byte_offset": 0,
+            "byte_size": 2,
+            "storage": "float16",
+            "logical_shape": [
+              1
+            ]
+          }
+        ],
+        "content_checks": {}
+      },
+      {
+        "record": "block38.layer4.layer",
+        "arena_offset": 122685952,
+        "payload_size": 1050624,
+        "sections": [
+          {
+            "name": "projection_weight",
+            "byte_offset": 0,
+            "byte_size": 1048576,
+            "storage": "packed_e4m3",
+            "logical_shape": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "attn_cos_skip",
+            "byte_offset": 1048576,
+            "byte_size": 2048,
+            "storage": "float16",
+            "logical_shape": [
+              1024
+            ],
+            "evidence": "CUBIN loads residual coefficients at weight+0x100000"
+          }
+        ],
+        "content_checks": {
+          "residual_skip_min": 0.1744384765625,
+          "residual_skip_max": 1.0
+        }
+      }
+    ]
+  }
+}
