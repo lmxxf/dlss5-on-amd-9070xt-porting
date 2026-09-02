@@ -1381,6 +1381,8 @@ main-only CPU链把block65 72×128×64上采样至144×256×32，blocks66–69�
 
 现存`stellar-block8/14/22-skip.fp8`尺寸恰好等于各级padded tensors，但直接E4M3解码std为54.8/78.4/46.7，仍是physical-scaled坐标而非canonical。以block48为控制变量：direct skip乘全局scale0.0625时body std2.63，0.375时std15.76；旧portable CUBIN active view std15.83。然而不论scale取值，直接row-major相关仅约0.337；再乘record的256-value prefix aux后相关反降约0.25。故缺口主要是token/channel physical permutation与per-tile dynamic scale，不是一个可调全局系数。该结果否决“按std拟合skip scalar”的捷径。
 
+block8 skip随后应用已严格恢复的`tinlayout-2h64-output-permutation.i32`逐tile unswizzle，得到72×128×64 canonical token/channel顺序；同法转换portable block62 target。即便如此，archive logical block62对target correlation仅约0.192，乘64-value prefix aux后约0.146；全局scale从1/32扫到1只改变输出std，不改变相关。说明已知2H permutation仍不足：upsample prefix还依赖spatial phase与per-tile dynamic scale，且portable CUBIN target本身使用错误runtime weight pack。该target不能用来拟合prefix，64-channel skip路线继续等待encoder effective scale状态。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
