@@ -1,0 +1,14 @@
+{
+  "packer": "pack_fused_swin32_archive.py",
+  "runner": "d3d12_block1_test.cpp",
+  "scope": "main-only; canonical block4 skip pending",
+  "cpu_main_only_std": {"66": 1.3565e-06, "67": 9.0846e-07, "68": 6.4095e-07, "69": 3.6717e-07},
+  "block66_amd": {
+    "submit_ms": 5.801,
+    "nonzero_values": 0,
+    "cpu_mae": 2.6174e-07,
+    "cpu_rmse": 1.3566e-06,
+    "cpu_max_abs_error": 2.87735e-05
+  },
+  "conclusion": "main-only signal is below E4M3 minimum; canonical encoder skips are mandatory before decoder end-to-end validation"
+}

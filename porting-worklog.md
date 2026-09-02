@@ -1371,6 +1371,10 @@ block62–65同样由普通block63尾布局对齐。normal record 30,880 halves�
 
 main-only CPU固定帧把block61 36×64×128 grouped投影后2×上采样到72×128×64；blocks62–65全部finite，std 8.20e-5→3.95e-5。AMD fused64模式复用QKV预计算，耗时2.118/2.440/2.340/1.898 ms；对CPU MAE 1.38e-5/1.05e-5/7.07e-6/5.42e-6。correlation从0.703降到0.629主要因信号已接近FP8量化步长，AMD/CPU std仍一致。canonical block8 skip待接入，数值kernel本身已闭合。
 
+block66–69 corrected 32-channel layout继续闭合。normal record：W1/W2各2,048、padding16、FFN skip32、QKV1,536、bias4,096、单FP32 scale占8 halves、projection512、attention skip32、tail8；block66额外32×32 prefix conv与32-value prefix aux，QKV corrected offset5,200。`pack_fused_swin32_archive.py`转换为现有block1 AMD layout。
+
+main-only CPU链把block65 72×128×64上采样至144×256×32，blocks66–69全部finite，但std仅1.36e-6→3.67e-7。RX9070XT block66耗时5.801 ms并把全部1,179,648 values量化为零；对continuous CPU MAE2.62e-7、RMSE1.36e-6。这不是kernel失败，而是正确的E4M3下溢行为，明确证明最终decoder数值由block4 canonical skip主导。至此66–69数值核／pack已恢复，但在encoder skips接入前继续跑67–69没有信息量，主线应立即转回block4/block8/block14/block22四条canonical skip。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

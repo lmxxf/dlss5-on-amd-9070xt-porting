@@ -49,6 +49,7 @@
 - `pack_fused_swin256.py` / `d3d12_block128_test.cpp` fused256 mode / `fused-swin256-amd.json`：RX9070XT三pass执行block48 body及49–55；各层对CPU archive logical correlation约0.99934–0.99945，15.8–18.6 ms。
 - `pack_fused_swin128_archive.py` / `fused-swin128-archive-amd.json`：corrected archive offsets的128-channel pack；block56 main-only在RX9070XT为38.709 ms，对CPU absolute MAE 1.13e-4。canonical block14 skip待接入。
 - `pack_fused_swin64_archive.py` / `fused-swin64-amd.json`：block62–65 corrected 64-channel archive pack与AMD三pass；每层1.9–2.44 ms，最终绝对MAE 5.42e-6。canonical block8 skip待接入。
+- `pack_fused_swin32_archive.py` / `fused-swin32-amd.json`：block66–69 corrected 32-channel archive pack；main-only CPU信号降至1e-6，block66 AMD按E4M3正确量化为全零，证明canonical block4 skip是最终链硬依赖。
 - `block70-attention-effective.bin` / `.json` / `pack_post_attention.py`：以权威prefix输出构造attention-only oracle后拟合的Q/K/V、projection、bias、shared skip/gain与scale；独立held-out correlation 0.97703。
 - `make_post_attention_compatible.py` / `block70-attention-block1-compatible.bin`：把shared skip代数吸收为`P'=P×skip`、`residual'=skip²`，直接复用AMD 1H runner；RX单tile对NVIDIA correlation 0.97252，对CPU effective 0.999615，1.806 ms。
 - `block70-ffn-effective.bin` / `.json` / `pack_post_ffn.py`：双residual identity读口恢复的完整32-channel FFN；held-out correlation 0.93751。
