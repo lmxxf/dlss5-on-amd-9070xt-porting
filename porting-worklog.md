@@ -1359,6 +1359,10 @@ block48 descriptor operation vector共有36步：4步upsample前缀`convolution�
 
 前述“fused tensor必须MMA unpack”的结论被offset修正推翻：±1e4爆炸来自把bias尾巴当scale并把scale bytes吃进projection。按正确+8 offsets重跑，main-only 16×16→32×18 prefix std0.1129，完整8H body finite、范围-1.66..1.42、std0.08768。真正尚未闭合的是block22 output1 canonical skip；直接把其NVIDIA physical E4 view reshape会产生std52并污染结果。`block48_reference.py`因此只接受canonical FP32 skip，缺省可用zero-skip验证main/body，不再隐式误读physical view。
 
+AMD correctness runner新增fused256模式：标准FFN hidden288、QKV 3×128、8 heads×16 dim，并复用QKV预计算三pass。`pack_fused_swin256.py`支持block48特殊offset与普通block49–55 corrected offsets，统一生成1,247,264-byte FP32 blob。block48 main-only padded24×32执行17.711 ms，对CPU correlation0.999339、MAE0.001096。
+
+blocks49–55 CPU archive logical从block48 main-only输出继续全部finite，std由0.0702降至0.02343。RX9070XT逐层独立验收（每层输入由CPU将上层18×32裁出后补零到24×32），耗时15.784–18.583 ms，correlation均在0.999344–0.999447；block55 MAE0.000301、RMSE0.000828。数值kernel已闭合，剩余工程项是把层间crop/zero-pad变成GPU pass，并补入block22 canonical skip后做真实串联。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -1,0 +1,15 @@
+{
+  "runner": "d3d12_block128_test.cpp fused256 mode",
+  "implementation": "FFN, QKV precompute, 8-head attention, projection",
+  "block48": {"scope": "main-only; canonical block22 skip pending", "submit_ms": 17.711, "correlation": 0.99933867, "mae": 0.00109593, "rmse": 0.00321580},
+  "blocks49_55": [
+    {"block": 49, "submit_ms": 15.920, "correlation": 0.99937895, "mae": 0.00084505, "rmse": 0.00250815},
+    {"block": 50, "submit_ms": 18.583, "correlation": 0.99944653, "mae": 0.00066056, "rmse": 0.00189656},
+    {"block": 51, "submit_ms": 17.288, "correlation": 0.99942261, "mae": 0.00056562, "rmse": 0.00165432},
+    {"block": 52, "submit_ms": 17.549, "correlation": 0.99940910, "mae": 0.00048417, "rmse": 0.00143759},
+    {"block": 53, "submit_ms": 17.924, "correlation": 0.99940389, "mae": 0.00043252, "rmse": 0.00127059},
+    {"block": 54, "submit_ms": 16.320, "correlation": 0.99934394, "mae": 0.00036372, "rmse": 0.00107959},
+    {"block": 55, "submit_ms": 15.784, "correlation": 0.99938380, "mae": 0.00030132, "rmse": 0.00082806}
+  ],
+  "boundary": "per-layer correctness; CPU currently crops 24 padded rows to 18 and re-pads zeros between layers"
+}
