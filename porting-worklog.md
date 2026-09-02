@@ -1379,6 +1379,8 @@ main-only CPU链把block65 72×128×64上采样至144×256×32，blocks66–69�
 
 但按该archive row-major CPU encoder从RGB重算得到决定性反例：block4/8/14/22 downsample前main std依次仅2.53e-4/3.29e-6/5.31e-9/4.68e-12，层级间指数衰减，与NVIDIA physical skips约几十量级完全不符。故offset闭合只证明tensor边界，不证明fused matrices已具备runtime dynamic scale；naive archive encoder不能提供canonical skips。decoder main-only在66处E4M3下溢是同一缺口的下游症状。下一主线必须把已恢复的block1–3、block10–13 effective方法推广到encoder downsample main branches4/8/14/22，而不是继续拼接naive archive值。
 
+现存`stellar-block8/14/22-skip.fp8`尺寸恰好等于各级padded tensors，但直接E4M3解码std为54.8/78.4/46.7，仍是physical-scaled坐标而非canonical。以block48为控制变量：direct skip乘全局scale0.0625时body std2.63，0.375时std15.76；旧portable CUBIN active view std15.83。然而不论scale取值，直接row-major相关仅约0.337；再乘record的256-value prefix aux后相关反降约0.25。故缺口主要是token/channel physical permutation与per-tile dynamic scale，不是一个可调全局系数。该结果否决“按std拟合skip scalar”的捷径。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
