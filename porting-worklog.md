@@ -1349,6 +1349,8 @@ AMD 512-channel correctness runner在`d3d12_block128_test.cpp`新增split512模�
 
 `pack_split_swin512.py`把四条archive records整理为统一3,936,320-byte FP32 blob。RX9070XT连续执行blocks40–47，每层submit→fence 20.512–25.745 ms；逐层对CPU archive logical correlation为0.99933/0.99872/0.99792/0.99687/0.99554/0.99413/0.99334/0.99271，最终MAE 0.03120、RMSE 0.13928。AMD block47 std1.0244、CPU0.9524，误差累积但无爆炸／坍缩。decoder39–47至此全部以archive真权重在AMD执行；下一段进入block48 8H upsample与49–55。
 
+block48 descriptor operation vector共有36步：4步upsample前缀`convolution→convolution→mul→add`，随后是带额外input convolution的标准8H Swin。live字段给出in/out=512/256、`+0x40..=[0,0,8,32]`、boundary flags1/1、scale1.0、mode3。record 410,392 halves，比普通8H block49多65,776；按尾部QKV/bias/projection结构反向对齐得到：前65,536为256×256 prefix conv，随后W0/W1/W2占65,536–245,759，245,760–246,263为504-half dw/sin/padding/FFN-skip区，QKV从246,264开始，之后全部与普通8H尾布局同构。结构固化为`block48-operation-graph.json`；下一步细分504-half区并实现archive logical upsample。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

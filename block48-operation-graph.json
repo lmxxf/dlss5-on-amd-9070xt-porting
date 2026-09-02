@@ -1,0 +1,30 @@
+{
+  "source": "CPU descriptor builder operation vector, live layer fields, and archive tail alignment",
+  "block": 48,
+  "layer_type": "CCTinlayoutFusedSwin8H",
+  "operations": [
+    "convolution", "convolution", "mul", "add",
+    "convolution", "clamp", "abs", "mul", "rsub", "mul", "add", "mul",
+    "convolution", "convolution", "mul", "add", "convolution",
+    "linalg_vector_norm", "clamp_min", "div", "linalg_vector_norm",
+    "clamp_min", "div", "mul", "stack", "bmm", "add", "clamp",
+    "_softmax", "sub", "detach", "add", "bmm", "convolution", "mul", "add"
+  ],
+  "live_descriptor_fields": {
+    "input_channels": 512,
+    "output_channels": 256,
+    "0x40_to_0x4c_u32": [0, 0, 8, 32],
+    "0x70_to_0x7c_u32": [4294967295, 4294967295, 1, 1],
+    "scale": 1.0,
+    "mode_or_rank": 3
+  },
+  "weight_layout_half_offsets": {
+    "prefix_conv_256x256": [0, 65536],
+    "standard_weight0_weight1_weight2": [65536, 245760],
+    "prefix_aux_padding_and_ffn_skip": [245760, 246264],
+    "qkv": [246264, 344568],
+    "attention_bias": [344568, 377336],
+    "scale_projection_attention_skip_and_tail": [377336, 410392]
+  },
+  "status": "operation order and major tensor ranges closed; 504-half middle region pending exact split"
+}

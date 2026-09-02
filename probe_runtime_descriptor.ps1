@@ -191,7 +191,7 @@ try {
                             [BitConverter]::ToString($candidateRaw).Replace('-', '').ToLowerInvariant()
                         } else { $null }
                         strings = if (($blockIndex -eq 1 -or $blockIndex -eq 39 -or
-                            $blockIndex -eq 40 -or
+                            $blockIndex -eq 40 -or $blockIndex -eq 48 -or
                             $blockIndex -eq 70) -and
                             (($candidateEnd - $candidateBegin) % 0x20) -eq 0 -and
                             ($candidateEnd - $candidateBegin) -le 0x10000) {
@@ -211,7 +211,7 @@ try {
                 }
             }
             $layerRawHex = $null
-            if ($blockIndex -eq 39 -or $blockIndex -eq 70) {
+            if ($blockIndex -eq 39 -or $blockIndex -eq 48 -or $blockIndex -eq 70) {
                 $layerRaw = New-Object byte[] 0x170
                 [System.Runtime.InteropServices.Marshal]::Copy($layerAddress, $layerRaw, 0, $layerRaw.Length)
                 $layerRawHex = [BitConverter]::ToString($layerRaw).Replace('-', '').ToLowerInvariant()
