@@ -29,9 +29,10 @@ static std::vector<unsigned char> read_file(const char *path) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 7) {
+    if (argc < 7 || argc > 9) {
         std::fprintf(stderr,
-            "usage: %s cubin symbol weights blend samples.u8 output.rgba32f\n"
+            "usage: %s cubin symbol weights blend samples.u8 output.rgba32f "
+            "[scan-half-count [ablate]]\n"
             "samples: repeated [2048-byte main][512-byte skip] records\n",
             argv[0]);
         return 2;
@@ -44,7 +45,13 @@ int main(int argc, char **argv) {
     constexpr size_t sample_bytes = main_bytes + skip_bytes;
     if (weights.size() != 21808 || blend.size() != 2 || samples.empty() ||
         samples.size() % sample_bytes) return 2;
-    const size_t count = samples.size() / sample_bytes;
+    const bool scan_weights = argc >= 8;
+    const bool ablate_weights = argc == 9 && !std::strcmp(argv[8], "ablate");
+    if (argc == 9 && !ablate_weights) return 2;
+    const size_t input_count = samples.size() / sample_bytes;
+    const size_t count = scan_weights ? std::strtoull(argv[7], nullptr, 0)
+                                      : input_count;
+    if (!count || (scan_weights && (input_count != 1 || count > 10336))) return 2;
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -62,7 +69,8 @@ int main(int argc, char **argv) {
     check("skip alloc", cuMemAlloc(&skip_device, 1 << 20));
     check("weights alloc", cuMemAlloc(&weights_device, weights.size()));
     check("blend alloc", cuMemAlloc(&blend_device, 512));
-    check("weights upload", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
+    if (!scan_weights)
+        check("weights upload", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
     check("blend upload", cuMemcpyHtoD(blend_device, blend.data(), blend.size()));
 
     CUDA_ARRAY3D_DESCRIPTOR output_desc{};
@@ -131,6 +139,17 @@ int main(int argc, char **argv) {
     void *arguments[] = {params};
 
     std::vector<float> output(count * 8 * 8 * 4);
+    std::vector<unsigned char> scan_weight;
+    if (scan_weights) {
+        if (ablate_weights) {
+            scan_weight = weights;
+        } else {
+            scan_weight.assign(weights.size(), 0);
+            // The last 568 FP16 slots are the post-specific output head. Keep
+            // them live while scanning one body slot at a time.
+            std::copy(weights.end() - 1136, weights.end(), scan_weight.end() - 1136);
+        }
+    }
     CUDA_MEMCPY2D download{};
     download.srcMemoryType = CU_MEMORYTYPE_ARRAY;
     download.srcArray = output_array;
@@ -139,7 +158,23 @@ int main(int argc, char **argv) {
     download.WidthInBytes = 8 * 16;
     download.Height = 8;
     for (size_t sample = 0; sample < count; ++sample) {
-        const auto *record = samples.data() + sample * sample_bytes;
+        const auto *record = samples.data() +
+            (scan_weights ? 0 : sample) * sample_bytes;
+        if (scan_weights) {
+            const unsigned short value = ablate_weights ? 0 : 0x3c00;
+            std::memcpy(scan_weight.data() + sample * 2, &value, 2);
+            if (sample) {
+                if (ablate_weights) {
+                    std::memcpy(scan_weight.data() + (sample - 1) * 2,
+                                weights.data() + (sample - 1) * 2, 2);
+                } else {
+                    const unsigned short zero = 0;
+                    std::memcpy(scan_weight.data() + (sample - 1) * 2, &zero, 2);
+                }
+            }
+            check("scan weight upload", cuMemcpyHtoD(
+                weights_device, scan_weight.data(), scan_weight.size()));
+        }
         check("main clear", cuMemsetD8(main_device, 0, 1 << 20));
         check("skip clear", cuMemsetD8(skip_device, 0, 1 << 20));
         check("main upload", cuMemcpyHtoD(main_device, record, main_bytes));
@@ -156,7 +191,7 @@ int main(int argc, char **argv) {
     const auto [low, high] = std::minmax_element(output.begin(), output.end());
     size_t finite = 0;
     for (float value : output) finite += std::isfinite(value);
-    std::printf("samples=%zu finite=%zu/%zu range=%.9g..%.9g\n",
-                count, finite, output.size(), *low, *high);
+    std::printf("samples=%zu scan_weights=%d finite=%zu/%zu range=%.9g..%.9g\n",
+                count, scan_weights, finite, output.size(), *low, *high);
     return stream ? 0 : 3;
 }

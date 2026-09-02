@@ -1275,6 +1275,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 `run_original_post_dataset.cpp`把单tile oracle改为复用同一CUDA context/module、weights、texture与surface，只逐样本上传2048-byte main和512-byte skip。128组输出与原逐进程runner逐float exact，耗时从约40秒降为0.42秒；9,216组联合样本仅0.70秒。独立held-out同时否决无结构MLP：128样本时correlation约0.04，8,192 train＋1,024 held-out、2560→512→192模型也只有0.292，MAE 0.0913，甚至不如零残差baseline MAE 0.0725。archive前10,336 FP16直接当row-major 1H Swin再拟合out head也只有correlation约0.13，证明前段虽然容量等于标准1H block，tensor-core physical pack仍必须用controlled weights/basis恢复；黑盒蒸馏不进入AMD主线。
 
+批量runner继续增加body weight one-hot与逐slot ablation scan。10,336个body slots在0.69秒内扫完；4096–4103恰为无响应padding，其余10256个slot对当前随机样本有可测影响，与标准1H容量边界一致。结构性branch ablation给出更关键的输出拓扑：清零FFN W1/W2后RGB residual仍有std 0.0871；清零QKV与projection后RGB residual精确归零；单独清零attention skip只令完整输出MAE 0.00566。故post RGB head主要消费attention/projected branch，而非标准block最终residual，identity-skip实验输出为零并不否定body offsets。下一步只需恢复FFN→QKV/attention→projection→RGB head有效路径，无需把未进入RGB head的residual误当输出。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
