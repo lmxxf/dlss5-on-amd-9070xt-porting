@@ -1387,6 +1387,10 @@ block8 skip随后应用已严格恢复的`tinlayout-2h64-output-permutation.i32`
 
 arena版addon已在AMD WSL用MinHook静态编译为349,012 bytes，部署到5090 Lab与《剑星》Win64目录。当前`query user`确认5090无互动登录用户，故未从SSH Session0强启Steam；下次桌面登录后正常启动游戏、让DLSS5运行一帧即可触发。`verify_runtime_weight_arena.py`会验证总长度、153 records边界，并逐record报告runtime/archive SHA与changed bytes。若arena成功，这将一次性替换所有错误archive→CUBIN路径，并直接解锁encoder skips与fused blocks的权威数值oracle。
 
+5090重新登录后，已通过交互式计划任务从SSH自动启动《剑星》。原probe的外层1H forward稳定命中，但`cuGetProcAddress` hook太晚：DLSSNR在addon加载前已缓存CUDA launch指针。改hook已验证稳定的`CubinBackendNGX::launch` RVA `0x449a0`后，首次真实参数直接得到block1 `weight=0x3bd605600`、arena base `0x3bd600000`、grid `240x136x1`；重启后的地址随机化样本仍严格满足`weight-base=0x5600`且base为64KiB对齐，证明offset推导正确。
+
+同时否决CUDA readback：backend参数里的input/output/weight均为D3D12 GPU virtual address，不是CUDA device pointer。primary context下`cuMemGetAddressRange_v2=500`、`cuMemcpyDtoH_v2=1`；`cuPointerGetAttribute(CONTEXT)=1`，明确不是CUDA context选择问题。旧`runtime_weight_upload_probe.cpp`注册ReShade copy/map事件会在D3D12初始化Fatal Error，仍禁止部署。下一步从原生D3D12对象层追踪`CreateCommittedResource`得到GPUVA→`ID3D12Resource`映射，再以独立readback command list复制完整arena；不再使用CUDA driver API或ReShade资源事件。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
