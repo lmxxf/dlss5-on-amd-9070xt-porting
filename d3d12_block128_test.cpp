@@ -32,7 +32,7 @@ int wmain(int argc, wchar_t **argv) {
     const auto weights=read_file(argv[1]), input=read_file(argv[2]);
     const bool split512=weights.size()==3936320;
     const bool fused256=weights.size()==1247264;
-    const bool precomputed=split512||fused256;
+    const bool precomputed=true;
     const auto oracle=stage_mode?std::vector<uint8_t>{}:read_file(argv[3]);
     const UINT width=stage_mode?(UINT)_wtoi(argv[4]):512, height=stage_mode?(UINT)_wtoi(argv[5]):64, shifted=stage_mode?(UINT)_wtoi(argv[6]):0;
     const UINT tokens=width*height; const UINT64 tensor_bytes=input.size();
@@ -49,10 +49,11 @@ int wmain(int argc, wchar_t **argv) {
     ID3D12GraphicsCommandList*cmd=nullptr;check("list",dev->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,alloc,nullptr,IID_PPV_ARGS(&cmd)));
 
     const char shader128[] = R"(
-ByteAddressBuffer w:register(t0);StructuredBuffer<float> inp:register(t1),feat_in:register(t2);RWStructuredBuffer<float> feat:register(u0),outp:register(u1);static const uint tokens=WIDTH*HEIGHT;float W(uint i){return asfloat(w.Load(i*4));}
+ByteAddressBuffer w:register(t0);StructuredBuffer<float> inp:register(t1),feat_in:register(t2),qkv_in:register(t3);RWStructuredBuffer<float> feat:register(u0),outp:register(u1),qkv_out:register(u2);static const uint tokens=WIDTH*HEIGHT;float W(uint i){return asfloat(w.Load(i*4));}
 float fp8(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return s*round(a*512)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e+=1;}return s*min(exp2(e)*(1+m/8),448.);}
 [numthreads(64,1,1)]void ffn(uint3 id:SV_DispatchThreadID){uint t=id.x;if(t>=tokens)return;float h[160];[loop]for(uint j=0;j<160;j++){float a=0;[loop]for(uint c=0;c<128;c++)a+=inp[t*128+c]*W(j*128+c);a=clamp(a,-4.,4.);h[j]=a*(.89453125+a*(.447265625-.055908203125*abs(a)));}[loop]for(uint c=0;c<128;c++){float v=0;[loop]for(uint j=0;j<160;j++)v+=h[j]*W(20480+c*160+j);feat[t*128+c]=fp8(v+inp[t*128+c]*W(90116+c));}}
-void qkv(uint t,out float q[64],out float k[64],out float v[64]){[loop]for(uint o=0;o<64;o++){q[o]=k[o]=v[o]=0;[loop]for(uint c=0;c<128;c++){float z=feat_in[t*128+c];q[o]+=z*W(40960+o*128+c);k[o]+=z*W(40960+(64+o)*128+c);v[o]+=z*W(40960+(128+o)*128+c);}}}
+ [numthreads(64,1,1)]void qkv_precompute(uint3 id:SV_DispatchThreadID){uint z=id.x;if(z>=tokens*192)return;uint t=z/192,r=z%192;float v=0;[loop]for(uint c=0;c<128;c++)v+=feat_in[t*128+c]*W(40960+r*128+c);qkv_out[z]=v;}
+void qkv(uint t,out float q[64],out float k[64],out float v[64]){[loop]for(uint o=0;o<64;o++){q[o]=qkv_in[t*192+o];k[o]=qkv_in[t*192+64+o];v[o]=qkv_in[t*192+128+o];}}
 [numthreads(64,1,1)]void attention(uint3 id:SV_DispatchThreadID){uint t=id.x;if(t>=tokens)return;uint tile=t/64,qi=t%64;float q[64],k0[64],v0[64];qkv(t,q,k0,v0);float acc[64];[unroll]for(uint i=0;i<64;i++)acc[i]=0;[unroll]for(uint head=0;head<4;head++){float qq=0;[unroll]for(uint d=0;d<16;d++)qq+=q[head*16+d]*q[head*16+d];float mx=-3.4e38;[loop]for(uint key=0;key<64;key++){float tq[64],k[64],v[64];qkv(tile*64+key,tq,k,v);float kk=0,dot=0;[unroll]for(uint d=0;d<16;d++){float z=k[head*16+d];kk+=z*z;dot+=q[head*16+d]*z;}mx=max(mx,dot*rsqrt(max(qq,1e-12))*rsqrt(max(kk,1e-12))*W(90112+head)+W(73728+head*4096+qi*64+key));}float den=0,tmp[16];[unroll]for(uint d=0;d<16;d++)tmp[d]=0;[loop]for(uint key=0;key<64;key++){float tq[64],k[64],v[64];qkv(tile*64+key,tq,k,v);float kk=0,dot=0;[unroll]for(uint d=0;d<16;d++){float z=k[head*16+d];kk+=z*z;dot+=q[head*16+d]*z;}float e=exp(dot*rsqrt(max(qq,1e-12))*rsqrt(max(kk,1e-12))*W(90112+head)+W(73728+head*4096+qi*64+key)-mx);den+=e;[unroll]for(uint d=0;d<16;d++)tmp[d]+=e*v[head*16+d];}[unroll]for(uint d=0;d<16;d++)acc[head*16+d]=tmp[d]/den;}[loop]for(uint c=0;c<128;c++){float z=0;[loop]for(uint i=0;i<64;i++)z+=acc[i]*W(65536+c*64+i);outp[t*128+c]=fp8(z+feat_in[t*128+c]*W(90244+c));}}
 )";
     const char shader512[] = R"(

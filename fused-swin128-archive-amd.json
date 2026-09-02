@@ -1,0 +1,14 @@
+{
+  "packer": "pack_fused_swin128_archive.py",
+  "runner": "d3d12_block128_test.cpp 128-channel mode with QKV precompute",
+  "block56_main_only": {
+    "submit_ms": 38.709,
+    "correlation": 0.99197923,
+    "mae": 0.0001130961,
+    "rmse": 0.0002776235,
+    "max_abs_error": 0.006492652,
+    "amd_std": 0.0021642554,
+    "cpu_std": 0.0020995967
+  },
+  "boundary": "canonical block14 skip pending; blocks57-61 share layout and have CPU archive-logical references"
+}

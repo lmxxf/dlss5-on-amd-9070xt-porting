@@ -1363,6 +1363,10 @@ AMD correctness runner新增fused256模式：标准FFN hidden288、QKV 3×128、
 
 blocks49–55 CPU archive logical从block48 main-only输出继续全部finite，std由0.0702降至0.02343。RX9070XT逐层独立验收（每层输入由CPU将上层18×32裁出后补零到24×32），耗时15.784–18.583 ms，correlation均在0.999344–0.999447；block55 MAE0.000301、RMSE0.000828。数值kernel已闭合，剩余工程项是把层间crop/zero-pad变成GPU pass，并补入block22 canonical skip后做真实串联。
 
+block56–61按相同尾对齐恢复128-channel archive布局。普通block57 record：W0 8,192、W1/W2各20,480、padding16、FFN skip128、QKV24,576、4-head bias16,384、4个FP32 scales、projection8,192、attention skip128、tail8。block56在前方多128×128 prefix conv与128-value prefix aux，corrected QKV起点65,792。`pack_fused_swin128_archive.py`统一生成90,372-float runner blob。
+
+main-only固定帧由block55 18×32×256 grouped投影并2×上采样到36×64×128；block56–61 CPU archive logical全部finite，std 0.00210→0.000854。128-channel AMD模式也改为QKV预计算；block56 padded40×64 submit→fence 38.709 ms，对CPU correlation0.991979、MAE1.13e-4、RMSE2.78e-4、max error0.00649。因信号std仅约0.0021，绝对误差比correlation更有解释力。canonical block14 skip仍待上游提供；57–61下一步用单device多block宿主避免每层重复D3DCompile。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
