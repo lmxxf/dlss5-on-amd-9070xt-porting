@@ -1337,6 +1337,8 @@ skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[
 
 `run_original_block39_basis.cpp`以0.52–0.71秒完成1,024/8,192 basis。物理拓扑清楚：四个16KiB banks（0/16384/32768/49152），每bank仅前8KiB输入有效并写同base的8KiB输出；bank0二分图精确分成16个`512 input→512 output` components，各component按原地址排序的basis矩阵correlation 0.9994+。然而single-impulse与dense Hadamard矩阵对真实portable输入correlation都约0.01，证明dynamic FP8/runtime weight pack使该CUBIN数值不可作为archive语义oracle。block39数值恢复正式改走archive逻辑grouped convolution与descriptor参数，不再蒸馏错误CUBIN。
 
+descriptor探针进一步导出block39完整0x170 layer object。稳定整数域为`+0x40..0x4c=[1,1,8,32]`、`+0x50=1024`、`+0x54=512`，`+0x80`为float 1.0、`+0x84=3`。与262,144-element主体联立后，主卷积容量唯一自然闭合为`in=1024,out=512,groups=2,in_per_group=512`（逻辑weight可视为512×512），而不是dense 1024×512。basis物理图每bank16个512→512 components也与“两组输入＋空间展开”一致。下一步实现archive FP16 grouped convolution reference，并只用CUBIN components恢复token/channel physical permutation。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

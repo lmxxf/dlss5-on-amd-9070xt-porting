@@ -14,5 +14,19 @@
     "matrix_body_factorization": "512x512; likely two-group 1024-to-512 convolution",
     "remaining_half_count": 512
   },
+  "live_descriptor_fields": {
+    "0x40_to_0x4c_u32": [1, 1, 8, 32],
+    "0x50_input_channels": 1024,
+    "0x54_output_channels": 512,
+    "0x80_scale_float": 1.0,
+    "0x84_mode_or_rank": 3
+  },
+  "physical_basis_topology": {
+    "bank_bases": [0, 16384, 32768, 49152],
+    "active_input_bytes_per_bank": 8192,
+    "active_output_bytes_per_bank": 8192,
+    "connected_components_per_bank": 16,
+    "component_shape": [512, 512]
+  },
   "status": "exact operation order and capacity split; physical matrix permutation pending"
 }

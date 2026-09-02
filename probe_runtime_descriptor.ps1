@@ -210,7 +210,7 @@ try {
                 }
             }
             $layerRawHex = $null
-            if ($blockIndex -eq 70) {
+            if ($blockIndex -eq 39 -or $blockIndex -eq 70) {
                 $layerRaw = New-Object byte[] 0x170
                 [System.Runtime.InteropServices.Marshal]::Copy($layerAddress, $layerRaw, 0, $layerRaw.Length)
                 $layerRawHex = [BitConverter]::ToString($layerRaw).Replace('-', '').ToLowerInvariant()
