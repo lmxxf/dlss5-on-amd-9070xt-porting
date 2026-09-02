@@ -82,11 +82,11 @@ def main() -> None:
         "storage": "float32_little_endian",
         "shape": [1024, 1024],
         "input": "main[0:512] concatenated with skip[0:512], E4M3 decoded",
-        "output": "8x8x16 pre-FFN values carried by the odd half of the 32-channel body",
+        "output": "8x8x16 controlled-identity coordinates carried by the odd half; may include post out_gain",
         "recovery": "1024-row Rademacher Hadamard at +/-0.5",
         "small_heldout": small,
         "real_amplitude_heldout": real,
-        "boundary": "portable effective input/upsample map; standard Swin body remains separate",
+        "boundary": "portable controlled input-path map; 56-half input/upsample/out_gain internals are not yet separated",
     }
     args.manifest.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, indent=2))

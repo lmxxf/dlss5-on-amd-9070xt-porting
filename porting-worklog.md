@@ -1301,6 +1301,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 `d3d12_post_upsample_test.cpp`已在RX9070XT直接执行portable 1024→1024矩阵。真实幅度独立样本submit→fence 0.565 ms，对NVIDIA controlled upsample oracle MAE 0.0436408、RMSE 0.0751269、max error 0.46234、cosine 0.99868323；逐项误差与CPU effective模型一致，AMD未增加计算偏差。block70至此在AMD闭合输入upsample与最终RGB head两端，中间缺口只剩标准1H FFN＋attention的dynamic-scale/effective参数。
 
+进一步分层修正了上一句“只剩标准1H”的过强结论。保留原W1/W2＋FFN skip、把attention改成diagonal identity后，odd-half可读出FFN相关target；用portable controlled input map训练时held-out correlation 0.741，换成NVIDIA controlled input的精确值后升至0.8846，证明输入桥误差确会被FFN放大。加入E4M3 straight-through量化仍约0.8835；改用block1 effective全套参数初始化再联合训练完整body也只到0.292。故剩余差异不只是dynamic scale：56-half post专用区按名字还含`out_gain`，controlled head basis读到的32维坐标可能已经经过projection后的post gain/正弦变换。`block70-upsample-effective`的边界改称controlled input-path map，不再声称它是纯pre-FFN upsample值。下一步必须把input-side与output-gain分别受控，标准Swin body才能独立验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
