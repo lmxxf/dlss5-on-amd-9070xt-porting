@@ -1,0 +1,12 @@
+{
+  "status": "portable full-block CPU reference validated; D3D12 multi-pass pending",
+  "runner": "vit_block31_reference.py",
+  "input_contract": "already-repacked 64 KiB 1D physical view; do not repack twice",
+  "pipeline": ["Expand", "fast activation", "Contract+skip", "QKV main/work", "64-key Attention", "Projection+skip"],
+  "heldout_against_5090": {
+    "contract_main_correlation": 0.938930563,
+    "final_projection_correlation": 0.838709954,
+    "final_mae": 0.90442824,
+    "final_rmse": 1.4037256
+  }
+}

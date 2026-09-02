@@ -1233,6 +1233,10 @@ QKV state dump揭示work的0/2/4 plane各为65,536-byte FP16张量，全部值�
 
 新增`prepare_vit_attention_case.py`将main E4M3与work FP16按上述公式生成64×1024 canonical Q/K/V，并将原Attention E4M3输出重排为canonical oracle。`d3d12_vit_attention_test.cpp`在RX9070XT执行64-key、32-head、head_dim=32的softmax与weighted-V：logit scale 0.5时correlation 0.8796198、MAE 0.7928114、submit→fence 2.133 ms；scale 0.25时correlation 0.8782215、MAE 0.7890296、0.689 ms。AMD与CPU公式逐项一致。
 
+首次整block串联曾把`vit-repack-output-to-input`再次作用于`block30-2m.bin`，Contract correlation仅0.324。哈希复核确认`block30-2m.bin`已经是single-block宿主所需的1D view；再次repack会得到另一个仅供2D全链入口使用的`vit8-repacked.bin`。改为direct unswizzle后Contract main correlation升至0.9389306。
+
+新增`vit_block31_reference.py`把所有portable参数串成64-token完整block31：Expand→SASS多项式→Contract+skip→QKV main/work→64-key Attention→Projection+skip。对5090 authoritative r1最终输出correlation 0.83870995、MAE 0.904428、RMSE 1.403726；六段串联未数值坍缩。下一步以该脚本为CPU oracle，在同一D3D12 device内实现多pass block31。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
