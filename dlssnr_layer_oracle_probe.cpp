@@ -10,15 +10,18 @@
 
 extern "C" __declspec(dllexport) const char *NAME = "DLSSNR Layer Oracle Probe";
 extern "C" __declspec(dllexport) const char *DESCRIPTION =
-    "Captures a small input/output oracle from the first live 1H layer.";
+    "Captures block1 input/output and the complete runtime-packed weight arena.";
 
 namespace {
 constexpr unsigned kReShadeApiVersion = 18;
 constexpr uintptr_t kForward1HRva = 0x637b0;
 constexpr size_t kCaptureBytes = 1024 * 1024;
+constexpr size_t kWeightArenaBytes = 147719680;
+constexpr unsigned long long kBlock1ArenaOffset = 22016;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\layer-oracle.txt)";
 constexpr wchar_t kInputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-input.bin)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output.bin)";
+constexpr wchar_t kWeightArenaPath[] = LR"(D:\DLSSNR-Lab\logs\runtime-weight-arena.bin)";
 constexpr wchar_t kForwardMetaPath[] = LR"(D:\DLSSNR-Lab\logs\layer-forward-meta.txt)";
 
 using RegisterAddon = BOOL (*)(void *, unsigned);
@@ -159,11 +162,20 @@ void capture_launch_oracle(
     int sync_result = synchronize == nullptr ? -1 : synchronize();
     int input_result = -1;
     int output_result = -1;
+    int arena_result = -1;
     std::vector<uint8_t> input_bytes(kCaptureBytes);
     std::vector<uint8_t> output_bytes(kCaptureBytes);
     if (sync_result == 0 && copy_to_host != nullptr) {
         input_result = copy_to_host(input_bytes.data(), input, input_bytes.size());
         output_result = copy_to_host(output_bytes.data(), output, output_bytes.size());
+        if (weight >= kBlock1ArenaOffset) {
+            std::vector<uint8_t> arena_bytes(kWeightArenaBytes);
+            arena_result = copy_to_host(
+                arena_bytes.data(), weight - kBlock1ArenaOffset, arena_bytes.size());
+            if (arena_result == 0) {
+                write_binary(kWeightArenaPath, arena_bytes);
+            }
+        }
     }
     if (input_result == 0) {
         write_binary(kInputPath, input_bytes);
@@ -177,10 +189,13 @@ void capture_launch_oracle(
             log,
             "width=%d\nheight=%d\ninput=0x%llx\noutput=0x%llx\nweight=0x%llx\n"
             "grid=%u,%u,%u\nblock=%u,%u,%u\ncapture_bytes=%zu\n"
-            "cuCtxSynchronize=%d\ncuMemcpyDtoH_input=%d\ncuMemcpyDtoH_output=%d\n",
+            "cuCtxSynchronize=%d\ncuMemcpyDtoH_input=%d\ncuMemcpyDtoH_output=%d\n"
+            "arena_base=0x%llx\ncuMemcpyDtoH_arena=%d\narena_bytes=%zu\n",
             g_width, g_height, input, output, weight,
             grid_x, grid_y, grid_z, block_x, block_y, block_z,
-            kCaptureBytes, sync_result, input_result, output_result);
+            kCaptureBytes, sync_result, input_result, output_result,
+            weight >= kBlock1ArenaOffset ? weight - kBlock1ArenaOffset : 0,
+            arena_result, kWeightArenaBytes);
         std::fclose(log);
     }
 }

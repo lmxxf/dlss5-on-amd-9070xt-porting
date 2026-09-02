@@ -1383,6 +1383,10 @@ main-only CPU链把block65 72×128×64上采样至144×256×32，blocks66–69�
 
 block8 skip随后应用已严格恢复的`tinlayout-2h64-output-permutation.i32`逐tile unswizzle，得到72×128×64 canonical token/channel顺序；同法转换portable block62 target。即便如此，archive logical block62对target correlation仅约0.192，乘64-value prefix aux后约0.146；全局scale从1/32扫到1只改变输出std，不改变相关。说明已知2H permutation仍不足：upsample prefix还依赖spatial phase与per-tile dynamic scale，且portable CUBIN target本身使用错误runtime weight pack。该target不能用来拟合prefix，64-channel skip路线继续等待encoder effective scale状态。
 
+因此主线改为直接导出5090 runtime-packed arena。现有`dlssnr_layer_oracle_probe.cpp`hook的是第一個1H forward（block1），其launch blob `+0x10`已知为block1 runtime weight VA；`weights-arena-index.json`给出block1 arena offset22,016，故arena base可精确计算为`weight-22016`。probe新增同步`cuMemcpyDtoH`完整147,719,680 bytes到`D:\DLSSNR-Lab\logs\runtime-weight-arena.bin`，并在log记录base/result/size。该路径复用已经成功抓activation的CUDA-context内copy，不使用会让游戏Fatal Error的ReShade map/copy resource事件。
+
+arena版addon已在AMD WSL用MinHook静态编译为349,012 bytes，部署到5090 Lab与《剑星》Win64目录。当前`query user`确认5090无互动登录用户，故未从SSH Session0强启Steam；下次桌面登录后正常启动游戏、让DLSS5运行一帧即可触发。`verify_runtime_weight_arena.py`会验证总长度、153 records边界，并逐record报告runtime/archive SHA与changed bytes。若arena成功，这将一次性替换所有错误archive→CUBIN路径，并直接解锁encoder skips与fused blocks的权威数值oracle。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
