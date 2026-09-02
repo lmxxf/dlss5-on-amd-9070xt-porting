@@ -1271,6 +1271,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 把block70的main与skip activation同时清零后，输出与Color source逐float MAE仅`1.54e-9`、correlation在浮点精度内为1，alpha恒为1。由此钉死post的高层合同是“原Color直通＋神经残差”，而不是旧`d3d12_final_readout.cpp`假设的`source*blend + prediction*(1-blend)`；旧readout继续只作诊断，不得复用其混合公式。把blend record内容改零但保留合法device pointer时输出不变，说明当前symbol不直接消费该首个FP16值，或该值已经编译进其它state；目前只提升“必须绑定合法record地址”，不提升“运行时按0.739746线性缩放”的结论。
 
+受控E4M3 impulse开始恢复block70两路spatial layout。main offset 0–63都只影响左上8×8窗；offset `+64/+128/+256/+512/+1024`分别把响应平移到x=8/16/32/64/128，offset `+8192/+16384/.../+131072`分别把响应平移到y=8/16/.../128。skip同样局部，但offset `+2048`把响应移到x=16，`+8192`移到x=64，吻合其半解析度输入经upsample进入full-resolution post。单独保留真实main或真实skip时，对完整post的MAE分别为0.02295与0.03414，二者都不是可忽略支路，且完整输出不是两次单支路残差的线性相加。下一步因此使用8×8单tile ABI批量生成main+skip联合随机dataset，不再对全图4 MiB地址做黑盒回归。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
