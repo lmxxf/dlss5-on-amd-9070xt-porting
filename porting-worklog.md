@@ -1391,6 +1391,14 @@ arena版addon已在AMD WSL用MinHook静态编译为349,012 bytes，部署到5090
 
 同时否决CUDA readback：backend参数里的input/output/weight均为D3D12 GPU virtual address，不是CUDA device pointer。primary context下`cuMemGetAddressRange_v2=500`、`cuMemcpyDtoH_v2=1`；`cuPointerGetAttribute(CONTEXT)=1`，明确不是CUDA context选择问题。旧`runtime_weight_upload_probe.cpp`注册ReShade copy/map事件会在D3D12初始化Fatal Error，仍禁止部署。下一步从原生D3D12对象层追踪`CreateCommittedResource`得到GPUVA→`ID3D12Resource`映射，再以独立readback command list复制完整arena；不再使用CUDA driver API或ReShade资源事件。
 
+原生D3D12 readback已成功。`runtime_weight_d3d12_readback.cpp`只用安全的ReShade `init_device`取得原生device，随后以MinHook直接追踪`ID3D12Device::CreateCommandQueue/CreateCommittedResource`，避开会Fatal Error的ReShade资源事件；addon必须用`GET_MODULE_HANDLE_EX_FLAG_PIN`常驻，否则worker会落入unloaded module。命中三个147,719,680-byte资源：default heap GPUVA即arena base、upload heap、readback heap；同一DIRECT queue fence排空后readback返回`S_OK`。
+
+完整runtime arena已回收到`/tmp/runtime-weight-arena.bin`，长度147,719,680，SHA256 `a5513b1845c98a486985ed04f38e66a1854cce33c2aba3a505866028bd4ee3e5`。`verify_runtime_weight_arena.py`确认它与archive arena全文件SHA完全相同，153/153 records逐byte exact，changed payload bytes=0。由此正式推翻“runtime动态改写权重/有效权重不同”假设：encoder skip衰减的根因只能在launch ABI、物理资源布局或arena外runtime state。下一步复用GPUVA→resource readback抓block1及各encoder skip live activation，与Spark原CUBIN chain逐层寻找首个偏离点。
+
+私有activation最终通过自制CUBIN读口打通。D3D12 committed/placed/reserved及device4/8/10 resource APIs均无法映射block1 input/output，证明它们是NvAPI backend私有raw GPU allocation。恢复stash中的`dlssnr_cubin_oracle_probe.cpp`后，移除会Fatal的ReShade resource/execute events，改用安全`init_device`与原生queue hook；外层block1 forward划定窗口，内层`CubinBackendNGX::launch` hook直接取得真实context/command_context/参数blob。旧probe另有三处错误一并修正：copy grid误放Y维、把`CCMultiCubinBackend`误当NGX backend、走`0x449a0`异常包装层。新版按反汇编直接调用context vtable sync `+0x150`、bind `+0xd8`、dispatch `+0x140`，三步均返回0，raw readback稳定成功。
+
+live block1参数包96 bytes：input/output/weight位于`+0/+8/+0x10`，`+0x18`为1088×1920，field均0，唯一额外输入为`+0x38 optional2`。GPUVA显示三个物理view：input resource `+0x42800`、output resource `+0x2800`、optional2基址对齐；input/output资源基址严格相差64MiB。最初只抓32MiB并在runner allocation起点放view，FP8 correlation仅0.18；扩为完整64MiB三段并在Spark重放时恢复`input+0x42800/output+0x2800`后，live 5090 vs Spark原CUBIN block1全64MiB correlation 0.99991518、MAE 1.4243e-4，从有效output view开始correlation 0.99995811、MAE 8.77e-5，仅50,848/67,108,864 bytes不同。根因正式闭环：旧encoder衰减来自不完整物理bank容量与错误view基址，不是权重或动态scale。`run_original_fused_global.cpp`现支持动态arena、完整weight arena offset、optional2输入及input/output view offsets。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

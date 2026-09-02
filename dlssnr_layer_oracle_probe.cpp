@@ -68,6 +68,24 @@ CuGetProcAddress g_original_get_proc_address = nullptr;
 BackendLaunch g_original_backend_launch = nullptr;
 int g_width = 0;
 int g_height = 0;
+void *g_backend_self = nullptr;
+void *g_backend_context = nullptr;
+void *g_backend_command_context = nullptr;
+
+void dump_qwords(FILE *file, const char *label, const void *address, size_t bytes) {
+    std::fprintf(file, "%s=%p", label, address);
+    for (size_t offset = 0; address != nullptr && offset < bytes; offset += 8) {
+        unsigned long long value = 0;
+        SIZE_T copied = 0;
+        if (!ReadProcessMemory(
+                GetCurrentProcess(), static_cast<const uint8_t *>(address) + offset,
+                &value, sizeof(value), &copied) || copied != sizeof(value)) {
+            break;
+        }
+        std::fprintf(file, "%s0x%llx", offset == 0 ? " qwords=" : ",", value);
+    }
+    std::fprintf(file, "\n");
+}
 
 void write_binary(const wchar_t *path, const std::vector<uint8_t> &bytes) {
     FILE *file = _wfopen(path, L"wb");
@@ -252,6 +270,9 @@ void capture_launch_oracle(
             weight >= kBlock1ArenaOffset ? weight - kBlock1ArenaOffset : 0,
             range_result, allocation_base, allocation_size,
             arena_result, kWeightArenaBytes);
+        dump_qwords(log, "backend_self", g_backend_self, 0x80);
+        dump_qwords(log, "backend_context", g_backend_context, 0x100);
+        dump_qwords(log, "backend_command_context", g_backend_command_context, 0x100);
         std::fclose(log);
     }
 }
@@ -316,6 +337,15 @@ int64_t hook_backend_launch(
     void *self, void *kernel, uint32_t grid_x, uint32_t grid_y,
     uint32_t grid_z, void *wrapper, uint64_t bytes, uint8_t flag) {
     const bool capture = g_launch_armed.load() && !g_launch_captured.exchange(true);
+    if (capture) {
+        g_backend_self = self;
+        std::memcpy(
+            &g_backend_context, static_cast<const uint8_t *>(self) + 0x08,
+            sizeof(g_backend_context));
+        std::memcpy(
+            &g_backend_command_context, static_cast<const uint8_t *>(self) + 0x10,
+            sizeof(g_backend_command_context));
+    }
     const int64_t result = g_original_backend_launch(
         self, kernel, grid_x, grid_y, grid_z, wrapper, bytes, flag);
     if (capture && result == 0 && wrapper != nullptr) {

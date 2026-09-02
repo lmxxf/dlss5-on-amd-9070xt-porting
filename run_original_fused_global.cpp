@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -33,18 +34,22 @@ static void write_file(const char *path, const void *data, size_t size) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 14) {
-        std::fprintf(stderr, "usage: %s cubin weights input main-out aux-out symbol width height grid-x grid-y block-y mode shift\nmode: 0=plain 1=inpview 2=1h-ds 3=multihead-ds\n", argv[0]);
+    if (argc < 14 || argc > 18) {
+        std::fprintf(stderr, "usage: %s cubin weights input main-out aux-out symbol width height grid-x grid-y block-y mode shift [optional2-input] [weight-offset] [input-offset] [output-offset]\nmode: 0=plain 1=inpview 2=1h-ds 3=multihead-ds\n", argv[0]);
         return 2;
     }
     auto weights = read_file(argv[2]), input = read_file(argv[3]);
     int width=std::atoi(argv[7]),height=std::atoi(argv[8]),gx=std::atoi(argv[9]),gy=std::atoi(argv[10]),by=std::atoi(argv[11]),mode=std::atoi(argv[12]),shift=std::atoi(argv[13]);
-    constexpr size_t arena_size=8*1024*1024; std::vector<unsigned char> host(arena_size);
+    const size_t arena_size=std::max<size_t>(8*1024*1024,(input.size()+65535)&~65535ull); std::vector<unsigned char> host(arena_size);
     check("init",cuInit(0)); CUdevice device; check("device",cuDeviceGet(&device,0)); CUcontext context; check("context",cuDevicePrimaryCtxRetain(&context,device)); check("current",cuCtxSetCurrent(context));
     CUmodule module; check("module",cuModuleLoad(&module,argv[1])); CUfunction function; check("function",cuModuleGetFunction(&function,module,argv[6]));
     CUdeviceptr di,doo,dw,aux; check("input alloc",cuMemAlloc(&di,arena_size)); check("output alloc",cuMemAlloc(&doo,arena_size)); check("weight alloc",cuMemAlloc(&dw,(weights.size()+65535)&~65535ull)); check("aux alloc",cuMemAlloc(&aux,arena_size));
     check("zero input",cuMemsetD8(di,0,arena_size)); check("zero output",cuMemsetD8(doo,0,arena_size)); check("zero aux",cuMemsetD8(aux,0,arena_size)); check("input",cuMemcpyHtoD(di,input.data(),input.size())); check("weights",cuMemcpyHtoD(dw,weights.data(),weights.size()));
-    Params p{}; p.input=di;p.output=doo;p.weights=dw;p.width=width;p.height=height;p.field_y=shift?-4:height;p.field_x=shift?-4:width;unsigned long long dims=(unsigned)height|((unsigned long long)(unsigned)width<<32);p.optional4=(CUdeviceptr)dims;
+    const size_t weight_offset=argc>=16?std::strtoull(argv[15],nullptr,0):0;
+    const size_t input_offset=argc>=17?std::strtoull(argv[16],nullptr,0):0;
+    const size_t output_offset=argc>=18?std::strtoull(argv[17],nullptr,0):0;
+    Params p{}; p.input=di+input_offset;p.output=doo+output_offset;p.weights=dw+weight_offset;p.width=width;p.height=height;p.field_y=shift?-4:height;p.field_x=shift?-4:width;unsigned long long dims=(unsigned)height|((unsigned long long)(unsigned)width<<32);p.optional4=(CUdeviceptr)dims;
+    if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
     if(mode==3){p.optional3=aux;p.optional_dims=aux;p.optional4=(CUdeviceptr)dims;p.override_width=width/2;p.override_height=height/2;}
     void *args[]={&p}; check("launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr)); check("sync",cuCtxSynchronize());
