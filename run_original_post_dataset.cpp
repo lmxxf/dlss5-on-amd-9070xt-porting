@@ -153,8 +153,8 @@ int main(int argc, char **argv) {
             scan_weight = weights;
         } else if (head_weights) {
             scan_weight.assign(weights.size(), 0);
-            // Preserve the body plus the 48-value input/gain region and its
-            // eight-slot padding; scan only the two packed out-conv blocks.
+            // Preserve the complete shifted body through its eight-slot tail
+            // padding; scan only the two packed out-conv blocks.
             std::copy(weights.begin(), weights.begin() + 10392 * 2,
                       scan_weight.begin());
         } else {

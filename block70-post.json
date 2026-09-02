@@ -22,6 +22,21 @@
     "0xb0": "output height"
   },
   "blend_scale_fp16": 0.73974609375,
+  "weight_half_layout": {
+    "weight1_weight2": [0, 4096],
+    "pre_special_padding": [4096, 4104],
+    "post_input_upsample": [4104, 4160],
+    "ffn_skip": [4160, 4192],
+    "pre_qkv_padding": [4192, 4200],
+    "qkv": [4200, 5736],
+    "attention_bias": [5736, 9832],
+    "attention_scale_float32_at_half": 9832,
+    "projection": [9840, 10352],
+    "attention_skip": [10352, 10384],
+    "body_tail_padding": [10384, 10392],
+    "outconv_first_16_channels": [10392, 10648],
+    "outconv_second_16_channels": [10648, 10904]
+  },
   "fixed_frame_validation": {
     "zero_activation_source_exact_mae": 1.54e-09,
     "source_activation_output_correlation": 0.95876,

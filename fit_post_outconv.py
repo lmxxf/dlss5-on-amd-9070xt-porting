@@ -3,7 +3,7 @@
 
 The post CUBIN stores the 3x32 matrix as two padded 3x16 tensor-core blocks.
 `run_original_post_dataset ... 512 head` turns on one physical slot at a time
-while preserving the body and the 48-value gain/input region.  This script
+while preserving the complete shifted body.  This script
 uses those responses as the feature basis, solves the effective matrix on one
 tile, and validates it on an independent tile.
 """
