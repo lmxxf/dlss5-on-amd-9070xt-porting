@@ -51,7 +51,9 @@
     "amd_vs_nvidia_png_exact_channel_fraction": 0.9832176,
     "amd_vs_nvidia_png_max_lsb": 1,
     "portable_upsample_small_heldout_correlation": 0.9987748,
-    "portable_upsample_real_amplitude_correlation": 0.9984821
+    "portable_upsample_real_amplitude_correlation": 0.9984821,
+    "amd_upsample_real_amplitude_cosine": 0.99868323,
+    "amd_upsample_submit_ms": 0.565
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }

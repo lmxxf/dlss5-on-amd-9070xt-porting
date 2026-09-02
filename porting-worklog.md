@@ -1299,6 +1299,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 尝试把portable upsample直接接raw-unpacked W1/W2/QKV/projection并做full-body联合训练，2,048个iid样本上held-out correlation只到0.254，明确否决。原因是标准1H矩阵仍包含dynamic FP8 scale造成的effective差异；block1历史数据也显示raw projection与effective projection仅correlation 0.391、std相差9.33倍。后续沿已成功的block1路线分别生成FFN branch与attention branch oracle，不用full-block梯度掩盖scale缺口。
 
+`d3d12_post_upsample_test.cpp`已在RX9070XT直接执行portable 1024→1024矩阵。真实幅度独立样本submit→fence 0.565 ms，对NVIDIA controlled upsample oracle MAE 0.0436408、RMSE 0.0751269、max error 0.46234、cosine 0.99868323；逐项误差与CPU effective模型一致，AMD未增加计算偏差。block70至此在AMD闭合输入upsample与最终RGB head两端，中间缺口只剩标准1H FFN＋attention的dynamic-scale/effective参数。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
