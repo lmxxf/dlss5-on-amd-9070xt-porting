@@ -22,9 +22,9 @@ static std::vector<unsigned char> read_file(const char *path, size_t size) {
   return result;
 }
 int main(int argc, char **argv) {
-  if (argc != 7) {
+  if (argc != 8) {
     std::fprintf(stderr, "usage: %s arena weight-offset branch residual "
-                         "output auxiliary-output\n", argv[0]);
+                         "output work-output auxiliary-output\n", argv[0]);
     return 2;
   }
   constexpr size_t bytes = 2 * 1024 * 1024, weightBytes = 147719680;
@@ -85,8 +85,11 @@ int main(int argc, char **argv) {
   check("read", cuMemcpyDtoH(host.data(), output, bytes));
   std::ofstream(argv[5], std::ios::binary).write(
       reinterpret_cast<const char *>(host.data()), host.size());
-  check("read_aux", cuMemcpyDtoH(host.data(), auxiliary, bytes));
+  check("read_work", cuMemcpyDtoH(host.data(), work, bytes));
   std::ofstream(argv[6], std::ios::binary).write(
+      reinterpret_cast<const char *>(host.data()), host.size());
+  check("read_aux", cuMemcpyDtoH(host.data(), auxiliary, bytes));
+  std::ofstream(argv[7], std::ios::binary).write(
       reinterpret_cast<const char *>(host.data()), host.size());
   return 0;
 }

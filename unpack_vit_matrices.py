@@ -46,7 +46,8 @@ MATRIX_OUTPUT_TO_RAW = (1, 8, 16, 2, 4)
 
 
 def unpack_matrix(raw: bytes, input_size: int, output_size: int,
-                  input_layout: str, output_layout: str) -> np.ndarray:
+                  input_layout: str, output_layout: str,
+                  output_groups: int = 1) -> np.ndarray:
     expected = input_size * output_size
     if len(raw) != expected:
         raise ValueError(f"matrix bytes {len(raw)} != {expected}")
@@ -58,12 +59,21 @@ def unpack_matrix(raw: bytes, input_size: int, output_size: int,
             for index in range(8):
                 k = thread * 4 + (index & 3) + (16 if index >= 4 else 0)
                 fragments[:, half, k, group] = lanes[:, lane, half * 8 + index]
-    matrix = fragments.reshape(input_size // 32, output_size // 8, 32, 8)
-    matrix = matrix.transpose(0, 2, 1, 3).reshape(input_size, output_size)
+    group_size = output_size // output_groups
+    # Multi-output records (Q/K/V) serialize complete matrices group-major;
+    # each group independently uses K-block-major/N-block-minor ordering.
+    matrix = fragments.reshape(
+        output_groups, input_size // 32, group_size // 8, 32, 8)
+    matrix = matrix.transpose(1, 3, 0, 2, 4).reshape(
+        input_size, output_size)
     layouts = {"matrix_input": MATRIX_INPUT_TO_RAW,
                "matrix_output": MATRIX_OUTPUT_TO_RAW}
     input_order = axis_permutation(input_size, layouts[input_layout])
-    output_order = axis_permutation(output_size, layouts[output_layout])
+    if output_size % output_groups:
+        raise ValueError("output size is not divisible by output groups")
+    group_order = axis_permutation(group_size, layouts[output_layout])
+    output_order = np.concatenate(
+        [group * group_size + group_order for group in range(output_groups)])
     return e4m3_to_float(matrix[input_order][:, output_order]).astype(np.float16)
 
 
@@ -85,17 +95,23 @@ def main() -> None:
     for block in range(first, last + 1):
         outputs = {}
         specifications = {
-            "expand": (0, 1024, 4096, "matrix_input", "matrix_output"),
-            "contract": (1, 4096, 1024, "matrix_input", "matrix_output"),
+            "expand": (0, 1024, 4096, "matrix_input", "matrix_output", 1,
+                       "numeric_oracle_validated"),
+            "contract": (1, 4096, 1024, "matrix_input", "matrix_output", 1,
+                         "numeric_oracle_validated"),
+            "qkv": (2, 1024, 3072, "matrix_input", "matrix_output", 3,
+                    "structural_only_pending_auxiliary_view"),
+            "projection": (4, 1024, 1024, "matrix_input", "matrix_output", 1,
+                           "structural_only_pending_attention_view"),
         }
         for kind, (layer, inputs, outputs_count, input_layout,
-                   output_layout) in specifications.items():
+                   output_layout, output_groups, validation) in specifications.items():
             record = records[f"block{block}.layer{layer}.layer"]
             begin = record["arena_offset"]
             matrix_bytes = inputs * outputs_count
             matrix = unpack_matrix(
                 arena[begin:begin + matrix_bytes], inputs, outputs_count,
-                input_layout, output_layout)
+                input_layout, output_layout, output_groups)
             filename = f"block{block}-vit-{kind}.f16"
             matrix.tofile(args.output_dir / filename)
             outputs[kind] = {
@@ -103,6 +119,8 @@ def main() -> None:
                 "shape": [inputs, outputs_count],
                 "input_layout": input_layout,
                 "output_layout": output_layout,
+                "output_groups": output_groups,
+                "validation": validation,
             }
         manifest["blocks"][str(block)] = outputs
     (args.output_dir / "vit-matrices.json").write_text(

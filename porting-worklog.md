@@ -1195,6 +1195,12 @@ block31两张FP16矩阵各8 MiB，导出耗时低于1秒。RX9070XT已直接执�
 
 Contract 单次真实分布 oracle 随后纠正了A/B命名：矩阵输入轴固定使用A排列，输出轴固定使用B排列，与buffer被叫作main还是branch无关。对`K/N order × A/B/identity input × A/B/identity output × 三种skip排列`全部54个候选穷举，唯一最优为`KN + K:A + N:B + skip:B`，correlation 0.9916288、MAE 0.0091401；第二类错误轴组合下降到0.84以下。`unpack_vit_matrices.py`已统一修正为所有线性矩阵`K=matrix_input(A), N=matrix_output(B)`。
 
+QKV record 已按三个独立1 MiB矩阵的group-major顺序加入unpacker，Projection也按1 MiB矩阵导出；但两者在manifest中明确标为`structural_only`。standalone Spark Contract standard kernel只写8个auxiliary bytes，而live descriptor证据表明QKV必须读取Contract的第二输出；在aux为零时，任何Q/K/V矩阵排列都无法与oracle相关，故不能用该失败提升或否决QKV轴布局。
+
+5090 clean reboot后，自建NVAPI宿主的Expand-only基线以114,443 nonzero／零NaN通过；追加Contract standard+chained也通过。`result=99`导出11个2 MiB view后确认：Contract main在r3（28,600 nonzero）、大aux/workspace在r5（57,054 nonzero，含141个E4M3 NaN哨兵）、小aux在r6（仅8个常量）。旧`result=98`硬编码复制r1+r6，不能代表single-block Contract state。
+
+`run_original_vit_contract.cpp`与`run_original_vit_qkv.cpp`已改为显式导出／接收main、work、aux。把5090的r3/r5/r6原样喂给Spark QKV后，Q/K/V分别得到28,663／28,596／28,642个nonzero，全部零NaN，证明第二输入链闭合。与此同时，QKV main与三路输出的channel view不属于FFN已恢复的A/B有限候选；54种tile/axis/group候选最高相关仅0.083。QKV/Projection继续保持structural-only，下一步用复用context的1,024-channel QKV basis直接恢复三套physical permutation与effective matrices。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

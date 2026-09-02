@@ -21,6 +21,7 @@
 - `run_original_split_global.cpp`：按真实 `2/1/4/1` launch 拓扑执行512-channel split-Swin四层。
 - `run_original_vit1d_global.cpp` / `run_original_vit1d_chain.cpp`：8×8 ViT 的cluster-aware runner；已闭合单block，跨block仍缺NvAPI `flag=1`同步原语。
 - `run_original_vit_repack.cpp`：独立执行原始8×8 ViT 1D→2D repack，用于把任意ViT断点接回decoder做画面级验收。
+- `run_original_vit_contract.cpp` / `run_original_vit_qkv.cpp`：独立执行 ViT Contract 与 QKV，并显式携带 main/work/aux 三路状态；用于绕开跨block同步、逐层恢复数值 view。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
 - `run_original_1h_upsample.cpp`：按block66真实0x60 ABI执行1H upsample；`+0`绑定decoder主输入、`+8`绑定输出，保留enc0 skip与override dimensions。
 - `export_weight_records.py` / `e4m3_to_f32.py` / `sanitize_e4m3.py`：权重record导出、E4M3物理view转换与近似桥NaN饱和工具。
@@ -40,7 +41,7 @@
 - `run_original_vit_expand_basis.cpp` / `run_original_vit_expand_matrix.cpp` / `run_original_vit_expand.cpp`：ViT Expand 的稀疏 basis、完整矩阵提取与任意输入 held-out oracle；basis 支持集恢复出 32-token main view 的 token/channel 物理位分解。
 - `block31-vit-expand-effective.f16` / `.json`：unit-basis 与小幅 Hadamard 联合恢复的首个 1024→4096 portable ViT Expand 矩阵；8 组稀疏到稠密 held-out correlation 0.9840，仅作 AMD bring-up bridge，不替代 raw packed-weight exact unswizzle。
 - `d3d12_vit_expand_test.cpp`：RX 9070 XT 的 1024→4096 ViT Expand correctness runner；直接读取 portable FP16 matrix，首个 Spark CUBIN held-out MAE 0.00664、submit→fence 0.600 ms。
-- `unpack_vit_matrices.py`：按 PTX matrix-B fragment 公式、K-block-major/N-block-minor tile 顺序及两套 channel bit permutation，直接把 blocks31–38 的 Expand／Contract packed E4M3 解成 portable FP16；block31 raw Expand 对 CUBIN basis 全矩阵 correlation 0.999399。
+- `unpack_vit_matrices.py`：按 PTX matrix-B fragment 公式、K-block-major/N-block-minor tile 顺序及两套 channel bit permutation，直接把 blocks31–38 的 Expand／Contract／QKV／Projection packed E4M3 解成 portable FP16；QKV 按三个独立 1024-wide 输出组重排。block31 raw Expand 对 CUBIN basis 全矩阵 correlation 0.999399。
 - `block1-effective.bin` / `block1-effective.json`：由原始 CUBIN oracle 拟合并 held-out 验证的 block1 row-major FFN／双流 cosine-attention 参数。
 - `block2-effective.bin` / `block3-effective.bin` / `effective-1h32.json`：同法恢复的后两个 32-channel blocks；manifest 同时记录 tensor layout、held-out 误差与 shifted-window 的 roll／mask 规则。
 - `d3d12_block1_test.cpp`：RX 9070 XT 两 pass HLSL block1 runner；对 256 个 held-out tiles 与 NVIDIA CUBIN oracle 做逐元素误差验收。
