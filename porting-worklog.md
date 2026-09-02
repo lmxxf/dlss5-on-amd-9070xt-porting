@@ -1307,6 +1307,10 @@ SASS进一步把post输出侧定位到weight byte `0x50e0`（half 10352）：四
 
 CPU descriptor的block70 1344-byte candidate vector随后被识别为42个连续MSVC string，而非weight descriptors；探针现直接解码operation names。与普通block1的31步图对齐结果是精确的：post独有5步前缀`convolution→alias→mul→mul→add`；随后完整复用block1运算序列，但QKV convolution前多`constant_pad_nd`；末尾再加5步`mul→convolution→mul→mul→add`。标准body自身的末两步仍是`mul→add`，即attention residual没有消失；post后缀首个mul才是独立输出调制。图固化为`block70-operation-graph.json`。按该图补回residual与独立gain后attention-only连续模型仍停在0.294，说明controlled输入坐标不是标准body的直接h值；后续必须在图的5步前缀出口建立新读口，而不是继续把最终head basis当中间activation。
 
+依据权威图构造了无attention伪装的prefix读口：W1/W2与QKV/projection全部归零，FFN skip与attention skip同时置1，标准body因此退化为identity，head basis直接读出5步post prefix的完整`8×8×32`。1024-row Hadamard恢复`1024→2048`矩阵，密度仅0.0011597；小幅held-out correlation 0.999998707、MAE 1.29e-5，真实幅度held-out correlation 0.999999938、MAE 3.07e-4、max error 0.00903。`fit_post_prefix.py`、`block70-prefix-effective.bin/.json`已固化该矩阵，旧odd-half controlled map降级为历史诊断。
+
+通用化后的`d3d12_post_upsample_test.cpp`已在RX9070XT执行该权威prefix：1024→2048 submit→fence 0.531 ms，对NVIDIA真实幅度oracle MAE 3.073e-4、RMSE 0.001049、max error 0.009033、cosine 0.999999931。block70输入侧至此不再依赖含混的controlled odd坐标，AMD输出可直接作为普通1H body的32-channel输入。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

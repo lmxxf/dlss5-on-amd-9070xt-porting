@@ -1,0 +1,33 @@
+{
+  "file": "block70-prefix-effective.bin",
+  "sha256": "e1cc7d820b331b2ba2c5afab86c04a6b572010441a19a976b8dfc4fb73efe2e7",
+  "storage": "float32_little_endian",
+  "shape": [
+    1024,
+    2048
+  ],
+  "input": "main[0:512] + skip[0:512], E4M3 decoded",
+  "output": "complete 8x8x32 output of the five-operation post prefix",
+  "operation_prefix": [
+    "convolution",
+    "alias",
+    "mul",
+    "mul",
+    "add"
+  ],
+  "recovery": "1024-row Rademacher Hadamard at +/-0.5",
+  "density_abs_gt_1e_5": 0.00115966796875,
+  "small_heldout": {
+    "correlation": 0.9999987071818327,
+    "mae": 1.2892065569758415e-05,
+    "rmse": 1.5800955225131474e-05,
+    "max_abs_error": 4.57763671875e-05
+  },
+  "real_amplitude_heldout": {
+    "correlation": 0.9999999381229104,
+    "mae": 0.0003073441330343485,
+    "rmse": 0.0010494075249880552,
+    "max_abs_error": 0.009033203125
+  },
+  "boundary": "portable effective prefix; standard 1H body and post suffix remain separate"
+}

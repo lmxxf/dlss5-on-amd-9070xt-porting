@@ -53,7 +53,10 @@
     "portable_upsample_small_heldout_correlation": 0.9987748,
     "portable_upsample_real_amplitude_correlation": 0.9984821,
     "amd_upsample_real_amplitude_cosine": 0.99868323,
-    "amd_upsample_submit_ms": 0.565
+    "amd_upsample_submit_ms": 0.565,
+    "portable_prefix_real_amplitude_correlation": 0.999999938,
+    "amd_prefix_real_amplitude_cosine": 0.999999931,
+    "amd_prefix_submit_ms": 0.531
   },
   "status": "original CUBIN post path reproduced; AMD semantic implementation pending"
 }
