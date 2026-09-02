@@ -1387,6 +1387,8 @@ block8 skip随后应用已严格恢复的`tinlayout-2h64-output-permutation.i32`
 
 arena版addon已在AMD WSL用MinHook静态编译为349,012 bytes，部署到5090 Lab与《剑星》Win64目录。当前`query user`确认5090无互动登录用户，故未从SSH Session0强启Steam；下次桌面登录后正常启动游戏、让DLSS5运行一帧即可触发。`verify_runtime_weight_arena.py`会验证总长度、153 records边界，并逐record报告runtime/archive SHA与changed bytes。若arena成功，这将一次性替换所有错误archive→CUBIN路径，并直接解锁encoder skips与fused blocks的权威数值oracle。
 
+等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

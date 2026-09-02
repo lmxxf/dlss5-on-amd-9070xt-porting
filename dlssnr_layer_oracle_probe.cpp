@@ -29,6 +29,8 @@ using UnregisterAddon = void (*)(void *);
 using Forward1H = void (*)(void *, void *, void *, void *, int, int);
 using CuCtxSynchronize = int (*)();
 using CuMemcpyDtoH = int (*)(void *, unsigned long long, size_t);
+using CuMemGetAddressRange = int (*)(
+    unsigned long long *, size_t *, unsigned long long);
 using CuInit = int (*)(unsigned);
 using CuDeviceGet = int (*)(int *, int);
 using CuDevicePrimaryCtxRetain = int (*)(void **, int);
@@ -159,19 +161,33 @@ void capture_launch_oracle(
         GetProcAddress(cuda, "cuCtxSynchronize"));
     auto copy_to_host = reinterpret_cast<CuMemcpyDtoH>(
         GetProcAddress(cuda, "cuMemcpyDtoH_v2"));
+    auto get_address_range = reinterpret_cast<CuMemGetAddressRange>(
+        GetProcAddress(cuda, "cuMemGetAddressRange_v2"));
     int sync_result = synchronize == nullptr ? -1 : synchronize();
     int input_result = -1;
     int output_result = -1;
     int arena_result = -1;
+    int range_result = -1;
+    unsigned long long allocation_base = 0;
+    size_t allocation_size = 0;
     std::vector<uint8_t> input_bytes(kCaptureBytes);
     std::vector<uint8_t> output_bytes(kCaptureBytes);
     if (sync_result == 0 && copy_to_host != nullptr) {
         input_result = copy_to_host(input_bytes.data(), input, input_bytes.size());
         output_result = copy_to_host(output_bytes.data(), output, output_bytes.size());
-        if (weight >= kBlock1ArenaOffset) {
+        if (get_address_range != nullptr) {
+            range_result = get_address_range(
+                &allocation_base, &allocation_size, weight);
+        }
+        const unsigned long long calculated_base =
+            weight >= kBlock1ArenaOffset ? weight - kBlock1ArenaOffset : 0;
+        const bool allocation_matches = range_result == 0 &&
+            allocation_base == calculated_base &&
+            allocation_size >= kWeightArenaBytes;
+        if (allocation_matches) {
             std::vector<uint8_t> arena_bytes(kWeightArenaBytes);
             arena_result = copy_to_host(
-                arena_bytes.data(), weight - kBlock1ArenaOffset, arena_bytes.size());
+                arena_bytes.data(), allocation_base, arena_bytes.size());
             if (arena_result == 0) {
                 write_binary(kWeightArenaPath, arena_bytes);
             }
@@ -190,11 +206,14 @@ void capture_launch_oracle(
             "width=%d\nheight=%d\ninput=0x%llx\noutput=0x%llx\nweight=0x%llx\n"
             "grid=%u,%u,%u\nblock=%u,%u,%u\ncapture_bytes=%zu\n"
             "cuCtxSynchronize=%d\ncuMemcpyDtoH_input=%d\ncuMemcpyDtoH_output=%d\n"
-            "arena_base=0x%llx\ncuMemcpyDtoH_arena=%d\narena_bytes=%zu\n",
+            "calculated_arena_base=0x%llx\ncuMemGetAddressRange=%d\n"
+            "allocation_base=0x%llx\nallocation_size=%zu\n"
+            "cuMemcpyDtoH_arena=%d\narena_bytes=%zu\n",
             g_width, g_height, input, output, weight,
             grid_x, grid_y, grid_z, block_x, block_y, block_z,
             kCaptureBytes, sync_result, input_result, output_result,
             weight >= kBlock1ArenaOffset ? weight - kBlock1ArenaOffset : 0,
+            range_result, allocation_base, allocation_size,
             arena_result, kWeightArenaBytes);
         std::fclose(log);
     }
