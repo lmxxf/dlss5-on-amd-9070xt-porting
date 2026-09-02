@@ -33,8 +33,9 @@ int main(int argc, char **argv) {
         std::fprintf(stderr,
             "usage: %s cubin symbol weights blend samples.u8 output.rgba32f "
             "[scan-half-count [ablate|head]]\n"
+            "       %s cubin symbol weights blend samples.u8 features.f32 features\n"
             "samples: repeated [2048-byte main][512-byte skip] records\n",
-            argv[0]);
+            argv[0], argv[0]);
         return 2;
     }
     auto weights = read_file(argv[3]);
@@ -45,7 +46,8 @@ int main(int argc, char **argv) {
     constexpr size_t sample_bytes = main_bytes + skip_bytes;
     if (weights.size() != 21808 || blend.size() != 2 || samples.empty() ||
         samples.size() % sample_bytes) return 2;
-    const bool scan_weights = argc >= 8;
+    const bool feature_mode = argc == 8 && !std::strcmp(argv[7], "features");
+    const bool scan_weights = argc >= 8 && !feature_mode;
     const bool ablate_weights = argc == 9 && !std::strcmp(argv[8], "ablate");
     const bool head_weights = argc == 9 && !std::strcmp(argv[8], "head");
     if (argc == 9 && !ablate_weights && !head_weights) return 2;
@@ -71,7 +73,7 @@ int main(int argc, char **argv) {
     check("skip alloc", cuMemAlloc(&skip_device, 1 << 20));
     check("weights alloc", cuMemAlloc(&weights_device, weights.size()));
     check("blend alloc", cuMemAlloc(&blend_device, 512));
-    if (!scan_weights)
+    if (!scan_weights && !feature_mode)
         check("weights upload", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
     check("blend upload", cuMemcpyHtoD(blend_device, blend.data(), blend.size()));
 
@@ -140,9 +142,13 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0xb0, &extent, 4);
     void *arguments[] = {params};
 
-    std::vector<float> output(count * 8 * 8 * 4);
+    std::vector<float> output(count * 8 * 8 * (feature_mode ? 32 : 4));
     std::vector<unsigned char> scan_weight;
-    if (scan_weights) {
+    if (feature_mode) {
+        scan_weight.assign(weights.size(), 0);
+        std::copy(weights.begin(), weights.begin() + 10392 * 2,
+                  scan_weight.begin());
+    } else if (scan_weights) {
         if (ablate_weights) {
             scan_weight = weights;
         } else if (head_weights) {
@@ -165,6 +171,7 @@ int main(int argc, char **argv) {
     download.dstPitch = 8 * 16;
     download.WidthInBytes = 8 * 16;
     download.Height = 8;
+    std::vector<float> rgba_tile(8 * 8 * 4);
     for (size_t sample = 0; sample < count; ++sample) {
         const auto *record = samples.data() +
             (scan_weights ? 0 : sample) * sample_bytes;
@@ -189,6 +196,27 @@ int main(int argc, char **argv) {
         check("skip clear", cuMemsetD8(skip_device, 0, 1 << 20));
         check("main upload", cuMemcpyHtoD(main_device, record, main_bytes));
         check("skip upload", cuMemcpyHtoD(skip_device, record + main_bytes, skip_bytes));
+        if (feature_mode) {
+            for (size_t channel = 0; channel < 32; ++channel) {
+                const size_t block = channel < 16 ? 10392 : 10648;
+                const size_t local = channel & 15;
+                const size_t slot = block + (local / 4) * 8 + local % 4;
+                const unsigned short one_half = 0x3c00, zero_half = 0;
+                std::memcpy(scan_weight.data() + slot * 2, &one_half, 2);
+                check("feature weight upload", cuMemcpyHtoD(
+                    weights_device, scan_weight.data(), scan_weight.size()));
+                check("feature launch", cuLaunchKernel(
+                    function, 1, 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
+                check("feature sync", cuCtxSynchronize());
+                download.dstHost = rgba_tile.data();
+                check("feature download", cuMemcpy2D(&download));
+                for (size_t pixel = 0; pixel < 64; ++pixel)
+                    output[(sample * 64 + pixel) * 32 + channel] =
+                        rgba_tile[pixel * 4] - 0.5f;
+                std::memcpy(scan_weight.data() + slot * 2, &zero_half, 2);
+            }
+            continue;
+        }
         check("launch", cuLaunchKernel(
             function, 1, 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
         check("sync", cuCtxSynchronize());
@@ -201,7 +229,8 @@ int main(int argc, char **argv) {
     const auto [low, high] = std::minmax_element(output.begin(), output.end());
     size_t finite = 0;
     for (float value : output) finite += std::isfinite(value);
-    std::printf("samples=%zu scan_weights=%d finite=%zu/%zu range=%.9g..%.9g\n",
-                count, scan_weights, finite, output.size(), *low, *high);
+    std::printf("samples=%zu scan_weights=%d features=%d finite=%zu/%zu "
+                "range=%.9g..%.9g\n", count, scan_weights, feature_mode,
+                finite, output.size(), *low, *high);
     return stream ? 0 : 3;
 }

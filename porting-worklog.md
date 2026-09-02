@@ -1283,6 +1283,8 @@ block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU 
 
 `d3d12_post_outconv_test.cpp`已在RX9070XT执行同一32→RGB矩阵与`saturate(Color + residual)`。用第二组独立随机tile的controlled basis feature作输入，对原NVIDIA完整post oracle：submit→fence 0.334 ms，MAE 2.17e-7、RMSE 4.20e-7、max error 2.83e-6、cosine 0.999999999867。该层至此完成“参数portable＋AMD GPU执行＋独立NVIDIA数值验收”三重闭合；后续不再改RGB head，集中恢复body的32-channel feature。
 
+批量runner新增`features`模式：保留body与48-value input/gain区，依次给两块out-conv的32个逻辑channel置unit weight，从R通道直接读回64×32 body feature。单tile结果与旧512-launch完整head basis逐float exact；9,216组联合main+skip只耗时5.47秒，18,874,368个值全部有限。无结构body MLP再次被held-out否决：8,192 train＋1,024 held-out的2560→512→2048模型correlation仅0.377、MAE 0.401，几乎等于均值baseline 0.413。原因是独立同分布FP8随机byte把attention推入大量±0.5饱和区，既不代表真实activation流形，也无法学习高维窗口结构。该dataset保留作受控分支证据，不作为portable参数；下一步用feature读口逐段恢复FFN与attention，而不是扩大黑盒网络。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

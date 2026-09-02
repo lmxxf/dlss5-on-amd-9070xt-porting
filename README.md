@@ -36,7 +36,7 @@
 - `block0-real-calibrated.bin` / `block4-real-calibrated.bin` / `stage2-real-calibrated.bin` / `encoder-real-calibration.json`：围绕当前《剑星》固定帧做checkerboard held-out校准的portable encoder桥；RX相关分别0.811/0.997/0.874，仅作真实分布校准证据，不冒充通用模型。
 - `nvapi_chain_probe.cpp` / `inject_probe.cpp`：5090 resident只读NVAPI chain参数探针与延迟注入器；用于抓取block70真实0xb8 blob，当前等待交互式console会话恢复。
 - `run_original_post.cpp` / `block70-post.json`：可重放block70原始0xb8 ABI；当前preset绑定`+0x38=Color RGBA`、`rgb_mode=1`、`input_scale=1/32`与独立FP16 `blend_scale=0.739746`，原始activation输出对source correlation 0.95876，portable block69输出对source correlation 0.8713。它取代灰色ABI图，成为最终画面验收oracle。
-- `run_original_post_dataset.cpp`：复用单一CUDA context批量执行8×8 block70 main+skip联合样本；输入record为2048-byte main＋512-byte skip。128组与逐进程oracle逐float exact，耗时0.42秒；9,216组耗时0.70秒。另支持body weight one-hot／逐slot ablation scan，供controlled-weight恢复physical pack。
+- `run_original_post_dataset.cpp`：复用单一CUDA context批量执行8×8 block70 main+skip联合样本；输入record为2048-byte main＋512-byte skip。128组与逐进程oracle逐float exact，耗时0.42秒；9,216组耗时0.70秒。另支持body weight one-hot／逐slot ablation及`features`模式；后者借controlled RGB head导出64×32 body feature，9,216组耗时5.47秒。
 - `fit_post_outconv.py` / `block70-outconv-effective.bin` / `.json`：从controlled head basis恢复block70最后的32→RGB矩阵；两组16-channel packed block各占256 FP16 slots、每组仅48个有效。独立held-out correlation 0.9999991、MAE 2.88e-7。
 - `d3d12_post_outconv_test.cpp`：RX9070XT直接执行portable 32→RGB与`Color + residual`；独立held-out tile submit→fence 0.334 ms，对NVIDIA oracle MAE 2.17e-7、max error 2.83e-6。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
