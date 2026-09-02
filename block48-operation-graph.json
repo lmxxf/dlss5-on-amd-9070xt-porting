@@ -21,10 +21,12 @@
   "weight_layout_half_offsets": {
     "prefix_conv_256x256": [0, 65536],
     "standard_weight0_weight1_weight2": [65536, 245760],
-    "prefix_aux_padding_and_ffn_skip": [245760, 246264],
+    "ffn_skip": [245760, 246016],
+    "prefix_dw_sin": [246016, 246256],
+    "pre_qkv_padding": [246256, 246264],
     "qkv": [246264, 344568],
     "attention_bias": [344568, 377336],
     "scale_projection_attention_skip_and_tail": [377336, 410392]
   },
-  "status": "operation order and major tensor ranges closed; 504-half middle region pending exact split"
+  "status": "all learned tensor ranges closed; prefix spatial/token topology pending"
 }

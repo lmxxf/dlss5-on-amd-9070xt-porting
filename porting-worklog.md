@@ -1351,6 +1351,8 @@ AMD 512-channel correctness runner在`d3d12_block128_test.cpp`新增split512模�
 
 block48 descriptor operation vector共有36步：4步upsample前缀`convolution→convolution→mul→add`，随后是带额外input convolution的标准8H Swin。live字段给出in/out=512/256、`+0x40..=[0,0,8,32]`、boundary flags1/1、scale1.0、mode3。record 410,392 halves，比普通8H block49多65,776；按尾部QKV/bias/projection结构反向对齐得到：前65,536为256×256 prefix conv，随后W0/W1/W2占65,536–245,759，245,760–246,263为504-half dw/sin/padding/FFN-skip区，QKV从246,264开始，之后全部与普通8H尾布局同构。结构固化为`block48-operation-graph.json`；下一步细分504-half区并实现archive logical upsample。
 
+504-half区随后由数值分布切开：245,760–246,015的256值集中在约0.82–1.0，是FFN skip；246,016–246,255的240值分布0–0.79，是prefix dw/sin；246,256–246,263为8个padding slots（序列化内容不保证清零）。block48全部learned tensor边界至此闭合，剩余变量只在512→256 prefix如何把64个main tokens与block22 skip展开到576个256-channel tokens。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
