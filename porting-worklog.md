@@ -1331,6 +1331,8 @@ skip full geometry则是两个1024-byte banks：相对CTA base的`[0,1024)`与`[
 
 上游主线转入decoder39–69。block39 CPU descriptor的128-byte operation vector解码为四步`convolution→convolution→mul→add`；archive record为262,656 halves，其中524,288恰等于1024×512主卷积，剩余1,024 halves供第二卷积／scale路径。结构与容量固化为`block39-operation-graph.json`。这证明block39是线性双输入decoder入口，不需要复制Swin；下一步分别以main-only/skip-only controlled oracle恢复两支effective映射，再复用batch AMD matrix runner。
 
+旧`probe_b39y2`的main/skip消融被重新执行后不具备数值权威性：a1虽写32,632 bytes，但全是E4M3 NaN哨兵，解码／sanitize后方差为零；skip-only也全零。它只证明旧0x50 ABI能store，不能用于判断第二输入无贡献或做线性basis。后续block39 oracle必须改用当前portable block38 finite输入、完整arena与正确block30 skip，且在采样前先通过“零NaN＋非零方差”门槛。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
