@@ -1,0 +1,23 @@
+{
+  "status": "fixed-frame/checkerboard calibration artifacts; diagnostic bridge, not general final model",
+  "files": {
+    "block0-real-calibrated.bin": {
+      "bytes": 2582528,
+      "sha256": "a19b68af1d035ffec457ee3603ea30b99204542690eb213245b54c59eaca1b6f"
+    },
+    "block4-real-calibrated.bin": {
+      "bytes": 5267456,
+      "sha256": "70235557dd05d215a70006d194683990bf2a4f8ca97a92c182b4d07720b21262"
+    },
+    "stage2-real-calibrated.bin": {
+      "bytes": 6358016,
+      "sha256": "5828a3506704d99b503470498841a16c25bf4c29c0055b810200c04cd43d4426"
+    }
+  },
+  "metrics": {
+    "block0_rx_correlation": 0.8112826,
+    "block3_after_original_blocks1_3_correlation": 0.8396473,
+    "block4_rx_correlation": 0.9965834,
+    "stage2_block7_rx_correlation": 0.8738006
+  }
+}

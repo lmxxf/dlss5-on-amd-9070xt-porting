@@ -1253,6 +1253,16 @@ portable block38经原repack接回decoder后，block39产生少量38–76个E4M3
 
 最终条纹经skip消融定位：四条skip全零时横向色带消失，只剩主干点阵；只恢复block48/56高层skip或只恢复block62/66低层skip都会分别重新产生色带。故横带来自整个encoder skip physical布局，不是ViT。尝试用现存AMD block3与distilled block8 main替换低层skip仍有色带，说明值域之外还存在skip view permutation／布局不匹配。下一主线转为重建blocks0–22的portable skip物理布局。
 
+后续控制实验修正了“skip本身错误”的过强归因：四skip全零只说明U-Net多尺度抵消被拿掉，单独恢复任一尺度出现带并不能证明该skip错。exact block31–34前缀替换portable前四层后，最终条纹也几乎不变；而最终输出仍走对某一旧activation拟合的linear readout。故条纹不能继续充当网络精度判据，最终验收必须恢复原block70 post。
+
+### Encoder真实分布校准与block70 post突破
+
+重新用同一RGB-only/Gaussian=0合同验收preblock，现有随机tile distilled模型在真实《剑星》帧上仍只有correlation 0.317，确认是真实图像domain shift。以576 tiles做空间checkerboard划分，从原distilled权重微调并保存held-out最佳：block0 RX全帧correlation 0.8112826；量化后送原blocks1–3，block3对原global view correlation 0.8396473、exact E4M3 47.8%。
+
+同法逐stage校准：block4直接用当前calibrated block3经原DS CUBIN生成576×512 target，checkerboard held-out 0.99347，RX全帧correlation 0.9965834；stage2→block7用原`stellar-block7.fp8` target校准，held-out 0.81116，RX全帧correlation 0.8738006。三份参数归档于`encoder-real-calibration.json`，明确是固定帧诊断桥，不替代通用权重。block8 main在144 tiles上held-out仅0.51、全帧上限0.877，未进入仓库。
+
+block70 forward反汇编给出遗漏字段：param`+0x68=state+0x08`，live GPU VA恰比layer weight base早0x200，对应独立`blend_scale` record；param`+0x30`来自DLL常量0x1800bc9a8，值为0.03125。绑定FP16 blend_scale=0.739746并填入0.03125后，post输出chroma从0恢复到951–3247，证明真实颜色路径已打开。剩余缺口严格收敛为param`+0x38/+0x58/+0x60`三路texture object语义；SASS确认三者均被TEX读取，不能再用同一个RGBA texture冒充。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
