@@ -1,0 +1,28 @@
+{
+  "source": "CPU descriptor builder operation-name vectors plus archive capacities",
+  "block": 40,
+  "width": 512,
+  "layers": [
+    {
+      "type": "CCSplitSwin16HFfwd",
+      "operations": ["convolution", "convolution", "clamp", "abs", "mul", "rsub", "mul", "add", "mul", "convolution"],
+      "tensors": [{"name": "gate", "shape": [256, 512]}, {"name": "up", "shape": [256, 512]}]
+    },
+    {
+      "type": "CCSplitSwin16HFfwdProj",
+      "operations": ["convolution", "mul", "add"],
+      "tensors": [{"name": "projection", "shape": [512, 256]}, {"name": "skip", "shape": [512]}]
+    },
+    {
+      "type": "CCSplitSwin16HQKVAttn",
+      "operations": ["convolution", "linalg_vector_norm", "clamp_min", "div", "linalg_vector_norm", "clamp_min", "div", "mul", "stack", "bmm", "add", "clamp", "_softmax", "sub", "detach", "add", "bmm"],
+      "tensors": [{"name": "qkv", "shape": [3, 256, 512]}, {"name": "bias", "shape": [16, 64, 64]}, {"name": "scale", "shape": [16], "storage": "float32"}]
+    },
+    {
+      "type": "CCSplitSwin16HProj",
+      "operations": ["convolution", "mul", "add"],
+      "tensors": [{"name": "projection", "shape": [512, 256]}, {"name": "skip", "shape": [512]}]
+    }
+  ],
+  "status": "archive logical shapes closed; shared reference applies to blocks40-47"
+}

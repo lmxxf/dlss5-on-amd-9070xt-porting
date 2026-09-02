@@ -1341,6 +1341,10 @@ descriptor探针进一步导出block39完整0x170 layer object。稳定整数域
 
 `build_block39_logical.py`按PyTorch convolution标准layout把record展开为1536→512稀疏矩阵：main前/后512 channels分别乘W前/后256 output rows，block30 output1的512 channels逐通道乘record尾部512 depthwise weights后相加。固定输入使用`blocks31-38-portable.f32`的64×1024 canonical main与`block30-pool-correct.bin`解码后的64×512 skip；CPU输出finite，范围-21.01..25.66、std1.946。通用AMD batch matrix runner在RX9070XT执行64 samples耗时0.836 ms，对CPU logical oracle MAE 1.43e-9、max error 4.77e-7、cosine 0.999999999993。block39 archive逻辑语义至此在AMD闭合；下一层转入block40 split-Swin。
 
+block40四个CPU operation vectors与record容量随后闭合全部逻辑张量。Ffwd层为两张256×512 gate/up卷积，按`fast_activation(gate) * up`形成gated hidden；FfwdProj为512×256 projection＋512 skip；QKVAttn为三张256×512、16 heads×16 dim、16×64×64 bias与16个FP32 scales；Proj为512×256＋512 skip。结构固化为`block40-operation-graph.json`，同构适用于40–47。
+
+`split_swin512_reference.py`直接读取四条archive FP16 records执行上述公式。以block39 logical 64×512输出起步，blocks40–47全部finite且无NaN，std依次为1.5972/1.5023/1.4190/1.3355/1.2571/1.0897/1.0088/0.9524，范围连续收敛而非坍缩。decoder 512-channel CPU logical主链至此贯通；下一验收点是把同一两pass gated-FFN＋16-head attention HLSL跑在RX9070XT。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
