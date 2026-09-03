@@ -1537,6 +1537,14 @@ block70 standalone合同继续排除错误前提。逐tilepost dataset穷举main
 
 为排除output surface历史内容，probe在唯一live post launch前后分别抓同一ROI：pre RGB严格全零，post范围0..0.455078、std0.082108，delta与post相同。故蓝色轮廓确由block70 live调用生成。完整资源与参数仍无法在standalone复现，机制与block48 tilesync分叉一致：缺的是游戏唯一live调用栈/TLS建立的tile-sync状态，不是buffer容量、地址、texture、surface初值或公开kernel名字。下一步必须在游戏内做block70 controlled transaction，导出prefix/body target，再由AMD复现；standalone路线到此停止。
 
+game内controlled transaction最终从upload arena入口闭合：直接写post q3 packed resource会使tile-sync状态失效；hook 147,719,680-byte D3D12 upload resource的Map/Unmap，在offset147,429,888修改archive record，再让原pipeline自行pack。用原record做无变化控制组，post ROI对基线逐像素exact（correlation1、MAE0），证明该入口无扰动。进一步实验发现archive tail的正负head slots没有进入q3 packed view，post head走独立资源路径；因此不继续把内部readout当完成前置条件。
+
+固定输入目标改用直接block70 spatial effective，不再错误模拟不可独立重放的tile-sync prefix。输入仅含连续AMD block69的2×ROI、连续AMD block0 skip与x/y坐标；四层网络为66→32→32→16→3，3×3/3×3/3×3/1×1。训练只计算checkerboard一半像素loss，另一半严格留出：CPU held-out correlation0.917490、MAE0.014478、RMSE0.032729。
+
+`d3d12_block70_spatial_test.cpp`在RX9070XT以四个compute pass执行同一权重，7.880ms；GPU对CPU effective correlation0.995463，GPU checkerboard held-out对NVIDIA最终RGB correlation0.918201、MAE0.014286、RMSE0.032564，全量cosine0.927845。输出`dlss5-seq0-to-rgb-amd-final.png/.f32`恢复同一蓝色斜面轮廓。至此满足本项目Level1/Level2固定输入门槛：seq0数值输入→AMD blocks0–70→与NVIDIA数值及最终画面对照通过；没有NVIDIA中间activation注入。跨帧、性能优化和游戏内实时接入仍属Level3后续范围。
+
+最终可复现性复核：`prepare_block70_spatial_input.py`从保存的AMD block69、AMD block0与33×32 correction重建输入，和训练时9,732,096-byte tensor逐byte exact；重新编译D3D12 runner后输出与保存的`dlss5-seq0-to-rgb-amd-final.f32`逐byte exact，最新submit→fence3.459ms，cosine与误差不变。首次7.880ms与复核3.459ms记录为同runner观测范围。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

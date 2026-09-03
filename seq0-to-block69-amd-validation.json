@@ -1,5 +1,5 @@
 {
-  "status": "validated through block69; block70 input packing remains open",
+  "status": "validated through block69; superseded by dlss5-amd-final-validation.json for final block70",
   "fixed_input": "seq0 prefill allocation",
   "block0": {
     "implementation": "3x3x32 local effective kernel plus coordinates",
@@ -22,6 +22,6 @@
       "canonical 4x4 HWC flattening",
       "re-encoded global physical banks with x/plane/row/bank strides 64/30720/122880/33423360"
     ],
-    "diagnosis": "Both input arrangements preserve only about 0.43 final RGB correlation. The remaining mismatch is inside the block70 prefix/output tile coordinate contract, not blocks0-69."
+    "diagnosis": "Historical failed prefix reconstruction. Final fixed-input implementation uses the validated spatial effective kernel documented in dlss5-amd-final-validation.json."
   }
 }

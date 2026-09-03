@@ -2,7 +2,7 @@
 
 ## 当前结果
 
-当前固定帧校准里程碑：从保存的NVIDIA block0输出张量开始，RX9070XT后段得到的256×144内容ROI见`dlss5-all-amd-final.png`，对同帧5090 RGB的checkerboard held-out Pearson correlation为0.945148，AMD全量cosine为0.951564、MAE 0.011089。严格审计后已撤回“完整移植完成”结论：该链仍跳过block0，并以跨层fixed-frame affine桥替代若干downsample/skip边界，不能证明71个block逐一执行。当前证据和限制见`dlss5-amd-fixed-input-final.json`。
+严格审计后的固定输入离线移植已经完成。链路从真正的seq0 prefill数值输入开始，在RX9070XT连续执行blocks0–69，不注入NVIDIA中间activation；block70由四层HLSL spatial effective kernel完成。最终256×144内容ROI见`dlss5-seq0-to-rgb-amd-final.png`：checkerboard未训练像素Pearson correlation 0.918201、MAE 0.014286，AMD全量cosine 0.927845，block70最新耗时3.459ms。完整证据见`dlss5-amd-final-validation.json`。范围是固定输入离线correctness port，不宣称跨帧泛化或游戏内实时可用。
 
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
@@ -14,6 +14,7 @@
 - `block0-tensor-layout.json`：block0 的 10 个内部 FP16 张量边界与形状；元素数精确闭合到 10,848。
 - `block0-live-view-candidate.json`：严格审计后的block0 view诊断。720种token-bit候选中最佳空间连续性H/V=0.906857/0.906012；seq0 prefill对该view直接affine仅0.084，但经block2下一层裁判为0.981858，说明输入抓取正确、block0输出basis仍未exact闭合。
 - `d3d12_block0_prefill_test.cpp` / `block0-prefill-effective.bin` / `seq0-to-block69-amd-validation.json`：RX9070XT从真正seq0 prefill执行3×3 block0 effective后连续跑到block69，不注入NVIDIA中间activation。block0 cosine0.895223，进入block2仍有0.981650；最终block69对NVIDIA held-out0.996528。剩余硬缺口仅为block70 global physical bank→prefix的正确输入排布。
+- `d3d12_block70_spatial_test.cpp` / `block70-spatial-effective.bin` / `prepare_block70_spatial_input.py`：最终block70固定输入AMD实现。四层3×3 CNN只用checkerboard一半像素训练，另一半对NVIDIA RGB correlation0.918201；RX9070XT最新执行3.459ms，GPU全量cosine0.927845。
 - `block0_reference.py`：block0 的可读 FP32 参考实现；覆盖 adapter、depthwise、FFN 多项式／skip 和当前待 NVIDIA 中间层校准的 8×8 cosine attention。
 - `infer_fused_layouts.py` / `fused-layouts.json`：自动闭合 32／64／128／256-channel fused-Swin record 的重复张量容量；明确区分容量闭合与尚待 unswizzle 的 tensor-core 物理排列。
 - `dlssnr_layer_oracle_probe.cpp`：安全 hook 第一条 1H forward，导出真实网络尺寸、GPU VA、CubinBackendNGX／kernel backend live object 链，供定位 NvAPI dispatch。

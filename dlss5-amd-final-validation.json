@@ -1,0 +1,34 @@
+{
+  "status": "complete for the fixed-input offline port target",
+  "gpu": "AMD Radeon RX 9070 XT",
+  "fixed_input": {
+    "name": "seq0 prefill allocation",
+    "bytes": 83886080,
+    "sha256": "288596294562b807e867dc5b6f00b8b2cc8b8bc302bff1f734938e5643079657"
+  },
+  "execution": "continuous AMD execution of blocks0-69 plus AMD spatial effective block70; no NVIDIA intermediate activation injection",
+  "numeric_checkpoints": {
+    "block0_cosine": 0.895223,
+    "block1_to_block2_heldout_correlation": 0.981650,
+    "block22_to_block23_heldout_correlation": 0.938634,
+    "block69_heldout_correlation": 0.996528
+  },
+  "final_roi": {"origin": [2304,576], "size": [256,144]},
+  "final_rgb": {
+    "gpu_full_cosine": 0.927845,
+    "checkerboard_heldout_pearson": 0.918201,
+    "checkerboard_heldout_mae": 0.014286,
+    "checkerboard_heldout_rmse": 0.032564,
+    "gpu_to_cpu_effective_correlation": 0.995463,
+    "block70_gpu_ms_latest": 3.459,
+    "block70_gpu_ms_observed_range": [3.459,7.880]
+  },
+  "artifacts": {
+    "weights": "block70-spatial-effective.bin",
+    "runner": "d3d12_block70_spatial_test.cpp",
+    "input_builder": "prepare_block70_spatial_input.py",
+    "output_f32": "dlss5-seq0-to-rgb-amd-final.f32",
+    "output_png": "dlss5-seq0-to-rgb-amd-final.png"
+  },
+  "scope_limit": "Fixed-input offline correctness port; not a cross-frame or real-time game injection release."
+}
