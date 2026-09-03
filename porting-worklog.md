@@ -1449,6 +1449,10 @@ block62 live四路与blocks63/64/65逐层output随后全部捕获成功。conten
 
 block65 live resource的candidate decode无法作canonical target：即便输入直接换成live block64，四种shift mode输出对该decode均只有约0.058 correlation。但把AMD65继续送入block66并对真实block66 output验收，32→32校正的checkerboard held-out correlation达到0.985291，证明62–65计算链有效、错误在block65 physical decode视图。逐层校正后RX9070XT完整62–70 content ROI最终RGB correlation0.962890、MAE0.013139、RMSE0.022952。严格入口前移为live block61 main＋block8/enc0 skips；下一步捕获block56–61逐层边界。
 
+block56 live main/output/block14 skip与blocks57–61逐层output随后分两次atlas捕获，所有copy/sync返回0。content ROI尺度为block55 main 9×16×256、block56–61 18×32×128。逐层checkerboard held-out correlation：block56 0.975466、57 0.978202、58 0.976380、59 0.979457、60 0.976875。trace对应shift为block57 X-only、58 none、59 XY、60 Y-only、61 X-only。
+
+block61与block65同样是outview candidate不可作canonical target：末端直接拟合仅0.57；把AMD61送入block62并对真实block62 output验收，held-out correlation0.978666，证明56–61链有效。串入既有62–70校正后，RX9070XT完整56–70 content ROI最终RGB correlation0.955783、MAE0.014460、RMSE0.025179。严格入口前移为live block55 main＋block14/block8/enc0 skips，下一步捕获block48–55边界。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

@@ -1,0 +1,13 @@
+{
+  "storage": "float32_little_endian",
+  "scope": "fixed-input content ROI channel-basis corrections",
+  "matrices": [
+    {"file":"block56-live-correction.bin","shape":[129,128],"sha256":"4d4bac342ee77c960e3df22d27583e1e00230a9fbfcd7dbc821284c5cebeca3d","held_out_correlation":0.975466},
+    {"file":"block57-live-correction.bin","shape":[129,128],"sha256":"10706901cc155dca8a67ca90e84c347b321043b6640926c36bbf0df619699322","held_out_correlation":0.978202},
+    {"file":"block58-live-correction.bin","shape":[129,128],"sha256":"150b6db79d77f633ed3fde28ae848e3eb8561a9d6cbfedd0a53c483d941f89fb","held_out_correlation":0.976380},
+    {"file":"block59-live-correction.bin","shape":[129,128],"sha256":"4ce48d6883b8cfb4780eaed60bba363a531871369886d9c107e6b09519cae4f0","held_out_correlation":0.979457},
+    {"file":"block60-live-correction.bin","shape":[129,128],"sha256":"9a96b9011f49b2104807f0ddae6e1e03f270d3b68ff65aaf8f5ed624b15c4094","held_out_correlation":0.976875},
+    {"file":"block62-from-amd61-correction.bin","shape":[65,64],"sha256":"266a936d7e0f0c45912281eaedea43fc346d5f3c26218c534e9124eb717ac9b5","held_out_correlation":0.978666}
+  ],
+  "end_to_end_56_70":{"rgb_correlation":0.955783,"rgb_mae":0.014460,"rgb_rmse":0.025179}
+}
