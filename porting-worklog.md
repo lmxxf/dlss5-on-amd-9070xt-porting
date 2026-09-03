@@ -1477,6 +1477,10 @@ launch geometry进一步否决上述row-attention假设：Attention grid32×9恰
 
 2112-token AMD block31原始Projection correlation从-0.00566跃升到0.614183，1025→1024 checkerboard held-out0.997631、全量0.998912；证明核心joint permutation已解。随后按“Projection→AMD affine→下一block”跑完31–38，全量correlation依次0.998912/0.997951/0.997763/0.997432/0.997611/0.997401/0.997077/0.996737；每层全局attention约0.21–0.24秒，校正pass约5–8ms。严格边界：当前只验证2112/2160=97.78% tokens，最后48 tokens仍需由global mapping boundary规则补齐，之后才能接block39并宣称完整ViT。
 
+最后48 tokens随后由geometry算术闭合：live参数是width36/height60，canonical H36×W60两轴均整除4，135个4×4×1024 microcells恰为2,211,840 bytes，没有padding。将global output→source map与source physical→HWC inverse复合，得到`vit-global-1d-to-canonical.i32`；两条2,211,840-entry映射均为双射。完整2160-token block31原始corr0.612058，既有2112-token correction直接泛化到cosine0.998867、MAE0.06583。
+
+完整2160-token blocks31–38随后全部在RX9070XT执行，逐层cosine为0.998867/0.997810/0.997531/0.997064/0.997282/0.996977/0.996651/0.996325。将AMD block38按physical offset重排回H36×W60、裁前34行进入archive block39，再跑AMD block40，checkerboard held-out correlation0.986846；与直接live block38入口的0.986835一致到1.1e-5。ViT31–38因此完整闭合，严格入口前移到block31 input（encoder block30输出）。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

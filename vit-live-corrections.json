@@ -1,9 +1,11 @@
 {
   "storage":"float32_little_endian",
   "shape":[1025,1024],
-  "tokens_validated":2112,
+  "tokens_validated":2160,
   "tokens_live":2160,
-  "scope":"fixed-input first 33 complete 64KiB physical chunks",
+  "scope":"fixed-input complete H36xW60 global token field",
+  "full_2160_cosine":{"31":0.998867,"32":0.997810,"33":0.997531,"34":0.997064,"35":0.997282,"36":0.996977,"37":0.996651,"38":0.996325},
+  "block40_next_layer_held_out_correlation":0.986846,
   "correlations":{"31":0.998912,"32":0.997951,"33":0.997763,"34":0.997432,"35":0.997611,"36":0.997401,"37":0.997077,"38":0.996737},
   "files":[
     {"block":31,"file":"vit-block31-live-correction.bin","sha256":"ef91a4fd210cde67491570e9861b0e2e874a341fdf03b0d42daae5dfa920a820"},
