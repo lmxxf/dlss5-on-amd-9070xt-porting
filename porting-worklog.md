@@ -1531,6 +1531,8 @@ seq0 prefill的3×3×32局部邻域对block0平滑view做空间留出，correlat
 
 block70最终验收仍未过。先后测试旧block69 shortcut、block66 phase8与真正`block70-prefix-effective`，RGB held-out最高仅0.430252。由于同一AMD block69对NVIDIA已0.9965，根因锁定为prefix effective的输入合同：1024→2048矩阵消费原global physical banks按local oracle排列的记录，不能把canonical 4×4×32 HWC直接flatten。下一步只需恢复block70 main/skip global bank→local record的精确排列，再跑body/head；不能再靠末端RGB拟合掩盖该错误。
 
+随后按已知live全局stride重建另一种权威候选：AMD block69先校正到NVIDIA canonical basis，再按恢复的`(5,3,4,2,0,1)`重新E4M3编码；每个post tile从`x/plane/row/bank=64/30720/122880/33423360`抽八个64-byte planes，组成512 main＋512 zero的local prefix记录。RX9070XT执行1024→2048矩阵后，最终RGB held-out仍为0.430754，与canonical flatten候选几乎相同。故剩余缺口进一步收窄：不是global main bank地址公式，而是block70 prefix输出的tile/channel坐标合同，或local oracle的main/skip联合输入排列。blocks0–69的0.996528结论不变。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

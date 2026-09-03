@@ -17,7 +17,11 @@
   },
   "block70": {
     "status": "not yet passed",
-    "failed_final_rgb_heldout_correlation": 0.430252,
-    "diagnosis": "block70-prefix-effective expects the original physical bank record ordering; canonical 4x4 HWC flattening is not its input contract"
+    "failed_final_rgb_heldout_correlation": 0.430754,
+    "tested_inputs": [
+      "canonical 4x4 HWC flattening",
+      "re-encoded global physical banks with x/plane/row/bank strides 64/30720/122880/33423360"
+    ],
+    "diagnosis": "Both input arrangements preserve only about 0.43 final RGB correlation. The remaining mismatch is inside the block70 prefix/output tile coordinate contract, not blocks0-69."
   }
 }
