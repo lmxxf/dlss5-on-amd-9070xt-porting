@@ -1,0 +1,49 @@
+{
+  "status": "dynamic integration milestone; full 71-block rendering is not complete",
+  "date": "2026-09-04",
+  "gpu": "AMD Radeon RX 9070 XT",
+  "game": "Stellar Blade",
+  "swapchain": {
+    "width": 3840,
+    "height": 2160,
+    "format": "DXGI_FORMAT_R10G10B10A2_UNORM",
+    "continuous_present_frames_verified": 1200,
+    "backbuffer_writeback": "ReShade immediate command list: copy-in -> AMD compute -> copy-out",
+    "evidence_png": "dynamic-captures/dynamic-frame-960-amd-compute.png"
+  },
+  "fidelityfx_dispatch_contract": {
+    "render_size": [2561, 1441],
+    "color": {"format": "RGBA16F", "resource_size": [2564, 1444], "state": "compute_read"},
+    "depth": {"format": "R32F", "resource_size": [2564, 1444], "state": "compute_read"},
+    "motion_vectors": {"format": "RG16F", "resource_size": [2564, 1444], "state": "compute_read"},
+    "output": {"format": "RGBA16F", "resource_size": [3840, 2160], "state": "unordered_access"},
+    "capture_frame": 1200,
+    "capture_sha256": {
+      "color": "f40bb9da6f4364e54855a22b7cd9b0c1c18177dc158ad3c47dbc3cb3d25a06f6",
+      "depth": "774b69705d9b1d71e2d5a2a797f52215c46e40979fa4dceb097af77cdf9da37d",
+      "motion": "53a264f693de7b52d970c670fa9c44ed277300128cd7abe07e5983110a1b637c"
+    }
+  },
+  "dynamic_dlss5_path": {
+    "model_shape": [1088, 1920, 32],
+    "input_tiles": 32640,
+    "block0_source": "current-game FidelityFX Color frame 1200",
+    "block0_implementation": "block0-distilled.bin, distilled from the original DLSS5 pre-block CUBIN",
+    "all_outputs_bytes": 267386880,
+    "timings_ms": {"block0": 94.361, "block1": 306.832, "block2": 231.226, "block3": 306.251},
+    "sha256": {
+      "block0": "b506a1b7e03a03b71803095e449314c515ff6be1277acecf2a31db2bf2b0462c",
+      "block1": "5703fc972eeb9c1fbfa48471d1e7d5a9274b34f538b8688328994319ad1d435f",
+      "block2": "194e2edd203c0a3077699cbddc7b36ef6f2885764ea400a29ca708b52e292fa7",
+      "block3": "11febec069fba767ceb326d8f1639cc49a9cc7dc9a20655d3bddd1ea4a171e93"
+    },
+    "decoded_block0": {
+      "finite": true,
+      "range": [-96.0, 120.0],
+      "standard_deviation": 3.573038,
+      "neighbor_correlation_horizontal": 0.9254949,
+      "neighbor_correlation_vertical": 0.9404486
+    }
+  },
+  "remaining": "Integrate blocks4-70 into the resident game add-on, replace the diagnostic color compute pass with network output, and validate continuous changing gameplay frames."
+}

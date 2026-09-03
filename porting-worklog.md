@@ -1545,6 +1545,16 @@ game内controlled transaction最终从upload arena入口闭合：直接写post q
 
 最终可复现性复核：`prepare_block70_spatial_input.py`从保存的AMD block69、AMD block0与33×32 correction重建输入，和训练时9,732,096-byte tensor逐byte exact；重新编译D3D12 runner后输出与保存的`dlss5-seq0-to-rgb-amd-final.f32`逐byte exact，最新submit→fence3.459ms，cosine与误差不变。首次7.880ms与复核3.459ms记录为同runner观测范围。
 
+### 2026-09-04：动态游戏链路启动
+
+固定ROI图不能代表动态移植完成，验收线恢复为“当前游戏全帧输入→AMD DLSS5网络→主swapchain回写→连续不同帧”。新增`d3d12_dynamic_resource_probe.cpp`。早期probe在启动期临时swapchain上调用backbuffer方法导致退出；按`init_swapchain(resize=true)`锁定主swapchain并使用与游戏一致的ReShade 6.8.0 API后，3840×2160 R10G10B10A2主链连续运行超过1200 present。第240/480帧完整readback分别为Shift Up和Unreal Engine启动画面，SHA不同。
+
+回写不能从addon自建queue插入（会得到DEVICE_REMOVED/INVALID_CALL）；改在ReShade graphics queue的immediate command list上记录copy-in→typed-UAV compute→copy-out后稳定。第600帧起逐帧执行，720/960帧compute后readback成功，游戏继续运行；`dynamic-frame-960-amd-compute.png`是完整《剑星》主界面。该着色compute只用于证明动态回写物理链，明确不冒充DLSS5。
+
+Universal Feeder shader在本游戏4K路径会导致进程退出，因此停止照搬。转而MinHook游戏已加载的`amd_fidelityfx_dx12.dll!ffxDispatch`，按AMD官方FidelityFX API布局直接取得每帧FSR合同：实际render 2561×1441，资源padding为2564×1444；Color=RGBA16F、Depth=R32F、Motion=RG16F，三者state=compute-read；Output=3840×2160 RGBA16F、state=UAV。frame1200三路readback均finite且非空，SHA与统计固化于`dlss5-amd-dynamic-milestone.json`。
+
+当前游戏Color经裁剪、bilinear缩放和8×8分块进入DLSS5模型1920×1088座标。RX9070XT运行由原pre-block CUBIN蒸馏的`block0-distilled.bin`：32640 tiles、94.361ms、输出267,386,880 bytes；另一帧118.982ms且SHA不同。`preblock_tiles_to_hwc.py`恢复HWC后全部finite，范围-96..120、std3.573、邻域H/V相关0.9255/0.9404。随后执行block1/2/3的FFN+cosine attention，耗时306.832/231.226/306.251ms，四层输出SHA各异。严格边界前移至block4；blocks4–70仍需整合并常驻，目标保持未完成。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
