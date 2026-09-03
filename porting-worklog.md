@@ -1509,6 +1509,14 @@ RX9070XT执行全分辨率blocks1–3。block1 candidate outview不可作target�
 
 至此约定的“固定数值输入→9070XT执行→与5090同帧最终图比较”目标完成。严格限定：入口是保存的block0数值张量，校正矩阵针对该固定帧；尚未完成的是跨帧通用化、性能优化和游戏内实时注入，它们属于下一阶段产品化，不属于本轮固定输入移植验收。
 
+### 完成声明撤回：严格71-block审计
+
+重新对照`amd-port-plan.md`后，上述“目标完成”结论过早：入口实际上是NVIDIA block0 output，且block4/8/14/22及四条decoder skip使用跨层fixed-frame affine桥，未证明71个block逐一执行。因此`dlss5-all-amd-final.png`降级为数值里程碑，目标保持未完成；`dlss5-amd-fixed-input-final.json`同步改为milestone状态。
+
+为补block0真实输入，probe先在post阶段和下一帧forward入口抓取Color texture；两次均确认固定preset的Color为全图RGB=0、A=1，SHA256 `6164b764...77da2`。AMD RGB-only block0在32640个8×8 tiles上执行56.786ms，但对live physical candidate仅correlation0.1488；其相同local位置跨tile平均std仅0.00145，而live block0为0.23417，证明缺失信息不是Color。
+
+trace给出seq0 `grid=1290`、q0 allocation base与block0 q27相差`0x142800`。seq0与主网络使用不同backend context；改为从当前`self+0x08/+0x10`取context后，raw-copy成功，80MiB prefill allocation SHA256为`28859629...79657`。这把block0缺口收敛为：恢复seq0预填buffer／live Gaussian生成状态对pre-block的语义，而不是继续调RGB-only surrogate。下一步解析seq0与block0 0x108参数的prefill/noise路径，随后让AMD从真正固定输入执行block0。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

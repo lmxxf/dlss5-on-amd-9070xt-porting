@@ -1,8 +1,8 @@
 {
-  "status": "complete for the agreed fixed-input offline target",
+  "status": "milestone only; completion claim withdrawn by strict audit",
   "gpu": "AMD Radeon RX 9070 XT",
   "input_boundary": "saved numeric block0 output tensor, H1088xW1920xC32",
-  "nvidia_intermediate_activations_during_amd_run": false,
+  "nvidia_intermediate_activations_during_amd_run": true,
   "output": "dlss5-all-amd-final.png",
   "nvidia_oracle": "same-frame 5090 block70 RGB ROI, origin 2304x576, size 256x144",
   "roi": [256, 144],
@@ -23,5 +23,5 @@
   },
   "block69_to_block70_main_correlation_vs_previous_live_skip_baseline": 0.966155,
   "final_head": "dlss5-all-amd-final-head.bin",
-  "limits": "Fixed-input calibration port. It is not yet a real-time game injection plugin and does not claim cross-frame generalization."
+  "limits": "Starts from a saved NVIDIA block0 output and uses cross-layer fixed-frame affine bridges. This does not prove execution of the complete 71-block network; retained only as a numerical milestone."
 }

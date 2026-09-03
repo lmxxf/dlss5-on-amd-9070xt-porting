@@ -2,7 +2,7 @@
 
 ## 当前结果
 
-约定的固定输入离线移植已经完成：从保存的block0数值张量开始，blocks1–70均由RX9070XT上的D3D12计算或固定输入校正执行，不再注入NVIDIA中间activation。最终256×144内容ROI见`dlss5-all-amd-final.png`，对同帧5090 RGB的checkerboard held-out Pearson correlation为0.945148，AMD全量cosine为0.951564、MAE 0.011089。完整边界与限制见`dlss5-amd-fixed-input-final.json`。这不是实时游戏插件，也不宣称跨帧泛化。
+当前固定帧校准里程碑：从保存的NVIDIA block0输出张量开始，RX9070XT后段得到的256×144内容ROI见`dlss5-all-amd-final.png`，对同帧5090 RGB的checkerboard held-out Pearson correlation为0.945148，AMD全量cosine为0.951564、MAE 0.011089。严格审计后已撤回“完整移植完成”结论：该链仍跳过block0，并以跨层fixed-frame affine桥替代若干downsample/skip边界，不能证明71个block逐一执行。当前证据和限制见`dlss5-amd-fixed-input-final.json`。
 
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。

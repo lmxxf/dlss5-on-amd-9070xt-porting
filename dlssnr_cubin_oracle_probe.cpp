@@ -26,6 +26,7 @@ constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
 constexpr UINT64 kCaptureBytes = 80ull << 20;
 constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
+constexpr bool kCaptureBlock0Color = true;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
 constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt)";
@@ -73,6 +74,7 @@ void *g_live_command_context = nullptr;
 UINT64 g_live_output = 0;
 UINT64 g_live_input = 0;
 UINT64 g_live_optional2 = 0;
+UINT64 g_block0_color = 0;
 uint8_t g_live_params[0x100]{};
 uint64_t g_live_param_bytes = 0;
 UINT64 g_arena_base = 0;
@@ -213,6 +215,9 @@ int64_t hook_backend_launch(
     void *wrapper, uint64_t bytes, uint8_t flag) {
     void *blob = nullptr;
     if (wrapper != nullptr) std::memcpy(&blob, wrapper, sizeof(blob));
+    if (blob != nullptr && bytes == 0x108) {
+        std::memcpy(&g_block0_color, blob, sizeof(g_block0_color));
+    }
     if (g_launch_armed.load() && !g_launch_captured.exchange(true) && blob != nullptr) {
         std::memcpy(
             &g_live_ngx_context, static_cast<const uint8_t *>(self) + 0x08,
@@ -531,6 +536,45 @@ int64_t hook_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
     if (g_finished.load()) return result;
     if (result == 0 && g_copy_ready.load() && blob != nullptr &&
+        bytes == 0x10 && gx == 1290 && g_queue != nullptr &&
+        !g_finished.exchange(true)) {
+        UINT64 source = 0;
+        std::memcpy(&source, blob, 8);
+        void *saved_ngx_context = g_live_ngx_context;
+        void *saved_command_context = g_live_command_context;
+        std::memcpy(&g_live_ngx_context,
+            static_cast<const uint8_t *>(self) + 0x08, 8);
+        std::memcpy(&g_live_command_context,
+            static_cast<const uint8_t *>(self) + 0x10, 8);
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int pre_sync = synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0);
+        const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+            source, g_destination->GetGPUVirtualAddress(), 80ull << 20) : -1;
+        const int sync_result = copy_result == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        g_live_ngx_context = saved_ngx_context;
+        g_live_command_context = saved_command_context;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file,
+                "block0_prefill source=0x%llx pre_sync=%d copy=%d sync=%d\n",
+                static_cast<unsigned long long>(source), pre_sync,
+                copy_result, sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+        if (sync_result == 0) {
+            g_queue->AddRef();
+            if (HANDLE thread = CreateThread(
+                    nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                CloseHandle(thread);
+            }
+        }
+        return result;
+    }
+    if (result == 0 && g_copy_ready.load() && blob != nullptr &&
         bytes == 0x18 && gx == 2176) {
         UINT64 input = 0, output = 0;
         std::memcpy(&input, static_cast<const uint8_t *>(blob) + 0x00, 8);
@@ -582,7 +626,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (sync_result == 0 && g_queue != nullptr &&
+            if (!kCaptureBlock0Color && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -613,7 +657,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (sync_result == 0 && g_queue != nullptr &&
+            if (!kCaptureBlock0Color && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -644,7 +688,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (sync_result == 0 && g_queue != nullptr &&
+            if (!kCaptureBlock0Color && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -675,7 +719,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (sync_result == 0 && g_queue != nullptr &&
+            if (!kCaptureBlock0Color && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -826,7 +870,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (offset == 5222912 && sync_result == 0 && g_queue != nullptr &&
+            if (!kCaptureBlock0Color && offset == 5222912 && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
@@ -976,8 +1020,8 @@ int64_t hook_backend_launch(
                 surface, g_destination->GetGPUVirtualAddress() + (592ull << 20),
                 256, 144, 2304, 576, 1, 1) : -1;
             const int texture_result = surface_result == 0 ? dispatch_texture_rgba(
-                color, g_destination->GetGPUVirtualAddress() + (593ull << 20),
-                256, 144, 3840, 2176, 2304, 576, 1, 1) : -1;
+                color, g_destination->GetGPUVirtualAddress(),
+                1920, 1088, 3840, 2176, 0, 0, 2, 2) : -1;
             const int sync_result = texture_result == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             AcquireSRWLockExclusive(&g_trace_lock);
@@ -993,7 +1037,7 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
-            if (sync_result == 0 && g_queue != nullptr && !g_finished.exchange(true)) {
+            if (!kCaptureBlock0Color && sync_result == 0 && g_queue != nullptr && !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(
                         nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
@@ -1053,8 +1097,38 @@ void hook_forward(
     void *self, void *inputs, void *outputs, void *context, int width, int height) {
     const unsigned call = g_calls.fetch_add(1);
     if (call == 0) g_launch_armed.store(true);
+    bool block0_color_ok = false;
+    if (false && call != 0 && kCaptureBlock0Color && !g_finished.load() &&
+        g_copy_ready.load() && g_block0_color != 0 && g_queue != nullptr) {
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int pre_sync = synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0);
+        const int copy_result = pre_sync == 0 ? dispatch_texture_rgba(
+            g_block0_color, g_destination->GetGPUVirtualAddress(),
+            1920, 1088, 3840, 2176, 0, 0, 2, 2) : -1;
+        const int sync_result = copy_result == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file,
+                "block0_color_forward texture=0x%llx pre_sync=%d copy=%d sync=%d\n",
+                static_cast<unsigned long long>(g_block0_color), pre_sync,
+                copy_result, sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+        block0_color_ok = sync_result == 0;
+    }
     g_original(self, inputs, outputs, context, width, height);
     if (call == 0) g_launch_armed.store(false);
+    if (block0_color_ok && !g_finished.exchange(true)) {
+        g_queue->AddRef();
+        if (HANDLE thread = CreateThread(
+                nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+            CloseHandle(thread);
+        }
+    }
     if (call != 0 || !create_destination()) return;
 
     constexpr UINT64 kResourceAlignment = 2ull * 1024 * 1024;
@@ -1168,13 +1242,6 @@ void hook_forward(
     if (optional2_dispatch_result != 0) return;
     g_copy_ready.store(true);
 
-    if (g_queue != nullptr && !g_finished.exchange(true)) {
-        g_queue->AddRef();
-        if (HANDLE thread = CreateThread(
-                nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
-            CloseHandle(thread);
-        }
-    }
 
     FILE *file = _wfopen(kLogPath, L"ab");
     if (file != nullptr) {
