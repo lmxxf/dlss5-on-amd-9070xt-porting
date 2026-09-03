@@ -1,0 +1,30 @@
+{
+  "scope": "fixed-frame encoder blocks 15-21",
+  "shape": [136, 240, 256],
+  "fit": "257-to-256 affine, spatial checkerboard train/held-out",
+  "shift_modes": {
+    "15": "none",
+    "16": "xy",
+    "17": "y",
+    "18": "x",
+    "19": "none",
+    "20": "xy",
+    "21": "y"
+  },
+  "heldout_correlation": {
+    "15": 0.951889,
+    "16": 0.957067,
+    "17": 0.950841,
+    "18": 0.928011,
+    "19": 0.900138,
+    "20": 0.884669,
+    "21": 0.870840
+  },
+  "amd_validation": {
+    "matrix": "block15-live-correction.bin",
+    "full_cosine": 0.952990,
+    "submit_to_fence_ms": 3.095
+  },
+  "strict_input_boundary": "live block14 downsample main",
+  "note": "Block21 candidate output is retained as a fixed-frame bridge; block22 next-layer judging remains pending."
+}

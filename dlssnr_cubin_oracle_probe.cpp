@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 600ull << 20;
+constexpr UINT64 kCaptureBytes = 128ull << 20;
 constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
@@ -529,6 +529,7 @@ int64_t hook_backend_launch(
     }
     int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (g_finished.load()) return result;
     if (result == 0 && g_copy_ready.load() && blob != nullptr &&
         bytes == 0x18 && gx == 2176) {
         UINT64 input = 0, output = 0;
@@ -561,7 +562,28 @@ int64_t hook_backend_launch(
         g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
-        if (weight - g_arena_base == 5912576) {
+        if (weight - g_arena_base == 833536) {
+            UINT64 output = 0;
+            std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x48, 8);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int pre_sync = synchronize(g_live_ngx_context, g_live_command_context, 0, 0);
+            const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+                output - 0x2800, g_destination->GetGPUVirtualAddress(),
+                16ull << 20) : -1;
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block14_main output=0x%llx pre_sync=%d copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(output), pre_sync,
+                    copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+        if (false && weight - g_arena_base == 5912576) {
             UINT64 output = 0;
             std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x48, 8);
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
@@ -657,17 +679,21 @@ int64_t hook_backend_launch(
         std::memcpy(&output, static_cast<const uint8_t *>(blob) + output_field, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 18281984) atlas_offset = 0;
-        else if (offset == 20250624) atlas_offset = 64ull << 20;
-        else if (offset == 22503424) atlas_offset = 128ull << 20;
+        if (offset == 1063936) atlas_offset = 16ull << 20;
+        else if (offset == 1753600) atlas_offset = 32ull << 20;
+        else if (offset == 2443264) atlas_offset = 48ull << 20;
+        else if (offset == 3132928) atlas_offset = 64ull << 20;
+        else if (offset == 3822592) atlas_offset = 80ull << 20;
+        else if (offset == 4533248) atlas_offset = 96ull << 20;
+        else if (offset == 5222912) atlas_offset = 112ull << 20;
         if (atlas_offset != UINT64_MAX) {
-            const UINT64 copy_bytes = 3ull << 20;
+            const UINT64 copy_bytes = 16ull << 20;
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
             const int pre_sync = synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0);
             const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
-                output,
+                output - 0x2800,
                 g_destination->GetGPUVirtualAddress() + atlas_offset,
                 copy_bytes) : -1;
             const int sync_result = copy_result == 0 ? synchronize(
@@ -683,6 +709,15 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
+            if (offset == 5222912 && sync_result == 0 && g_queue != nullptr &&
+                !g_finished.exchange(true)) {
+                g_queue->AddRef();
+                if (HANDLE thread = CreateThread(
+                        nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                    CloseHandle(thread);
+                }
+                return result;
+            }
         }
     }
     if (result == 0 && block66_pre_ok) {

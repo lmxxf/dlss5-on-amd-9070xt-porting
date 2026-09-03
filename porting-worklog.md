@@ -1487,6 +1487,10 @@ encoder尾段trace确认block22 downsample main位于0x58 blob q9（q1是供deco
 
 block30 layer4 record前524,288 bytes按512→1024 matrix unpack，AMD执行3.306ms。其原始输出对live canonical corr-0.0674，1025→1024 checkerboard held-out correlation0.942102、全量0.941571；证明28/29低值为layer3 view basis而非主链坍缩。blocks22–30因此闭合，严格入口前移到live block22 downsample main；下一步继续encoder blocks14–22。
 
+encoder blocks14–21同帧atlas现已稳定导出。probe在block21返回后立即停止后续抓取并异步读回128MiB，避免旧vit/block70 capture覆盖前段槽位；block14 downsample main ABI同时修正为0x58 blob q9/+0x48，q10/+0x50只是尺寸常数`0xf000000088`。所有raw-copy、sync与readback均返回0。
+
+H136×W240×C256 blocks15–21按trace的shift序列none/XY/Y/X/none/XY/Y在RX9070XT串行执行，单层correctness shader约249–262ms。逐层257→256 checkerboard空间留出correlation为0.951889/0.957067/0.950841/0.928011/0.900138/0.884669/0.870840；误差渐增但信号没有坍缩。block15 affine另由AMD matrix pass执行3.095ms，全量cosine0.952990。严格入口已前移为live block14 downsample main；block21 candidate view仍需送入block22下一层裁判，随后继续向blocks9–14前移。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
