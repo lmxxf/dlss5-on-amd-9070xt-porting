@@ -30,6 +30,8 @@ constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
 constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt)";
 constexpr bool kCaptureBlock48Identity = false;
+constexpr bool kCaptureBlock66 = false;
+constexpr bool kCaptureBlock62 = false;
 
 using Forward1H = void (*)(void *, void *, void *, void *, int, int);
 using CreateBackend = void *(*)(void *);
@@ -239,10 +241,43 @@ int64_t hook_backend_launch(
     bool block66_pre_ok = false;
     UINT64 block66_main = 0, block66_output = 0;
     UINT64 block66_aux = 0, block66_skip = 0;
+    bool block62_pre_ok = false;
+    UINT64 block62_main = 0, block62_output = 0;
+    UINT64 block62_skip = 0, block62_aux = 0;
     if (g_copy_ready.load() && blob != nullptr && bytes >= 0x50 && g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
-        if (bytes == 0x60 && weight - g_arena_base == 147281408) {
+        if (kCaptureBlock62 && bytes == 0x58 && weight - g_arena_base == 147025408) {
+            std::memcpy(&block62_main, static_cast<const uint8_t *>(blob) + 0x00, 8);
+            std::memcpy(&block62_output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            std::memcpy(&block62_skip, static_cast<const uint8_t *>(blob) + 0x18, 8);
+            std::memcpy(&block62_aux, static_cast<const uint8_t *>(blob) + 0x40, 8);
+            const UINT64 atlas = g_destination->GetGPUVirtualAddress();
+            int operations[3]{};
+            operations[0] = dispatch_raw_copy(block62_main - 0x2800, atlas, 64ull << 20);
+            operations[1] = operations[0] == 0 ? dispatch_raw_copy(
+                block62_skip - 0x2800, atlas + (128ull << 20), 64ull << 20) : -1;
+            operations[2] = operations[1] == 0 ? dispatch_raw_copy(
+                block62_aux - 0x2800, atlas + (192ull << 20), 64ull << 20) : -1;
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = operations[2] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            block62_pre_ok = sync_result == 0;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block62_pre main=0x%llx output=0x%llx skip=0x%llx aux=0x%llx copies=%d,%d,%d sync=%d\n",
+                    static_cast<unsigned long long>(block62_main),
+                    static_cast<unsigned long long>(block62_output),
+                    static_cast<unsigned long long>(block62_skip),
+                    static_cast<unsigned long long>(block62_aux),
+                    operations[0], operations[1], operations[2], sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+        if (kCaptureBlock66 && bytes == 0x60 && weight - g_arena_base == 147281408) {
             std::memcpy(&block66_main, static_cast<const uint8_t *>(blob) + 0x00, 8);
             std::memcpy(&block66_output, static_cast<const uint8_t *>(blob) + 0x08, 8);
             std::memcpy(&block66_aux, static_cast<const uint8_t *>(blob) + 0x38, 8);
@@ -351,6 +386,54 @@ int64_t hook_backend_launch(
     }
     int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (result == 0 && block62_pre_ok) {
+        const int copy_result = dispatch_raw_copy(
+            block62_output - 0x2800,
+            g_destination->GetGPUVirtualAddress() + (64ull << 20), 64ull << 20);
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int sync_result = copy_result == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file, "block62_post output_copy=%d sync=%d\n",
+                copy_result, sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+    }
+    if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x18 &&
+        g_arena_base != 0) {
+        UINT64 weight = 0, output = 0;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        const UINT64 offset = weight - g_arena_base;
+        UINT64 atlas_offset = UINT64_MAX;
+        if (offset == 147095552) atlas_offset = 0;
+        else if (offset == 147157504) atlas_offset = 64ull << 20;
+        else if (offset == 147219456) atlas_offset = 128ull << 20;
+        if (atlas_offset != UINT64_MAX) {
+            const int copy_result = dispatch_raw_copy(
+                output - 0x2800,
+                g_destination->GetGPUVirtualAddress() + atlas_offset,
+                64ull << 20);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "decoder_stage_output weight_offset=%llu output=0x%llx atlas_offset=%llu copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(offset),
+                    static_cast<unsigned long long>(output),
+                    static_cast<unsigned long long>(atlas_offset),
+                    copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+    }
     if (result == 0 && block66_pre_ok) {
         const int copy_result = dispatch_raw_copy(
             block66_output - 0x2800,

@@ -1,0 +1,15 @@
+{
+  "storage": "float32_little_endian",
+  "scope": "fixed-input content ROI channel-basis corrections",
+  "matrices": [
+    {"file": "block62-live-correction.bin", "shape": [65, 64], "sha256": "36f751c261b793b576f3d0dbad4c95f119fcc8e70096aa500b177bdb5d8bf2fd", "held_out_correlation": 0.965698, "rx9070xt_ms": 0.595},
+    {"file": "block63-live-correction.bin", "shape": [65, 64], "sha256": "253084929edbae1283348170a7b219ea0027e4b0f3cf819ff80da828111deb5d", "held_out_correlation": 0.968701, "rx9070xt_ms": 0.671},
+    {"file": "block64-live-correction.bin", "shape": [65, 64], "sha256": "abf6848016257f0bbe9b27593e14f15692b3eb1dc70a3b6a85d46cdad7bcde35", "held_out_correlation": 0.974088, "rx9070xt_ms": 0.609},
+    {"file": "block66-from-amd65-correction.bin", "shape": [33, 32], "sha256": "3f737caca1ef6d88c5dd582766447399ee5a181a212668530f307b42bb1ad797", "held_out_correlation": 0.985291, "rx9070xt_ms": 0.800}
+  ],
+  "end_to_end_62_70": {
+    "rgb_correlation": 0.962890,
+    "rgb_mae": 0.013139,
+    "rgb_rmse": 0.022952
+  }
+}

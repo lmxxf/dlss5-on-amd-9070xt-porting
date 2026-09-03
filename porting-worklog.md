@@ -1445,6 +1445,10 @@ block66 live四路随后在同一次launch闭合：`+0x00 main`、`+0x08 output`
 
 校正后blocks67–69按72×128在RX9070XT依次耗时2.378/2.006/2.566ms。把AMD69直接2×展开后对live block70 main prefix做33→32校正，checkerboard held-out correlation0.975165、GPU pass0.846ms；这同时否决了候选`encode_tinlayout_global→physical gather`（其prefix correlation仅0.063）。接入live skip、AMD block70 body与已保存head校正后，66–70纯AMD content ROI最终RGB correlation0.978812、MAE0.007868、RMSE0.016834；图像恢复蓝色球体的位置、轮廓及明暗，仍有纹理噪声。当前严格入口为live block65 main＋enc0 skip，下一步继续前移到blocks62–65。
 
+block62 live四路与blocks63/64/65逐层output随后全部捕获成功。content ROI尺度为：block61 main 18×32×128，block62 output/block8 skip 36×64×64。block62 65→64校正checkerboard held-out correlation0.965698；block63为0.968701；block64为0.974088。trace还纠正shift并非统一双轴：block63=(-4,-4)、block64=(-4,0)、block65=(0,-4)，`d3d12_block128_test.cpp`现以mode 0/1/2/3表示none/both/x/y。
+
+block65 live resource的candidate decode无法作canonical target：即便输入直接换成live block64，四种shift mode输出对该decode均只有约0.058 correlation。但把AMD65继续送入block66并对真实block66 output验收，32→32校正的checkerboard held-out correlation达到0.985291，证明62–65计算链有效、错误在block65 physical decode视图。逐层校正后RX9070XT完整62–70 content ROI最终RGB correlation0.962890、MAE0.013139、RMSE0.022952。严格入口前移为live block61 main＋block8/enc0 skips；下一步捕获block56–61逐层边界。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
