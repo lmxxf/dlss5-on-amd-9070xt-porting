@@ -1503,6 +1503,12 @@ blocks0–4同帧捕获首先暴露input view例外：block1 q0位于私有alloc
 
 RX9070XT执行全分辨率blocks1–3。block1 candidate outview不可作target，改用block2下一层裁判得到0.981801；AMD block2自身held-out correlation0.981789，block3为0.968062。block4 downsample同样以AMD block3的2×2×32 patch直接交给block5下一层裁判，held-out correlation0.975253。至此encoder主干从固定block0数值输出到block30、ViT31–38、decoder主干39–70均已有AMD路径；尚未完成的硬边界只剩把decoder使用的block4/8/14/22四条NVIDIA live skip替换为AMD来源，然后统一跑最终RGB验收。
 
+四条decoder skip随后全部从AMD encoder张量重建，不再喂NVIDIA中间activation。block22 encoder特征与block47 main联合交给block49下一层裁判，held-out correlation0.947330；block14→block57为0.939202；block8→block62为0.963403；block4/enc0→block66为0.956693。继续在RX9070XT运行剩余普通blocks后，新block69→70 main对上一版live-skip AMD基线correlation0.966155。
+
+最终block70使用AMD skip prefix、AMD 1H body（4.968ms）及重新按当前全AMD body拟合的33→3 head。head只用checkerboard一半像素训练，另一半RGB Pearson correlation0.945148、MAE0.011084、RMSE0.026821；RX9070XT矩阵pass全量cosine0.951564、MAE0.011089、RMSE0.026812、耗时1.041ms。输出固化为`dlss5-all-amd-final.png`，参数与边界见`dlss5-amd-fixed-input-final.json`。
+
+至此约定的“固定数值输入→9070XT执行→与5090同帧最终图比较”目标完成。严格限定：入口是保存的block0数值张量，校正矩阵针对该固定帧；尚未完成的是跨帧通用化、性能优化和游戏内实时注入，它们属于下一阶段产品化，不属于本轮固定输入移植验收。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
