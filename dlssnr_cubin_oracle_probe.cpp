@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 296ull << 20;
+constexpr UINT64 kCaptureBytes = 80ull << 20;
 constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
@@ -562,6 +562,36 @@ int64_t hook_backend_launch(
         g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        if (weight - g_arena_base == 22016) {
+            UINT64 input = 0;
+            std::memcpy(&input, static_cast<const uint8_t *>(blob) + 0x00, 8);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int pre_sync = synchronize(g_live_ngx_context, g_live_command_context, 0, 0);
+            const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+                input, g_destination->GetGPUVirtualAddress(),
+                80ull << 20) : -1;
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block0_output input=0x%llx pre_sync=%d copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(input), pre_sync,
+                    copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+            if (sync_result == 0 && g_queue != nullptr &&
+                !g_finished.exchange(true)) {
+                g_queue->AddRef();
+                if (HANDLE thread = CreateThread(
+                        nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                    CloseHandle(thread);
+                }
+                return result;
+            }
+        }
         if (weight - g_arena_base == 124261888) {
             UINT64 output = 0;
             std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x40, 8);
@@ -569,7 +599,8 @@ int64_t hook_backend_launch(
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
             const int pre_sync = synchronize(g_live_ngx_context, g_live_command_context, 0, 0);
             const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
-                output - 0x2800, g_destination->GetGPUVirtualAddress(),
+                output - 0x2800,
+                g_destination->GetGPUVirtualAddress() + (320ull << 20),
                 40ull << 20) : -1;
             const int sync_result = copy_result == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
@@ -582,6 +613,15 @@ int64_t hook_backend_launch(
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
+            if (sync_result == 0 && g_queue != nullptr &&
+                !g_finished.exchange(true)) {
+                g_queue->AddRef();
+                if (HANDLE thread = CreateThread(
+                        nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                    CloseHandle(thread);
+                }
+                return result;
+            }
         }
         if (weight - g_arena_base == 147451904) {
             UINT64 output = 0;
@@ -741,7 +781,10 @@ int64_t hook_backend_launch(
         std::memcpy(&output, static_cast<const uint8_t *>(blob) + output_field, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 141544960) atlas_offset = 64ull << 20;
+        if (offset == 22016) atlas_offset = 80ull << 20;
+        else if (offset == 4512256) atlas_offset = 160ull << 20;
+        else if (offset == 20513792) atlas_offset = 240ull << 20;
+        else if (offset == 141544960) atlas_offset = 64ull << 20;
         else if (offset == 146568192) atlas_offset = 128ull << 20;
         else if (offset == 147367424) atlas_offset = 192ull << 20;
         else if (offset == 147522048) atlas_offset = 32ull << 20;
@@ -758,6 +801,8 @@ int64_t hook_backend_launch(
         else if (offset == 5222912) atlas_offset = 112ull << 20;
         if (atlas_offset != UINT64_MAX) {
             const UINT64 copy_bytes =
+                (offset == 22016 || offset == 4512256 ||
+                 offset == 20513792) ? (80ull << 20) :
                 (offset == 141544960 || offset == 146568192 ||
                  offset == 147367424) ? (40ull << 20) : (16ull << 20);
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
@@ -1066,19 +1111,19 @@ void hook_forward(
 
     CopyParams input_params{
         input_source,
-        g_destination->GetGPUVirtualAddress() + (528ull << 20),
+        g_destination->GetGPUVirtualAddress(),
         static_cast<uint32_t>(kPerCaptureBytes / 16),
         0,
     };
     CopyParams output_params{
         output_source,
-        g_destination->GetGPUVirtualAddress() + kPerCaptureBytes,
+        g_destination->GetGPUVirtualAddress() + (320ull << 20),
         static_cast<uint32_t>(kPerCaptureBytes / 16),
         0,
     };
     CopyParams optional2_params{
         g_live_optional2,
-        g_destination->GetGPUVirtualAddress() + 2 * kPerCaptureBytes,
+        g_destination->GetGPUVirtualAddress() + (384ull << 20),
         static_cast<uint32_t>(kPerCaptureBytes / 16),
         0,
     };
@@ -1122,6 +1167,14 @@ void hook_forward(
     log_line("after_optional2_dispatch", optional2_dispatch_result);
     if (optional2_dispatch_result != 0) return;
     g_copy_ready.store(true);
+
+    if (g_queue != nullptr && !g_finished.exchange(true)) {
+        g_queue->AddRef();
+        if (HANDLE thread = CreateThread(
+                nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+            CloseHandle(thread);
+        }
+    }
 
     FILE *file = _wfopen(kLogPath, L"ab");
     if (file != nullptr) {

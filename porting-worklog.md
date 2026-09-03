@@ -1499,6 +1499,10 @@ blocks4–8的296MiB同帧atlas完成：block4 main来自0x60 blob q8，blocks5�
 
 block8 candidate decode同样不是canonical；AMD block7的2×2×64 patch经block9下一层裁判得到held-out correlation0.970651。由该边界连续重跑blocks10–13、block14→15、16–21，最终block21对live correlation0.723170；主要下降发生在第二个downsample桥，但整条block4→21信号仍未坍缩。严格入口前移到live block4 downsample main，下一步闭合blocks0–4后接整条encoder/ViT/decoder做最终画面验收。
 
+blocks0–4同帧捕获首先暴露input view例外：block1 q0位于私有allocation的`+0x42800`，不能按普通output减`0x2800`。hook_forward改为把allocation base复制到atlas0并从`0x42800`取active H1088×W1920×C32，解码后std0.4218、finite且非零。blocks1–3 q1与block4 q8 main另一次360MiB atlas全部成功。
+
+RX9070XT执行全分辨率blocks1–3。block1 candidate outview不可作target，改用block2下一层裁判得到0.981801；AMD block2自身held-out correlation0.981789，block3为0.968062。block4 downsample同样以AMD block3的2×2×32 patch直接交给block5下一层裁判，held-out correlation0.975253。至此encoder主干从固定block0数值输出到block30、ViT31–38、decoder主干39–70均已有AMD路径；尚未完成的硬边界只剩把decoder使用的block4/8/14/22四条NVIDIA live skip替换为AMD来源，然后统一跑最终RGB验收。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

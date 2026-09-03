@@ -1,0 +1,13 @@
+{
+  "scope": "fixed-frame encoder blocks 0-4",
+  "input_shape": [1088, 1920, 32],
+  "fit": "sampled spatial held-out affine; downsample judged through the following normal layer",
+  "correlation": {
+    "block1_to_block2_next_layer": 0.981801,
+    "block2": 0.981789,
+    "block3": 0.968062,
+    "block4_to_block5_next_layer": 0.975253
+  },
+  "strict_input_boundary": "live block0 output at allocation offset 0x42800",
+  "remaining_for_end_to_end": "replace decoder live skip inputs from encoder blocks 4, 8, 14 and 22"
+}
