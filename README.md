@@ -53,6 +53,7 @@
 - `vit-repack-global-output-to-input.i32` / `vit-repack-global-permutation.json`：原repack CUBIN用23次address-bit launch恢复的2,211,840-entry exact全局映射；套live repack前后逐byte100% exact。前33个完整64KiB chunks解出2112 tokens。
 - `vit-live-corrections.json`及blocks31–38八条matrix：首轮用33个完整64KiB chunks执行2112-token全局attention，逐层correlation 0.996737–0.998912；下一项全局映射随后补齐2160 tokens。
 - `vit-global-canonical-to-2d.i32` / `vit-global-1d-to-canonical.i32`：由exact repack map与H36×W60×C1024 microcells合成的两条2,211,840-entry双射，补齐全部2160 tokens。RX9070XT完整31–38逐层cosine0.996325–0.998867，接block39/40下一层held-out correlation0.986846。
+- `block23-live-correction.bin/.json`：encoder尾段以live block22 main为输入，H36×W60补到H40×W64后在RX9070XT执行block23；原始corr0.908986，checkerboard held-out0.957373。blocks22–30主线已启动。
 - `run_original_fused_live_replay.cpp` / `inspect_cubin_function.cpp`：以完整live D3D资源重放8H fused kernel并恢复精确written mask。block48前5MiB可由标准CUDA逐byte重放，但live实际选择`upsample_tilesync_fp8`，后3.36MiB只有NvAPI tile-sync协议能复现；main/skip/aux扩容至128MiB均不改变分叉，已排除缺页与标准cluster attribute。
 - `d3d12_nvapi_fused_live.cpp`：5090独立D3D12/NvAPI fused快照宿主。旧Chain与官方ChainEx均可运行，但都只复现block48 written区66.8775%；证明游戏runtime的live tile-sync状态不由公开接口ID单独建立。下一步使用游戏唯一正常launch的原调用栈做原位controlled transaction。
 - block48原位controlled transaction：在唯一正常高层launch前备份/替换原资源、launch后捕获、恢复并补跑正常block48，游戏下游输出保持逐byte exact。zero main/skip + `0xA5` output精确恢复2/3 update rows与1/3 preserved rows；updated区标准CUDA对live 100% exact，preserved区来自与block1 input同VA的复用buffer。

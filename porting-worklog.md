@@ -1481,6 +1481,8 @@ launch geometry进一步否决上述row-attention假设：Attention grid32×9恰
 
 完整2160-token blocks31–38随后全部在RX9070XT执行，逐层cosine为0.998867/0.997810/0.997531/0.997064/0.997282/0.996977/0.996651/0.996325。将AMD block38按physical offset重排回H36×W60、裁前34行进入archive block39，再跑AMD block40，checkerboard held-out correlation0.986846；与直接live block38入口的0.986835一致到1.1e-5。ViT31–38因此完整闭合，严格入口前移到block31 input（encoder block30输出）。
 
+encoder尾段trace确认block22 downsample main位于0x58 blob q9（q1是供decoder block48的skip）；blocks23–29仍以split layer3 q3 weight/q2 output收尾，block30 ProjPool q1直接等于repack q0。probe首轮同步捕获block22 main及blocks23–27 outputs，每路3MiB。张量均为H36×W60×C512；AMD runner补到H40×W64执行。live block22→AMD block23原始corr0.908986，513→512 checkerboard held-out0.957373、全量0.958289。下一步逐层跑24–30并以完整ViT链作下游裁判。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
