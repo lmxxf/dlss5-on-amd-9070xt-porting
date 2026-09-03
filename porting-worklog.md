@@ -1555,6 +1555,12 @@ Universal Feeder shader在本游戏4K路径会导致进程退出，因此停止�
 
 当前游戏Color经裁剪、bilinear缩放和8×8分块进入DLSS5模型1920×1088座标。RX9070XT运行由原pre-block CUBIN蒸馏的`block0-distilled.bin`：32640 tiles、94.361ms、输出267,386,880 bytes；另一帧118.982ms且SHA不同。`preblock_tiles_to_hwc.py`恢复HWC后全部finite，范围-96..120、std3.573、邻域H/V相关0.9255/0.9404。随后执行block1/2/3的FFN+cosine attention，耗时306.832/231.226/306.251ms，四层输出SHA各异。严格边界前移至block4；blocks4–70仍需整合并常驻，目标保持未完成。
 
+动态frame1200随后完整推进到block70。补齐并固化了各stage body effective、`d3d12_downsample_enter_test.cpp`、`d3d12_affine_test.cpp`、block22特殊410144-half record、block30 pool/projection、block39 main+skip合流、block48/56/62/66三条decoder skip。ViT按36×60=2160 tokens执行，split-Swin有效H68补到H72后裁回。block70扩为3840×2176×66全幅输入，RX9070XT四层spatial head耗时520.721ms，输出全部finite。
+
+单独block70 RGB近常量蓝色；恢复原post的`Color + neural residual`后得到可辨完整游戏画面。addon新增R10G10B10A2上传与mtime热更新：游戏运行中先显示frame1200，随后原子替换frame3600，日志在frame1200依次记录`update detected`与`output loaded`，swapchain未重启且两张截图确实不同。`run_dynamic_frame_pipeline.sh FRAME`把capture→0–70→合成→原子更新收敛为一次命令，并成功完整跑通；同时新增空Color/低方差拒绝门，避免把过渡期零帧发布。
+
+但两帧neural tensor最终SHA均为`9d7d4661...acb4afa`且逐byte exact，不能据热切换宣布动态DLSS5完成。checkpoint审计：block0/1/3/5/7/9不同，block13开始相同；block62/66/69因encoder skip重新不同，block70再次相同。根因是把固定帧live-correction矩阵用于跨帧动态路径，并继续使用只对固定ROI训练的block70 spatial head。当前变化画面主要来自Color base分支。下一步必须移除所有fixed-frame correction，并用通用prefix/body/outconv替换spatial head；目标继续未完成。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

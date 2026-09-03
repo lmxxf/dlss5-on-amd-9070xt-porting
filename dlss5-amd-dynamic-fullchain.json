@@ -1,0 +1,38 @@
+{
+  "status": "full 71-block dynamic-input execution achieved; neural branch generalization not yet achieved",
+  "date": "2026-09-04",
+  "gpu": "AMD Radeon RX 9070 XT",
+  "frames": [1200, 3600],
+  "input": "Stellar Blade FidelityFX ffxDispatch Color/Depth/Motion contract",
+  "network": {
+    "blocks_executed": [0, 70],
+    "model_geometry": "1920x1088 encoder, 2160-token ViT, 3840x2176 block70",
+    "block70_ms": [520.721, 539.875],
+    "block70_output_bytes": 100270080,
+    "block70_output_sha256_both_frames": "9d7d4661d014b6b470373b80288679a3bb4679bfc7e92f95883f889f0acb4afa",
+    "block70_outputs_byte_exact": true
+  },
+  "runtime_writeback": {
+    "format": "R10G10B10A2_UNORM",
+    "frame1200_sha256": "19b094219ab032a9ca4791cf7cbf62fde657f85fd06446e84928aa02960c1543",
+    "frame3600_sha256": "f9c7bbbda00bc508743765ad75d7c8626298f9f0d37c5dbfb900ff2a9171cc52",
+    "hot_reload_log": [
+      "dynamic external DLSS5 output loaded frame=600",
+      "dynamic external update detected frame=1200",
+      "dynamic external DLSS5 output loaded frame=1200"
+    ],
+    "before_image": "dynamic-captures/runtime-before-update.png",
+    "after_image": "dynamic-captures/runtime-after-update.png"
+  },
+  "collapse_audit": {
+    "block0_equal": false,
+    "block9_equal": false,
+    "block13_equal": true,
+    "block62_equal": false,
+    "block69_equal": false,
+    "block70_equal": true,
+    "diagnosis": "fixed-frame live-correction matrices collapse the main branch by block13; encoder skips reintroduce differences later, but the fixed-frame block70 spatial head maps both frames to the same neural output"
+  },
+  "completion": false,
+  "next": "Remove fixed-frame correction matrices from the dynamic path and replace the fixed-frame block70 spatial head with the general recovered prefix/body/outconv path."
+}

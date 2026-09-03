@@ -6,6 +6,8 @@
 
 动态产品化正在进行：`d3d12_dynamic_resource_probe.cpp`已在RX9070XT的《剑星》进程内稳定识别3840×2160主swapchain，并通过ReShade immediate command list闭合逐帧copy-in／AMD compute／copy-out。进一步直接hook官方`ffxDispatch`取得当前帧权威Color RGBA16F、Depth R32F、Motion RG16F与FSR输出合同；一张真实游戏帧已在AMD上连续执行DLSS5-derived block0与blocks1–3，四段耗时94.361/306.832/231.226/306.251ms。证据见`dlss5-amd-dynamic-milestone.json`。严格状态仍是未完成：blocks4–70尚未接入resident addon，当前屏幕compute仅为回写链诊断，不能称为DLSS5最终输出。
 
+2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

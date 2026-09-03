@@ -1,0 +1,3 @@
+param([int]$Frame = 1200)
+$ErrorActionPreference='Stop';$Lab='D:\DLSSNR-Lab';$Input=Join-Path $Lab "ffx-color-$Frame-block48-corrected.f32";$Shifts=@{49=0;50=1;51=3;52=2;53=0;54=1;55=3}
+foreach($Block in 49..55){$Raw=Join-Path $Lab "ffx-color-$Frame-block$Block.f32";& (Join-Path $Lab 'd3d12_block128_test.exe') (Join-Path $Lab "block$Block-body-effective.bin") $Input $Raw 240 136 $Shifts[$Block];if($LASTEXITCODE -ne 0){throw "block$Block failed"};if($Block -le 54){$Corrected=Join-Path $Lab "ffx-color-$Frame-block$Block-corrected.f32";& (Join-Path $Lab 'd3d12_affine_test.exe') (Join-Path $Lab "block$Block-live-correction.bin") $Raw $Corrected 256 256;if($LASTEXITCODE -ne 0){throw "block$Block correction failed"};$Input=$Corrected}else{$Input=$Raw}}

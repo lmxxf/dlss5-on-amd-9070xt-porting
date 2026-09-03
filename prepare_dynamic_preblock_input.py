@@ -43,6 +43,10 @@ def main() -> None:
         mode="bilinear",
         align_corners=False,
     )[0].permute(1, 2, 0).numpy()
+    if float(image.max()) <= 1e-6 or float(image.std()) <= 1e-5:
+        raise ValueError(
+            f"refusing empty/stale FFX Color capture: range={image.min():.7g}..{image.max():.7g} std={image.std():.7g}"
+        )
     if args.target_width % 8 or args.target_height % 8:
         raise ValueError("target dimensions must be divisible by 8")
     tiled = (

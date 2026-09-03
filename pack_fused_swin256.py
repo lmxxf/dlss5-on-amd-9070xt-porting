@@ -11,6 +11,10 @@ def main() -> None:
     v=np.fromfile(a.weights,dtype="<f2").astype(np.float32)
     if len(v)==410392:
         w1,w2,skip,qkv,bias,scale,proj,ats=(v[98304:172032],v[172032:245760],v[245760:246016],v[246272:344576],v[344576:377344],v[377344:377360],v[377360:410128],v[410128:410384])
+    elif len(v)==410144:
+        # Encoder block22: regular 256-channel body followed by a 256x256
+        # downsample projection (the usual 8-half tail is replaced by it).
+        w1,w2,skip,qkv,bias,scale,proj,ats=(v[32768:106496],v[106496:180224],v[180240:180496],v[180496:278800],v[278800:311568],v[311568:311584],v[311584:344352],v[344352:344608])
     elif len(v)==344616:
         w1,w2,skip,qkv,bias,scale,proj,ats=(v[32768:106496],v[106496:180224],v[180240:180496],v[180496:278800],v[278800:311568],v[311568:311584],v[311584:344352],v[344352:344608])
     else: raise ValueError(f"unexpected record size {len(v)}")
