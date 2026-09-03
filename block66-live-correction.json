@@ -1,0 +1,13 @@
+{
+  "file": "block66-live-correction.bin",
+  "sha256": "cf9a8456dfb05b3eb526657bd17080aff64c6393c4e9ad54c01beb841257ed7b",
+  "storage": "float32_little_endian",
+  "shape": [33, 32],
+  "input": "RX9070XT block66 archive body plus constant bias channel",
+  "target": "live NVIDIA block66 output content ROI",
+  "fixed_frame_validation": {
+    "checkerboard_held_out_correlation": 0.954105,
+    "full_roi_correlation": 0.958552,
+    "rx9070xt_submit_to_fence_ms": 0.684
+  }
+}

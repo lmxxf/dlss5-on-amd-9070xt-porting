@@ -1441,6 +1441,10 @@ live几何亦完成校正。post grid481×273对应有效480×272 tiles；standa
 
 尺度关系进一步纠正：live block69有效空间为1920×1088，block70 prefix把4×4 main patch上采样为8×8 output tile；因此256×144 post ROI只对应128×72 block69区域。此前把144×256 block69再取p10相位得到72×128，是错误几何的补丁，相关输出全部降级。下一主线从live block66的0x60参数同时捕获main/aux/enc0 skip，以正确72×128 ROI在AMD重跑66–69，不再沿用p10下采样。
 
+block66 live四路随后在同一次launch闭合：`+0x00 main`、`+0x08 output`、`+0x38 aux`、`+0x50 enc0 skip`各抓完整64MiB，pre三次copy、post output copy与两次sync全部返回0。按global microcell从block65取36×64×64 ROI，从block66 output/skip取72×128×32 ROI。archive block66直接输出对live相关接近0，但全局32→32校正在checkerboard held-out达到0.954105，证明空间坐标正确、缺口为channel basis；完整矩阵在RX9070XT为0.684ms、全ROI correlation0.958552。
+
+校正后blocks67–69按72×128在RX9070XT依次耗时2.378/2.006/2.566ms。把AMD69直接2×展开后对live block70 main prefix做33→32校正，checkerboard held-out correlation0.975165、GPU pass0.846ms；这同时否决了候选`encode_tinlayout_global→physical gather`（其prefix correlation仅0.063）。接入live skip、AMD block70 body与已保存head校正后，66–70纯AMD content ROI最终RGB correlation0.978812、MAE0.007868、RMSE0.016834；图像恢复蓝色球体的位置、轮廓及明暗，仍有纹理噪声。当前严格入口为live block65 main＋enc0 skip，下一步继续前移到blocks62–65。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

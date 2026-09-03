@@ -1,0 +1,13 @@
+{
+  "file": "block69-to70-live-main-correction.bin",
+  "sha256": "4cf8f5bd6a83a85dbdb1994376e6c6131d148d75c7c36238d9eee78256bb90db",
+  "storage": "float32_little_endian",
+  "shape": [33, 32],
+  "input": "2x nearest expanded RX9070XT block69 HWC plus constant bias",
+  "target": "live NVIDIA block70 main prefix content ROI",
+  "fixed_frame_validation": {
+    "checkerboard_held_out_correlation": 0.975165,
+    "full_roi_correlation": 0.975630,
+    "rx9070xt_submit_to_fence_ms": 0.846
+  }
+}
