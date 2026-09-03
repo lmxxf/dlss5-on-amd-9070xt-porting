@@ -1,0 +1,9 @@
+{
+  "file":"block39-to40-live-correction.bin",
+  "sha256":"bc26f509763f5ea0feada1933b29530b000e36e5db7b11d2e66c1d04908d1bcc",
+  "storage":"float32_little_endian",
+  "shape":[513,512],
+  "input":"RX9070XT block40 output from archive-logical block39",
+  "target":"synchronized live NVIDIA block40 output",
+  "fixed_frame_validation":{"checkerboard_held_out_correlation":0.986835,"full_correlation":0.989755,"full_mae":0.152137}
+}

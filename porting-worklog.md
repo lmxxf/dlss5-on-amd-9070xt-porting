@@ -1461,6 +1461,10 @@ split-Swin捕获首先修正两处ABI：block39 weight/output分别在0xb8 blob�
 
 同步后blocks40–46 full live张量neighbor correlation约0.97。以block39特殊layout candidate为输入，AMD block40输出原始corr近0，但513→512校正checkerboard held-out0.959338，证明空间位置正确。完整blocks40–46逐层校正correlation为0.967078/0.962779/0.962617/0.963513/0.963564/0.970136/0.967684；block47继续用block48/49下一层裁判。AMD39→47→48→49的block49 held-out correlation0.898400，与直接live block47入口的0.903055仅差0.0047，故40–47链通过，严格入口前移为live block39 output。下一步恢复block39 main/skip与ViT 31–38。
 
+block39输入geometry确认为34×60 bottleneck：main为40个8×8×1024 padded windows（约2.62MiB），skip已是2×空间68×120×512（约4.18MiB）。probe改为从精确GPUVA捕获main4MiB、skip5MiB、output5MiB；统一减0x2800或复制8MiB都会跨私有allocation并延迟触发DEVICE_REMOVED。skip按global map解码后neighbor H/V为0.919/0.915。
+
+main分别测试直接线性、window identity、single-window repack map/inverse四种解释；archive grouped projection＋2×nearest＋live skip后四者几乎等价，说明该固定帧block39由skip主导。最佳map方案送入AMD block40，原始corr0.3053；513→512校正checkerboard held-out correlation0.986835、MAE0.1680，全量correlation0.989755。block39因此通过下一层裁判，严格入口前移为live block38 repack main＋block30 skip，下一步进入ViT31–38。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

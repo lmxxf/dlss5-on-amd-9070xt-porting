@@ -288,9 +288,9 @@ int64_t hook_backend_launch(
                 const UINT64 atlas = g_destination->GetGPUVirtualAddress();
                 int operations[2]{};
                 operations[0] = dispatch_raw_copy(
-                    block39_main, atlas, 1ull << 20);
+                    block39_main, atlas, 4ull << 20);
                 operations[1] = operations[0] == 0 ? dispatch_raw_copy(
-                    block39_skip, atlas + (64ull << 20), 1ull << 20) : -1;
+                    block39_skip, atlas + (64ull << 20), 5ull << 20) : -1;
                 void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
                 auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
                 const int sync_result = operations[1] == 0 ? synchronize(
