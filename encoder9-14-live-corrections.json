@@ -18,6 +18,9 @@
     "13": 0.853233,
     "14_to_15_next_layer": 0.952174
   },
+  "separate_downsample_and_enter_validation": {
+    "block14_body_downsample_then_block15_enter_body": 0.950740
+  },
   "strict_input_boundary": "live block8 downsample main",
   "note": "The block14 physical candidate is not canonical (direct affine correlation about 0.18). The authoritative judge is live block15 output."
 }

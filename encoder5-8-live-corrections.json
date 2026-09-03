@@ -10,6 +10,10 @@
     "7": 0.881387,
     "8_to_9_next_layer": 0.970651
   },
+  "separate_downsample_and_enter_validation": {
+    "block4_body_downsample_then_block5_enter_body": 0.976558,
+    "block8_body_downsample_then_block9_enter_body": 0.971510
+  },
   "continuous_block4_to_block21_correlation": 0.723170,
   "strict_input_boundary": "live block4 downsample main",
   "note": "The block8 physical candidate is not canonical; block9 output is the authoritative next-layer judge."

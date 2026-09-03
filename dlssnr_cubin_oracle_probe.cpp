@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 80ull << 20;
+constexpr UINT64 kCaptureBytes = 72ull << 20;
 constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
 constexpr bool kCaptureBlock0Color = true;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
@@ -536,7 +536,7 @@ int64_t hook_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
     if (g_finished.load()) return result;
     if (result == 0 && g_copy_ready.load() && blob != nullptr &&
-        bytes == 0x10 && gx == 1290 && g_queue != nullptr &&
+        false && bytes == 0x10 && gx == 1290 && g_queue != nullptr &&
         !g_finished.exchange(true)) {
         UINT64 source = 0;
         std::memcpy(&source, blob, 8);
@@ -729,14 +729,14 @@ int64_t hook_backend_launch(
                 return result;
             }
         }
-        if (false && weight - g_arena_base == 5912576) {
+        if (weight - g_arena_base == 5912576) {
             UINT64 output = 0;
             std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x48, 8);
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
             const int pre_sync = synchronize(g_live_ngx_context, g_live_command_context, 0, 0);
             const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
-                output, g_destination->GetGPUVirtualAddress(), 3ull << 20) : -1;
+                output, g_destination->GetGPUVirtualAddress(), 5ull << 20) : -1;
             const int sync_result = copy_result == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             AcquireSRWLockExclusive(&g_trace_lock);
@@ -826,6 +826,14 @@ int64_t hook_backend_launch(
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
         if (offset == 22016) atlas_offset = 80ull << 20;
+        else if (offset == 8438784) atlas_offset = 8ull << 20;
+        else if (offset == 10407424) atlas_offset = 16ull << 20;
+        else if (offset == 12376064) atlas_offset = 24ull << 20;
+        else if (offset == 14344704) atlas_offset = 32ull << 20;
+        else if (offset == 16313344) atlas_offset = 40ull << 20;
+        else if (offset == 18281984) atlas_offset = 48ull << 20;
+        else if (offset == 20250624) atlas_offset = 56ull << 20;
+        else if (offset == 22503424) atlas_offset = 64ull << 20;
         else if (offset == 4512256) atlas_offset = 160ull << 20;
         else if (offset == 20513792) atlas_offset = 240ull << 20;
         else if (offset == 141544960) atlas_offset = 64ull << 20;
@@ -845,6 +853,11 @@ int64_t hook_backend_launch(
         else if (offset == 5222912) atlas_offset = 112ull << 20;
         if (atlas_offset != UINT64_MAX) {
             const UINT64 copy_bytes =
+                (offset == 8438784 || offset == 10407424 ||
+                 offset == 12376064 || offset == 14344704 ||
+                 offset == 16313344 || offset == 18281984 ||
+                 offset == 20250624) ? (5ull << 20) :
+                (offset == 22503424) ? (3ull << 20) :
                 (offset == 22016 || offset == 4512256 ||
                  offset == 20513792) ? (80ull << 20) :
                 (offset == 141544960 || offset == 146568192 ||
@@ -871,6 +884,15 @@ int64_t hook_backend_launch(
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
             if (!kCaptureBlock0Color && offset == 5222912 && sync_result == 0 && g_queue != nullptr &&
+                !g_finished.exchange(true)) {
+                g_queue->AddRef();
+                if (HANDLE thread = CreateThread(
+                        nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+                    CloseHandle(thread);
+                }
+                return result;
+            }
+            if (offset == 22503424 && sync_result == 0 && g_queue != nullptr &&
                 !g_finished.exchange(true)) {
                 g_queue->AddRef();
                 if (HANDLE thread = CreateThread(

@@ -1517,6 +1517,12 @@ RX9070XT执行全分辨率blocks1–3。block1 candidate outview不可作target�
 
 trace给出seq0 `grid=1290`、q0 allocation base与block0 q27相差`0x142800`。seq0与主网络使用不同backend context；改为从当前`self+0x08/+0x10`取context后，raw-copy成功，80MiB prefill allocation SHA256为`28859629...79657`。这把block0缺口收敛为：恢复seq0预填buffer／live Gaussian生成状态对pre-block的语义，而不是继续调RGB-only surrogate。下一步解析seq0与block0 0x108参数的prefill/noise路径，随后让AMD从真正固定输入执行block0。
 
+随后从record容量与下一层类型纠正stage边界：block4/8/14的q9仍是32/64/128 channels，下一层block5/9/15 record开头的`weight0`分别执行32→64、64→128、128→256；block23则是split-Swin、没有enter projection，因此block22 q9本身为68×120×512。此前block22–29每路只抓3MiB并按36×60×512解释，实际4,177,920-byte active被截断，旧23–30证据降级。
+
+downsample与enter projection已在AMD拆开执行而非跨层跳过。block4 body→archive matrix→2×pool→block5 weight0/body held-out0.976558；block8→block9为0.971510；block14→block15为0.950740，均与旧跨层桥精度相当。
+
+block22与blocks23–29按5MiB重新同帧捕获，后者H68×W120×C512空间连续性约0.91–0.93。RX9070XT重跑split-Swin blocks23–29，held-out依次0.930936/0.926670/0.922398/0.902453/0.893748/0.889838/0.891634。block30按H68×W120执行body，2×pool得到34×60×512，再补两行形成ViT要求的36×60并执行archive 512→1024 projection：raw cosine0.925823、校正held-out0.939221。该输出进入AMD ViT31后沿用既有校正仍有correlation0.940372。encoder tail截断问题至此修复。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
