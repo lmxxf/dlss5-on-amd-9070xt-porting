@@ -1667,6 +1667,12 @@ QKV同样尝试DXC/SM6.2 FP32，但从热态约17ms回退到33.763ms，最终RGB
 
 block70 QKV的DXC/SM6 FP32对照从约17ms回退到33.763ms，且最终RGBA出现MAE约`7e-9`（exact99.9947%），已恢复SM5 QKV；实验源码仅留反证。当前block70正式热态约70.222ms。
 
+block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：sparse column现场解码为4×4 tile内的全局HWC地址，不再由CPU构造/上传530MB `[tile,1024]`。frame16800最终RGBA继续逐byte exact；wall从1372.875ms微降至1357.771ms，热态GPU＋copy为67.130ms（prefix11.484、FFN20.578、QKV14.178、attention14.074、outconv2.931ms）。wall收益小证明CPU prepare不是主因，但接口已变成可直接承接上游GPU resources的最终形状。
+
+`run_dynamic_frame_pipeline.sh`新增精确`pipeline_wall_seconds`输出。下一次完整frame16800运行将作为所有resident/local化改动后的新端到端基线；该整帧耗时实验由Zero直接执行，避免sandbox长命令失联。
+
+新增`run_dynamic_network_resident.ps1`，把block0 HWC之后到block70最终RGBA的所有resident段、stage转换、skip merge收进一次Windows侧编排，Linux主脚本只用一次SSH触发整网。frame16800中段wall为20,883.289ms，最终RGBA对既有权威结果逐byte exact。日志仍出现12次adapter初始化，证明剩余20.9秒主要是12个独立进程/device与本地GiB tensor边界，而非SSH控制往返。下一步必须把这些operator family合并进一个全网D3D12进程，最终再嵌入addon；继续合并PowerShell命令已无数量级收益。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
