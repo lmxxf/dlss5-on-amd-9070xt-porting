@@ -529,6 +529,34 @@ int64_t hook_backend_launch(
     }
     int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (result == 0 && g_copy_ready.load() && blob != nullptr &&
+        bytes == 0x18 && gx == 2176) {
+        UINT64 input = 0, output = 0;
+        std::memcpy(&input, static_cast<const uint8_t *>(blob) + 0x00, 8);
+        std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int pre_sync = synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0);
+        int operations[2]{};
+        operations[0] = pre_sync == 0 ? dispatch_raw_copy(
+            input, g_destination->GetGPUVirtualAddress(), 4ull << 20) : -1;
+        operations[1] = operations[0] == 0 ? dispatch_raw_copy(
+            output, g_destination->GetGPUVirtualAddress() + (64ull << 20),
+            4ull << 20) : -1;
+        const int sync_result = operations[1] == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file,
+                "vit_repack_pair input=0x%llx output=0x%llx pre_sync=%d copies=%d,%d sync=%d\n",
+                static_cast<unsigned long long>(input),
+                static_cast<unsigned long long>(output), pre_sync,
+                operations[0], operations[1], sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+    }
     if (result == 0 && block39_pre_ok) {
         void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
         auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
@@ -604,10 +632,7 @@ int64_t hook_backend_launch(
         std::memcpy(&output, static_cast<const uint8_t *>(blob) + output_field, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 34566144) atlas_offset = 64ull << 20;
-        else if (offset == 47154688) atlas_offset = 128ull << 20;
-        else if (offset == 59743232) atlas_offset = 192ull << 20;
-        else if (offset == 72331776) atlas_offset = 256ull << 20;
+        (void)offset;
         if (atlas_offset != UINT64_MAX) {
             const UINT64 copy_bytes = 3ull << 20;
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
