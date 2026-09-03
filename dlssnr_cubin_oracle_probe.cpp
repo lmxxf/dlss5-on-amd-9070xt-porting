@@ -33,7 +33,8 @@ constexpr bool kCaptureBlock48Identity = false;
 constexpr bool kCaptureBlock66 = false;
 constexpr bool kCaptureBlock62 = false;
 constexpr bool kCaptureBlock56 = false;
-constexpr bool kCaptureBlock48 = true;
+constexpr bool kCaptureBlock48 = false;
+constexpr bool kCompareBlock47To48 = false;
 
 using Forward1H = void (*)(void *, void *, void *, void *, int, int);
 using CreateBackend = void *(*)(void *);
@@ -249,9 +250,65 @@ int64_t hook_backend_launch(
     UINT64 block62_skip = 0, block62_aux = 0;
     bool block56_pre_ok = false;
     UINT64 block56_main = 0, block56_output = 0, block56_skip = 0;
+    bool block39_pre_ok = false;
+    UINT64 block39_main = 0, block39_skip = 0, block39_output = 0;
     if (g_copy_ready.load() && blob != nullptr && bytes >= 0x50 && g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
+        if (kCompareBlock47To48 && bytes == 0x58 &&
+            weight - g_arena_base == 140034048) {
+            UINT64 source = 0;
+            std::memcpy(&source, static_cast<const uint8_t *>(blob) + 0x00, 8);
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int pre_sync = synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0);
+            const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+                source, g_destination->GetGPUVirtualAddress() + (320ull << 20),
+                5ull << 20) : -1;
+            const int sync_result = copy_result == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block48_compare_main source=0x%llx pre_sync=%d copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(source), pre_sync,
+                    copy_result, sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+        if (bytes == 0x50) {
+            UINT64 block39_weight = 0;
+            std::memcpy(&block39_weight, static_cast<const uint8_t *>(blob) + 0x38, 8);
+            if (block39_weight - g_arena_base == 123736576) {
+                std::memcpy(&block39_main, static_cast<const uint8_t *>(blob) + 0x00, 8);
+                std::memcpy(&block39_skip, static_cast<const uint8_t *>(blob) + 0x08, 8);
+                std::memcpy(&block39_output, static_cast<const uint8_t *>(blob) + 0x30, 8);
+                const UINT64 atlas = g_destination->GetGPUVirtualAddress();
+                int operations[2]{};
+                operations[0] = dispatch_raw_copy(
+                    block39_main, atlas, 1ull << 20);
+                operations[1] = operations[0] == 0 ? dispatch_raw_copy(
+                    block39_skip, atlas + (64ull << 20), 1ull << 20) : -1;
+                void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+                auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+                const int sync_result = operations[1] == 0 ? synchronize(
+                    g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+                block39_pre_ok = sync_result == 0;
+                AcquireSRWLockExclusive(&g_trace_lock);
+                if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                    std::fprintf(file,
+                        "block39_pre main=0x%llx skip=0x%llx output=0x%llx copies=%d,%d sync=%d\n",
+                        static_cast<unsigned long long>(block39_main),
+                        static_cast<unsigned long long>(block39_skip),
+                        static_cast<unsigned long long>(block39_output),
+                        operations[0], operations[1], sync_result);
+                    std::fclose(file);
+                }
+                ReleaseSRWLockExclusive(&g_trace_lock);
+            }
+        }
         if (kCaptureBlock48 && bytes == 0x58 &&
             weight - g_arena_base == 140034048) {
             std::memcpy(&block48_main_source, static_cast<const uint8_t *>(blob) + 0x00, 8);
@@ -446,6 +503,24 @@ int64_t hook_backend_launch(
     }
     int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (result == 0 && block39_pre_ok) {
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int pre_sync = synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0);
+        const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+            block39_output,
+            g_destination->GetGPUVirtualAddress() + (128ull << 20), 5ull << 20) : -1;
+        const int sync_result = copy_result == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file, "block39_post pre_sync=%d output_copy=%d sync=%d\n",
+                pre_sync, copy_result, sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+    }
     if (result == 0 && block48_simple_pre_ok) {
         const int copy_result = dispatch_raw_copy(
             block48_output_source - 0x2800,
@@ -497,31 +572,35 @@ int64_t hook_backend_launch(
     if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes >= 0x18 &&
         g_arena_base != 0) {
         UINT64 weight = 0, output = 0;
-        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
-        std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        const size_t weight_field = bytes == 0x48 ? 0x18 : 0x10;
+        const size_t output_field = bytes == 0x48 ? 0x10 : 0x08;
+        std::memcpy(&weight, static_cast<const uint8_t *>(blob) + weight_field, 8);
+        std::memcpy(&output, static_cast<const uint8_t *>(blob) + output_field, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 142986240) atlas_offset = 0;
-        else if (offset == 143675904) atlas_offset = 64ull << 20;
-        else if (offset == 144365568) atlas_offset = 128ull << 20;
-        else if (offset == 145055232) atlas_offset = 192ull << 20;
+        if (offset == 125990400) atlas_offset = 192ull << 20;
+        else if (offset == 127959040) atlas_offset = 256ull << 20;
+        else if (offset == 129927680) atlas_offset = 320ull << 20;
         if (atlas_offset != UINT64_MAX) {
-            const int copy_result = dispatch_raw_copy(
-                output - 0x2800,
-                g_destination->GetGPUVirtualAddress() + atlas_offset,
-                64ull << 20);
+            const UINT64 copy_bytes = bytes == 0x48 ? 5ull << 20 : 64ull << 20;
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int pre_sync = synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0);
+            const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
+                bytes == 0x48 ? output : output - 0x2800,
+                g_destination->GetGPUVirtualAddress() + atlas_offset,
+                copy_bytes) : -1;
             const int sync_result = copy_result == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             AcquireSRWLockExclusive(&g_trace_lock);
             if (FILE *file = _wfopen(kLogPath, L"ab")) {
                 std::fprintf(file,
-                    "decoder_stage_output weight_offset=%llu output=0x%llx atlas_offset=%llu copy=%d sync=%d\n",
+                    "decoder_stage_output weight_offset=%llu output=0x%llx atlas_offset=%llu pre_sync=%d copy=%d sync=%d\n",
                     static_cast<unsigned long long>(offset),
                     static_cast<unsigned long long>(output),
                     static_cast<unsigned long long>(atlas_offset),
-                    copy_result, sync_result);
+                    pre_sync, copy_result, sync_result);
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);

@@ -1457,6 +1457,10 @@ block48 live main/output/block22 skip与blocks49–55逐层output分两次atlas�
 
 blocks49–54逐层full-frame校正correlation依次0.9052/0.8780/0.8735/0.8448/0.9162/0.8921。block55 live candidate vertical continuity仅0.152，按既定规则不用它作target；把AMD55送入full block56，以130,560个token对真实block56 output验收，checkerboard held-out correlation0.957322、全量0.957703。由此48–55链通过下一层裁判，严格入口前移为live block47 main＋block22/block14/block8/enc0 skips。下一步进入block39–47与ViT decoder入口。
 
+split-Swin捕获首先修正两处ABI：block39 weight/output分别在0xb8 blob的q7/q6；blocks40–47最终layer3 weight/output在0x48 blob的q3/q2。最初post-launch立即copy抓到大量stale bank，block47与下一步block48同GPUVA却仅corr0.708；增加`launch return→context sync→raw copy→sync`后，同一evaluate双抓block47 q2与block48 q0达到5MiB逐byte100% exact。block39/40–47资源同时改为从精确view GPUVA复制1/5MiB，避免统一减0x2800并跨allocation导致`0x887a0005 DEVICE_REMOVED`。
+
+同步后blocks40–46 full live张量neighbor correlation约0.97。以block39特殊layout candidate为输入，AMD block40输出原始corr近0，但513→512校正checkerboard held-out0.959338，证明空间位置正确。完整blocks40–46逐层校正correlation为0.967078/0.962779/0.962617/0.963513/0.963564/0.970136/0.967684；block47继续用block48/49下一层裁判。AMD39→47→48→49的block49 held-out correlation0.898400，与直接live block47入口的0.903055仅差0.0047，故40–47链通过，严格入口前移为live block39 output。下一步恢复block39 main/skip与ViT 31–38。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
