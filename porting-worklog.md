@@ -1469,6 +1469,10 @@ ViT projection ABI由arena qword反查闭合：每block最终layer4使用0x48 bl
 
 现有AMD ViT runner仅支持单组64 tokens。下一工作假设是把live 2160组织为34行×60有效token、每行补4个zero keys形成34组64-token attention；该解释与544个Expand CTA咬合，但尚未由attention地址证明，不能标exact。下一步将runner批处理化为34组，并以已抓31–38逐层Projection output和block39/40下一层裁判决定接受或否决；若失败再测试全局attention。
 
+launch geometry进一步否决上述row-attention假设：Attention grid32×9恰为32 heads×ceil(2160/256)，对应全局attention query分块；Expand 544 CTA同样等于ceil(2160/4)。`d3d12_vit_block31_test.cpp`改为从input长度推导TOKENS，动态分配五段UAV并把attention key循环扩到TOKENS。RX9070XT完整2160-token block31 submit→fence仅272.918ms，说明naive correctness实现已可用，不需先做row近似。
+
+但直接把live raw前2160×1024 bytes按token-major E4M3解码后，AMD Projection对live output correlation-0.00566；1025→1024 channel affine的checkerboard held-out仍约0。用channel-order不变量分位数做2160×2160 Hungarian token matching也得到随机排列、无法提升相关。结论：当前缺口是ViT input/output的联合token-channel physical permutation；不是全局attention计算成本，也不能靠单独channel矩阵吸收。下一步需用已保存single-window repack bit公式推广到2160-tokenglobal view，或对live block31做controlled permutation basis。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

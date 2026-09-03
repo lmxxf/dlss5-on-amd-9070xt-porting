@@ -80,8 +80,10 @@ int wmain(int argc, wchar_t **argv) {
       qkvMain.size() != 1024ull * 3 * 1024 ||
       qkvWork.size() != 1024ull * 3 * 1024 * 2 ||
       projection.size() != 1024ull * 1024 * 2 ||
-      projectionSkip.size() != 2048 || input.size() != 64ull * 1024 * 4 ||
+      projectionSkip.size() != 2048 || input.empty() ||
+      input.size() % (1024ull * 4) ||
       oracle.size() != input.size()) return 2;
+  const UINT tokens = static_cast<UINT>(input.size() / (1024ull * 4));
   std::vector<uint8_t> packed;
   size_t expandOffset = append_aligned(packed, expand);
   size_t contractOffset = append_aligned(packed, contract);
@@ -137,23 +139,25 @@ RWStructuredBuffer<float> branch:register(u0),hidden:register(u1),qkv:register(u
 float H(uint base,uint i){uint x=weights.Load(base+(i>>1)*4);return f16tof32((x>>((i&1)*16))&65535);}
 float E(uint base,uint i){uint x=weights.Load(base+(i&~3));uint v=(x>>((i&3)*8))&255;float s=(v&128)?-1:1;uint e=(v>>3)&15,m=v&7;if(e==0)return s*(m/8.0)*exp2(-6.0);return s*(1+m/8.0)*exp2((int)e-7);}
 float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return s*round(a*512)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e+=1;}return s*min(exp2(e)*(1+m/8),448.);}
-[numthreads(64,1,1)]void expand_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=262144)return;uint t=o/4096,c=o%4096;float y=0;[loop]for(uint i=0;i<1024;i++)y+=source[t*1024+i]*H(EXPAND_OFFSET,i*4096+c);branch[o]=F(y);}
-[numthreads(64,1,1)]void contract_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=65536)return;uint t=o/1024,c=o%1024;float y=0;[loop]for(uint i=0;i<4096;i++){float x=clamp(branch[t*4096+i],-4.,4.);x=x*(.89453125+x*(.447265625-.055908203125*abs(x)));y+=x*H(CONTRACT_OFFSET,i*1024+c);}hidden[o]=F(y+source[o]*H(CONTRACT_SKIP_OFFSET,c));}
+[numthreads(64,1,1)]void expand_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=TOKENS*4096)return;uint t=o/4096,c=o%4096;float y=0;[loop]for(uint i=0;i<1024;i++)y+=source[t*1024+i]*H(EXPAND_OFFSET,i*4096+c);branch[o]=F(y);}
+[numthreads(64,1,1)]void contract_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=TOKENS*1024)return;uint t=o/1024,c=o%1024;float y=0;[loop]for(uint i=0;i<4096;i++){float x=clamp(branch[t*4096+i],-4.,4.);x=x*(.89453125+x*(.447265625-.055908203125*abs(x)));y+=x*H(CONTRACT_OFFSET,i*1024+c);}hidden[o]=F(y+source[o]*H(CONTRACT_SKIP_OFFSET,c));}
 [numthreads(32,1,1)]void qkv_cs(uint3 tid:SV_GroupThreadID,uint3 gid:SV_GroupID){uint t=gid.x,h=tid.x;float q[32],k[32],v[32];[loop]for(uint d=0;d<32;d++){q[d]=k[d]=v[d]=0;}[loop]for(uint i=0;i<1024;i++){float x=hidden[t*1024+i];[loop]for(uint d=0;d<32;d++){uint o=h*32+d;q[d]+=x*E(QKV_MAIN_OFFSET,(i*3+0)*1024+o);k[d]+=x*E(QKV_MAIN_OFFSET,(i*3+1)*1024+o);v[d]+=x*E(QKV_MAIN_OFFSET,(i*3+2)*1024+o);}}float qn=0,kn=0;[loop]for(uint d=0;d<32;d++){qn+=q[d]*q[d];kn+=k[d]*k[d];}qn=scales[h]*rsqrt(max(qn,1e-12));kn=scales[32+h]*rsqrt(max(kn,1e-12));[loop]for(uint d=0;d<32;d++){uint o=h*32+d;qkv[(t*3+0)*1024+o]=q[d]*qn;qkv[(t*3+1)*1024+o]=k[d]*kn;qkv[(t*3+2)*1024+o]=v[d];}}
-[numthreads(64,1,1)]void attention_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=65536)return;uint t=o/1024,c=o%1024,h=c/32;float mx=-3.4e38;[loop]for(uint key=0;key<64;key++){float dot=0;[loop]for(uint d=0;d<32;d++)dot+=qkv[(t*3+0)*1024+h*32+d]*qkv[(key*3+1)*1024+h*32+d];mx=max(mx,dot);}float den=0,value=0;[loop]for(uint key=0;key<64;key++){float dot=0;[loop]for(uint d=0;d<32;d++)dot+=qkv[(t*3+0)*1024+h*32+d]*qkv[(key*3+1)*1024+h*32+d];float a=exp(dot-mx);den+=a;value+=a*qkv[(key*3+2)*1024+c];}attention[o]=F(value/den);}
-[numthreads(64,1,1)]void projection_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=65536)return;uint t=o/1024,c=o%1024;float y=0;[loop]for(uint i=0;i<1024;i++)y+=attention[t*1024+i]*H(PROJECTION_OFFSET,i*1024+c);result[o]=F(y+hidden[o]*H(PROJECTION_SKIP_OFFSET,c));}
+[numthreads(64,1,1)]void attention_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=TOKENS*1024)return;uint t=o/1024,c=o%1024,h=c/32;float mx=-3.4e38;[loop]for(uint key=0;key<TOKENS;key++){float dot=0;[loop]for(uint d=0;d<32;d++)dot+=qkv[(t*3+0)*1024+h*32+d]*qkv[(key*3+1)*1024+h*32+d];mx=max(mx,dot);}float den=0,value=0;[loop]for(uint key=0;key<TOKENS;key++){float dot=0;[loop]for(uint d=0;d<32;d++)dot+=qkv[(t*3+0)*1024+h*32+d]*qkv[(key*3+1)*1024+h*32+d];float a=exp(dot-mx);den+=a;value+=a*qkv[(key*3+2)*1024+c];}attention[o]=F(value/den);}
+[numthreads(64,1,1)]void projection_cs(uint3 id:SV_DispatchThreadID){uint o=id.x;if(o>=TOKENS*1024)return;uint t=o/1024,c=o%1024;float y=0;[loop]for(uint i=0;i<1024;i++)y+=attention[t*1024+i]*H(PROJECTION_OFFSET,i*1024+c);result[o]=F(y+hidden[o]*H(PROJECTION_SKIP_OFFSET,c));}
 )";
-  char offsets[7][32];
+  char offsets[7][32], tokenCount[16];
   size_t offsetValues[7] = {expandOffset, contractOffset, contractSkipOffset,
                             qkvMainOffset, qkvWorkOffset, projectionOffset,
                             projectionSkipOffset};
   for (int i = 0; i < 7; ++i)
     std::snprintf(offsets[i], sizeof(offsets[i]), "%zu", offsetValues[i]);
+  std::snprintf(tokenCount, sizeof(tokenCount), "%u", tokens);
   D3D_SHADER_MACRO macros[] = {
       {"EXPAND_OFFSET", offsets[0]}, {"CONTRACT_OFFSET", offsets[1]},
       {"CONTRACT_SKIP_OFFSET", offsets[2]}, {"QKV_MAIN_OFFSET", offsets[3]},
       {"QKV_WORK_OFFSET", offsets[4]}, {"PROJECTION_OFFSET", offsets[5]},
-      {"PROJECTION_SKIP_OFFSET", offsets[6]}, {nullptr, nullptr}};
+      {"PROJECTION_SKIP_OFFSET", offsets[6]}, {"TOKENS", tokenCount},
+      {nullptr, nullptr}};
   D3D12_DESCRIPTOR_RANGE ranges[2]{};
   ranges[0] = {D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, 0};
   ranges[1] = {D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 5, 0, 0, 3};
@@ -225,9 +229,9 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
     std::memcpy(mapped, item.second.first, item.second.second);
     item.first->Unmap(0, nullptr);
   }
-  const UINT64 sizes[5] = {64ull * 4096 * 4, 64ull * 1024 * 4,
-                           64ull * 3 * 1024 * 4, 64ull * 1024 * 4,
-                           64ull * 1024 * 4};
+  const UINT64 sizes[5] = {UINT64(tokens) * 4096 * 4, UINT64(tokens) * 1024 * 4,
+                           UINT64(tokens) * 3 * 1024 * 4, UINT64(tokens) * 1024 * 4,
+                           UINT64(tokens) * 1024 * 4};
   ID3D12Resource *uavs[5]{};
   for (int i = 0; i < 5; ++i)
     uavs[i] = make(sizes[i], &defaultHeap,
@@ -258,7 +262,7 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
   rawView.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
   device->CreateShaderResourceView(weightResource, &rawView, descriptor);
   descriptor.ptr += descriptorSize;
-  for (auto pair : {std::pair<ID3D12Resource *, UINT>{inputResource, 64 * 1024},
+  for (auto pair : {std::pair<ID3D12Resource *, UINT>{inputResource, tokens * 1024},
                     {scaleResource, 64}}) {
     D3D12_SHADER_RESOURCE_VIEW_DESC view{};
     view.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
@@ -294,7 +298,8 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
   commands->SetComputeRootSignature(root);
   commands->SetComputeRootDescriptorTable(
       0, descriptorHeap->GetGPUDescriptorHandleForHeapStart());
-  const UINT dispatches[5] = {4096, 1024, 64, 1024, 1024};
+  const UINT dispatches[5] = {tokens * 64, tokens * 16, tokens,
+                              tokens * 16, tokens * 16};
   for (int pass = 0; pass < 5; ++pass) {
     commands->SetPipelineState(pipelines[pass]);
     commands->Dispatch(dispatches[pass], 1, 1);
@@ -339,12 +344,12 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
       static_cast<const uint8_t *>(mapped) + readbackOffsets[4]);
   auto *wanted = reinterpret_cast<const float *>(oracle.data());
   double ae = 0, se = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
-  for (UINT i = 0; i < 64 * 1024; ++i) {
+  for (UINT i = 0; i < tokens * 1024; ++i) {
     double x = output[i], y = wanted[i], delta = x - y;
     ae += std::abs(delta); se += delta * delta;
     sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y;
   }
-  double count = 64.0 * 1024;
+  double count = double(tokens) * 1024;
   double correlation = (sxy - sx * sy / count) /
       std::sqrt((sxx - sx * sx / count) * (syy - sy * sy / count));
   std::printf("corr=%.9f MAE=%.9f RMSE=%.9f submit_to_fence_ms=%.3f\n",
