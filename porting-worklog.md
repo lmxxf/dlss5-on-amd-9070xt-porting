@@ -1583,6 +1583,90 @@ block70的3840×2176单buffer试验暴露两个执行问题：一维Dispatch超�
 
 最终在同一个新游戏进程内先加载frame16800，再原子换入frame5400，最后换回frame16800。probe依次记录`loaded frame=600`、`update/loaded frame=3600`、`update/loaded frame=6000`，桌面截图对应实景→主菜单→实景，证明不是离线PNG，也不是Color base假动态。功能性低频动态链已闭合；尚不能宣称目标完成，因端到端吞吐仍为约8分钟/帧。下一阶段把各层整合进单一常驻D3D12进程，消除反复shader编译、device建立、readback/upload与SSH传输。
 
+### 2026-09-04：实时化基线与首轮去跨机传输
+
+frame16800在AMD机上保留的92个中间FP32文件合计10,361,241,600 bytes，确认现有约484秒延迟主要来自把磁盘与SSH当作层间显存总线，而非纯GPU计算。单独重跑全分辨率block69：进程wall time 1846.427ms，其中submit-to-fence仅346.684ms；约81%在device／shader／文件生命周期。
+
+新增`merge_upsample_skip.cpp`，在Windows本机完成decoder的2×nearest upsample＋skip相加。`run_dynamic_frame_pipeline.sh`的block48/56/62/66合流不再把projected、skip拉回Linux经NumPy处理后再推回Windows。frame16800 block62回归中新旧输出SHA-256均为`a956bc31...9bf`，逐byte exact。四处合流每帧消除约1.13GB跨机传输；仍保留Windows本地文件I/O，下一步由常驻D3D12 ping-pong resource继续消除。
+
+`d3d12_block1_test.cpp`与`d3d12_block128_test.cpp`新增按shader版本／channel／geometry／shift区分的持久化CSO cache，默认落在exe同目录`shader-cache/`。block69冷／热进程wall为3944.228/1129.348ms；block65为3629.476/1615.815ms，分别减少71%和55%。两组冷/热输出SHA一致，且block65对历史pipeline输出逐byte exact。正式AMD Lab runner已替换。cache只消除重复HLSL编译，不改变最终路线：层间tensor仍需进入同一device的ping-pong default-heap resources。
+
+32-channel runner的attention原先在每个query/key与softmax两遍中重复计算QKV。新增独立QKV precompute pass与`tokens×48` default-heap buffer后，block69 submit-to-fence由346.684ms降至首测308.353ms、正式热测312.639ms，约10–11%；shift=0的block69及shift=1的block68均与旧pipeline输出逐byte exact。尝试每个8×8 window以12KB groupshared缓存Q/K/V，虽输出exact但耗时331.767ms，因LDS occupancy代价高于global read收益，已撤回。正式runner保留QKV precompute，不保留groupshared分支。
+
+### 2026-09-04：DXC／Shader Model 6 首个数量级加速
+
+新增`d3d12_realtime_capability_probe.cpp`直接查询RX9070XT驱动：最高Shader Model 6.8、WaveOps=true、wave lane 32–64、Native16BitShaderOps=true。AMD Lab安装Microsoft DirectXShaderCompiler稳定版1.9.2602.24到独立`D:\DLSSNR-Lab\dxc`，zip SHA-256为`cf658aac...3b4`，不修改系统PATH。
+
+先以SM6.2 native FP16分别替换QKV与FFN：单层block69最低43.701ms、correlation0.999999939；四层66–69累计correlation0.999998963。随后做控制变量发现主要收益并非FP16，而是DXC对FFN固定循环的展开与SM6 codegen：改用`block1_ffn_sm6_fp32.hlsl`保持全FP32，block69降至24.582ms且对旧输出逐byte exact，较346.684ms快14.1倍。blocks66–69连续耗时24.485/25.971/25.360/25.164ms，合计100.980ms，最终block69仍逐byte exact。FP16 QKV自身略慢且有微小误差，正式cache已恢复FP32；`build_block1_sm6_shaders.ps1`只构建无损SM6 FP32 FFN。
+
+实验性的`block1_ffn_fp16.hlsl`与`block1_qkv_fp16.hlsl`保留作后续精度／吞吐研究，不进入当前正式动态链。下一步把相同DXC控制变量方法推广到64/128/256/512 runner；同时最终实时化仍需要单device graph消除四层约1秒的进程与文件wall time。
+
+同法随后落到64-channel FFN（`block64_ffn_sm6_fp32.hlsl`）：block65从912.447ms降至35.721ms，25.5倍，单层逐byte exact。decoder blocks62–65分别33.833/27.033/34.964/27.152ms，encoder blocks5–8分别35.877/27.890/28.656/38.728ms；两组各自串联到末层后均与旧pipeline逐byte exact，覆盖shift 0/1/2/3全部路径。32/64通道统一构建入口改为`build_sm6_ffn_shaders.ps1`。
+
+128-channel首次照搬全展开策略失败：候选shader运行超过一分钟仍未结束，确认160×128展开跨过寄存器／指令体积阈值；仅改DXC动态loop也只把block13从681.549ms降至641.796ms。随后把FFN改成`token×160` expand与`token×128` project两pass，复用每token 384-float QKV scratch保存hidden，block13降至95.396ms；DXC SM6两pass进一步为89.630ms。blocks9–13串联最终逐byte exact。
+
+同一两pass结构扩到256与512 channels：256的288 hidden写QKV scratch，block55从251.426ms降至22.407ms（11.2倍）；blocks49–55热层约20–25ms，七层累计逐byte exact。512 gated FFN在expand线程同时计算gate/up并写256 hidden，block47从122.174ms降至23.053ms（5.3倍）；decoder blocks40–47与encoder blocks23–29分别串联，最终均逐byte exact。至此普通Swin的32/64/128/256/512五档宽度都已有无损加速路径；剩余主要GPU热点转为ViT31–38、attention、downsample/enter与block70，且仍需合并为单device resident graph。
+
+### 2026-09-04：ViT attention去32倍重复softmax
+
+`d3d12_vit_block31_test.cpp`先取消branch/hidden/QKV/attention四份诊断readback，只复制最终result，block31 submit-to-fence从234.453ms降至224.476ms，输出逐byte exact。随后加6点GPU timestamp，基线分解为Expand45.111ms、Contract48.091ms、QKV16.913ms、Attention119.646ms、Projection2.197ms。
+
+旧Attention以`query×channel`为线程，每个head的32个channel重复计算完全相同的QK dot与softmax。改为`query×head`线程后，每个线程只算一次softmax并同时累计32维V；Attention降至33.964ms（3.52倍），block31总时间降至约148–173ms，输出逐byte exact。完整blocks31–38重跑后，最终block38与改动前逐byte exact。
+
+ViT五个shader新增按代码版本与token数区分的持久CSO cache；2160-token block31冷／热进程wall为4207.624/574.243ms，输出逐byte exact。热wall仍约为GPU本体的3–4倍，说明常驻device/weights/resources依然是硬要求，cache不替代resident graph。
+
+Expand/Contract按64输入分块共享实验出现非对称结果：Contract把branch激活从“每个输出重复计算”变成每个输入只算一次，由约58.5ms降至6.5–7.4ms；Expand只有读复用，反因barrier从约40–45ms回退到89.469ms，故正式版只保留tiled Contract。组合后block31约100.358ms且逐byte exact。
+
+ViT Attention进一步用SM6.6 Wave32改写：一个32-lane wave负责一个query×head，每lane负责一个维度，QK dot经`WaveActiveSum`归约；Attention从约34.1ms降至22.873ms。block31为92.987ms；完整blocks31–38每层75.753–105.575ms、合计约770ms，最终block38仍与优化前逐byte exact。源码/构建入口为`vit_attention_wave32.hlsl`与`build_vit_wave_shaders.ps1`。当前ViT最大剩余热点是Expand约27–56ms/层，下一步需矩阵指令或更合适的GEMM tiling。
+
+Expand随后改为每线程同时累计相邻4个输出（`float4`），保持每个输出的1024项累加顺序不变。单block首次从约40–44ms降至24.283ms；热态完整八层中为8.278–19.228ms。`float8`实验为24.171ms，与`float4`无实质差异且寄存器压力更高，正式版保留`float4`。最终组合为float4 Expand＋tiled Contract＋Wave32 Attention：blocks31–38每层57.692–67.884ms，GPU合计约496ms，相对最初约1.87秒快3.8倍；最终block38逐byte exact。当前下一热点为QKV约15.4–15.9ms/层，以及Attention约23ms/层。
+
+QKV尝试拆为`token×3072`矩阵pass＋32-thread归一化pass，复用已消费完的branch资源。首版归一化unroll令block31仅有极小误差；恢复顺序loop后block31逐byte exact，QKV从约15.6ms降至约12.4ms。然而完整八层暴露跨block累积：最终block38 correlation0.993641706、NRMSE0.113683、exact仅24.84%。3ms/层收益不值得破坏主链，正式runner已完整回退单pass QKV，并重跑blocks31–38确认最终block38再次逐byte exact。教训：E4M3使单层差异消失不代表多层稳定，ViT优化必须做八层累计验收。
+
+回退后正式八层每层57.043–80.775ms；Expand8.154–29.414ms、Contract6.202–7.492ms、QKV15.345–15.932ms、Attention22.965–24.001ms。下一步不再单独改QKV累加拓扑，优先优化普通Swin attention与构建resident graph。
+
+### 2026-09-04：普通Swin attention按head并行
+
+`d3d12_block128_test.cpp`新增GPU timestamp。128-channel block13分解为FFN expand5.143ms、project5.345ms、QKV9.628ms、Attention32.959ms，其余约37ms为barrier/copy/readback。旧Attention一线程串行处理全部head并直接做projection；首版拆成`token×head`与独立projection后因仍调用加载完整64维的`qkv()`，Attention反而49.924ms。改为只加载当前16维的`qkv_head()`后，Attention降至0.700ms、projection1.183ms，block13总GPU降至31.489ms，逐byte exact。
+
+同一结构推广到64/256/512 channels。热态代表层：block65约25–34ms（attention约1.2–1.5ms）；block55约19–23ms（attention约0.6–0.7ms）；block47约20–25ms（attention约0.4–0.8ms）。blocks9–13、57–61、40–47、49–55、62–65分别累计重跑，段末输出全部与旧pipeline逐byte exact。普通Swin attention至此不再是主热点，下一步优先resident graph与QKV/FFN。
+
+### 2026-09-04：首个多层resident D3D12 graph
+
+新增`d3d12_swin_chain.cpp`，把同构Swin段放入单一D3D12 device与一次command-list提交：多套权重一次上传，两个main tensor default-heap ping-pong，FFN hidden/QKV/attention scratch跨层复用，只在入口读取FP32、末端一次readback。首版128-channel样板误把FFN scratch stride设为192，实际shader写`t*384+j`，N=1即出现NRMSE0.94%；改回standalone一致的384后，N=1与N=5均逐byte exact。
+
+decoder blocks57–61 resident执行含最终64MiB copy为115.188ms；端到端进程wall从旧五进程2944.246ms降至649.723ms，4.53倍。encoder blocks9–13同一宿主为102.950ms，最终block13逐byte exact。`run_dynamic_encoder_raw13.ps1`与`run_dynamic_decoder_raw57_61.ps1`已正式切换resident chain，两段每帧不再生成/重读八份中间64MiB张量。下一步把相同资源图泛化到64/256/512与ViT，并最终嵌入游戏addon直接消费FFX textures。
+
+resident宿主随后按权重record大小泛化geometry/channel/hidden/head：256-channel blocks49–55为138.117ms、blocks15–21为149.621ms；512-channel支持H72计算/H68有效行回写，blocks40–47为318.503ms、blocks23–29为276.278ms；64-channel先把单pass FFN改成96-hidden两pass，blocks62–65为92.023ms、blocks5–8为100.220ms。六段末端均与旧多进程pipeline逐byte exact，且相应PowerShell/bash入口已全部切换resident chain。普通Swin目前只剩32-channel blocks1–4与66–69尚未resident化。
+
+新增`d3d12_swin32_chain.cpp`覆盖32-channel首尾四层，加载既有SM6 FP32 FFN、QKV precompute与attention CSO，在两张267MB main buffer间ping-pong并复用QKV/feature scratch。blocks1–4含末端copy为56.594ms，blocks66–69为64.085ms，两端均逐byte exact；`run_dynamic_encoder_raw13.ps1`与`run_dynamic_frame_pipeline.sh`已切换该宿主。至此blocks1–69所有普通Swin连续段均已resident化；剩余多进程边界是stage downsample/enter、ViT31–38、四次decoder merge与block70。
+
+### 2026-09-04：ViT八层resident graph
+
+新增`d3d12_vit_chain_amd.cpp`：固定读取blocks31–38八套Expand/QKV参数与共享Contract/Projection参数，在CPU一次计算各层Q/K head scale；GPU侧只创建一个device与一套5个PSO，八层权重/scales一次上传，main双缓冲，branch/hidden/QKV/attention四类default-heap scratch全程复用。八层只提交一个command list，只在入口读block30、末端读回block38。
+
+frame16800实测blocks31–38为513.721ms（含最终8.4MiB copy），输出对旧八进程block38逐byte exact。进程wall从4211.536ms降至1245.663ms，3.38倍。`run_dynamic_vit_raw.ps1`已正式切换resident宿主。至此网络各连续Swin/ViT段均已resident；但GPU计算仍远未达到实时，尤其ViT约0.51秒与block70约0.8秒，下一步需将stage/skip/block70并入统一graph并继续做GEMM级优化。
+
+### 2026-09-04：block70移除Linux stitch与3.2GB SSH
+
+新增Windows原生`prepare_block70_general_input.cpp`，直接从AMD机本地block69/block0生成129600×1024 tile records；frame16800输出530,841,600 bytes，SHA-256与原Linux NumPy prepare完全一致。`d3d12_block1_test.cpp`增加仅由`block70-body-compatible.bin`触发的tiled input索引，直接消费prefix的`[tile,8,8,32]`布局并输出HWC，不再需要`stitch_block70_prefix.py`。其body输出与旧stitch路径265,420,800 floats逐byte exact，GPU从旧约786ms降至564.016ms。
+
+`run_dynamic_frame_pipeline.sh`已删除block69/block0 pull、530MB input push、1.06GB prefix pull与1.06GB mosaic push，改为Windows本地prepare→prefix→tiled body。frame16800继续跑outconv后的最终RGBA与旧结果逐byte exact；当前四进程本地block70链wall为10,094.679ms。剩余十秒主要来自530MB/1.06GB/1.06GB中间文件和三次D3D12 device生命周期，下一步必须合并prefix/body/outconv为单device resident block70 graph。
+
+新增`d3d12_block70_chain.cpp`，在单device/单command-list内串联sparse prefix、tiled 1H body三pass与outconv；prefix/body保持default heap，不再产生两份1.06GB中间文件，只读回最终132.7MB RGBA。首版读取现成tile input时GPU＋最终copy为95.885ms，进程wall2172.156ms，最终RGBA逐byte exact。随后把main/skip→tile record的CPU prepare也并入同一进程，直接读block69/block0/backbuffer，wall进一步降至1372.875ms，结果仍逐byte exact。`run_dynamic_frame_pipeline.sh`现已切换单进程resident block70，不再生成530MB input、1.06GB prefix或1.06GB body文件。
+
+严格边界：1.37秒仍非实时，其中大部分是进程启动、读取两份267MB activation与132MB backbuffer、CPU tile重排及最终132MB写盘；GPU本体约96ms也仍超过一帧预算。下一步是把block70接到上游resident output resource并直接写游戏backbuffer，彻底移除CPU prepare与文件I/O，同时继续优化prefix/body kernel。
+
+block70 resident加入6点GPU timestamp后，热态分解为prefix11.242ms、FFN47.684ms、QKV11.889ms、attention13.912ms、outconv2.823ms。新增`block70_ffn_sm6_fp32.hlsl`与`build_block70_sm6_shader.ps1`，保持tiled索引和FP32累加，仅换DXC/SM6.2 codegen；输出逐byte exact。首跑受全GPU降频影响各pass一起变慢，连续热跑后FFN降至20.811ms，resident总GPU＋copy由91.605ms降至70.222ms。当前各段已较均衡，继续实时化优先消除CPU/file边界并把graph嵌入addon。
+
+QKV同样尝试DXC/SM6.2 FP32，但从热态约17ms回退到33.763ms，最终RGBA虽correlation近1仍有MAE约`7e-9`、exact99.9947%，性能/无损两项均失败，正式cache与构建脚本已恢复SM5 QKV。该实验源码`block1_qkv_sm6_fp32.hlsl`仅保留作反证。
+
+新增Windows原生`preblock_tiles_to_hwc.cpp`，复刻32-channel token-bit mapping、permutation排序、ties-to-even E4M3量化及SATFINITE解码。frame16800生成267,386,880-byte HWC，SHA-256 `3ba89bfe...9c56`与Linux Python路径完全一致。`run_dynamic_frame_pipeline.sh`已改为AMD本地转换，每帧再消除267MB block0 pull与267MB HWC push。
+
+新增`prepare_block39_dynamic_input.cpp`：在AMD机本地取ViT block38前34行做2×nearest upsample，并与68×120×512 block30 skip拼成68×120×1536。frame16800输出50,135,040 bytes，SHA-256与原Python join完全一致；固定`block39-logical-effective-bias.bin`不再每帧重造/上传。新增`pad_hwc_rows.cpp`本地把block30的34×60×1024补成36行，8,847,360-byte输出SHA亦与Python一致。正式pipeline已删除这两处中段pull/push；blocks1–70中间数据至此不再跨Linux/Windows，跨机仅剩输入Color/backbuffer预处理与最终验证输出。
+
+block70 QKV的DXC/SM6 FP32对照从约17ms回退到33.763ms，且最终RGBA出现MAE约`7e-9`（exact99.9947%），已恢复SM5 QKV；实验源码仅留反证。当前block70正式热态约70.222ms。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -1,2 +1,5 @@
 param([int]$Frame)
-$ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab';$Source="$L\raw-$Frame-block30.f32";foreach($b in 31..38){$qm=if($b-eq31){'block31-qkv-effective.fp8'}else{"block$b-qkv-main.fp8"};$qw=if($b-eq31){'block31-qkv-work-effective.f16'}else{"block$b-qkv-work.f16"};$out="$L\raw-$Frame-block$b.f32";& "$L\d3d12_vit_block31_test.exe" "$L\block$b-vit-expand-effective.f16" "$L\block31-vit-contract.f16" "$L\block31-vit-contract-skip.f16" "$L\$qm" "$L\$qw" "$L\block31-vit-projection.f16" "$L\block31-vit-projection-skip.f16" $Source $Source $out;if($LASTEXITCODE){throw "vit$b"};$Source=$out}
+$ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab'
+& "$L\d3d12_vit_chain_amd.exe" `
+  "$L\raw-$Frame-block30.f32" "$L\raw-$Frame-block38.f32"
+if($LASTEXITCODE){throw 'resident blocks31-38 failed'}

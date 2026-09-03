@@ -1,2 +1,8 @@
 param([int]$Frame)
-$ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab';$src="$L\raw-$Frame-block56.f32";$sh=@{57=0;58=1;59=3;60=2;61=0};foreach($b in 57..61){$out="$L\raw-$Frame-block$b.f32";& "$L\d3d12_block128_test.exe" "$L\block$b-body-effective.bin" $src $out 480 272 $sh[$b];if($LASTEXITCODE){throw "block$b"};$src=$out}
+$ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab'
+& "$L\d3d12_swin_chain.exe" `
+  "$L\raw-$Frame-block56.f32" "$L\raw-$Frame-block61.f32" `
+  "$L\block57-body-effective.bin" "$L\block58-body-effective.bin" `
+  "$L\block59-body-effective.bin" "$L\block60-body-effective.bin" `
+  "$L\block61-body-effective.bin"
+if($LASTEXITCODE){throw 'resident blocks57-61 failed'}

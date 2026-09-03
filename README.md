@@ -14,6 +14,44 @@
 
 同帧边界现已闭合。`run_dynamic_frame_pipeline.sh FRAME`只接受同一编号的FFX Color与override前4K backbuffer，连续执行raw blocks0–69、通用block70 prefix/body/outconv，再原子发布R10。frame5400主菜单与frame16800实际洞穴场景均完整跑通，packed SHA分别为`e2f63091...6480`与`923c35a7...f3e9`；frame16800的Color/Depth/Motion/backbuffer四路均非静态，最终游戏画面无条纹。两份输出又在同一游戏进程按场景→主菜单→场景热切换，probe于frame600/3600/6000确认三次加载。证据见`dlss5-amd-synchronous-dynamic-validation.json`。严格状态仍未完成：frame16800端到端约484秒，现有多进程、逐层建D3D12设备和GiB级磁盘/SSH往返必须改成常驻GPU graph，才能称为实时动态渲染。
 
+实时化首轮已开始：实测单帧中间FP32文件10.36GB；block69进程wall 1846.427ms而GPU fence仅346.684ms。新增Windows原生`merge_upsample_skip.cpp`并替换block48/56/62/66的Linux NumPy往返，block62逐byte回归通过，每帧先消除约1.13GB SSH传输。它仍是过渡步骤，最终要求是层间tensor全留在常驻D3D12 resource。
+
+现有32-channel与64/128/256/512-channel runner又加入版本化持久CSO cache。block69冷→热wall为3944→1129ms，block65为3629→1616ms，输出均逐byte不变；它消除了重复shader编译，但尚未消除逐层device创建和FP32文件读写。
+
+全分辨率32-channel attention已补QKV预计算，block69 GPU fence从346.684ms降至约308–313ms；shift=0/1两类输出均逐byte exact。12KB groupshared window缓存实测反而回退到331.767ms，已撤销。当前naive FP32/SM5.1 kernel本身仍远超实时预算，后续除常驻graph外还必须转FP16与wave/matrix级实现。
+
+随后硬件探针确认RX9070XT支持SM6.8、Wave32/64与native 16-bit，AMD Lab已部署DXC 1.9.2602.24。关键控制实验推翻“必须先牺牲精度上FP16”：仅把32-channel FFN改由DXC以SM6.2 FP32编译，block69便从346.684ms降至24.582ms，且逐byte exact；blocks66–69合计100.980ms，最终仍逐byte exact。FP16 QKV反而略慢且有微误差，未进入正式链。
+
+同一无损路线扩到64-channel：block65从912.447ms降至35.721ms，25.5倍；encoder blocks5–8与decoder blocks62–65四种shift串联后均逐byte exact。统一构建入口现为`build_sm6_ffn_shaders.ps1`。
+
+更宽层不能全展开，已改成expand/project两pass并复用QKV scratch：128-channel block13从681.549ms降至89.630ms；256-channel block55从251.426ms降至22.407ms；512-channel gated block47从122.174ms降至23.053ms。blocks9–13、23–29、40–47、49–55四段累计回归全部逐byte exact。普通Swin五档宽度至此均已进入无损加速路径，下一热点是ViT/attention与常驻graph。
+
+ViT31–38已开始优化：只读回最终result先省约10ms；GPU timestamp把旧block31拆为Expand45.111/Contract48.091/QKV16.913/Attention119.646/Projection2.197ms。Attention改为每个query×head只算一次softmax并同时累计32维V后降至33.964ms（3.52倍），完整blocks31–38最终输出逐byte exact。五个ViT shader亦加入持久CSO cache，单block冷/热wall为4208/574ms；常驻graph仍是消除剩余wall开销的必要条件。
+
+随后64值分块共享令Contract从约58.5ms降至6.5–7.4ms；同法对Expand反而变慢，已撤回。Attention再改为SM6.6 Wave32，以`WaveActiveSum`并行32维QK，降至22.873ms。block31约92.987ms，完整八层GPU约770ms，最终block38逐byte exact。当前ViT最大热点转为Expand。
+
+Expand改为每线程累计相邻4个输出后，热态降至8.3–19.2ms；`float8`无额外收益，保留`float4`。ViT正式组合现为float4 Expand＋tiled Contract＋Wave32 Attention，完整八层每层57.7–67.9ms、合计约496ms，较最初约1.87秒快3.8倍，最终block38仍逐byte exact。下一热点是QKV与Attention本体。
+
+QKV矩阵／归一化两pass曾把单层约15.6ms降至12.4ms，且block31逐byte exact；但八层累计后block38降至correlation0.993642、NRMSE11.37%，故已撤回。正式单pass QKV恢复后八层最终再次逐byte exact。后续优化必须保留完整八层累计门，不能用单block量化相等替代。
+
+普通Swin attention现已按`token×head`并行并把projection拆成独立pass；专用`qkv_head()`只加载当前16维，避免每head白读完整QKV。128-channel Attention从32.959ms降至0.700ms，block13从约90ms降至约25–31ms。64/256/512通道attention也降至约0.4–1.5ms；blocks9–13、40–47、49–55、57–61、62–65累计回归全部逐byte exact。普通Swin当前主要计算热点已转为QKV/FFN，系统级热点仍是逐层进程和文件I/O。
+
+首个真正多层resident graph已落地：`d3d12_swin_chain.cpp`在单device/单command-list内用default-heap ping-pong连续执行多层，只在入口/末端传输。128-channel blocks57–61含最终copy为115.188ms，进程wall从2944.246ms降至649.723ms（4.53倍）；blocks9–13为102.950ms。宿主随后泛化到256/512/64通道：blocks15–21/49–55、23–29/40–47、5–8/62–65均已resident化，六段末端全部逐byte exact。普通Swin仅剩32-channel首尾两段尚未resident。
+
+32-channel另由`d3d12_swin32_chain.cpp`收束：blocks1–4为56.594ms，blocks66–69为64.085ms，均含最终copy且逐byte exact，并已接入正式动态脚本。至此blocks1–69内所有普通Swin连续段均不再逐层创建device或落中间文件；下一步是ViT八层resident与跨stage整图合并。
+
+ViT八层resident亦已完成：`d3d12_vit_chain_amd.cpp`一次上传八套参数，复用main ping-pong与branch/hidden/QKV/attention scratch，单device/单command-list执行blocks31–38。frame16800含最终copy为513.721ms，block38逐byte exact；wall从4211.536ms降至1245.663ms（3.38倍），正式ViT脚本已切换。当前所有连续Swin/ViT段均resident化，剩余是跨stage统一graph和GPU本体继续加速。
+
+block70先移除跨机拼接：Windows原生prepare与旧Python输出SHA一致；body shader直接读取tiled prefix，不再生成HWC mosaic，输出逐byte exact且GPU约786→564ms。正式脚本每帧消除约3.2GB SSH传输。完整本地prepare→prefix→body→outconv wall仍为10.095秒，最终RGBA exact；下一步是把这四步收进单device resident block70 graph。
+
+block70 resident graph随后完成：`d3d12_block70_chain.cpp`单device串联prefix/body/outconv，中间1.06GB张量只留显存，GPU＋最终copy为95.885ms；再把CPU tile prepare并入同一进程后wall从10.095秒降至1.373秒，最终RGBA仍逐byte exact。正式pipeline已切换该单进程入口。要到实时仍需与上游/游戏backbuffer共享GPU resource并继续把约96ms计算压低。
+
+block70 GPU timestamp进一步定位prefix/FFN/QKV/attention/outconv约11.2/47.7/11.9/13.9/2.8ms；FFN换成专用DXC SM6.2 FP32后热态降至20.811ms，总GPU＋copy降至70.222ms且逐byte exact。当前主要边界转为上游activation与游戏backbuffer仍经CPU/file传递。
+
+DXC QKV实测更慢且有极小非exact，已撤回。另新增Windows原生`preblock_tiles_to_hwc.cpp`，frame16800输出SHA与原Python完全一致；正式pipeline不再跨机pull/push两份267MB block0张量。当前跨机数据主要剩输入Color/backbuffer、block39准备与最终RGBA/R10。
+
+block39 join与block30补行也已改成Windows原生工具，输出SHA均与原Python路径完全一致；固定block39 bias矩阵不再每帧重造。至此blocks1–70所有中间tensor都留在AMD机，Linux/Windows传输只剩帧输入预处理和最终验证产物。下一项权威指标是重跑完整frame16800后的新端到端wall。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。
