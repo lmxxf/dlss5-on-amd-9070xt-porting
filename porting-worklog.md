@@ -1495,6 +1495,10 @@ blocks8–14同帧atlas随后闭合：block8 downsample main在0x58 blob q9，bl
 
 block14 candidate decode的纵向连续性为负，直接513→256拟合仅约0.18，确认它和block21/29/55/61/65一样不是canonical target。将AMD block13的2×2×128 patch直接交给真实block15 output作下一层裁判，held-out correlation恢复到0.952174。以此纯AMD block15边界继续重跑16–21，逐层全量correlation为0.956762/0.950935/0.926201/0.897853/0.881657/0.867947，与中途使用live block14的基线几乎一致。严格入口前移为live block8 downsample main；下一段进入blocks5–8。
 
+blocks4–8的296MiB同帧atlas完成：block4 main来自0x60 blob q8，blocks5–7 output为q1，block8 main为0x58 blob q9；全部copy/sync/readback为0。H544×W960×C64 blocks5–7按none/XY/Y在RX9070XT执行约0.91–0.98秒，checkerboard held-out correlation为0.976507/0.940912/0.881387。
+
+block8 candidate decode同样不是canonical；AMD block7的2×2×64 patch经block9下一层裁判得到held-out correlation0.970651。由该边界连续重跑blocks10–13、block14→15、16–21，最终block21对live correlation0.723170；主要下降发生在第二个downsample桥，但整条block4→21信号仍未坍缩。严格入口前移到live block4 downsample main，下一步闭合blocks0–4后接整条encoder/ViT/decoder做最终画面验收。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

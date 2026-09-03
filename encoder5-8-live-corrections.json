@@ -1,0 +1,16 @@
+{
+  "scope": "fixed-frame encoder blocks 5-8",
+  "block5_7_shape": [544, 960, 64],
+  "block8_output_shape": [272, 480, 128],
+  "fit": "65-to-64 affine for blocks 5-7; 2x2x64 patch to block9 next-layer target for block8",
+  "shift_modes": {"5": "none", "6": "xy", "7": "y"},
+  "heldout_correlation": {
+    "5": 0.976507,
+    "6": 0.940912,
+    "7": 0.881387,
+    "8_to_9_next_layer": 0.970651
+  },
+  "continuous_block4_to_block21_correlation": 0.723170,
+  "strict_input_boundary": "live block4 downsample main",
+  "note": "The block8 physical candidate is not canonical; block9 output is the authoritative next-layer judge."
+}
