@@ -338,10 +338,10 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
   QueryPerformanceCounter(&end);
   D3D12_RANGE range{0, static_cast<SIZE_T>(readbackSize)};
   readback->Map(0, &range, &mapped);
-  std::ofstream(argv[10], std::ios::binary).write(
-      static_cast<const char *>(mapped), readbackSize);
   auto *output = reinterpret_cast<const float *>(
       static_cast<const uint8_t *>(mapped) + readbackOffsets[4]);
+  std::ofstream(argv[10], std::ios::binary).write(
+      reinterpret_cast<const char *>(output), sizes[4]);
   auto *wanted = reinterpret_cast<const float *>(oracle.data());
   double ae = 0, se = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
   for (UINT i = 0; i < tokens * 1024; ++i) {

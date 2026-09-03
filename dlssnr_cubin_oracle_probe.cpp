@@ -1264,6 +1264,14 @@ void hook_forward(
     if (optional2_dispatch_result != 0) return;
     g_copy_ready.store(true);
 
+    if (false && kCaptureBlock0Color && g_queue != nullptr && !g_finished.exchange(true)) {
+        g_queue->AddRef();
+        if (HANDLE thread = CreateThread(
+                nullptr, 0, readback_worker, g_queue, 0, nullptr)) {
+            CloseHandle(thread);
+        }
+    }
+
 
     FILE *file = _wfopen(kLogPath, L"ab");
     if (file != nullptr) {

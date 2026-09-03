@@ -31,13 +31,14 @@ static void write_file(const char *path, const void *data, size_t size) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 6 && argc != 7) {
+    if (argc < 6 || argc > 8) {
         std::fprintf(stderr,
-            "usage: %s cubin block0.weights input-8x8-rgba32f main.fp8 ds.fp8 [texture-slot 0..3]\n",
+            "usage: %s cubin block0.weights input-8x8-rgba32f main.fp8 ds.fp8 [texture-slot 0..3] [gaussian-scale]\n",
             argv[0]);
         return 2;
     }
-    const int texture_slot = argc == 7 ? std::atoi(argv[6]) : 3;
+    const int texture_slot = argc >= 7 ? std::atoi(argv[6]) : 3;
+    const float gaussian_scale = argc == 8 ? std::strtof(argv[7], nullptr) : 0.0f;
     if (texture_slot < 0 || texture_slot > 3) return 2;
     const auto weights = read_file(argv[2]);
     const auto input = read_file(argv[3]);
@@ -105,9 +106,11 @@ int main(int argc, char **argv) {
     for (int offset : {0x78, 0xd0, 0xd4})
         std::memcpy(params + offset, &extent, sizeof(extent));
     const unsigned zero = 0;
+    const unsigned gaussian_enabled = gaussian_scale != 0.0f;
     std::memcpy(params + 0x88, &zero, sizeof(zero));
     std::memcpy(params + 0x8c, &zero, sizeof(zero));
-    std::memcpy(params + 0xb0, &zero, sizeof(zero)); // Gaussian input scale
+    std::memcpy(params + 0xb0, &gaussian_enabled, sizeof(gaussian_enabled));
+    std::memcpy(params + 0xb4, &gaussian_scale, sizeof(gaussian_scale));
     std::memcpy(params + 0xc0, &zero, sizeof(zero));
     const unsigned long long dimensions = 8ull | (8ull << 32);
     const int texture_offsets[] = {0x00, 0x08, 0x18, 0x20};

@@ -1,0 +1,23 @@
+{
+  "status": "validated through block69; block70 input packing remains open",
+  "fixed_input": "seq0 prefill allocation",
+  "block0": {
+    "implementation": "3x3x32 local effective kernel plus coordinates",
+    "amd_ms": 22.892,
+    "cosine": 0.895223,
+    "mae": 0.124888,
+    "next_layer_block2_correlation": 0.981650
+  },
+  "execution": "continuous AMD execution from seq0 through blocks0-69 without NVIDIA intermediate activation injection",
+  "block22_to_block23_heldout_correlation": 0.938634,
+  "block69": {
+    "nvidia_view_token_bits": [5, 3, 4, 2, 0, 1],
+    "heldout_correlation": 0.996528,
+    "mae": 0.275548
+  },
+  "block70": {
+    "status": "not yet passed",
+    "failed_final_rgb_heldout_correlation": 0.430252,
+    "diagnosis": "block70-prefix-effective expects the original physical bank record ordering; canonical 4x4 HWC flattening is not its input contract"
+  }
+}

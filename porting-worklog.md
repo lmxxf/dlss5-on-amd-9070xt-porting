@@ -1525,6 +1525,12 @@ block22与blocks23–29按5MiB重新同帧捕获，后者H68×W120×C512空间�
 
 block0继续审计：固定preset的Color在network前后均为RGB0/A1，AMD RGB-only surrogate跨tile几乎周期重复，而live输出有明显tile间变化，缺失的是kernel内Box–Muller Gaussian／seq0状态。block0 output的720种token-bit候选中`(5,3,2,0,1,4)`使空间连续性从H/V=0.9069/0.5234提升到0.9069/0.9060，但它仍只是smoothness候选。seq0 prefill按global view解码后，对block0 candidate直接affine held-out仅0.0840，对block2下一层target却达0.981858；结论是prefill抓取和空间信息正确，尚缺block0 output的basis-exact view或Gaussian状态显式重建。目标继续未完成。
 
+seq0 prefill的3×3×32局部邻域对block0平滑view做空间留出，correlation从单点0.084跃升至0.895848。`d3d12_block0_prefill_test.cpp`将291→32有效映射放到RX9070XT，全图1920×1088耗时22.892ms、cosine0.895223、MAE0.124888；输出继续进入AMD block1后，既有block1→2校正无需重拟合仍达0.981650。这消除了“NVIDIA block0 activation作为入口”的旧硬边界。
+
+随后从seq0连续执行AMD blocks0–69，中途未换回任何NVIDIA activation。block4/8/14/22均实际执行body、archive matrix、AMD 2×pool及下一stage enter/inpview；block22→23 held-out0.938634。ViT31–38、decoder39–69均从该连续链输入重跑。block69原C32 view位序错误；720候选恢复`(5,3,4,2,0,1)`后H/V连续性0.9705/0.9813，当前AMD block69对NVIDIA ROI的33→32 held-out correlation0.996528、MAE0.275548，证明0–69主链健康。
+
+block70最终验收仍未过。先后测试旧block69 shortcut、block66 phase8与真正`block70-prefix-effective`，RGB held-out最高仅0.430252。由于同一AMD block69对NVIDIA已0.9965，根因锁定为prefix effective的输入合同：1024→2048矩阵消费原global physical banks按local oracle排列的记录，不能把canonical 4×4×32 HWC直接flatten。下一步只需恢复block70 main/skip global bank→local record的精确排列，再跑body/head；不能再靠末端RGB拟合掩盖该错误。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

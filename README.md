@@ -13,6 +13,7 @@
 - `d3d12_weight_arena_test.cpp`：最小 Windows D3D12 权重宿主；强制选择 AMD adapter，上传完整 FP16 arena 到 default heap、读回逐字节校验，并由 HLSL compute shader 按 153 个 record offset 实际读取权重。
 - `block0-tensor-layout.json`：block0 的 10 个内部 FP16 张量边界与形状；元素数精确闭合到 10,848。
 - `block0-live-view-candidate.json`：严格审计后的block0 view诊断。720种token-bit候选中最佳空间连续性H/V=0.906857/0.906012；seq0 prefill对该view直接affine仅0.084，但经block2下一层裁判为0.981858，说明输入抓取正确、block0输出basis仍未exact闭合。
+- `d3d12_block0_prefill_test.cpp` / `block0-prefill-effective.bin` / `seq0-to-block69-amd-validation.json`：RX9070XT从真正seq0 prefill执行3×3 block0 effective后连续跑到block69，不注入NVIDIA中间activation。block0 cosine0.895223，进入block2仍有0.981650；最终block69对NVIDIA held-out0.996528。剩余硬缺口仅为block70 global physical bank→prefix的正确输入排布。
 - `block0_reference.py`：block0 的可读 FP32 参考实现；覆盖 adapter、depthwise、FFN 多项式／skip 和当前待 NVIDIA 中间层校准的 8×8 cosine attention。
 - `infer_fused_layouts.py` / `fused-layouts.json`：自动闭合 32／64／128／256-channel fused-Swin record 的重复张量容量；明确区分容量闭合与尚待 unswizzle 的 tensor-core 物理排列。
 - `dlssnr_layer_oracle_probe.cpp`：安全 hook 第一条 1H forward，导出真实网络尺寸、GPU VA、CubinBackendNGX／kernel backend live object 链，供定位 NvAPI dispatch。
