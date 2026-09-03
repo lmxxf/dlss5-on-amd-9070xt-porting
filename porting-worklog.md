@@ -1439,6 +1439,8 @@ live几何亦完成校正。post grid481×273对应有效480×272 tiles；standa
 
 为获得可见验收图，surface/Color捕获改到tile对齐ROI origin=(2304,576)，size256×144；对应main tile origin=(288,72)，skip从raw allocation第二个64MiB page读取。NVIDIA图中蓝色球体轮廓清晰。archive final head直接使用时AMD内容幅度近零，但32-channel body对目标仍保留强线性信息：只用checkerboard一半像素拟合33→3矩阵，另一半RGB correlation0.984375、MAE0.007192。全图矩阵由RX9070XT执行0.607ms，RGB correlation0.984697、MAE0.007156，生成图恢复球体位置、轮廓与明暗方向。该结果闭合“live NVIDIA block69 raw→AMD block70”；上游0–69仍未统一替换为AMD输出，故71-block总目标继续未完成。
 
+尺度关系进一步纠正：live block69有效空间为1920×1088，block70 prefix把4×4 main patch上采样为8×8 output tile；因此256×144 post ROI只对应128×72 block69区域。此前把144×256 block69再取p10相位得到72×128，是错误几何的补丁，相关输出全部降级。下一主线从live block66的0x60参数同时捕获main/aux/enc0 skip，以正确72×128 ROI在AMD重跑66–69，不再沿用p10下采样。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
