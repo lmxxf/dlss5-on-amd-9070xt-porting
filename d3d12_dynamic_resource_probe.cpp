@@ -92,6 +92,7 @@ bool run_dynamic_pass(reshade::api::command_queue*qwrap,ID3D12Resource*source,co
  ID3D12Device*dev=nullptr;if(FAILED(source->GetDevice(IID_PPV_ARGS(&dev))))return false;
  if(!g_dynamic_ready)g_dynamic_ready=init_dynamic_pass(qwrap->get_device(),dev,desc);
  if(!g_dynamic_ready){dev->Release();return false;}
+ if(!g_external_available){dev->Release();return false;}
  if(g_external_available&&frame%120==0){WIN32_FILE_ATTRIBUTE_DATA data{};if(GetFileAttributesExW(LR"(D:\DLSSNR-Lab\dlss5-output-r10.bin)",GetFileExInfoStandard,&data)&&CompareFileTime(&data.ftLastWriteTime,&g_external_write_time)!=0){if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\dlss5-output-r10.bin)",L"rb")){void*mapped=nullptr;D3D12_RANGE none{0,0};const size_t bytes=(size_t)(desc.Width*desc.Height*4);if(SUCCEEDED(g_external_upload->Map(0,&none,&mapped))){const bool complete=fread(mapped,1,bytes,f)==bytes;g_external_upload->Unmap(0,nullptr);if(complete){g_external_write_time=data.ftLastWriteTime;g_external_loaded=false;log("dynamic external update detected frame=%llu\n",frame);}}fclose(f);}}}
  auto*cmd=qwrap->get_immediate_command_list();const reshade::api::resource src{reinterpret_cast<uint64_t>(source)},tmp{reinterpret_cast<uint64_t>(g_dynamic_texture)};
  if(g_external_available){if(!g_external_loaded){const reshade::api::resource upload{reinterpret_cast<uint64_t>(g_external_upload)};cmd->copy_buffer_to_texture(upload,0,(uint32_t)desc.Width,desc.Height,tmp,0,nullptr);cmd->barrier(tmp,reshade::api::resource_usage::copy_dest,reshade::api::resource_usage::copy_source);g_external_loaded=true;log("dynamic external DLSS5 output loaded frame=%llu\n",frame);}cmd->barrier(src,reshade::api::resource_usage::present,reshade::api::resource_usage::copy_dest);cmd->copy_texture_region(tmp,0,nullptr,src,0,nullptr);cmd->barrier(src,reshade::api::resource_usage::copy_dest,reshade::api::resource_usage::present);dev->Release();return true;}
@@ -132,11 +133,11 @@ void on_present(reshade::api::command_queue*qwrap,reshade::api::swapchain*s,cons
   if(SUCCEEDED(hr)){
    const auto desc=buffer->GetDesc();
    if(report)log("present frame=%llu swapchain=%p native=%p current=%u resource=%p width=%llu height=%u format=%u flags=0x%x\n",n,s,sc,index,buffer,(unsigned long long)desc.Width,desc.Height,(unsigned)desc.Format,(unsigned)desc.Flags);
-   if(n>=600)run_dynamic_pass(qwrap,buffer,desc,n);
    if(n==240||n==480||n%600==0)capture_resource(qwrap,buffer,n,desc,L"dynamic-frame",reshade::api::resource_usage::present);
    if(n%600==0)if(auto*color=g_ffx_color.load())capture_resource(qwrap,color,n,color->GetDesc(),L"ffx-color",reshade::api::resource_usage::shader_resource_non_pixel);
    if(n%600==0)if(auto*depth=g_ffx_depth.load())capture_resource(qwrap,depth,n,depth->GetDesc(),L"ffx-depth",reshade::api::resource_usage::shader_resource_non_pixel);
    if(n%600==0)if(auto*motion=g_ffx_motion.load())capture_resource(qwrap,motion,n,motion->GetDesc(),L"ffx-motion",reshade::api::resource_usage::shader_resource_non_pixel);
+   if(n>=600)run_dynamic_pass(qwrap,buffer,desc,n);
    buffer->Release();
   }else log("GetBuffer current=%u hr=0x%08x\n",index,(unsigned)hr);
  }

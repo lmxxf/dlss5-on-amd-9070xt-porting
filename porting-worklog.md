@@ -1571,6 +1571,8 @@ block70的3840×2176单buffer试验暴露两个执行问题：一维Dispatch超�
 
 画质仍有规则条纹。低强度outconv、去坐标通道、tile DC消除均只能减轻不能根治；且连通用prefix/head仍有条纹，和旧日志“canonical flatten／global bank候选固定帧仅约0.43 correlation”的结论一致。剩余硬缺口明确为block70 local physical record→prefix输入/输出排列，而不是动态性、AMD执行、swapchain回写或Color合成。5090当前SSH超时，待其恢复后必须用多帧controlled oracle解这个排列；目标保持未完成。
 
+条纹归因随后被推翻：直接渲染当时的`dynamic-frame-6600.bin`，未加任何neural也有完全相同的周期条纹；桌面截图却干净。probe代码核对发现present回调先执行fallback typed-UAV tint，再做readback，故所有“base”已被诊断pass污染。修正为capture先于override，且外部输出不存在时完全不运行fallback。新frame5400 R10解码无条纹。把通用head的residual从旧base精确相减后叠到clean R10，完整游戏画面干净；frame5400/19800两份packed SHA不同，并在同一游戏进程于frame1440热更新成功。当前剩余边界不是画质条纹，而是clean base与residual尚非同一capture frame；下一步收敛同步自动管线。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

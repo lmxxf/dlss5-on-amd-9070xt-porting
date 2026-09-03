@@ -1,0 +1,33 @@
+{
+  "status": "clean display-path validation; synchronous automation still pending",
+  "clean_capture": {
+    "frame": 5400,
+    "change": "backbuffer capture moved before output override; diagnostic fallback disabled",
+    "result": "no periodic striping"
+  },
+  "general_neural_residual": {
+    "source_frames": [6600, 10800],
+    "rgba_sha256": [
+      "6a616c967ca613d3a7b99eddd8bb55e3c4a419a96c3059b2e212cb7b1e270081",
+      "aba7ac552883d6194bfbbb7fd74961052ec312f6687b0b42c823caca379f991e"
+    ],
+    "dynamic": true
+  },
+  "clean_composites": {
+    "packed_sha256": [
+      "d1fff23b077d9aea79de51833adafe9bf90743b06f74ae6533d4c0e3c07c3fe3",
+      "a033ff5ee9408bc9686790b1ce7568b36fa6106bd4f1bd4ab45b96455b86bd0c"
+    ],
+    "images": [
+      "dynamic-captures/dynamic-frame-5400-dlss5-clean-base.png",
+      "dynamic-captures/dynamic-frame-19800-dlss5-clean-base.png"
+    ],
+    "runtime_hot_switch": true,
+    "runtime_log": [
+      "dynamic external DLSS5 output loaded frame=600",
+      "dynamic external update detected frame=1440",
+      "dynamic external DLSS5 output loaded frame=1440"
+    ]
+  },
+  "strict_boundary": "clean base frames and residual source frames are nearby but not identical; next validation must run the raw pipeline and clean backbuffer from the same capture frame automatically"
+}
