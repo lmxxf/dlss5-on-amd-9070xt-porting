@@ -1,0 +1,36 @@
+{
+  "status": "same-frame dynamic rendering validated; real-time resident execution pending",
+  "frames": {
+    "5400": {
+      "scene": "Stellar Blade main menu",
+      "pipeline_wall_seconds": 496.54,
+      "block70_ms": {"sparse_prefix": 47.899, "body": 786.811, "outconv": 31.091},
+      "packed_r10_sha256": "e2f630916a5048b194f819a32dd777622da2f30c41143380315c280a5b864480",
+      "image": "dynamic-captures/dynamic-frame-5400-dlss5-synchronous.png",
+      "runtime_image": "dynamic-captures/dynamic-frame-5400-dlss5-synchronous-runtime.png"
+    },
+    "16800": {
+      "scene": "Stellar Blade cave gameplay",
+      "capture_fnv64": {"backbuffer_r10": "49869b469f8ec5d0", "color_rgba16f": "bfe29b765e8e9d24", "depth_r32f": "b44b2472ee091397", "motion_rg16f": "c6504863f79bc734"},
+      "pipeline_wall_seconds_from_file_mtime": 483.906,
+      "block70_ms": {"sparse_prefix": 49.993, "body": 835.243, "outconv": 31.226},
+      "post_metrics_against_clean_base": {"mae": 0.0117617126, "rmse": 0.0229761836, "max_abs": 0.616902471, "cosine": 0.99910197323},
+      "packed_r10_sha256": "923c35a7ecc8c3c098f7274179999eda96aedadf9163ac6adfa089c49db3f3e9",
+      "image": "dynamic-captures/dynamic-frame-16800-dlss5-synchronous.png",
+      "runtime_image": "dynamic-captures/dynamic-frame-16800-dlss5-synchronous-runtime.png"
+    }
+  },
+  "same_process_hot_switch": {
+    "sequence": ["16800 gameplay", "5400 main menu", "16800 gameplay"],
+    "runtime_log": [
+      "dynamic external DLSS5 output loaded frame=600",
+      "dynamic external update detected frame=3600",
+      "dynamic external DLSS5 output loaded frame=3600",
+      "dynamic external update detected frame=6000",
+      "dynamic external DLSS5 output loaded frame=6000"
+    ],
+    "game_restart_between_outputs": false,
+    "swapchain_restart_between_outputs": false
+  },
+  "strict_boundary": "functional low-cadence dynamic path is proven, but approximately 484 seconds per frame is not real-time; resident single-process GPU execution remains required"
+}

@@ -1575,6 +1575,14 @@ block70的3840×2176单buffer试验暴露两个执行问题：一维Dispatch超�
 
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
+### 2026-09-04：同帧实景闭环与进程内热切换
+
+同步自动管线改为严格读取同一frame编号的`ffx-color-N.bin`与override前`dynamic-frame-N.bin`，raw encoder脚本保留block30 body供block39 skip，并新增`merge_upsample_skip.py`统一三层decoder合流。frame5400主菜单完整执行成功；全管线wall time 496.54秒，block70 sparse prefix/body/outconv分别47.899/786.811/31.091ms，packed R10 SHA-256为`e2f630916a5048b194f819a32dd777622da2f30c41143380315c280a5b864480`。
+
+随后从同一运行游戏抓得frame16800实景：4K backbuffer、Color、Depth、Motion FNV64分别为`49869b469f8ec5d0`、`bfe29b765e8e9d24`、`b44b2472ee091397`、`c6504863f79bc734`，与frame16200四路均不同。单命令管线再次完整成功；由本地首尾mtime计得约483.91秒，block70 sparse prefix/body/outconv为49.993/835.243/31.226ms，最终post相对base MAE0.0117617、RMSE0.0229762、cosine0.999102，packed SHA-256为`923c35a7ecc8c3c098f7274179999eda96aedadf9163ac6adfa089c49db3f3e9`。输出是完整洞穴游戏场景，角色、HUD、细线和高亮均可辨，无周期条纹。
+
+最终在同一个新游戏进程内先加载frame16800，再原子换入frame5400，最后换回frame16800。probe依次记录`loaded frame=600`、`update/loaded frame=3600`、`update/loaded frame=6000`，桌面截图对应实景→主菜单→实景，证明不是离线PNG，也不是Color base假动态。功能性低频动态链已闭合；尚不能宣称目标完成，因端到端吞吐仍为约8分钟/帧。下一阶段把各层整合进单一常驻D3D12进程，消除反复shader编译、device建立、readback/upload与SSH传输。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

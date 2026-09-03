@@ -12,6 +12,8 @@
 
 周期条纹随后确认并非network residual：旧probe在capture前执行了诊断fallback compute，未叠神经的backbuffer dump本身已有相同条纹。现已禁用无外部输出时的fallback，并把R10 capture移到任何override之前；新frame5400 clean capture无条纹。把通用head residual叠回clean R10后画面正常，两份clean结果在游戏内热切换成功。证据见`dlss5-amd-clean-display-validation.json`。严格保留一项边界：clean base与已算residual来自相近但非同一frame；下一步把raw pipeline改成单命令处理同一clean capture并测端到端延迟。
 
+同帧边界现已闭合。`run_dynamic_frame_pipeline.sh FRAME`只接受同一编号的FFX Color与override前4K backbuffer，连续执行raw blocks0–69、通用block70 prefix/body/outconv，再原子发布R10。frame5400主菜单与frame16800实际洞穴场景均完整跑通，packed SHA分别为`e2f63091...6480`与`923c35a7...f3e9`；frame16800的Color/Depth/Motion/backbuffer四路均非静态，最终游戏画面无条纹。两份输出又在同一游戏进程按场景→主菜单→场景热切换，probe于frame600/3600/6000确认三次加载。证据见`dlss5-amd-synchronous-dynamic-validation.json`。严格状态仍未完成：frame16800端到端约484秒，现有多进程、逐层建D3D12设备和GiB级磁盘/SSH往返必须改成常驻GPU graph，才能称为实时动态渲染。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。
