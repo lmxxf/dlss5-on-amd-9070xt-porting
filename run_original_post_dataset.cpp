@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     CUsurfObject output_surface;
     check("output surface", cuSurfObjectCreate(&output_surface, &output_resource));
 
-    std::vector<float> color(8 * 8 * 4, 0.5f);
+    std::vector<float> color(8 * 8 * 4, 0.0f);
     for (size_t pixel = 0; pixel < 64; ++pixel) color[pixel * 4 + 3] = 1.0f;
     CUDA_ARRAY3D_DESCRIPTOR texture_desc{};
     texture_desc.Width = texture_desc.Height = 8;

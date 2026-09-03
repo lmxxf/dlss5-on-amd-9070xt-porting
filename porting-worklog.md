@@ -1533,6 +1533,10 @@ block70最终验收仍未过。先后测试旧block69 shortcut、block66 phase8�
 
 随后按已知live全局stride重建另一种权威候选：AMD block69先校正到NVIDIA canonical basis，再按恢复的`(5,3,4,2,0,1)`重新E4M3编码；每个post tile从`x/plane/row/bank=64/30720/122880/33423360`抽八个64-byte planes，组成512 main＋512 zero的local prefix记录。RX9070XT执行1024→2048矩阵后，最终RGB held-out仍为0.430754，与canonical flatten候选几乎相同。故剩余缺口进一步收窄：不是global main bank地址公式，而是block70 prefix输出的tile/channel坐标合同，或local oracle的main/skip联合输入排列。blocks0–69的0.996528结论不变。
 
+block70 standalone合同继续排除错误前提。逐tilepost dataset穷举main的四个512-byte槽与global skip的四个512-byte chunk共16种放置，全部无法复现game ROI；改用256×144 global scatter仍失败。随后game probe一次抓取完整128MiB block69 main与320MiB block70 skip，所有copy/sync/readback为0；`run_original_post.cpp`扩容到320MiB、恢复main/skip `+0x2800`参数基址、3840×2176原尺寸、481×273 halo grid与0xb8 live qword常量后，standalone ROI仍只有std0.00110、对game corr约-0.06。五个post kernel符号结果逐值相同。
+
+为排除output surface历史内容，probe在唯一live post launch前后分别抓同一ROI：pre RGB严格全零，post范围0..0.455078、std0.082108，delta与post相同。故蓝色轮廓确由block70 live调用生成。完整资源与参数仍无法在standalone复现，机制与block48 tilesync分叉一致：缺的是游戏唯一live调用栈/TLS建立的tile-sync状态，不是buffer容量、地址、texture、surface初值或公开kernel名字。下一步必须在游戏内做block70 controlled transaction，导出prefix/body target，再由AMD复现；standalone路线到此停止。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    constexpr size_t activation_bytes = 4 * 1024 * 1024;
+    constexpr size_t activation_bytes = 320 * 1024 * 1024;
     auto main_view = read_file(argv[3], activation_bytes);
     auto skip_view = read_file(argv[4], activation_bytes);
     auto weights = read_file(argv[5], 21808);
@@ -125,8 +125,10 @@ int main(int argc, char **argv) {
         &texture, &texture_resource, &texture_options, nullptr));
 
     alignas(8) unsigned char params[0xb8]{};
-    std::memcpy(params + 0x00, &main_device, 8);
-    std::memcpy(params + 0x08, &skip_device, 8);
+    const CUdeviceptr main_pointer = main_device + 0x2800;
+    const CUdeviceptr skip_pointer = skip_device + 0x2800;
+    std::memcpy(params + 0x00, &main_pointer, 8);
+    std::memcpy(params + 0x08, &skip_pointer, 8);
     std::memcpy(params + 0x10, &output_surface, 8);
     std::memcpy(params + 0x18, &weights_device, 8);
     std::memcpy(params + 0x20, &height, 4);
@@ -136,15 +138,13 @@ int main(int argc, char **argv) {
     if (texture_mask & 1) std::memcpy(params + 0x38, &texture, 8);
     if (texture_mask & 2) std::memcpy(params + 0x58, &texture, 8);
     if (texture_mask & 4) std::memcpy(params + 0x60, &texture, 8);
-    const float texture_transform[6] = {0.0f, 0.0f, 1.0f,
-                                        1.0f, 1.0f, 1.0f};
+    const unsigned long long texture_transform[3] = {
+        0x0ull, 0x4507000045700000ull, 0x39f2b9d639888889ull};
     std::memcpy(params + 0x40, texture_transform, sizeof(texture_transform));
     std::memcpy(params + 0x68, &blend_device, 8);
-    const float one = 1.0f;
-    std::memcpy(params + 0xa4, &one, 4);
-    std::memcpy(params + 0xa8, &one, 4);
-    std::memcpy(params + 0xac, &width, 4);
-    std::memcpy(params + 0xb0, &height, 4);
+    const unsigned long long live_tail[3] = {
+        0x3988888900000000ull, 0x00000f0039f2b9d6ull, 0x870ull};
+    std::memcpy(params + 0xa0, live_tail, sizeof(live_tail));
 
     void *arguments[] = {params};
     std::vector<float> output(static_cast<size_t>(width) * height * 4);
@@ -157,8 +157,8 @@ int main(int argc, char **argv) {
     download.WidthInBytes = width * 16;
     download.Height = height;
     const auto launch_and_download = [&]() {
-        check("launch", cuLaunchKernel(function, (width + 7) / 8,
-            (height + 7) / 8, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
+        check("launch", cuLaunchKernel(function, (width + 7) / 8 + 1,
+            (height + 7) / 8 + 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
         check("sync", cuCtxSynchronize());
         check("download", cuMemcpy2D(&download));
     };
