@@ -32,6 +32,8 @@ constexpr wchar_t kTracePath[] = LR"(D:\DLSSNR-Lab\logs\backend-launch-trace.txt
 constexpr bool kCaptureBlock48Identity = false;
 constexpr bool kCaptureBlock66 = false;
 constexpr bool kCaptureBlock62 = false;
+constexpr bool kCaptureBlock56 = false;
+constexpr bool kCaptureBlock48 = true;
 
 using Forward1H = void (*)(void *, void *, void *, void *, int, int);
 using CreateBackend = void *(*)(void *);
@@ -232,6 +234,7 @@ int64_t hook_backend_launch(
         }
     }
     bool block48_inputs_pre_ok = false;
+    bool block48_simple_pre_ok = false;
     bool block48_replay_ok = false;
     UINT64 block48_main_source = 0;
     UINT64 block48_output_source = 0;
@@ -249,7 +252,35 @@ int64_t hook_backend_launch(
     if (g_copy_ready.load() && blob != nullptr && bytes >= 0x50 && g_arena_base != 0) {
         UINT64 weight = 0;
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x10, 8);
-        if (bytes == 0x58 && weight - g_arena_base == 145744896) {
+        if (kCaptureBlock48 && bytes == 0x58 &&
+            weight - g_arena_base == 140034048) {
+            std::memcpy(&block48_main_source, static_cast<const uint8_t *>(blob) + 0x00, 8);
+            std::memcpy(&block48_output_source, static_cast<const uint8_t *>(blob) + 0x08, 8);
+            std::memcpy(&block48_skip_source, static_cast<const uint8_t *>(blob) + 0x18, 8);
+            const UINT64 atlas = g_destination->GetGPUVirtualAddress();
+            int operations[2]{};
+            operations[0] = dispatch_raw_copy(
+                block48_main_source - 0x2800, atlas, 64ull << 20);
+            operations[1] = operations[0] == 0 ? dispatch_raw_copy(
+                block48_skip_source - 0x2800, atlas + (128ull << 20), 64ull << 20) : -1;
+            void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+            auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+            const int sync_result = operations[1] == 0 ? synchronize(
+                g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+            block48_simple_pre_ok = sync_result == 0;
+            AcquireSRWLockExclusive(&g_trace_lock);
+            if (FILE *file = _wfopen(kLogPath, L"ab")) {
+                std::fprintf(file,
+                    "block48_simple_pre main=0x%llx output=0x%llx skip=0x%llx copies=%d,%d sync=%d\n",
+                    static_cast<unsigned long long>(block48_main_source),
+                    static_cast<unsigned long long>(block48_output_source),
+                    static_cast<unsigned long long>(block48_skip_source),
+                    operations[0], operations[1], sync_result);
+                std::fclose(file);
+            }
+            ReleaseSRWLockExclusive(&g_trace_lock);
+        }
+        if (kCaptureBlock56 && bytes == 0x58 && weight - g_arena_base == 145744896) {
             std::memcpy(&block56_main, static_cast<const uint8_t *>(blob) + 0x00, 8);
             std::memcpy(&block56_output, static_cast<const uint8_t *>(blob) + 0x08, 8);
             std::memcpy(&block56_skip, static_cast<const uint8_t *>(blob) + 0x18, 8);
@@ -415,6 +446,22 @@ int64_t hook_backend_launch(
     }
     int64_t result = g_original_backend_launch(
         self, kernel, gx, gy, gz, wrapper, bytes, flag);
+    if (result == 0 && block48_simple_pre_ok) {
+        const int copy_result = dispatch_raw_copy(
+            block48_output_source - 0x2800,
+            g_destination->GetGPUVirtualAddress() + (64ull << 20), 64ull << 20);
+        void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+        auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
+        const int sync_result = copy_result == 0 ? synchronize(
+            g_live_ngx_context, g_live_command_context, 0, 0) : -1;
+        AcquireSRWLockExclusive(&g_trace_lock);
+        if (FILE *file = _wfopen(kLogPath, L"ab")) {
+            std::fprintf(file, "block48_simple_post output_copy=%d sync=%d\n",
+                copy_result, sync_result);
+            std::fclose(file);
+        }
+        ReleaseSRWLockExclusive(&g_trace_lock);
+    }
     if (result == 0 && block56_pre_ok) {
         const int copy_result = dispatch_raw_copy(
             block56_output - 0x2800,
@@ -454,8 +501,10 @@ int64_t hook_backend_launch(
         std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 146630144) atlas_offset = 0;
-        else if (offset == 146827776) atlas_offset = 64ull << 20;
+        if (offset == 142986240) atlas_offset = 0;
+        else if (offset == 143675904) atlas_offset = 64ull << 20;
+        else if (offset == 144365568) atlas_offset = 128ull << 20;
+        else if (offset == 145055232) atlas_offset = 192ull << 20;
         if (atlas_offset != UINT64_MAX) {
             const int copy_result = dispatch_raw_copy(
                 output - 0x2800,

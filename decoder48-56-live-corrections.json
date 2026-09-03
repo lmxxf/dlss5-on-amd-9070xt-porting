@@ -1,0 +1,14 @@
+{
+  "storage":"float32_little_endian",
+  "scope":"fixed-input full-frame channel-basis corrections",
+  "matrices":[
+    {"file":"block48-live-correction.bin","shape":[257,256],"sha256":"8910e2746c06e888eeaf2b0bbd0247ef8159d07d1f62addc1be9fe0ee704dce4","correlation":0.821105},
+    {"file":"block49-live-correction.bin","shape":[257,256],"sha256":"ddbe3f2e2c56994b2695667b9a50e5be61ca166a716f4472f38472261851bda8","correlation":0.905201},
+    {"file":"block50-live-correction.bin","shape":[257,256],"sha256":"4a9fc8f814a2e36576be2837cc7f326ffd04c618672a724055ef1a5abeffe3a8","correlation":0.878007},
+    {"file":"block51-live-correction.bin","shape":[257,256],"sha256":"69f49bc08d386a241181def7c4284f88439862cd8d873132c7418b9cf7671b32","correlation":0.873538},
+    {"file":"block52-live-correction.bin","shape":[257,256],"sha256":"db5980b9dfea3d69b2e708de97357dc0db23e68f35e99e83df85f9f8af4ee070","correlation":0.844779},
+    {"file":"block53-live-correction.bin","shape":[257,256],"sha256":"2a1341310c627a03821764a2c144efeb4232e588b5b622f4a258bf3ee8f89420","correlation":0.916231},
+    {"file":"block54-live-correction.bin","shape":[257,256],"sha256":"ba604afc48be8855d34b40cc25dd4c5c0f7139383a1831cddcdac377904d923b","correlation":0.892053},
+    {"file":"block55-to56-live-correction.bin","shape":[129,128],"sha256":"85e4e47dcb216c840f318b4f64d8b9e784e1a49fc2b4ddea030b53f4b45633b6","held_out_correlation":0.957322}
+  ]
+}
