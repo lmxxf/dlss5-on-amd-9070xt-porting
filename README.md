@@ -48,6 +48,7 @@
 - `decoder48-56-live-corrections.json`及八条matrix：使用完整136×240×256 frame校正48–54，并由full block56裁判block55 outview。block55→56 checkerboard held-out correlation0.957322；当前数值入口前移为live block47 main＋block22/block14/block8/enc0 skips。
 - `decoder40-47-live-corrections.json`及七条matrix：同步捕获split-Swin layer3 output后，AMD完整68×120×512 blocks40–47逐层correlation为0.9626–0.9701；经48送入block49的下一层裁判为0.898400（live block47 baseline0.903055），入口前移为live block39 output。
 - `block39-to40-live-correction.bin/.json`：live block38 repack main与block30 skip经archive grouped 1024→512和AMD block40后，下一层checkerboard held-out correlation0.986835；block39由此闭合，入口前移为live block38 main＋block30 skip。
+- ViT live Projection完整捕获：blocks31–37 active终点均为2,211,839=`2160×1024-1`，即34×60 tokens；旧2MiB文件截断128KiB。block38的3MiB尾部为后续resource复用，权威active范围仍取前2,211,840 bytes。
 - `run_original_fused_live_replay.cpp` / `inspect_cubin_function.cpp`：以完整live D3D资源重放8H fused kernel并恢复精确written mask。block48前5MiB可由标准CUDA逐byte重放，但live实际选择`upsample_tilesync_fp8`，后3.36MiB只有NvAPI tile-sync协议能复现；main/skip/aux扩容至128MiB均不改变分叉，已排除缺页与标准cluster attribute。
 - `d3d12_nvapi_fused_live.cpp`：5090独立D3D12/NvAPI fused快照宿主。旧Chain与官方ChainEx均可运行，但都只复现block48 written区66.8775%；证明游戏runtime的live tile-sync状态不由公开接口ID单独建立。下一步使用游戏唯一正常launch的原调用栈做原位controlled transaction。
 - block48原位controlled transaction：在唯一正常高层launch前备份/替换原资源、launch后捕获、恢复并补跑正常block48，游戏下游输出保持逐byte exact。zero main/skip + `0xA5` output精确恢复2/3 update rows与1/3 preserved rows；updated区标准CUDA对live 100% exact，preserved区来自与block1 input同VA的复用buffer。

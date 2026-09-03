@@ -1465,6 +1465,10 @@ block39输入geometry确认为34×60 bottleneck：main为40个8×8×1024 padded 
 
 main分别测试直接线性、window identity、single-window repack map/inverse四种解释；archive grouped projection＋2×nearest＋live skip后四者几乎等价，说明该固定帧block39由skip主导。最佳map方案送入AMD block40，原始corr0.3053；513→512校正checkerboard held-out correlation0.986835、MAE0.1680，全量correlation0.989755。block39因此通过下一层裁判，严格入口前移为live block38 repack main＋block30 skip，下一步进入ViT31–38。
 
+ViT projection ABI由arena qword反查闭合：每block最终layer4使用0x48 blob，weight=q3、output=q2；block31 input来自layer0 q0。首次每路抓2MiB时几乎写满，复核Expand grid544后扩为3MiB重抓。blocks31–37八个Projection output的最后非零offset全部精确为2,211,839=`2160×1024-1`，确认live ViT为34×60 tokens且无有效padding尾；旧2MiB文件截断128KiB，全部降级。block38在active范围之后仍有数据是resource被后续block39复用，不属于ViT输出。
+
+现有AMD ViT runner仅支持单组64 tokens。下一工作假设是把live 2160组织为34行×60有效token、每行补4个zero keys形成34组64-token attention；该解释与544个Expand CTA咬合，但尚未由attention地址证明，不能标exact。下一步将runner批处理化为34组，并以已抓31–38逐层Projection output和block39/40下一层裁判决定接受或否决；若失败再测试全局attention。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律
