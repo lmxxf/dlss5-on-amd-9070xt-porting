@@ -1473,6 +1473,10 @@ launch geometry进一步否决上述row-attention假设：Attention grid32×9恰
 
 但直接把live raw前2160×1024 bytes按token-major E4M3解码后，AMD Projection对live output correlation-0.00566；1025→1024 channel affine的checkerboard held-out仍约0。用channel-order不变量分位数做2160×2160 Hungarian token matching也得到随机排列、无法提升相关。结论：当前缺口是ViT input/output的联合token-channel physical permutation；不是全局attention计算成本，也不能靠单独channel矩阵吸收。下一步需用已保存single-window repack bit公式推广到2160-tokenglobal view，或对live block31做controlled permutation basis。
 
+原`run_original_vit_repack_permutation.cpp`随后参数化到width36/height60、4MiB arena与22 address bits。原CUBIN仅23次launch即恢复2,211,840-entry output→input映射，source min/max=0/2,211,839且一一对应；应用于同帧live repack pair逐byte100% exact。映射低16位与single-window bit公式一致，先取33个完整64KiB chunks得到2112个exact canonical tokens，暂留最后48-token boundary chunk。
+
+2112-token AMD block31原始Projection correlation从-0.00566跃升到0.614183，1025→1024 checkerboard held-out0.997631、全量0.998912；证明核心joint permutation已解。随后按“Projection→AMD affine→下一block”跑完31–38，全量correlation依次0.998912/0.997951/0.997763/0.997432/0.997611/0.997401/0.997077/0.996737；每层全局attention约0.21–0.24秒，校正pass约5–8ms。严格边界：当前只验证2112/2160=97.78% tokens，最后48 tokens仍需由global mapping boundary规则补齐，之后才能接block39并宣称完整ViT。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

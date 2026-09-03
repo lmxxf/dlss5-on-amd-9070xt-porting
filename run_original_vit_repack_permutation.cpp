@@ -18,14 +18,16 @@ static void check(const char *name, CUresult result) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 3) {
-    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json\n",
+  if (argc != 3 && argc != 5) {
+    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height]\n",
                  argv[0]);
     return 2;
   }
-  constexpr size_t arenaBytes = 2 * 1024 * 1024;
-  constexpr size_t outputBytes = 64 * 1024;
-  constexpr unsigned addressBits = 21;
+  constexpr size_t arenaBytes = 4 * 1024 * 1024;
+  const int width = argc == 5 ? std::atoi(argv[3]) : 8;
+  const int height = argc == 5 ? std::atoi(argv[4]) : 8;
+  const size_t outputBytes = static_cast<size_t>(width) * height * 1024;
+  constexpr unsigned addressBits = 22;
   constexpr unsigned char one = 0x38; // E4M3 1.0
 
   check("init", cuInit(0));
@@ -47,7 +49,6 @@ int main(int argc, char **argv) {
   std::vector<unsigned char> input(arenaBytes), output(arenaBytes);
   std::vector<uint32_t> outputToInput(outputBytes, 0);
   std::vector<unsigned char> active(outputBytes, 0);
-  int width = 8, height = 8;
   unsigned char params[0x18]{};
   std::memcpy(params + 0, &source, 8);
   std::memcpy(params + 8, &destination, 8);
@@ -58,7 +59,7 @@ int main(int argc, char **argv) {
   auto launch = [&]() {
     check("upload", cuMemcpyHtoD(source, input.data(), arenaBytes));
     check("clear", cuMemsetD8(destination, 0, arenaBytes));
-    check("launch", cuLaunchKernel(repack, 80, 1, 1, 32, 4, 1, 0,
+    check("launch", cuLaunchKernel(repack, width * height + 16, 1, 1, 32, 4, 1, 0,
                                     nullptr, arguments, nullptr));
     check("sync", cuCtxSynchronize());
     check("download", cuMemcpyDtoH(output.data(), destination, arenaBytes));
@@ -110,7 +111,7 @@ int main(int argc, char **argv) {
   std::ofstream metadata(argv[2]);
   metadata << "{\n"
            << "  \"semantics\": \"1d physical byte offset -> 2d physical byte offset\",\n"
-           << "  \"shape\": [64, 1024],\n"
+           << "  \"shape\": [" << (width * height) << ", 1024],\n"
            << "  \"entries\": " << outputToInput.size() << ",\n"
            << "  \"source_arena_bytes\": " << arenaBytes << ",\n"
            << "  \"launches\": " << (addressBits + 1) << ",\n"

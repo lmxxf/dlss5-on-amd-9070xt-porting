@@ -1,0 +1,18 @@
+{
+  "storage":"float32_little_endian",
+  "shape":[1025,1024],
+  "tokens_validated":2112,
+  "tokens_live":2160,
+  "scope":"fixed-input first 33 complete 64KiB physical chunks",
+  "correlations":{"31":0.998912,"32":0.997951,"33":0.997763,"34":0.997432,"35":0.997611,"36":0.997401,"37":0.997077,"38":0.996737},
+  "files":[
+    {"block":31,"file":"vit-block31-live-correction.bin","sha256":"ef91a4fd210cde67491570e9861b0e2e874a341fdf03b0d42daae5dfa920a820"},
+    {"block":32,"file":"vit-block32-live-correction.bin","sha256":"69fbdafb936c3ff79459785b0affae55069183c54b1740462b92f2a7f7f981ee"},
+    {"block":33,"file":"vit-block33-live-correction.bin","sha256":"44d7ace8bff42146fea45fe609b32948406965274b580c6fa5144177b9bba765"},
+    {"block":34,"file":"vit-block34-live-correction.bin","sha256":"53eb017b6946102594ead35c8caa6d2e3bd497c40ddbd50498d550a110b362ab"},
+    {"block":35,"file":"vit-block35-live-correction.bin","sha256":"abde3686c28a85411630670dd31649eb24a97c2010e7ea68ef12f262fb6a1661"},
+    {"block":36,"file":"vit-block36-live-correction.bin","sha256":"3ca6c5e5d2249b6633bc7b2b816932340d214ca86365f74cda85aeddaa8f7335"},
+    {"block":37,"file":"vit-block37-live-correction.bin","sha256":"b791b7511c7a02eac3e360740d9347a47a3ab206710ba2c8f64f100340fa96a3"},
+    {"block":38,"file":"vit-block38-live-correction.bin","sha256":"6fdbfa4ebf34261446cee5899a1892c994ed1500500c85042e06ac6fbfce5330"}
+  ]
+}
