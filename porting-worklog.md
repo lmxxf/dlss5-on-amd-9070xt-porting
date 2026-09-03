@@ -1483,6 +1483,10 @@ launch geometry进一步否决上述row-attention假设：Attention grid32×9恰
 
 encoder尾段trace确认block22 downsample main位于0x58 blob q9（q1是供decoder block48的skip）；blocks23–29仍以split layer3 q3 weight/q2 output收尾，block30 ProjPool q1直接等于repack q0。probe首轮同步捕获block22 main及blocks23–27 outputs，每路3MiB。张量均为H36×W60×C512；AMD runner补到H40×W64执行。live block22→AMD block23原始corr0.908986，513→512 checkerboard held-out0.957373、全量0.958289。下一步逐层跑24–30并以完整ViT链作下游裁判。
 
+第二轮同步捕获blocks28/29 layer3 q2与block30 ProjPool q1；后者与下一步repack q0在2,211,840 active bytes上逐byte100% exact。AMD blocks24–27逐层全量correlation0.923307/0.925637/0.910187/0.904450；blocks28/29 candidate view仅0.655811/0.671686，但继续进入block30下一层裁判。
+
+block30 layer4 record前524,288 bytes按512→1024 matrix unpack，AMD执行3.306ms。其原始输出对live canonical corr-0.0674，1025→1024 checkerboard held-out correlation0.942102、全量0.941571；证明28/29低值为layer3 view basis而非主链坍缩。blocks22–30因此闭合，严格入口前移到live block22 downsample main；下一步继续encoder blocks14–22。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

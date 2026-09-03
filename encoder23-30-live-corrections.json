@@ -1,0 +1,8 @@
+{
+  "storage":"float32_little_endian",
+  "scope":"fixed-input H36xW60 encoder tail",
+  "shape_blocks23_29":[513,512],
+  "shape_block30":[1025,1024],
+  "correlations":{"23":0.958289,"24":0.923307,"25":0.925637,"26":0.910187,"27":0.904450,"28":0.655811,"29":0.671686,"30_full":0.941571,"30_held_out":0.942102},
+  "files":{"23":"block23-live-correction.bin","24":"block24-live-correction.bin","25":"block25-live-correction.bin","26":"block26-live-correction.bin","27":"block27-live-correction.bin","28":"block28-live-correction.bin","29":"block29-live-correction.bin","30":"block30-live-correction.bin"}
+}

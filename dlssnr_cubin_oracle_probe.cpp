@@ -657,11 +657,9 @@ int64_t hook_backend_launch(
         std::memcpy(&output, static_cast<const uint8_t *>(blob) + output_field, 8);
         const UINT64 offset = weight - g_arena_base;
         UINT64 atlas_offset = UINT64_MAX;
-        if (offset == 8438784) atlas_offset = 64ull << 20;
-        else if (offset == 10407424) atlas_offset = 128ull << 20;
-        else if (offset == 12376064) atlas_offset = 192ull << 20;
-        else if (offset == 14344704) atlas_offset = 256ull << 20;
-        else if (offset == 16313344) atlas_offset = 320ull << 20;
+        if (offset == 18281984) atlas_offset = 0;
+        else if (offset == 20250624) atlas_offset = 64ull << 20;
+        else if (offset == 22503424) atlas_offset = 128ull << 20;
         if (atlas_offset != UINT64_MAX) {
             const UINT64 copy_bytes = 3ull << 20;
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
@@ -669,7 +667,7 @@ int64_t hook_backend_launch(
             const int pre_sync = synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0);
             const int copy_result = pre_sync == 0 ? dispatch_raw_copy(
-                bytes == 0x48 ? output : output - 0x2800,
+                output,
                 g_destination->GetGPUVirtualAddress() + atlas_offset,
                 copy_bytes) : -1;
             const int sync_result = copy_result == 0 ? synchronize(
