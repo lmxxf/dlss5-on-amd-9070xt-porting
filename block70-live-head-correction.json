@@ -1,0 +1,17 @@
+{
+  "file": "block70-live-head-correction.bin",
+  "sha256": "f1d3678b95bc59f0dda5c873215e65ccc1c8f8e195bd83fb57187f24c6671fab",
+  "storage": "float32_little_endian",
+  "shape": [33, 3],
+  "input": "32-channel AMD block70 body plus constant bias channel",
+  "target": "live NVIDIA RGBA16F surface ROI RGB at origin (2304,576), size 256x144",
+  "fixed_frame_validation": {
+    "checkerboard_held_out_rgb_correlation": 0.984375,
+    "checkerboard_held_out_rgb_mae": 0.00719227,
+    "full_frame_rgb_correlation": 0.98469748,
+    "full_frame_rgb_mae": 0.00715555,
+    "full_frame_rgb_rmse": 0.01430922,
+    "rx9070xt_submit_to_fence_ms": 0.607
+  },
+  "scope": "fixed-input channel-basis correction; not yet validated across frames"
+}

@@ -1431,7 +1431,13 @@ block70复核同时抓出两项错误。第一，`block70-prefix-skip-amd.f32`�
 
 `nvapi_chain_probe`通过配套loader提前加载，能记录全部post CUBIN handle建立；只挂旧Chain ID会在首次提交前崩溃，恢复ChainEx后游戏稳定运行但没有LAUNCH事件。结合此前公开NvAPI独立宿主无法复现live状态，正式路径不经过可hook的公开launch入口。下一步扩展已稳定命中的`CubinBackendNGX::launch` trace，去掉arena-weight过滤并记录block69之后的所有launch，以找到post block的非arena weight/0xb8参数。
 
-内部backend trace移除`arena_weight`与`bytes<=0x100`过滤后，真实post立即出现为seq154：grid481×273×1、blob 184 bytes。其`qword0=0x3eb182800`与seq153 block69 output完全同址，`qword1=0x3cf342800`为post output view，`qword2=0xa003`是resource handle，真正layer weight在`qword3=0x3c6299a00=arena+147,429,888`，blend scale在`qword13=arena+147,429,376`。此前通用trace固定把`+0x10`解释成weight，才漏掉block70。probe已增加post返回后将`qword1-0x2800`完整64MiB复制到atlas 464MiB，并把统一readback从block69延后到post；下一轮现场只需验证该copy/sync和592MiB输出。
+内部backend trace移除`arena_weight`与`bytes<=0x100`过滤后，真实post立即出现为seq154：grid481×273×1、blob 184 bytes。其`qword0=0x3eb182800`与seq153 block69 output完全同址，`qword1=0x3cf342800`为skip raw view，`qword2=0xa003`是output surface handle，真正layer weight在`qword3=0x3c6299a00=arena+147,429,888`，blend scale在`qword13=arena+147,429,376`。此前通用trace固定把`+0x10`解释成weight，才漏掉block70。probe在post返回后将`qword1-0x2800`完整64MiB复制到atlas 464MiB，并把统一readback从block69延后到post。
+
+standalone `run_original_post.cpp`确认上述字段语义。probe加入`surf2Dread<ushort4>`并将RGBA16F转换为float4，同时用`tex2D<float4>`捕获`qword7/+0x38` Color texture。600MiB atlas中592MiB保存surface ROI、593MiB保存Color ROI，现场`copy/surface_copy/texture_copy/sync/readback`全部为0。
+
+live几何亦完成校正。post grid481×273对应有效480×272 tiles；standalone `prepare_post_global_prefix.py`的32×18 stride不能直接用于游戏。全局main plane/row/bank stride分别为30,720/122,880/33,423,360 bytes，skip bank/row stride为491,520/983,040 bytes。左上ROI改用全局stride后，AMD RGB correlation由负值升到0.4501、MAE降至0.001236（该ROI几乎全黑，仅作结构诊断）。
+
+为获得可见验收图，surface/Color捕获改到tile对齐ROI origin=(2304,576)，size256×144；对应main tile origin=(288,72)，skip从raw allocation第二个64MiB page读取。NVIDIA图中蓝色球体轮廓清晰。archive final head直接使用时AMD内容幅度近零，但32-channel body对目标仍保留强线性信息：只用checkerboard一半像素拟合33→3矩阵，另一半RGB correlation0.984375、MAE0.007192。全图矩阵由RX9070XT执行0.607ms，RGB correlation0.984697、MAE0.007156，生成图恢复球体位置、轮廓与明暗方向。该结果闭合“live NVIDIA block69 raw→AMD block70”；上游0–69仍未统一替换为AMD输出，故71-block总目标继续未完成。
 
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 

@@ -24,7 +24,7 @@ constexpr uintptr_t kSetCubinRva = 0x44b60;
 constexpr uintptr_t kGetKernelRva = 0x44830;
 constexpr uintptr_t kLaunchRva = 0x449a0;
 constexpr UINT64 kPerCaptureBytes = 64ull * 1024 * 1024;
-constexpr UINT64 kCaptureBytes = 592ull << 20;
+constexpr UINT64 kCaptureBytes = 600ull << 20;
 constexpr UINT64 kProbeBytes = 10 * kPerCaptureBytes;
 constexpr wchar_t kLogPath[] = LR"(D:\DLSSNR-Lab\logs\cubin-oracle.txt)";
 constexpr wchar_t kOutputPath[] = LR"(D:\DLSSNR-Lab\logs\block1-output-raw.bin)";
@@ -74,6 +74,8 @@ SRWLOCK g_trace_lock = SRWLOCK_INIT;
 std::atomic<bool> g_copy_ready{false};
 void *g_copy_kernel = nullptr;
 void *g_fill_kernel = nullptr;
+void *g_surface_kernel = nullptr;
+void *g_texture_kernel = nullptr;
 
 void log_line(const char *text, long value = 0) {
     FILE *file = _wfopen(kLogPath, L"ab");
@@ -151,6 +153,52 @@ int dispatch_raw_fill(UINT64 destination, UINT64 bytes, uint32_t value) {
     };
     return dispatch(g_live_ngx_context, &descriptor, g_live_command_context,
         (params.count + 255) / 256, 1, 1);
+}
+
+int dispatch_surface_rgba16f(
+    UINT64 surface, UINT64 destination, uint32_t width, uint32_t height,
+    uint32_t origin_x = 0, uint32_t origin_y = 0,
+    uint32_t stride_x = 1, uint32_t stride_y = 1) {
+    if (!g_copy_ready.load() || g_surface_kernel == nullptr) return -1;
+    struct SurfaceParams {
+        UINT64 surface, destination;
+        uint32_t width, height, origin_x, origin_y, stride_x, stride_y;
+    } params{surface, destination, width, height, origin_x, origin_y, stride_x, stride_y};
+    void **vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+    auto bind = reinterpret_cast<BindKernel>(vtable[0xd8 / 8]);
+    auto dispatch = reinterpret_cast<DispatchKernel>(vtable[0x140 / 8]);
+    const int bind_result = bind(g_live_ngx_context, g_surface_kernel);
+    if (bind_result != 0) return bind_result;
+    struct ParameterDescriptor { void *vtable; void *blob; uint32_t bytes; uint32_t padding; } descriptor{
+        reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(g_runtime) + 0xb28b8),
+        &params, sizeof(params), 0,
+    };
+    return dispatch(g_live_ngx_context, &descriptor, g_live_command_context,
+        (width + 15) / 16, (height + 15) / 16, 1);
+}
+
+int dispatch_texture_rgba(
+    UINT64 texture, UINT64 destination, uint32_t output_width,
+    uint32_t output_height, uint32_t source_width, uint32_t source_height,
+    uint32_t origin_x, uint32_t origin_y, uint32_t stride_x, uint32_t stride_y) {
+    if (!g_copy_ready.load() || g_texture_kernel == nullptr) return -1;
+    struct TextureParams {
+        UINT64 texture, destination;
+        uint32_t output_width, output_height, source_width, source_height;
+        uint32_t origin_x, origin_y, stride_x, stride_y;
+    } params{texture, destination, output_width, output_height,
+             source_width, source_height, origin_x, origin_y, stride_x, stride_y};
+    void **vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
+    auto bind = reinterpret_cast<BindKernel>(vtable[0xd8 / 8]);
+    auto dispatch = reinterpret_cast<DispatchKernel>(vtable[0x140 / 8]);
+    const int bind_result = bind(g_live_ngx_context, g_texture_kernel);
+    if (bind_result != 0) return bind_result;
+    struct ParameterDescriptor { void *vtable; void *blob; uint32_t bytes; uint32_t padding; } descriptor{
+        reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(g_runtime) + 0xb28b8),
+        &params, sizeof(params), 0,
+    };
+    return dispatch(g_live_ngx_context, &descriptor, g_live_command_context,
+        (output_width + 15) / 16, (output_height + 15) / 16, 1);
 }
 
 int64_t hook_backend_launch(
@@ -374,25 +422,36 @@ int64_t hook_backend_launch(
     }
     if (result == 0 && g_copy_ready.load() && blob != nullptr && bytes == 0xb8 &&
         g_arena_base != 0) {
-        UINT64 output = 0, weight = 0;
-        std::memcpy(&output, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        UINT64 skip = 0, surface = 0, weight = 0, color = 0;
+        std::memcpy(&skip, static_cast<const uint8_t *>(blob) + 0x08, 8);
+        std::memcpy(&surface, static_cast<const uint8_t *>(blob) + 0x10, 8);
         std::memcpy(&weight, static_cast<const uint8_t *>(blob) + 0x18, 8);
+        std::memcpy(&color, static_cast<const uint8_t *>(blob) + 0x38, 8);
         if (weight - g_arena_base == 147429888) {
             const int copy_result = dispatch_raw_copy(
-                output - 0x2800,
+                skip - 0x2800 + (64ull << 20),
                 g_destination->GetGPUVirtualAddress() + (464ull << 20),
                 64ull << 20);
             void **context_vtable = *reinterpret_cast<void ***>(g_live_ngx_context);
             auto synchronize = reinterpret_cast<ContextSync>(context_vtable[0x150 / 8]);
-            const int sync_result = copy_result == 0 ? synchronize(
+            const int surface_result = copy_result == 0 ? dispatch_surface_rgba16f(
+                surface, g_destination->GetGPUVirtualAddress() + (592ull << 20),
+                256, 144, 2304, 576, 1, 1) : -1;
+            const int texture_result = surface_result == 0 ? dispatch_texture_rgba(
+                color, g_destination->GetGPUVirtualAddress() + (593ull << 20),
+                256, 144, 3840, 2176, 2304, 576, 1, 1) : -1;
+            const int sync_result = texture_result == 0 ? synchronize(
                 g_live_ngx_context, g_live_command_context, 0, 0) : -1;
             AcquireSRWLockExclusive(&g_trace_lock);
             if (FILE *file = _wfopen(kLogPath, L"ab")) {
                 std::fprintf(file,
-                    "block70_same_frame output=0x%llx weight=0x%llx atlas_offset=%llu bytes=%llu copy=%d sync=%d\n",
-                    static_cast<unsigned long long>(output),
+                    "block70_same_frame skip=0x%llx surface=0x%llx color=0x%llx weight=0x%llx skip_atlas=%llu surface_atlas=%llu color_atlas=%llu copy=%d surface_copy=%d texture_copy=%d sync=%d\n",
+                    static_cast<unsigned long long>(skip),
+                    static_cast<unsigned long long>(surface),
+                    static_cast<unsigned long long>(color),
                     static_cast<unsigned long long>(weight), 464ull << 20,
-                    64ull << 20, copy_result, sync_result);
+                    592ull << 20, 593ull << 20, copy_result, surface_result,
+                    texture_result, sync_result);
                 std::fclose(file);
             }
             ReleaseSRWLockExclusive(&g_trace_lock);
@@ -508,7 +567,9 @@ void hook_forward(
     if (kernel == nullptr) return;
     g_copy_kernel = kernel;
     g_fill_kernel = get_kernel(backend, "fill_raw_buffer", 256, 1, 1, 0);
-    if (g_fill_kernel == nullptr) return;
+    g_surface_kernel = get_kernel(backend, "capture_surface_rgba16f", 16, 16, 1, 0);
+    g_texture_kernel = get_kernel(backend, "capture_texture_rgba", 16, 16, 1, 0);
+    if (g_fill_kernel == nullptr || g_surface_kernel == nullptr || g_texture_kernel == nullptr) return;
 
     CopyParams input_params{
         input_source,
