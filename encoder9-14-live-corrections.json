@@ -1,0 +1,23 @@
+{
+  "scope": "fixed-frame encoder blocks 9-14",
+  "block9_13_shape": [272, 480, 128],
+  "block14_output_shape": [136, 240, 256],
+  "fit": "channel affine for blocks 9-13; 2x2x128 patch to block15 next-layer target for block14",
+  "shift_modes": {
+    "9": "none",
+    "10": "xy",
+    "11": "y",
+    "12": "x",
+    "13": "none"
+  },
+  "heldout_correlation": {
+    "9": 0.971611,
+    "10": 0.961525,
+    "11": 0.918933,
+    "12": 0.891650,
+    "13": 0.853233,
+    "14_to_15_next_layer": 0.952174
+  },
+  "strict_input_boundary": "live block8 downsample main",
+  "note": "The block14 physical candidate is not canonical (direct affine correlation about 0.18). The authoritative judge is live block15 output."
+}
