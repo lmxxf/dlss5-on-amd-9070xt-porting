@@ -12,8 +12,24 @@ def main() -> None:
     p.add_argument("block69_correction",type=Path,help="33x32 affine matrix")
     p.add_argument("output",type=Path)
     p.add_argument("--full",action="store_true",help="prepare the complete 3840x2176 tensor")
+    p.add_argument("--tiled",action="store_true",help="prepare 15x15 independent 256x144 output tiles")
+    p.add_argument("--raw-block69",action="store_true",help="do not apply the fixed-frame 33x32 correction")
     a=p.parse_args()
     matrix=np.fromfile(a.block69_correction,dtype="<f4").reshape(33,32)
+    if a.tiled:
+        b69=np.memmap(a.block69,dtype="<f4",mode="r",shape=(1088,1920,32))
+        b0=np.memmap(a.block0,dtype="<f4",mode="r",shape=(1088,1920,32))
+        output=np.memmap(a.output,dtype="<f4",mode="w+",shape=(225,144,256,66))
+        y,x=np.indices((144,256));coords=np.stack((x/255,y/143),axis=-1).astype(np.float32)
+        ones=np.ones((72*128,1),np.float32);tile=0
+        for ty in range(15):
+            for tx in range(15):
+                main=np.asarray(b69[ty*72:(ty+1)*72,tx*128:(tx+1)*128]).reshape(-1,32)
+                if not a.raw_block69:main=np.concatenate((main,ones),axis=1)@matrix
+                main=np.repeat(np.repeat(main.reshape(72,128,32),2,axis=0),2,axis=1)
+                skip=np.repeat(np.repeat(np.asarray(b0[ty*72:(ty+1)*72,tx*128:(tx+1)*128]),2,axis=0),2,axis=1)
+                output[tile]=np.concatenate((main,skip,coords),axis=-1);tile+=1
+        output.flush();print(f"shape={output.shape} bytes={output.nbytes} output={a.output}");return
     if a.full:
         b69=np.memmap(a.block69,dtype="<f4",mode="r",shape=(1088,1920,32))
         b0=np.memmap(a.block0,dtype="<f4",mode="r",shape=(1088,1920,32))
@@ -21,7 +37,7 @@ def main() -> None:
         xcoord=(np.arange(3840,dtype=np.float32)/3839)[:,None]
         ones=np.ones((1920,1),np.float32)
         for sy in range(1088):
-            corrected=np.concatenate((np.asarray(b69[sy]),ones),axis=1)@matrix
+            corrected=np.asarray(b69[sy]) if a.raw_block69 else np.concatenate((np.asarray(b69[sy]),ones),axis=1)@matrix
             main=np.repeat(corrected,2,axis=0);skip=np.repeat(np.asarray(b0[sy]),2,axis=0)
             for oy in (sy*2,sy*2+1):
                 row=np.concatenate((main,skip,xcoord,np.full((3840,1),oy/2175,np.float32)),axis=1)
@@ -31,7 +47,7 @@ def main() -> None:
         return
     b69=np.memmap(a.block69,dtype="<f4",mode="r",shape=(1088,1920,32))[288:360,1152:1280]
     flat=np.asarray(b69).reshape(-1,32)
-    b69=(np.c_[flat,np.ones(len(flat),np.float32)]@matrix).reshape(72,128,32)
+    b69=(flat if a.raw_block69 else np.c_[flat,np.ones(len(flat),np.float32)]@matrix).reshape(72,128,32)
     b69=np.repeat(np.repeat(b69,2,axis=0),2,axis=1)
     b0=np.memmap(a.block0,dtype="<f4",mode="r",shape=(1088,1920,32))[288:360,1152:1280]
     b0=np.repeat(np.repeat(np.asarray(b0),2,axis=0),2,axis=1)

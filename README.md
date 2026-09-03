@@ -8,6 +8,8 @@
 
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
+上述坍缩随后被解除：动态raw路径不再应用任何`*-live-correction.bin`，两张实景帧的差异已连续穿过blocks0–69与ViT；block70按225个局部tile分成9批执行，neural输出99.9999919%元素不同。通用head也已运行：CSR prefix仅2432个非零、全幅1H body约1.49–1.56s、outconv约37–41ms，两份最终RGBA SHA不同并在同一游戏进程热切换。证据见`dlss5-amd-dynamic-raw-general.json`。严格剩余问题是明显周期条纹：已知block70 prefix local physical-record排列未exact（旧固定帧上限约0.43 correlation）；5090当前离线，尚不能抓新多帧oracle闭合该排列。因此功能动态链已证明，但画质移植仍未完成。旧含固定帧校正的自动脚本已重命名为`run_dynamic_frame_pipeline_fixed_correction.sh`，避免误用。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

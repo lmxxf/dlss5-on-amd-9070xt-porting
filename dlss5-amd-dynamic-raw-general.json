@@ -1,0 +1,38 @@
+{
+  "status": "dynamic neural execution proven; exact visual-quality port remains incomplete",
+  "gpu": "AMD Radeon RX 9070 XT",
+  "frames": [6600, 10800],
+  "fixed_frame_corrections_removed": true,
+  "checkpoint_difference": {
+    "block13": true,
+    "block21": true,
+    "block30": true,
+    "block38": true,
+    "block47": true,
+    "block61": true,
+    "block69": true
+  },
+  "spatial_head_dynamic_proof": {
+    "geometry": "225 independent 256x144 batches, executed as 9 chunks of 25 tiles",
+    "reason_for_chunking": "single 2.19 GiB StructuredBuffer did not execute correctly; 25-tile input is 243302400 bytes",
+    "per_chunk_ms_range": [56.427, 57.878],
+    "frame6600_sha256": "c8c528a5d1ed80c29ba38f3fa67f2f9277f4b18a27de19322b9c0543e507fae7",
+    "frame10800_sha256": "c8332ddde7069a52e127a2d5285df33e11081fc8e9b841901ca540a57450ac45",
+    "changed_fraction": 0.9999999196,
+    "delta_mae": 0.024817236,
+    "delta_rmse": 0.06296118
+  },
+  "general_head": {
+    "prefix": "block70-prefix-effective.bin packed to CSR: 1024x2048, 2432 nonzeros",
+    "prefix_tiles": 129600,
+    "body": "block70-body-compatible.bin on 3840x2160x32",
+    "body_ms": [1487.155, 1557.275],
+    "outconv_ms": [37.452, 40.605],
+    "frame6600_rgba_sha256": "6a616c967ca613d3a7b99eddd8bb55e3c4a419a96c3059b2e212cb7b1e270081",
+    "frame10800_rgba_sha256": "aba7ac552883d6194bfbbb7fd74961052ec312f6687b0b42c823caca379f991e",
+    "runtime_hot_switch": true
+  },
+  "remaining_quality_issue": "visible periodic striping; block70 prefix local physical-record permutation is not exact, matching the earlier fixed-input correlation ceiling near 0.43",
+  "completion": false,
+  "external_blocker": "5090 host is currently unreachable, so a fresh multi-frame NVIDIA oracle cannot yet be captured to solve the final local record permutation"
+}

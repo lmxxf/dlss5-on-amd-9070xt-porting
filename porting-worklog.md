@@ -1561,6 +1561,16 @@ Universal Feeder shader在本游戏4K路径会导致进程退出，因此停止�
 
 但两帧neural tensor最终SHA均为`9d7d4661...acb4afa`且逐byte exact，不能据热切换宣布动态DLSS5完成。checkpoint审计：block0/1/3/5/7/9不同，block13开始相同；block62/66/69因encoder skip重新不同，block70再次相同。根因是把固定帧live-correction矩阵用于跨帧动态路径，并继续使用只对固定ROI训练的block70 spatial head。当前变化画面主要来自Color base分支。下一步必须移除所有fixed-frame correction，并用通用prefix/body/outconv替换spatial head；目标继续未完成。
 
+### 2026-09-04：解除跨帧坍缩与通用block70
+
+重新捕获两个确定进入场景且Color/Depth/Motion均变化的frame6600/10800，动态链完全移除`*-live-correction.bin`。checkpoint SHA从block0、13、21、22、29、30、31、38、47、48、55、56、61到69始终不同，证明主链不再被单帧bias吸到同一输出。fixed spatial head单ROI输出也不同，直接确认此前坍缩来自校正矩阵。
+
+block70的3840×2176单buffer试验暴露两个执行问题：一维Dispatch超过65535 groups，以及2.19GiB StructuredBuffer实际寻址失效。前者改为2D group线性索引；后者改为225个256×144 batch tile、9批×25 tiles。每批约56.4–57.9ms，两帧neural输出SHA分别`c8c528a5...e507fae7`与`c8332ddd...a57450ac`，99.9999919%元素不同，delta MAE0.02482。
+
+随后接回通用post：`block70-prefix-effective.bin`打包为CSR，1024×2048矩阵仅2432个abs>1e-5非零；129600个4×4 main+skip records输出8×8×32，再拼成2160×3840。`block70-body-compatible.bin`全幅执行1487–1557ms，`block70-outconv-effective.bin`执行37–41ms。两帧最终RGBA SHA不同，并再次在同一游戏进程完成mtime热更新。
+
+画质仍有规则条纹。低强度outconv、去坐标通道、tile DC消除均只能减轻不能根治；且连通用prefix/head仍有条纹，和旧日志“canonical flatten／global bank候选固定帧仅约0.43 correlation”的结论一致。剩余硬缺口明确为block70 local physical record→prefix输入/输出排列，而不是动态性、AMD执行、swapchain回写或Color合成。5090当前SSH超时，待其恢复后必须用多帧controlled oracle解这个排列；目标保持未完成。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

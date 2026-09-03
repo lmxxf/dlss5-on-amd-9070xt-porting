@@ -1,0 +1,5 @@
+param([int]$Frame)
+$ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab';function P($b,$s=''){"$L\raw-$Frame-block$b$s.f32"};function Q($n){if($LASTEXITCODE){throw "$n failed"}}
+$i = P 0 '-hwc';foreach($b in 1..3){& "$L\d3d12_block1_test.exe" "$L\block$b-effective.bin" $i (P $b) 1920 1088 $(if($b-eq1){0}else{1});Q "block$b";$i = P $b}
+& "$L\d3d12_block1_test.exe" "$L\block4-body-effective.bin" $i (P 4) 1920 1088 1;Q block4;& "$L\d3d12_downsample_enter_test.exe" (P 4) "$L\block4-downsample-matrix.bin" "$L\block5-enter-32x64.bin" (P 4 '-enter5') 1920 1088 32;Q down4;$i = P 4 '-enter5';$sh=@{5=0;6=1;7=3;8=2};foreach($b in 5..8){& "$L\d3d12_block128_test.exe" "$L\block$b-body-effective.bin" $i (P $b) 960 544 $sh[$b];Q "block$b";$i = P $b}
+& "$L\d3d12_downsample_enter_test.exe" (P 8) "$L\block8-downsample-matrix.bin" "$L\block9-enter-64x128.bin" (P 8 '-enter9') 960 544 64;Q down8;$i = P 8 '-enter9';$sh=@{9=0;10=1;11=3;12=2;13=0};foreach($b in 9..13){$weight=if($b-eq9){"block9-body-effective.bin"}else{"block$b-effective.bin"};& "$L\d3d12_block128_test.exe" "$L\$weight" $i (P $b) 480 272 $sh[$b];Q "block$b";$i = P $b}

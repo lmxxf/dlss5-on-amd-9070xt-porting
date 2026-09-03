@@ -103,8 +103,9 @@ StructuredBuffer<float> weight:register(t0);
 StructuredBuffer<float> feature:register(t1);
 StructuredBuffer<float> source:register(t2);
 RWStructuredBuffer<float> output:register(u0);
-[numthreads(64,1,1)] void main(uint3 id:SV_DispatchThreadID) {
-    uint pixel=id.x;if(pixel>=PIXELS)return;
+uint linear_id(uint3 g,uint3 t){return (g.y*65535+g.x)*64+t.x;}
+[numthreads(64,1,1)] void main(uint3 g:SV_GroupID,uint3 t:SV_GroupThreadID) {
+    uint pixel=linear_id(g,t);if(pixel>=PIXELS)return;
     [unroll]for(uint color=0;color<3;color++) {
         float residual=0;
         [unroll]for(uint channel=0;channel<32;channel++)
@@ -201,7 +202,9 @@ RWStructuredBuffer<float> output:register(u0);
     commands->SetComputeRootDescriptorTable(
         0, descriptors->GetGPUDescriptorHandleForHeapStart());
     commands->SetPipelineState(pipeline);
-    commands->Dispatch(static_cast<UINT>((pixels + 63) / 64), 1, 1);
+    const UINT64 groups=(pixels+63)/64;
+    commands->Dispatch(static_cast<UINT>(std::min<UINT64>(groups,65535)),
+                       static_cast<UINT>((groups+65534)/65535),1);
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Transition.pResource = output;
