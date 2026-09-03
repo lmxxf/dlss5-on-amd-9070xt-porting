@@ -1523,6 +1523,8 @@ downsample与enter projection已在AMD拆开执行而非跨层跳过。block4 bo
 
 block22与blocks23–29按5MiB重新同帧捕获，后者H68×W120×C512空间连续性约0.91–0.93。RX9070XT重跑split-Swin blocks23–29，held-out依次0.930936/0.926670/0.922398/0.902453/0.893748/0.889838/0.891634。block30按H68×W120执行body，2×pool得到34×60×512，再补两行形成ViT要求的36×60并执行archive 512→1024 projection：raw cosine0.925823、校正held-out0.939221。该输出进入AMD ViT31后沿用既有校正仍有correlation0.940372。encoder tail截断问题至此修复。
 
+block0继续审计：固定preset的Color在network前后均为RGB0/A1，AMD RGB-only surrogate跨tile几乎周期重复，而live输出有明显tile间变化，缺失的是kernel内Box–Muller Gaussian／seq0状态。block0 output的720种token-bit候选中`(5,3,2,0,1,4)`使空间连续性从H/V=0.9069/0.5234提升到0.9069/0.9060，但它仍只是smoothness候选。seq0 prefill按global view解码后，对block0 candidate直接affine held-out仅0.0840，对block2下一层target却达0.981858；结论是prefill抓取和空间信息正确，尚缺block0 output的basis-exact view或Gaussian状态显式重建。目标继续未完成。
+
 等待期间对dump路径加固：新版probe先调用`cuMemGetAddressRange_v2(weight)`取得真实allocation base/size，仅当`allocation_base == block1_weight-22016`且allocation至少147,719,680 bytes时才执行完整copy；log同时记录calculated base、driver-returned base/size与result。这样即使record VA看似连续但实际跨allocation，也不会盲目越界。v2 addon重新静态编译并覆盖Lab／游戏目录，SHA-256为`f980f2f2f07edb36bef95193a0687a2b903860c4346efa19cba8eeb0a79beed8`。5090仍无互动用户、无游戏进程、无arena文件。
 
 ## 工作纪律

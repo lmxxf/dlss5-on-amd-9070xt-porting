@@ -1,0 +1,10 @@
+{
+  "status": "diagnostic candidate, not exact mapping",
+  "shape": [1088, 1920, 32],
+  "token_bit_sources": [5, 3, 2, 0, 1, 4],
+  "neighbor_correlation": {"horizontal": 0.906857, "vertical": 0.906012},
+  "previous_candidate_vertical_correlation": 0.523385,
+  "prefill_to_block0_direct_affine_heldout": 0.084022,
+  "prefill_to_block2_next_layer_affine_heldout": 0.981858,
+  "interpretation": "The seq0 prefill is authoritative input evidence, while the block0 output still needs a basis-exact view or Gaussian-state reconstruction."
+}
