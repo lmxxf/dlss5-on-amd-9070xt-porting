@@ -1733,6 +1733,8 @@ GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因�
 
 `d3d12_directml_gemm.cpp`随后加入`DML_GPU_BOUNDARY=1`正式联合模式：同一D3D12 command list先用HLSL把resident FP32 source写入DirectML A buffer，切换descriptor heap执行compiled GEMM，再切回HLSL把FP16 output解包并执行`F()`。200次GPU timestamp平均0.427682ms，不仅低于分段0.744ms加和，也比旧Expand 8.154–29.414ms快约19–69倍。联合输出8,847,360个FP32（35,389,440 bytes）与“GPU pack文件→独立GEMM→独立unpack”的分段oracle逐byteexact，SHA-256均为`2a6b74c1faebeb17e4980d1876c2b2a009af4388d33c62e07fbf091d433b785a`；纯GEMM回归仍为0.159610ms且exact。block31 Expand由此具备可直接移入resident ViT的完整GPU合同。
 
+复核resident条件时发现上述0.427682ms仍让pack shader直接从UPLOAD heap读取source，和游戏内前一层输出驻留显存不一致。runner改为初始化阶段先copy到DEFAULT heap，计时区只读本地VRAM；300次后Expand完整边界降至0.273847ms，输出SHA仍为`2a6b74c1...b785a`逐byte不变。相同方式测`2160×4096×1024` Contract矩阵＋通用边界为0.327796ms。故正式性能基线必须采用VRAM-local source：完整Expand相对旧8.154–29.414ms约快30–107倍；0.427682ms保留为跨heap诊断值，不再作为resident预测。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
