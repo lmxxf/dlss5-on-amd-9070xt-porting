@@ -1825,6 +1825,10 @@ block39随后真正并入`d3d12_directml_swin512_resident.cpp`：新增第41个D
 
 FFN/Projection诊断runner泛化为环境变量tokens/channels/hidden/attention_dim，非512档关闭双gate，combine只执行fast(expand)。普通block49真输入：DirectML FFN0.515000ms vs旧5.378＋4.562=9.940ms，correlation0.9999998822、MAE7.405e-6、max0.001953125、99.620864% exact；DirectML QKV0.328102ms vs旧5.786ms，correlation0.9999998918、MAE4.926e-6、max5.21e-5。微小误差进入原window Attention与DirectML Projection0.227400ms后完全被E4M3吸收，block49最终8,355,840 floats与旧输出逐byteexact，SHA同为`e5482c76...86a91`。按VRAM-local旧Attention0.581ms估计完整block约1.65ms vs旧19.783ms，约12倍。256档算法门槛通过；下一步构建encoder blocks15–22与decoder blocks48–55两条resident链。
 
+`d3d12_directml_swin256_resident.cpp`由512 resident机械特化后逐项校准为T32640/C256/H288/Q384/A128、W240/H136、8 heads、blocks49–55 shift序列。审计先抓出三类不会由编译器报错的残留：Boundary 512常数、key_token W120，以及未使用block39 bias resource仅分256 floats却创建512-float SRV导致`DXGI_ERROR_INVALID_CALL`；全部修正后真链执行。非gated档仍创建up operator/buffer作为统一骨架但combine忽略，后续可删以省JIT/GPU空算。
+
+七层真resident单次冷GPU26.337520ms；同一graph连续100轮平均9.322514ms，旧blocks49–55为153.983ms，稳态约16.5倍。block55对旧correlation0.9999892933、MAE8.584e-5、RMSE0.000475423、max0.0234375、95.741027% exact，全finite。两路继续进入相同blocks56–70，最终33,177,600-byte 4K R10 SHA均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`逐byteexact。decoder 256 normal段通过；严格剩余是把block48 upsample/prefix并入、删除unused up/block39遗留，以及构建encoder blocks15–22八层变体。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

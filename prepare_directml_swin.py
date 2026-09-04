@@ -28,6 +28,8 @@ for name in ("expand","up","project","ffn_skip","qkv","bias","scale","attention_
     elif name=="qkv":value=value.reshape(c["qstride"],a.channels).T
     elif name=="attention_project":value=value.reshape(a.channels,c["adim"]).T
     keep=name in ("ffn_skip","attention_skip","bias","scale");path=a.output/f"{a.input.stem}-{name}.{'f32' if keep else 'f16'}";value.astype("<f4" if keep else "<f2").tofile(path);parts[name]={"shape":list(value.shape),"file":path.name,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+if "up" not in parts:
+    source=a.output/parts["expand"]["file"];path=a.output/f"{a.input.stem}-up.f16";path.write_bytes(source.read_bytes());parts["up"]={"shape":parts["expand"]["shape"],"file":path.name,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"unused":True}
 manifest={"source":a.input.name,"source_sha256":hashlib.sha256(a.input.read_bytes()).hexdigest(),"channels":a.channels,"hidden":c["hidden"],"qstride":c["qstride"],"attention_dim":c["adim"],"parts":parts}
 (a.output/f"{a.input.stem}-directml.json").write_text(json.dumps(manifest,indent=2)+"\n")
 print(f"channels={a.channels} floats={w.size} parts={len(parts)}")

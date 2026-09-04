@@ -1,11 +1,23 @@
 {
-  "status": "block49-cumulative-correctness-passed-not-resident",
+  "status": "decoder-blocks49-55-single-device-resident-passed",
   "date": "2026-09-04",
   "block": 49,
   "channels": 256,
   "tokens": 32640,
   "gpu_ms": {"ffn": 0.515000, "qkv": 0.328102, "window_attention_old_vram": 0.581, "attention_projection": 0.227400, "estimated_total": 1.651502},
   "old_block_gpu_ms": 19.783,
+  "resident_blocks49_55": {
+    "cold_gpu_ms": 26.337520,
+    "persistent_repeat_100_gpu_ms": 9.322514,
+    "old_gpu_plus_copy_ms": 153.983,
+    "speedup_persistent": 16.516,
+    "block55_correlation": 0.9999892932956532,
+    "block55_mae": 8.583676581289253e-5,
+    "block55_max_abs_error": 0.0234375,
+    "block55_exact_fraction": 0.9574102663526348,
+    "final_r10_byte_exact": true,
+    "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"
+  },
   "final_vs_old": {"elements": 8355840, "correlation": 1.0, "mae": 0.0, "max_abs_error": 0.0, "exact_fraction": 1.0, "sha256": "e5482c76d02db5ffc46e3932d917ec312a100b12ab6be6c294be11f4f3f86a91"},
-  "strict_boundary": "Full cumulative block49 output is byte-exact, but the components still execute in separate diagnostic processes. Encoder and decoder 256-channel resident segments remain to be built."
+  "strict_boundary": "Decoder blocks49-55 now execute on one device and command list and pass final-image validation. Decoder block48 upsample/prefix and encoder blocks15-22 remain outside this resident executable."
 }
