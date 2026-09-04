@@ -1777,6 +1777,8 @@ QKV pack设计随后去掉K显式转置。`DmlGemmOperator::Create`新增可选`
 
 resident宿主新增由环境变量注入真中段数据的诊断模式：`block31-hidden-old.f32`在初始化阶段FP32→FP16并上传hidden，`block31-qkv-directml.f16`与64-value scales上传对应resident资源；计时链跳过Expand/Contract，从QKV GEMM一路执行到AV，最后仅为验证读回head-major FP16 attention。真机QKV0.158320、normalize/pack0.053160、QKᵀ1.383960、softmax1.272600、AV1.235080ms，中段合计4.103120ms；旧QKV＋Attention约39.6ms，约9.65倍。将读回结果重排token-major并执行原`F()`后，对旧AMD Attention全量2,211,840值correlation0.9999717267、MAE8.404e-5、RMSE0.00127166、max0.03125、99.372694%逐值exact，全finite。新resident QKV pack/TransB/softmax/AV真数据合同通过；严格剩余边界是把attention unpack＋`F()`留在GPU并接Projection，以及前端Expand/Contract真链。
 
+`OutputPasses`随后闭合resident后端。第一pass将AV的`[head,token,dim]` FP16重排为token-major，在GPU执行原`F()`并打包为Projection输入；第二pass读取Projection raw FP16，加入resident hidden×FP16 projection skip，执行`F()`并写FP32 final。真block31 projection weight/skip同样只在初始化阶段上传。真hidden起点分段：QKV0.159680、normalize/pack0.073440、QKᵀ1.460000、softmax1.548360、AV1.371240、attention unpack0.012440、Projection0.069640、projection post0.026120ms，总计4.721000ms；旧对应QKV＋Attention＋Projection约42.2ms，约8.9倍。resident final对旧block31 final correlation0.9998874708、MAE0.000449472、RMSE0.00198782、max0.03125、90.037028%逐值exact，全finite，SHA`6476dd13...bd00a`。从Contract hidden到FP32 final已无CPU中间边界；严格剩余仅前端FP32 input→Expand与Contract激活/residual两段。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

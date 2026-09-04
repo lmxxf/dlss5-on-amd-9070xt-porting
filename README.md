@@ -202,6 +202,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - QKV pack接口进一步简化：`DmlGemmOperator`支持`TransB`，QKᵀ已用`TransB=TRANSPOSE`直接接受统一的`[head,token,dim]` K，无需另建`[head,dim,token]`转置buffer；真机QKᵀ 1.346920ms，resident全链4.814480ms。64-value scale资源已纳入arena，下一步写normalize/pack shader。
 - `QkvPackPass`现已进入resident command list：直接读DirectML FP16 QKV，每token/head以32 lanes归一化Q/K，并把Q/K/V写成统一`[head,token,dim]` FP16；pass仅0.061480ms。完整DML→QKV pack→QKᵀ→softmax→AV互操作零链为5.019600ms，剩余边界为前后激活/residual与真权重输入。
 - resident宿主新增真中段模式，直接上传block31旧Contract hidden、DirectML QKV weight与scales后执行QKV→normalize/pack→QKᵀ→softmax→AV；GPU合计4.103120ms。AV解包＋`F()`后对旧Attention correlation0.999971727、99.3727%逐值exact、max0.03125，全finite。
+- `OutputPasses`补齐resident后端：AV head-major FP16现场重排/`F()`为0.012440ms，Projection GEMM 0.069640ms，hidden residual/skip＋`F()`写FP32为0.026120ms。真hidden到block31 final总计4.721ms，对旧final correlation0.999887471、90.037%逐值exact、max0.03125。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
