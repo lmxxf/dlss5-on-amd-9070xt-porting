@@ -1773,6 +1773,8 @@ resident骨架随后升为真实六GEMM执行链。程序创建main/hidden/branc
 
 QKV pack设计随后去掉K显式转置。`DmlGemmOperator::Create`新增可选`TransB`，当启用时B tensor物理shape改为`[batch,1,N,K]`；resident QK以`TransB=TRANSPOSE`直接绑定与Q/V统一的`[head,token,dim]` K。RX9070XT接受该compiled operator，零链QKᵀ1.346920ms，softmax1.256520ms，AV1.293120ms，全resident链4.814480ms；额外64-value normalization scale资源已纳入16张resource清零/生命周期。这样后续normalize/pack shader只需按每个token/head连续写三份32维FP16，不再承担跨token转置，也少一张中间buffer。严格边界：scale当前为零、QKV仍未真正写入Q/K/V；本轮只验证接口与执行拓扑。
 
+`QkvPackPass`随后实现并插入resident链：一个32-thread group对应一个token/head，从DirectML FP16 QKV读取32维Q/K/V，以groupshared tree reduction求Q/K norm，乘64-value scale，并由偶数lane将相邻两维打包写入三张`[head,token,dim]` FP16 buffer。QKV GEMM后切custom heap执行该pass，三路UAV barrier后Q/K直接进入`TransB` QKᵀ。零链真机：Expand0.208400、Contract0.293040、QKV0.161920、normalize/pack0.061480、QKᵀ1.348000、softmax1.548200、AV1.329480、Projection0.069080ms，总计5.019600ms。DML→normalize/pack HLSL→DML→softmax HLSL→DML的完整中段拓扑已无CPU同步。严格边界：输入/权重/scale当前仍为clear零值，只证明执行与资源合同；下一步上传block31真参数，并补Expand/Contract/Projection边界后做resident真输出对拍。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
