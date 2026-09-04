@@ -1707,6 +1707,8 @@ block70末端新增GPU R10 pack pass：outconv RGBA不再readback，转SRV后以
 
 alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，插入alias barrier后以ViT view写`0x22222222`，再插barrier切到block70 view写`0x33333333`；从block70 1.012GiB view首尾readback均为`0x33333333`。这证明重叠placed resources不只可创建，三phase的barrier与GPU可见性在RX9070XT上实际成立。下一步可在同一heap上逐段替换smoke clear为现有已验证PSO dispatch。
 
+正式`d3d12_block70_chain.cpp`随后把prefix/feature/QKV/body/RGBA/R10六个committed resources替换为单块4714.5MiB heap上的placed resources，并执行完整prefix→FFN→QKV→attention→outconv→GPU R10 pack。输出SHA-256 `4868b7e4...be35`与原committed版本逐byte exact，热态GPU＋copy71.081ms，与旧波动区间一致。block70真实phase至此已进入全网alias arena布局；下一步迁移Swin/ViT phase并在同一进程插alias barrier。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

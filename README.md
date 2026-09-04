@@ -82,6 +82,8 @@ phase alias也已实测：750MiB永久skip＋4714.5MiB共享heap，总arena5464.
 
 alias barrier也已真实执行：Swin/ViT/block70三组重叠view依次写`0x11111111/0x22222222/0x33333333`，最终block70 1.012GiB view首尾均读回`0x33333333`。GPU phase切换与可见性已闭合，下一步直接把clear替换为网络PSO。
 
+block70已成为首个真正迁入alias arena的网络phase：六个大资源改为同一4714.5MiB heap上的placed views，完整六pass输出R10与committed版本逐byte exact，热态71.081ms无性能回退。下一步迁移Swin/ViT并合并进程。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

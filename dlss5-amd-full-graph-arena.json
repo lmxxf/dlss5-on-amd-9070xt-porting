@@ -35,5 +35,14 @@
     "r10": 31.64
   },
   "conclusion": "A full single-device graph is physically feasible. The driver accepted the phase-aliased 5.46 GiB arena intended for coexistence with the running game and model weights.",
-  "strict_boundary": "This validates allocation capacity and executed alias barriers, not full-network execution or real-time rendering."
+  "actual_phase_execution": {
+    "phase": "block70",
+    "resources": ["prefix", "feature", "qkv", "body", "rgba", "r10"],
+    "allocation": "six placed resources in one 4714.5 MiB heap",
+    "full_shader_sequence": "prefix -> ffn -> qkv -> attention -> outconv -> r10 pack",
+    "packed_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "comparison": "byte-exact against committed-resource production output",
+    "hot_gpu_plus_copy_ms": 71.081
+  },
+  "strict_boundary": "This validates allocation capacity, alias barriers, and actual block70 execution on placed resources; full-network single-process execution and real-time rendering remain incomplete."
 }
