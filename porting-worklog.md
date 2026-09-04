@@ -1743,6 +1743,10 @@ GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因�
 
 按旧shader完全相同的权重median norm scale，对DirectML raw Q/K逐token/head做normalization，V保持原值；全量6,635,520值对旧AMD QKV correlation0.9999999794、MAE6.888e-5、RMSE1.596e-4、max0.003112。分支correlation：Q 0.9999999794、K 0.9999999809、V 0.9999999776。由此QKV dense矩阵替换数值成立；当前0.171639ms尚不含GPU normalization，下一步用32-lane group reduction把该步骤直接接在DirectML output后，不能拿CPU补算时间冒充最终性能。
 
+QKV normalization随后并入联合GPU pass：每个token/head一个32-thread group，从DirectML FP16 output同时读取Q/K/V，以groupshared tree reduction求Q/K平方和并乘预计算median norm scale，V直接写回。`make_vit_qkv_scales.py`固化64个FP32 scale，文件SHA-256为`0712134d...e8ce7`。完整pack→DirectML→normalize/unpack为0.201329ms；对CPU normalization correlation1.0、MAE1.60e-8、max9.54e-7，对旧QKV保持correlation0.9999999794、MAE6.888e-5，GPU reduction自身没有引入可观测新误差。
+
+block31 runner再加入`VIT_PRECOMPUTED_QKV`入口，在相同旧Expand/Contract后跳过旧QKV，直接让GPU-normalized DirectML QKV进入原Attention＋Projection。尾链wall46.719ms；加DirectML QKV 0.201ms后整块约46.92ms，对旧五段block31最终输出correlation0.9999980898、MAE1.000e-5、RMSE2.589e-4、max0.015625、99.754503%逐值exact，全finite。误差穿过softmax attention后未放大，QKV完整算子替换通过；block31当前最大热点收敛为Attention约23ms。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
