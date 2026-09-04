@@ -1723,6 +1723,8 @@ alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，
 
 RX9070XT热态GPU timestamp结果：ViT Expand `2160×1024×4096`为0.150368ms／120.500 TFLOPS；Contract `2160×4096×1024`约0.14–0.17ms／106–126 TFLOPS；QKV `2160×1024×3072`为0.115377ms／117.784 TFLOPS。Swin代表形状`8160×512×576`为0.052317ms、`32640×256×288`为0.101855ms、`522240×64×96`为0.562593ms。小K吞吐下降但仍是亚毫秒；相较现有ViT Expand单层8.154–29.414ms，矩阵主体约有48–196倍加速空间。严格边界：这是独立FP16 dense GEMM，不含权重转换、SASS多项式、residual、Q/K normalization、attention和全网调度；下一步把block31 Expand真权重与真输入接入同一operator做逐元素误差验收。
 
+GEMM runner新增文件模式后直接读取`probe-block30-pad-native.f32`与`block31-vit-expand-effective.f16`，CPU仅做与未来GPU cast等价的FP32→FP16输入转换，DirectML输出完整2160×4096 FP16。100次热态平均0.174538ms／103.814 TFLOPS。`validate_directml_gemm.py`在token 0/1/100/1000/2159抽查20,480值：对相同FP16输入＋FP32累加reference correlation0.999999977、MAE1.459e-5、max1.384e-4；对旧FP32输入shader correlation0.999999969。套原`F()` E4M3量化后，对旧shader correlation0.999989102、99.7021%逐值exact，最大差一个0.03125量化级。矩阵核数值替换成立；剩余接口工作是把input cast与output cast＋`F()`留在GPU并接入resident ViT command list。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
