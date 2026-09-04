@@ -1779,6 +1779,10 @@ resident宿主新增由环境变量注入真中段数据的诊断模式：`block
 
 `OutputPasses`随后闭合resident后端。第一pass将AV的`[head,token,dim]` FP16重排为token-major，在GPU执行原`F()`并打包为Projection输入；第二pass读取Projection raw FP16，加入resident hidden×FP16 projection skip，执行`F()`并写FP32 final。真block31 projection weight/skip同样只在初始化阶段上传。真hidden起点分段：QKV0.159680、normalize/pack0.073440、QKᵀ1.460000、softmax1.548360、AV1.371240、attention unpack0.012440、Projection0.069640、projection post0.026120ms，总计4.721000ms；旧对应QKV＋Attention＋Projection约42.2ms，约8.9倍。resident final对旧block31 final correlation0.9998874708、MAE0.000449472、RMSE0.00198782、max0.03125、90.037028%逐值exact，全finite，SHA`6476dd13...bd00a`。从Contract hidden到FP32 final已无CPU中间边界；严格剩余仅前端FP32 input→Expand与Contract激活/residual两段。
 
+`FrontPasses`最终闭合block31前端：FP32 source成对打包main FP16；Expand raw经`F()`、clamp与原多项式写Contract input；Contract raw加入FP32 source×FP16 skip，执行`F()`并写final hidden FP16。为避免in-place hazard新增contractInput/contractRaw，真input及Expand/Contract weights/skip仅初始化上传。完整resident block31共23张资源694.79MiB，在一个command list执行13段：input pack0.017960、Expand0.682160、contract prepare0.075840、Contract0.998800、contract post0.028920、QKV0.549680、QKV pack0.057560、QKᵀ1.106960、softmax1.528840、AV1.147360、attention unpack0.011800、Projection0.068800、projection post0.027040ms，总计6.301720ms；旧block31 61.426ms，约9.75倍。
+
+resident final对旧block31 correlation0.9996383986、MAE0.00135754、RMSE0.00356281、max0.03125、75.343831% exact、全finite；SHA-256 `cb7095a1b04b017f51fb64b9d48d2e8a297d28bddf15a34195091d914184d0ba`，与先前五进程逐段DirectML累积oracle逐byte完全相同。由此证明单device合并未引入新误差，block31 resident算法/资源/同步/性能四项同时通过。严格下一步：在同一进程加载blocks32–38逐层权重并loop八次，替换生产`d3d12_vit_chain_amd.exe`后重跑frame56400最终R10。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

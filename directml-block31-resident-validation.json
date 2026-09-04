@@ -1,0 +1,38 @@
+{
+  "status": "single-device-resident-block31-passed",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "tokens": 2160,
+  "resident_resources": 23,
+  "resident_mib": 694.79,
+  "gpu_ms": {
+    "input_pack": 0.017960,
+    "expand": 0.682160,
+    "contract_prepare": 0.075840,
+    "contract": 0.998800,
+    "contract_post": 0.028920,
+    "qkv": 0.549680,
+    "qkv_pack": 0.057560,
+    "qk": 1.106960,
+    "softmax": 1.528840,
+    "av": 1.147360,
+    "attention_unpack": 0.011800,
+    "projection": 0.068800,
+    "projection_post": 0.027040,
+    "total": 6.301720
+  },
+  "old_block31_ms": 61.426,
+  "speedup": 9.7475,
+  "final_vs_old": {
+    "elements": 2211840,
+    "correlation": 0.9996383986156728,
+    "mae": 0.00135754214392768,
+    "rmse": 0.0035628137926675715,
+    "max_abs_error": 0.03125,
+    "exact_fraction": 0.7534383138020834,
+    "all_finite": true,
+    "sha256": "cb7095a1b04b017f51fb64b9d48d2e8a297d28bddf15a34195091d914184d0ba",
+    "matches_multiprocess_directml_sha256": true
+  },
+  "strict_boundary": "Block31 is fully resident and validated. Blocks32-38 still need to be looped inside this process before the ViT stage can replace the production resident runner."
+}
