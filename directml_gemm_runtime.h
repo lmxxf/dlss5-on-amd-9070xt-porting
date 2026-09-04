@@ -25,16 +25,19 @@ inline DML_BINDING_PROPERTIES dmlrt_binding_properties(IDMLDispatchable* dispatc
 
 class DmlGemmOperator {
 public:
-    void Create(IDMLDevice* dml, ID3D12Device* dx, UINT batch, UINT m, UINT k, UINT n) {
+    void Create(IDMLDevice* dml, ID3D12Device* dx, UINT batch, UINT m, UINT k, UINT n,
+                DML_MATRIX_TRANSFORM transB = DML_MATRIX_TRANSFORM_NONE) {
         batch_ = batch; m_ = m; k_ = k; n_ = n;
         UINT aSizes[4] = {batch, 1, m, k};
-        UINT bSizes[4] = {batch, 1, k, n};
+        UINT bSizes[4] = {batch, 1,
+                          transB == DML_MATRIX_TRANSFORM_NONE ? k : n,
+                          transB == DML_MATRIX_TRANSFORM_NONE ? n : k};
         UINT oSizes[4] = {batch, 1, m, n};
         DML_BUFFER_TENSOR_DESC aBuffer{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,aSizes,nullptr,UINT64(batch)*m*k*2,0};
         DML_BUFFER_TENSOR_DESC bBuffer{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,bSizes,nullptr,UINT64(batch)*k*n*2,0};
         DML_BUFFER_TENSOR_DESC oBuffer{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,oSizes,nullptr,UINT64(batch)*m*n*2,0};
         DML_TENSOR_DESC a{DML_TENSOR_TYPE_BUFFER,&aBuffer}, b{DML_TENSOR_TYPE_BUFFER,&bBuffer}, o{DML_TENSOR_TYPE_BUFFER,&oBuffer};
-        DML_GEMM_OPERATOR_DESC gemm{&a,&b,nullptr,&o,DML_MATRIX_TRANSFORM_NONE,DML_MATRIX_TRANSFORM_NONE,1.0f,0.0f,nullptr};
+        DML_GEMM_OPERATOR_DESC gemm{&a,&b,nullptr,&o,DML_MATRIX_TRANSFORM_NONE,transB,1.0f,0.0f,nullptr};
         DML_OPERATOR_DESC desc{DML_OPERATOR_GEMM,&gemm};
         IDMLOperator* raw = nullptr;
         dmlrt_check("CreateOperator", dml->CreateOperator(&desc, DMLRT_IID_OPERATOR, (void**)&raw));

@@ -1771,6 +1771,8 @@ resident骨架随后升为真实六GEMM执行链。程序创建main/hidden/branc
 
 首个custom边界随后进入resident链：与独立Attention相同的64-thread FP16 softmax直接读取DirectML QKᵀ的298,598,400-byte score，按head/query做max与sum reduction，写同尺寸probability；command list从DirectML descriptor heap切到custom heap，UAV barrier后再切回AV的DirectML heap，全程不插CPU fence。零链真机分段为Expand0.440760、Contract0.573960、QKV0.339200、QKᵀ1.998840、softmax1.525040、AV1.325520、Projection0.069240ms，合计6.272560ms，DML→HLSL→DML互操作完成、无device removed。该轮GPU频率/冷态使矩阵段比前次3.297ms基线慢，不能用差值推断softmax开销；softmax自身timestamp为1.525ms。严格边界：Q/K/V当前仍是clear资源，尚待QKV normalize/head-major pack接入后以真数据复验。
 
+QKV pack设计随后去掉K显式转置。`DmlGemmOperator::Create`新增可选`TransB`，当启用时B tensor物理shape改为`[batch,1,N,K]`；resident QK以`TransB=TRANSPOSE`直接绑定与Q/V统一的`[head,token,dim]` K。RX9070XT接受该compiled operator，零链QKᵀ1.346920ms，softmax1.256520ms，AV1.293120ms，全resident链4.814480ms；额外64-value normalization scale资源已纳入16张resource清零/生命周期。这样后续normalize/pack shader只需按每个token/head连续写三份32维FP16，不再承担跨token转置，也少一张中间buffer。严格边界：scale当前为零、QKV仍未真正写入Q/K/V；本轮只验证接口与执行拓扑。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
