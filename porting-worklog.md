@@ -1855,6 +1855,10 @@ decoder block56 prefix随后并入128 resident。`prepare_directml_upsample_pref
 
 真`raw-16800-block55`＋block14 skip单轮prefix→blocks56–61为26.093240ms，对旧`--upsample`六层输出16,711,680 floats逐float/byte100% exact；100轮每轮重建prefix，稳态14.849870ms，旧123.793ms，约8.34倍。因block61二进制完全相同，确定性blocks62–70输入不变，最终R10继承既有exact，无需重复同一尾链。decoder128 external prefix已闭合；下一步转64/32档与持久生命周期。
 
+64-channel从block63启动，T522240/C64/H96/Q96/A32/2 heads。纯矩阵benchmark：64→96约0.58–0.60ms、32→64 0.227906ms、16320-batch window `64×16×64` 1.076938ms。通用runner的大tensor边界继续采用2D dispatch。真FFN2.273320ms vs旧10.002ms；33,423,360输出corr0.99999999929、MAE1.002e-7，仅116值不同、7值差>0.01、max0.5。QKV1.437972ms；同时把standalone QKV buffer从错误统一stride384修为真实分档768/384/192/96，旧QKV自身由约12ms降至3.245ms，避免3/4空线程。
+
+完整DirectML block63对同版本即时旧oracle corr0.9999734214、MAE0.0129612、max0.5、76.5630% exact，全finite；继续到block70后R10有827,468/8,294,400像素不同（9.9762%），但10-bit RGB最大差仅3/5/6。分离替换确认只换FFN已复现几乎全部差异，QKV/Projection非主因：whole-output FP16 project rounding让116个FFN值跨E4M3边界，Attention再将稀疏差异扩散。故64档状态明确为性能通过、最终exact失败，不进入主线。下一步对FFN project按K维拆partial FP16，GPU FP32累加后再做residual/E4M3，避免最终总和先压成FP16。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

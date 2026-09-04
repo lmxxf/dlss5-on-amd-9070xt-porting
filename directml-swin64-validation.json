@@ -1,0 +1,13 @@
+{
+  "status": "block63-performance-pass-final-exact-failed",
+  "date": "2026-09-04",
+  "block": 63,
+  "channels": 64,
+  "tokens": 522240,
+  "gpu_ms": {"ffn": 2.273320, "qkv": 1.437972, "attention_projection": 0.993600},
+  "old_gpu_ms": {"ffn": 10.002, "qkv_tight": 3.245, "window_attention": 1.249, "attention_projection": 0.798},
+  "ffn_vs_old": {"correlation": 0.9999999992896169, "mae": 1.001591775931564e-7, "max_abs_error": 0.5, "different_values": 116, "differences_over_0_01": 7},
+  "full_block_vs_same_version_old": {"correlation": 0.9999734213725204, "mae": 0.01296116622055278, "max_abs_error": 0.5, "exact_fraction": 0.7656304752125459, "all_finite": true},
+  "downstream_r10": {"byte_exact": false, "different_pixels": 827468, "different_pixel_fraction": 0.09976224922839506, "max_channel_deltas": [3,5,6]},
+  "diagnosis": "FFN-only replacement reproduces nearly all final differences. Whole-output FP16 rounding at 64 channels moves 116 FFN values across E4M3 boundaries; later attention diffuses them. Use K-split FP16 partials with FP32 accumulation before accepting this width."
+}
