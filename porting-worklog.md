@@ -1739,6 +1739,10 @@ GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因�
 
 `d3d12_vit_block31_test.cpp`新增可选precomputed Expand入口：将DirectML联合pass的8,847,360-value FP32激活一次上传到branch，跳过旧Expand，继续执行原Contract/QKV/Attention/Projection。对同一`probe-block30-pad-native`输入，旧五段block31为61.426ms（Expand11.851、Contract6.555、QKV15.640、Attention23.961、Projection2.591）；hybrid尾链为52.353ms，加入VRAM-local DirectML Expand 0.274ms后约52.63ms。hybrid最终2,211,840值对旧AMD block31 correlation0.999614718、MAE0.00142826、RMSE0.00367897、max0.03125、74.0607%逐值exact，全finite。注意该输入与保存的NVIDIA oracle不属同一谱系，二者约0.07 correlation不能用于判断回归；权威裁判是相同输入下旧AMD与hybrid的直接对拍。DirectML误差穿过完整block后仍被限制在一个E4M3量化级，block31替换数值可行；性能主热点转为QKV＋Attention约40ms。
 
+为隔离QKV，block31 runner新增`VIT_DUMP_PASS`，可在任意pass后提前读回；同输入导出Contract hidden与旧QKV完整输出。`e4m3_to_f16.py`把`block31-qkv-effective.fp8`的3,145,728个有限E4M3权重按原`[input,3,head,dim]`顺序解到FP16，SHA-256为`3254cda9...626fa`。DirectML以真hidden执行`2160×1024×3072`，含VRAM pack与raw FP32 unpack为0.171639ms，对比旧QKV shader15.690ms约快91倍。
+
+按旧shader完全相同的权重median norm scale，对DirectML raw Q/K逐token/head做normalization，V保持原值；全量6,635,520值对旧AMD QKV correlation0.9999999794、MAE6.888e-5、RMSE1.596e-4、max0.003112。分支correlation：Q 0.9999999794、K 0.9999999809、V 0.9999999776。由此QKV dense矩阵替换数值成立；当前0.171639ms尚不含GPU normalization，下一步用32-lane group reduction把该步骤直接接在DirectML output后，不能拿CPU补算时间冒充最终性能。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

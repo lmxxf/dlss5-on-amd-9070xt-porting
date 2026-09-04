@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cwchar>
 #include <cstring>
 #include <fstream>
@@ -77,6 +78,10 @@ int wmain(int argc, wchar_t **argv) {
        projectionSkip = read_file(argv[7]), input = read_file(argv[8]),
        oracle = read_file(argv[9]);
   const bool precomputedExpand = argc == 12;
+  const char *dumpPassText = std::getenv("VIT_DUMP_PASS");
+  const int dumpPass = dumpPassText ? std::atoi(dumpPassText) : -1;
+  if (dumpPass < -1 || dumpPass > 4 || (precomputedExpand && dumpPass == 0))
+    return 2;
   auto directmlExpand = precomputedExpand ? read_file(argv[11]) : std::vector<uint8_t>{};
   if (expand.size() != 1024ull * 4096 * 2 ||
       contract.size() != 4096ull * 1024 * 2 || contractSkip.size() != 2048 ||
@@ -276,7 +281,8 @@ groupshared float shared_values[64];
                    precomputedExpand && i == 0 ? D3D12_RESOURCE_STATE_COPY_DEST
                                                : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-  const UINT64 readbackSize = sizes[4];
+  const int outputPass = dumpPass >= 0 ? dumpPass : 4;
+  const UINT64 readbackSize = sizes[outputPass];
   ID3D12Resource *readback = make(
       readbackSize, &readbackHeap, D3D12_RESOURCE_STATE_COPY_DEST,
       D3D12_RESOURCE_FLAG_NONE);
@@ -356,7 +362,7 @@ groupshared float shared_values[64];
   commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
   if (precomputedExpand)
     commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
-  for (int pass = precomputedExpand ? 1 : 0; pass < 5; ++pass) {
+  for (int pass = precomputedExpand ? 1 : 0; pass <= outputPass; ++pass) {
     commands->SetPipelineState(pipelines[pass]);
     if (pass == 3 && waveAttention) commands->Dispatch(tokens, 32, 1);
     else commands->Dispatch(dispatches[pass], 1, 1);
@@ -370,12 +376,12 @@ groupshared float shared_values[64];
                              timestampReadback, 0);
   D3D12_RESOURCE_BARRIER copy{};
   copy.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-  copy.Transition.pResource = uavs[4];
+  copy.Transition.pResource = uavs[outputPass];
   copy.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
   copy.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
   copy.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
   commands->ResourceBarrier(1, &copy);
-  commands->CopyBufferRegion(readback, 0, uavs[4], 0, sizes[4]);
+  commands->CopyBufferRegion(readback, 0, uavs[outputPass], 0, readbackSize);
   check("close", commands->Close());
   LARGE_INTEGER frequency, begin, end;
   QueryPerformanceFrequency(&frequency);
@@ -400,7 +406,17 @@ groupshared float shared_values[64];
   readback->Map(0, &range, &mapped);
   auto *output = reinterpret_cast<const float *>(mapped);
   std::ofstream(argv[10], std::ios::binary).write(
-      reinterpret_cast<const char *>(output), sizes[4]);
+      reinterpret_cast<const char *>(output), readbackSize);
+  if (outputPass != 4) {
+    std::printf("dump_pass=%d output_floats=%llu submit_to_fence_ms=%.3f\n",
+                outputPass, (unsigned long long)(readbackSize / 4),
+                1000.0 * (end.QuadPart - begin.QuadPart) / frequency.QuadPart);
+    for (int pass = precomputedExpand ? 1 : 0; pass <= outputPass; ++pass)
+      std::printf("%s_ms=%.3f\n", entries[pass],
+                  1000.0 * double(timestamps[pass + 1] - timestamps[pass]) /
+                      double(timestampFrequency));
+    return 0;
+  }
   auto *wanted = reinterpret_cast<const float *>(oracle.data());
   double ae = 0, se = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
   for (UINT i = 0; i < tokens * 1024; ++i) {

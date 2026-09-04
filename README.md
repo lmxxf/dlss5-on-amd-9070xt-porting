@@ -187,6 +187,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `d3d12_post_upsample_test.cpp`现亦支持`[spatial-width phase-period]`，按样本的窗口内phase选择独立矩阵。block62的8×8 phase校正在RX9070XT为0.789 ms，block66为0.684 ms；分别对同帧层级oracle达到0.86294与0.96993。该模式用于恢复physical dynamic-scale的固定帧残差。
 - `d3d12_post_outconv_test.cpp`：RX9070XT直接执行portable 32→RGB与`Color + residual`；独立held-out tile MAE 2.17e-7。256×144全图用controlled body feature对NVIDIA oracle：1.060 ms、RGBA MAE 4.95e-5、max error 0.001531；8-bit RGB 98.32% channels exact、最大1 LSB。
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
+- `e4m3_to_f16.py`与DirectML QKV路径：把block31的`1024×3072` E4M3矩阵无损解码到FP16，DirectML真hidden输入矩阵＋GPU边界仅0.171639ms；CPU补回原逐head Q/K normalization后，对旧AMD QKV全量correlation0.999999979、MAE6.89e-5，下一步将同一normalization reduction移入GPU。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `d3d12_directml_probe.cpp`：从现有D3D12 AMD adapter动态加载Windows系统`DirectML.dll`，不捆绑redist；RX9070XT已成功创建`IDMLDevice`并报告最高DirectML feature level 6.4。用于进入FP16矩阵核GEMM基准，不代表整网已经实时化。
 - `d3d12_directml_gemm.cpp` / `validate_directml_gemm.py`：DirectML FP16 GEMM真机基准、文件输入模式、抽样数值验证及同command-list GPU边界模式；显式修正MinGW对24-byte COM struct return的ABI差异。ViT Expand纯GEMM约0.15–0.17ms；activation先驻留本地VRAM后，pack→GEMM→unpack＋`F()`联合pass为0.273847ms，输出与分段oracle 35.4MB逐byte exact。
