@@ -70,6 +70,8 @@ block30 pool/enter与H34→H36零padding现已并入ViT resident宿主，block30
 
 同宽块继续合并：decoder48–55与56–61分别成为单次8/6层chain；encoder9–14、15–22、23–30分别成为6/8/8层chain，段末全部exact。encoder0–14热态2.853秒，encoder15–30降至1.399秒；Windows blocks1–70总wall由20.403秒进一步降至15.317秒，最终RGBA逐byte exact。
 
+decoder四条跨stage现全部由resident宿主直接执行affine＋2×upsample＋skip再进入Swin，projected/prefix中间文件与独立merge进程均删除。block48→55/56→61/62→65/66→69分别为159.024/126.077/97.136/67.733ms且exact；Windows blocks1–70 wall进一步降至12.441秒，最终RGBA逐byte exact。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

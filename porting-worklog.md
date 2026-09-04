@@ -1691,6 +1691,8 @@ predown shader随后加入版本化CSO cache。ViT block30 predown冷/热wall为
 
 同宽连续块随后最大化合链：decoder blocks48–55合为8层153.853ms，blocks56–61合为6层121.111ms，两端exact；Windows整网wall由20.403秒降至16.761秒。encoder侧blocks9–14合为6层128.157ms；blocks15–22合为8层154.509ms；带block22 predown的blocks23–30合为8层165.541ms，全部逐byte exact。热态encoder0–14为2853.064ms，encoder15–30从初始4870.546ms降至1398.768ms。再次执行Windows blocks1–70总wall为15,317.273ms，最终RGBA逐byte exact。剩余进程边界均发生在不同channel/geometry或skip merge之间，下一步需要真正的跨stage全网device。
 
+`d3d12_swin_chain.cpp`新增`--upsample low skip output weights...`：单GPU pass按低分辨率执行`2C→C` affine并现场2×nearest＋skip，直接写下一Swin段stagein；block48→55/56→61/62→65分别为159.024/126.077/97.136ms，段末逐byte exact。`d3d12_swin32_chain.cpp`同样加入64→32 upsample，block66→69为67.733ms且exact。四条decoder跨stage均接入整网脚本，不再生成projected/prefix文件或启动独立affine/CPU merge进程。Windows blocks1–70 wall先降至13,710.218ms，再随block66融合降至12,440.536ms，最终RGBA逐byte exact；相对20.403秒resident初版再降约39%。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

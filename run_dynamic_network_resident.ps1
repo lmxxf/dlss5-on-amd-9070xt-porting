@@ -24,11 +24,7 @@ Check 'block39'
 Check 'decoder40-47'
 Mark 'block39+decoder40-47'
 
-& "$L\d3d12_affine_test.exe" "$L\block48-prefix-matrix-with-bias.bin" (P 47) (P 48 '-projected') 512 256
-Check 'block48 projection'
-& "$L\merge_upsample_skip.exe" (P 48 '-projected') (P 22 '-body') (P 48 '-prefix') 68 120 256
-Check 'block48 merge'
-& "$L\d3d12_swin_chain.exe" (P 48 '-prefix') (P 55) `
+& "$L\d3d12_swin_chain.exe" --upsample (P 47) (P 22 '-body') (P 55) `
   "$L\block48-body-effective.bin" "$L\block49-body-effective.bin" `
   "$L\block50-body-effective.bin" "$L\block51-body-effective.bin" `
   "$L\block52-body-effective.bin" "$L\block53-body-effective.bin" `
@@ -36,27 +32,18 @@ Check 'block48 merge'
 Check 'decoder48-55'
 Mark 'block48+decoder49-55'
 
-function Upsample($Block,$Previous,$Skip,$InputChannels,$OutputChannels,$Height,$Width){
-  & "$L\d3d12_affine_test.exe" "$L\block$Block-prefix-matrix-with-bias.bin" (P $Previous) (P $Block '-projected') $InputChannels $OutputChannels
-  Check "block$Block projection"
-  & "$L\merge_upsample_skip.exe" (P $Block '-projected') (P $Skip) (P $Block '-prefix') $Height $Width $OutputChannels
-  Check "block$Block merge"
-}
-Upsample 56 55 14 256 128 136 240
-& "$L\d3d12_swin_chain.exe" (P 56 '-prefix') (P 61) `
+& "$L\d3d12_swin_chain.exe" --upsample (P 55) (P 14) (P 61) `
   "$L\block56-body-effective.bin" "$L\block57-body-effective.bin" `
   "$L\block58-body-effective.bin" "$L\block59-body-effective.bin" `
   "$L\block60-body-effective.bin" "$L\block61-body-effective.bin"
 Check 'decoder56-61'
 Mark 'block56+decoder57-61'
-Upsample 62 61 8 128 64 272 480
-& "$L\d3d12_swin_chain.exe" (P 62 '-prefix') (P 65) `
+& "$L\d3d12_swin_chain.exe" --upsample (P 61) (P 8) (P 65) `
   "$L\block62-body-effective.bin" "$L\block63-body-effective.bin" `
   "$L\block64-body-effective.bin" "$L\block65-body-effective.bin"
 Check 'decoder62-65'
 Mark 'block62-65'
-Upsample 66 65 4 64 32 544 960
-& "$L\d3d12_swin32_chain.exe" (P 66 '-prefix') (P 69) `
+& "$L\d3d12_swin32_chain.exe" --upsample (P 65) (P 4) (P 69) `
   "$L\block66-body-effective.bin" "$L\block67-body-effective.bin" `
   "$L\block68-body-effective.bin" "$L\block69-body-effective.bin"
 Check 'decoder66-69'
