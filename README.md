@@ -211,6 +211,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - block40 QKV同样用拆出的`512×768` FP16真权重执行：DirectML含边界0.125465ms vs旧8.320ms（66.3倍）；6,266,880个有效值对旧QKV correlation0.999999978、MAE2.70e-7、max3.79e-6。窗口Attention旧实现仅约0.8ms，当前优先替换Attention Projection。
 - block40 Attention Projection `8640×256→512`亦完成：DirectML pack/GEMM/residual＋E4M3为0.163840ms vs旧2.219ms（13.54倍），最终4,177,920有效值逐float100% exact。三个矩阵段合计约0.71ms，只剩旧window Attention约0.8ms。
 - block40完整累积链已验证：DirectML FFN→DirectML QKV→原window Attention→DirectML Projection最终仍对旧block40逐float100% exact，SHA`e7f86183...3679`。按VRAM-local分段预计约1.44ms/block；诊断runner从upload heap读预计算QKV导致Attention显示1.43ms，不作为resident预测。
+- blocks40–47已逐层吃前一层DirectML final完成八层累积：block47对旧resident链所有4,177,920值数值100% exact、MAE/max 0；仅10,125个`+0/-0`符号bit不同（0.2423%）。估计约12ms vs旧190.890ms，严格状态仍为多进程，见`directml-swin512-validation.json`。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。

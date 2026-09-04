@@ -1,0 +1,20 @@
+{
+  "status": "eight-block-cumulative-numeric-pass-not-resident",
+  "date": "2026-09-04",
+  "blocks": [40,41,42,43,44,45,46,47],
+  "old_resident_gpu_plus_copy_ms": 190.890,
+  "directml_estimated_gpu_ms": 12.0,
+  "block47_vs_old": {
+    "elements": 4177920,
+    "correlation": 1.0,
+    "mae": 0.0,
+    "rmse": 0.0,
+    "max_abs_error": 0.0,
+    "numeric_exact_fraction": 1.0,
+    "bit_exact_fraction": 0.9975765452665441,
+    "signed_zero_bit_differences": 10125,
+    "all_bit_differences_are_signed_zero": true,
+    "all_finite": true
+  },
+  "strict_boundary": "All eight blocks consume the previous hybrid DirectML output, but still use separate diagnostic processes. The only bit differences are +0.0 versus -0.0. A single-device resident implementation is still required."
+}
