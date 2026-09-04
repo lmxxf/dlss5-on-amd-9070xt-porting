@@ -2037,6 +2037,12 @@ production SHA`b0e0ada5...82219f`冷启动复验：日志明确`max_block=70 raw
 
 部署候选SHA为7e94524c9debf38659f29100ac08c54f7839c4322e73cce8d35b0b36bce57b8e。实测菜单5秒窗口约13.315–13.317fps；进入游戏加载期9.878/11.061，随后12.721/12.643fps。实际场景截图未见此前绿色网格。尚未达到30fps，且场景变化下这些数字不能独立证明两项候选各自的收益；下一步需要GPU分段timestamp定位热点，目标仍为33.3ms总帧预算。
 
+### 2026-09-05 游戏内GPU时间戳
+
+新增一次性GPU profile：完整初始化并热身60帧后，在游戏原生command list对13段插timestamp，Resolve到112-byte时间戳buffer；present侧在游戏queue Signal fence，后续确认完成才读取。不读回图像。首个样本(ms)：block0 0.59316，front1–4 11.88072，enc5–8 4.20388，enc9–14 3.47156，enc15–22 3.55660，enc23–30 2.01384，ViT 5.36352，dec39–47 1.30444，dec48–55 2.52932，dec56–61 2.44796，dec62–65 3.30388，dec66–69 11.57468，block70 19.43360；全网71.67716ms。该计时不含FSR、输入bridge和最终显示合成，不能当完整帧耗时。
+
+核查本地block22-pool-identity和block30-pool-identity逐元素等于单位矩阵，C512/Vit predown省略apply_matrix并直接从输入pool，保持后续顺序；进一步扩展profile为18点，增加block70内部prefix/FFN/QKV/attention。候选部署SHA aa86d6a5ab501b8b20af4f25d9f209831c1dd4f7f7d100147be208827ea3ee60。30fps尚未达成，优先优化两个C32阶段及block70。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
