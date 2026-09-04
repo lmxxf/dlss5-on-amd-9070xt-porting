@@ -2007,6 +2007,8 @@ AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身�
 
 文件门第二次仍显示70，核查文件内容为69，根因是Windows PowerShell 5 `Set-Content`默认UTF-16LE，而DLL对binary wide stream的读取未建立正确文本编码状态。launcher改为显式`-Encoding Ascii`，DLL改用`fscanf`解析窄字符数字。ASCII门版SHA-256=`b3f2b254068b5a8260d41c8a7e85c2cc39baf8adbdd9802d477905ef80fc4f65`。
 
+ASCII诊断门后完成真实GPU二分：max69在blocks66–69首submit后退出；max38在ViT首submit后退出；max30在blocks23–30首submit后退出；max22在blocks15–22首submit后退出；max14在blocks9–14首submit后退出。max8当前进程稳定且present超过3000，但FFX frame在全graph ready前停于533，因而一帧网络都未执行，不能判通过。下一步需让游戏窗口回前台/进入动态场景，使ready后的FFX dispatch继续发生，再判blocks0–8。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
