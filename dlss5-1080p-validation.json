@@ -28,5 +28,17 @@
     "block4_sha256": "75778dc103fc5c3543d462921a06289440a9e6a5364a50a9a34827a83d59e6ce",
     "block4_byte_exact_vs_same_input_separate_reference": true
   },
+  "runtime_dll": {
+    "source": "dlss5_1080p_runtime.cpp",
+    "binary_sha256": "e496e01b48febb81356f741111b1eec9a4f79bf9303b6c01f3d54cb60338d3e7",
+    "in_process_contract": [
+      "main IDXGISwapChain3 device",
+      "persistent DirectML device, queue, allocator, list and fence",
+      "one-time 8160x192x256 representative operator initialization and 100 warm dispatches",
+      "MinHook ffxDispatch current-frame Color, Depth, Motion and output resources",
+      "1080p output-size and same-device validation without CPU readback"
+    ],
+    "status": "compiled and deployed; first in-game load pending"
+  },
   "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
 }

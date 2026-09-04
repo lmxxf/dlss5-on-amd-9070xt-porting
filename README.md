@@ -8,6 +8,8 @@
 
 1080p/10fps现为第一阶段完成目标。全网几何按空间各轴减半，front为960×544、最终block70为1920×1088并裁到1080；权重/通道/window保持不变，详见`dlss5-1080p-geometry.json`。frame56400真实Color已生成8160 tiles，动态front runner完成block0→GPU HWC→blocks1–4：100轮稳态12.767225ms，block4 66,846,720 bytes与同输入分离参考逐byte exact，证据见`dlss5-1080p-validation.json`。
 
+统一游戏内DLL骨架已建立：`dlss5_1080p_runtime.cpp`在主swapchain device上一次初始化DirectML/queue/list/fence与8160×192→256代表算子，同时MinHook同一DLL内的`ffxDispatch`，逐帧取得Color/Depth/Motion/output、render/upscale尺寸、jitter和原生commandList；只以资源`GetDevice`验证同设备，不做CPU readback。部署脚本会移除两个旧probe避免双重hook，binary SHA为`e496e01b...38d3e7`，等待首次前台加载。
+
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
 最新明亮场景验收为frame56400主菜单：同帧Color/backbuffer SHA分别`fd201dba...d492a`／`c1fc1eaf...74d43`，全AMD blocks0–70输出R10 SHA为`251b7ef7...e1ca1`，截图人物、文字、发丝可辨且无周期条纹。端到端29.624秒、Windows network 10.858秒；这是DirectML ViT接入前的新视觉/性能基线，仍明确不是实时。证据见`dlss5-amd-frame56400-validation.json`与`dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png`。

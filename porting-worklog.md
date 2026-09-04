@@ -1937,6 +1937,10 @@ Zero将第一阶段目标明确为1080p至少10fps，严格4K留待后续。不�
 
 `d3d12_directml_preblock_resident.cpp`改为从`DML_FRONT_WIDTH/HEIGHT`推导tile/token/resource尺寸，HWC reorder以WIDTH/HEIGHT宏寻址，PSO cache同样动态选几何；`DML_FRONT_HWC_ONLY`提供同源裁判。真960×544 block0→HWC→blocks1–4单轮16.366240ms、100轮稳态12.767225ms，HWC-only单轮1.109040ms。完整block4 66,846,720-byte SHA`75778dc1...d59e6ce`与同一DirectML HWC起跑的四个分离block逐byteexact。1080p front性能/数值门通过，下一边界是block4 predown＋480×272 blocks5–8。
 
+主线随后从离线runner正式切到单一游戏DLL。`dlss5_1080p_runtime.cpp`合并此前分离的resource hook与lifecycle probe：只在主`init_swapchain(resize=true)`反查游戏D3D12 device并PIN自身；一次创建DirectML device、独立queue/allocator/list/fence，初始化1080p block0代表形状`8160×192→256`并在常驻input/weight/output上warm dispatch 100次。另一worker MinHook `amd_fidelityfx_dx12.dll!ffxDispatch`，在当前调用栈读取当帧Color/Depth/Motion/output、render/upscale尺寸、jitter与原生commandList，并用四个resource的`GetDevice`确认与主swapchain同device，全程不readback、不写中间张量。
+
+统一runtime交叉编译SHA-256为`e496e01b48febb81356f741111b1eec9a4f79bf9303b6c01f3d54cb60338d3e7`。`deploy_dlss5_1080p_runtime.ps1`在游戏运行时拒绝变更；Install校验hash后移除旧`d3d12-dynamic-resource-probe`与`dlss5-resident-lifecycle`，避免两个MinHook争同一target，再安装唯一runtime。当前边界明确：DLL已承载正确设备/当前帧资源/一次性初始化合同，但尚未把front0–4算子代码录入ffx commandList，不宣称已改画面。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
