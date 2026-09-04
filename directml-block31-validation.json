@@ -1,0 +1,26 @@
+{
+  "status": "all-operators-cumulative-correctness-milestone-not-resident",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "tokens": 2160,
+  "gpu_ms": {
+    "expand": 0.292500,
+    "contract": 0.522683,
+    "qkv_with_normalization": 0.210380,
+    "attention": 3.817040,
+    "projection": 0.267523,
+    "sum": 5.110126
+  },
+  "old_block31_ms": 61.426,
+  "final_vs_old_block31": {
+    "elements": 2211840,
+    "correlation": 0.9996383986156728,
+    "mae": 0.00135754214392768,
+    "rmse": 0.0035628137926675715,
+    "max_abs_error": 0.03125,
+    "exact_fraction": 0.7534383138020834,
+    "all_finite": true,
+    "sha256": "cb7095a1b04b017f51fb64b9d48d2e8a297d28bddf15a34195091d914184d0ba"
+  },
+  "strict_boundary": "All five operators consume the previous DirectML output, proving cumulative numerical stability. They still run in separate processes with file boundaries; 5.110126 ms is the sum of GPU timestamps, not end-to-end process wall time."
+}

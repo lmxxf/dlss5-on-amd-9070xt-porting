@@ -1757,6 +1757,8 @@ DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4
 
 同一residual GEMM边界复用于Projection（无Contract前多项式）：旧Attention精确输出×`1024×1024` FP16 projection＋hidden residual/skip＋`F()`为0.282099ms；对旧block31最终输出correlation0.9999761705、MAE3.711e-5、RMSE9.159e-4、max0.03125、99.543593% exact，全finite。至此block31五段均有真数据DirectML完整算子：Expand0.273847＋Contract0.505068＋QKV0.201329＋Attention3.980880＋Projection0.282099≈5.243ms，相对旧61.426ms约11.7倍。严格边界：这是相同输入下逐段独立替换与下游传播验证，尚非五段同一执行实例；下一步必须全串联后检查累积FP16误差与真实联合timestamp。
 
+`run_directml_block31.ps1`随后按真实依赖把五段全部换成DirectML：Expand输出进入Contract，Contract hidden进入QKV，GPU-normalized QKV进入完整DirectML Attention，Attention再进入DirectML Projection，只有进程/文件边界，不再夹任何旧shader中间值。本轮GPU timestamp为0.292500/0.522683/0.210380/3.817040/0.267523ms，合计5.110126ms。最终2,211,840值对旧完整block31 correlation0.9996383986、MAE0.00135754、RMSE0.00356281、max0.03125、75.343831%逐值exact，全finite，SHA-256 `cb7095a1...84d0ba`。五次FP16与E4M3误差累积后仍不超过一个量化级，算法风险至此关闭。严格边界：5.110126ms是五段GPU timestamp之和，不含五进程wall/file I/O；下一阶段是把同样已验收的dispatch机械合并到单device resident block31，再推广blocks32–38。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
