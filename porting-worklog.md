@@ -2021,6 +2021,8 @@ bridge-only `max_block=999`首submit后同样触发PS Studios通用Report Proble
 
 unwrapped native list后，block0连续提交1440帧、max69连续提交480帧均稳定。max70且关闭raw-R10 present时，完整blocks0–70连续提交；独立20.032945秒窗口从submission1440增至1680，实测11.9802655fps。开启raw-R10 copy虽然同样稳定并产生连续`r10_backbuffer_submit`，但画面为暗绿规则网格；关闭后画面恢复清晰主菜单。原因是FFX output是pre-tonemap RGBA16F，直接UNORM R10 pack跳过游戏tonemap/UI/compositor。production因此保留block70对FFX output的原位回写，由游戏原生管线生成最终R10 swapchain；raw pack/copy默认关闭且不再执行pack shader。两张间隔3秒截图SHA分别`90c61e21...371a1a`与`a61e4c50...b1a44`，画面中伊芙眼睛一闭一睁，排除固定截图/旧帧重复。
 
+production SHA`b0e0ada5...82219f`冷启动复验：日志明确`max_block=70 raw_r10_present=0`，blocks0–70连续提交超过720，进程Responding、无device removed。独立20.0270987秒窗口从submission480增至720，最终实测11.9837628fps。置前截图`09f55ba3f0f991f746f14f95e7dc91a6a196edf9c21fff27d0e396b42e17dfa6`画面清晰；结合前述闭眼/睁眼双帧，1080p连续动态、画面与≥10fps三门闭合。运行时每帧无exe、无文件、无CPU readback；startup gate文件仅初始化读取一次。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
