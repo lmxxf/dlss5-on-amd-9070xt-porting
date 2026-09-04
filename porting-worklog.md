@@ -1731,6 +1731,8 @@ GEMM runner新增文件模式后直接读取`probe-block30-pad-native.f32`与`bl
 
 GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因此进一步让DirectML直接读取GPU packed文件而非CPU转换结果：GEMM为0.173652ms，抽查20,480个post值对旧FP32-input shader correlation0.999981525、99.6044922%逐值exact、最大差一个0.03125量化级；GPU unpack＋`F()`仍100% exact。由独立timestamp相加，完整GPU边界Expand约0.744ms，较旧8.154–29.414ms约快11–40倍。下一步把pack→DirectML→unpack三段录进同一command list与resident资源，实测联合时间而非继续使用加和估计。
 
+`d3d12_directml_gemm.cpp`随后加入`DML_GPU_BOUNDARY=1`正式联合模式：同一D3D12 command list先用HLSL把resident FP32 source写入DirectML A buffer，切换descriptor heap执行compiled GEMM，再切回HLSL把FP16 output解包并执行`F()`。200次GPU timestamp平均0.427682ms，不仅低于分段0.744ms加和，也比旧Expand 8.154–29.414ms快约19–69倍。联合输出8,847,360个FP32（35,389,440 bytes）与“GPU pack文件→独立GEMM→独立unpack”的分段oracle逐byteexact，SHA-256均为`2a6b74c1faebeb17e4980d1876c2b2a009af4388d33c62e07fbf091d433b785a`；纯GEMM回归仍为0.159610ms且exact。block31 Expand由此具备可直接移入resident ViT的完整GPU合同。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
