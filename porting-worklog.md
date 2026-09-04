@@ -2023,6 +2023,14 @@ unwrapped native list后，block0连续提交1440帧、max69连续提交480帧�
 
 production SHA`b0e0ada5...82219f`冷启动复验：日志明确`max_block=70 raw_r10_present=0`，blocks0–70连续提交超过720，进程Responding、无device removed。独立20.0270987秒窗口从submission480增至720，最终实测11.9837628fps。置前截图`09f55ba3f0f991f746f14f95e7dc91a6a196edf9c21fff27d0e396b42e17dfa6`画面清晰；结合前述闭眼/睁眼双帧，1080p连续动态、画面与≥10fps三门闭合。运行时每帧无exe、无文件、无CPU readback；startup gate文件仅初始化读取一次。
 
+### 2026-09-05 实际场景方格回归修复
+
+用户进入游戏后报告满屏小方格，撤回此前仅以主菜单截图作出的画质完成判断。同一洞窟存档场景，新增F6输出对照（0=神经残差，1=仅原生画面，2=左原生/右神经），全网计算不变：关闭block70写入后方格消失，证明问题由输出分支引入。
+
+修复两处代码错误：C512 predown输入active68×120，pool读行跨度从遗留240修正为120，dispatch数量同步改为1080几何；block70残差恢复离线runner的display-color合同，不再对FSR中间RGBA16F施加SDR残差和saturate。present时在游戏原生immediate command list内把当前R10 backbuffer复制到一次性分配的R10 UAV，执行outconv残差相加，再复制回当前backbuffer。FSR中间输出保持原样。无CPU图像readback、无每帧文件或资源创建。
+
+部署SHA-256为`4fe1d38d9815c1f6171be694cb9f2483271f02ba314305a99c03ff796a81ecbf`。进入同一洞窟后截图`grid-bug-after.png`已无修前`grid-bug-before.png`的满屏绿色周期网格；日志确认`display_residual generation=1320 mode=0`，并非关闭神经写入的截图。两项修正一起验证，尚未分别量化各自对方格的贡献。原20秒cadence脚本每120帧取一次计数有量化误差，不能把11.9838当作精确帧率证明。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
