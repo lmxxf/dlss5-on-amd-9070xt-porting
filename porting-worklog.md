@@ -1727,6 +1727,10 @@ GEMM runner新增文件模式后直接读取`probe-block30-pad-native.f32`与`bl
 
 驱动能力探针同时尝试直接省掉边界转换的混合类型GEMM：`FP32 A × FP16 B → FP32 output`在`CreateOperator`返回`E_INVALIDARG (0x80070057)`。因此不能靠单个GEMM描述符直连现有FP32 resident tensor；正式接入必须使用GPU cast（HLSL或DirectML graph cast）→FP16 GEMM→GPU unpack＋`F()`。该负结果排除了继续围绕mixed tensor type猜测的支线。
 
+新增`d3d12_directml_boundary.cpp`实现两条GPU边界shader：2.21M个FP32 activation以`f32tof16`两值打包，8.85M个DirectML FP16输出以`f16tof32`解包并现场执行与旧ViT shader相同的`F()` E4M3量化。两pass在RX9070XT合计0.569982ms（200次）／0.589968ms（100次），unpack＋`F()`对CPU公式8,847,360值逐值100% exact且全finite。
+
+GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因此进一步让DirectML直接读取GPU packed文件而非CPU转换结果：GEMM为0.173652ms，抽查20,480个post值对旧FP32-input shader correlation0.999981525、99.6044922%逐值exact、最大差一个0.03125量化级；GPU unpack＋`F()`仍100% exact。由独立timestamp相加，完整GPU边界Expand约0.744ms，较旧8.154–29.414ms约快11–40倍。下一步把pack→DirectML→unpack三段录进同一command list与resident资源，实测联合时间而非继续使用加和估计。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
