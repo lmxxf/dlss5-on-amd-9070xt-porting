@@ -1891,6 +1891,10 @@ block22→23特殊predown随后并入512 resident：136×240×256 block22 body�
 
 decoder block48 prefix随后并入256 resident。`UpsamplePass`从68×120×512 block47按2×nearest直接pack为32640×512 FP16，DirectML `512→256`后加FP32 bias与136×240×256 block22 skip，写main[0]再执行block48–55八层；权重由通用prefix splitter及`prepare_directml_swin.py`生成。真输入单轮17.388720ms、100轮每次重建prefix稳态10.784976ms；旧`--upsample`八层151.382ms，约14.04倍。block55对同版本旧链8,355,840值corr0.9999869541、MAE9.333e-5、RMSE0.0005249、max0.0234375，仅1941值差>0.01且全finite。两路继续跑blocks56–70后4K R10 SHA同为`4868b7e4...be35`逐byteexact；decoder256外置边界清零。
 
+前端重审确认block39已完整resident，真正大热点是block0 distilled MLP：旧shader对每tile标量执行`192→256→256→2048`，动态帧约94–119ms。新增`prepare_directml_preblock.py`把三层output-major FP32权重转为DirectML row-major FP16矩阵并保留三层bias、output scale/bias FP32；`d3d12_directml_preblock_resident.cpp`以三枚常驻GEMM串RGBA→RGB pack、SiLU、SiLU和最终affine。RX9070XT真32640 tiles单轮2.036720ms、100轮稳态1.684028ms，对旧94.361ms约56倍。
+
+DirectML preblock 66,846,720 tile输出对旧标量结果corr0.9999999430、MAE0.0004242、RMSE0.0007388、max0.004587、没有值差>0.01且全finite。经过现有E4M3 tile→HWC后仅489,600/66,846,720值变化（0.7324%），再以新frame id完整跑blocks1–70，4K R10 SHA为`8c8bd142...caf831`；相对修正predown基线35.3134%像素发生微调，但RGB平均仅0.171/0.209/0.232个10-bit刻度、最大均6，目视菜单画面干净无条纹/NaN/几何变化。block0性能门通过；下一步把tile→HWC与blocks1–4接到同一resident资源，消除最后的前端process/file边界。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

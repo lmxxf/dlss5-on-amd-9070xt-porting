@@ -1,0 +1,52 @@
+{
+  "status": "resident-directml-preblock-performance-and-final-image-pass",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "shape": {
+    "tiles": 32640,
+    "input_per_tile": 256,
+    "layer1": "192x256",
+    "layer2": "256x256",
+    "layer3": "256x2048",
+    "output_values": 66846720
+  },
+  "performance": {
+    "single_gpu_ms": 2.036720,
+    "steady_100_gpu_ms": 1.684028,
+    "old_fp32_shader_gpu_ms": 94.361,
+    "steady_speedup_vs_old": 56.033
+  },
+  "tile_output_vs_old": {
+    "correlation": 0.9999999430428806,
+    "mae": 0.00042421228,
+    "rmse": 0.00073876086,
+    "max_abs_error": 0.0045871735,
+    "different_values": 66846720,
+    "differences_over_0_01": 0,
+    "all_finite": true
+  },
+  "quantized_hwc_vs_old": {
+    "correlation": 0.9999899235315501,
+    "mae": 0.00045681,
+    "max_abs_error": 0.25,
+    "different_values": 489600,
+    "different_fraction": 0.00732421875,
+    "differences_over_0_01": 228480
+  },
+  "full_network_r10": {
+    "sha256": "8c8bd14225d203da072f8aa3fcd77942e87ed824a65ae09bb0e681fb59caf831",
+    "reference_corrected_preblock_sha256": "44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46",
+    "different_pixels": 2929032,
+    "different_pixel_fraction": 0.35313368055555555,
+    "mean_channel_deltas": [0.17117405, 0.20863595, 0.23208828],
+    "max_channel_deltas": [6, 6, 6],
+    "visual": "clean 4K Stellar Blade menu frame without corruption, stripes, NaNs, or geometry changes"
+  },
+  "implementation": {
+    "weight_splitter": "prepare_directml_preblock.py",
+    "runner": "d3d12_directml_preblock_resident.cpp",
+    "operators": 3,
+    "passes": ["RGBA-to-RGB FP16 pack", "GEMM1", "SiLU1", "GEMM2", "SiLU2", "GEMM3", "affine output"]
+  },
+  "strict_boundary": "The block0 distilled MLP is resident and fast, but tile-to-HWC and blocks1-4 are still separate processes/resources. Final production validation requires the graph to run inside the game addon on consecutive live frames."
+}
