@@ -1811,6 +1811,10 @@ Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32�
 
 真`raw-16800-block39` H72输入与8套参数一次预载后，blocks40–47 resident GPU为14.326320ms，旧resident 190.890ms，约13.32倍。resident block47对多进程hybrid/旧链correlation0.9999994633、MAE1.122e-7、max0.0078125、99.998564%数值exact，全finite；仅75个非signed-zero量化边界值不同。裁为68行active后进入相同blocks48–70，resident/旧两份33,177,600-byte 4K R10 SHA均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byte exact。输出代码现直接只写68×120×512 active，满足block48接口，无外部裁剪。512-channel段资源、同步、数值、性能与最终画面通过；严格下一步是接入production block39链，并将同一模板泛化256/128/64/32 channel段。
 
+block39随后矩阵核化。`prepare_directml_block39.py`把现有`(1536+1)×512` FP32 affine+bias拆为1,572,864-byte FP16矩阵与2,048-byte FP32 bias。通用DirectML runner以现成68×120×1536真input执行，含约50MiB input pack与16MiB raw unpack为0.432135ms；加bias后对旧block39 correlation0.9999999839、MAE2.740e-6、RMSE9.059e-6、max0.00012055，全finite。补H72进入完整resident blocks40–47，本轮GPU10.072160ms；block47对旧仍是correlation0.9999994633、MAE1.122e-7、max0.0078125，与直接使用旧block39时完全相同，说明block39误差在block40 E4M3边界被吸收。
+
+block39 DirectML＋resident512输出裁68行后继续进入blocks48–70，最终4K R10与旧链SHA同为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`逐byte exact。block39→47矩阵替换的数值与画质门槛通过。严格剩余：block39目前仍由独立通用GEMM进程和外部1536拼接输入完成；下一步在512 resident exe内加入ViT main上采样＋block30 skip pack、block39 GEMM/bias，随后替换production `d3d12_swin_chain --block39`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

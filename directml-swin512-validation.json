@@ -5,6 +5,8 @@
   "old_resident_gpu_plus_copy_ms": 190.890,
   "directml_estimated_gpu_ms": 12.0,
   "directml_resident_gpu_ms": 14.326320,
+  "directml_resident_gpu_ms_warm": 10.072160,
+  "block39_directml_gpu_ms": 0.432135,
   "block47_vs_old": {
     "elements": 4177920,
     "correlation": 1.0,
@@ -29,5 +31,11 @@
     "old_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
     "byte_exact": true
   },
-  "strict_boundary": "Blocks40-47 now execute on one device and command list, and final 4K R10 is byte-exact after blocks48-70. The stage is not yet wired into the production wrapper, and other channel-width Swin stages remain unconverted."
+  "block39_through_47": {
+    "block47_correlation": 0.9999994632758346,
+    "block47_mae": 1.1219697840073529e-7,
+    "block47_max_abs_error": 0.0078125,
+    "final_r10_byte_exact": true
+  },
+  "strict_boundary": "Blocks40-47 now execute on one device and command list, and DirectML block39 has passed downstream/final-image validation. Block39 still executes in a separate diagnostic process; it must be inserted into the resident executable before production replacement."
 }
