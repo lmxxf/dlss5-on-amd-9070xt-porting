@@ -1981,6 +1981,8 @@ decoder blocks66–69接入DLL。block66先从block65的480×272×64 FP16做2×n
 
 block70接入前修正FFX hook的命令录制顺序：旧版在调用原`ffxDispatch`之前追加网络命令，未来即使写回output也会被随后录制的FSR覆盖。新版先调用trampoline，让原FSR在同一native command list生成当帧RGBA16F base，再追加自有blocks0–70；因此block70可以读取原FSR结果并成为最后写入者。该变更不创建第二queue、不提交command list，仍完全使用游戏原生调度序列。顺序修正版SHA-256=`14f69553ded7fb5db080d470ece3fb017c89f08e2ff295e5eae31e138dcf3dc6`。
 
+block70随后并入统一DLL，几何严格使用padded1920×1088、active1920×1080。prefix直接读取block69与block0两份960×544×32 FP32 HWC，以240×136个4×4 sample生成32640×2048 tiled tensor；FFN/QKV/8×8 attention在1920×1088上执行，outconv只处理前1080行。因hook已改为原FSR先录命令，outconv可从当帧RGBA16F output UAV读取base并原位叠加神经残差，随后另行GPU pack为1920×1080 R10 buffer。三份权重尺寸为27,652/41,220/384 bytes，交叉编译SHA-256=`619f720275279f024bc26fc9574860e85d566f3e61c6c22076be23488a97a011`。至此DLL内blocks0–70已连通；严格剩余为present前R10→swapchain回写及真游戏连续动态/帧率验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
