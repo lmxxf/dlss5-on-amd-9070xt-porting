@@ -84,6 +84,8 @@ alias barrier也已真实执行：Swin/ViT/block70三组重叠view依次写`0x11
 
 block70已成为首个真正迁入alias arena的网络phase：六个大资源改为同一4714.5MiB heap上的placed views，完整六pass输出R10与committed版本逐byte exact，热态71.081ms无性能回退。下一步迁移Swin/ViT并合并进程。
 
+Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81MiB（纠正旧清单漏算第二张main），block38及各Swin段末均exact。三phase正式版本重跑整网后R10 SHA仍逐byte不变，wall10.853秒无性能回退。现在只剩把三个alias-compatible宿主合成一个进程/共享heap。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

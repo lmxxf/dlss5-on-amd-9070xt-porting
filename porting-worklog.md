@@ -1709,6 +1709,10 @@ alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，
 
 正式`d3d12_block70_chain.cpp`随后把prefix/feature/QKV/body/RGBA/R10六个committed resources替换为单块4714.5MiB heap上的placed resources，并执行完整prefix→FFN→QKV→attention→outconv→GPU R10 pack。输出SHA-256 `4868b7e4...be35`与原committed版本逐byte exact，热态GPU＋copy71.081ms，与旧波动区间一致。block70真实phase至此已进入全网alias arena布局；下一步迁移Swin/ViT phase并在同一进程插alias barrier。
 
+`d3d12_vit_chain_amd.cpp`随后将两张main ping-pong、branch、hidden、QKV、attention六资源迁入单个92.81MiB placed heap；block30-body→ViT31–38为466.650ms，block38逐byte exact。该迁移也纠正arena清单漏算第二张main：ViT phase从84.38修正为92.81MiB，placed views总数16→17，alias smoke重跑仍pass。
+
+`d3d12_swin_chain.cpp`与`d3d12_swin32_chain.cpp`亦将main ping-pong/feature/QKV/attention改为placed resources。block39、block48 upsample、32-channel normal与block66 upsample四类路径均逐byte exact。三个phase全部升正式后重跑Windows blocks1–70，最终R10 SHA-256仍为`4868b7e4...be35`逐byte不变，wall10852.710ms与committed版本同一波动区间。至此Swin/ViT/block70真实PSO均已在alias-compatible placed布局运行；剩余核心只是在单进程共享同一heap并插入phase alias barriers。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
