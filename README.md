@@ -207,6 +207,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - 八层resident绑定架构已验证：同一DirectML device一次创建并initialize 8×6=48个独立compiled operator/binding table，避免录制后rebind导致前层看到末层descriptor；RX9070XT冷进程含全部JIT约514.835ms，仅初始化支付一次，无device removed。下一步绑定8套权重与main ping-pong。
 - 八层resident现已真执行：预载8套Expand/QKV/scales共112MiB，FP32 main双缓冲，8×13 pass在单device/单command-list运行。probe输入block38与40进程DirectML oracle逐byte exact；frame56400为31.706960ms vs旧475.515ms（15.0倍），进入相同decoder/block70后4K R10仍逐byte exact。生产切换前只剩block30 predown/padding并入该exe。
 - block30 predown现已并入resident exe：直接读取68×120×512 body，执行matrix/pool/enter并写36×60（尾两行零），输出与外部34→36行路径逐byte exact。`run_dynamic_vit_raw.ps1`已正式切换DirectML；frame56400全网回归R10 SHA不变，ViT GPU33.195ms、stage wall1126.738ms、network wall10120.780ms。
+- `prepare_directml_swin512.py` / `d3d12_directml_swin512_ffn.cpp`启动Swin矩阵核化：从block40 FP32 blob拆gate/up/project/skip并转置到DirectML FP16。真68×120输入（补H72）完整gated FFN为0.420520ms vs旧8.263ms（19.65倍），4,177,920个有效输出逐float100% exact。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
@@ -219,6 +220,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `block10-effective.bin` / `block10-effective.json`：128-channel 四头 Swin 的语义级 FFN／QKV／cosine-attention／projection 参数；完整 block 对原 CUBIN correlation 0.99485。
 - `block11-effective.bin` / `block12-effective.bin` / `block13-effective.bin` / `effective-4h128.json`：full-block 联合校准后的其余 4H blocks；correlation 0.9951–0.9959。
 - `d3d12_block128_test.cpp`：RX 9070 XT 的通用 4H/128-channel correctness runner；首版 naive attention 重算 QKV，仅用于语义验收。
+- `d3d12_block128_test.cpp`支持`DUMP_FFN=1`只读导出FFN后feat，供DirectML分段验收；不改变后续block执行。
 - `block8-downsample-effective.bin` / `block8-downsample-effective.json`：block8 的 main→compact 线性 downsample；含 physical token/channel mixing，held-out correlation 0.9988。
 - `tinlayout-2h64-input-permutation.i32` / `tinlayout-2h64-output-permutation.i32` / `tinlayout-2h64-permutation.json`：4096-basis CUBIN scan 恢复的完整 2H/64-channel token+channel unswizzle；64 个对齐 Jacobian correlation 全为 1.0。
 - `fp8-weight-layout-evidence.json`：2H SASS 把 weight view 当 E4M3 packed/swizzled 数据消费的直接证据；archive 外层按两字节计数且 `blend_scale` 确为 FP16，但矩阵 payload 是否由 NvAPI 上传时转换仍待与 auxiliary-view 缺口一起判定。

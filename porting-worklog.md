@@ -1793,6 +1793,10 @@ probe输入首跑八层resident为34.973520ms，输出2,211,840 floats与40进�
 
 正式`run_dynamic_vit_raw.ps1`已从旧`d3d12_vit_chain_amd.exe`切换到`d3d12_directml_vit_resident.exe`，外部合同保持`raw-FRAME-block30-body.f32 → raw-FRAME-block38.f32`。frame56400 production wrapper输出SHA`52bdd06d...952ae`；完整`run_dynamic_network_resident.ps1`重跑最终R10仍为`251b7ef7...e1ca1`逐byte不变。ViT八层GPU33.195480ms，stage wall1126.738ms（含每帧进程启动、48 operator JIT、112MiB参数上传与readback），Windows network wall从10857.587降至10120.780ms。功能生产路径已切换；严格实时边界仍未完成：addon常驻可消ViT约1.09秒wall，但其余Swin/decoder GPU段累计仍远超帧预算，下一步把DirectML矩阵核路线推广到Swin FFN/QKV并最终嵌入addon。
 
+Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32按shader权威offset拆为gate/up各`512×256`、project`256×512`、FFN skip512、QKV`512×768`、attention projection`256×512`及attention skip512；`prepare_directml_swin512.py`转置矩阵并输出FP16与SHA manifest。独立shape benchmark：`8640×512×256` 0.021261ms、`8640×256×512` 0.027470ms、`8640×512×768` 0.058086ms；窗口Attention 135 windows×16 heads即batch2160的`64×16×64`为0.153658ms。所有矩阵理论合计低于0.5ms，但尚不包含窗口重排、cosine normalization、bias与softmax。
+
+`d3d12_directml_swin512_ffn.cpp`随后以真`raw-16800-block39`（68行补H72）执行input FP32→FP16、两路DirectML gate/up、原fast多项式相乘、DirectML project、residual skip＋E4M3。分段0.029920/0.092520/0.089840/0.028680/0.117640/0.061920ms，合计0.420520ms；旧runner同输入FFN expand/project为6.242＋2.021=8.263ms，约19.65倍。`d3d12_block128_test.cpp`新增`DUMP_FFN=1`只读导出FFN feat；DirectML对旧有效68×120×512共4,177,920 floats correlation1.0、MAE/RMSE/max均0、逐float100% exact，SHA`06c29d4d...5b75f`。首个Swin算子在性能与精确性上同时通过；下一步接QKV与window attention。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
