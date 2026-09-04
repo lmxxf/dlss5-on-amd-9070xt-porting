@@ -28,6 +28,20 @@
     "block4_sha256": "75778dc103fc5c3543d462921a06289440a9e6a5364a50a9a34827a83d59e6ce",
     "block4_byte_exact_vs_same_input_separate_reference": true
   },
+  "encoder_blocks5_8": {
+    "geometry": "960x544x32 -> 480x272x64",
+    "single_gpu_ms": 11.417120,
+    "steady_100_gpu_ms": 4.796600,
+    "block8_vs_fp32_reference": {"correlation": 0.9997517399650941, "mae": 0.00082317897, "rmse": 0.0022526057, "max_abs_error": 0.03125, "all_finite": true}
+  },
+  "encoder_blocks9_14": {
+    "geometry": "480x272x64 -> 240x136x128",
+    "single_gpu_ms": 7.230000,
+    "steady_100_gpu_ms": 3.837133,
+    "block14_vs_fp32_reference": {"correlation": 0.3958571261, "mae": 122.32783, "rmse": 204.16377, "max_abs_error": 448.5625, "all_finite": true},
+    "reference_saturation": {"block11_min": -96.0, "block12_negative_448_values": 2208000, "block13_negative_448_values": 2434890, "block14_negative_448_values": 96000},
+    "status": "performance passed but numerical acceptance deferred to the final 1080p image; the FP32 reference itself saturates at this new geometry"
+  },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
     "binary_sha256": "99c3266f3a7f1b4be102d04b23a534ac7830e057cbf80aa6531dc85ba68b04fe",
@@ -65,5 +79,5 @@
     },
     "status": "compiled and deployed; first in-game current-frame blocks0-8 load pending"
   },
-  "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
+  "next_boundary": "embed block8 predown and blocks9-14 in the runtime DLL, then continue block14 predown to 120x68 blocks15-22 while tracking the saturation through the final image"
 }

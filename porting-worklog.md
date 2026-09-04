@@ -1955,6 +1955,10 @@ blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effec
 
 已验收的predown/Boundary/Window三类pass抽为`swin64_1080_runtime.h`并嵌入统一DLL。初始化期一次创建20枚DirectML operator、4×9权重、main ping-pong与共享hidden/QKV/attention scratch；block4 down/enter常量转固定SRV。每帧直接消费`g_front_main[1]`，mid在重复帧前NON_PIXEL→UAV，predown后回SRV，四层内部维持UAV资源与显式UAV barrier，最终block8留在`g_s64_main[0]`。新版DLL SHA为`99c3266f3a7f1b4be102d04b23a534ac7830e057cbf80aa6531dc85ba68b04fe`；游戏内链推进为Color→blocks0–8，无exe/file/readback。
 
+1080p blocks9–14随后建立专用runner：T32640、W240×H136、C128/H160/Q192/A64，block8 predown为480×272×64 matrix/pool/64→128。机械模板首跑在`boundary root`报device removed，根因是encoder文件仍初始化完全无关的8160×1536→512 block39及资源；删除所有block39 operator/init/bind/record后正常。真输入单轮7.230000ms、100轮稳态3.837133ms。
+
+这一段的数值不能直接按旧“逐层接近1”验收：同几何FP32参考自身从block10均值-0.021迅速到block11 range -96..0.75，block12已有2,208,000值为-448，block13为2,434,890，block14回落到96,000；DirectML与参考均finite但block14 corr仅0.395857、MAE122.33。说明现有effective网络在新空间几何出现强饱和吸引子，可能在后续层恢复，也可能导致最终画面失败。策略是继续完整1080p链并以最终R10/画面裁判，不把3.84ms性能通过误写成数值通过；若最终失败，再回查effective参数的固定几何依赖。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
