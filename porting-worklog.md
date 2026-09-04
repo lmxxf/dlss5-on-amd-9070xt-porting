@@ -1753,6 +1753,10 @@ DirectML runner进一步支持4D batch维，按Attention的32 heads测试`batch=
 
 真机分段：pack0.203520ms、QKᵀ1.353680ms、softmax1.229080ms、AV1.180600ms、unpack0.014000ms，合计3.980880ms；旧Attention23.951ms，约6.0倍。全量2,211,840输出对旧AMD Attention correlation0.999954405、MAE1.319e-4、RMSE0.00161724、max0.03125、98.984782%逐值exact，全finite。block31 runner再加入`VIT_PRECOMPUTED_ATTENTION`，让DirectML结果穿过旧Projection；最终对旧完整block31 correlation0.9998746915、MAE0.000533607、RMSE0.00209812、max0.03125、87.954373%逐值exact，全finite。softmax与Projection均未造成数值爆炸，完整Attention算子替换通过；下一步是把Expand/QKV/Attention三个已验收算子内嵌resident ViT并处理Contract/Projection矩阵核化。
 
+DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4)`与`.89453125+x*(.447265625-.055908203125*abs(x))`多项式，GEMM后加source residual×FP16 channel skip再执行`F()`。以旧Expand精确输出为入口，完整Contract为0.505068ms，对旧hidden correlation0.9999971852、MAE1.208e-5、RMSE2.903e-4、max0.03125、99.709066%逐值exact。再让该hidden穿过旧QKV/Attention/Projection，block31最终correlation0.9999269439、MAE0.000371973、max0.03125、91.51001% exact，全finite，误差未爆炸。
+
+同一residual GEMM边界复用于Projection（无Contract前多项式）：旧Attention精确输出×`1024×1024` FP16 projection＋hidden residual/skip＋`F()`为0.282099ms；对旧block31最终输出correlation0.9999761705、MAE3.711e-5、RMSE9.159e-4、max0.03125、99.543593% exact，全finite。至此block31五段均有真数据DirectML完整算子：Expand0.273847＋Contract0.505068＋QKV0.201329＋Attention3.980880＋Projection0.282099≈5.243ms，相对旧61.426ms约11.7倍。严格边界：这是相同输入下逐段独立替换与下游传播验证，尚非五段同一执行实例；下一步必须全串联后检查累积FP16误差与真实联合timestamp。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

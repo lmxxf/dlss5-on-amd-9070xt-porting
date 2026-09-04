@@ -193,6 +193,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `d3d12_directml_gemm.cpp` / `validate_directml_gemm.py`：DirectML FP16 GEMM真机基准、文件输入模式、抽样数值验证及同command-list GPU边界模式；显式修正MinGW对24-byte COM struct return的ABI差异。ViT Expand纯GEMM约0.15–0.17ms；activation先驻留本地VRAM后，pack→GEMM→unpack＋`F()`联合pass为0.273847ms，输出与分段oracle 35.4MB逐byte exact。
 - 同一runner现支持batched GEMM；ViT Attention的32 heads `2160×32×2160`在RX9070XT为0.943629ms／10.126 TFLOPS。QKᵀ与softmax×V两次矩阵主体合计约1.89ms，证明旧约23ms Attention具备数量级下降空间；softmax与Q/K/V重排尚待同command-list实测。
 - `d3d12_directml_attention.cpp`：完整32-head真Attention GPU链，执行Q/K/V head-major pack→DirectML QKᵀ→FP16 score softmax→DirectML AV→token-major unpack/E4M3。block31真QKV总计3.980880ms，对旧Attention correlation0.999954405；再穿过原Projection后的block31最终输出correlation0.999874691、max0.03125。
+- DirectML Contract与Projection亦完成完整边界：Contract含原clamp/多项式、residual/skip及`F()`为0.505068ms，对旧hidden correlation0.999997185；Projection含residual/skip及`F()`为0.282099ms，对旧block31最终输出correlation0.999976170。五段独立实测合计约5.24ms/block，仍待单实体串联验证累积误差。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
