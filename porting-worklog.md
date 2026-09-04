@@ -2017,6 +2017,8 @@ bridge-only `max_block=999`首submit后同样触发PS Studios通用Report Proble
 
 把全graph直接迁到FFX proxy device后游戏不再崩，但DirectML首个`CreateOperator`返回DXGI_ERROR_INVALID_CALL，说明proxy device能录D3D12、不能作为DirectML设备。最终采用双device共享资源：graph与DirectML继续建立在swapchain native device；frame bridge的root/PSO/descriptor建立在FFX proxy device；native device以`D3D12_HEAP_FLAG_SHARED`创建tiles buffer并导出handle，proxy device`OpenSharedHandle`得到同显存别名。bridge写proxy alias，block0读native alias，同一物理显存且零CPU/零copy。共享版SHA-256=`536de16a49ebad9e62f9cd08c0ae2906e261bc3f007af1a5b3763f0a901ee14c`。
 
+共享tiles bridge-only连续提交超过1440帧且游戏Responding，跨device输入问题关闭；加入block0后仍首submit崩，说明native DirectML命令不能经proxy command-list接口录制。查ReShade 6.8源码确认proxy支持私有`IID_UnwrappedObject {7F2C9A11-3B4E-4D6A-812F-5E9CD37A1B42}`并返回`_orig`。hook现同时持有proxy与native list：bridge在proxy list上录，原FSR正常录，block0–70在同一底层list的unwrapped native接口上录；没有第二command list或submit。unwrap版SHA-256=`b8bf9533c483391b7641a8d7a63e9a7635315442f5a5ec9a8da8382dbb0e3bb4`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

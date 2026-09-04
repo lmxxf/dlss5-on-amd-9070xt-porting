@@ -42,6 +42,7 @@ static const GUID kDmlDevice = {0x6dbd6437, 0x96fd, 0x423f,
     {0xa9, 0x8c, 0xae, 0x5e, 0x7c, 0x2a, 0x57, 0x3f}};
 static const GUID kDmlRecorder = {0xe6857a76, 0x2e3e, 0x4fdd,
     {0xbf, 0xf4, 0x5d, 0x2b, 0xa1, 0x0f, 0xb4, 0x53}};
+static const GUID kUnwrappedObject={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,0x9c,0xd3,0x7a,0x1b,0x42}};
 using CreateDml = HRESULT(WINAPI *)(ID3D12Device *, DML_CREATE_DEVICE_FLAGS,
                                     REFIID, void **);
 
@@ -220,8 +221,8 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
     const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
     FfxDispatchUpscale snapshot{};
-    ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr;
-    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();if(held_commands&&g_device&&!g_started.load()){ID3D12Device*device=nullptr;if(SUCCEEDED(held_commands->GetDevice(IID_PPV_ARGS(&device)))){bool expected=false;if(g_started.compare_exchange_strong(expected,true)){g_bridge_device=device;log("resident_start_ffx command_list=%p native_device=%p bridge_device=%p\n",held_commands,g_device,g_bridge_device);if(HANDLE thread=CreateThread(nullptr,0,initialize_worker,nullptr,0,nullptr))CloseHandle(thread);else{g_failed.store(true);log("resident_thread_failed error=%lu\n",GetLastError());}}else device->Release();}}}
+    ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr,*native_commands=nullptr;
+    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands){held_commands->AddRef();held_commands->QueryInterface(kUnwrappedObject,reinterpret_cast<void**>(&native_commands));}if(held_commands&&native_commands&&g_device&&!g_started.load()){ID3D12Device*device=nullptr;if(SUCCEEDED(held_commands->GetDevice(IID_PPV_ARGS(&device)))){bool expected=false;if(g_started.compare_exchange_strong(expected,true)){g_bridge_device=device;log("resident_start_ffx proxy_list=%p native_list=%p native_device=%p bridge_device=%p\n",held_commands,native_commands,g_device,g_bridge_device);if(HANDLE thread=CreateThread(nullptr,0,initialize_worker,nullptr,0,nullptr))CloseHandle(thread);else{g_failed.store(true);log("resident_thread_failed error=%lu\n",GetLastError());}}else device->Release();}}}
     bool color_same=false,depth_same=false,motion_same=false,output_same=false,command_same=false,resources_same_device=false,target=false,bridge_ok=false;
     if (is_upscale) {
         const auto *dispatch = &snapshot;
@@ -233,7 +234,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
         if(resources_same_device&&target&&dispatch->commandList&&g_ready.load())bridge_ok=record_frame_bridge(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList),static_cast<ID3D12Resource*>(dispatch->color.resource),dispatch->renderSize.width,dispatch->renderSize.height,n);
     }
     const uint32_t result=g_ffx_dispatch(context,header);
-    if(is_upscale){const auto*dispatch=&snapshot;if(bridge_ok&&g_max_block!=999){auto*commands=static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList);bool ok=record_block0(commands,n);if(ok&&g_max_block>=4)ok=record_blocks1_4(commands,n);if(ok&&g_max_block>=8)ok=record_blocks5_8(commands,n);if(ok&&g_max_block>=14)ok=record_blocks9_14(commands,n);if(ok&&g_max_block>=22)ok=record_blocks15_22(commands,n);if(ok&&g_max_block>=30)ok=record_blocks23_30(commands,n);if(ok&&g_max_block>=38)ok=record_blocks31_38(commands,n);if(ok&&g_max_block>=47)ok=record_blocks39_47(commands,n);if(ok&&g_max_block>=55)ok=record_blocks48_55(commands,n);if(ok&&g_max_block>=61)ok=record_blocks56_61(commands,n);if(ok&&g_max_block>=65)ok=record_blocks62_65(commands,n);if(ok&&g_max_block>=69)ok=record_blocks66_69(commands,n);if(ok&&g_max_block>=70)record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);}
+    if(is_upscale){const auto*dispatch=&snapshot;if(bridge_ok&&native_commands&&g_max_block!=999){auto*commands=native_commands;bool ok=record_block0(commands,n);if(ok&&g_max_block>=4)ok=record_blocks1_4(commands,n);if(ok&&g_max_block>=8)ok=record_blocks5_8(commands,n);if(ok&&g_max_block>=14)ok=record_blocks9_14(commands,n);if(ok&&g_max_block>=22)ok=record_blocks15_22(commands,n);if(ok&&g_max_block>=30)ok=record_blocks23_30(commands,n);if(ok&&g_max_block>=38)ok=record_blocks31_38(commands,n);if(ok&&g_max_block>=47)ok=record_blocks39_47(commands,n);if(ok&&g_max_block>=55)ok=record_blocks48_55(commands,n);if(ok&&g_max_block>=61)ok=record_blocks56_61(commands,n);if(ok&&g_max_block>=65)ok=record_blocks62_65(commands,n);if(ok&&g_max_block>=69)ok=record_blocks66_69(commands,n);if(ok&&g_max_block>=70)record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);}
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u abi_output=%ux%u target1080=%u same_device=%u device_parts=%u%u%u%u%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
                 n, dispatch->commandList, dispatch->renderSize.width, dispatch->renderSize.height,
@@ -249,7 +250,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
                 dispatch->output.description.width, dispatch->output.description.height, dispatch->output.state);
         }
     }
-    if(is_upscale){for(auto*r:held_resources)if(r)r->Release();if(held_commands)held_commands->Release();}
+    if(is_upscale){for(auto*r:held_resources)if(r)r->Release();if(native_commands)native_commands->Release();if(held_commands)held_commands->Release();}
     return result;
 }
 
