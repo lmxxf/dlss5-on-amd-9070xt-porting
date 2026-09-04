@@ -1799,6 +1799,8 @@ Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32�
 
 `d3d12_block128_test.cpp`继续加入`DUMP_QKV=1`，将QKV readback扩为padded `tokens×768`但只写有效68行。DirectML通用runner读取逐float exact的FFN输出与`prepare_directml_swin512.py`拆出的`512×768` FP16矩阵，执行8640 tokens QKV及GPU边界为0.125465ms；旧QKV8.320ms，约66.3倍。有效6,266,880值对旧QKV correlation0.9999999785、MAE2.704e-7、RMSE4.191e-7、max3.789e-6、全finite。QKV未做E4M3量化故不逐值exact（0.116%），但连续值误差仅百万分之一量级。旧window Attention本身约0.795ms，短期保留HLSL比引入batched score scratch更合算；下一优先是旧2.076ms Attention Projection的`256→512` DirectML替换，再做完整block下游误差裁判。
 
+`DUMP_ATTENTION=1`再导出旧window Attention的有效68×120×256，补H72后进入新`d3d12_directml_swin512_projection.cpp`；该runner执行FP32→FP16 pack、DirectML `8640×256×512`、FFN feat residual×FP32 skip及E4M3。真机0.026280/0.043160/0.094400ms，合计0.163840ms；旧Attention Projection2.219ms，约13.54倍。对旧block40 final有效4,177,920 floats correlation1.0、MAE/RMSE/max均0、逐float100% exact，SHA`e7f86183...3679`。至此block40三个矩阵段独立闭合：FFN0.420520、QKV0.125465、Attention Projection0.163840ms，合计0.709825ms；加保留的旧window Attention约0.8ms，完整block性能目标约1.5ms。严格边界：Projection验证使用旧Attention输入；下一步需把DirectML QKV送入旧window Attention再接DirectML Projection，做完整block累积裁判。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
