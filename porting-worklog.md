@@ -1851,6 +1851,10 @@ block8 predown随后并入encoder128：544×960×64 input经64×64 matrix、2×2
 
 最终画面裁判保留各自decoder skip：DirectML encoder128路径使用自己的block14与经resident256得到的block22，旧路径使用旧block14/block22；共同block30进入DirectML ViT与DirectML39–47，再经对应skip的block48/56和共同62–70。两份4K R10 SHA均为`4868b7e4...be35`逐byteexact。encoder/decoder128的资源、同步、数值、稳态性能和最终画面全部通过。严格剩余是decoder block56 prefix与生命周期整合。
 
+decoder block56 prefix随后并入128 resident。`prepare_directml_upsample_prefix.py`把`(2C+1)×C` FP32 affine+bias拆为DirectML FP16 `2C×C`与FP32 bias，可复用于block48/56/62/66。`UpsamplePass`从136×240×256 low按2×nearest直接pack为130560×256 FP16，DirectML `256→128`后加bias与272×480×128 block14 skip，写main[0] FP16，再依次执行block56–61六层、shift `0/0/1/3/2/0`。
+
+真`raw-16800-block55`＋block14 skip单轮prefix→blocks56–61为26.093240ms，对旧`--upsample`六层输出16,711,680 floats逐float/byte100% exact；100轮每轮重建prefix，稳态14.849870ms，旧123.793ms，约8.34倍。因block61二进制完全相同，确定性blocks62–70输入不变，最终R10继承既有exact，无需重复同一尾链。decoder128 external prefix已闭合；下一步转64/32档与持久生命周期。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
