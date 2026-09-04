@@ -50,6 +50,7 @@ std::atomic<bool> g_started{false}, g_ready{false}, g_failed{false};
 UINT g_max_block=70;bool g_present_enabled=true;
 std::atomic<unsigned long long> g_presents{0};
 ID3D12Device *g_device = nullptr;
+ID3D12Device *g_bridge_device = nullptr;
 IDMLDevice *g_dml = nullptr;
 IDMLCommandRecorder *g_recorder = nullptr;
 ID3D12CommandQueue *g_queue = nullptr;
@@ -69,6 +70,7 @@ ID3D12RootSignature *g_frame_bridge_root = nullptr;
 ID3D12PipelineState *g_frame_bridge_pso = nullptr;
 ID3D12DescriptorHeap *g_frame_bridge_heaps[8]{};
 ID3D12Resource *g_frame_tiles = nullptr;
+ID3D12Resource *g_frame_tiles_bridge = nullptr;
 DmlGemmOperator *g_block0_l1 = nullptr, *g_block0_l2 = nullptr, *g_block0_l3 = nullptr;
 ID3D12Resource *g_block0_packed = nullptr, *g_block0_raw1 = nullptr, *g_block0_hidden1 = nullptr,
                  *g_block0_raw2 = nullptr, *g_block0_hidden2 = nullptr, *g_block0_raw3 = nullptr,
@@ -219,7 +221,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
     FfxDispatchUpscale snapshot{};
     ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr;
-    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();if(held_commands&&!g_started.load()){ID3D12Device*device=nullptr;if(SUCCEEDED(held_commands->GetDevice(IID_PPV_ARGS(&device)))){bool expected=false;if(g_started.compare_exchange_strong(expected,true)){g_device=device;log("resident_start_ffx command_list=%p device=%p\n",held_commands,g_device);if(HANDLE thread=CreateThread(nullptr,0,initialize_worker,nullptr,0,nullptr))CloseHandle(thread);else{g_failed.store(true);log("resident_thread_failed error=%lu\n",GetLastError());}}else device->Release();}}}
+    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();if(held_commands&&g_device&&!g_started.load()){ID3D12Device*device=nullptr;if(SUCCEEDED(held_commands->GetDevice(IID_PPV_ARGS(&device)))){bool expected=false;if(g_started.compare_exchange_strong(expected,true)){g_bridge_device=device;log("resident_start_ffx command_list=%p native_device=%p bridge_device=%p\n",held_commands,g_device,g_bridge_device);if(HANDLE thread=CreateThread(nullptr,0,initialize_worker,nullptr,0,nullptr))CloseHandle(thread);else{g_failed.store(true);log("resident_thread_failed error=%lu\n",GetLastError());}}else device->Release();}}}
     bool color_same=false,depth_same=false,motion_same=false,output_same=false,command_same=false,resources_same_device=false,target=false,bridge_ok=false;
     if (is_upscale) {
         const auto *dispatch = &snapshot;
@@ -295,9 +297,7 @@ ID3D12Resource *make_buffer(UINT64 bytes, D3D12_HEAP_TYPE heap_type,
 
 void initialize_frame_bridge() {
     constexpr UINT64 tile_bytes = 8160ull * 256 * sizeof(float);
-    g_frame_tiles = make_buffer(tile_bytes, D3D12_HEAP_TYPE_DEFAULT,
-                                D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    if(!g_bridge_device)throw DmlFailure{"bridge device",E_POINTER};D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC bd{};bd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;bd.Width=tile_bytes;bd.Height=1;bd.DepthOrArraySize=bd.MipLevels=1;bd.SampleDesc.Count=1;bd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;bd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;dmlrt_check("frame bridge shared resource",g_device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_SHARED,&bd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&g_frame_tiles)));HANDLE shared=nullptr;dmlrt_check("frame bridge shared handle",g_device->CreateSharedHandle(g_frame_tiles,nullptr,GENERIC_ALL,nullptr,&shared));dmlrt_check("frame bridge open shared",g_bridge_device->OpenSharedHandle(shared,IID_PPV_ARGS(&g_frame_tiles_bridge)));CloseHandle(shared);
     const char shader[] = R"(
 cbuffer Params : register(b0) { uint render_width; uint render_height; };
 Texture2D<float4> color : register(t0);
@@ -335,19 +335,19 @@ void main(uint3 id : SV_DispatchThreadID) {
     ID3DBlob *signature = nullptr;
     dmlrt_check("frame bridge signature", D3D12SerializeRootSignature(
         &root_desc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-    dmlrt_check("frame bridge root", g_device->CreateRootSignature(0,
+    dmlrt_check("frame bridge root", g_bridge_device->CreateRootSignature(0,
         signature->GetBufferPointer(), signature->GetBufferSize(),
         IID_PPV_ARGS(&g_frame_bridge_root)));
     D3D12_COMPUTE_PIPELINE_STATE_DESC pipeline_desc{};
     pipeline_desc.pRootSignature = g_frame_bridge_root;
     pipeline_desc.CS = {code->GetBufferPointer(), code->GetBufferSize()};
-    dmlrt_check("frame bridge pso", g_device->CreateComputePipelineState(
+    dmlrt_check("frame bridge pso", g_bridge_device->CreateComputePipelineState(
         &pipeline_desc, IID_PPV_ARGS(&g_frame_bridge_pso)));
-    const UINT step = g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    const UINT step = g_bridge_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     for (auto &heap : g_frame_bridge_heaps) {
         D3D12_DESCRIPTOR_HEAP_DESC heap_desc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
             2, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 0};
-        dmlrt_check("frame bridge heap", g_device->CreateDescriptorHeap(&heap_desc,
+        dmlrt_check("frame bridge heap", g_bridge_device->CreateDescriptorHeap(&heap_desc,
                                                                         IID_PPV_ARGS(&heap)));
         auto cpu = heap->GetCPUDescriptorHandleForHeapStart();
         cpu.ptr += step;
@@ -355,7 +355,7 @@ void main(uint3 id : SV_DispatchThreadID) {
         uav.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
         uav.Buffer.StructureByteStride = sizeof(float);
         uav.Buffer.NumElements = static_cast<UINT>(tile_bytes / sizeof(float));
-        g_device->CreateUnorderedAccessView(g_frame_tiles, nullptr, &uav, cpu);
+        g_bridge_device->CreateUnorderedAccessView(g_frame_tiles_bridge, nullptr, &uav, cpu);
     }
     g_frame_bridge_ready.store(true);
     log("frame_bridge_ready target=960x544 tiles=8160 bytes=%llu heaps=8\n",
@@ -371,7 +371,7 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
     if (g_frame_bridge_submissions.load()) {
         D3D12_RESOURCE_BARRIER transition{};
         transition.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        transition.Transition.pResource = g_frame_tiles;
+        transition.Transition.pResource = g_frame_tiles_bridge;
         transition.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         transition.Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
         transition.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -384,7 +384,7 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
     srv.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srv.Texture2D.MipLevels = 1;
-    g_device->CreateShaderResourceView(color, &srv, cpu);
+    g_bridge_device->CreateShaderResourceView(color, &srv, cpu);
     ID3D12DescriptorHeap *heaps[] = {heap};
     commands->SetDescriptorHeaps(1, heaps);
     commands->SetComputeRootSignature(g_frame_bridge_root);
@@ -395,11 +395,11 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
     commands->Dispatch(120, 68, 1);
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-    barrier.UAV.pResource = g_frame_tiles;
+    barrier.UAV.pResource = g_frame_tiles_bridge;
     commands->ResourceBarrier(1, &barrier);
     D3D12_RESOURCE_BARRIER transition{};
     transition.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    transition.Transition.pResource = g_frame_tiles;
+    transition.Transition.pResource = g_frame_tiles_bridge;
     transition.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     transition.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
     transition.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
@@ -910,12 +910,13 @@ void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
         return;
     }
     if(!g_main_swapchain){g_main_swapchain=native;g_main_swapchain->AddRef();}
+    if(!g_device){g_device=device;device=nullptr;}
     DXGI_SWAP_CHAIN_DESC desc{};
     native->GetDesc(&desc);
     log("resident_start swapchain=%p device=%p size=%ux%u format=%u\n",
-        native, device, desc.BufferDesc.Width, desc.BufferDesc.Height,
+        native, g_device, desc.BufferDesc.Width, desc.BufferDesc.Height,
         static_cast<unsigned>(desc.BufferDesc.Format));
-    device->Release();
+    if(device)device->Release();
 }
 
 void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swapchain,
