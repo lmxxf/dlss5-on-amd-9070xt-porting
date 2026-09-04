@@ -2049,6 +2049,8 @@ block70 QKV原先每线程顺序处理16输出，改为16个线程各处理一�
 
 随后准备C32 group FFN候选：每64线程组处理一个token，共享32输入与64hidden，前32线程负责project；当前以enable-group-ffn.txt选择，QKV以enable-block70-parallel-qkv.txt选择，均只启动时读取。构建脚本包含1920×1088 tiled与960×544 HWC两种几何。画质逐像素对照与30fps目标尚未关闭。
 
+group FFN实测：block70 FFN5.76844→4.59296ms有效，但front/decoder C32从8.62/8.32升到10.687/10.730ms，全网退回61.43072ms。已只保留block70 group FFN，前端和解码C32恢复原FFN；并行QKV全部保留。混合候选SHA73393cbde16c98f0810f28f6fa242356ceed2484a137677c368e55c06f333b02，待下一次profile确认整网收益。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
