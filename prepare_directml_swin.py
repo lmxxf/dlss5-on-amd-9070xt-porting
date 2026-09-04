@@ -4,6 +4,9 @@ import argparse, hashlib, json, pathlib
 import numpy as np
 
 CONFIG = {
+    32: dict(floats=10305, hidden=64, qstride=48, adim=16,
+             expand=(0,2048), project=(2048,4096), ffn_skip=(10241,10273), qkv=(4096,5632),
+             bias=(6144,10240), scale=(10240,10241), attention_project=(5632,6144), attention_skip=(10273,10305)),
     512: dict(floats=984080, hidden=256, qstride=768, adim=256,
               expand=(0,131072), up=(131072,262144), project=(262144,393216), ffn_skip=(393216,393728),
               qkv=(393728,786944), bias=(786944,852480), scale=(852480,852496), attention_project=(852496,983568), attention_skip=(983568,984080)),
@@ -25,8 +28,13 @@ for name in ("expand","up","project","ffn_skip","qkv","bias","scale","attention_
     lo,hi=c[name];value=w[lo:hi]
     if name in ("expand","up"):value=value.reshape(c["hidden"],a.channels).T
     elif name=="project":value=value.reshape(a.channels,c["hidden"]).T
-    elif name=="qkv":value=value.reshape(c["qstride"],a.channels).T
+    elif name=="qkv":
+        if a.channels==32:
+            packed=value.reshape(3,2,16,16);q=np.empty((3,16,32),dtype="<f4")
+            q[:,:,0::2],q[:,:,1::2]=packed[:,0],packed[:,1];value=q.reshape(c["qstride"],a.channels).T
+        else:value=value.reshape(c["qstride"],a.channels).T
     elif name=="attention_project":value=value.reshape(a.channels,c["adim"]).T
+    elif name=="scale" and a.channels==32:value=np.frombuffer(value.tobytes(),"<f2",count=1).astype("<f4")
     keep=name in ("ffn_skip","attention_skip","bias","scale");path=a.output/f"{a.input.stem}-{name}.{'f32' if keep else 'f16'}";value.astype("<f4" if keep else "<f2").tofile(path);parts[name]={"shape":list(value.shape),"file":path.name,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
 if "up" not in parts:
     source=a.output/parts["expand"]["file"];path=a.output/f"{a.input.stem}-up.f16";path.write_bytes(source.read_bytes());parts["up"]={"shape":parts["expand"]["shape"],"file":path.name,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"unused":True}

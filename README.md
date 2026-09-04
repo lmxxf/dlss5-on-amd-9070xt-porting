@@ -226,6 +226,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - encoder128现内建block8 matrix/pool/64→128 enter；predown＋blocks9–14稳态18.282716ms，输出与外部enter9路径逐byte exact。继续经resident256与blocks23–30后block30逐float exact，带各自decoder skips走到最终4K R10仍逐byte exact。
 - decoder128现内建block56的2×nearest pack、256→128 DirectML prefix、bias＋block14 skip；prefix＋blocks56–61稳态14.849870ms vs旧123.793ms（8.34倍），block61逐byte exact。`prepare_directml_upsample_prefix.py`统一拆各decoder 2C→C矩阵/bias。
 - `d3d12_directml_swin64_resident.cpp`现将block62的128→64 prefix与blocks62–65四层放进同一常驻graph：100轮稳态21.467901ms vs旧98.013ms（4.57倍）；block65对同版本旧链corr0.9999999889、MAE5.79e-6，继续通过blocks66–70后4K R10 SHA同为`4868b7e4...be35`、逐byte exact。production仍等待把已初始化graph迁入持久addon/worker。
+- 32-channel尾段做过同样的DirectML resident实测，但不采用：blocks66–69稳态52.204ms，仅略快于现有FP32 HLSL约60.051ms，同时最终R10有44.77%像素发生至多6/1023的微差；补shift mask反而升至91.697ms且不改善主误差。正式路线保留无损SM6 FP32 PSO并把它迁入持久addon，而不是为了API统一牺牲精度；详见`directml-swin32-validation.json`。
 - 64档K-split已否决：split2/3分别产生20,378/2,617个FFN差异，均差于不切的116个；原因是每份partial独立FP16舍入，后续FP32相加无法恢复。主线保留split1，以R10最大6/1023为当前近似边界并继续resident化。
 - resident graph新增重复提交模式；同一已初始化block39→47 graph连续100次平均5.985188ms，末次输出与单次逐byte exact，无状态污染。进程总wall4489.6ms说明约3.89秒是一次性JIT/PSO/文件初始化，稳态GPU已进入6ms级实时预算。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。

@@ -1865,6 +1865,10 @@ K-split实测否决该假设。通用FFN runner新增`SWIN_PROJECT_SPLIT`：hidd
 
 RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.467901ms；旧链98.013ms，约4.57倍。两路block65继续经过相同blocks66–69与block70，得到33,177,600-byte 4K R10 SHA-256均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。此前单独替block63得到的9.98%像素微差不能代表完整同版本segment裁判；四层集成后的最终画面门已通过。严格剩余转为32-channel resident与持久addon/worker生命周期，冷进程不切production。
 
+32-channel DirectML候选完成但被性能／精度门否决。提取器新增特殊1H布局：把Q/K/V各自的偶列、奇列重新交织成`32×48` FP16矩阵，并从bit-packed槽恢复单head scale；block66 prefix同样拆为DirectML 64→32矩阵与FP32 bias。真blocks66–69常驻20个GEMM，100轮稳态52.204307ms；现有SM6 FP32 HLSL单链含copy约60.051ms，收益很小。block69对同版本旧链corr0.9999581442、MAE0.001421、max0.5，最终R10有44.7732%像素变化但RGB最大仅4/4/6个10-bit刻度。
+
+另按旧1H shader补齐shift边界mask，稳态反而升到91.697462ms，而block69 corr仍为0.9999581489，证明mask只影响边缘窗口，主误差来自32-channel矩阵的FP16落地。结论：不为统一DirectML而替换这一档；blocks66–69正式保留现有逐byteexact的SM6 FP32 PSO，下一阶段直接把这些PSO与宽档DirectML operators放进同一持久addon/worker。`d3d12_swin32_chain.cpp`增加按层、FFN与prefix诊断开关，默认行为不变。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

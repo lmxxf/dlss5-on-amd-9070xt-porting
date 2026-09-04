@@ -1,0 +1,48 @@
+{
+  "status": "directml32-rejected-keep-existing-fp32-hlsl",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "segment": {
+    "blocks": [66, 67, 68, 69],
+    "tokens": 2088960,
+    "channels": 32,
+    "hidden": 64,
+    "qkv_stride": 48,
+    "attention_dim": 16,
+    "heads": 1
+  },
+  "directml_resident": {
+    "source": "d3d12_directml_swin32_resident.cpp",
+    "directml_operators": 20,
+    "resources": 54,
+    "resident_mib": 2932.63,
+    "single_gpu_ms": 60.387040,
+    "steady_100_gpu_ms": 52.204307
+  },
+  "existing_fp32_hlsl": {
+    "source": "d3d12_swin32_chain.cpp",
+    "gpu_plus_copy_ms": 60.051,
+    "output": "byte exact"
+  },
+  "block69_vs_same_version_old": {
+    "correlation": 0.9999581442494491,
+    "mae": 0.0014212449,
+    "rmse": 0.012701915,
+    "max_abs_error": 0.5,
+    "different_values": 12699304,
+    "differences_over_0_01": 830018,
+    "all_finite": true
+  },
+  "downstream_r10": {
+    "byte_exact": false,
+    "different_pixels": 3713672,
+    "different_pixel_fraction": 0.4477324459876543,
+    "max_channel_deltas": [4, 4, 6]
+  },
+  "shift_mask_test": {
+    "steady_100_gpu_ms": 91.697462,
+    "block69_correlation": 0.9999581488544375,
+    "result": "rejected; branch-heavy SM5.1 mask cost 39.5 ms and did not address the dominant FP16 rounding error"
+  },
+  "decision": "Do not replace blocks66-69 with DirectML. The existing SM6 FP32 HLSL path is exact and has comparable latency. Reuse that PSO inside the persistent addon/worker; DirectML remains selected for the wider matrix-bound stages."
+}
