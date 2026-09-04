@@ -1847,6 +1847,10 @@ encoder最终画面裁判随后完成。DirectML block14 predown＋resident bloc
 
 encoder128变体为L6 blocks9–14、shift `0/1/3/2/0/1`；loader正确处理9/14的`body-effective`与10–13历史`effective`命名。以同帧`block8-enter9`起跑，冷24.549760ms、100轮稳态14.440822ms；旧125.272ms，约8.67倍。block14对旧corr0.999999999981、MAE3.242e-5、RMSE0.000711786、max0.015625、99.792480% exact，全finite。严格剩余：把block8 downsample/enter并入encoder resident并走最终R10；decoder block56 upsample/prefix亦尚未并入。
 
+block8 predown随后并入encoder128：544×960×64 input经64×64 matrix、2×2 pool与64→128 enter直接写272×480×128 FP16 main。第一pass33,423,360 threads从一开始采用X65535/Y8的2D flatten；input/down/enter上传后固定SRV态，mid写后显式转SRV，每次repeat前转回UAV。predown＋blocks9–14单轮输出与外部`block8-enter9`版本逐float/byte exact；100轮每轮重建predown，稳态18.282716ms。主干继续进入resident256 block14 predown/15–22与旧blocks23–30后，两路block30逐float exact。
+
+最终画面裁判保留各自decoder skip：DirectML encoder128路径使用自己的block14与经resident256得到的block22，旧路径使用旧block14/block22；共同block30进入DirectML ViT与DirectML39–47，再经对应skip的block48/56和共同62–70。两份4K R10 SHA均为`4868b7e4...be35`逐byteexact。encoder/decoder128的资源、同步、数值、稳态性能和最终画面全部通过。严格剩余是decoder block56 prefix与生命周期整合。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
