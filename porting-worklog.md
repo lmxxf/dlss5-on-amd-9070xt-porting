@@ -1705,6 +1705,8 @@ block70末端新增GPU R10 pack pass：outconv RGBA不再readback，转SRV后以
 
 新增`d3d12_full_graph_alias_arena.cpp`后实际创建一块4714.50MiB buffer-only heap，并在相同offset区间重叠创建Swin、ViT与block70共16个placed-resource views；六条永久skip另占750MiB。RX9070XT驱动全部接受，总arena5464.50MiB，分配后DXGI usage5475.79MiB、headroom9940.74MiB。Swin phase1211.25MiB、ViT phase84.38MiB均远小于block70峰值，因此alias布局成立；相对naive arena再省1287.14MiB。
 
+alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，插入alias barrier后以ViT view写`0x22222222`，再插barrier切到block70 view写`0x33333333`；从block70 1.012GiB view首尾readback均为`0x33333333`。这证明重叠placed resources不只可创建，三phase的barrier与GPU可见性在RX9070XT上实际成立。下一步可在同一heap上逐段替换smoke clear为现有已验证PSO dispatch。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

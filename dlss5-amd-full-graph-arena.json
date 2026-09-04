@@ -15,7 +15,14 @@
     "usage_after_allocation_mib": 5475.79,
     "reported_headroom_mib": 9940.74,
     "overlapping_placed_resource_views": 16,
-    "driver_allocation_result": "success"
+    "driver_allocation_result": "success",
+    "alias_barrier_smoke": {
+      "sequence": ["swin", "vit", "block70"],
+      "patterns": ["0x11111111", "0x22222222", "0x33333333"],
+      "block70_first_uint": "0x33333333",
+      "block70_last_uint": "0x33333333",
+      "result": "pass"
+    }
   },
   "persistent_skip_mib": 750.0,
   "largest_phase": "block70",
@@ -28,5 +35,5 @@
     "r10": 31.64
   },
   "conclusion": "A full single-device graph is physically feasible. The driver accepted the phase-aliased 5.46 GiB arena intended for coexistence with the running game and model weights.",
-  "strict_boundary": "This validates allocation capacity, not full-network execution or real-time rendering."
+  "strict_boundary": "This validates allocation capacity and executed alias barriers, not full-network execution or real-time rendering."
 }
