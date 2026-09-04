@@ -1919,6 +1919,8 @@ batched Attention先过独立矩阵门：`DML_BATCH=32640`、`64×16 · 16×64`�
 
 block70 sparse prefix同时做固定两项展开。CSR的2048个输出degree分布恰为1664×1＋384×2；文件尾少一个weight，审计确认shader越界读按零处理，pair生成器显式补一项implicit zero。`BLOCK70_PREFIX_PAIRS=1`直接读取`{i0,i1,w0,w1}`并保持加法顺序，最终4K R10 SHA仍为`4868b7e4...be35`逐byteexact；四次热态prefix为11.239/11.254/11.240/11.242ms，与CSR版约11.24ms相同。动态offset/loop不是瓶颈，固定pair不进入production；候选及manifest生成器保留作可复现实证。
 
+block70再测FFN→QKV融合。`block70_ffn_qkv_sm6_fp32.hlsl`在每token寄存器中保留64 hidden与32个E4M3 feature，写feature的同时直接用local feature计算并写QKV，从执行图删除独立QKV dispatch和一次267MB feature读取。最终4K R10 SHA仍为`4868b7e4...be35`逐byteexact；但热态融合pass37.974/38.903ms，后续空QKV区仅0.089/0.107ms，高于分离FFN＋QKV观测约32.161–36.230ms。64+32局部数组把寄存器/occupancy推过阈值，spill代价超过带宽收益；融合路线关闭，环境变量候选保留作反证。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -30,5 +30,15 @@
     "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
     "decision": "rejected for production; fixed two-entry records are exact but do not improve the CSR shader"
   },
+  "fused_ffn_qkv": {
+    "shader": "block70_ffn_qkv_sm6_fp32.hlsl",
+    "method": "keep 64 hidden and 32 quantized feature values per token, write feature and compute QKV before leaving the shader",
+    "hot_fused_pass_ms": [37.974, 38.903],
+    "standalone_ffn_plus_qkv_observed_ms": [32.161, 36.230],
+    "qkv_followup_dispatch_ms": [0.089, 0.107],
+    "final_r10_byte_exact": true,
+    "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "decision": "rejected; register pressure/spilling costs more than the eliminated feature read and dispatch"
+  },
   "production_decision": "retain the existing sparse prefix and SM6 FP32 FFN; focus on persistent full-network scheduling and other stages"
 }
