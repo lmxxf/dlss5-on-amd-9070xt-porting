@@ -1905,6 +1905,8 @@ front宿主增加14点GPU timestamp，把单轮拆为preblock+HWC 5.983ms及四�
 
 最低风险的Attention DXC重编先做控制实验。新增`block1_attention_sm6_fp32.hlsl`逐式复刻旧shader，cs_6_2/O3输出block4 SHA与旧链逐byteexact；但unshifted为4.981ms，三层shifted分别26.372/22.973/22.975ms，全front升到104.819ms。故“只换DXC”路线否决，正式仍用旧DXBC；下一步转为真正的32640-window batched DirectML QKᵀ/softmax/AV，避免每个query重复标量矩阵乘。
 
+batched Attention先过独立矩阵门：`DML_BATCH=32640`、`64×16 · 16×64`在RX9070XT连续100轮平均2.158108ms、1.982TFLOPS。QKᵀ与softmax×V两次矩阵主体约4.316ms，显著低于当前四层旧Attention合计18.190ms，路线可继续。四层geometry完全相同，因此正式实现不需要8套compiled operator：一枚TransB QK与一枚AV固定绑定共享Q/K/V、score/prob scratch，每层在旧QKV之后覆盖pack、record同一对operator，再做mask/softmax和projection；先验收累积FP16误差，未过画质门前不替换exact DXBC路径。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

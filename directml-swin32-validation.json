@@ -44,5 +44,15 @@
     "block69_correlation": 0.9999581488544375,
     "result": "rejected; branch-heavy SM5.1 mask cost 39.5 ms and did not address the dominant FP16 rounding error"
   },
+  "batched_window_attention_probe": {
+    "batch": 32640,
+    "qk_shape": "64x16 times 16x64",
+    "iterations": 100,
+    "single_gemm_gpu_ms": 2.158108,
+    "qk_plus_av_matrix_estimate_ms": 4.316216,
+    "old_four_layer_attention_total_ms": 18.19024,
+    "effective_tflops": 1.982,
+    "decision": "proceed with shared resident Q/K/V, score/prob buffers and one reusable QK/AV compiled-operator pair; validate pack, mask, softmax and projection before replacing the exact DXBC path"
+  },
   "decision": "Do not replace blocks66-69 with DirectML. The existing SM6 FP32 HLSL path is exact and has comparable latency. Reuse that PSO inside the persistent addon/worker; DirectML remains selected for the wider matrix-bound stages."
 }
