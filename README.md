@@ -306,6 +306,6 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `model-overview.svg`：正文结构图；只画二进制能支撑的骨架，不能当作 NVIDIA 完整执行图。
 - `amd-port-plan.md`：从权重格式、执行图、离线出图到 AMD GPU 实时化的分阶段实验路线；每一步都附验收标准和可成文选题。
 
-当前1080p游戏内runtime：`dlss5_1080p_runtime.cpp`把当帧FFX Color连续录入常驻GPU blocks0–70，在原FSR之后原位更新1920×1080 RGBA16F output；游戏原生tonemap/UI/compositor随后生成最终R10 swapchain。真机20秒窗口实测11.9803fps；两张间隔截图SHA不同且伊芙眼睛一闭一睁，证明输出为连续动态帧。直接把pre-tonemap RGBA量化成R10覆盖backbuffer会产生暗绿网格，已降级为默认关闭的诊断路径。
+当前1080p游戏内runtime：`dlss5_1080p_runtime.cpp`常驻执行blocks0–70；block70按display-color合同在present前对当帧R10 backbuffer叠加残差。2026-09-05已修正C512 predown的遗留行跨度和错误的FSR中间输出合成位置，在实际洞窟场景确认满屏小方格消失（`grid-bug-before.png` / `grid-bug-after.png`，日志mode=0）。F6可切换神经输出、原生对照和左右对照。此前主菜单画质验收及11.9838精确帧率说法不足，详见porting-worklog最新修复记录。
 
 296 期的样本哈希、PE 资源树和许可证基础分析见 `../296/`。
