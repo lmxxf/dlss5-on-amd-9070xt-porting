@@ -2009,6 +2009,8 @@ AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身�
 
 ASCII诊断门后完成真实GPU二分：max69在blocks66–69首submit后退出；max38在ViT首submit后退出；max30在blocks23–30首submit后退出；max22在blocks15–22首submit后退出；max14在blocks9–14首submit后退出。max8当前进程稳定且present超过3000，但FFX frame在全graph ready前停于533，因而一帧网络都未执行，不能判通过。下一步需让游戏窗口回前台/进入动态场景，使ready后的FFX dispatch继续发生，再判blocks0–8。
 
+继续二分得到：max30在block23–30首submit后退出，max22在block15–22后退出，max14在blocks9–14后退出，max0在frame bridge与block0首submit后退出。因此故障已缩到Color→tiles bridge或block0。新增特殊`max_block=999`仅执行frame bridge而跳过block0及全部下游，区分最后两项；诊断版SHA-256=`954714b8d93e23b28cb26f28da5937ebd2577e318c20b78c6ee601847a502ba7`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
