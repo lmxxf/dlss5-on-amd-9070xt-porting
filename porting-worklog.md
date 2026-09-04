@@ -1995,6 +1995,8 @@ R10 swapchain回写随后进入present callback。block70的1920×1080 packed bu
 
 snapshot修正版在第二次真游戏运行中仍显示ABI upscaleSize=0×0，证明问题不是调用后内存改写，而是当前FFX版本的尺寸字段偏移与旧公开结构不同；相邻output resource descriptor始终稳定给出真实3840×2160。target门改以`output.description.width/height`为权威。device判断同时从接口裸指针比较改为IUnknown identity，并把Color/Depth/Motion/Output/command-list五项分别写日志，避免D3D12代理接口导致同对象不同指针的假阴性。诊断版SHA-256=`5a7526630ec7b62f404b3907a44dac571ecc72bfb08e0b525a20edd89edf89df`，待游戏切1080并重启后部署。
 
+游戏切独占全屏1080后，FFX权威合同变为render1281×721（resource pad1284×724）、output1920×1080，`target1080=1`；blocks0–70与resident_ready再次通过。但原FSR返回后五项GetDevice均失败，说明仅复制dispatch结构不足以延长其中COM对象生命周期。修正为trampoline前对Color/Depth/Motion/Output与native command list全部AddRef，自有命令录完后Release。present每600帧同步记录当前backbuffer实际尺寸/format，以判断启动时3840×2160 swapchain是否随后resize。交叉编译SHA-256=`23592b5cc69f2fae91b7cb1b2135fd6b56416b2d002d0b57134ca2bafcf1fa9a`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

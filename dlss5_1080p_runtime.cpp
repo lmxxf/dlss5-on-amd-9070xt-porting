@@ -218,7 +218,8 @@ bool record_block70(ID3D12GraphicsCommandList *commands,ID3D12Resource *output,u
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
     FfxDispatchUpscale snapshot{};
-    if (is_upscale) snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);
+    ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr;
+    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();}
     const uint32_t result = g_ffx_dispatch(context, header);
     const auto n = ++g_ffx_frames;
     if (is_upscale) {
@@ -250,6 +251,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
                 dispatch->output.description.width, dispatch->output.description.height, dispatch->output.state);
         }
     }
+    if(is_upscale){for(auto*r:held_resources)if(r)r->Release();if(held_commands)held_commands->Release();}
     return result;
 }
 
@@ -936,6 +938,7 @@ void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swa
                 const reshade::api::rect *) {
     const auto n = ++g_presents;
     auto*native=reinterpret_cast<IDXGISwapChain3*>(static_cast<uintptr_t>(swapchain->get_native()));
+    if(native==g_main_swapchain&&(n==1||n%600==0)){const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*b=nullptr;if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&b)))){const auto d=b->GetDesc();log("present_backbuffer=%llu index=%u size=%llux%u format=%u\n",n,index,(unsigned long long)d.Width,d.Height,(UINT)d.Format);b->Release();}}
     if(native==g_main_swapchain&&g_b70_submissions.load()&&!g_b70_packed_copied.load()){
         const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*backbuffer=nullptr;
         if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&backbuffer)))){const auto desc=backbuffer->GetDesc();if(desc.Width==1920&&desc.Height==1080&&desc.Format==DXGI_FORMAT_R10G10B10A2_UNORM){auto*cmd=queue->get_immediate_command_list();const reshade::api::resource src{reinterpret_cast<uint64_t>(g_b70.packed)},dst{reinterpret_cast<uint64_t>(backbuffer)};cmd->barrier(src,reshade::api::resource_usage::unordered_access,reshade::api::resource_usage::copy_source);cmd->barrier(dst,reshade::api::resource_usage::present,reshade::api::resource_usage::copy_dest);cmd->copy_buffer_to_texture(src,0,1920,1080,dst,0,nullptr);cmd->barrier(dst,reshade::api::resource_usage::copy_dest,reshade::api::resource_usage::present);g_b70_packed_copied.store(true);if(n==1||n%120==0)log("r10_backbuffer_submit=%llu index=%u resource=%p\n",n,index,backbuffer);}backbuffer->Release();}
