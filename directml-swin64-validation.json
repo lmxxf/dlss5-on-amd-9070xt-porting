@@ -61,6 +61,26 @@
       "directml_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
       "old_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
       "validation_script": "validate_directml_encoder64.ps1"
+    },
+    "integrated_block4_predown": {
+      "single_gpu_ms": 30.663440,
+      "steady_100_gpu_ms": 24.478336,
+      "predown_only_gpu_ms": 5.555640,
+      "vs_corrected_fp32_chain": {
+        "correlation": 0.999999944390375,
+        "mae": 1.0284723e-7,
+        "rmse": 0.000033553013,
+        "max_abs_error": 0.015625,
+        "different_values": 543,
+        "differences_over_0_01": 135
+      },
+      "corrected_r10_vs_historical_r10": {
+        "new_sha256": "44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46",
+        "historical_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+        "different_pixel_fraction": 0.02127146026234568,
+        "max_channel_deltas": [2, 3, 3],
+        "visual": "clean 4K menu frame; difference is the correction of a historical one-axis dispatch truncation, not a regression"
+      }
     }
   },
   "implementation": {

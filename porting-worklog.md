@@ -1879,6 +1879,10 @@ RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.4679
 
 新增`validate_directml_encoder64.ps1`做完整最终裁判：DirectML block8依次进入blocks9–30、resident ViT31–38、decoder39–69；decoder分别使用由该分支生成的block22/block14/block8三条skip，block4保持共同输入，最后进入block70。输出33,177,600-byte 4K R10与旧链SHA-256同为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。encoder64算法、性能、skip传播和最终画面四门闭合；严格剩余包括把block4 predown并入该graph，以及游戏内持久生命周期实测。
 
+block4 predown并入encoder64后反而揭开旧runner静默截断：旧`d3d12_swin_chain`与独立downsample runner将66,846,720线程作为1,044,480个groups全部dispatch到X轴，超过D3D12每轴65535上限，shader又只读`id.x`；结果mid只覆盖前4,194,240值即131,072像素，约第68行以下沿用未写区。CPU抽样证实旧enter5在首行与正确公式误差约1e-8，到y100/y300/y543分别升至约0.019/0.028/0.054；新2D flatten对CPU仅约2.4e-4 FP16误差。generic两处shader改为`id.x+id.y*4194240`并将cache从predown-v1 bump v2，独立runner同步修复。
+
+修正后的FP32 generic predown＋blocks5–8与DirectML integrated版本比较：33,423,360值corr0.9999999444、MAE1.028e-7、RMSE3.355e-5、max0.015625，仅543值不同、135值差>0.01。integrated单轮30.663440ms，100轮每次重做predown稳态24.478336ms，其中predown-only 5.555640ms。正确pre-down完整跑到block70得到4K R10 SHA`44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46`；画面干净，相对历史截断版仅176,434/8,294,400像素变化（2.1271%），RGB最大2/3/3个10-bit刻度。因此旧SHA不再作为该边界golden；这是修复历史执行缺口，不是DirectML回归。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

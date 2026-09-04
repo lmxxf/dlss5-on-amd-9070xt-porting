@@ -1,9 +1,10 @@
+param([string]$Block8 = 'D:\DLSSNR-Lab\directml-encoder64-block8.f32')
 $ErrorActionPreference = 'Stop'
 $L = 'D:\DLSSNR-Lab'
 function V($Name) { "$L\encoder64-validation-$Name.f32" }
 function Check($Name) { if ($LASTEXITCODE) { throw "$Name failed: $LASTEXITCODE" } }
 
-& "$L\d3d12_swin_chain.exe" "$L\directml-encoder64-block8.f32" (V 'block14') `
+& "$L\d3d12_swin_chain.exe" $Block8 (V 'block14') `
   "$L\block9-body-effective.bin" "$L\block10-effective.bin" `
   "$L\block11-effective.bin" "$L\block12-effective.bin" `
   "$L\block13-effective.bin" "$L\block14-body-effective.bin"
@@ -56,7 +57,7 @@ Check 'blocks48-55'
   "$L\block60-body-effective.bin" "$L\block61-body-effective.bin"
 Check 'blocks56-61'
 
-& "$L\d3d12_swin_chain.exe" --upsample (V 'block61') "$L\directml-encoder64-block8.f32" (V 'block65') `
+& "$L\d3d12_swin_chain.exe" --upsample (V 'block61') $Block8 (V 'block65') `
   "$L\block62-body-effective.bin" "$L\block63-body-effective.bin" `
   "$L\block64-body-effective.bin" "$L\block65-body-effective.bin"
 Check 'blocks62-65'
