@@ -1941,6 +1941,8 @@ Zero将第一阶段目标明确为1080p至少10fps，严格4K留待后续。不�
 
 统一runtime交叉编译SHA-256为`e496e01b48febb81356f741111b1eec9a4f79bf9303b6c01f3d54cb60338d3e7`。`deploy_dlss5_1080p_runtime.ps1`在游戏运行时拒绝变更；Install校验hash后移除旧`d3d12-dynamic-resource-probe`与`dlss5-resident-lifecycle`，避免两个MinHook争同一target，再安装唯一runtime。当前边界明确：DLL已承载正确设备/当前帧资源/一次性初始化合同，但尚未把front0–4算子代码录入ffx commandList，不宣称已改画面。
 
+DLL随后接入第一个真实逐帧GPU pass。初始化worker创建常驻8,355,840-byte tile UAV、固定960×544 bilinear/tile PSO与8套双descriptor heaps；每次FFX upscale hook在调用原FSR前，以renderSize作为active范围从当帧RGBA16F Color `Texture2D.Load`做align-corners-false等价bilinear，直接按`[tile,8×8,RGBA]`写8160 tiles，并插UAV barrier。descriptor按frame&7轮转，避免CPU更新覆盖仍在GPU使用的SRV；Color只读、输出仅为自有buffer，不碰游戏画面。该pass即使游戏暂为4K也可验证当前帧桥，只有upscaleSize=1920×1080时才提升`frame_contract_1080`。全程仍无readback和中间文件。新版统一runtime SHA为`8d25f71c4814f5b53d790dbfe35e75a9bcc23dcc746db87ccf73b601f2cfc627`，下一前台启动日志应同时出现`ffx_frame`与`frame_bridge_submit`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

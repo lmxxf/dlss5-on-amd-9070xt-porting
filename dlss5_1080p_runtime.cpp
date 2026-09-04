@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <d3d12.h>
+#include <d3dcompiler.h>
 #include <dxgi1_4.h>
 #define DML_TARGET_VERSION_USE_LATEST
 #ifndef _Maybenull_
@@ -46,6 +47,12 @@ ID3D12Resource *g_probe_input = nullptr, *g_probe_weight = nullptr,
 double g_probe_gpu_ms = 0.0;
 std::atomic<unsigned long long> g_ffx_frames{0};
 std::atomic<bool> g_ffx_hook_ready{false}, g_frame_contract_ready{false};
+std::atomic<bool> g_frame_bridge_ready{false};
+std::atomic<unsigned long long> g_frame_bridge_submissions{0};
+ID3D12RootSignature *g_frame_bridge_root = nullptr;
+ID3D12PipelineState *g_frame_bridge_pso = nullptr;
+ID3D12DescriptorHeap *g_frame_bridge_heaps[8]{};
+ID3D12Resource *g_frame_tiles = nullptr;
 
 struct FfxHeader { uint64_t type; FfxHeader *pNext; };
 struct FfxDimensions2D { uint32_t width, height; };
@@ -87,6 +94,10 @@ bool on_main_device(void *resource) {
     return same;
 }
 
+bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *color,
+                         uint32_t render_width, uint32_t render_height,
+                         unsigned long long frame);
+
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
     if (header && (header->type & 0x00ffffffu) == 0x00010001u) {
@@ -96,6 +107,10 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
             on_main_device(dispatch->output.resource);
         const bool target = dispatch->upscaleSize.width == 1920 && dispatch->upscaleSize.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
+        if (resources_same_device && dispatch->commandList && g_frame_bridge_ready.load())
+            record_frame_bridge(static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList),
+                                static_cast<ID3D12Resource *>(dispatch->color.resource),
+                                dispatch->renderSize.width, dispatch->renderSize.height, n);
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
                 n, dispatch->commandList, dispatch->renderSize.width, dispatch->renderSize.height,
@@ -154,6 +169,108 @@ ID3D12Resource *make_buffer(UINT64 bytes, D3D12_HEAP_TYPE heap_type,
                                           state, nullptr,
                                           IID_PPV_ARGS(&resource)));
     return resource;
+}
+
+void initialize_frame_bridge() {
+    constexpr UINT64 tile_bytes = 8160ull * 256 * sizeof(float);
+    g_frame_tiles = make_buffer(tile_bytes, D3D12_HEAP_TYPE_DEFAULT,
+                                D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    const char shader[] = R"(
+cbuffer Params : register(b0) { uint render_width; uint render_height; };
+Texture2D<float4> color : register(t0);
+RWStructuredBuffer<float> tiles : register(u0);
+[numthreads(8,8,1)]
+void main(uint3 id : SV_DispatchThreadID) {
+    if (id.x >= 960 || id.y >= 544) return;
+    float2 source = (float2(id.xy) + .5) * float2(render_width, render_height) / float2(960, 544) - .5;
+    int2 p0 = int2(floor(source));
+    float2 f = source - floor(source);
+    p0 = clamp(p0, int2(0,0), int2(int(render_width)-1, int(render_height)-1));
+    int2 p1 = min(p0 + 1, int2(int(render_width)-1, int(render_height)-1));
+    float4 a = lerp(color.Load(int3(p0.x, p0.y, 0)), color.Load(int3(p1.x, p0.y, 0)), f.x);
+    float4 b = lerp(color.Load(int3(p0.x, p1.y, 0)), color.Load(int3(p1.x, p1.y, 0)), f.x);
+    float4 value = saturate(lerp(a, b, f.y));
+    uint tile = (id.y / 8) * 120 + id.x / 8;
+    uint local = ((id.y % 8) * 8 + id.x % 8) * 4;
+    [unroll] for (uint c = 0; c < 4; ++c) tiles[tile * 256 + local + c] = value[c];
+})";
+    ID3DBlob *code = nullptr, *error = nullptr;
+    dmlrt_check("frame bridge compile", D3DCompile(shader, sizeof(shader) - 1, nullptr,
+        nullptr, nullptr, "main", "cs_5_1", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0,
+        &code, &error));
+    D3D12_DESCRIPTOR_RANGE ranges[2]{};
+    ranges[0] = {D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, 0};
+    ranges[1] = {D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0, 0, 1};
+    D3D12_ROOT_PARAMETER parameters[2]{};
+    parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+    parameters[0].Constants = {0, 0, 2};
+    parameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    parameters[1].DescriptorTable = {2, ranges};
+    D3D12_ROOT_SIGNATURE_DESC root_desc{};
+    root_desc.NumParameters = 2;
+    root_desc.pParameters = parameters;
+    ID3DBlob *signature = nullptr;
+    dmlrt_check("frame bridge signature", D3D12SerializeRootSignature(
+        &root_desc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
+    dmlrt_check("frame bridge root", g_device->CreateRootSignature(0,
+        signature->GetBufferPointer(), signature->GetBufferSize(),
+        IID_PPV_ARGS(&g_frame_bridge_root)));
+    D3D12_COMPUTE_PIPELINE_STATE_DESC pipeline_desc{};
+    pipeline_desc.pRootSignature = g_frame_bridge_root;
+    pipeline_desc.CS = {code->GetBufferPointer(), code->GetBufferSize()};
+    dmlrt_check("frame bridge pso", g_device->CreateComputePipelineState(
+        &pipeline_desc, IID_PPV_ARGS(&g_frame_bridge_pso)));
+    const UINT step = g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    for (auto &heap : g_frame_bridge_heaps) {
+        D3D12_DESCRIPTOR_HEAP_DESC heap_desc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+            2, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 0};
+        dmlrt_check("frame bridge heap", g_device->CreateDescriptorHeap(&heap_desc,
+                                                                        IID_PPV_ARGS(&heap)));
+        auto cpu = heap->GetCPUDescriptorHandleForHeapStart();
+        cpu.ptr += step;
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uav{};
+        uav.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+        uav.Buffer.StructureByteStride = sizeof(float);
+        uav.Buffer.NumElements = static_cast<UINT>(tile_bytes / sizeof(float));
+        g_device->CreateUnorderedAccessView(g_frame_tiles, nullptr, &uav, cpu);
+    }
+    g_frame_bridge_ready.store(true);
+    log("frame_bridge_ready target=960x544 tiles=8160 bytes=%llu heaps=8\n",
+        static_cast<unsigned long long>(tile_bytes));
+}
+
+bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *color,
+                         uint32_t render_width, uint32_t render_height,
+                         unsigned long long frame) {
+    if (!commands || !color || !g_frame_bridge_ready.load() || !render_width || !render_height)
+        return false;
+    ID3D12DescriptorHeap *heap = g_frame_bridge_heaps[frame & 7];
+    auto cpu = heap->GetCPUDescriptorHandleForHeapStart();
+    const auto desc = color->GetDesc();
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv{};
+    srv.Format = desc.Format;
+    srv.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srv.Texture2D.MipLevels = 1;
+    g_device->CreateShaderResourceView(color, &srv, cpu);
+    ID3D12DescriptorHeap *heaps[] = {heap};
+    commands->SetDescriptorHeaps(1, heaps);
+    commands->SetComputeRootSignature(g_frame_bridge_root);
+    const UINT constants[2] = {render_width, render_height};
+    commands->SetComputeRoot32BitConstants(0, 2, constants, 0);
+    commands->SetComputeRootDescriptorTable(1, heap->GetGPUDescriptorHandleForHeapStart());
+    commands->SetPipelineState(g_frame_bridge_pso);
+    commands->Dispatch(120, 68, 1);
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    barrier.UAV.pResource = g_frame_tiles;
+    commands->ResourceBarrier(1, &barrier);
+    const auto submitted = ++g_frame_bridge_submissions;
+    if (submitted == 1 || submitted % 120 == 0)
+        log("frame_bridge_submit=%llu ffx_frame=%llu render=%ux%u color=%p format=%u\n",
+            submitted, frame, render_width, render_height, color, static_cast<unsigned>(desc.Format));
+    return true;
 }
 
 void run_warm_probe() {
@@ -281,6 +398,7 @@ DWORD WINAPI initialize_worker(void *) {
     if (SUCCEEDED(hr)) {
         try {
             run_warm_probe();
+            initialize_frame_bridge();
         } catch (const DmlFailure &failure) {
             hr = failure.result;
             log("resident_execution_failed operation=%s hr=0x%08x\n",

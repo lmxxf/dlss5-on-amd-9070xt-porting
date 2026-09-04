@@ -30,15 +30,17 @@
   },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
-    "binary_sha256": "e496e01b48febb81356f741111b1eec9a4f79bf9303b6c01f3d54cb60338d3e7",
+    "binary_sha256": "8d25f71c4814f5b53d790dbfe35e75a9bcc23dcc746db87ccf73b601f2cfc627",
     "in_process_contract": [
       "main IDXGISwapChain3 device",
       "persistent DirectML device, queue, allocator, list and fence",
       "one-time 8160x192x256 representative operator initialization and 100 warm dispatches",
       "MinHook ffxDispatch current-frame Color, Depth, Motion and output resources",
-      "1080p output-size and same-device validation without CPU readback"
+      "1080p output-size and same-device validation without CPU readback",
+      "current-frame Color bilinear resize to 960x544 and direct 8x8 tile-major GPU buffer write"
     ],
-    "status": "compiled and deployed; first in-game load pending"
+    "persistent_frame_input": {"target": "960x544", "tiles": 8160, "bytes": 8355840, "descriptor_ring": 8},
+    "status": "compiled and deployed; first in-game frame-bridge load pending"
   },
   "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
 }
