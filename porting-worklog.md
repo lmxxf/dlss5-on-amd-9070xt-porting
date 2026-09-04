@@ -1689,6 +1689,8 @@ block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：
 
 predown shader随后加入版本化CSO cache。ViT block30 predown冷/热wall为1645.286/1279.091ms，热态已低于旧pad+ViT的1408ms；Swin predown同样缓存。最终热后encoder0–13为2960.419ms（初始4029.193ms），encoder14–30为3199.859ms（初始4870.546ms），block13/block30-body/block38关键输出均逐byte exact。两个encoder合计相对初始减少约2.74秒；严格目标仍是把剩余各stage进程合成一个device。
 
+同宽连续块随后最大化合链：decoder blocks48–55合为8层153.853ms，blocks56–61合为6层121.111ms，两端exact；Windows整网wall由20.403秒降至16.761秒。encoder侧blocks9–14合为6层128.157ms；blocks15–22合为8层154.509ms；带block22 predown的blocks23–30合为8层165.541ms，全部逐byte exact。热态encoder0–14为2853.064ms，encoder15–30从初始4870.546ms降至1398.768ms。再次执行Windows blocks1–70总wall为15,317.273ms，最终RGBA逐byte exact。剩余进程边界均发生在不同channel/geometry或skip merge之间，下一步需要真正的跨stage全网device。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

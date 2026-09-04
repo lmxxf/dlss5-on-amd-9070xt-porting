@@ -6,12 +6,12 @@ function Check($Name){if($LASTEXITCODE){throw "$Name failed: $LASTEXITCODE"}}
 $Clock=[Diagnostics.Stopwatch]::StartNew();$Last=0
 function Mark($Name){$Now=$Clock.Elapsed.TotalMilliseconds;Write-Output ("stage_wall_ms {0} {1:F3}" -f $Name,($Now-$script:Last));$script:Last=$Now}
 
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_encoder_raw13.ps1" -Frame $Frame
-Check 'encoder0-13'
-Mark 'encoder0-13'
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_encoder_raw14.ps1" -Frame $Frame
+Check 'encoder0-14'
+Mark 'encoder0-14'
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_raw14_30.ps1" -Frame $Frame
-Check 'encoder14-30'
-Mark 'encoder14-30'
+Check 'encoder15-30'
+Mark 'encoder15-30'
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_vit_raw.ps1" -Frame $Frame
 Check 'vit31-38'
 Mark 'vit31-38'
@@ -28,10 +28,12 @@ Mark 'block39+decoder40-47'
 Check 'block48 projection'
 & "$L\merge_upsample_skip.exe" (P 48 '-projected') (P 22 '-body') (P 48 '-prefix') 68 120 256
 Check 'block48 merge'
-& "$L\d3d12_block128_test.exe" "$L\block48-body-effective.bin" (P 48 '-prefix') (P 48) 240 136 0
-Check 'block48 body'
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_decoder_raw49_55.ps1" -Frame $Frame
-Check 'decoder49-55'
+& "$L\d3d12_swin_chain.exe" (P 48 '-prefix') (P 55) `
+  "$L\block48-body-effective.bin" "$L\block49-body-effective.bin" `
+  "$L\block50-body-effective.bin" "$L\block51-body-effective.bin" `
+  "$L\block52-body-effective.bin" "$L\block53-body-effective.bin" `
+  "$L\block54-body-effective.bin" "$L\block55-body-effective.bin"
+Check 'decoder48-55'
 Mark 'block48+decoder49-55'
 
 function Upsample($Block,$Previous,$Skip,$InputChannels,$OutputChannels,$Height,$Width){
@@ -41,10 +43,11 @@ function Upsample($Block,$Previous,$Skip,$InputChannels,$OutputChannels,$Height,
   Check "block$Block merge"
 }
 Upsample 56 55 14 256 128 136 240
-& "$L\d3d12_block128_test.exe" "$L\block56-body-effective.bin" (P 56 '-prefix') (P 56) 480 272 0
-Check 'block56 body'
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_decoder_raw57_61.ps1" -Frame $Frame
-Check 'decoder57-61'
+& "$L\d3d12_swin_chain.exe" (P 56 '-prefix') (P 61) `
+  "$L\block56-body-effective.bin" "$L\block57-body-effective.bin" `
+  "$L\block58-body-effective.bin" "$L\block59-body-effective.bin" `
+  "$L\block60-body-effective.bin" "$L\block61-body-effective.bin"
+Check 'decoder56-61'
 Mark 'block56+decoder57-61'
 Upsample 62 61 8 128 64 272 480
 & "$L\d3d12_swin_chain.exe" (P 62 '-prefix') (P 65) `

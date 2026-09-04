@@ -68,6 +68,8 @@ block22→23特殊边也已GPU直连：136行池化为68行，尾4行在GPU清�
 
 block30 pool/enter与H34→H36零padding现已并入ViT resident宿主，block30-body可直接跑到block38且逐byte exact；独立downsample/pad两进程和两份文件已删除。predown CSO cache热后：encoder0–13=2.960秒、encoder14–30=3.200秒、含block30 predown的ViT=1.279秒；两个encoder较初始合计减少约2.74秒。
 
+同宽块继续合并：decoder48–55与56–61分别成为单次8/6层chain；encoder9–14、15–22、23–30分别成为6/8/8层chain，段末全部exact。encoder0–14热态2.853秒，encoder15–30降至1.399秒；Windows blocks1–70总wall由20.403秒进一步降至15.317秒，最终RGBA逐byte exact。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

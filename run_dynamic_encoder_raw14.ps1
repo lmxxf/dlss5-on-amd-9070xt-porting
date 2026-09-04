@@ -6,7 +6,7 @@ $ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab';function P($b,$s=''){"$L\raw-$F
 & "$L\d3d12_swin_chain.exe" (P 4) (P 8) `
   "$L\block5-body-effective.bin" "$L\block6-body-effective.bin" `
   "$L\block7-body-effective.bin" "$L\block8-body-effective.bin";Q 'resident blocks5-8'
-& "$L\d3d12_swin_chain.exe" (P 8) (P 13) `
+& "$L\d3d12_swin_chain.exe" (P 8) (P 14) `
   "$L\block9-body-effective.bin" "$L\block10-effective.bin" `
   "$L\block11-effective.bin" "$L\block12-effective.bin" `
-  "$L\block13-effective.bin";Q 'resident blocks9-13'
+  "$L\block13-effective.bin" "$L\block14-body-effective.bin";Q 'resident blocks9-14'
