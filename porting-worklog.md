@@ -1897,6 +1897,10 @@ DirectML preblock 66,846,720 tile输出对旧标量结果corr0.9999999430、MAE0
 
 tile→HWC随后并入preblock resident同一command list。`prepare_directml_preblock.py --permutation`复刻CPU转换器，从4096-entry physical permutation生成4个quadrant×512 logical slot的uint16 rank map；GPU reorder按HWC座标反推tile/quadrant/local slot，读取tile FP32并现场E4M3编码解码。首版仅65,280值差一个subnormal刻度：权威CPU `enc()`在指数低于-6时把mantissa clamp到7，而通用`F()`允许round到8；补`min(round(a*512),7)`后，267,386,880-byte GPU HWC与独立`preblock_tiles_to_hwc.exe`逐byteexact，SHA同为`6b80db5c321123af13a08dbd07ef9f0dcfd0d8ba4884b83b23b9966274332212`。block0三GEMM＋HWC重排单轮3.368840ms、100轮稳态2.547040ms；267MB tile中间文件与独立转换进程可删除，严格剩余边界是把HWC resident buffer直连blocks1–4。
 
+blocks1–4随后并入同一front宿主。程序预载四份41,220-byte effective参数和12枚已有SM6 PSO，分配两张main ping-pong、feature与QKV scratch；HWC reorder完成后原地UAV→SRV，四层只切descriptor table并在同一command list执行。首版把32640 tiles误当2,088,960 tokens，QKV只分/执行1/64而输出corr0.125；拆出`TOKENS=TILES×64`并按其分配/dispatch后，block4 66,846,720 floats与分离`d3d12_swin32_chain`逐float/byte100% exact、全finite。
+
+完整block0三DirectML GEMM→GPU HWC→SM6 blocks1–4单轮40.910480ms，100轮稳态39.567292ms；分离稳态preblock+HWC 2.547040ms加blocks1–4 52.820ms合计55.367ms，消除device/resource/readback边界即再快约1.40倍。前端文件边界清零，但39.57ms本身仍超过60fps整帧预算；下一步必须优化1H32 FFN/QKV/Attention本体或采用混合矩阵核，不能把“resident”偷换成“实时完成”。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

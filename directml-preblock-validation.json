@@ -41,6 +41,18 @@
     "sha256": "6b80db5c321123af13a08dbd07ef9f0dcfd0d8ba4884b83b23b9966274332212",
     "map": "4x512 uint16 ranks derived from tinlayout-2h64-output-permutation.i32"
   },
+  "integrated_front_blocks0_4": {
+    "single_gpu_ms": 40.910480,
+    "steady_100_gpu_ms": 39.567292,
+    "separate_preblock_hwc_gpu_ms": 2.547040,
+    "separate_blocks1_4_gpu_plus_copy_ms": 52.820,
+    "separate_sum_ms": 55.367040,
+    "boundary_elimination_speedup": 1.39932,
+    "block4_values": 66846720,
+    "block4_byte_exact_vs_separate_graph": true,
+    "block4_correlation": 1.0,
+    "all_finite": true
+  },
   "full_network_r10": {
     "sha256": "8c8bd14225d203da072f8aa3fcd77942e87ed824a65ae09bb0e681fb59caf831",
     "reference_corrected_preblock_sha256": "44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46",
@@ -56,5 +68,5 @@
     "operators": 3,
     "passes": ["RGBA-to-RGB FP16 pack", "GEMM1", "SiLU1", "GEMM2", "SiLU2", "GEMM3", "affine output", "E4M3 tile-to-HWC reorder"]
   },
-  "strict_boundary": "The block0 distilled MLP and tile-to-HWC conversion are now one resident GPU graph. Blocks1-4 are still a separate process/resource boundary. Final production validation requires the graph to run inside the game addon on consecutive live frames."
+  "strict_boundary": "Block0, tile-to-HWC, and blocks1-4 are now one resident GPU graph with exact block4 output. Its 39.57 ms steady latency still exceeds a 60 fps frame budget, so the 32-channel kernels need further optimization before addon rollout. Final production validation requires consecutive live game frames."
 }
