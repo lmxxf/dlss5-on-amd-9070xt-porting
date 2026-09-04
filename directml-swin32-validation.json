@@ -65,5 +65,20 @@
     },
     "decision": "rejected: 4.316 ms is the matrix cost for one layer, not all four; four layers already cost about 17.265 ms before pack/softmax/projection, and the complete candidate is both slower and less accurate than DXBC"
   },
+  "pre_normalized_qkv_rejected": {
+    "source": "d3d12_front_normalized_attention.cpp",
+    "method": "compute Q/K norms once in the QKV pass, store Q times scale and normalized K as FP32, then remove repeated norm/rsqrt work from Attention",
+    "front_total_gpu_ms": 94.584320,
+    "qkv_ms_per_block": [3.096920, 2.560920, 2.649680, 2.677840],
+    "attention_ms_per_block": [4.968400, 23.085720, 18.517920, 22.404080],
+    "result": "rejected; shifted control-flow/register codegen dominates and is much slower than the existing cached DXBC PSO"
+  },
+  "directml_qkv_matrix_probe": {
+    "shape": "2088960x32 times 32x48",
+    "iterations": 100,
+    "gpu_ms": 1.740559,
+    "effective_tflops": 3.687,
+    "note": "matrix-only cost is lower than the 2.56-3.49 ms old QKV pass, but FP32-to-FP16 pack and result unpack must be included before adoption"
+  },
   "decision": "Do not replace blocks66-69 with DirectML. The existing SM6 FP32 HLSL path is exact and has comparable latency. Reuse that PSO inside the persistent addon/worker; DirectML remains selected for the wider matrix-bound stages."
 }

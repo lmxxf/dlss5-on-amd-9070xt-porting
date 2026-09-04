@@ -1911,6 +1911,10 @@ batched Attention先过独立矩阵门：`DML_BATCH=32640`、`64×16 · 16×64`�
 
 该路线正式关闭。为不让失败候选即使关闭环境变量仍常驻约700MB scratch和额外JIT，它被隔离为`d3d12_directml_front_batched_attention.cpp`；已验收的`d3d12_directml_preblock_resident.cpp`恢复干净版本。下一优化应针对旧Attention内部重复norm/load或降低全分辨率stage工作量，而不是继续把小K window GEMM强塞DirectML。
 
+旧Attention的重复norm随后做FP32预归一化候选：QKV pass按token计算一次Q/K范数，保存`Q×scale`、normalized K与原V，Attention只做dot+bias+softmax。QKV本身略降为3.097/2.561/2.650/2.678ms，但unshifted Attention仍4.968ms，三层shifted反而为23.086/18.518/22.404ms，front总94.584320ms。瓶颈不是rsqrt算术，而是新shader在shifted控制流和数组上的寄存器/codegen劣化；路线否决并隔离为`d3d12_front_normalized_attention.cpp`，干净front再次恢复。
+
+作为下一候选门，DirectML纯QKV `2088960×32 · 32×48`连续100轮为1.740559ms、3.687TFLOPS，对比旧QKV每层2.56–3.49ms只剩约0.8–1.7ms空间；FP32→FP16 pack和FP16结果解包尚未计入，很可能吃掉收益。后续必须做完整边界实测，不再用裸矩阵数字直接宣称可加速。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
