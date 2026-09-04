@@ -1973,6 +1973,8 @@ decoder blocks39–47接入同一DLL。block39专用prefix按active34×60生成2
 
 decoder blocks48–55接入DLL。block48 prefix直接读取block47的padded40×64×512 FP16，按active34×60做2×nearest写入72×120×512 packed tensor，底部4行先置零；DirectML `512→256`后加固定bias与encoder block22的72×120×256 skip，finish再次强制底4行归零，避免bias复活padding。随后blocks48–55以T8640/C256运行八层resident Swin，所有74份远端权重存在。交叉编译SHA-256=`587987894d59fe0ca8021175af0b0adda20942a539e33b7add6c014f0a7fbab7`；当前动态链覆盖blocks0–55。
 
+decoder blocks56–61接入DLL。block56 prefix从block55的padded72×120×256 FP16中只按目标136×240映射读取active68行，2×nearest后由DirectML `256→128`，加固定bias与encoder block14的240×136×128 skip，写出无padding的32640-token主张量。blocks56–61随后以T32640/C128执行六层resident Swin，56份远端依赖权重全部存在。交叉编译SHA-256=`0ab94c1faface6c45e5d47b9dc842bae7fdfb55b8c76371ae906b7b1533dfd70`；当前动态链覆盖blocks0–61。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
