@@ -2005,6 +2005,8 @@ AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身�
 
 首轮max69未真实生效，runtime日志明确为`max_block=70`：launcher调用已存在Steam进程时只发送IPC，游戏不是其子进程，环境变量不会继承。诊断门改为初始化期只读一次`D:\DLSSNR-Lab\runtime-max-block.txt`与`runtime-disable-present.txt`；不在帧循环访问文件。launcher固定写69/0后再调用Steam。文件门版SHA-256=`022d5e960f63b265fba9055f13b3d16d90f383c687793be59ffbe297bc1458d2`。
 
+文件门第二次仍显示70，核查文件内容为69，根因是Windows PowerShell 5 `Set-Content`默认UTF-16LE，而DLL对binary wide stream的读取未建立正确文本编码状态。launcher改为显式`-Encoding Ascii`，DLL改用`fscanf`解析窄字符数字。ASCII门版SHA-256=`b3f2b254068b5a8260d41c8a7e85c2cc39baf8adbdd9802d477905ef80fc4f65`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

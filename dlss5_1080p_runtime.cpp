@@ -817,7 +817,7 @@ void run_warm_probe() {
 }
 
 DWORD WINAPI initialize_worker(void *) {
-    const ULONGLONG begin = GetTickCount64();wchar_t value[16]{};if(GetEnvironmentVariableW(L"DLSS5_MAX_BLOCK",value,16))g_max_block=(UINT)_wtoi(value);else if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\runtime-max-block.txt)",L"rb")){unsigned v=70;if(fwscanf(f,L"%u",&v)==1)g_max_block=v;fclose(f);}g_present_enabled=GetEnvironmentVariableW(L"DLSS5_DISABLE_PRESENT",value,16)==0;if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\runtime-disable-present.txt)",L"rb")){unsigned v=0;if(fwscanf(f,L"%u",&v)==1&&v)g_present_enabled=false;fclose(f);}log("runtime_gate max_block=%u present=%u\n",g_max_block,g_present_enabled?1u:0u);
+    const ULONGLONG begin = GetTickCount64();wchar_t value[16]{};if(GetEnvironmentVariableW(L"DLSS5_MAX_BLOCK",value,16))g_max_block=(UINT)_wtoi(value);else if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\runtime-max-block.txt)",L"rb")){unsigned v=70;if(fscanf(f,"%u",&v)==1)g_max_block=v;fclose(f);}g_present_enabled=GetEnvironmentVariableW(L"DLSS5_DISABLE_PRESENT",value,16)==0;if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\runtime-disable-present.txt)",L"rb")){unsigned v=0;if(fscanf(f,"%u",&v)==1&&v)g_present_enabled=false;fclose(f);}log("runtime_gate max_block=%u present=%u\n",g_max_block,g_present_enabled?1u:0u);
     HMODULE library = LoadLibraryW(L"DirectML.dll");
     auto create = library ? reinterpret_cast<CreateDml>(
                                 GetProcAddress(library, "DMLCreateDevice"))
