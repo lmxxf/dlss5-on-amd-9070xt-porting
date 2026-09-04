@@ -8,6 +8,13 @@
   "directml_resident_gpu_ms_warm": 10.072160,
   "block39_directml_gpu_ms": 0.432135,
   "block39_through_47_resident_gpu_ms": 13.410320,
+  "persistent_repeat_100": {
+    "average_gpu_ms": 5.985188,
+    "process_wall_ms": 4489.6044,
+    "amortized_wall_ms": 44.896044,
+    "final_output_byte_exact_vs_single_run": true,
+    "iterations": 100
+  },
   "production_trial": {
     "gpu_ms": 16.820680,
     "stage_wall_ms": 4041.334,

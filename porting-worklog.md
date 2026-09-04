@@ -1819,6 +1819,8 @@ block39随后真正并入`d3d12_directml_swin512_resident.cpp`：新增第41个D
 
 新增`run_dynamic_decoder40_47_directml.ps1`并试挂production。frame56400功能回归最终R10仍为`251b7ef7...e1ca1`逐byteexact；新stage GPU16.820680ms，但stage wall达4041.334ms，因为每帧新进程重新创建41个DirectML compiled operator并编译8套Boundary/WindowAttention PSO；全网wall由旧10120.780恶化到13597.273ms。故正式`run_dynamic_network_resident.ps1`已回退旧block39–47 runner，实验wrapper保留。结论不是GPU路线失败，恰恰证明剩余壁垒已从计算转为生命周期：该13–17ms graph必须嵌入长驻addon（或持久worker），不能以逐帧CLI进程上线。
 
+为直接量持久态，512 resident exe新增`DML_SWIN512_ITERATIONS`，同一已初始化资源与command list内重复录制block39→47 graph；block39每轮重建main[0]，因此各轮输入固定且不会把上一轮输出误当下一轮输入。100轮平均GPU为5.985188ms，最终block47与单轮输出correlation1.0、MAE/max0、逐byteexact，SHA同为`ca717bb2...ae61`，排除状态污染。完整进程wall4489.604ms，扣除约598.5ms GPU可见约3.89秒一次性JIT/PSO/文件初始化；摊100轮44.896ms，长期稳态收敛于约6ms GPU。由此production试挂的4秒stage wall被严格归因为错误生命周期，而非真实逐帧计算成本。下一步无需继续优化512算力，转向其它channel宽度并建立持久worker/addon生命周期。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
