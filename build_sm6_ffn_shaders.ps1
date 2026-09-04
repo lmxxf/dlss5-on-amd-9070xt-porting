@@ -39,6 +39,7 @@ function Compile-Parallel128($Width, $Height, $Shifts) {
 # D3DCompile output byte-for-byte. QKV/attention remain cached FP32 shaders.
 $Hashes = @()
 $Hashes += Compile-Ffn 'block1_ffn_sm6_fp32.hlsl' 'block1-v1' 1920 1088 @(0, 1)
+$Hashes += Compile-Ffn 'block1_ffn_sm6_fp32.hlsl' 'block1-v1' 960 544 @(0, 1)
 $Hashes += Compile-Ffn 'block64_ffn_sm6_fp32.hlsl' 'block128-v1-c64' 960 544 @(0, 1, 2, 3)
 $Hashes += Compile-Parallel128 480 272 @(0, 1, 2, 3)
 $Hashes | Format-Table Path, Hash

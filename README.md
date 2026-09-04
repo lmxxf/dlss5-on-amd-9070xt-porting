@@ -6,6 +6,8 @@
 
 动态产品化正在进行：`d3d12_dynamic_resource_probe.cpp`已在RX9070XT的《剑星》进程内稳定识别3840×2160主swapchain，并通过ReShade immediate command list闭合逐帧copy-in／AMD compute／copy-out。进一步直接hook官方`ffxDispatch`取得当前帧权威Color RGBA16F、Depth R32F、Motion RG16F与FSR输出合同；一张真实游戏帧已在AMD上连续执行DLSS5-derived block0与blocks1–3，四段耗时94.361/306.832/231.226/306.251ms。证据见`dlss5-amd-dynamic-milestone.json`。严格状态仍是未完成：blocks4–70尚未接入resident addon，当前屏幕compute仅为回写链诊断，不能称为DLSS5最终输出。
 
+1080p/10fps现为第一阶段完成目标。全网几何按空间各轴减半，front为960×544、最终block70为1920×1088并裁到1080；权重/通道/window保持不变，详见`dlss5-1080p-geometry.json`。frame56400真实Color已生成8160 tiles，动态front runner完成block0→GPU HWC→blocks1–4：100轮稳态12.767225ms，block4 66,846,720 bytes与同输入分离参考逐byte exact，证据见`dlss5-1080p-validation.json`。
+
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
 最新明亮场景验收为frame56400主菜单：同帧Color/backbuffer SHA分别`fd201dba...d492a`／`c1fc1eaf...74d43`，全AMD blocks0–70输出R10 SHA为`251b7ef7...e1ca1`，截图人物、文字、发丝可辨且无周期条纹。端到端29.624秒、Windows network 10.858秒；这是DirectML ViT接入前的新视觉/性能基线，仍明确不是实时。证据见`dlss5-amd-frame56400-validation.json`与`dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png`。

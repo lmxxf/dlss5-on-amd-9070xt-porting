@@ -1,0 +1,32 @@
+{
+  "status": "front-block0-through-4-passed",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "target_display": "1920x1080",
+  "front_network_geometry": {"width": 960, "height": 544, "tiles": 8160, "tokens": 522240},
+  "input": {
+    "source": "frame56400 FFX RGBA16F capture",
+    "source_resource": "2564x1444 padded, 2561x1441 active",
+    "preprocess": "bilinear to 960x544 then 8x8 tiling",
+    "tile_bytes": 8355840,
+    "range": [0.0, 1.0]
+  },
+  "reference": {
+    "block0_hwc_shape": [544, 960, 32],
+    "block0_hwc_finite": true,
+    "block0_hwc_range": [-10.0, 5.5],
+    "block0_hwc_std": 2.166947,
+    "neighbor_correlation_horizontal": 0.9533534,
+    "neighbor_correlation_vertical": 0.945253
+  },
+  "resident_front": {
+    "runner": "d3d12_directml_preblock_resident.cpp",
+    "single_gpu_ms": 16.366240,
+    "steady_100_gpu_ms": 12.767225,
+    "hwc_only_single_gpu_ms": 1.109040,
+    "block4_output_bytes": 66846720,
+    "block4_sha256": "75778dc103fc5c3543d462921a06289440a9e6a5364a50a9a34827a83d59e6ce",
+    "block4_byte_exact_vs_same_input_separate_reference": true
+  },
+  "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
+}

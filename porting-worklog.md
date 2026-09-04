@@ -1931,6 +1931,12 @@ decoder32旧exact链加入14点GPU profile。热态三轮prefix稳定8.617/8.580
 
 为消除前台验证的人工作业链，新增`validate_resident_lifecycle.ps1`：先调用hash锁定的deploy脚本Install，若游戏未运行则由当前互动用户直接发Steam URI，随后每2秒读取`resident-lifecycle-probe.txt`；`resident_ready`即输出passed JSON，任何operator/execution/device失败立即退出2，默认180秒无ready退出3并附当前状态。该脚本只验主swapchain device＋DirectML初始化＋100次warm dispatch；不把probe通过升级成整网接入。
 
+Zero将第一阶段目标明确为1080p至少10fps，严格4K留待后续。不是4K算完再缩图，而是全网空间轴减半：front960×544 C32；480×272 C64；240×136 C128；120×68 C256；C512 active34×60/pad40×60；ViT18×30=540 tokens；decoder镜像；block70输出1920×1088再裁1080。weights、channels与8×8 windows不变。几何固化于`dlss5-1080p-geometry.json`。
+
+第一段直接用frame56400真实FFX Color建立1080p输入：现有preprocess以`--target-width 960 --target-height 544`从2561×1441 active RGBA16F bilinear缩放并生成8160 tiles（8,355,840 bytes）。旧block0输出经通用tile→HWC得到544×960×32，全部finite、range -10..5.5、std2.166947、邻域H/V corr0.95335/0.94525；据此运行block1测试生成960×544 shift0/1 QKV/Attention cache，FFN由DXC cs_6_2/O3重编并加入正式build脚本。
+
+`d3d12_directml_preblock_resident.cpp`改为从`DML_FRONT_WIDTH/HEIGHT`推导tile/token/resource尺寸，HWC reorder以WIDTH/HEIGHT宏寻址，PSO cache同样动态选几何；`DML_FRONT_HWC_ONLY`提供同源裁判。真960×544 block0→HWC→blocks1–4单轮16.366240ms、100轮稳态12.767225ms，HWC-only单轮1.109040ms。完整block4 66,846,720-byte SHA`75778dc1...d59e6ce`与同一DirectML HWC起跑的四个分离block逐byteexact。1080p front性能/数值门通过，下一边界是block4 predown＋480×272 blocks5–8。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
