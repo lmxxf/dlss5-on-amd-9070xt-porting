@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $Source = 'D:\DLSSNR-Lab\dlss5-resident-lifecycle.addon64'
 $Target = 'C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64\dlss5-resident-lifecycle.addon64'
 $Log = 'D:\DLSSNR-Lab\logs\resident-lifecycle-probe.txt'
-$ExpectedHash = '8B2ABE1F31E02D5F3B5E3DB12AB0498EC02181C38410D00539B51492441921BD'
+$ExpectedHash = '07E2794E8F226E821601AC218992802268375E5A120CC2EA29706EDC73D91621'
 
 if ($Action -eq 'Remove') {
     Remove-Item -LiteralPath $Target -Force -ErrorAction SilentlyContinue

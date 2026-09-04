@@ -1871,6 +1871,10 @@ RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.4679
 
 持久addon生命周期开始落地。新增`d3d12_resident_lifecycle_probe.cpp`：ReShade `init_device`取得游戏原生D3D12 device并AddRef，worker线程在同一device创建DirectML device、独立DIRECT queue/allocator/list/fence，compile＋initialize一枚代表Swin64 Expand形状`522240×64→96`的operator，随后分配常驻input/weight/output，在同一binding上连续提交100次真零GEMM并用GPU timestamp计时；全部对象保持到进程结束，present只记录ready/failed，不触碰画面。首版审计发现standalone helper的`dmlrt_check`失败会`ExitProcess`，因此未让游戏加载并立即从目录撤下；helper改为可覆写`DMLRT_FAILURE`，addon抛出并记录HRESULT，所有现有exe默认仍fail-fast。安全执行版SHA-256为`8b2abe1f31e02d5f3b5e3db12ab0498ec02181c38410d00539b51492441921bd`，交叉编译与Swin64 standalone回归通过；下一次前台启动只验同进程DirectML初始化、重复dispatch和device-removed，不把生命周期probe误称整网接入。
 
+生命周期入口随后从`init_device`收紧到主swapchain。原因是ReShade启动期可能报告临时D3D12 device，若在第一个device上成功初始化，只能证明进程内DirectML可用，不能证明它与最终4K backbuffer同device。新版只接受`init_swapchain(resize=true)`，从真实`IDXGISwapChain3::GetDevice`取得并持有device，同时把swapchain尺寸/format写日志，再启动worker。安全执行版SHA更新为`fa5ba1bc210359233412a1e6c35b2167f4ebdf2b68d0b7e50c1a3f82e6d97668`；这使下一次ready日志同时证明“主游戏device＋DirectML重复dispatch”，而不是启动期旁路设备。
+
+后台worker的DLL生命周期也按已验证runtime probe模式收紧：`DllMain`在注册ReShade事件前以`GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|PIN`固定自身，避免热重载/卸载addon后初始化线程落入已释放代码。最终待测binary SHA-256为`07e2794e8f226e821601ac218992802268375e5a120cc2ea29706edc73d91621`；部署脚本同步锁定该hash。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <d3d12.h>
+#include <dxgi1_4.h>
 #define DML_TARGET_VERSION_USE_LATEST
 #ifndef _Maybenull_
 #define _Maybenull_
@@ -223,14 +224,28 @@ DWORD WINAPI initialize_worker(void *) {
     return SUCCEEDED(hr) && SUCCEEDED(removed) ? 0 : 1;
 }
 
-void on_init_device(reshade::api::device *device) {
-    if (device->get_api() != reshade::api::device_api::d3d12 ||
-        g_started.exchange(true))
+void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
+    if (!resize || g_started.load()) return;
+    auto *native = reinterpret_cast<IDXGISwapChain3 *>(
+        static_cast<uintptr_t>(swapchain->get_native()));
+    ID3D12Device *device = nullptr;
+    const HRESULT hr = native ? native->GetDevice(IID_PPV_ARGS(&device)) : E_POINTER;
+    if (FAILED(hr)) {
+        log("resident_swapchain_device_failed swapchain=%p hr=0x%08x\n",
+            native, static_cast<unsigned>(hr));
         return;
-    g_device = reinterpret_cast<ID3D12Device *>(
-        static_cast<uintptr_t>(device->get_native()));
-    g_device->AddRef();
-    log("resident_start device=%p\n", g_device);
+    }
+    bool expected = false;
+    if (!g_started.compare_exchange_strong(expected, true)) {
+        device->Release();
+        return;
+    }
+    g_device = device;
+    DXGI_SWAP_CHAIN_DESC desc{};
+    native->GetDesc(&desc);
+    log("resident_start swapchain=%p device=%p size=%ux%u format=%u\n",
+        native, g_device, desc.BufferDesc.Width, desc.BufferDesc.Height,
+        static_cast<unsigned>(desc.BufferDesc.Format));
     if (HANDLE thread = CreateThread(nullptr, 0, initialize_worker, nullptr, 0, nullptr))
         CloseHandle(thread);
     else {
@@ -252,13 +267,19 @@ void on_present(reshade::api::command_queue *, reshade::api::swapchain *,
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         DisableThreadLibraryCalls(instance);
+        HMODULE pinned = nullptr;
+        if (!GetModuleHandleExW(
+                GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                    GET_MODULE_HANDLE_EX_FLAG_PIN,
+                reinterpret_cast<LPCWSTR>(&initialize_worker), &pinned))
+            return FALSE;
         DeleteFileW(kLog);
         if (!reshade::register_addon(instance)) return FALSE;
-        reshade::register_event<reshade::addon_event::init_device>(on_init_device);
+        reshade::register_event<reshade::addon_event::init_swapchain>(on_init_swapchain);
         reshade::register_event<reshade::addon_event::present>(on_present);
     } else if (reason == DLL_PROCESS_DETACH) {
         reshade::unregister_event<reshade::addon_event::present>(on_present);
-        reshade::unregister_event<reshade::addon_event::init_device>(on_init_device);
+        reshade::unregister_event<reshade::addon_event::init_swapchain>(on_init_swapchain);
         reshade::unregister_addon(instance);
     }
     return TRUE;
