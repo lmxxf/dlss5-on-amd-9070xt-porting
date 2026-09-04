@@ -1929,6 +1929,8 @@ decoder32旧exact链加入14点GPU profile。热态三轮prefix稳定8.617/8.580
 
 这是**乐观下限**：没算进程/JIT/file（持久化可消）、跨stage barrier、游戏本身GPU争用及少数未单独量的边界，只会低估真实帧时。block70/decoder32/front32/ViT四项占约62.2%；30fps需整体再快约9.33倍，60fps约18.65倍。结论：常驻addon仍是必要工程，但已不是充分条件，不能再写“只剩生命周期”；必须同时取得多阶段算法/内核数量级优化。完成门保持不变：游戏内连续变化帧、明确实测cadence、画面目视通过，三者缺一不称实时。
 
+为消除前台验证的人工作业链，新增`validate_resident_lifecycle.ps1`：先调用hash锁定的deploy脚本Install，若游戏未运行则由当前互动用户直接发Steam URI，随后每2秒读取`resident-lifecycle-probe.txt`；`resident_ready`即输出passed JSON，任何operator/execution/device失败立即退出2，默认180秒无ready退出3并附当前状态。该脚本只验主swapchain device＋DirectML初始化＋100次warm dispatch；不把probe通过升级成整网接入。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
