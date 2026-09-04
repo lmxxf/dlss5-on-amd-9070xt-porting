@@ -64,6 +64,13 @@ ID3D12PipelineState *g_block0_pso[5]{};
 ID3D12DescriptorHeap *g_block0_heap = nullptr;
 std::atomic<bool> g_block0_ready{false};
 std::atomic<unsigned long long> g_block0_submissions{0};
+ID3D12Resource *g_front_main[2]{}, *g_front_feature = nullptr, *g_front_qkv = nullptr,
+                 *g_front_weights[4]{};
+ID3D12RootSignature *g_front_root = nullptr;
+ID3D12PipelineState *g_front_pso[4][3]{};
+ID3D12DescriptorHeap *g_front_heap = nullptr;
+std::atomic<bool> g_front_ready{false};
+std::atomic<unsigned long long> g_front_submissions{0};
 
 struct FfxHeader { uint64_t type; FfxHeader *pNext; };
 struct FfxDimensions2D { uint32_t width, height; };
@@ -109,6 +116,7 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
                          uint32_t render_width, uint32_t render_height,
                          unsigned long long frame);
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame);
+bool record_blocks1_4(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
@@ -122,8 +130,9 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
         if (resources_same_device && dispatch->commandList && g_frame_bridge_ready.load()) {
             auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
             if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
-                                    dispatch->renderSize.width, dispatch->renderSize.height, n))
-                record_block0(commands, n);
+                                    dispatch->renderSize.width, dispatch->renderSize.height, n) &&
+                record_block0(commands, n))
+                record_blocks1_4(commands, n);
         }
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
@@ -399,12 +408,43 @@ float F(float x){if(x==0)return 0;float q=x<0?-1:1,a=abs(x);if(a<.015625)return 
     g_block0_l1->Bind(g_block0_packed,rw1,g_block0_raw1);g_block0_l2->Bind(g_block0_hidden1,rw2,g_block0_raw2);g_block0_l3->Bind(g_block0_hidden2,rw3,g_block0_raw3);g_block0_ready.store(true);log("block0_ready tiles=8160 hwc=960x544 output=%p\n",g_block0_hwc);
 }
 
+void initialize_blocks1_4() {
+    constexpr UINT tokens=960*544;
+    constexpr UINT64 tensor_bytes=UINT64(tokens)*32*4,qkv_bytes=UINT64(tokens)*48*4;
+    g_front_main[0]=make_buffer(tensor_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_front_main[1]=make_buffer(tensor_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_front_feature=make_buffer(tensor_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_front_qkv=make_buffer(qkv_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    const wchar_t *weight_names[4]={L"block1-effective.bin",L"block2-effective.bin",L"block3-effective.bin",L"block4-body-effective.bin"};
+    for(UINT i=0;i<4;i++){auto data=read_runtime_file(weight_names[i]);if(data.size()!=41220)throw DmlFailure{"front weight size",E_INVALIDARG};g_front_weights[i]=make_buffer(data.size(),D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ,D3D12_RESOURCE_FLAG_NONE);void *mapped=nullptr;D3D12_RANGE none{0,0};dmlrt_check("front weight map",g_front_weights[i]->Map(0,&none,&mapped));std::memcpy(mapped,data.data(),data.size());g_front_weights[i]->Unmap(0,nullptr);}
+    D3D12_DESCRIPTOR_RANGE ranges[2]={{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,4,0,0,0},{D3D12_DESCRIPTOR_RANGE_TYPE_UAV,3,0,0,4}};
+    D3D12_ROOT_PARAMETER parameter{};parameter.ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;parameter.DescriptorTable={2,ranges};D3D12_ROOT_SIGNATURE_DESC root_desc{};root_desc.NumParameters=1;root_desc.pParameters=&parameter;ID3DBlob *signature=nullptr,*error=nullptr;dmlrt_check("front signature",D3D12SerializeRootSignature(&root_desc,D3D_ROOT_SIGNATURE_VERSION_1,&signature,&error));dmlrt_check("front root",g_device->CreateRootSignature(0,signature->GetBufferPointer(),signature->GetBufferSize(),IID_PPV_ARGS(&g_front_root)));
+    const UINT shifts[4]={0,1,1,1},versions[3]={1,2,2};const wchar_t *passes[3]={L"ffn",L"qkv",L"attention"};
+    for(UINT b=0;b<4;b++)for(UINT p=0;p<3;p++){wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\shader-cache\block1-v%u-960x544-s%u-%ls.cso)",versions[p],shifts[b],passes[p]);ID3DBlob *code=nullptr;dmlrt_check("front shader",D3DReadFileToBlob(path,&code));D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};desc.pRootSignature=g_front_root;desc.CS={code->GetBufferPointer(),code->GetBufferSize()};dmlrt_check("front pso",g_device->CreateComputePipelineState(&desc,IID_PPV_ARGS(&g_front_pso[b][p])));}
+    D3D12_DESCRIPTOR_HEAP_DESC heap_desc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,28,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};dmlrt_check("front heap",g_device->CreateDescriptorHeap(&heap_desc,IID_PPV_ARGS(&g_front_heap)));UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);auto cpu=g_front_heap->GetCPUDescriptorHandleForHeapStart();
+    for(UINT b=0;b<4;b++){ID3D12Resource *source=b?g_front_main[(b-1)&1]:g_block0_hwc,*dest=g_front_main[b&1];D3D12_SHADER_RESOURCE_VIEW_DESC srv{};srv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;srv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;srv.Format=DXGI_FORMAT_R32_TYPELESS;srv.Buffer.NumElements=41220/4;srv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;g_device->CreateShaderResourceView(g_front_weights[b],&srv,cpu);cpu.ptr+=step;srv.Format=DXGI_FORMAT_UNKNOWN;srv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_NONE;srv.Buffer.StructureByteStride=4;for(auto pair:{std::pair<ID3D12Resource*,UINT64>{source,tensor_bytes},{g_front_feature,tensor_bytes},{g_front_qkv,qkv_bytes}}){srv.Buffer.NumElements=(UINT)(pair.second/4);g_device->CreateShaderResourceView(pair.first,&srv,cpu);cpu.ptr+=step;}D3D12_UNORDERED_ACCESS_VIEW_DESC uav{};uav.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uav.Buffer.StructureByteStride=4;for(auto pair:{std::pair<ID3D12Resource*,UINT64>{g_front_feature,tensor_bytes},{dest,tensor_bytes},{g_front_qkv,qkv_bytes}}){uav.Buffer.NumElements=(UINT)(pair.second/4);g_device->CreateUnorderedAccessView(pair.first,nullptr,&uav,cpu);cpu.ptr+=step;}}
+    g_front_ready.store(true);log("front_blocks1_4_ready tokens=%u block4=%p bytes=%llu\n",tokens,g_front_main[1],(unsigned long long)tensor_bytes);
+}
+
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
     if(!commands||!g_block0_ready.load())return false;
+    if(g_front_submissions.load()){
+        D3D12_RESOURCE_BARRIER transition{};transition.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;transition.Transition.pResource=g_block0_hwc;transition.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;transition.Transition.StateBefore=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;transition.Transition.StateAfter=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;commands->ResourceBarrier(1,&transition);
+    }
     auto custom=[&](UINT pass,UINT64 threads){ID3D12DescriptorHeap *heaps[]={g_block0_heap};commands->SetDescriptorHeaps(1,heaps);commands->SetComputeRootSignature(g_block0_root);commands->SetComputeRootDescriptorTable(0,g_block0_heap->GetGPUDescriptorHandleForHeapStart());commands->SetPipelineState(g_block0_pso[pass]);UINT64 groups=(threads+63)/64;commands->Dispatch((UINT)std::min<UINT64>(groups,65535),(UINT)((groups+65534)/65535),1);};
     auto barrier=[&](ID3D12Resource *resource){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=resource;commands->ResourceBarrier(1,&b);};
     custom(0,8160*192/2);barrier(g_block0_packed);g_block0_l1->Record(g_recorder,commands);barrier(g_block0_raw1);custom(1,8160*256/2);barrier(g_block0_hidden1);g_block0_l2->Record(g_recorder,commands);barrier(g_block0_raw2);custom(2,8160*256/2);barrier(g_block0_hidden2);g_block0_l3->Record(g_recorder,commands);barrier(g_block0_raw3);custom(3,8160*2048);barrier(g_block0_tile);custom(4,8160*2048);barrier(g_block0_hwc);
     const auto submitted=++g_block0_submissions;if(submitted==1||submitted%120==0)log("block0_submit=%llu ffx_frame=%llu hwc=%p\n",submitted,frame,g_block0_hwc);return true;
+}
+
+bool record_blocks1_4(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
+    if(!commands||!g_front_ready.load())return false;
+    auto transition=[&](ID3D12Resource *resource,D3D12_RESOURCE_STATES before,D3D12_RESOURCE_STATES after){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=resource;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=before;b.Transition.StateAfter=after;commands->ResourceBarrier(1,&b);};
+    if(g_front_submissions.load()){transition(g_front_feature,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_qkv,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_main[0],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_main[1],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
+    transition(g_block0_hwc,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    ID3D12DescriptorHeap *heaps[]={g_front_heap};commands->SetDescriptorHeaps(1,heaps);commands->SetComputeRootSignature(g_front_root);const UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);constexpr UINT groups=(960*544+63)/64;
+    for(UINT b=0;b<4;b++){if(b){transition(g_front_feature,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_qkv,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(b>=2)transition(g_front_main[b&1],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}auto gpu=g_front_heap->GetGPUDescriptorHandleForHeapStart();gpu.ptr+=UINT64(b)*7*step;commands->SetComputeRootDescriptorTable(0,gpu);commands->SetPipelineState(g_front_pso[b][0]);commands->Dispatch(groups,1,1);transition(g_front_feature,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);commands->SetPipelineState(g_front_pso[b][1]);commands->Dispatch(groups,1,1);transition(g_front_qkv,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);commands->SetPipelineState(g_front_pso[b][2]);commands->Dispatch(groups,1,1);transition(g_front_main[b&1],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
+    const auto submitted=++g_front_submissions;if(submitted==1||submitted%120==0)log("front_blocks1_4_submit=%llu ffx_frame=%llu block4=%p\n",submitted,frame,g_front_main[1]);return true;
 }
 
 void run_warm_probe() {
@@ -534,6 +574,7 @@ DWORD WINAPI initialize_worker(void *) {
             run_warm_probe();
             initialize_frame_bridge();
             initialize_block0();
+            initialize_blocks1_4();
         } catch (const DmlFailure &failure) {
             hr = failure.result;
             log("resident_execution_failed operation=%s hr=0x%08x\n",

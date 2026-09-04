@@ -1947,6 +1947,10 @@ block0完整执行随后搬入同一runtime。初始化worker一次加载DirectM
 
 同步合同同时收紧：frame tile初态UAV；每帧写前若非首帧显式`NON_PIXEL→UAV`，写后UAV barrier再`UAV→NON_PIXEL`供block0 SRV读取，不能依赖standalone驱动对UAV状态下SRV读的宽松容忍。新版binary SHA为`c48e77d01a0515de6230015d2b7bcb0c40e52f7ae236569bf0fd1cc5528e5866`。当前严格边界：真实当帧Color已经在DLL内跑到block0 HWC，但尚未接blocks1–4或回写画面；首次游戏加载仍待前台验收。
 
+blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effective权重到常驻upload resources，加载960×544 shift0/1对应的4×FFN/QKV/Attention共12枚cache PSO，并分配两张66,846,720-byte FP32 main ping-pong、同尺寸feature及约100MB QKV scratch。descriptor table与权重全程固定，不在帧循环重建。
+
+逐帧执行在block0 HWC后显式`UAV→NON_PIXEL`，四层依次FFN→feature SRV、QKV→QKV SRV、Attention→main SRV；复用scratch或ping-pong前精确转回UAV。下一帧block0写HWC前转回UAV，front开始前再把两张main/feature/QKV统一恢复UAV，排除跨帧状态污染。最终block4留在`g_front_main[1]` GPU resource，不readback、不落盘。新版DLL SHA为`b1bc9ce6c3dd75300f908dc983b07e7bdb832222db08c1ba8a0d425bf0942d12`；当前游戏内链为Color→tiles→block0→blocks1–4，尚未接block4 predown。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

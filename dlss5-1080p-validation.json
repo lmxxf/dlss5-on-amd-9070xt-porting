@@ -30,7 +30,7 @@
   },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
-    "binary_sha256": "c48e77d01a0515de6230015d2b7bcb0c40e52f7ae236569bf0fd1cc5528e5866",
+    "binary_sha256": "b1bc9ce6c3dd75300f908dc983b07e7bdb832222db08c1ba8a0d425bf0942d12",
     "in_process_contract": [
       "main IDXGISwapChain3 device",
       "persistent DirectML device, queue, allocator, list and fence",
@@ -47,7 +47,15 @@
       "weights": "loaded once during initialization",
       "frame_input_transition": "UAV -> NON_PIXEL_SHADER_RESOURCE, restored to UAV before the next frame"
     },
-    "status": "compiled and deployed; first in-game current-frame block0 load pending"
+    "persistent_blocks1_4": {
+      "weights": 4,
+      "psos": 12,
+      "geometry": "960x544x32",
+      "resources": ["two FP32 main ping-pong buffers", "shared FP32 feature", "shared FP32 QKV"],
+      "output": "resident block4 FP32 resource",
+      "state_contract": "block0 HWC UAV-to-SRV; all main/feature/QKV resources restored to UAV before the next frame"
+    },
+    "status": "compiled and deployed; first in-game current-frame blocks0-4 load pending"
   },
   "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
 }
