@@ -1683,6 +1683,8 @@ block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：
 
 接入正式脚本后，encoder0–13 wall从4029.193ms降至3180.790ms，block8/block13 exact；encoder14–30从4870.546ms降至4339.819ms，block21与block30-34x60 exact。三条stage融合合计减少约1.38秒wall与三个独立D3D12进程。严格边界：encoder仍由多个Swin stage进程构成，下一步继续合并为同一device，而非把3.18/4.34秒当实时结果。
 
+特殊block22→23边随后纳入predown：输入136×240×256，先用`block22-pool-identity`与`block22-enter-256x512`生成68×120×512，并在GPU清零stagein后只写前68行，保留Swin要求的H72尾4行零padding。block22-body→blocks23–29为143.029ms，block29逐byte exact。正式encoder14–30删除独立block22 downsample进程后wall进一步降至3999.159ms，block29与block30-34x60均exact；相对最初4870.546ms累计减少约871ms。下一边界为block30 pool/enter＋H34→H36 padding与ViT resident合并。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

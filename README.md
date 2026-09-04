@@ -64,6 +64,8 @@ Windows整网编排`run_dynamic_network_resident.ps1`已跑通：从block0 HWC�
 
 Swin resident宿主现可把上一stage的downsample/enter直接接到下一段GPU input。block4→5–8、block8→9–13、block14→15–21三条边均逐byte exact；encoder0–13 wall从4.029秒降至3.181秒，encoder14–30从4.871秒降至4.340秒。它删除三个stage-input文件/进程，但完整encoder仍需进一步合成单device图。
 
+block22→23特殊边也已GPU直连：136行池化为68行，尾4行在GPU清零后补成H72；blocks23–29输出exact。encoder14–30进一步降至3.999秒。下一步把block30 pool/enter、H34→H36 padding直接并入ViT八层resident宿主。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

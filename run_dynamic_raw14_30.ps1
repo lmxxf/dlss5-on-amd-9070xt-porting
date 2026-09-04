@@ -6,9 +6,8 @@ $i = P 13;B 14 $i 480 272 1
   "$L\block17-body-effective.bin" "$L\block18-body-effective.bin" `
   "$L\block19-body-effective.bin" "$L\block20-body-effective.bin" `
   "$L\block21-body-effective.bin";Q 'resident blocks15-21'
-B 22 (P 21) 240 136 2;Move-Item -Force (P 22) (P 22 '-body');& "$L\d3d12_downsample_enter_test.exe" (P 22 '-body') "$L\block22-pool-identity.bin" "$L\block22-enter-256x512.bin" (P 22) 240 136 256;Q down22
-$i = P 22
-& "$L\d3d12_swin_chain.exe" $i (P 29) `
+B 22 (P 21) 240 136 2;Move-Item -Force (P 22) (P 22 '-body')
+& "$L\d3d12_swin_chain.exe" (P 22 '-body') (P 29) `
   "$L\block23-logical-effective.bin" "$L\block24-logical-effective.bin" `
   "$L\block25-logical-effective.bin" "$L\block26-logical-effective.bin" `
   "$L\block27-logical-effective.bin" "$L\block28-logical-effective.bin" `
