@@ -189,7 +189,11 @@ bool on_main_device(void *resource) {
     if (!resource || !g_device) return false;
     ID3D12Device *device = nullptr;
     const HRESULT hr = static_cast<ID3D12Resource *>(resource)->GetDevice(IID_PPV_ARGS(&device));
-    const bool same = SUCCEEDED(hr) && device == g_device;
+    IUnknown *resource_identity=nullptr,*main_identity=nullptr;
+    if(SUCCEEDED(hr))device->QueryInterface(IID_PPV_ARGS(&resource_identity));
+    if(g_device)g_device->QueryInterface(IID_PPV_ARGS(&main_identity));
+    const bool same = resource_identity && main_identity && resource_identity==main_identity;
+    if(resource_identity)resource_identity->Release();if(main_identity)main_identity->Release();
     if (device) device->Release();
     return same;
 }
@@ -219,10 +223,10 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
     if (is_upscale) {
         const auto *dispatch = &snapshot;
-        const bool resources_same_device = on_main_device(dispatch->color.resource) &&
-            on_main_device(dispatch->depth.resource) && on_main_device(dispatch->motionVectors.resource) &&
-            on_main_device(dispatch->output.resource);
-        const bool target = dispatch->upscaleSize.width == 1920 && dispatch->upscaleSize.height == 1080;
+        const bool color_same=on_main_device(dispatch->color.resource),depth_same=on_main_device(dispatch->depth.resource),motion_same=on_main_device(dispatch->motionVectors.resource),output_same=on_main_device(dispatch->output.resource);
+        ID3D12Device*command_device=nullptr;IUnknown*command_identity=nullptr,*main_identity=nullptr;const bool command_get=dispatch->commandList&&SUCCEEDED(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList)->GetDevice(IID_PPV_ARGS(&command_device)));if(command_get)command_device->QueryInterface(IID_PPV_ARGS(&command_identity));if(g_device)g_device->QueryInterface(IID_PPV_ARGS(&main_identity));const bool command_same=command_identity&&main_identity&&command_identity==main_identity;if(command_identity)command_identity->Release();if(main_identity)main_identity->Release();if(command_device)command_device->Release();
+        const bool resources_same_device=color_same&&depth_same&&motion_same&&output_same&&command_same;
+        const bool target = dispatch->output.description.width == 1920 && dispatch->output.description.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
         if (resources_same_device && target && dispatch->commandList && g_frame_bridge_ready.load()) {
             auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
@@ -232,10 +236,10 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
                 if(record_blocks1_4(commands,n)&&record_blocks5_8(commands,n)&&record_blocks9_14(commands,n)&&record_blocks15_22(commands,n)&&record_blocks23_30(commands,n)&&record_blocks31_38(commands,n)&&record_blocks39_47(commands,n)&&record_blocks48_55(commands,n)&&record_blocks56_61(commands,n)&&record_blocks62_65(commands,n)&&record_blocks66_69(commands,n))record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);
         }
         if (n == 1 || n % 120 == 0) {
-            log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
+            log("ffx_frame=%llu cmd=%p render=%ux%u abi_output=%ux%u target1080=%u same_device=%u device_parts=%u%u%u%u%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
                 n, dispatch->commandList, dispatch->renderSize.width, dispatch->renderSize.height,
                 dispatch->upscaleSize.width, dispatch->upscaleSize.height, target ? 1u : 0u,
-                resources_same_device ? 1u : 0u, dispatch->jitterOffset.x, dispatch->jitterOffset.y,
+                resources_same_device ? 1u : 0u,color_same,depth_same,motion_same,output_same,command_same,dispatch->jitterOffset.x, dispatch->jitterOffset.y,
                 dispatch->color.resource, dispatch->color.description.format, dispatch->color.description.width,
                 dispatch->color.description.height, dispatch->color.state, dispatch->depth.resource,
                 dispatch->depth.description.format, dispatch->depth.description.width,

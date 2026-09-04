@@ -1993,6 +1993,8 @@ R10 swapchain回写随后进入present callback。block70的1920×1080 packed bu
 
 该运行同时暴露hook重排后的生命周期错误：先调用原`ffxDispatch`再读取调用方header时，返回后的结构已被改写，日志出现upscaleSize 0×0和same_device=0。修复为调用trampoline前整份复制`FfxDispatchUpscale`到栈上，返回后只使用snapshot；逐帧网络执行条件同时收紧为same-device且1920×1080，避免4K时误写左上角。`launch_stellar_blade.ps1`改由Steam附带`-ResX=1920 -ResY=1080 -Fullscreen`启动，下一次进程重启验证真实1080合同。
 
+snapshot修正版在第二次真游戏运行中仍显示ABI upscaleSize=0×0，证明问题不是调用后内存改写，而是当前FFX版本的尺寸字段偏移与旧公开结构不同；相邻output resource descriptor始终稳定给出真实3840×2160。target门改以`output.description.width/height`为权威。device判断同时从接口裸指针比较改为IUnknown identity，并把Color/Depth/Motion/Output/command-list五项分别写日志，避免D3D12代理接口导致同对象不同指针的假阴性。诊断版SHA-256=`5a7526630ec7b62f404b3907a44dac571ecc72bfb08e0b525a20edd89edf89df`，待游戏切1080并重启后部署。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
