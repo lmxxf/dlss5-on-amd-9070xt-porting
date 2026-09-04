@@ -226,7 +226,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
         const bool resources_same_device=color_same&&depth_same&&motion_same&&output_same&&command_same;
         const bool target = dispatch->output.description.width == 1920 && dispatch->output.description.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
-        if (resources_same_device && target && dispatch->commandList && g_frame_bridge_ready.load()) {
+        if (resources_same_device && target && dispatch->commandList && g_ready.load()) {
             auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
             if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
                                     dispatch->renderSize.width, dispatch->renderSize.height, n) &&

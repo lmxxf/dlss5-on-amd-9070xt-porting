@@ -1999,6 +1999,8 @@ snapshot修正版在第二次真游戏运行中仍显示ABI upscaleSize=0×0，�
 
 AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身未崩，说明FFX/ReShade proxy device与swapchain native device有不同COM identity。完成门改为比较`ID3D12Device::GetAdapterLuid()`：资源device、command-list device与主swapchain device只要属于同一adapter即允许录制；这正对应目标“游戏原生RX9070XT device/queue”，不再把代理接口地址误当物理设备身份。该轮还确认swapchain从启动瞬间3840×2160在present600前resize为1920×1080 R10。LUID修正版SHA-256=`3dc1269622af02b600ebc2a5b7bb41be3d404f5d35d28e9adbe329158de2056a`。
 
+首次LUID放行运行在blocks9–14 ready附近退出。时间线显示根因不是该stage数值：在完整初始化完成前，game hook已开始用全局`IDMLCommandRecorder`录blocks0–8执行命令，同时worker在独立queue/线程继续用同一recorder录blocks9之后的operator initializer，形成未受支持的并发调用。修正为逐帧执行硬门必须等待全局`g_ready`：所有blocks0–70 operator/PSO/weights/scratch初始化、fence完成且worker不再触碰recorder后，才从下一帧整链一次放行。交叉编译SHA-256=`9ac7e97629e2b2ed708291e2ebda3e94a9f2115abe64a7dcfe654e1f31177398`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
