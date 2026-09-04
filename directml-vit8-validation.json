@@ -1,0 +1,20 @@
+{
+  "status": "eight-layer-cumulative-correctness-milestone-not-resident",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "tokens": 2160,
+  "old_resident_vit31_38_gpu_plus_copy_ms": 448.622,
+  "directml_estimated_gpu_ms": 40.0,
+  "block38_vs_old": {
+    "elements": 2211840,
+    "correlation": 0.9909274572586578,
+    "mae": 0.010796679390801324,
+    "rmse": 0.014240738982624656,
+    "max_abs_error": 0.0703125,
+    "exact_fraction": 0.20961507161458334,
+    "all_finite": true,
+    "directml_sha256": "52bdd06dcb305985fff6eeb8a3d75ba5f6904b35202ac2f094d26d47d03952ae",
+    "old_sha256": "5323d89a6b3cd4176bf6cd0acdd95948030f73cf5e5f1a0e7b986cf2c0f8b2e5"
+  },
+  "strict_boundary": "Blocks31-38 all consume the previous DirectML block output, but each block is still a separate process. The roughly 40 ms figure is a sum/estimate from per-operator GPU timestamps, not a resident eight-layer timestamp."
+}

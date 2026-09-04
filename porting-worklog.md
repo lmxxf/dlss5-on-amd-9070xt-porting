@@ -1759,6 +1759,10 @@ DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4
 
 `run_directml_block31.ps1`随后按真实依赖把五段全部换成DirectML：Expand输出进入Contract，Contract hidden进入QKV，GPU-normalized QKV进入完整DirectML Attention，Attention再进入DirectML Projection，只有进程/文件边界，不再夹任何旧shader中间值。本轮GPU timestamp为0.292500/0.522683/0.210380/3.817040/0.267523ms，合计5.110126ms。最终2,211,840值对旧完整block31 correlation0.9996383986、MAE0.00135754、RMSE0.00356281、max0.03125、75.343831%逐值exact，全finite，SHA-256 `cb7095a1...84d0ba`。五次FP16与E4M3误差累积后仍不超过一个量化级，算法风险至此关闭。严格边界：5.110126ms是五段GPU timestamp之和，不含五进程wall/file I/O；下一阶段是把同样已验收的dispatch机械合并到单device resident block31，再推广blocks32–38。
 
+`prepare_directml_vit_weights.py`随后批量处理blocks31–38：各层3,145,728-byte E4M3 QKV解为6,291,456-byte FP16，并生成64-value median norm scales；完整来源/产物SHA、scale范围写入`directml-vit-weights.json`并部署AMD机，合计约49MiB。审核`d3d12_vit_chain_amd.cpp`确认八层共用Contract/Projection及两条skip，只有Expand/QKV逐层变化。`run_directml_block31.ps1`泛化为`-Block 31..38 -Source`；同时修复PowerShell保留自动变量`$input`吞掉scriptblock参数的缺陷，参数改名`$Source`。
+
+跨层先以旧block31输出为共同入口验证block32：五段DirectML约5.097ms，对旧block32 correlation0.9995182449、MAE0.00152817、RMSE0.00404913、max0.03125、73.309326% exact，全finite，排除block31特调。随后由相同`probe-block30-pad-native`入口分别执行旧单进程ViT31–38和八个全DirectML block；每个DirectML block严格消费前一层DirectML final。旧resident为448.622ms；DirectML逐层约4.6–5.3ms，GPU时间总和约40ms。最终block38对旧输出correlation0.9909274573、MAE0.01079668、RMSE0.01424074、max0.0703125、20.961507% exact，全finite；SHA分别`52bdd06d...952ae`与`5323d89a...8b2e5`。误差跨八层累积但未坍缩；严格下一步是送入相同block39/decoder及最终画面裁判，并将多进程链合并为resident，不能仅凭0.991 correlation宣布画质通过。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
