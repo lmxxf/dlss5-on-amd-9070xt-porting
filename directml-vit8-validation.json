@@ -7,6 +7,9 @@
   "directml_estimated_gpu_ms": 40.0,
   "directml_resident_gpu_ms_probe": 34.973520,
   "directml_resident_gpu_ms_frame56400": 31.706960,
+  "production_wrapper_gpu_ms_frame56400": 33.195480,
+  "production_wrapper_stage_wall_ms": 1126.738,
+  "production_network_wall_ms": 10120.780,
   "block38_vs_old": {
     "elements": 2211840,
     "correlation": 0.9909274572586578,
@@ -33,5 +36,5 @@
     "output_bytes": 33177600,
     "screenshot": "dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png"
   },
-  "strict_boundary": "Blocks31-38 now execute on one D3D12/DirectML device and one command list. Numerical and final-image acceptance pass, including byte-exact 4K R10 after block70. Production replacement still needs block30 predown/padding integrated into this resident executable."
+  "strict_boundary": "Blocks31-38 and block30 predown now execute through the production wrapper. Numerical and final-image acceptance pass, including byte-exact 4K R10 after block70. Per-frame process/JIT overhead remains until the graph is embedded in the addon; other Swin stages remain far above the realtime budget."
 }

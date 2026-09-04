@@ -1789,6 +1789,10 @@ resident final对旧block31 correlation0.9996383986、MAE0.00135754、RMSE0.0035
 
 probe输入首跑八层resident为34.973520ms，输出2,211,840 floats与40进程DirectML累积oracle correlation1.0、MAE/max均0、逐byte100%，SHA同为`52bdd06d...952ae`；对旧ViT保持correlation0.990927457。frame56400同源输入再跑为31.706960ms，旧resident ViT为475.515ms，约15.0倍。新resident block38进入完全相同block39–70后，最终33,177,600-byte 4K R10 SHA仍为`251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1`，与旧ViT逐byte exact。八层resident的资源、同步、数值、GPU性能与最终画面全部通过。严格剩余：正式pipeline当前给ViT的是68×120 block30 body，resident exe暂收36×60 padded FP32；需把已有block30 pool/enter＋尾两行清零并入前端后再替换生产runner。
 
+`PredownPass`随后并入resident宿主：从68×120×512 block30 body先执行512×512 matrix，再2×2 average pool与512→1024 enter；第二pass覆盖完整36×60×1024，前34行写结果、尾两行显式写零，不依赖旧内容。frame56400直接body入口产生的block38与外部`downsample_enter→34行→pad36行`版本逐byte exact，SHA同为`52bdd06d...952ae`。predown与八层已留在同一command list，无中间CPU fence；当前`vit8_gpu_ms`timestamp起点仍在predown之后，33ms数字不含predown，后续需前移query作完整stage GPU计时。
+
+正式`run_dynamic_vit_raw.ps1`已从旧`d3d12_vit_chain_amd.exe`切换到`d3d12_directml_vit_resident.exe`，外部合同保持`raw-FRAME-block30-body.f32 → raw-FRAME-block38.f32`。frame56400 production wrapper输出SHA`52bdd06d...952ae`；完整`run_dynamic_network_resident.ps1`重跑最终R10仍为`251b7ef7...e1ca1`逐byte不变。ViT八层GPU33.195480ms，stage wall1126.738ms（含每帧进程启动、48 operator JIT、112MiB参数上传与readback），Windows network wall从10857.587降至10120.780ms。功能生产路径已切换；严格实时边界仍未完成：addon常驻可消ViT约1.09秒wall，但其余Swin/decoder GPU段累计仍远超帧预算，下一步把DirectML矩阵核路线推广到Swin FFN/QKV并最终嵌入addon。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
