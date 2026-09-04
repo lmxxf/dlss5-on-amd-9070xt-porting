@@ -1695,6 +1695,8 @@ predown shader随后加入版本化CSO cache。ViT block30 predown冷/热wall为
 
 `d3d12_swin_chain.cpp`继续增加`--block39`：直接读取36×60×1024 ViT main与68×120×512 block30 skip，现场构造1536维dot并写H72 stagein（尾4行GPU清零），随后同device执行blocks40–47。该链为200.058ms，block47逐byte exact；正式编排删除CPU join、50MB block39-input、独立affine与block39输出文件。Windows blocks1–70 wall进一步降至11,539.784ms，最终RGBA exact；相对20,402.723ms初版减少43.4%。
 
+block70末端新增GPU R10 pack pass：outconv RGBA不再readback，转SRV后以0.267ms直接量化/打包R10G10B10A2，只回读33,177,600 bytes。packed SHA-256与原CPU/NumPy结果`4868b7e4...be35`逐byte一致；单block70进程wall约1030.399ms。正式编排让block70直接写`dlss5-output-r10.new`并原子替换，删除132MB RGBA文件与CPU pack进程。Windows blocks1–70 wall从11,539.784ms降至10,589.697ms，最终R10 SHA不变；相对resident初版20.403秒已减少约48.1%。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

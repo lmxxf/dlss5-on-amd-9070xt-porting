@@ -74,6 +74,8 @@ decoder四条跨stage现全部由resident宿主直接执行affine＋2×upsample�
 
 block39也已GPU直连：ViT main与block30 skip不再CPU拼1536维tensor，block39 affine直接写H72 stagein后执行blocks40–47；200.058ms且exact。整网wall降至11.540秒，相对resident初版20.403秒减少43.4%。下一边界是block70直接GPU打包R10，只回读33MB。
 
+block70现由GPU以0.267ms直接打包R10，只回读33MB，不再落132MB RGBA或启动CPU pack；packed SHA逐byte一致。Windows blocks1–70 wall进一步降至10.590秒，相对resident初版20.403秒减48.1%。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。
