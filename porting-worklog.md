@@ -1829,6 +1829,10 @@ FFN/Projection诊断runner泛化为环境变量tokens/channels/hidden/attention_
 
 七层真resident单次冷GPU26.337520ms；同一graph连续100轮平均9.322514ms，旧blocks49–55为153.983ms，稳态约16.5倍。block55对旧correlation0.9999892933、MAE8.584e-5、RMSE0.000475423、max0.0234375、95.741027% exact，全finite。两路继续进入相同blocks56–70，最终33,177,600-byte 4K R10 SHA均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`逐byteexact。decoder 256 normal段通过；严格剩余是把block48 upsample/prefix并入、删除unused up/block39遗留，以及构建encoder blocks15–22八层变体。
 
+encoder 256变体由同一已验收源码机械派生为L8、blocks15–22、shift `0/1/3/2/0/1/3/2`。首次直接喂`raw-block14`被尺寸检查正确拒绝：block14仍是272×480×128，需先经旧融合predown得到136×240×256；使用现存同帧`raw-16800-block14-enter15.f32`建立纯block15–22裁判。真resident单次冷GPU28.486080ms、100轮稳态10.612648ms；旧同段153.966ms，约14.5倍。block22对旧correlation0.9999836306、MAE0.000289806、RMSE0.00179881、max0.03125、93.484653% exact，全finite。
+
+两份block22再各自进入完全相同的旧block22→23 predown与blocks23–30。block30 correlation0.9999817488、MAE5.811e-5、RMSE0.000523504、max0.01171875、98.040843% exact，全finite；下游把MAE与max均压低，没有误差放大。encoder256数值/稳态性能通过。严格剩余：把block14 downsample/enter并入encoder resident，再将其一路送过DirectML ViT/decoder到最终R10；目前还不能仅凭block30宣布画面门通过。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

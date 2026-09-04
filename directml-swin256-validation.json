@@ -18,6 +18,20 @@
     "final_r10_byte_exact": true,
     "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"
   },
+  "resident_encoder_blocks15_22": {
+    "cold_gpu_ms": 28.486080,
+    "persistent_repeat_100_gpu_ms": 10.612648,
+    "old_gpu_plus_copy_ms": 153.966,
+    "speedup_persistent": 14.507,
+    "block22_correlation": 0.9999836306289579,
+    "block22_mae": 0.00028980619767132927,
+    "block22_max_abs_error": 0.03125,
+    "block22_exact_fraction": 0.9348465265012255,
+    "block30_after_old_downstream_correlation": 0.9999817487592847,
+    "block30_mae": 5.811102250043084e-5,
+    "block30_max_abs_error": 0.01171875,
+    "block30_exact_fraction": 0.9804084329044118
+  },
   "final_vs_old": {"elements": 8355840, "correlation": 1.0, "mae": 0.0, "max_abs_error": 0.0, "exact_fraction": 1.0, "sha256": "e5482c76d02db5ffc46e3932d917ec312a100b12ab6be6c294be11f4f3f86a91"},
-  "strict_boundary": "Decoder blocks49-55 now execute on one device and command list and pass final-image validation. Decoder block48 upsample/prefix and encoder blocks15-22 remain outside this resident executable."
+  "strict_boundary": "Decoder blocks49-55 and encoder blocks15-22 have separate resident implementations. Decoder block48 prefix and encoder block14 predown remain outside; encoder replacement still needs final-R10 validation."
 }
