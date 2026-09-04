@@ -64,5 +64,17 @@
     "block30_correlation": 1.0,
     "all_finite": true
   },
-  "strict_boundary": "Decoder block39-47 and encoder blocks24-30 now have resident DirectML implementations. Encoder block22-to-23 predown remains outside the DirectML graph, and persistent addon integration is required before rollout."
+  "encoder_block22_predown_through_30": {
+    "input": "raw-16800-block22-body.f32",
+    "predown": "256x256 matrix, 2x2 average pool, 256x512 enter, H68 active plus four explicit zero rows",
+    "single_gpu_ms": 16.186520,
+    "steady_100_gpu_ms": 8.923368,
+    "old_corrected_gpu_plus_copy_ms": 185.640,
+    "steady_speedup_vs_old": 20.8038,
+    "block30_values": 4177920,
+    "block30_byte_exact": true,
+    "block30_correlation": 1.0,
+    "all_finite": true
+  },
+  "strict_boundary": "Decoder block39-47 and encoder block22 predown through block30 now have resident DirectML implementations with exact stage outputs. Persistent addon integration is required before production rollout."
 }

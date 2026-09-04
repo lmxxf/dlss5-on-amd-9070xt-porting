@@ -1887,6 +1887,8 @@ block4 predown并入encoder64后反而揭开旧runner静默截断：旧`d3d12_sw
 
 encoder512主体也进入resident。`d3d12_directml_swin512_resident.cpp`新增`DML_SWIN_FIRST_BLOCK`与`DML_SWIN_LAYERS`，shift按blocks23–30的`none/XY/Y/X`周期由真实block号推导，输出ping-pong按active layer奇偶选择。从同帧`raw-16800-block23`补H68→H72后起跑blocks24–30：单轮6.418760ms、100轮稳态5.020680ms；旧七层FP32 HLSL 177.965ms，约35.45倍。最终block30 4,177,920 floats与同版本旧链逐float/byte 100% exact且全finite。严格剩余是把block22的256-channel body经pool/256→512 enter直接送入block23，并做最终R10裁判。
 
+block22→23特殊predown随后并入512 resident：136×240×256 block22 body先乘256×256 matrix，再做2×2 average pool与256→512 enter；pool pass覆盖完整H72×W120×C512，H68之后显式写零，避免repeat沿用上一轮main内容。真输入单轮predown＋blocks23–30为16.186520ms，100轮每轮重建predown稳态8.923368ms；旧predown-v2＋八层185.640ms，约20.80倍。两路block30 4,177,920 floats逐float/byte 100% exact、全finite。因下游ViT/decoder为相同确定性输入，既有最终画面裁判直接继承；encoder512不再依赖外部block23或手工H72 padding。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
