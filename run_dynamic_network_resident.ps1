@@ -12,11 +12,9 @@ Mark 'encoder0-13'
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_raw14_30.ps1" -Frame $Frame
 Check 'encoder14-30'
 Mark 'encoder14-30'
-& "$L\pad_hwc_rows.exe" (P 30 '-34x60') (P 30) 34 36 60 1024
-Check 'pad block30'
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_vit_raw.ps1" -Frame $Frame
 Check 'vit31-38'
-Mark 'pad+vit31-38'
+Mark 'vit31-38'
 
 & "$L\prepare_block39_dynamic_input.exe" (P 38) (P 30 '-body') (P 39 '-input')
 Check 'prepare block39'

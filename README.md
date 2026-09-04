@@ -66,6 +66,8 @@ Swin resident宿主现可把上一stage的downsample/enter直接接到下一段G
 
 block22→23特殊边也已GPU直连：136行池化为68行，尾4行在GPU清零后补成H72；blocks23–29输出exact。encoder14–30进一步降至3.999秒。下一步把block30 pool/enter、H34→H36 padding直接并入ViT八层resident宿主。
 
+block30 pool/enter与H34→H36零padding现已并入ViT resident宿主，block30-body可直接跑到block38且逐byte exact；独立downsample/pad两进程和两份文件已删除。predown CSO cache热后：encoder0–13=2.960秒、encoder14–30=3.200秒、含block30 predown的ViT=1.279秒；两个encoder较初始合计减少约2.74秒。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

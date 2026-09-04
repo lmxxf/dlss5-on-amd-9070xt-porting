@@ -1685,6 +1685,10 @@ block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：
 
 特殊block22→23边随后纳入predown：输入136×240×256，先用`block22-pool-identity`与`block22-enter-256x512`生成68×120×512，并在GPU清零stagein后只写前68行，保留Swin要求的H72尾4行零padding。block22-body→blocks23–29为143.029ms，block29逐byte exact。正式encoder14–30删除独立block22 downsample进程后wall进一步降至3999.159ms，block29与block30-34x60均exact；相对最初4870.546ms累计减少约871ms。下一边界为block30 pool/enter＋H34→H36 padding与ViT resident合并。
 
+`d3d12_vit_chain_amd.cpp`现可直接读取68×120×512 block30-body，在同一device先执行block30 matrix/pool/512→1024 enter；整块36×60 stagein先GPU清零，只写34×60有效区，尾两行自然保持零，再直接进入ViT31。block30-body→block38为534.150ms，输出逐byte exact；正式脚本删除block30 downsample、34行文件、36行pad文件与pad进程。
+
+predown shader随后加入版本化CSO cache。ViT block30 predown冷/热wall为1645.286/1279.091ms，热态已低于旧pad+ViT的1408ms；Swin predown同样缓存。最终热后encoder0–13为2960.419ms（初始4029.193ms），encoder14–30为3199.859ms（初始4870.546ms），block13/block30-body/block38关键输出均逐byte exact。两个encoder合计相对初始减少约2.74秒；严格目标仍是把剩余各stage进程合成一个device。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

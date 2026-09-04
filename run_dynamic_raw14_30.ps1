@@ -12,4 +12,4 @@ B 22 (P 21) 240 136 2;Move-Item -Force (P 22) (P 22 '-body')
   "$L\block25-logical-effective.bin" "$L\block26-logical-effective.bin" `
   "$L\block27-logical-effective.bin" "$L\block28-logical-effective.bin" `
   "$L\block29-logical-effective.bin";Q 'resident blocks23-29'
-B 30 (P 29) 120 72 2 'block30-logical-effective.bin';Move-Item -Force (P 30) (P 30 '-body');& "$L\d3d12_downsample_enter_test.exe" (P 30 '-body') "$L\block30-pool-identity.bin" "$L\block30-enter-512x1024.bin" (P 30 '-34x60') 120 68 512;Q down30
+B 30 (P 29) 120 72 2 'block30-logical-effective.bin';Move-Item -Force (P 30) (P 30 '-body')
