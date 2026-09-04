@@ -1,0 +1,11 @@
+{
+  "status": "block49-cumulative-correctness-passed-not-resident",
+  "date": "2026-09-04",
+  "block": 49,
+  "channels": 256,
+  "tokens": 32640,
+  "gpu_ms": {"ffn": 0.515000, "qkv": 0.328102, "window_attention_old_vram": 0.581, "attention_projection": 0.227400, "estimated_total": 1.651502},
+  "old_block_gpu_ms": 19.783,
+  "final_vs_old": {"elements": 8355840, "correlation": 1.0, "mae": 0.0, "max_abs_error": 0.0, "exact_fraction": 1.0, "sha256": "e5482c76d02db5ffc46e3932d917ec312a100b12ab6be6c294be11f4f3f86a91"},
+  "strict_boundary": "Full cumulative block49 output is byte-exact, but the components still execute in separate diagnostic processes. Encoder and decoder 256-channel resident segments remain to be built."
+}

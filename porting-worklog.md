@@ -1821,6 +1821,10 @@ block39随后真正并入`d3d12_directml_swin512_resident.cpp`：新增第41个D
 
 为直接量持久态，512 resident exe新增`DML_SWIN512_ITERATIONS`，同一已初始化资源与command list内重复录制block39→47 graph；block39每轮重建main[0]，因此各轮输入固定且不会把上一轮输出误当下一轮输入。100轮平均GPU为5.985188ms，最终block47与单轮输出correlation1.0、MAE/max0、逐byteexact，SHA同为`ca717bb2...ae61`，排除状态污染。完整进程wall4489.604ms，扣除约598.5ms GPU可见约3.89秒一次性JIT/PSO/文件初始化；摊100轮44.896ms，长期稳态收敛于约6ms GPU。由此production试挂的4秒stage wall被严格归因为错误生命周期，而非真实逐帧计算成本。下一步无需继续优化512算力，转向其它channel宽度并建立持久worker/addon生命周期。
 
+通用`prepare_directml_swin.py`随后覆盖512/256/128/64四档权威offset、matrix transpose与bias/scale/skip导出；在block40上与旧512专用脚本的所有二进制payload逐byte一致。256-channel真shape benchmark：`32640×256×288` Expand0.115388ms、`32640×256×384` QKV0.061211ms、`32640×128×256` Attention Projection0.029710ms，4080 batch的`64×16×64`为0.276290ms。
+
+FFN/Projection诊断runner泛化为环境变量tokens/channels/hidden/attention_dim，非512档关闭双gate，combine只执行fast(expand)。普通block49真输入：DirectML FFN0.515000ms vs旧5.378＋4.562=9.940ms，correlation0.9999998822、MAE7.405e-6、max0.001953125、99.620864% exact；DirectML QKV0.328102ms vs旧5.786ms，correlation0.9999998918、MAE4.926e-6、max5.21e-5。微小误差进入原window Attention与DirectML Projection0.227400ms后完全被E4M3吸收，block49最终8,355,840 floats与旧输出逐byteexact，SHA同为`e5482c76...86a91`。按VRAM-local旧Attention0.581ms估计完整block约1.65ms vs旧19.783ms，约12倍。256档算法门槛通过；下一步构建encoder blocks15–22与decoder blocks48–55两条resident链。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
