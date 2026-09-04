@@ -1713,6 +1713,12 @@ alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，
 
 `d3d12_swin_chain.cpp`与`d3d12_swin32_chain.cpp`亦将main ping-pong/feature/QKV/attention改为placed resources。block39、block48 upsample、32-channel normal与block66 upsample四类路径均逐byte exact。三个phase全部升正式后重跑Windows blocks1–70，最终R10 SHA-256仍为`4868b7e4...be35`逐byte不变，wall10852.710ms与committed版本同一波动区间。至此Swin/ViT/block70真实PSO均已在alias-compatible placed布局运行；剩余核心只是在单进程共享同一heap并插入phase alias barriers。
 
+### 2026-09-04：DirectML矩阵核入口
+
+普通SM6 HLSL虽然已把全网从数百秒压到秒级，但其标量dot不可能承担实时ViT/Swin GEMM；实时主线必须切到RX9070XT的FP16矩阵吞吐。新增`d3d12_directml_probe.cpp`，用官方DirectML 1.15.4 header编译、运行时动态加载AMD机现有`C:\Windows\System32\DirectML.dll` 1.15.6，不随程序部署DLL。MinGW需要显式启用latest target、补`_Maybenull_` SAL空定义并直接传`IDMLDevice` GUID。
+
+真机探针输出：`adapter=AMD Radeon RX 9070 XT ... max_feature_level=0x6400`。这证明同一个D3D12 adapter可以直接建立DirectML 6.4设备，下一步以ViT Expand形状做FP16 GEMM microbenchmark并与现有shader逐层比数值/耗时；此处只确认执行入口，不把API可用误写成矩阵核已命中或实时目标已完成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
