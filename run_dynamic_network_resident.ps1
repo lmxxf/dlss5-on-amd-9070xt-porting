@@ -16,12 +16,12 @@ Mark 'encoder15-30'
 Check 'vit31-38'
 Mark 'vit31-38'
 
-& "$L\prepare_block39_dynamic_input.exe" (P 38) (P 30 '-body') (P 39 '-input')
-Check 'prepare block39'
-& "$L\d3d12_affine_test.exe" "$L\block39-logical-effective-bias.bin" (P 39 '-input') (P 39) 1536 512
-Check 'block39'
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$L\run_dynamic_decoder_raw40_47.ps1" -Frame $Frame
-Check 'decoder40-47'
+& "$L\d3d12_swin_chain.exe" --block39 (P 38) (P 30 '-body') (P 47) `
+  "$L\block40-logical-effective.bin" "$L\block41-logical-effective.bin" `
+  "$L\block42-logical-effective.bin" "$L\block43-logical-effective.bin" `
+  "$L\block44-logical-effective.bin" "$L\block45-logical-effective.bin" `
+  "$L\block46-logical-effective.bin" "$L\block47-logical-effective.bin"
+Check 'block39+decoder40-47'
 Mark 'block39+decoder40-47'
 
 & "$L\d3d12_swin_chain.exe" --upsample (P 47) (P 22 '-body') (P 55) `
