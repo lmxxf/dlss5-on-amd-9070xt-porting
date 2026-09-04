@@ -1815,6 +1815,10 @@ block39随后矩阵核化。`prepare_directml_block39.py`把现有`(1536+1)×512
 
 block39 DirectML＋resident512输出裁68行后继续进入blocks48–70，最终4K R10与旧链SHA同为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`逐byte exact。block39→47矩阵替换的数值与画质门槛通过。严格剩余：block39目前仍由独立通用GEMM进程和外部1536拼接输入完成；下一步在512 resident exe内加入ViT main上采样＋block30 skip pack、block39 GEMM/bias，随后替换production `d3d12_swin_chain --block39`。
 
+block39随后真正并入`d3d12_directml_swin512_resident.cpp`：新增第41个DirectML operator `8160×1536×512`，`Block39Pass`在GPU直接从36×60×1024 ViT main按2×nearest取样并拼68×120×512 block30 skip为FP16 1536维输入，GEMM后加bias写H72 FP16 main（尾四行零）。与完整blocks40–47同一command list执行为13.410320ms；block47误差与分离block39版本完全一致。输出直接写68行active。
+
+新增`run_dynamic_decoder40_47_directml.ps1`并试挂production。frame56400功能回归最终R10仍为`251b7ef7...e1ca1`逐byteexact；新stage GPU16.820680ms，但stage wall达4041.334ms，因为每帧新进程重新创建41个DirectML compiled operator并编译8套Boundary/WindowAttention PSO；全网wall由旧10120.780恶化到13597.273ms。故正式`run_dynamic_network_resident.ps1`已回退旧block39–47 runner，实验wrapper保留。结论不是GPU路线失败，恰恰证明剩余壁垒已从计算转为生命周期：该13–17ms graph必须嵌入长驻addon（或持久worker），不能以逐帧CLI进程上线。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

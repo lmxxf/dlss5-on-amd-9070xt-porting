@@ -7,6 +7,15 @@
   "directml_resident_gpu_ms": 14.326320,
   "directml_resident_gpu_ms_warm": 10.072160,
   "block39_directml_gpu_ms": 0.432135,
+  "block39_through_47_resident_gpu_ms": 13.410320,
+  "production_trial": {
+    "gpu_ms": 16.820680,
+    "stage_wall_ms": 4041.334,
+    "network_wall_ms": 13597.273,
+    "final_r10_byte_exact": true,
+    "rolled_back": true,
+    "reason": "Per-frame process performs 40 DirectML JITs and custom shader compilation; keep the faster GPU path experimental until persistent addon integration."
+  },
   "block47_vs_old": {
     "elements": 4177920,
     "correlation": 1.0,
@@ -37,5 +46,5 @@
     "block47_max_abs_error": 0.0078125,
     "final_r10_byte_exact": true
   },
-  "strict_boundary": "Blocks40-47 now execute on one device and command list, and DirectML block39 has passed downstream/final-image validation. Block39 still executes in a separate diagnostic process; it must be inserted into the resident executable before production replacement."
+  "strict_boundary": "Block39-47 now execute on one device and command list and pass final-image validation. The production trial was rolled back because per-frame process/JIT startup made wall time worse; persistent addon integration is required before rollout."
 }
