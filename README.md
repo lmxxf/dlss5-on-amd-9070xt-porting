@@ -186,6 +186,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `d3d12_vit_qkv_test.cpp`：RX9070XT QKV correctness runner；执行Q/K逐head归一化与V线性投影，对5090权威view correlation 0.9820/0.9717/0.9918。
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `d3d12_directml_probe.cpp`：从现有D3D12 AMD adapter动态加载Windows系统`DirectML.dll`，不捆绑redist；RX9070XT已成功创建`IDMLDevice`并报告最高DirectML feature level 6.4。用于进入FP16矩阵核GEMM基准，不代表整网已经实时化。
+- `d3d12_directml_gemm.cpp`：DirectML FP16 GEMM真机基准兼数值smoke；显式修正MinGW对24-byte COM struct return的ABI差异。ViT Expand `2160×1024×4096`稳定约0.15ms／120.5 TFLOPS，输出FP16 exact；证明矩阵核路线相对现有标量HLSL已有两个数量级的算力余量。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
 - `run_original_1h_upsample.cpp`：按block66真实0x60 ABI执行1H upsample；`+0`绑定decoder主输入、`+8`绑定输出，保留enc0 skip与override dimensions。

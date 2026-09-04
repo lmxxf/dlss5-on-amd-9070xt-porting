@@ -1719,6 +1719,10 @@ alias arena随后执行真实GPU smoke：先以Swin view清零为`0x11111111`，
 
 真机探针输出：`adapter=AMD Radeon RX 9070 XT ... max_feature_level=0x6400`。这证明同一个D3D12 adapter可以直接建立DirectML 6.4设备，下一步以ViT Expand形状做FP16 GEMM microbenchmark并与现有shader逐层比数值/耗时；此处只确认执行入口，不把API可用误写成矩阵核已命中或实时目标已完成。
 
+`d3d12_directml_gemm.cpp`随后跑通真实GEMM。MinGW直接调用`GetBindingProperties()`会把COM虚函数返回的24-byte结构读乱；改为按vtable显式传返回buffer后，initializer=`0 descriptors`、compiled GEMM=`3 descriptors`、temporary/persistent均为0，绑定合同恢复正常。输入用`A=1/K`、`B=1`，各测试首元素均精确得到FP16 `0x3c00=1.0`，同时排除“计时到空dispatch”的假阳性。
+
+RX9070XT热态GPU timestamp结果：ViT Expand `2160×1024×4096`为0.150368ms／120.500 TFLOPS；Contract `2160×4096×1024`约0.14–0.17ms／106–126 TFLOPS；QKV `2160×1024×3072`为0.115377ms／117.784 TFLOPS。Swin代表形状`8160×512×576`为0.052317ms、`32640×256×288`为0.101855ms、`522240×64×96`为0.562593ms。小K吞吐下降但仍是亚毫秒；相较现有ViT Expand单层8.154–29.414ms，矩阵主体约有48–196倍加速空间。严格边界：这是独立FP16 dense GEMM，不含权重转换、SASS多项式、residual、Q/K normalization、attention和全网调度；下一步把block31 Expand真权重与真输入接入同一operator做逐元素误差验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
