@@ -1861,6 +1861,10 @@ decoder block56 prefix随后并入128 resident。`prepare_directml_upsample_pref
 
 K-split实测否决该假设。通用FFN runner新增`SWIN_PROJECT_SPLIT`：hidden按K chunk转成batch-major，DirectML batch并行输出多份FP16 partial，finish shader FP32相加后再做residual/E4M3。split3(K32)为3.291440ms，FFN不同值从116增至2617、MAE6.868e-7、43值差>0.01；split2(K48)3.229240ms，不同值20378、MAE4.876e-6、51值差>0.01，均差于split1。原因是每个partial各自落FP16引入更多舍入面，事后FP32相加无法恢复。K-split路线关闭；64主线保留split1近似，当前最终R10最大channel delta6/1023，继续构建resident链并另寻全FP32 output/WMMA方案。
 
+64 decoder resident随后闭合block62 prefix与blocks62–65。新runner以同一D3D12/DirectML device常驻20个GEMM：从272×480×128 block61按2×nearest打包，DirectML 128→64，加bias与544×960×64 block8 skip，再执行四层FFN、cosine window Attention与Projection。首轮真输入排查抓到Attention累加误读K偏移32而非V偏移64；修正后block65对同版本旧`--upsample`链33,423,360值corr0.9999999889、MAE5.791e-6、RMSE0.0003561、仅51值差>0.01且全finite。
+
+RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.467901ms；旧链98.013ms，约4.57倍。两路block65继续经过相同blocks66–69与block70，得到33,177,600-byte 4K R10 SHA-256均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。此前单独替block63得到的9.98%像素微差不能代表完整同版本segment裁判；四层集成后的最终画面门已通过。严格剩余转为32-channel resident与持久addon/worker生命周期，冷进程不切production。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
