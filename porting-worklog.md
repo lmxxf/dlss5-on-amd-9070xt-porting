@@ -1765,6 +1765,8 @@ DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4
 
 最终画面裁判使用明亮frame56400重新建立完整同源链：由`raw-56400-block30-body`生成旧resident block38，同时由同一34×60 block30投影补行后生成八层DirectML block38；两路分别进入相同block39、decoder40–69、block0/4/8/14/22 skips、backbuffer与block70。旧ViT和DirectML ViT的最终33,177,600-byte 4K R10 SHA-256均为`251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1`，逐byte exact。说明block38的0.9909中间误差经decoder residual与最终10-bit量化后完全不可见；对应明亮主菜单截图保持不变。ViT替换的数值与画质门槛至此通过。严格剩余边界：八层仍由40个诊断进程串联，约40ms只是GPU timestamp总和；必须合成单device resident宿主后才有实际实时意义。
 
+resident实施正式启动。`directml_gemm_runtime.h`抽出MinGW struct-return ABI兼容、GEMM compile/initializer/binding table与外部resource绑定；`d3d12_directml_vit_resident.cpp`在单一RX9070XT D3D12 device与单一DirectML device上同时创建Expand、Contract、QKV、QKᵀ、AV、Projection六个compiled operator，并在同一command list完成六个initializer dispatch。随后分配main/branch/QKV、head-major Q/K/V/attention与score/prob共九张default-heap UAV，全部成功；常驻资源653.91MiB，其中score/prob各284.77MiB。该数值远低于已通过的全网5.46GiB alias arena，显存与DirectML多operator共存无阻塞。严格边界：当前仅完成执行对象和资源骨架，尚未把custom pack/softmax/residual dispatch录入并执行真实block；下一步在此宿主替换smoke分配为block31完整链。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
