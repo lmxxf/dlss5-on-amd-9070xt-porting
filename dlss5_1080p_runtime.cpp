@@ -208,6 +208,7 @@ bool record_blocks62_65(ID3D12GraphicsCommandList *commands, unsigned long long 
 bool record_blocks66_69(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
+    const uint32_t result = g_ffx_dispatch(context, header);
     const auto n = ++g_ffx_frames;
     if (header && (header->type & 0x00ffffffu) == 0x00010001u) {
         const auto *dispatch = reinterpret_cast<const FfxDispatchUpscale *>(header);
@@ -238,7 +239,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
                 dispatch->output.description.width, dispatch->output.description.height, dispatch->output.state);
         }
     }
-    return g_ffx_dispatch(context, header);
+    return result;
 }
 
 DWORD WINAPI ffx_hook_worker(void *) {

@@ -1979,6 +1979,8 @@ decoder blocks62–65接入DLL。block62从240×136×128的block61做2×nearest�
 
 decoder blocks66–69接入DLL。block66先从block65的480×272×64 FP16做2×nearest，DirectML `64→32`，在GPU finish中加FP32 bias与encoder block4的960×544×32 FP32 skip，写FP16后由常驻bridge解为FP32。blocks66–69随后复用已验收的960×544 C32 FFN/QKV/Attention PSO与四份41,220-byte body参数，最终block69留在FP32 GPU resource。prefix与四份body的远端尺寸逐项正确；交叉编译SHA-256=`81ff76842e2a604c395a50b37659905d2fac82751e8c29a3db96467d4f75d191`。当前动态网络链覆盖blocks0–69，只剩block70与最终R10回写。
 
+block70接入前修正FFX hook的命令录制顺序：旧版在调用原`ffxDispatch`之前追加网络命令，未来即使写回output也会被随后录制的FSR覆盖。新版先调用trampoline，让原FSR在同一native command list生成当帧RGBA16F base，再追加自有blocks0–70；因此block70可以读取原FSR结果并成为最后写入者。该变更不创建第二queue、不提交command list，仍完全使用游戏原生调度序列。顺序修正版SHA-256=`14f69553ded7fb5db080d470ece3fb017c89f08e2ff295e5eae31e138dcf3dc6`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
