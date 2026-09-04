@@ -4,11 +4,15 @@
 #include <algorithm>
 #include <cstdio>
 
+#ifndef DMLRT_FAILURE
+#define DMLRT_FAILURE(name, result) do { \
+    std::fprintf(stderr, "%s=0x%08lx\n", name, (unsigned long)(result)); \
+    ExitProcess(1); \
+} while (0)
+#endif
+
 inline void dmlrt_check(const char* name, HRESULT result) {
-    if (FAILED(result)) {
-        std::fprintf(stderr, "%s=0x%08lx\n", name, (unsigned long)result);
-        ExitProcess(1);
-    }
+    if (FAILED(result)) DMLRT_FAILURE(name, result);
 }
 
 inline const GUID DMLRT_IID_OPERATOR = {0x26caae7a,0x3081,0x4633,{0x95,0x81,0x22,0x6f,0xbe,0x57,0x69,0x5d}};
@@ -46,8 +50,7 @@ public:
         dmlrt_check("CreateOperatorInitializer", dml->CreateOperatorInitializer(1, operators, DMLRT_IID_INITIALIZER, (void**)&initializer_));
         auto init = dmlrt_binding_properties(initializer_), exec = dmlrt_binding_properties(compiled_);
         if (init.TemporaryResourceSize || exec.TemporaryResourceSize || exec.PersistentResourceSize) {
-            std::fprintf(stderr, "unexpected GEMM scratch for %ux%ux%u batch %u\n", m, k, n, batch);
-            ExitProcess(2);
+            DMLRT_FAILURE("unexpected GEMM scratch", E_UNEXPECTED);
         }
         descriptorCount_ = std::max<UINT>(1, std::max(init.RequiredDescriptorCount, exec.RequiredDescriptorCount));
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,descriptorCount_,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};

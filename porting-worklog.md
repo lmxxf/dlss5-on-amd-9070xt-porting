@@ -1869,6 +1869,8 @@ RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.4679
 
 另按旧1H shader补齐shift边界mask，稳态反而升到91.697462ms，而block69 corr仍为0.9999581489，证明mask只影响边缘窗口，主误差来自32-channel矩阵的FP16落地。结论：不为统一DirectML而替换这一档；blocks66–69正式保留现有逐byteexact的SM6 FP32 PSO，下一阶段直接把这些PSO与宽档DirectML operators放进同一持久addon/worker。`d3d12_swin32_chain.cpp`增加按层、FFN与prefix诊断开关，默认行为不变。
 
+持久addon生命周期开始落地。新增`d3d12_resident_lifecycle_probe.cpp`：ReShade `init_device`取得游戏原生D3D12 device并AddRef，worker线程在同一device创建DirectML device、独立DIRECT queue/allocator/list/fence，compile＋initialize一枚代表Swin64 Expand形状`522240×64→96`的operator，随后保持全部对象到进程结束；present只记录ready/failed，不触碰画面。首版审计发现standalone helper的`dmlrt_check`失败会`ExitProcess`，因此未让游戏加载并立即从目录撤下；helper改为可覆写`DMLRT_FAILURE`，addon抛出并记录HRESULT，所有现有exe默认仍fail-fast。安全版addon SHA-256为`c17f4e214b4e5f6c2edc844738536cd40460b65c9b248948959a93e03d2d687e`，交叉编译与Swin64 standalone回归通过；下一次前台启动《剑星》只验同进程DirectML初始化和device-removed，不把生命周期probe误称整网接入。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
