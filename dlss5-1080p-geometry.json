@@ -5,8 +5,8 @@
     {"range": "block0-4", "width": 960, "height": 544, "channels": 32, "tokens": 522240},
     {"range": "block5-8 / block62-65", "width": 480, "height": 272, "channels": 64, "tokens": 130560},
     {"range": "block9-14 / block56-61", "width": 240, "height": 136, "channels": 128, "tokens": 32640},
-    {"range": "block15-22 / block48-55", "width": 120, "height": 68, "channels": 256, "tokens": 8160},
-    {"range": "block23-30 / block39-47", "width": 60, "active_height": 34, "padded_height": 40, "channels": 512, "active_tokens": 2040, "padded_tokens": 2400},
+    {"range": "block15-22 / block48-55", "width": 120, "active_height": 68, "padded_height": 72, "channels": 256, "active_tokens": 8160, "padded_tokens": 8640},
+    {"range": "block23-30 / block39-47", "active_width": 60, "padded_width": 64, "active_height": 34, "padded_height": 40, "channels": 512, "active_tokens": 2040, "padded_tokens": 2560},
     {"range": "block31-38", "width": 30, "height": 18, "channels": 1024, "tokens": 540},
     {"range": "block66-69", "width": 960, "height": 544, "channels": 32, "tokens": 522240},
     {"range": "block70", "width": 1920, "active_height": 1080, "padded_height": 1088, "channels": 32, "active_tokens": 2073600, "padded_tokens": 2088960}

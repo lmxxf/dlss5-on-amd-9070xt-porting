@@ -40,7 +40,18 @@
     "steady_100_gpu_ms": 3.837133,
     "block14_vs_fp32_reference": {"correlation": 0.3958571261, "mae": 122.32783, "rmse": 204.16377, "max_abs_error": 448.5625, "all_finite": true},
     "reference_saturation": {"block11_min": -96.0, "block12_negative_448_values": 2208000, "block13_negative_448_values": 2434890, "block14_negative_448_values": 96000},
-    "status": "performance passed but numerical acceptance deferred to the final 1080p image; the FP32 reference itself saturates at this new geometry"
+    "status": "the FP32 reference itself saturates at this geometry, but the next stage demonstrably returns to a finite nonsaturated attractor"
+  },
+  "encoder_blocks15_22": {
+    "geometry": "240x136x128 -> active 120x68x256 padded to 120x72",
+    "padding": "last four rows explicitly zeroed before blocks15-22",
+    "single_gpu_ms": 9.609480,
+    "steady_100_gpu_ms": 4.020946,
+    "block22_range": [-1.75, 0.9375],
+    "block22_std": 0.31411546,
+    "block22_saturated_values": 0,
+    "block22_vs_fp32_reference": {"correlation": 0.9999998395411733, "mae": 0.000006086686, "rmse": 0.00017794652, "max_abs_error": 0.015625, "different_values": 4245, "differences_over_0_01": 255, "all_finite": true},
+    "status": "passed; the block11-13 saturation is recovered by block22"
   },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
@@ -79,5 +90,5 @@
     },
     "status": "compiled and deployed; first in-game current-frame blocks0-8 load pending"
   },
-  "next_boundary": "embed block8 predown and blocks9-14 in the runtime DLL, then continue block14 predown to 120x68 blocks15-22 while tracking the saturation through the final image"
+  "next_boundary": "embed blocks9-22 in the runtime DLL, then implement block22 predown and blocks23-30 with both axes padded to 64x40"
 }

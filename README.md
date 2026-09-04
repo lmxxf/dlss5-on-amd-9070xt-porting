@@ -18,6 +18,8 @@ block4 predown＋blocks5–8也已进入DLL。1080专用runner先以真实block4
 
 block8→blocks9–14的1080专用runner也已运行，清理模板遗留block39后稳态3.837133ms；但新几何出现数值风险：FP32参考自身从block11开始走向负E4M3饱和，block12/13分别约220.8万/243.5万值为-448，最终DirectML block14对参考corr仅0.3959。两路均finite，故暂不以中层corr判死，继续推进到最终1080p画面裁判；该段尚未嵌DLL。
 
+block14→blocks15–22证明上述饱和可恢复。C256阶段按active120×68、pad120×72运行，predown对尾四行显式写零，避免读取H136之外；DirectML block22恢复到-1.75..0.9375、零饱和值，对FP32参考corr0.9999998395、MAE6.09e-6、max0.015625，稳态4.020946ms。下一C512阶段因60×34两轴都非8倍数，必须pad到64×40。
+
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
 最新明亮场景验收为frame56400主菜单：同帧Color/backbuffer SHA分别`fd201dba...d492a`／`c1fc1eaf...74d43`，全AMD blocks0–70输出R10 SHA为`251b7ef7...e1ca1`，截图人物、文字、发丝可辨且无周期条纹。端到端29.624秒、Windows network 10.858秒；这是DirectML ViT接入前的新视觉/性能基线，仍明确不是实时。证据见`dlss5-amd-frame56400-validation.json`与`dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png`。
