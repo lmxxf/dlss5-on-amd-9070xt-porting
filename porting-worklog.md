@@ -1837,6 +1837,8 @@ block14 predown随后并入encoder resident。首版输出全零的排查依次�
 
 修正后的`raw-16800-block14`→matrix→2×2 pool→128→256 enter→DirectML blocks15–22输出，与外部`raw-16800-block14-enter15`起跑版本逐byteexact；100轮每轮把mid转回UAV并重做predown，最终仍逐byteexact、SHA同为`a7f7df9c...b7780`，排除状态污染。包含predown的持久态GPU14.869602ms；旧blocks15–22 153.966ms外加旧predown约10ms，整段约11倍。严格剩余：encoder输出尚需跑至最终R10裁判；且该exe仍含从512模板遗留的unused block39/up资源与JIT，后续清理并并入持久生命周期。
 
+encoder最终画面裁判随后完成。DirectML block14 predown＋resident blocks15–22与旧blocks15–22分别进入相同blocks23–30；两路block30再各自通过完整DirectML ViT31–38、integrated DirectML block39＋resident40–47、对应block22 skip的旧block48–55，以及共同block56–70。两份33,177,600-byte 4K R10 SHA-256均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。encoder256的数值、稳态性能与最终画面三门全部通过。严格剩余转为工程生命周期与其它宽度：不把每帧重做JIT的实验exe挂production，待持久worker/addon统一承载。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
