@@ -1673,6 +1673,10 @@ block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：
 
 新增`run_dynamic_network_resident.ps1`，把block0 HWC之后到block70最终RGBA的所有resident段、stage转换、skip merge收进一次Windows侧编排，Linux主脚本只用一次SSH触发整网。frame16800中段wall为20,883.289ms，最终RGBA对既有权威结果逐byte exact。日志仍出现12次adapter初始化，证明剩余20.9秒主要是12个独立进程/device与本地GiB tensor边界，而非SSH控制往返。下一步必须把这些operator family合并进一个全网D3D12进程，最终再嵌入addon；继续合并PowerShell命令已无数量级收益。
 
+编排脚本新增阶段wall剖面后重跑frame16800，最终仍逐byte exact，总wall20,337.660ms：encoder0–13=4029.193ms、encoder14–30=4870.546ms、pad+ViT=1393.047ms、block39+decoder40–47=1280.420ms、block48+decoder49–55=1711.442ms、block56+decoder57–61=1927.275ms、block62–65=1600.732ms、block66–69=2292.396ms、block70=1232.383ms。对照各resident GPU时间（多为50–150ms）说明绝大多数wall来自段间文件与device创建。首个全网合并单元定为encoder0–13，同时必须保留block4/block8 skip输出合同。
+
+完整`run_dynamic_frame_pipeline.sh 16800`随后实跑成功，端到端wall为49.594秒，相对历史同名帧483.906秒约快9.76倍；Windows blocks1–70为20.403秒，block70 GPU＋copy68.299ms。packed R10 SHA-256为`4868b7e4...be35`。它不同于旧审计`923c35a7...f3e9`并非数值回归：同名`frame16800`已被另一游戏进程覆盖，当前Color/backbuffer FNV64为`f6dcf788.../ea6ca2a1...`，旧审计为`bfe29b76.../49869b46...`。frame编号只在单进程内唯一，不能再作为跨启动capture identity；脚本现打印Color/backbuffer SHA-256，完整证据见`dlss5-amd-resident-pipeline-validation.json`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -1,0 +1,46 @@
+{
+  "status": "resident-segment pipeline validated; full single-device real-time execution pending",
+  "date": "2026-09-04",
+  "logical_frame_label": 16800,
+  "capture_identity_warning": "frame labels reset per game process and are not globally unique",
+  "current_capture": {
+    "color_sha256": "fd201dbace03360a379cd2b685bdf0151a9b32700e31a568ec702e7db81d492a",
+    "backbuffer_sha256": "e15f401e5d82ce988796d64a7d12fa6afdedc0a81b5ae625bbf2525986de31a1",
+    "color_fnv64": "f6dcf7885d7b1fc1",
+    "backbuffer_fnv64": "ea6ca2a19e59b8a5",
+    "packed_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "image": "dynamic-captures/dynamic-frame-16800-dlss5-synchronous.png"
+  },
+  "historical_capture_with_same_label": {
+    "color_fnv64": "bfe29b765e8e9d24",
+    "backbuffer_fnv64": "49869b469f8ec5d0",
+    "packed_r10_sha256": "923c35a7ecc8c3c098f7274179999eda96aedadf9163ac6adfa089c49db3f3e9"
+  },
+  "timing_ms": {
+    "full_pipeline_wall": 49594.0,
+    "windows_blocks1_70_wall": 20402.723,
+    "encoder0_13": 4058.067,
+    "encoder14_30": 4864.434,
+    "pad_and_vit31_38": 1408.409,
+    "block39_and_decoder40_47": 1306.142,
+    "block48_and_decoder49_55": 1711.100,
+    "block56_and_decoder57_61": 1931.192,
+    "block62_65": 1614.827,
+    "block66_69": 2256.997,
+    "block70": 1251.337,
+    "block70_gpu_plus_copy": 68.299
+  },
+  "block70_gpu_breakdown_ms": {
+    "prefix": 11.251,
+    "ffn": 20.832,
+    "qkv": 14.165,
+    "attention": 13.732,
+    "outconv": 2.855
+  },
+  "correctness": {
+    "all_resident_segment_replacements": "byte-exact against their previous multi-process outputs",
+    "current_full_run": "completed successfully from current same-label capture and produced a nonempty packed R10 output",
+    "historical_output_hash_mismatch_explained": "the source Color and backbuffer FNV64 values differ, proving the same frame label was overwritten by another game process"
+  },
+  "strict_boundary": "49.594 seconds per frame is not real-time; twelve D3D12 process/device lifetimes and local tensor files remain"
+}

@@ -13,6 +13,7 @@ push(){ scp "$1" "$host:D:/DLSSNR-Lab/$2"; }
 
 pull "logs/ffx-color-$frame.bin" "$work/color.bin"
 pull "logs/dynamic-frame-$frame.bin" "$work/backbuffer.bin"
+sha256sum "$work/color.bin" "$work/backbuffer.bin"
 python3 "$root/prepare_dynamic_preblock_input.py" "$work/color.bin" "$work/tiles.rgba32f" "$work/block0-zero.fp8"
 push "$work/tiles.rgba32f" "raw-$frame-tiles.rgba32f"
 push "$work/block0-zero.fp8" "raw-$frame-block0-zero.fp8"
