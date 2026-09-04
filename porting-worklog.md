@@ -1967,6 +1967,8 @@ blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effec
 
 blocks23–30随后接入同一DLL的C512 resident段。这里不能照搬4K的72×120布局：1080p block22只有active68×120，predown执行256×256 matrix与2×2 pool后得到active34×60，再显式写入padded40×64×512，右侧4列与底部6行全部清零；Window Attention同步改为64×40循环位移。八层使用既有`block23–30-logical-effective-*`拆分权重，跨stage继续由GPU FP16→FP32 bridge衔接。顺手修正通用record状态机：只有输出确被下一级读成SRV后，下一帧才做NON_PIXEL→UAV，避免末级在第二帧提交无效transition。编译SHA-256=`dbafaaf4ecd2f77cdc6582bf75fa5663c4ee6a901817a714f6a13ae34e71e033`；当前游戏DLL动态链已覆盖blocks0–30。
 
+ViT blocks31–38随后接入DLL，并按1080p而非4K几何重建。block30输出是padded40×64×512 FP16，新增常驻crop PSO逐行抽取active34×60到FP32，避免右侧padding被错误flatten；block30 matrix/pool/512→1024 enter再生成active17×30并显式清零第18行，得到540 tokens。八层各自常驻Expand/QKV/scale权重，共用Contract、Projection及两条skip；QKV pack、32头QKᵀ、540-way softmax、AV与projection全在同一游戏command list执行。所有30个依赖权重在AMD Lab逐项存在，交叉编译SHA-256=`8e535b1aa4942fdcd3a1f1a5be0b585cc74a9268073406738c4d8e6f0496590e`。当前动态链推进到block38；首次游戏内初始化/连续submit仍待互动Steam会话验证。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
