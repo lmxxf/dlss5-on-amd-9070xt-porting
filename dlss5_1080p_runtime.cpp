@@ -889,6 +889,16 @@ DWORD WINAPI initialize_worker(void *) {
             initialize_blocks66_69();
             initialize_block70();
             g_gpu_profile.Create(g_device);
+            if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-shared-attention.txt)")!=INVALID_FILE_ATTRIBUTES){
+                for(UINT side=0;side<2;side++)for(UINT i=0;i<4;i++){
+                    const bool shifted=side?(i==1||i==2):(i!=0);if(shifted)continue;ID3DBlob *code=nullptr;dmlrt_check("c32 attention read",D3DReadFileToBlob(shifted?LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s1.cso)":LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s0.cso)",&code));
+                    D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=side?g_d32.root:g_front_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("c32 attention pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));auto &old=side?g_d32.pso[i][2]:g_front_pso[i][2];old->Release();old=candidate;code->Release();
+                }
+                log("c32_attention=shared_masked\n");
+            }
+            if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-shared-attention.txt)")!=INVALID_FILE_ATTRIBUTES){
+                ID3DBlob *code=nullptr;dmlrt_check("shared attention read",D3DReadFileToBlob(LR"(D:\DLSSNR-Lab\shader-cache\block70-shared-attention.cso)",&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=g_b70.body_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("shared attention pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));g_b70.body_pso[2]->Release();g_b70.body_pso[2]=candidate;code->Release();log("block70_attention=shared\n");
+            }
             if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-block70-parallel-qkv.txt)")!=INVALID_FILE_ATTRIBUTES){
                 ID3DBlob *code=nullptr;dmlrt_check("c32 parallel read",D3DReadFileToBlob(LR"(D:\DLSSNR-Lab\shader-cache\c32-960x544-parallel-qkv.cso)",&code));
                 for(UINT i=0;i<4;i++)for(UINT side=0;side<2;side++){D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=side?g_d32.root:g_front_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("c32 parallel pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));auto &old=side?g_d32.pso[i][1]:g_front_pso[i][1];old->Release();old=candidate;}
