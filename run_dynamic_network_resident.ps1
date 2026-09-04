@@ -64,5 +64,8 @@ Mark 'block66-69'
 & "$L\d3d12_block70_chain.exe" (P 69) (P 0 '-hwc') `
   "$L\raw-$Frame-backbuffer-rgba.f32" "$L\raw-$Frame-dlss5-rgba.f32"
 Check 'block70'
+& "$L\pack_r10g10b10a2.exe" "$L\raw-$Frame-dlss5-rgba.f32" "$L\dlss5-output-r10.new"
+Check 'pack R10'
+Move-Item -Force "$L\dlss5-output-r10.new" "$L\dlss5-output-r10.bin"
 Mark 'block70'
 Write-Output ("network_wall_ms {0:F3}" -f $Clock.Elapsed.TotalMilliseconds)

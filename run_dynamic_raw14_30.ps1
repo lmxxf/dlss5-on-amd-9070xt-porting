@@ -1,7 +1,7 @@
 param([int]$Frame)
 $ErrorActionPreference='Stop';$L='D:\DLSSNR-Lab';function P($b,$s=''){"$L\raw-$Frame-block$b$s.f32"};function Q($n){if($LASTEXITCODE){throw "$n failed"}};function B($b,$src,$w,$h,$shift,$weight="block$b-body-effective.bin"){& "$L\d3d12_block128_test.exe" "$L\$weight" $src (P $b) $w $h $shift;Q "block$b"}
-$i = P 13;B 14 $i 480 272 1;& "$L\d3d12_downsample_enter_test.exe" (P 14) "$L\block14-downsample-matrix.bin" "$L\block15-enter-128x256.bin" (P 14 '-enter15') 480 272 128;Q down14
-& "$L\d3d12_swin_chain.exe" (P 14 '-enter15') (P 21) `
+$i = P 13;B 14 $i 480 272 1
+& "$L\d3d12_swin_chain.exe" (P 14) (P 21) `
   "$L\block15-body-effective.bin" "$L\block16-body-effective.bin" `
   "$L\block17-body-effective.bin" "$L\block18-body-effective.bin" `
   "$L\block19-body-effective.bin" "$L\block20-body-effective.bin" `

@@ -60,6 +60,10 @@ Windows整网编排`run_dynamic_network_resident.ps1`已跑通：从block0 HWC�
 
 完整新管线已实跑：端到端49.594秒，较历史483.906秒快约9.76倍；Windows blocks1–70为20.403秒，证据见`dlss5-amd-resident-pipeline-validation.json`。新packed SHA与历史同名frame16800不同，是因为frame号被另一游戏进程复用覆盖，Color/backbuffer FNV均已变化，不是resident数值回归。脚本现同时打印两路输入SHA，避免再把进程内frame计数当全局身份。
 
+最终RGBA→R10打包与原始R10→RGBA解码均已移到Windows原生工具，两端输出SHA与NumPy逐byte一致。正式pipeline不再跨机传132MB RGBA，只传29MB Color、33MB原始backbuffer验证副本与33MB最终R10；R10在AMD机本地原子发布给运行中的游戏。
+
+Swin resident宿主现可把上一stage的downsample/enter直接接到下一段GPU input。block4→5–8、block8→9–13、block14→15–21三条边均逐byte exact；encoder0–13 wall从4.029秒降至3.181秒，encoder14–30从4.871秒降至4.340秒。它删除三个stage-input文件/进程，但完整encoder仍需进一步合成单device图。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。

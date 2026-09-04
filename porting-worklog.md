@@ -1677,6 +1677,12 @@ block70 prefix随后改为直接绑定block69 main与block0 skip两份HWC SRV：
 
 完整`run_dynamic_frame_pipeline.sh 16800`随后实跑成功，端到端wall为49.594秒，相对历史同名帧483.906秒约快9.76倍；Windows blocks1–70为20.403秒，block70 GPU＋copy68.299ms。packed R10 SHA-256为`4868b7e4...be35`。它不同于旧审计`923c35a7...f3e9`并非数值回归：同名`frame16800`已被另一游戏进程覆盖，当前Color/backbuffer FNV64为`f6dcf788.../ea6ca2a1...`，旧审计为`bfe29b76.../49869b46...`。frame编号只在单进程内唯一，不能再作为跨启动capture identity；脚本现打印Color/backbuffer SHA-256，完整证据见`dlss5-amd-resident-pipeline-validation.json`。
 
+新增Windows原生`pack_r10g10b10a2.cpp`，对当前最终RGBA生成的33,177,600-byte结果SHA-256为`4868b7e4...be35`，与NumPy及游戏当前热加载文件完全一致。R10打包与原子发布已移入`run_dynamic_network_resident.ps1`；Linux不再pull 132MB RGBA、Python打包再push 33MB，只pull最终R10作哈希/截图。新增`decode_r10g10b10a2.cpp`，从游戏capture生成132,710,400-byte RGBA的SHA与NumPy完全一致；正式pipeline改为AMD本地解码，不再push 132MB backbuffer RGBA。跨机数据现收敛为29MB Color、33MB原始backbuffer（身份验证）和33MB最终R10。
+
+`d3d12_swin_chain.cpp`新增可选predown模式：若输入正好为当前stage tensor两倍，便在同一device/command-list先执行上一stage的matrix→2×2 average pool→enter projection，下一Swin段直接绑定GPU `stagein`，不产生`block4-enter5`、`block8-enter9`或`block14-enter15`文件。三条边分别以block4→5–8、block8→9–13、block14→15–21验证，段末全部逐byte exact。
+
+接入正式脚本后，encoder0–13 wall从4029.193ms降至3180.790ms，block8/block13 exact；encoder14–30从4870.546ms降至4339.819ms，block21与block30-34x60 exact。三条stage融合合计减少约1.38秒wall与三个独立D3D12进程。严格边界：encoder仍由多个Swin stage进程构成，下一步继续合并为同一device，而非把3.18/4.34秒当实时结果。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

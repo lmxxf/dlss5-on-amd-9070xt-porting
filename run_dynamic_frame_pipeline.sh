@@ -20,18 +20,15 @@ push "$work/block0-zero.fp8" "raw-$frame-block0-zero.fp8"
 remote "cmd /c $R\\d3d12_preblock_test.exe $R\\block0-distilled.bin $R\\raw-$frame-tiles.rgba32f $R\\raw-$frame-block0-zero.fp8 $R\\raw-$frame-block0.f32"
 remote "cmd /c $R\\preblock_tiles_to_hwc.exe $R\\raw-$frame-block0.f32 $R\\tinlayout-2h64-output-permutation.i32 $R\\raw-$frame-block0-hwc.f32"
 
-python3 "$root/decode_r10g10b10a2.py" "$work/backbuffer.bin" "$work/backbuffer-rgba.f32"
-push "$work/backbuffer-rgba.f32" "raw-$frame-backbuffer-rgba.f32"
+remote "cmd /c $R\\decode_r10g10b10a2.exe $R\\logs\\dynamic-frame-$frame.bin $R\\raw-$frame-backbuffer-rgba.f32"
 remote "powershell.exe -NoProfile -ExecutionPolicy Bypass -File $R\\run_dynamic_network_resident.ps1 -Frame $frame"
-pull "raw-$frame-dlss5-rgba.f32" "$work/output-rgba.f32"
-python3 "$root/pack_r10g10b10a2.py" "$work/output-rgba.f32" "$work/output-r10.bin"
-push "$work/output-r10.bin" dlss5-output-r10.new
-remote "powershell.exe -NoProfile -Command \"Move-Item -Force $R\\dlss5-output-r10.new $R\\dlss5-output-r10.bin\""
-python3 - "$work/output-rgba.f32" "$root/dynamic-captures/dynamic-frame-$frame-dlss5-synchronous.png" <<'PY'
+pull "dlss5-output-r10.bin" "$work/output-r10.bin"
+python3 - "$work/output-r10.bin" "$root/dynamic-captures/dynamic-frame-$frame-dlss5-synchronous.png" <<'PY'
 import sys,numpy as np
 from PIL import Image
-a=np.fromfile(sys.argv[1],'<f4').reshape(2160,3840,4)
-Image.fromarray(np.rint(np.clip(a[...,:3],0,1)*255).astype(np.uint8),'RGB').save(sys.argv[2])
+v=np.fromfile(sys.argv[1],'<u4').reshape(2160,3840)
+rgb=np.stack((v&1023,(v>>10)&1023,(v>>20)&1023),-1)
+Image.fromarray(np.rint(rgb*(255/1023)).astype(np.uint8),'RGB').save(sys.argv[2])
 PY
 sha256sum "$work/output-r10.bin"
 pipeline_end_ns=$(date +%s%N)
