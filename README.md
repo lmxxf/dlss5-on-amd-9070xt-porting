@@ -120,6 +120,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `prepare_vit_attention_case.py` / `d3d12_vit_attention_test.cpp` / `block31-attention-effective.json`：把main E4M3与work FP16两半序列重排成64×1024 canonical Q/K/V，并在RX9070XT执行32-head softmax attention；correlation 0.8796。
 - `vit_block31_reference.py` / `block31-portable.json`：64-token portable block31整链CPU oracle；Expand→Contract→QKV→Attention→Projection对5090最终输出correlation 0.8387，供D3D12多pass串联验收。
 - `d3d12_vit_block31_test.cpp`：RX9070XT单device五pass完整block31；语义正确的main＋zero Attention路径一次Execute/Fence为15.476 ms，最终对5090 correlation 0.825232，各pass对CPU reference近逐位一致。
+- `d3d12_vit_block31_test.cpp`现亦接受可选precomputed Expand FP32，跳过旧标量Expand后执行Contract/QKV/Attention/Projection。真DirectML Expand穿过完整block31后，对旧AMD block31最终输出correlation0.999614718、MAE0.001428、max0.03125；证明误差未被后四段放大。
 - `vit_blocks31_38_reference.py` / `vit-qkv-blocks31-38.json`：八个ViT block的portable串联参考与权威NVAPI-pair QKV参数；可导出canonical FP32及原repack可消费的2 MiB physical E4M3。
 - `vit-expand-blocks31-38.json` / `block32–38-vit-expand-effective.f16`：其余ViT blocks的unit-basis＋small-Hadamard portable Expand矩阵；与QKV参数一起组成八层完整参数集。
 - `stellar-amd-portable-vit.png`：portable blocks31–38→原decoder39–69→RX9070XT readout的当前诊断图；人物可辨但仍有点阵/横向色带，明确未达到最终验收。

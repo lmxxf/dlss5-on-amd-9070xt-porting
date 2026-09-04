@@ -64,11 +64,11 @@ static size_t append_aligned(std::vector<uint8_t> &destination,
 }
 
 int wmain(int argc, wchar_t **argv) {
-  if (argc != 11) {
+  if (argc != 11 && argc != 12) {
     std::fwprintf(stderr,
         L"usage: %ls expand.f16 contract.f16 contract-skip.f16 "
         L"qkv-main.fp8 qkv-work.f16 projection.f16 projection-skip.f16 "
-        L"input.f32 oracle.f32 dump.bin\n", argv[0]);
+        L"input.f32 oracle.f32 dump.bin [precomputed-expand.f32]\n", argv[0]);
     return 2;
   }
   auto expand = read_file(argv[1]), contract = read_file(argv[2]),
@@ -76,6 +76,8 @@ int wmain(int argc, wchar_t **argv) {
        qkvWork = read_file(argv[5]), projection = read_file(argv[6]),
        projectionSkip = read_file(argv[7]), input = read_file(argv[8]),
        oracle = read_file(argv[9]);
+  const bool precomputedExpand = argc == 12;
+  auto directmlExpand = precomputedExpand ? read_file(argv[11]) : std::vector<uint8_t>{};
   if (expand.size() != 1024ull * 4096 * 2 ||
       contract.size() != 4096ull * 1024 * 2 || contractSkip.size() != 2048 ||
       qkvMain.size() != 1024ull * 3 * 1024 ||
@@ -85,6 +87,8 @@ int wmain(int argc, wchar_t **argv) {
       input.size() % (1024ull * 4) ||
       oracle.size() != input.size()) return 2;
   const UINT tokens = static_cast<UINT>(input.size() / (1024ull * 4));
+  if (precomputedExpand && directmlExpand.size() != UINT64(tokens) * 4096 * 4)
+    return 2;
   std::vector<uint8_t> packed;
   size_t expandOffset = append_aligned(packed, expand);
   size_t contractOffset = append_aligned(packed, contract);
@@ -245,6 +249,9 @@ groupshared float shared_values[64];
   ID3D12Resource *scaleResource = make(
       scales.size() * 4, &uploadHeap, D3D12_RESOURCE_STATE_GENERIC_READ,
       D3D12_RESOURCE_FLAG_NONE);
+  ID3D12Resource *directmlExpandUpload = precomputedExpand ? make(
+      directmlExpand.size(), &uploadHeap, D3D12_RESOURCE_STATE_GENERIC_READ,
+      D3D12_RESOURCE_FLAG_NONE) : nullptr;
   void *mapped = nullptr;
   D3D12_RANGE empty{0, 0};
   for (auto item : {std::pair<ID3D12Resource *, std::pair<const void *, size_t>>{
@@ -255,13 +262,19 @@ groupshared float shared_values[64];
     std::memcpy(mapped, item.second.first, item.second.second);
     item.first->Unmap(0, nullptr);
   }
+  if (precomputedExpand) {
+    directmlExpandUpload->Map(0, &empty, &mapped);
+    std::memcpy(mapped, directmlExpand.data(), directmlExpand.size());
+    directmlExpandUpload->Unmap(0, nullptr);
+  }
   const UINT64 sizes[5] = {UINT64(tokens) * 4096 * 4, UINT64(tokens) * 1024 * 4,
                            UINT64(tokens) * 3 * 1024 * 4, UINT64(tokens) * 1024 * 4,
                            UINT64(tokens) * 1024 * 4};
   ID3D12Resource *uavs[5]{};
   for (int i = 0; i < 5; ++i)
     uavs[i] = make(sizes[i], &defaultHeap,
-                   D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                   precomputedExpand && i == 0 ? D3D12_RESOURCE_STATE_COPY_DEST
+                                               : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   const UINT64 readbackSize = sizes[4];
   ID3D12Resource *readback = make(
@@ -330,8 +343,20 @@ groupshared float shared_values[64];
       0, descriptorHeap->GetGPUDescriptorHandleForHeapStart());
   const UINT dispatches[5] = {tokens * 16, tokens * 16, tokens,
                               (tokens * 32 + 63) / 64, tokens * 16};
+  if (precomputedExpand) {
+    commands->CopyBufferRegion(uavs[0], 0, directmlExpandUpload, 0, sizes[0]);
+    D3D12_RESOURCE_BARRIER ready{};
+    ready.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    ready.Transition.pResource = uavs[0];
+    ready.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    ready.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    ready.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    commands->ResourceBarrier(1, &ready);
+  }
   commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
-  for (int pass = 0; pass < 5; ++pass) {
+  if (precomputedExpand)
+    commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
+  for (int pass = precomputedExpand ? 1 : 0; pass < 5; ++pass) {
     commands->SetPipelineState(pipelines[pass]);
     if (pass == 3 && waveAttention) commands->Dispatch(tokens, 32, 1);
     else commands->Dispatch(dispatches[pass], 1, 1);
@@ -386,9 +411,10 @@ groupshared float shared_values[64];
   double count = double(tokens) * 1024;
   double correlation = (sxy - sx * sy / count) /
       std::sqrt((sxx - sx * sx / count) * (syy - sy * sy / count));
-  std::printf("corr=%.9f MAE=%.9f RMSE=%.9f submit_to_fence_ms=%.3f\n",
+  std::printf("corr=%.9f MAE=%.9f RMSE=%.9f submit_to_fence_ms=%.3f precomputed_expand=%u\n",
               correlation, ae / count, std::sqrt(se / count),
-              1000.0 * (end.QuadPart - begin.QuadPart) / frequency.QuadPart);
+              1000.0 * (end.QuadPart - begin.QuadPart) / frequency.QuadPart,
+              precomputedExpand ? 1u : 0u);
   const char *passNames[5] = {"expand", "contract", "qkv", "attention", "projection"};
   for (int pass = 0; pass < 5; ++pass)
     std::printf("%s_ms=%.3f\n", passNames[pass],
