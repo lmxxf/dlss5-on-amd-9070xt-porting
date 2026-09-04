@@ -1895,6 +1895,8 @@ decoder block48 prefix随后并入256 resident。`UpsamplePass`从68×120×512 b
 
 DirectML preblock 66,846,720 tile输出对旧标量结果corr0.9999999430、MAE0.0004242、RMSE0.0007388、max0.004587、没有值差>0.01且全finite。经过现有E4M3 tile→HWC后仅489,600/66,846,720值变化（0.7324%），再以新frame id完整跑blocks1–70，4K R10 SHA为`8c8bd142...caf831`；相对修正predown基线35.3134%像素发生微调，但RGB平均仅0.171/0.209/0.232个10-bit刻度、最大均6，目视菜单画面干净无条纹/NaN/几何变化。block0性能门通过；下一步把tile→HWC与blocks1–4接到同一resident资源，消除最后的前端process/file边界。
 
+tile→HWC随后并入preblock resident同一command list。`prepare_directml_preblock.py --permutation`复刻CPU转换器，从4096-entry physical permutation生成4个quadrant×512 logical slot的uint16 rank map；GPU reorder按HWC座标反推tile/quadrant/local slot，读取tile FP32并现场E4M3编码解码。首版仅65,280值差一个subnormal刻度：权威CPU `enc()`在指数低于-6时把mantissa clamp到7，而通用`F()`允许round到8；补`min(round(a*512),7)`后，267,386,880-byte GPU HWC与独立`preblock_tiles_to_hwc.exe`逐byteexact，SHA同为`6b80db5c321123af13a08dbd07ef9f0dcfd0d8ba4884b83b23b9966274332212`。block0三GEMM＋HWC重排单轮3.368840ms、100轮稳态2.547040ms；267MB tile中间文件与独立转换进程可删除，严格剩余边界是把HWC resident buffer直连blocks1–4。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

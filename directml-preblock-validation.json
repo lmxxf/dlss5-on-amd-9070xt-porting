@@ -33,6 +33,14 @@
     "different_fraction": 0.00732421875,
     "differences_over_0_01": 228480
   },
+  "integrated_gpu_tile_to_hwc": {
+    "single_preblock_plus_reorder_gpu_ms": 3.368840,
+    "steady_100_preblock_plus_reorder_gpu_ms": 2.547040,
+    "output_bytes": 267386880,
+    "byte_exact_vs_preblock_tiles_to_hwc_exe": true,
+    "sha256": "6b80db5c321123af13a08dbd07ef9f0dcfd0d8ba4884b83b23b9966274332212",
+    "map": "4x512 uint16 ranks derived from tinlayout-2h64-output-permutation.i32"
+  },
   "full_network_r10": {
     "sha256": "8c8bd14225d203da072f8aa3fcd77942e87ed824a65ae09bb0e681fb59caf831",
     "reference_corrected_preblock_sha256": "44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46",
@@ -46,7 +54,7 @@
     "weight_splitter": "prepare_directml_preblock.py",
     "runner": "d3d12_directml_preblock_resident.cpp",
     "operators": 3,
-    "passes": ["RGBA-to-RGB FP16 pack", "GEMM1", "SiLU1", "GEMM2", "SiLU2", "GEMM3", "affine output"]
+    "passes": ["RGBA-to-RGB FP16 pack", "GEMM1", "SiLU1", "GEMM2", "SiLU2", "GEMM3", "affine output", "E4M3 tile-to-HWC reorder"]
   },
-  "strict_boundary": "The block0 distilled MLP is resident and fast, but tile-to-HWC and blocks1-4 are still separate processes/resources. Final production validation requires the graph to run inside the game addon on consecutive live frames."
+  "strict_boundary": "The block0 distilled MLP and tile-to-HWC conversion are now one resident GPU graph. Blocks1-4 are still a separate process/resource boundary. Final production validation requires the graph to run inside the game addon on consecutive live frames."
 }
