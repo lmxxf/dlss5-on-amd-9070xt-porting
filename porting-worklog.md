@@ -1987,6 +1987,8 @@ R10 swapchain回写随后进入present callback。block70的1920×1080 packed bu
 
 首次自动前台验收尝试使用Windows互动式计划任务`DLSS5Launch`，以console session 1的`lmxxf`身份执行真实Steam路径`steam.exe -applaunch 3489700`。任务成功启动Steam PID6620，进程CommandLine与SessionId均核对正确；但75秒内未派生`SB-Win64-Shipping`，也没有创建runtime log。故当前阻塞点在Steam前台登录/更新/弹窗状态，而不是已观察到DLL加载或GPU初始化失败；不得把这次尝试记成游戏内通过或失败。
 
+继续追查Steam前台后得到明确根因：`console_log.txt`记录`LaunchApp waiting for user response to SynchronizingCloud "pendingcloudsessions"`。manifest已证实游戏完整安装且UpdateResult=0；互动任务、Steam进程、session 1与真实命令行均正常。直接启动EXE也被Steam接管并返回同一pending cloud gate。此处必须由用户选择保留本地或云端存档，不能自动替选以免覆盖游戏进度。新增`launch_stellar_blade.ps1`固定正确working directory，以及`inspect_stellar_blade_launch.ps1`统一读取Steam启动日志和Windows应用错误；选择完成后可复用同一互动任务继续验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
