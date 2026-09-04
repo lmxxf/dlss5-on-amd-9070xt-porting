@@ -1983,6 +1983,8 @@ block70接入前修正FFX hook的命令录制顺序：旧版在调用原`ffxDisp
 
 block70随后并入统一DLL，几何严格使用padded1920×1088、active1920×1080。prefix直接读取block69与block0两份960×544×32 FP32 HWC，以240×136个4×4 sample生成32640×2048 tiled tensor；FFN/QKV/8×8 attention在1920×1088上执行，outconv只处理前1080行。因hook已改为原FSR先录命令，outconv可从当帧RGBA16F output UAV读取base并原位叠加神经残差，随后另行GPU pack为1920×1080 R10 buffer。三份权重尺寸为27,652/41,220/384 bytes，交叉编译SHA-256=`619f720275279f024bc26fc9574860e85d566f3e61c6c22076be23488a97a011`。至此DLL内blocks0–70已连通；严格剩余为present前R10→swapchain回写及真游戏连续动态/帧率验收。
 
+R10 swapchain回写随后进入present callback。block70的1920×1080 packed buffer保持GPU resident；主swapchain为1920×1080 R10G10B10A2时，ReShade同一D3D12 command queue的immediate list执行`UAV→COPY_SOURCE`、buffer-to-texture、backbuffer `COPY_DEST→PRESENT`，下一次block70再转回UAV。整个闭环不map、不readback、不创建每帧资源。交叉编译SHA-256=`b1efd3b6087c6c13eea3079a6d4514f816edcabd970f4ef3258688ea5eb41dd6`。代码层面已形成当前帧Color→blocks0–70→R10→游戏backbuffer，但完成状态仍等待真游戏连续帧、画面与≥10fps三项实测。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
