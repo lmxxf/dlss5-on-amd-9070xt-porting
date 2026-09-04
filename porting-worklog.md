@@ -1767,6 +1767,8 @@ DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4
 
 resident实施正式启动。`directml_gemm_runtime.h`抽出MinGW struct-return ABI兼容、GEMM compile/initializer/binding table与外部resource绑定；`d3d12_directml_vit_resident.cpp`在单一RX9070XT D3D12 device与单一DirectML device上同时创建Expand、Contract、QKV、QKᵀ、AV、Projection六个compiled operator，并在同一command list完成六个initializer dispatch。随后分配main/branch/QKV、head-major Q/K/V/attention与score/prob共九张default-heap UAV，全部成功；常驻资源653.91MiB，其中score/prob各284.77MiB。该数值远低于已通过的全网5.46GiB alias arena，显存与DirectML多operator共存无阻塞。严格边界：当前仅完成执行对象和资源骨架，尚未把custom pack/softmax/residual dispatch录入并执行真实block；下一步在此宿主替换smoke分配为block31完整链。
 
+resident骨架随后升为真实六GEMM执行链。程序创建main/hidden/branch/QKV、Q/K/V、score/prob/attention/final及四套weight共15张default-heap UAV（652.59MiB），用typed clear确定全零初态，将六个compiled operator绑定到前后相接的resident resource，并在一个command list依次dispatch＋UAV barrier＋timestamp。RX9070XT结果：Expand0.211960、Contract0.289440、QKV0.156320、QKᵀ1.344320、AV1.227120、Projection0.068160ms，合计3.297320ms；全链完成、无device removed或隐式同步失败。该值是单device真实GPU timestamp，不再是多进程加和。严格边界：当前用零数据且Q/K/V、prob由clear提供，尚未插custom pack、Contract激活/residual、QKV normalize、softmax及Projection residual；3.297ms仅代表六个矩阵核主体的resident成本。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
