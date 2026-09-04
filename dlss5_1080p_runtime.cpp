@@ -212,13 +212,14 @@ bool record_blocks56_61(ID3D12GraphicsCommandList *commands, unsigned long long 
 bool record_blocks62_65(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_blocks66_69(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_block70(ID3D12GraphicsCommandList *commands,ID3D12Resource *output,unsigned long long frame);
+DWORD WINAPI initialize_worker(void *);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
     const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
     FfxDispatchUpscale snapshot{};
     ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr;
-    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();}
+    if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();if(held_commands&&!g_started.load()){ID3D12Device*device=nullptr;if(SUCCEEDED(held_commands->GetDevice(IID_PPV_ARGS(&device)))){bool expected=false;if(g_started.compare_exchange_strong(expected,true)){g_device=device;log("resident_start_ffx command_list=%p device=%p\n",held_commands,g_device);if(HANDLE thread=CreateThread(nullptr,0,initialize_worker,nullptr,0,nullptr))CloseHandle(thread);else{g_failed.store(true);log("resident_thread_failed error=%lu\n",GetLastError());}}else device->Release();}}}
     bool color_same=false,depth_same=false,motion_same=false,output_same=false,command_same=false,resources_same_device=false,target=false,bridge_ok=false;
     if (is_upscale) {
         const auto *dispatch = &snapshot;
@@ -898,7 +899,7 @@ DWORD WINAPI initialize_worker(void *) {
 }
 
 void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
-    if (!resize || g_started.load()) return;
+    if (!resize) return;
     auto *native = reinterpret_cast<IDXGISwapChain3 *>(
         static_cast<uintptr_t>(swapchain->get_native()));
     ID3D12Device *device = nullptr;
@@ -908,24 +909,13 @@ void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
             native, static_cast<unsigned>(hr));
         return;
     }
-    bool expected = false;
-    if (!g_started.compare_exchange_strong(expected, true)) {
-        device->Release();
-        return;
-    }
-    g_device = device;
-    g_main_swapchain=native;g_main_swapchain->AddRef();
+    if(!g_main_swapchain){g_main_swapchain=native;g_main_swapchain->AddRef();}
     DXGI_SWAP_CHAIN_DESC desc{};
     native->GetDesc(&desc);
     log("resident_start swapchain=%p device=%p size=%ux%u format=%u\n",
-        native, g_device, desc.BufferDesc.Width, desc.BufferDesc.Height,
+        native, device, desc.BufferDesc.Width, desc.BufferDesc.Height,
         static_cast<unsigned>(desc.BufferDesc.Format));
-    if (HANDLE thread = CreateThread(nullptr, 0, initialize_worker, nullptr, 0, nullptr))
-        CloseHandle(thread);
-    else {
-        g_failed.store(true);
-        log("resident_thread_failed error=%lu\n", GetLastError());
-    }
+    device->Release();
 }
 
 void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swapchain,

@@ -2013,6 +2013,8 @@ ASCII诊断门后完成真实GPU二分：max69在blocks66–69首submit后退出
 
 bridge-only `max_block=999`首submit后同样触发PS Studios通用Report Problem，故障严格锁定为Color→tiles pass。根因指向命令顺序下的Color状态：公开FFX descriptor给的是进入dispatch前compute-read状态，原FSR录制后不能假设Color末态仍可作SRV。hook改为双段：调用原FSR前在已知状态下先录frame bridge；调用trampoline；返回后再从resident tiles录block0–70并最终覆盖output。COM AddRef覆盖整个双段。双段版SHA-256=`b9be9bb035359b3234ba3922f933cdf179f31fd3f10644c205166a5f1cec566d`。
 
+双段hook后bridge-only仍首submit崩，排除Color末态。最终机制是D3D12 device ownership：swapchain `GetDevice`所得native接口与FFX command-list/resource所属ReShade代理device虽LUID相同，却不是同一D3D12 device instance；用前者创建descriptor/heap再绑定后者resource非法。初始化入口因此从`init_swapchain`移到第一次FFX upscale：由native command list `GetDevice`取得真实计算device，再一次创建DirectML、PSO、weights与scratch。swapchain callback仅保留present目标，不再创建graph。FFX-device版SHA-256=`54adff8338721099be77209159081f44d083086b06ed36183d360dee1aa0bf2b`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
