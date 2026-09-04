@@ -214,24 +214,23 @@ bool record_blocks66_69(ID3D12GraphicsCommandList *commands, unsigned long long 
 bool record_block70(ID3D12GraphicsCommandList *commands,ID3D12Resource *output,unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
+    const auto n = ++g_ffx_frames;
     const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
     FfxDispatchUpscale snapshot{};
     ID3D12Resource *held_resources[4]{};ID3D12GraphicsCommandList*held_commands=nullptr;
     if (is_upscale) {snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);held_resources[0]=static_cast<ID3D12Resource*>(snapshot.color.resource);held_resources[1]=static_cast<ID3D12Resource*>(snapshot.depth.resource);held_resources[2]=static_cast<ID3D12Resource*>(snapshot.motionVectors.resource);held_resources[3]=static_cast<ID3D12Resource*>(snapshot.output.resource);for(auto*r:held_resources)if(r)r->AddRef();held_commands=static_cast<ID3D12GraphicsCommandList*>(snapshot.commandList);if(held_commands)held_commands->AddRef();}
-    const uint32_t result = g_ffx_dispatch(context, header);
-    const auto n = ++g_ffx_frames;
+    bool color_same=false,depth_same=false,motion_same=false,output_same=false,command_same=false,resources_same_device=false,target=false,bridge_ok=false;
     if (is_upscale) {
         const auto *dispatch = &snapshot;
-        const bool color_same=on_main_device(dispatch->color.resource),depth_same=on_main_device(dispatch->depth.resource),motion_same=on_main_device(dispatch->motionVectors.resource),output_same=on_main_device(dispatch->output.resource);
-        ID3D12Device*command_device=nullptr;const bool command_get=dispatch->commandList&&SUCCEEDED(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList)->GetDevice(IID_PPV_ARGS(&command_device)));const LUID ca=command_get?command_device->GetAdapterLuid():LUID{},cb=g_device?g_device->GetAdapterLuid():LUID{};const bool command_same=command_get&&ca.HighPart==cb.HighPart&&ca.LowPart==cb.LowPart;if(command_device)command_device->Release();
-        const bool resources_same_device=color_same&&depth_same&&motion_same&&output_same&&command_same;
-        const bool target = dispatch->output.description.width == 1920 && dispatch->output.description.height == 1080;
+        color_same=on_main_device(dispatch->color.resource);depth_same=on_main_device(dispatch->depth.resource);motion_same=on_main_device(dispatch->motionVectors.resource);output_same=on_main_device(dispatch->output.resource);
+        ID3D12Device*command_device=nullptr;const bool command_get=dispatch->commandList&&SUCCEEDED(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList)->GetDevice(IID_PPV_ARGS(&command_device)));const LUID ca=command_get?command_device->GetAdapterLuid():LUID{},cb=g_device?g_device->GetAdapterLuid():LUID{};command_same=command_get&&ca.HighPart==cb.HighPart&&ca.LowPart==cb.LowPart;if(command_device)command_device->Release();
+        resources_same_device=color_same&&depth_same&&motion_same&&output_same&&command_same;
+        target=dispatch->output.description.width==1920&&dispatch->output.description.height==1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
-        if (resources_same_device && target && dispatch->commandList && g_ready.load()) {
-            auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
-            bool ok=record_frame_bridge(commands,static_cast<ID3D12Resource*>(dispatch->color.resource),dispatch->renderSize.width,dispatch->renderSize.height,n);
-            if(ok&&g_max_block!=999){ok=record_block0(commands,n);if(ok&&g_max_block>=4)ok=record_blocks1_4(commands,n);if(ok&&g_max_block>=8)ok=record_blocks5_8(commands,n);if(ok&&g_max_block>=14)ok=record_blocks9_14(commands,n);if(ok&&g_max_block>=22)ok=record_blocks15_22(commands,n);if(ok&&g_max_block>=30)ok=record_blocks23_30(commands,n);if(ok&&g_max_block>=38)ok=record_blocks31_38(commands,n);if(ok&&g_max_block>=47)ok=record_blocks39_47(commands,n);if(ok&&g_max_block>=55)ok=record_blocks48_55(commands,n);if(ok&&g_max_block>=61)ok=record_blocks56_61(commands,n);if(ok&&g_max_block>=65)ok=record_blocks62_65(commands,n);if(ok&&g_max_block>=69)ok=record_blocks66_69(commands,n);if(ok&&g_max_block>=70)record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);}
-        }
+        if(resources_same_device&&target&&dispatch->commandList&&g_ready.load())bridge_ok=record_frame_bridge(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList),static_cast<ID3D12Resource*>(dispatch->color.resource),dispatch->renderSize.width,dispatch->renderSize.height,n);
+    }
+    const uint32_t result=g_ffx_dispatch(context,header);
+    if(is_upscale){const auto*dispatch=&snapshot;if(bridge_ok&&g_max_block!=999){auto*commands=static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList);bool ok=record_block0(commands,n);if(ok&&g_max_block>=4)ok=record_blocks1_4(commands,n);if(ok&&g_max_block>=8)ok=record_blocks5_8(commands,n);if(ok&&g_max_block>=14)ok=record_blocks9_14(commands,n);if(ok&&g_max_block>=22)ok=record_blocks15_22(commands,n);if(ok&&g_max_block>=30)ok=record_blocks23_30(commands,n);if(ok&&g_max_block>=38)ok=record_blocks31_38(commands,n);if(ok&&g_max_block>=47)ok=record_blocks39_47(commands,n);if(ok&&g_max_block>=55)ok=record_blocks48_55(commands,n);if(ok&&g_max_block>=61)ok=record_blocks56_61(commands,n);if(ok&&g_max_block>=65)ok=record_blocks62_65(commands,n);if(ok&&g_max_block>=69)ok=record_blocks66_69(commands,n);if(ok&&g_max_block>=70)record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);}
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u abi_output=%ux%u target1080=%u same_device=%u device_parts=%u%u%u%u%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
                 n, dispatch->commandList, dispatch->renderSize.width, dispatch->renderSize.height,

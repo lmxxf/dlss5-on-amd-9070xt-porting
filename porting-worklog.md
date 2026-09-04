@@ -2011,6 +2011,8 @@ ASCII诊断门后完成真实GPU二分：max69在blocks66–69首submit后退出
 
 继续二分得到：max30在block23–30首submit后退出，max22在block15–22后退出，max14在blocks9–14后退出，max0在frame bridge与block0首submit后退出。因此故障已缩到Color→tiles bridge或block0。新增特殊`max_block=999`仅执行frame bridge而跳过block0及全部下游，区分最后两项；诊断版SHA-256=`954714b8d93e23b28cb26f28da5937ebd2577e318c20b78c6ee601847a502ba7`。
 
+bridge-only `max_block=999`首submit后同样触发PS Studios通用Report Problem，故障严格锁定为Color→tiles pass。根因指向命令顺序下的Color状态：公开FFX descriptor给的是进入dispatch前compute-read状态，原FSR录制后不能假设Color末态仍可作SRV。hook改为双段：调用原FSR前在已知状态下先录frame bridge；调用trampoline；返回后再从resident tiles录block0–70并最终覆盖output。COM AddRef覆盖整个双段。双段版SHA-256=`b9be9bb035359b3234ba3922f933cdf179f31fd3f10644c205166a5f1cec566d`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
