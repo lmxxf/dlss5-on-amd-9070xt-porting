@@ -1763,6 +1763,8 @@ DirectML通用runner随后补齐ViT Contract合同：pack前执行原`clamp(-4,4
 
 跨层先以旧block31输出为共同入口验证block32：五段DirectML约5.097ms，对旧block32 correlation0.9995182449、MAE0.00152817、RMSE0.00404913、max0.03125、73.309326% exact，全finite，排除block31特调。随后由相同`probe-block30-pad-native`入口分别执行旧单进程ViT31–38和八个全DirectML block；每个DirectML block严格消费前一层DirectML final。旧resident为448.622ms；DirectML逐层约4.6–5.3ms，GPU时间总和约40ms。最终block38对旧输出correlation0.9909274573、MAE0.01079668、RMSE0.01424074、max0.0703125、20.961507% exact，全finite；SHA分别`52bdd06d...952ae`与`5323d89a...8b2e5`。误差跨八层累积但未坍缩；严格下一步是送入相同block39/decoder及最终画面裁判，并将多进程链合并为resident，不能仅凭0.991 correlation宣布画质通过。
 
+最终画面裁判使用明亮frame56400重新建立完整同源链：由`raw-56400-block30-body`生成旧resident block38，同时由同一34×60 block30投影补行后生成八层DirectML block38；两路分别进入相同block39、decoder40–69、block0/4/8/14/22 skips、backbuffer与block70。旧ViT和DirectML ViT的最终33,177,600-byte 4K R10 SHA-256均为`251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1`，逐byte exact。说明block38的0.9909中间误差经decoder residual与最终10-bit量化后完全不可见；对应明亮主菜单截图保持不变。ViT替换的数值与画质门槛至此通过。严格剩余边界：八层仍由40个诊断进程串联，约40ms只是GPU timestamp总和；必须合成单device resident宿主后才有实际实时意义。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

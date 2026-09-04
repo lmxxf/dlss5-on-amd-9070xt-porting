@@ -16,5 +16,13 @@
     "directml_sha256": "52bdd06dcb305985fff6eeb8a3d75ba5f6904b35202ac2f094d26d47d03952ae",
     "old_sha256": "5323d89a6b3cd4176bf6cd0acdd95948030f73cf5e5f1a0e7b986cf2c0f8b2e5"
   },
-  "strict_boundary": "Blocks31-38 all consume the previous DirectML block output, but each block is still a separate process. The roughly 40 ms figure is a sum/estimate from per-operator GPU timestamps, not a resident eight-layer timestamp."
+  "frame56400_downstream": {
+    "path": "block39 through block70 with identical skips and backbuffer",
+    "old_vit_r10_sha256": "251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1",
+    "directml_vit_r10_sha256": "251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1",
+    "byte_exact": true,
+    "output_bytes": 33177600,
+    "screenshot": "dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png"
+  },
+  "strict_boundary": "Numerical and final-image acceptance pass, including byte-exact 4K R10 after block70. Blocks31-38 still execute as separate processes; the roughly 40 ms figure is a sum/estimate, not a resident eight-layer timestamp."
 }
