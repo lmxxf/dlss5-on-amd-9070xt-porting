@@ -1963,7 +1963,7 @@ blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effec
 
 修正后DirectML block22 active区恢复到range -1.75..0.9375、std0.314115、零±448饱和值；同一block14起跑的FP32参考范围完全一致。两者2,088,960值corr0.9999998395、MAE6.087e-6、RMSE0.00017795、max0.015625，仅4245值不同、255值差>0.01且全finite。故block11–13的负饱和是可逆中间吸引子，并未判死1080p链。几何表同步修正：C256 pad72×120；下一C512 active34×60的宽高都非8倍数，需pad40×64而非只pad高度。
 
-统一游戏DLL现已接入上述两段。两枚常驻FP16→FP32 GPU bridge分别把block8的`480×272×64`与block14的`240×136×128`直接送入下一stage predown；blocks9–14为六层，blocks15–22为带`120×72`补零的八层。所有DirectML operator、PSO、权重与scratch仍只初始化一次，每帧仅在游戏原生FFX command list记录dispatch和barrier，跨stage没有CPU readback、exe或中间文件。同步修正256 predown二维flatten跨度为`4194240`。交叉编译DLL SHA-256=`39b704d64ce6d0172b17092a8a59d7f4a7b02a3aa7185456bc775bd0dfcdb7e9`；当前动态链推进到block22，但仍未回写游戏画面，且需以首次游戏启动日志确认连续submit。
+统一游戏DLL现已接入上述两段。两枚常驻FP16→FP32 GPU bridge分别把block8的`480×272×64`与block14的`240×136×128`直接送入下一stage predown；blocks9–14为六层，blocks15–22为带`120×72`补零的八层。所有DirectML operator、PSO、权重与scratch仍只初始化一次，每帧仅在游戏原生FFX command list记录dispatch和barrier，跨stage没有CPU readback、exe或中间文件。同步修正256 predown二维flatten跨度为`4194240`。交叉编译DLL SHA-256=`eaee5438dfb83aca3be8338d900ce7dce82004b8280ca6d8298d1dc9374799ee`；当前动态链推进到block22，但仍未回写游戏画面，且需以首次游戏启动日志确认连续submit。
 
 ## 工作纪律
 

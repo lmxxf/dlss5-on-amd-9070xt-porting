@@ -483,6 +483,7 @@ void initialize_blocks5_8() {
 template<class R, UINT L>
 void initialize_swin_stage(R &s, UINT T, UINT C, UINT H, UINT Q, UINT A,
                            UINT first_block, ID3D12Resource *source,
+                           UINT source_t,
                            const wchar_t *down_name, const wchar_t *enter_name,
                            const UINT (&shifts)[L], UINT64 fence_value,
                            std::atomic<bool> &ready, const char *label) {
@@ -499,7 +500,7 @@ void initialize_swin_stage(R &s, UINT T, UINT C, UINT H, UINT Q, UINT A,
     s.main[0]=gpu(main_bytes);s.main[1]=gpu(main_bytes);s.gate_out=gpu(hidden_bytes);s.up_out=gpu(hidden_bytes);s.hidden=gpu(hidden_bytes);
     s.project_raw=gpu(main_bytes);s.feature=gpu(main_bytes);s.qkv_raw=gpu(qkv_bytes);s.qkv_float=gpu(qkv_bytes*2);
     s.attention_float=gpu(attention_bytes*2);s.attention=gpu(attention_bytes);s.attention_raw=gpu(main_bytes);
-    const UINT source_c=C/2,source_t=T*4; s.input_fp32=gpu(UINT64(source_t)*source_c*4);s.mid=gpu(UINT64(source_t)*source_c*4);
+    const UINT source_c=C/2;s.input_fp32=gpu(UINT64(source_t)*source_c*4);s.mid=gpu(UINT64(source_t)*source_c*4);
     std::vector<ID3D12Resource*> uploads;
     s.down=upload_runtime_resource(read_runtime_file(down_name),uploads);s.enter=upload_runtime_resource(read_runtime_file(enter_name),uploads);
     const wchar_t *parts[9]={L"expand.f16",L"up.f16",L"project.f16",L"qkv.f16",L"attention_project.f16",L"ffn_skip.f32",L"attention_skip.f32",L"bias.f32",L"scale.f32"};
@@ -514,8 +515,8 @@ void initialize_swin_stage(R &s, UINT T, UINT C, UINT H, UINT Q, UINT A,
     dmlrt_check("stage init close",g_list->Close());ID3D12CommandList *lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("stage init signal",g_queue->Signal(g_fence,fence_value));dmlrt_check("stage init event",g_fence->SetEventOnCompletion(fence_value,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"stage init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto *r:uploads)r->Release();ready.store(true);log("%s_ready input=%p output=%p tokens=%u\n",label,source,s.main[0],T);
 }
 
-void initialize_blocks9_14(){const UINT shifts[6]={0,1,3,2,0,1};initialize_swin_stage<RuntimeS128,6>(g_s128,32640,128,160,192,64,9,g_s64_main[0],L"block8-downsample-matrix.bin",L"block9-enter-64x128.bin",shifts,5,g_s128_ready,"blocks9_14");}
-void initialize_blocks15_22(){const UINT shifts[8]={0,1,3,2,0,1,3,2};initialize_swin_stage<RuntimeS256,8>(g_s256,8640,256,288,384,128,15,g_s128.main[0],L"block14-downsample-matrix.bin",L"block15-enter-128x256.bin",shifts,6,g_s256_ready,"blocks15_22");}
+void initialize_blocks9_14(){const UINT shifts[6]={0,1,3,2,0,1};initialize_swin_stage<RuntimeS128,6>(g_s128,32640,128,160,192,64,9,g_s64_main[0],130560,L"block8-downsample-matrix.bin",L"block9-enter-64x128.bin",shifts,5,g_s128_ready,"blocks9_14");}
+void initialize_blocks15_22(){const UINT shifts[8]={0,1,3,2,0,1,3,2};initialize_swin_stage<RuntimeS256,8>(g_s256,8640,256,288,384,128,15,g_s128.main[0],32640,L"block14-downsample-matrix.bin",L"block15-enter-128x256.bin",shifts,6,g_s256_ready,"blocks15_22");}
 
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
     if(!commands||!g_block0_ready.load())return false;
