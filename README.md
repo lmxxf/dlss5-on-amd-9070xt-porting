@@ -204,6 +204,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - resident宿主新增真中段模式，直接上传block31旧Contract hidden、DirectML QKV weight与scales后执行QKV→normalize/pack→QKᵀ→softmax→AV；GPU合计4.103120ms。AV解包＋`F()`后对旧Attention correlation0.999971727、99.3727%逐值exact、max0.03125，全finite。
 - `OutputPasses`补齐resident后端：AV head-major FP16现场重排/`F()`为0.012440ms，Projection GEMM 0.069640ms，hidden residual/skip＋`F()`写FP32为0.026120ms。真hidden到block31 final总计4.721ms，对旧final correlation0.999887471、90.037%逐值exact、max0.03125。
 - `FrontPasses`补齐FP32 input pack、Expand后`F()`＋Contract多项式、Contract residual/skip＋`F()`；真block31从FP32 input到FP32 final现于单device/单command-list执行，23张资源694.79MiB、6.301720ms vs旧61.426ms（9.75倍）。final SHA与五进程DirectML oracle逐byte相同，证据见`directml-block31-resident-validation.json`。
+- 八层resident绑定架构已验证：同一DirectML device一次创建并initialize 8×6=48个独立compiled operator/binding table，避免录制后rebind导致前层看到末层descriptor；RX9070XT冷进程含全部JIT约514.835ms，仅初始化支付一次，无device removed。下一步绑定8套权重与main ping-pong。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。

@@ -1783,6 +1783,8 @@ resident宿主新增由环境变量注入真中段数据的诊断模式：`block
 
 resident final对旧block31 correlation0.9996383986、MAE0.00135754、RMSE0.00356281、max0.03125、75.343831% exact、全finite；SHA-256 `cb7095a1b04b017f51fb64b9d48d2e8a297d28bddf15a34195091d914184d0ba`，与先前五进程逐段DirectML累积oracle逐byte完全相同。由此证明单device合并未引入新误差，block31 resident算法/资源/同步/性能四项同时通过。严格下一步：在同一进程加载blocks32–38逐层权重并loop八次，替换生产`d3d12_vit_chain_amd.exe`后重跑frame56400最终R10。
 
+八层binding生命周期先行验证。单个compiled operator若共用binding table并在录制期间反复`Reset`，前七次dispatch可能在GPU执行时看到最后一次descriptor；因此宿主改为每层独立持有Expand/Contract/QKV/QKᵀ/AV/Projection六个`DmlGemmOperator`，总计48个compiled operator、initializer、binding table与shader-visible heap。在同一DirectML device/command list一次性录制48个initializer，RX9070XT全部成功，无device removed；冷进程从启动、48次JIT/initialize、资源建立到单层zero-chain结束共514.835ms。该成本只在addon初始化支付，不属于逐帧预算。单层零链仍为4.675600ms，证明扩容未破坏原路径。严格下一步是为8层绑定独立Expand/QKV weights/scales，并以两张main FP16 ping-pong录制8×13 pass。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
