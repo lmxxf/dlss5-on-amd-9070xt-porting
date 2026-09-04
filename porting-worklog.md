@@ -2043,6 +2043,12 @@ production SHA`b0e0ada5...82219f`冷启动复验：日志明确`max_block=70 raw
 
 核查本地block22-pool-identity和block30-pool-identity逐元素等于单位矩阵，C512/Vit predown省略apply_matrix并直接从输入pool，保持后续顺序；进一步扩展profile为18点，增加block70内部prefix/FFN/QKV/attention。候选部署SHA aa86d6a5ab501b8b20af4f25d9f209831c1dd4f7f7d100147be208827ea3ee60。30fps尚未达成，优先优化两个C32阶段及block70。
 
+### 2026-09-05 C32并行QKV
+
+block70 QKV原先每线程顺序处理16输出，改为16个线程各处理一个输出（同时算Q/K/V），保持FP32与相同输入/权重索引。首样本QKV 8.492→1.3384ms，block70 19.63→12.333ms，全网64.18684ms。将同核以960×544几何用于front1–4与decoder66–69，前端11.87988→8.62072ms、解码11.6468→8.3192ms，全网57.76232ms，block70 QKV1.28408ms。所有数字来自热身后的同一GPU时间戳profile结构，非CPU wall估算。
+
+随后准备C32 group FFN候选：每64线程组处理一个token，共享32输入与64hidden，前32线程负责project；当前以enable-group-ffn.txt选择，QKV以enable-block70-parallel-qkv.txt选择，均只启动时读取。构建脚本包含1920×1088 tiled与960×544 HWC两种几何。画质逐像素对照与30fps目标尚未关闭。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
