@@ -212,16 +212,19 @@ bool record_blocks66_69(ID3D12GraphicsCommandList *commands, unsigned long long 
 bool record_block70(ID3D12GraphicsCommandList *commands,ID3D12Resource *output,unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
+    const bool is_upscale = header && (header->type & 0x00ffffffu) == 0x00010001u;
+    FfxDispatchUpscale snapshot{};
+    if (is_upscale) snapshot = *reinterpret_cast<const FfxDispatchUpscale *>(header);
     const uint32_t result = g_ffx_dispatch(context, header);
     const auto n = ++g_ffx_frames;
-    if (header && (header->type & 0x00ffffffu) == 0x00010001u) {
-        const auto *dispatch = reinterpret_cast<const FfxDispatchUpscale *>(header);
+    if (is_upscale) {
+        const auto *dispatch = &snapshot;
         const bool resources_same_device = on_main_device(dispatch->color.resource) &&
             on_main_device(dispatch->depth.resource) && on_main_device(dispatch->motionVectors.resource) &&
             on_main_device(dispatch->output.resource);
         const bool target = dispatch->upscaleSize.width == 1920 && dispatch->upscaleSize.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
-        if (resources_same_device && dispatch->commandList && g_frame_bridge_ready.load()) {
+        if (resources_same_device && target && dispatch->commandList && g_frame_bridge_ready.load()) {
             auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
             if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
                                     dispatch->renderSize.width, dispatch->renderSize.height, n) &&

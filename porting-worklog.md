@@ -1989,6 +1989,10 @@ R10 swapchain回写随后进入present callback。block70的1920×1080 packed bu
 
 继续追查Steam前台后得到明确根因：`console_log.txt`记录`LaunchApp waiting for user response to SynchronizingCloud "pendingcloudsessions"`。manifest已证实游戏完整安装且UpdateResult=0；互动任务、Steam进程、session 1与真实命令行均正常。直接启动EXE也被Steam接管并返回同一pending cloud gate。此处必须由用户选择保留本地或云端存档，不能自动替选以免覆盖游戏进度。新增`launch_stellar_blade.ps1`固定正确working directory，以及`inspect_stellar_blade_launch.ps1`统一读取Steam启动日志和Windows应用错误；选择完成后可复用同一互动任务继续验收。
 
+云同步解除后的真游戏验证首次跑完整初始化：主swapchain为3840×2160 R10，frame56400同类FFX合同实际为render2561×1441、output3840×2160；blocks0–70依次全部ready，`resident_ready init_wall_ms=29766 removed=0x00000000`，随后FFX frame计数持续到2160，证明一次性创建全部DirectML operator/PSO/weights/scratch不会device removed。由于仍是4K，1080回写未触发。
+
+该运行同时暴露hook重排后的生命周期错误：先调用原`ffxDispatch`再读取调用方header时，返回后的结构已被改写，日志出现upscaleSize 0×0和same_device=0。修复为调用trampoline前整份复制`FfxDispatchUpscale`到栈上，返回后只使用snapshot；逐帧网络执行条件同时收紧为same-device且1920×1080，避免4K时误写左上角。`launch_stellar_blade.ps1`改由Steam附带`-ResX=1920 -ResY=1080 -Fullscreen`启动，下一次进程重启验证真实1080合同。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

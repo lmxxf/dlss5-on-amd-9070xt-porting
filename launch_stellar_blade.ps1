@@ -1,7 +1,9 @@
 $ErrorActionPreference = 'Stop'
-$Game = 'C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64'
-$Executable = Join-Path $Game 'SB-Win64-Shipping.exe'
-if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
-    throw "Missing Stellar Blade executable: $Executable"
+$Steam = 'C:\Program Files (x86)\Steam\steam.exe'
+if (-not (Test-Path -LiteralPath $Steam -PathType Leaf)) {
+    throw "Missing Steam executable: $Steam"
 }
-Start-Process -FilePath $Executable -WorkingDirectory $Game
+Start-Process -FilePath $Steam -ArgumentList @(
+    '-applaunch', '3489700',
+    '-ResX=1920', '-ResY=1080', '-Fullscreen'
+)
