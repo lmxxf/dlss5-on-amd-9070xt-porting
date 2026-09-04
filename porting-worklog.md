@@ -2001,6 +2001,8 @@ AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身�
 
 首次LUID放行运行在blocks9–14 ready附近退出。时间线显示根因不是该stage数值：在完整初始化完成前，game hook已开始用全局`IDMLCommandRecorder`录blocks0–8执行命令，同时worker在独立queue/线程继续用同一recorder录blocks9之后的operator initializer，形成未受支持的并发调用。修正为逐帧执行硬门必须等待全局`g_ready`：所有blocks0–70 operator/PSO/weights/scratch初始化、fence完成且worker不再触碰recorder后，才从下一帧整链一次放行。交叉编译SHA-256=`9ac7e97629e2b2ed708291e2ebda3e94a9f2115abe64a7dcfe654e1f31177398`。
 
+全ready后第一帧CPU成功录到`block70_submit=1`，但present未返回、进程随后以Steam exit16384终止，且Application/System均无普通错误或GPU TDR事件。为定位GPU命令边界，新增初始化时读取的`DLSS5_MAX_BLOCK`与`DLSS5_DISABLE_PRESENT`诊断门：完整graph仍一次初始化，逐帧只控制最远record stage与是否执行R10 copy。首轮launcher设max_block=69；若持续present则把错误锁到block70/present，随后再以70+disable-present区分。诊断版SHA-256=`f2804d8ec4ca936108ea2ab385078025b55a704892d832385639a1a688677858`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

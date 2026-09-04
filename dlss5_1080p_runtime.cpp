@@ -47,6 +47,7 @@ using CreateDml = HRESULT(WINAPI *)(ID3D12Device *, DML_CREATE_DEVICE_FLAGS,
 
 SRWLOCK g_log_lock = SRWLOCK_INIT;
 std::atomic<bool> g_started{false}, g_ready{false}, g_failed{false};
+UINT g_max_block=70;bool g_present_enabled=true;
 std::atomic<unsigned long long> g_presents{0};
 ID3D12Device *g_device = nullptr;
 IDMLDevice *g_dml = nullptr;
@@ -228,10 +229,8 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
         if (resources_same_device && target && dispatch->commandList && g_ready.load()) {
             auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
-            if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
-                                    dispatch->renderSize.width, dispatch->renderSize.height, n) &&
-                record_block0(commands, n))
-                if(record_blocks1_4(commands,n)&&record_blocks5_8(commands,n)&&record_blocks9_14(commands,n)&&record_blocks15_22(commands,n)&&record_blocks23_30(commands,n)&&record_blocks31_38(commands,n)&&record_blocks39_47(commands,n)&&record_blocks48_55(commands,n)&&record_blocks56_61(commands,n)&&record_blocks62_65(commands,n)&&record_blocks66_69(commands,n))record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);
+            bool ok=record_frame_bridge(commands,static_cast<ID3D12Resource*>(dispatch->color.resource),dispatch->renderSize.width,dispatch->renderSize.height,n)&&record_block0(commands,n);
+            if(ok&&g_max_block>=4)ok=record_blocks1_4(commands,n);if(ok&&g_max_block>=8)ok=record_blocks5_8(commands,n);if(ok&&g_max_block>=14)ok=record_blocks9_14(commands,n);if(ok&&g_max_block>=22)ok=record_blocks15_22(commands,n);if(ok&&g_max_block>=30)ok=record_blocks23_30(commands,n);if(ok&&g_max_block>=38)ok=record_blocks31_38(commands,n);if(ok&&g_max_block>=47)ok=record_blocks39_47(commands,n);if(ok&&g_max_block>=55)ok=record_blocks48_55(commands,n);if(ok&&g_max_block>=61)ok=record_blocks56_61(commands,n);if(ok&&g_max_block>=65)ok=record_blocks62_65(commands,n);if(ok&&g_max_block>=69)ok=record_blocks66_69(commands,n);if(ok&&g_max_block>=70)record_block70(commands,static_cast<ID3D12Resource*>(dispatch->output.resource),n);
         }
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u abi_output=%ux%u target1080=%u same_device=%u device_parts=%u%u%u%u%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
@@ -818,7 +817,7 @@ void run_warm_probe() {
 }
 
 DWORD WINAPI initialize_worker(void *) {
-    const ULONGLONG begin = GetTickCount64();
+    const ULONGLONG begin = GetTickCount64();wchar_t value[16]{};if(GetEnvironmentVariableW(L"DLSS5_MAX_BLOCK",value,16))g_max_block=(UINT)_wtoi(value);g_present_enabled=GetEnvironmentVariableW(L"DLSS5_DISABLE_PRESENT",value,16)==0;log("runtime_gate max_block=%u present=%u\n",g_max_block,g_present_enabled?1u:0u);
     HMODULE library = LoadLibraryW(L"DirectML.dll");
     auto create = library ? reinterpret_cast<CreateDml>(
                                 GetProcAddress(library, "DMLCreateDevice"))
@@ -936,7 +935,7 @@ void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swa
     const auto n = ++g_presents;
     auto*native=reinterpret_cast<IDXGISwapChain3*>(static_cast<uintptr_t>(swapchain->get_native()));
     if(native==g_main_swapchain&&(n==1||n%600==0)){const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*b=nullptr;if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&b)))){const auto d=b->GetDesc();log("present_backbuffer=%llu index=%u size=%llux%u format=%u\n",n,index,(unsigned long long)d.Width,d.Height,(UINT)d.Format);b->Release();}}
-    if(native==g_main_swapchain&&g_b70_submissions.load()&&!g_b70_packed_copied.load()){
+    if(g_present_enabled&&native==g_main_swapchain&&g_b70_submissions.load()&&!g_b70_packed_copied.load()){
         const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*backbuffer=nullptr;
         if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&backbuffer)))){const auto desc=backbuffer->GetDesc();if(desc.Width==1920&&desc.Height==1080&&desc.Format==DXGI_FORMAT_R10G10B10A2_UNORM){auto*cmd=queue->get_immediate_command_list();const reshade::api::resource src{reinterpret_cast<uint64_t>(g_b70.packed)},dst{reinterpret_cast<uint64_t>(backbuffer)};cmd->barrier(src,reshade::api::resource_usage::unordered_access,reshade::api::resource_usage::copy_source);cmd->barrier(dst,reshade::api::resource_usage::present,reshade::api::resource_usage::copy_dest);cmd->copy_buffer_to_texture(src,0,1920,1080,dst,0,nullptr);cmd->barrier(dst,reshade::api::resource_usage::copy_dest,reshade::api::resource_usage::present);g_b70_packed_copied.store(true);if(n==1||n%120==0)log("r10_backbuffer_submit=%llu index=%u resource=%p\n",n,index,backbuffer);}backbuffer->Release();}
     }

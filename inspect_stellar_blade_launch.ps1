@@ -8,3 +8,8 @@ Get-WinEvent -FilterHashtable @{ LogName = 'Application'; StartTime = (Get-Date)
     Where-Object { $_.LevelDisplayName -in @('Error', 'Critical') } |
     Select-Object -First 12 TimeCreated, ProviderName, Id, Message |
     Format-List
+Write-Output 'recent_system_gpu_events:'
+Get-WinEvent -FilterHashtable @{ LogName = 'System'; StartTime = (Get-Date).AddMinutes(-15) } -ErrorAction SilentlyContinue |
+    Where-Object { $_.LevelDisplayName -in @('Error', 'Critical', 'Warning') -or $_.ProviderName -match 'Display|amdw|dxg' } |
+    Select-Object -First 20 TimeCreated, ProviderName, Id, LevelDisplayName, Message |
+    Format-List
