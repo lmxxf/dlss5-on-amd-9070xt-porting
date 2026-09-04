@@ -80,12 +80,15 @@ int wmain(int argc, wchar_t **argv) {
   const bool precomputedExpand = argc == 12;
   const wchar_t *precomputedQkvPath = _wgetenv(L"VIT_PRECOMPUTED_QKV");
   const bool precomputedQkv = precomputedQkvPath != nullptr;
+  const wchar_t *precomputedAttentionPath = _wgetenv(L"VIT_PRECOMPUTED_ATTENTION");
+  const bool precomputedAttention = precomputedAttentionPath != nullptr;
   const char *dumpPassText = std::getenv("VIT_DUMP_PASS");
   const int dumpPass = dumpPassText ? std::atoi(dumpPassText) : -1;
   if (dumpPass < -1 || dumpPass > 4 || (precomputedExpand && dumpPass == 0))
     return 2;
   auto directmlExpand = precomputedExpand ? read_file(argv[11]) : std::vector<uint8_t>{};
   auto directmlQkv = precomputedQkv ? read_file(precomputedQkvPath) : std::vector<uint8_t>{};
+  auto directmlAttention = precomputedAttention ? read_file(precomputedAttentionPath) : std::vector<uint8_t>{};
   if (expand.size() != 1024ull * 4096 * 2 ||
       contract.size() != 4096ull * 1024 * 2 || contractSkip.size() != 2048 ||
       qkvMain.size() != 1024ull * 3 * 1024 ||
@@ -98,6 +101,8 @@ int wmain(int argc, wchar_t **argv) {
   if (precomputedExpand && directmlExpand.size() != UINT64(tokens) * 4096 * 4)
     return 2;
   if (precomputedQkv && directmlQkv.size() != UINT64(tokens) * 3 * 1024 * 4)
+    return 2;
+  if (precomputedAttention && directmlAttention.size() != UINT64(tokens) * 1024 * 4)
     return 2;
   std::vector<uint8_t> packed;
   size_t expandOffset = append_aligned(packed, expand);
@@ -265,6 +270,9 @@ groupshared float shared_values[64];
   ID3D12Resource *directmlQkvUpload = precomputedQkv ? make(
       directmlQkv.size(), &uploadHeap, D3D12_RESOURCE_STATE_GENERIC_READ,
       D3D12_RESOURCE_FLAG_NONE) : nullptr;
+  ID3D12Resource *directmlAttentionUpload = precomputedAttention ? make(
+      directmlAttention.size(), &uploadHeap, D3D12_RESOURCE_STATE_GENERIC_READ,
+      D3D12_RESOURCE_FLAG_NONE) : nullptr;
   void *mapped = nullptr;
   D3D12_RANGE empty{0, 0};
   for (auto item : {std::pair<ID3D12Resource *, std::pair<const void *, size_t>>{
@@ -285,13 +293,19 @@ groupshared float shared_values[64];
     std::memcpy(mapped, directmlQkv.data(), directmlQkv.size());
     directmlQkvUpload->Unmap(0, nullptr);
   }
+  if (precomputedAttention) {
+    directmlAttentionUpload->Map(0, &empty, &mapped);
+    std::memcpy(mapped, directmlAttention.data(), directmlAttention.size());
+    directmlAttentionUpload->Unmap(0, nullptr);
+  }
   const UINT64 sizes[5] = {UINT64(tokens) * 4096 * 4, UINT64(tokens) * 1024 * 4,
                            UINT64(tokens) * 3 * 1024 * 4, UINT64(tokens) * 1024 * 4,
                            UINT64(tokens) * 1024 * 4};
   ID3D12Resource *uavs[5]{};
   for (int i = 0; i < 5; ++i)
     uavs[i] = make(sizes[i], &defaultHeap,
-                   (precomputedExpand && i == 0) || (precomputedQkv && i == 2)
+                   (precomputedExpand && i == 0) || (precomputedQkv && i == 2) ||
+                           (precomputedAttention && i == 3)
                        ? D3D12_RESOURCE_STATE_COPY_DEST
                        : D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
                    D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -383,11 +397,25 @@ groupshared float shared_values[64];
     ready.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
     commands->ResourceBarrier(1, &ready);
   }
+  if (precomputedAttention) {
+    commands->CopyBufferRegion(uavs[3], 0, directmlAttentionUpload, 0, sizes[3]);
+    D3D12_RESOURCE_BARRIER ready{};
+    ready.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    ready.Transition.pResource = uavs[3];
+    ready.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    ready.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    ready.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    commands->ResourceBarrier(1, &ready);
+  }
   commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0);
   if (precomputedExpand)
     commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 1);
   for (int pass = precomputedExpand ? 1 : 0; pass <= outputPass; ++pass) {
     if (precomputedQkv && pass == 2) {
+      commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, pass + 1);
+      continue;
+    }
+    if (precomputedAttention && pass == 3) {
       commands->EndQuery(queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, pass + 1);
       continue;
     }
@@ -455,10 +483,11 @@ groupshared float shared_values[64];
   double count = double(tokens) * 1024;
   double correlation = (sxy - sx * sy / count) /
       std::sqrt((sxx - sx * sx / count) * (syy - sy * sy / count));
-  std::printf("corr=%.9f MAE=%.9f RMSE=%.9f submit_to_fence_ms=%.3f precomputed_expand=%u precomputed_qkv=%u\n",
+  std::printf("corr=%.9f MAE=%.9f RMSE=%.9f submit_to_fence_ms=%.3f precomputed_expand=%u precomputed_qkv=%u precomputed_attention=%u\n",
               correlation, ae / count, std::sqrt(se / count),
               1000.0 * (end.QuadPart - begin.QuadPart) / frequency.QuadPart,
-              precomputedExpand ? 1u : 0u, precomputedQkv ? 1u : 0u);
+              precomputedExpand ? 1u : 0u, precomputedQkv ? 1u : 0u,
+              precomputedAttention ? 1u : 0u);
   const char *passNames[5] = {"expand", "contract", "qkv", "attention", "projection"};
   for (int pass = 0; pass < 5; ++pass)
     std::printf("%s_ms=%.3f\n", passNames[pass],

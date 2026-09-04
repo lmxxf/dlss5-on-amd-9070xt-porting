@@ -1749,6 +1749,10 @@ block31 runner再加入`VIT_PRECOMPUTED_QKV`入口，在相同旧Expand/Contract
 
 DirectML runner进一步支持4D batch维，按Attention的32 heads测试`batch=32, M=2160, K=32, N=2160`。300次GPU timestamp平均0.943629ms、10.126 TFLOPS；该形状正对应每头`Q×Kᵀ`，第二次`softmax×V` FLOPs与形状对称，因此两次矩阵主体约1.89ms，对比旧完整Attention约23ms已有约12倍理论空间。严格边界：当前是synthetic batched GEMM，仅首batch初始化用于数值smoke，值分布不影响固定shape dispatch计时；尚未包含head-major pack、约285MiB FP16 score、softmax与第二次GEMM的真实串联，不能把1.89ms写成完成后的Attention时间。
 
+新增`d3d12_directml_attention.cpp`后，上述边界全部由真block31 QKV闭合。GPU先把token-major FP32 Q/K/V打成三份head-major FP16（K现场转置），DirectML执行32-batch `2160×32×2160` QKᵀ，64-thread group对每个head/query的2160个score做max/sum softmax并写FP16 probability，再由第二个DirectML GEMM执行`2160×2160×32` AV，最后解包到token-major FP32并执行原`F()`。两张score/prob buffer各298,598,400 bytes。
+
+真机分段：pack0.203520ms、QKᵀ1.353680ms、softmax1.229080ms、AV1.180600ms、unpack0.014000ms，合计3.980880ms；旧Attention23.951ms，约6.0倍。全量2,211,840输出对旧AMD Attention correlation0.999954405、MAE1.319e-4、RMSE0.00161724、max0.03125、98.984782%逐值exact，全finite。block31 runner再加入`VIT_PRECOMPUTED_ATTENTION`，让DirectML结果穿过旧Projection；最终对旧完整block31 correlation0.9998746915、MAE0.000533607、RMSE0.00209812、max0.03125、87.954373%逐值exact，全finite。softmax与Projection均未造成数值爆炸，完整Attention算子替换通过；下一步是把Expand/QKV/Attention三个已验收算子内嵌resident ViT并处理Contract/Projection矩阵核化。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
