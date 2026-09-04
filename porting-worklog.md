@@ -1725,6 +1725,8 @@ RX9070XT热态GPU timestamp结果：ViT Expand `2160×1024×4096`为0.150368ms�
 
 GEMM runner新增文件模式后直接读取`probe-block30-pad-native.f32`与`block31-vit-expand-effective.f16`，CPU仅做与未来GPU cast等价的FP32→FP16输入转换，DirectML输出完整2160×4096 FP16。100次热态平均0.174538ms／103.814 TFLOPS。`validate_directml_gemm.py`在token 0/1/100/1000/2159抽查20,480值：对相同FP16输入＋FP32累加reference correlation0.999999977、MAE1.459e-5、max1.384e-4；对旧FP32输入shader correlation0.999999969。套原`F()` E4M3量化后，对旧shader correlation0.999989102、99.7021%逐值exact，最大差一个0.03125量化级。矩阵核数值替换成立；剩余接口工作是把input cast与output cast＋`F()`留在GPU并接入resident ViT command list。
 
+驱动能力探针同时尝试直接省掉边界转换的混合类型GEMM：`FP32 A × FP16 B → FP32 output`在`CreateOperator`返回`E_INVALIDARG (0x80070057)`。因此不能靠单个GEMM描述符直连现有FP32 resident tensor；正式接入必须使用GPU cast（HLSL或DirectML graph cast）→FP16 GEMM→GPU unpack＋`F()`。该负结果排除了继续围绕mixed tensor type猜测的支线。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

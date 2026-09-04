@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <vector>
 
@@ -38,19 +39,19 @@ static void submit_wait(ID3D12CommandQueue*q,ID3D12GraphicsCommandList*l,ID3D12C
  ck("Close",l->Close());ID3D12CommandList*ls[]={l};q->ExecuteCommandLists(1,ls);ck("Signal",q->Signal(f,++fv));if(f->GetCompletedValue()<fv){ck("SetEvent",f->SetEventOnCompletion(fv,ev));WaitForSingleObject(ev,INFINITE);}ck("AllocatorReset",a->Reset());ck("ListReset",l->Reset(a,nullptr));
 }
 int main(int argc,char**argv){
- const UINT M=argc>1?std::strtoul(argv[1],nullptr,10):2160,K=argc>2?std::strtoul(argv[2],nullptr,10):1024,N=argc>3?std::strtoul(argv[3],nullptr,10):4096,iters=argc>4?std::strtoul(argv[4],nullptr,10):50;const bool fileMode=argc==8;
+ const UINT M=argc>1?std::strtoul(argv[1],nullptr,10):2160,K=argc>2?std::strtoul(argv[2],nullptr,10):1024,N=argc>3?std::strtoul(argv[3],nullptr,10):4096,iters=argc>4?std::strtoul(argv[4],nullptr,10):50;const bool fileMode=argc==8,mixedProbe=std::getenv("DML_MIXED_PROBE")!=nullptr;
  IDXGIFactory6*fac=nullptr;ck("factory",CreateDXGIFactory2(0,IID_PPV_ARGS(&fac)));IDXGIAdapter1*adp=nullptr;DXGI_ADAPTER_DESC1 ad{};
  for(UINT i=0;;++i){IDXGIAdapter1*x=nullptr;if(fac->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&x))==DXGI_ERROR_NOT_FOUND)break;x->GetDesc1(&ad);if(!(ad.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)&&wcsstr(ad.Description,L"AMD")){adp=x;break;}x->Release();}if(!adp)return 2;
  ID3D12Device*d=nullptr;ck("D3D12CreateDevice",D3D12CreateDevice(adp,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&d)));
  D3D12_COMMAND_QUEUE_DESC qd{};ID3D12CommandQueue*q=nullptr;ck("CreateQueue",d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));ID3D12CommandAllocator*ca=nullptr;ck("CreateAllocator",d->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&ca)));ID3D12GraphicsCommandList*cl=nullptr;ck("CreateList",d->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,ca,nullptr,IID_PPV_ARGS(&cl)));ID3D12Fence*fence=nullptr;ck("CreateFence",d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));HANDLE ev=CreateEventW(nullptr,FALSE,FALSE,nullptr);UINT64 fv=0;
  HMODULE mod=LoadLibraryW(L"DirectML.dll");if(!mod)return 3;auto create=(CreateFn)GetProcAddress(mod,"DMLCreateDevice");IDMLDevice*ml=nullptr;ck("DMLCreateDevice",create(d,DML_CREATE_DEVICE_FLAG_NONE,iid_dev,(void**)&ml));
  UINT asz[4]={1,1,M,K},bsz[4]={1,1,K,N},osz[4]={1,1,M,N};
- DML_BUFFER_TENSOR_DESC ab{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,asz,nullptr,fp16_bytes(UINT64(M)*K),0};
+ DML_BUFFER_TENSOR_DESC ab{mixedProbe?DML_TENSOR_DATA_TYPE_FLOAT32:DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,asz,nullptr,mixedProbe?UINT64(M)*K*4:fp16_bytes(UINT64(M)*K),0};
  DML_BUFFER_TENSOR_DESC bb{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,bsz,nullptr,fp16_bytes(UINT64(K)*N),0};
- DML_BUFFER_TENSOR_DESC ob{DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,osz,nullptr,fp16_bytes(UINT64(M)*N),0};
+ DML_BUFFER_TENSOR_DESC ob{mixedProbe?DML_TENSOR_DATA_TYPE_FLOAT32:DML_TENSOR_DATA_TYPE_FLOAT16,DML_TENSOR_FLAG_NONE,4,osz,nullptr,mixedProbe?UINT64(M)*N*4:fp16_bytes(UINT64(M)*N),0};
  DML_TENSOR_DESC at{DML_TENSOR_TYPE_BUFFER,&ab},bt{DML_TENSOR_TYPE_BUFFER,&bb},ot{DML_TENSOR_TYPE_BUFFER,&ob};
  DML_GEMM_OPERATOR_DESC gd{&at,&bt,nullptr,&ot,DML_MATRIX_TRANSFORM_NONE,DML_MATRIX_TRANSFORM_NONE,1.0f,0.0f,nullptr};DML_OPERATOR_DESC od{DML_OPERATOR_GEMM,&gd};
- IDMLOperator*op=nullptr;ck("CreateOperator",ml->CreateOperator(&od,iid_op,(void**)&op));IDMLCompiledOperator*co=nullptr;ck("CompileOperator",ml->CompileOperator(op,DML_EXECUTION_FLAG_ALLOW_HALF_PRECISION_COMPUTATION,iid_compiled,(void**)&co));
+ IDMLOperator*op=nullptr;ck("CreateOperator",ml->CreateOperator(&od,iid_op,(void**)&op));IDMLCompiledOperator*co=nullptr;ck("CompileOperator",ml->CompileOperator(op,DML_EXECUTION_FLAG_ALLOW_HALF_PRECISION_COMPUTATION,iid_compiled,(void**)&co));if(mixedProbe){std::puts("mixed FP32 x FP16 -> FP32 GEMM accepted and compiled");return 0;}
  IDMLCompiledOperator*ops[]={co};IDMLOperatorInitializer*init=nullptr;ck("CreateInitializer",ml->CreateOperatorInitializer(1,ops,iid_init,(void**)&init));
  // Invoke the struct-returning COM method explicitly: MinGW's generated member-call ABI is incompatible here.
  DML_BINDING_PROPERTIES ip=binding_properties(init),ep=binding_properties(co);const UINT descs=std::max<UINT>(1,std::max(ip.RequiredDescriptorCount,ep.RequiredDescriptorCount));const UINT64 tmpBytes=std::max(ip.TemporaryResourceSize,ep.TemporaryResourceSize),persistBytes=ep.PersistentResourceSize;
