@@ -1697,6 +1697,14 @@ predown shader随后加入版本化CSO cache。ViT block30 predown冷/热wall为
 
 block70末端新增GPU R10 pack pass：outconv RGBA不再readback，转SRV后以0.267ms直接量化/打包R10G10B10A2，只回读33,177,600 bytes。packed SHA-256与原CPU/NumPy结果`4868b7e4...be35`逐byte一致；单block70进程wall约1030.399ms。正式编排让block70直接写`dlss5-output-r10.new`并原子替换，删除132MB RGBA文件与CPU pack进程。Windows blocks1–70 wall从11,539.784ms降至10,589.697ms，最终R10 SHA不变；相对resident初版20.403秒已减少约48.1%。
 
+### 2026-09-04：全网单device显存可行性
+
+新增`d3d12_full_graph_arena.cpp`，按不做任何alias的保守上界同时分配encoder六条skip、最大Swin main/feature/QKV/attention、ViT四类scratch、block70 prefix/feature/QKV/body/RGBA及最终R10。RX9070XT上21个default-heap资源全部成功，合计6751.64MiB；DXGI本地budget15416.53MiB，分配后usage6763.54MiB、headroom8652.99MiB。证据见`dlss5-amd-full-graph-arena.json`。
+
+结论：全网单device graph没有显存物理阻塞。游戏运行时本身约占7.2GiB，再加权重会使naive arena偏紧；实施时必须按phase alias，让Swin/ViT scratch在进入block70后复用为其prefix/feature/QKV/body，目标arena约5.5GiB。该实验只证明分配可行，不冒充全网执行或实时完成。
+
+新增`d3d12_full_graph_alias_arena.cpp`后实际创建一块4714.50MiB buffer-only heap，并在相同offset区间重叠创建Swin、ViT与block70共16个placed-resource views；六条永久skip另占750MiB。RX9070XT驱动全部接受，总arena5464.50MiB，分配后DXGI usage5475.79MiB、headroom9940.74MiB。Swin phase1211.25MiB、ViT phase84.38MiB均远小于block70峰值，因此alias布局成立；相对naive arena再省1287.14MiB。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -1,0 +1,32 @@
+{
+  "status": "full-network persistent D3D12 arena allocation validated on RX 9070 XT",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "dedicated_video_memory_mib": 16188,
+  "dxgi_local_budget_mib": 15416.53,
+  "naive_committed_arena_mib": 6751.64,
+  "current_usage_after_allocation_mib": 6763.54,
+  "reported_headroom_after_allocation_mib": 8652.99,
+  "aliased_arena": {
+    "persistent_skip_mib": 750.0,
+    "shared_phase_heap_mib": 4714.5,
+    "total_arena_mib": 5464.5,
+    "swin_phase_mib": 1211.25,
+    "vit_phase_mib": 84.38,
+    "usage_after_allocation_mib": 5475.79,
+    "reported_headroom_mib": 9940.74,
+    "overlapping_placed_resource_views": 16,
+    "driver_allocation_result": "success"
+  },
+  "persistent_skip_mib": 750.0,
+  "largest_phase": "block70",
+  "largest_phase_resources_mib": {
+    "prefix": 1012.5,
+    "feature": 1012.5,
+    "qkv": 1518.75,
+    "body": 1012.5,
+    "rgba": 126.56,
+    "r10": 31.64
+  },
+  "conclusion": "A full single-device graph is physically feasible. The driver accepted the phase-aliased 5.46 GiB arena intended for coexistence with the running game and model weights.",
+  "strict_boundary": "This validates allocation capacity, not full-network execution or real-time rendering."
+}

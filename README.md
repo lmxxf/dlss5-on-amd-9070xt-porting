@@ -76,6 +76,10 @@ block39也已GPU直连：ViT main与block30 skip不再CPU拼1536维tensor，bloc
 
 block70现由GPU以0.267ms直接打包R10，只回读33MB，不再落132MB RGBA或启动CPU pack；packed SHA逐byte一致。Windows blocks1–70 wall进一步降至10.590秒，相对resident初版20.403秒减48.1%。
 
+全网单device资源arena已在RX9070XT实分配通过：naive不alias上界6751.64MiB，DXGI budget15416.53MiB，分配后仍余8652.99MiB。完整证据见`dlss5-amd-full-graph-arena.json`。因此全网graph无显存物理阻塞；为与约7.2GiB游戏占用及权重共存，正式实现将按phase alias把Swin/ViT scratch复用于block70，目标约5.5GiB。
+
+phase alias也已实测：750MiB永久skip＋4714.5MiB共享heap，总arena5464.5MiB；Swin/ViT/block70共16个重叠placed-resource view全部被RX9070XT驱动接受，分配后headroom9940.7MiB。全网单device的显存骨架至此闭合，下一步是在该arena上串入现有已验证PSO与alias barrier。
+
 - `reverse-engineering-notes.md`：相对 Hikari 初稿新增的宽度阶梯、skip 证据、71 个权重 block 与下一步逆向路线。
 - `porting-worklog.md`：DLSSNR → AMD 的实际工作日志；记录设备拓扑、每日进度、失败、工作假设和下一步。
 - `extract_model_evidence.py`：零依赖证据提取脚本，输出 kernel 家族、直接报错证据、权重 block/layer 编号和偏移。
