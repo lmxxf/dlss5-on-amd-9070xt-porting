@@ -1901,6 +1901,10 @@ blocks1–4随后并入同一front宿主。程序预载四份41,220-byte effecti
 
 完整block0三DirectML GEMM→GPU HWC→SM6 blocks1–4单轮40.910480ms，100轮稳态39.567292ms；分离稳态preblock+HWC 2.547040ms加blocks1–4 52.820ms合计55.367ms，消除device/resource/readback边界即再快约1.40倍。前端文件边界清零，但39.57ms本身仍超过60fps整帧预算；下一步必须优化1H32 FFN/QKV/Attention本体或采用混合矩阵核，不能把“resident”偷换成“实时完成”。
 
+front宿主增加14点GPU timestamp，把单轮拆为preblock+HWC 5.983ms及四层各三段：block1 FFN/QKV/Attention=4.038/3.269/3.942ms，block2=3.063/3.360/5.072ms，block3=3.048/2.916/4.874ms，block4=3.173/2.748/4.303ms；四层合计FFN13.322、QKV12.293、Attention18.190ms。瓶颈分散，Attention最大。
+
+最低风险的Attention DXC重编先做控制实验。新增`block1_attention_sm6_fp32.hlsl`逐式复刻旧shader，cs_6_2/O3输出block4 SHA与旧链逐byteexact；但unshifted为4.981ms，三层shifted分别26.372/22.973/22.975ms，全front升到104.819ms。故“只换DXC”路线否决，正式仍用旧DXBC；下一步转为真正的32640-window batched DirectML QKᵀ/softmax/AV，避免每个query重复标量矩阵乘。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

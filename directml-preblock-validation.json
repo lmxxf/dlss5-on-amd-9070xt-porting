@@ -53,6 +53,23 @@
     "block4_correlation": 1.0,
     "all_finite": true
   },
+  "front_profile_single_run": {
+    "preblock_hwc_ms": 5.982880,
+    "blocks": {
+      "1": {"ffn_ms": 4.038000, "qkv_ms": 3.269000, "attention_ms": 3.941640},
+      "2": {"ffn_ms": 3.063280, "qkv_ms": 3.360240, "attention_ms": 5.071560},
+      "3": {"ffn_ms": 3.047720, "qkv_ms": 2.915800, "attention_ms": 4.874280},
+      "4": {"ffn_ms": 3.172600, "qkv_ms": 2.748080, "attention_ms": 4.302760}
+    },
+    "blocks1_4_totals_ms": {"ffn": 13.3216, "qkv": 12.29312, "attention": 18.19024}
+  },
+  "dxc_attention_rejected": {
+    "shader": "block1_attention_sm6_fp32.hlsl",
+    "profile_total_gpu_ms": 104.818840,
+    "shifted_attention_ms": [26.372400, 22.972840, 22.974960],
+    "block4_byte_exact": true,
+    "decision": "keep the existing DXBC attention PSO; use batched matrix attention for the next optimization attempt"
+  },
   "full_network_r10": {
     "sha256": "8c8bd14225d203da072f8aa3fcd77942e87ed824a65ae09bb0e681fb59caf831",
     "reference_corrected_preblock_sha256": "44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46",
