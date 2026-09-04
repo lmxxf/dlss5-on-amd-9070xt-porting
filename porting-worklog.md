@@ -2003,6 +2003,8 @@ AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身�
 
 全ready后第一帧CPU成功录到`block70_submit=1`，但present未返回、进程随后以Steam exit16384终止，且Application/System均无普通错误或GPU TDR事件。为定位GPU命令边界，新增初始化时读取的`DLSS5_MAX_BLOCK`与`DLSS5_DISABLE_PRESENT`诊断门：完整graph仍一次初始化，逐帧只控制最远record stage与是否执行R10 copy。首轮launcher设max_block=69；若持续present则把错误锁到block70/present，随后再以70+disable-present区分。诊断版SHA-256=`f2804d8ec4ca936108ea2ab385078025b55a704892d832385639a1a688677858`。
 
+首轮max69未真实生效，runtime日志明确为`max_block=70`：launcher调用已存在Steam进程时只发送IPC，游戏不是其子进程，环境变量不会继承。诊断门改为初始化期只读一次`D:\DLSSNR-Lab\runtime-max-block.txt`与`runtime-disable-present.txt`；不在帧循环访问文件。launcher固定写69/0后再调用Steam。文件门版SHA-256=`022d5e960f63b265fba9055f13b3d16d90f383c687793be59ffbe297bc1458d2`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

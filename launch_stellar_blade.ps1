@@ -1,5 +1,7 @@
 $ErrorActionPreference = 'Stop'
-$env:DLSS5_MAX_BLOCK = '69'
+$Lab = 'D:\DLSSNR-Lab'
+Set-Content -LiteralPath (Join-Path $Lab 'runtime-max-block.txt') -Value '69' -NoNewline
+Set-Content -LiteralPath (Join-Path $Lab 'runtime-disable-present.txt') -Value '0' -NoNewline
 $Steam = 'C:\Program Files (x86)\Steam\steam.exe'
 if (-not (Test-Path -LiteralPath $Steam -PathType Leaf)) {
     throw "Missing Steam executable: $Steam"
