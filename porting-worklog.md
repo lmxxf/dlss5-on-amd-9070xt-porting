@@ -1965,6 +1965,8 @@ blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effec
 
 统一游戏DLL现已接入上述两段。两枚常驻FP16→FP32 GPU bridge分别把block8的`480×272×64`与block14的`240×136×128`直接送入下一stage predown；blocks9–14为六层，blocks15–22为带`120×72`补零的八层。所有DirectML operator、PSO、权重与scratch仍只初始化一次，每帧仅在游戏原生FFX command list记录dispatch和barrier，跨stage没有CPU readback、exe或中间文件。同步修正256 predown二维flatten跨度为`4194240`。交叉编译DLL SHA-256=`eaee5438dfb83aca3be8338d900ce7dce82004b8280ca6d8298d1dc9374799ee`；当前动态链推进到block22，但仍未回写游戏画面，且需以首次游戏启动日志确认连续submit。
 
+blocks23–30随后接入同一DLL的C512 resident段。这里不能照搬4K的72×120布局：1080p block22只有active68×120，predown执行256×256 matrix与2×2 pool后得到active34×60，再显式写入padded40×64×512，右侧4列与底部6行全部清零；Window Attention同步改为64×40循环位移。八层使用既有`block23–30-logical-effective-*`拆分权重，跨stage继续由GPU FP16→FP32 bridge衔接。顺手修正通用record状态机：只有输出确被下一级读成SRV后，下一帧才做NON_PIXEL→UAV，避免末级在第二帧提交无效transition。编译SHA-256=`dbafaaf4ecd2f77cdc6582bf75fa5663c4ee6a901817a714f6a13ae34e71e033`；当前游戏DLL动态链已覆盖blocks0–30。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
