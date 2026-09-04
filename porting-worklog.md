@@ -1971,6 +1971,8 @@ ViT blocks31–38随后接入DLL，并按1080p而非4K几何重建。block30输�
 
 decoder blocks39–47接入同一DLL。block39专用prefix按active34×60生成2040×1536 FP16 records：ViT 18×30×1024走2×nearest，encoder block30 skip从padded40×64资源按真实x/y读取active512通道；DirectML `1536→512`后再按padded40×64落回，右4列/底6行显式清零。随后blocks40–47以T2560/C512执行八层resident Swin，shift周期为XY/Y/X/none重复。74个远端依赖权重逐项存在；交叉编译SHA-256=`10a83e29b152ff6e011e66ca9f90ed4c7f2e3b987b25fd5a331685516ae94b2d`。游戏内动态链当前覆盖blocks0–47。
 
+decoder blocks48–55接入DLL。block48 prefix直接读取block47的padded40×64×512 FP16，按active34×60做2×nearest写入72×120×512 packed tensor，底部4行先置零；DirectML `512→256`后加固定bias与encoder block22的72×120×256 skip，finish再次强制底4行归零，避免bias复活padding。随后blocks48–55以T8640/C256运行八层resident Swin，所有74份远端权重存在。交叉编译SHA-256=`587987894d59fe0ca8021175af0b0adda20942a539e33b7add6c014f0a7fbab7`；当前动态链覆盖blocks0–55。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

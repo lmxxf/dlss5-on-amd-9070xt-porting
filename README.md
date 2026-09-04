@@ -306,6 +306,6 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `model-overview.svg`：正文结构图；只画二进制能支撑的骨架，不能当作 NVIDIA 完整执行图。
 - `amd-port-plan.md`：从权重格式、执行图、离线出图到 AMD GPU 实时化的分阶段实验路线；每一步都附验收标准和可成文选题。
 
-当前1080p游戏内runtime：`dlss5_1080p_runtime.cpp`已把当帧FFX Color连续录入常驻GPU链至block47（960×544 blocks0–4 → 480×272 blocks5–8 → 240×136 blocks9–14 → active120×68/padded120×72 blocks15–22 → active60×34/padded64×40 blocks23–30 → 18×30×1024 blocks31–38 → padded40×64×512 blocks39–47）。`deploy_dlss5_1080p_runtime.ps1`锁定当前DLL SHA并负责安装；此階段仍不宣稱完成，因為blocks48–70、最終R10回寫以及遊戲內動態幀率驗收尚未閉合。
+当前1080p游戏内runtime：`dlss5_1080p_runtime.cpp`已把当帧FFX Color连续录入常驻GPU链至block55（960×544 blocks0–4 → 480×272 blocks5–8 → 240×136 blocks9–14 → active120×68/padded120×72 blocks15–22 → active60×34/padded64×40 blocks23–30 → 18×30×1024 blocks31–38 → padded40×64×512 blocks39–47 → padded72×120×256 blocks48–55）。`deploy_dlss5_1080p_runtime.ps1`锁定当前DLL SHA并负责安装；此阶段仍不宣称完成，因为blocks56–70、最终R10回写以及游戏内动态帧率验收尚未闭合。
 
 296 期的样本哈希、PE 资源树和许可证基础分析见 `../296/`。
