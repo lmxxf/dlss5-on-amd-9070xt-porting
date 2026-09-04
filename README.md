@@ -198,6 +198,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `prepare_directml_vit_weights.py`批量生成blocks31–38的QKV FP16与normalization scales并记录源/产物SHA；八层逐层吃前一层DirectML输出后，block38对旧resident ViT correlation0.990927457、MAE0.010797、max0.0703125且全finite，预计GPU总和约40ms vs旧448.622ms。严格状态仍为多进程数值链，见`directml-vit8-validation.json`。
 - frame56400最终画面裁判已通过：旧ViT与八层全DirectML ViT分别进入相同block39–70、encoder skips及backbuffer，两份33,177,600-byte 4K R10 SHA均为`251b7ef7...e1ca1`，逐byte exact；对应截图仍是`dynamic-frame-56400-dlss5-synchronous.png`。ViT替换的数值/画质风险关闭，剩余边界只有多进程尚未resident化。
 - `directml_gemm_runtime.h` / `d3d12_directml_vit_resident.cpp`建立单device resident执行链：同一RX9070XT D3D12/DirectML device上同时compile＋initialize并连续dispatch Expand/Contract/QKV/QKᵀ/AV/Projection六个GEMM；15张资源652.59MiB，零输入真执行总计3.297320ms，无device removed。custom pack/softmax/residual尚待插入。
+- resident链现已在QKᵀ与AV之间插入真实HLSL FP16 softmax：DirectML heap→custom heap→DirectML heap在同一command list切换，298MiB score/prob经UAV barrier连续可见，七段冷态总计6.272560ms，无额外fence/device removed。剩余custom边界为输入pack、Contract residual、QKV normalize/pack及Projection residual。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。

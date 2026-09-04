@@ -1769,6 +1769,8 @@ resident实施正式启动。`directml_gemm_runtime.h`抽出MinGW struct-return 
 
 resident骨架随后升为真实六GEMM执行链。程序创建main/hidden/branch/QKV、Q/K/V、score/prob/attention/final及四套weight共15张default-heap UAV（652.59MiB），用typed clear确定全零初态，将六个compiled operator绑定到前后相接的resident resource，并在一个command list依次dispatch＋UAV barrier＋timestamp。RX9070XT结果：Expand0.211960、Contract0.289440、QKV0.156320、QKᵀ1.344320、AV1.227120、Projection0.068160ms，合计3.297320ms；全链完成、无device removed或隐式同步失败。该值是单device真实GPU timestamp，不再是多进程加和。严格边界：当前用零数据且Q/K/V、prob由clear提供，尚未插custom pack、Contract激活/residual、QKV normalize、softmax及Projection residual；3.297ms仅代表六个矩阵核主体的resident成本。
 
+首个custom边界随后进入resident链：与独立Attention相同的64-thread FP16 softmax直接读取DirectML QKᵀ的298,598,400-byte score，按head/query做max与sum reduction，写同尺寸probability；command list从DirectML descriptor heap切到custom heap，UAV barrier后再切回AV的DirectML heap，全程不插CPU fence。零链真机分段为Expand0.440760、Contract0.573960、QKV0.339200、QKᵀ1.998840、softmax1.525040、AV1.325520、Projection0.069240ms，合计6.272560ms，DML→HLSL→DML互操作完成、无device removed。该轮GPU频率/冷态使矩阵段比前次3.297ms基线慢，不能用差值推断softmax开销；softmax自身timestamp为1.525ms。严格边界：Q/K/V当前仍是clear资源，尚待QKV normalize/head-major pack接入后以真数据复验。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
