@@ -889,9 +889,21 @@ DWORD WINAPI initialize_worker(void *) {
             initialize_blocks66_69();
             initialize_block70();
             g_gpu_profile.Create(g_device);
+            if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-swin-shared.txt)")!=INVALID_FILE_ATTRIBUTES){
+                auto replace=[&](auto &windows,UINT width,UINT height,UINT heads,std::initializer_list<UINT> shifts){UINT i=0;for(UINT shift:shifts){wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\shader-cache\swin-shared-%u-%u-%u-%u.cso)",width,height,heads,shift);ID3DBlob *code=nullptr;dmlrt_check("swin shared read",D3DReadFileToBlob(path,&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=windows[i].root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("swin shared pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));windows[i].pso[1]->Release();windows[i].pso[1]=candidate;code->Release();i++;}};
+                replace(g_s64_window,480,272,2,{0,1,3,2});
+                replace(g_s128.window,240,136,4,{0,1,3,2,0,1});
+                replace(g_s256.window,120,72,8,{0,1,3,2,0,1,3,2});
+                replace(g_s512.window,64,40,16,{0,1,3,2,0,1,3,2});
+                replace(g_d512.window,64,40,16,{1,3,2,0,1,3,2,0});
+                replace(g_d256.window,120,72,8,{0,0,1,3,2,0,1,3});
+                replace(g_d128.window,240,136,4,{0,0,1,3,2,0});
+                replace(g_d64.window,480,272,2,{0,0,1,3});
+                log("multihead_swin_attention=shared\n");
+            }
             if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-shared-attention.txt)")!=INVALID_FILE_ATTRIBUTES){
                 for(UINT side=0;side<2;side++)for(UINT i=0;i<4;i++){
-                    const bool shifted=side?(i==1||i==2):(i!=0);if(shifted)continue;ID3DBlob *code=nullptr;dmlrt_check("c32 attention read",D3DReadFileToBlob(shifted?LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s1.cso)":LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s0.cso)",&code));
+                    const bool shifted=side?(i==1||i==2):(i!=0);if(shifted&&GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-shifted-shared.txt)")==INVALID_FILE_ATTRIBUTES)continue;ID3DBlob *code=nullptr;dmlrt_check("c32 attention read",D3DReadFileToBlob(shifted?LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s1.cso)":LR"(D:\DLSSNR-Lab\shader-cache\c32-shared-attention-s0.cso)",&code));
                     D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=side?g_d32.root:g_front_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("c32 attention pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));auto &old=side?g_d32.pso[i][2]:g_front_pso[i][2];old->Release();old=candidate;code->Release();
                 }
                 log("c32_attention=shared_masked\n");

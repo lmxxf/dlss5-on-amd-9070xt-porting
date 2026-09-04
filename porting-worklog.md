@@ -2059,6 +2059,12 @@ block70 attention每个8×8窗口一个64线程组，将K/V及K范数放入group
 
 非移位混合版复测：front8.47304、decoder C32 8.03012、block70 9.11212（attention2.6786），全网54.19568ms。进入洞窟后最近5秒cadence16.400/16.299fps，截图未见此前方格回归。相对上一轮56.94736ms再省2.75168ms。剩余目标仍是30fps@1080p。
 
+### 2026-09-05 多头共享attention
+
+新增swin_attention_shared.hlsl，匹配现有WindowPass绑定布局，每group处理一个head/window，共享K/V及norm，保持各stage原有循环位移。四种几何、四种shift由build_swin_shared_attention.ps1生成16份cache，启动开关enable-swin-shared.txt。替换全部encoder/decoder多头Swin后全网50.82348ms（此前54.19568），encoder C256 2.88912、decoder C256 1.87584ms；其余各stage亦小幅下降。
+
+另测试C32 shifted共享核，将inner-loop continue改为对masked score/probability选择零，避免执行分歧；由enable-shifted-shared.txt独立控制，尚待新样本决定保留或回退。当前候选SHA134e5e26776e2b90e687868718b63c96c4c0323945d329aa265779da6a41e978。目标30fps尚未达成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

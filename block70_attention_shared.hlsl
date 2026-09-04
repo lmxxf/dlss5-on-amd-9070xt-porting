@@ -32,15 +32,15 @@ void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
     GroupMemoryBarrierWithGroupSync();
     float qnorm=rsqrt(max(qq,1e-12)),scale=W(10240),mx=-3.4e38;
     [loop]for(uint k=0;k<64;k++){
-        if(SHIFTED&&(region(rx,WIDTH)!=region(wx+k%8,WIDTH)||region(ry,HEIGHT)!=region(wy+k/8,HEIGHT)))continue;
+        bool allowed=!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
         float dot=0;[unroll]for(uint d=0;d<16;d++)dot+=q[d]*keys[k*16+d];
-        mx=max(mx,dot*qnorm*key_norm[k]*scale+W(6144+query*64+k));
+        mx=max(mx,allowed?dot*qnorm*key_norm[k]*scale+W(6144+query*64+k):-3.4e38);
     }
     float den=0,a[16];[unroll]for(uint d=0;d<16;d++)a[d]=0;
     [loop]for(uint k=0;k<64;k++){
-        if(SHIFTED&&(region(rx,WIDTH)!=region(wx+k%8,WIDTH)||region(ry,HEIGHT)!=region(wy+k/8,HEIGHT)))continue;
+        bool allowed=!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
         float dot=0;[unroll]for(uint d=0;d<16;d++)dot+=q[d]*keys[k*16+d];
-        float e=exp(dot*qnorm*key_norm[k]*scale+W(6144+query*64+k)-mx);den+=e;
+        float e=allowed?exp(dot*qnorm*key_norm[k]*scale+W(6144+query*64+k)-mx):0;den+=e;
         [unroll]for(uint d=0;d<16;d++)a[d]+=e*values[k*16+d];
     }
     [loop]for(uint c=0;c<32;c++){float z=0;[unroll]for(uint d=0;d<16;d++)z+=(a[d]/den)*W(5632+c*16+d);outp[t*32+c]=F(z+feat_in[t*32+c]*W(10273+c));}
