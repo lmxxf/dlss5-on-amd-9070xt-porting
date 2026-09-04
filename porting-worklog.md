@@ -2065,6 +2065,8 @@ block70 attention每个8×8窗口一个64线程组，将K/V及K范数放入group
 
 另测试C32 shifted共享核，将inner-loop continue改为对masked score/probability选择零，避免执行分歧；由enable-shifted-shared.txt独立控制，尚待新样本决定保留或回退。当前候选SHA134e5e26776e2b90e687868718b63c96c4c0323945d329aa265779da6a41e978。目标30fps尚未达成。
 
+C32 shifted无continue候选依然退化：front10.202、decoder C32 9.1012、全网53.9142ms。删除启动标记enable-shifted-shared.txt并重启回到原移位PSO；保留多头Swin共享版及C32非移位共享版。该候选仅留源码和可选门供复现，不作为提速结果。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
