@@ -2069,6 +2069,12 @@ C32 shifted无continue候选依然退化：front10.202、decoder C32 9.1012、�
 
 多头共享保留配置进入洞窟复验，最近3个5秒窗口17.436/17.400/17.400fps，截图无此前满屏绿色小方格。shader仍完整执行所有窗口与heads，无跳帧/降分辨率。该视觉检查不替代后续逐元素精度验证。
 
+### 2026-09-05 C32 batch4 FFN候选
+
+新增c32_ffn_batched.hlsl，每64线程处理4token（16lane/token），共享输入与hidden。实测front9.64912、decoder C32 9.83956、全网54.27832ms，比保留版50.82348ms慢；已删除enable-c32-batched-ffn.txt启动标记并回退。候选源码及编译入口保留作反证。
+
+GPU profile扩展42点，对front/decoder各4层的FFN/QKV/attention单独计时；首层FFN窗口包含该段prefix转换，日志使用ffn_including_prefix_ms注明。当前诊断部署SHA885af038ff2f45a4a5f9830125917cc2c5d3e12d3fc20cdbdf97387174d56fc3。30fps尚未达成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

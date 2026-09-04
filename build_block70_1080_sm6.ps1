@@ -18,6 +18,8 @@ Get-FileHash -LiteralPath $C32Output -Algorithm SHA256
 if ($LASTEXITCODE) { throw 'C32 group FFN compilation failed' }
 & $Compiler -T cs_6_2 -E main -O3 -D WIDTH=1920 -D HEIGHT=1088 -D TILED_INPUT=1 (Join-Path $Lab 'c32_ffn_group.hlsl') -Fo (Join-Path $Lab 'shader-cache\block70-group-ffn.cso')
 if ($LASTEXITCODE) { throw 'Block70 group FFN compilation failed' }
+& $Compiler -T cs_6_2 -E main -O3 (Join-Path $Lab 'c32_ffn_batched.hlsl') -Fo (Join-Path $Lab 'shader-cache\c32-batched-ffn.cso')
+if ($LASTEXITCODE) { throw 'Batched C32 FFN compilation failed' }
 & $Compiler -T cs_6_2 -E main -O3 (Join-Path $Lab 'block70_attention_shared.hlsl') -Fo (Join-Path $Lab 'shader-cache\block70-shared-attention.cso')
 if ($LASTEXITCODE) { throw 'Block70 shared attention compilation failed' }
 foreach ($Shift in @(0,1)) {
