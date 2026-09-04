@@ -80,5 +80,28 @@
     "effective_tflops": 3.687,
     "note": "matrix-only cost is lower than the 2.56-3.49 ms old QKV pass, but FP32-to-FP16 pack and result unpack must be included before adoption"
   },
+  "hybrid_directml_prefix_old_bodies": {
+    "old_prefix_hot_ms": [8.617240, 8.580480],
+    "directml_prefix_steady_100_ms": 2.759728,
+    "prefix_speedup": 3.1082,
+    "saved_ms": 5.820752,
+    "prefix_vs_old": {
+      "correlation": 0.9999999899691524,
+      "mae": 0.0015125521,
+      "rmse": 0.0031588466,
+      "max_abs_error": 0.014509201,
+      "differences_over_0_01": 1781102,
+      "all_finite": true
+    },
+    "body": "existing exact FP32 SM6/DXBC blocks66-69",
+    "r10": {
+      "sha256": "50b8d44b303f81b1c014d77e7adec5dcce81bd77b8edd93f4053af828004b0c1",
+      "different_pixels": 150291,
+      "different_pixel_fraction": 0.01811957465277778,
+      "mean_channel_deltas": [0.01612932, 0.02132463, 0.01005100],
+      "max_channel_deltas": [2, 3, 2]
+    },
+    "decision": "retain as a realtime candidate; require consecutive live-frame visual validation before production switch"
+  },
   "decision": "Do not replace blocks66-69 with DirectML. The existing SM6 FP32 HLSL path is exact and has comparable latency. Reuse that PSO inside the persistent addon/worker; DirectML remains selected for the wider matrix-bound stages."
 }

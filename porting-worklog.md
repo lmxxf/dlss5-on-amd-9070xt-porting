@@ -1921,6 +1921,10 @@ block70 sparse prefix同时做固定两项展开。CSR的2048个输出degree分�
 
 block70再测FFN→QKV融合。`block70_ffn_qkv_sm6_fp32.hlsl`在每token寄存器中保留64 hidden与32个E4M3 feature，写feature的同时直接用local feature计算并写QKV，从执行图删除独立QKV dispatch和一次267MB feature读取。最终4K R10 SHA仍为`4868b7e4...be35`逐byteexact；但热态融合pass37.974/38.903ms，后续空QKV区仅0.089/0.107ms，高于分离FFN＋QKV观测约32.161–36.230ms。64+32局部数组把寄存器/occupancy推过阈值，spill代价超过带宽收益；融合路线关闭，环境变量候选保留作反证。
 
+decoder32旧exact链加入14点GPU profile。热态三轮prefix稳定8.617/8.580ms；blocks66–69的FFN约2.72–3.06ms/层、QKV2.38–3.52ms/层、Attention3.47–5.23ms/层，四层合计约11.3/10.1/16.1ms。与front一样瓶颈分散，但64→32 prefix单项占约15%。
+
+因此重访先前整段失败的DirectML32，只取其prefix：`DML_SWIN_PREFIX_ONLY`执行2×nearest FP16 pack、DirectML `2088960×64·64×32`、bias＋block4 skip，100轮稳态2.759728ms，相对旧prefix约3.11倍、节省5.821ms。prefix对FP32旧输出corr0.99999998997、MAE0.001513、max0.01451、全finite；随后仍用原FP32 blocks66–69，最终R10仅150,291/8,294,400像素变化（1.81196%），RGB平均0.0161/0.0213/0.0101、最大2/3/2个10-bit刻度。该混合路径不是byte-exact，但比整段DirectML误差小一个数量级且有真收益；保留为实时候选，动态连续帧通过前不切production。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
