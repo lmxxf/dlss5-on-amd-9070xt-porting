@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <atomic>
 #include <cstdio>
+#include <cstring>
 #include <d3d12.h>
 #define DML_TARGET_VERSION_USE_LATEST
 #ifndef _Maybenull_
@@ -38,6 +39,9 @@ ID3D12GraphicsCommandList *g_list = nullptr;
 ID3D12Fence *g_fence = nullptr;
 HANDLE g_event = nullptr;
 DmlGemmOperator *g_operator = nullptr;
+ID3D12Resource *g_probe_input = nullptr, *g_probe_weight = nullptr,
+                 *g_probe_output = nullptr;
+double g_probe_gpu_ms = 0.0;
 
 void log(const char *format, ...) {
     AcquireSRWLockExclusive(&g_log_lock);
@@ -49,6 +53,106 @@ void log(const char *format, ...) {
         fclose(file);
     }
     ReleaseSRWLockExclusive(&g_log_lock);
+}
+
+ID3D12Resource *make_buffer(UINT64 bytes, D3D12_HEAP_TYPE heap_type,
+                            D3D12_RESOURCE_STATES state,
+                            D3D12_RESOURCE_FLAGS flags) {
+    D3D12_HEAP_PROPERTIES heap{};
+    heap.Type = heap_type;
+    heap.CreationNodeMask = heap.VisibleNodeMask = 1;
+    D3D12_RESOURCE_DESC desc{};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Width = bytes;
+    desc.Height = 1;
+    desc.DepthOrArraySize = desc.MipLevels = 1;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.Flags = flags;
+    ID3D12Resource *resource = nullptr;
+    dmlrt_check("probe CreateCommittedResource",
+        g_device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &desc,
+                                          state, nullptr,
+                                          IID_PPV_ARGS(&resource)));
+    return resource;
+}
+
+void run_warm_probe() {
+    constexpr UINT iterations = 100;
+    const UINT64 input_bytes = g_operator->ABytes();
+    const UINT64 weight_bytes = g_operator->BBytes();
+    const UINT64 output_bytes = g_operator->OutputBytes();
+    g_probe_input = make_buffer(input_bytes, D3D12_HEAP_TYPE_DEFAULT,
+                                D3D12_RESOURCE_STATE_COPY_DEST,
+                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_probe_weight = make_buffer(weight_bytes, D3D12_HEAP_TYPE_DEFAULT,
+                                 D3D12_RESOURCE_STATE_COPY_DEST,
+                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_probe_output = make_buffer(output_bytes, D3D12_HEAP_TYPE_DEFAULT,
+                                 D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    ID3D12Resource *zero = make_buffer(input_bytes, D3D12_HEAP_TYPE_UPLOAD,
+                                       D3D12_RESOURCE_STATE_GENERIC_READ,
+                                       D3D12_RESOURCE_FLAG_NONE);
+    void *mapped = nullptr;
+    D3D12_RANGE none{0, 0};
+    dmlrt_check("probe Map", zero->Map(0, &none, &mapped));
+    std::memset(mapped, 0, static_cast<size_t>(input_bytes));
+    zero->Unmap(0, nullptr);
+
+    dmlrt_check("probe allocator reset", g_allocator->Reset());
+    dmlrt_check("probe list reset", g_list->Reset(g_allocator, nullptr));
+    g_list->CopyBufferRegion(g_probe_input, 0, zero, 0, input_bytes);
+    g_list->CopyBufferRegion(g_probe_weight, 0, zero, 0, weight_bytes);
+    D3D12_RESOURCE_BARRIER transitions[2]{};
+    for (UINT i = 0; i < 2; ++i) {
+        transitions[i].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        transitions[i].Transition.pResource = i ? g_probe_weight : g_probe_input;
+        transitions[i].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        transitions[i].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        transitions[i].Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    }
+    g_list->ResourceBarrier(2, transitions);
+    g_operator->Bind(g_probe_input, g_probe_weight, g_probe_output);
+
+    D3D12_QUERY_HEAP_DESC query_desc{};
+    query_desc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+    query_desc.Count = 2;
+    ID3D12QueryHeap *queries = nullptr;
+    dmlrt_check("probe query heap",
+                g_device->CreateQueryHeap(&query_desc, IID_PPV_ARGS(&queries)));
+    ID3D12Resource *readback = make_buffer(16, D3D12_HEAP_TYPE_READBACK,
+        D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_FLAG_NONE);
+    g_list->EndQuery(queries, D3D12_QUERY_TYPE_TIMESTAMP, 0);
+    for (UINT i = 0; i < iterations; ++i) {
+        g_operator->Record(g_recorder, g_list);
+        D3D12_RESOURCE_BARRIER barrier{};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        barrier.UAV.pResource = g_probe_output;
+        g_list->ResourceBarrier(1, &barrier);
+    }
+    g_list->EndQuery(queries, D3D12_QUERY_TYPE_TIMESTAMP, 1);
+    g_list->ResolveQueryData(queries, D3D12_QUERY_TYPE_TIMESTAMP, 0, 2,
+                             readback, 0);
+    dmlrt_check("probe close", g_list->Close());
+    ID3D12CommandList *lists[] = {g_list};
+    g_queue->ExecuteCommandLists(1, lists);
+    dmlrt_check("probe signal", g_queue->Signal(g_fence, 2));
+    dmlrt_check("probe completion", g_fence->SetEventOnCompletion(2, g_event));
+    if (WaitForSingleObject(g_event, 30000) != WAIT_OBJECT_0)
+        throw DmlFailure{"probe wait", HRESULT_FROM_WIN32(ERROR_TIMEOUT)};
+    UINT64 *timestamps = nullptr;
+    D3D12_RANGE range{0, 16};
+    dmlrt_check("probe timestamp map", readback->Map(0, &range,
+                                                     reinterpret_cast<void **>(&timestamps)));
+    UINT64 frequency = 0;
+    dmlrt_check("probe timestamp frequency", g_queue->GetTimestampFrequency(&frequency));
+    g_probe_gpu_ms = 1000.0 * double(timestamps[1] - timestamps[0]) /
+                     double(frequency) / iterations;
+    readback->Unmap(0, nullptr);
+    queries->Release();
+    readback->Release();
+    zero->Release();
 }
 
 DWORD WINAPI initialize_worker(void *) {
@@ -95,11 +199,21 @@ DWORD WINAPI initialize_worker(void *) {
     if (SUCCEEDED(hr)) hr = g_fence->SetEventOnCompletion(1, g_event);
     if (SUCCEEDED(hr) && WaitForSingleObject(g_event, 30000) != WAIT_OBJECT_0)
         hr = HRESULT_FROM_WIN32(ERROR_TIMEOUT);
+    if (SUCCEEDED(hr)) {
+        try {
+            run_warm_probe();
+        } catch (const DmlFailure &failure) {
+            hr = failure.result;
+            log("resident_execution_failed operation=%s hr=0x%08x\n",
+                failure.operation, static_cast<unsigned>(failure.result));
+        }
+    }
     const HRESULT removed = g_device->GetDeviceRemovedReason();
     if (SUCCEEDED(hr) && SUCCEEDED(removed)) {
         g_ready.store(true);
-        log("resident_ready device=%p dml=%p operator=522240x64x96 init_wall_ms=%llu removed=0x%08x\n",
-            g_device, g_dml, GetTickCount64() - begin, static_cast<unsigned>(removed));
+        log("resident_ready device=%p dml=%p operator=522240x64x96 gpu_ms=%.6f iterations=100 init_wall_ms=%llu removed=0x%08x\n",
+            g_device, g_dml, g_probe_gpu_ms, GetTickCount64() - begin,
+            static_cast<unsigned>(removed));
     } else {
         g_failed.store(true);
         log("resident_failed hr=0x%08x removed=0x%08x wall_ms=%llu\n",
