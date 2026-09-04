@@ -1,9 +1,10 @@
 {
-  "status": "eight-block-cumulative-numeric-pass-not-resident",
+  "status": "eight-block-single-device-resident-passed",
   "date": "2026-09-04",
   "blocks": [40,41,42,43,44,45,46,47],
   "old_resident_gpu_plus_copy_ms": 190.890,
   "directml_estimated_gpu_ms": 12.0,
+  "directml_resident_gpu_ms": 14.326320,
   "block47_vs_old": {
     "elements": 4177920,
     "correlation": 1.0,
@@ -16,5 +17,17 @@
     "all_bit_differences_are_signed_zero": true,
     "all_finite": true
   },
-  "strict_boundary": "All eight blocks consume the previous hybrid DirectML output, but still use separate diagnostic processes. The only bit differences are +0.0 versus -0.0. A single-device resident implementation is still required."
+  "resident_vs_old": {
+    "correlation": 0.9999994632758346,
+    "mae": 1.1219697840073529e-7,
+    "max_abs_error": 0.0078125,
+    "numeric_exact_fraction": 0.9999856387867647,
+    "all_finite": true
+  },
+  "downstream_r10": {
+    "resident_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "old_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "byte_exact": true
+  },
+  "strict_boundary": "Blocks40-47 now execute on one device and command list, and final 4K R10 is byte-exact after blocks48-70. The stage is not yet wired into the production wrapper, and other channel-width Swin stages remain unconverted."
 }

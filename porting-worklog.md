@@ -1807,6 +1807,10 @@ Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32�
 
 新增`d3d12_directml_swin512_resident.cpp`建立单device骨架：同一DirectML device创建8层×gate/up/project/QKV/attention-project五类共40个独立compiled operator/binding table，main两张FP16 ping-pong，gate/up/hidden/feat/QKV/attention scratch跨层复用，五套weight buffer逐层独立。全部资源clear后在一个command list连续执行40个真实GEMM＋UAV barrier，RX9070XT矩阵主体总计3.753200ms；48张default-heap资源仅68.84MiB，无device removed。冷进程含40次JIT/initializer、资源建立和执行为527.181ms，仅在未来addon初始化支付。严格边界：当前zero-chain尚未插FFN combine/residual、QKV FP32边界、原window Attention与attention residual；3.753ms不是完整八层时间，但证明40 operator共存、ping-pong绑定与矩阵成本成立。
 
+512 resident宿主随后补齐全部custom路径。`BoundaryPass`逐层执行fast(gate)×up、FFN project residual/E4M3与Attention project residual/E4M3；`WindowAttentionPass`把DirectML FP16 QKV解到FP32，执行与旧shader相同的cosine normalization、16-head×64-token bias/softmax及shift映射，再打包FP16给DirectML Attention Projection。`prepare_directml_swin512.py`增加逐层attention bias/scale导出；8层共40个GEMM、24个boundary pass、24个window attention pass在单device/单command-list执行，84张资源121.50MiB。
+
+真`raw-16800-block39` H72输入与8套参数一次预载后，blocks40–47 resident GPU为14.326320ms，旧resident 190.890ms，约13.32倍。resident block47对多进程hybrid/旧链correlation0.9999994633、MAE1.122e-7、max0.0078125、99.998564%数值exact，全finite；仅75个非signed-zero量化边界值不同。裁为68行active后进入相同blocks48–70，resident/旧两份33,177,600-byte 4K R10 SHA均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byte exact。输出代码现直接只写68×120×512 active，满足block48接口，无外部裁剪。512-channel段资源、同步、数值、性能与最终画面通过；严格下一步是接入production block39链，并将同一模板泛化256/128/64/32 channel段。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
