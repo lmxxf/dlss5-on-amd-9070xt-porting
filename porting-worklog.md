@@ -2019,6 +2019,8 @@ bridge-only `max_block=999`首submit后同样触发PS Studios通用Report Proble
 
 共享tiles bridge-only连续提交超过1440帧且游戏Responding，跨device输入问题关闭；加入block0后仍首submit崩，说明native DirectML命令不能经proxy command-list接口录制。查ReShade 6.8源码确认proxy支持私有`IID_UnwrappedObject {7F2C9A11-3B4E-4D6A-812F-5E9CD37A1B42}`并返回`_orig`。hook现同时持有proxy与native list：bridge在proxy list上录，原FSR正常录，block0–70在同一底层list的unwrapped native接口上录；没有第二command list或submit。unwrap版SHA-256=`b8bf9533c483391b7641a8d7a63e9a7635315442f5a5ec9a8da8382dbb0e3bb4`。
 
+unwrapped native list后，block0连续提交1440帧、max69连续提交480帧均稳定。max70且关闭raw-R10 present时，完整blocks0–70连续提交；独立20.032945秒窗口从submission1440增至1680，实测11.9802655fps。开启raw-R10 copy虽然同样稳定并产生连续`r10_backbuffer_submit`，但画面为暗绿规则网格；关闭后画面恢复清晰主菜单。原因是FFX output是pre-tonemap RGBA16F，直接UNORM R10 pack跳过游戏tonemap/UI/compositor。production因此保留block70对FFX output的原位回写，由游戏原生管线生成最终R10 swapchain；raw pack/copy默认关闭且不再执行pack shader。两张间隔3秒截图SHA分别`90c61e21...371a1a`与`a61e4c50...b1a44`，画面中伊芙眼睛一闭一睁，排除固定截图/旧帧重复。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
