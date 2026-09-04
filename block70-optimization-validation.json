@@ -1,0 +1,34 @@
+{
+  "status": "block70-directml-ffn-and-fixed-pair-prefix-rejected",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "directml_matrix_probes": {
+    "ffn_expand_8294400x32x64_ms": 2.830383,
+    "ffn_project_8294400x64x32_ms": 4.474761,
+    "qkv_8294400x32x48_ms": 6.823202
+  },
+  "directml_complete_ffn": {
+    "pack_ms": 2.928600,
+    "expand_ms": 2.995520,
+    "activation_pack_ms": 3.905400,
+    "project_ms": 5.057480,
+    "residual_finish_ms": 6.428640,
+    "total_ms": 21.315680,
+    "existing_sm6_ffn_observed_ms": [19.217, 22.863],
+    "decision": "rejected; boundary and activation costs consume the raw matrix advantage"
+  },
+  "fixed_pair_prefix": {
+    "source": "block70-prefix-sparse.bin",
+    "records": 2048,
+    "degree_1": 1664,
+    "degree_2": 384,
+    "stored_weights": 2431,
+    "implicit_zero_tail_weights": 1,
+    "pair_file_sha256": "8ea2a0da3baf082da403ced9e467694d9d00977806b945fe3964875c064dc7c4",
+    "hot_prefix_ms": [11.239, 11.254, 11.240, 11.242],
+    "final_r10_byte_exact": true,
+    "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+    "decision": "rejected for production; fixed two-entry records are exact but do not improve the CSR shader"
+  },
+  "production_decision": "retain the existing sparse prefix and SM6 FP32 FFN; focus on persistent full-network scheduling and other stages"
+}

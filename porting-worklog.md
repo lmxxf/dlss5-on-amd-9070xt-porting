@@ -1915,6 +1915,10 @@ batched Attention先过独立矩阵门：`DML_BATCH=32640`、`64×16 · 16×64`�
 
 作为下一候选门，DirectML纯QKV `2088960×32 · 32×48`连续100轮为1.740559ms、3.687TFLOPS，对比旧QKV每层2.56–3.49ms只剩约0.8–1.7ms空间；FP32→FP16 pack和FP16结果解包尚未计入，很可能吃掉收益。后续必须做完整边界实测，不再用裸矩阵数字直接宣称可加速。
 
+连续两次front Attention候选失败后切换热点，重审block70。4K FFN的DirectML裸矩阵`8294400×32→64`与`64→32`分别2.830383/4.474761ms，QKV `32→48`为6.823202ms；但完整FFN真prefix边界实测pack2.929＋expand2.996＋SiLU pack3.905＋project5.057＋residual finish6.429=21.315680ms，与现有SM6 FFN热态19.217–22.863ms无优势。矩阵核7.3ms的乐观空间被四次全图边界吃完，DirectML FFN路线关闭。
+
+block70 sparse prefix同时做固定两项展开。CSR的2048个输出degree分布恰为1664×1＋384×2；文件尾少一个weight，审计确认shader越界读按零处理，pair生成器显式补一项implicit zero。`BLOCK70_PREFIX_PAIRS=1`直接读取`{i0,i1,w0,w1}`并保持加法顺序，最终4K R10 SHA仍为`4868b7e4...be35`逐byteexact；四次热态prefix为11.239/11.254/11.240/11.242ms，与CSR版约11.24ms相同。动态offset/loop不是瓶颈，固定pair不进入production；候选及manifest生成器保留作可复现实证。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
