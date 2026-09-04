@@ -30,7 +30,7 @@
   },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
-    "binary_sha256": "b1bc9ce6c3dd75300f908dc983b07e7bdb832222db08c1ba8a0d425bf0942d12",
+    "binary_sha256": "99c3266f3a7f1b4be102d04b23a534ac7830e057cbf80aa6531dc85ba68b04fe",
     "in_process_contract": [
       "main IDXGISwapChain3 device",
       "persistent DirectML device, queue, allocator, list and fence",
@@ -55,7 +55,15 @@
       "output": "resident block4 FP32 resource",
       "state_contract": "block0 HWC UAV-to-SRV; all main/feature/QKV resources restored to UAV before the next frame"
     },
-    "status": "compiled and deployed; first in-game current-frame blocks0-4 load pending"
+    "persistent_blocks5_8": {
+      "geometry": "block4 960x544x32 -> matrix/pool/32-to-64 -> blocks5-8 480x272x64",
+      "single_gpu_ms": 11.417120,
+      "steady_100_gpu_ms": 4.796600,
+      "block8_vs_fp32_reference": {"correlation": 0.9997517399650941, "mae": 0.00082317897, "rmse": 0.0022526057, "max_abs_error": 0.03125, "differences_over_0_01": 50832, "all_finite": true},
+      "operators": 20,
+      "output": "resident 480x272x64 FP16 block8 resource"
+    },
+    "status": "compiled and deployed; first in-game current-frame blocks0-8 load pending"
   },
   "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
 }

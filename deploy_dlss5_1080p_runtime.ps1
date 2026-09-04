@@ -8,7 +8,7 @@ $Game = 'C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\
 $Source = Join-Path $Lab 'dlss5-1080p-runtime.addon64'
 $Target = Join-Path $Game 'dlss5-1080p-runtime.addon64'
 $Log = Join-Path $Lab 'logs\dlss5-1080p-runtime.txt'
-$ExpectedHash = 'B1BC9CE6C3DD75300F908DC983B07E7BDB832222DB08C1BA8A0D425BF0942D12'
+$ExpectedHash = '99C3266F3A7F1B4BE102D04B23A534AC7830E057CBF80AA6531DC85BA68B04FE'
 $OldAddons = @(
     (Join-Path $Game 'd3d12-dynamic-resource-probe.addon64'),
     (Join-Path $Game 'dlss5-resident-lifecycle.addon64')

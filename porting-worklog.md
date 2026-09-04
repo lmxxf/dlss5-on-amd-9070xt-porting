@@ -1951,6 +1951,10 @@ blocks1–4随后接入同一runtime。初始化期读取四份41,220-byte effec
 
 逐帧执行在block0 HWC后显式`UAV→NON_PIXEL`，四层依次FFN→feature SRV、QKV→QKV SRV、Attention→main SRV；复用scratch或ping-pong前精确转回UAV。下一帧block0写HWC前转回UAV，front开始前再把两张main/feature/QKV统一恢复UAV，排除跨帧状态污染。最终block4留在`g_front_main[1]` GPU resource，不readback、不落盘。新版DLL SHA为`b1bc9ce6c3dd75300f908dc983b07e7bdb832222db08c1ba8a0d425bf0942d12`；当前游戏内链为Color→tiles→block0→blocks1–4，尚未接block4 predown。
 
+1080p Swin64段先在独立同构宿主闭合。`d3d12_directml_swin64_1080_encoder.cpp`把几何特化为T130560、W480×H272、C64/H96/Q96/A32；predown直接读960×544×32 block4，执行32×32 matrix、2×2 pool与32→64 enter。真block4单轮predown＋blocks5–8为11.417120ms，100轮稳态4.796600ms；block8对四个FP32参考block的8,355,840值corr0.9997517400、MAE0.0008232、RMSE0.0022526、max0.03125、50,832值差>0.01且全finite。
+
+已验收的predown/Boundary/Window三类pass抽为`swin64_1080_runtime.h`并嵌入统一DLL。初始化期一次创建20枚DirectML operator、4×9权重、main ping-pong与共享hidden/QKV/attention scratch；block4 down/enter常量转固定SRV。每帧直接消费`g_front_main[1]`，mid在重复帧前NON_PIXEL→UAV，predown后回SRV，四层内部维持UAV资源与显式UAV barrier，最终block8留在`g_s64_main[0]`。新版DLL SHA为`99c3266f3a7f1b4be102d04b23a534ac7830e057cbf80aa6531dc85ba68b04fe`；游戏内链推进为Color→blocks0–8，无exe/file/readback。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

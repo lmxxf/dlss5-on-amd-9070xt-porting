@@ -14,6 +14,8 @@
 
 blocks1–4现也进入同一DLL：初始化期一次加载4份effective权重及960×544的12枚FFN/QKV/Attention PSO，常驻两张main ping-pong与共享feature/QKV；每帧block0 HWC显式UAV→SRV后连续record四层，下一帧前把全部scratch/main恢复UAV。当前帧链已到resident block4，binary SHA`b1bc9ce6...942d12`；离线同代码稳态12.767ms且block4 exact，游戏内首次加载待验。
 
+block4 predown＋blocks5–8也已进入DLL。1080专用runner先以真实block4验证：`960×544×32→480×272×64` matrix/pool/enter后执行四层DirectML Swin，稳态4.796600ms；block8对FP32参考corr0.99975174、MAE0.000823、max0.03125、全finite。相同20枚operator及custom passes抽入`swin64_1080_runtime.h`，DLL内直接消费resident block4并输出resident block8；binary SHA`99c3266f...8b04fe`。
+
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
 最新明亮场景验收为frame56400主菜单：同帧Color/backbuffer SHA分别`fd201dba...d492a`／`c1fc1eaf...74d43`，全AMD blocks0–70输出R10 SHA为`251b7ef7...e1ca1`，截图人物、文字、发丝可辨且无周期条纹。端到端29.624秒、Windows network 10.858秒；这是DirectML ViT接入前的新视觉/性能基线，仍明确不是实时。证据见`dlss5-amd-frame56400-validation.json`与`dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png`。
