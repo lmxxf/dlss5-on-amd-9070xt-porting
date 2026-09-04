@@ -1875,6 +1875,10 @@ RX9070XT单轮prefix＋四层28.141120ms，100轮每轮重建prefix稳态21.4679
 
 后台worker的DLL生命周期也按已验证runtime probe模式收紧：`DllMain`在注册ReShade事件前以`GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|PIN`固定自身，避免热重载/卸载addon后初始化线程落入已释放代码。最终待测binary SHA-256为`07e2794e8f226e821601ac218992802268375e5a120cc2ea29706edc73d91621`；部署脚本同步锁定该hash。
 
+全网缺口复审发现encoder64尚未resident，不能把剩余工作收窄成纯生命周期。`d3d12_directml_swin64_resident.cpp`新增`DML_SWIN_FIRST_BLOCK`，同一T522240/C64/H96/Q96/A32图在first=5时加载blocks5–8并使用shift `none/XY/Y/X`，first=62仍保留decoder原行为。真`raw-16800-block4-enter5`单轮26.133640ms、100轮稳态20.997551ms；旧链94.349ms，约4.49倍。block8对同版本旧链33,423,360值corr0.9999974395、MAE3.147e-6、RMSE0.0002276、max0.0390625、仅1168值差>0.01且全finite。
+
+新增`validate_directml_encoder64.ps1`做完整最终裁判：DirectML block8依次进入blocks9–30、resident ViT31–38、decoder39–69；decoder分别使用由该分支生成的block22/block14/block8三条skip，block4保持共同输入，最后进入block70。输出33,177,600-byte 4K R10与旧链SHA-256同为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。encoder64算法、性能、skip传播和最终画面四门闭合；严格剩余包括把block4 predown并入该graph，以及游戏内持久生命周期实测。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

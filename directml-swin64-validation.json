@@ -39,8 +39,32 @@
     "bytes": 33177600,
     "path": "resident blocks62-65 -> old blocks66-69 -> block70 R10"
   },
+  "encoder_blocks5_8": {
+    "input": "raw-16800-block4-enter5.f32",
+    "shift_modes": ["none", "xy", "y", "x"],
+    "single_gpu_ms": 26.133640,
+    "steady_100_gpu_ms": 20.997551,
+    "old_gpu_plus_copy_ms": 94.349,
+    "steady_speedup_vs_old": 4.4933,
+    "block8_vs_same_version_old": {
+      "values": 33423360,
+      "correlation": 0.9999974395437564,
+      "mae": 3.14695e-6,
+      "rmse": 0.00022755582,
+      "max_abs_error": 0.0390625,
+      "different_values": 33091,
+      "differences_over_0_01": 1168,
+      "all_finite": true
+    },
+    "full_network_r10": {
+      "byte_exact": true,
+      "directml_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+      "old_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35",
+      "validation_script": "validate_directml_encoder64.ps1"
+    }
+  },
   "implementation": {
-    "source": "d3d12_directml_swin64_resident.cpp",
+    "source": "d3d12_directml_swin64_resident.cpp (DML_SWIN_FIRST_BLOCK=5 or 62)",
     "prefix": "2x nearest pack 128 channels -> DirectML 128x64 -> FP32 bias plus block8 skip",
     "weights": "prepare_directml_swin.py blocks62-65 plus prepare_directml_upsample_prefix.py block62",
     "lifetime": "single D3D12 device, single DirectML device, resident operators and weights"
