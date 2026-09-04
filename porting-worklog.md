@@ -1969,6 +1969,8 @@ blocks23–30随后接入同一DLL的C512 resident段。这里不能照搬4K的7
 
 ViT blocks31–38随后接入DLL，并按1080p而非4K几何重建。block30输出是padded40×64×512 FP16，新增常驻crop PSO逐行抽取active34×60到FP32，避免右侧padding被错误flatten；block30 matrix/pool/512→1024 enter再生成active17×30并显式清零第18行，得到540 tokens。八层各自常驻Expand/QKV/scale权重，共用Contract、Projection及两条skip；QKV pack、32头QKᵀ、540-way softmax、AV与projection全在同一游戏command list执行。所有30个依赖权重在AMD Lab逐项存在，交叉编译SHA-256=`8e535b1aa4942fdcd3a1f1a5be0b585cc74a9268073406738c4d8e6f0496590e`。当前动态链推进到block38；首次游戏内初始化/连续submit仍待互动Steam会话验证。
 
+decoder blocks39–47接入同一DLL。block39专用prefix按active34×60生成2040×1536 FP16 records：ViT 18×30×1024走2×nearest，encoder block30 skip从padded40×64资源按真实x/y读取active512通道；DirectML `1536→512`后再按padded40×64落回，右4列/底6行显式清零。随后blocks40–47以T2560/C512执行八层resident Swin，shift周期为XY/Y/X/none重复。74个远端依赖权重逐项存在；交叉编译SHA-256=`10a83e29b152ff6e011e66ca9f90ed4c7f2e3b987b25fd5a331685516ae94b2d`。游戏内动态链当前覆盖blocks0–47。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

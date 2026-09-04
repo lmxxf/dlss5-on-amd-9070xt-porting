@@ -25,6 +25,7 @@ struct DmlFailure { const char *operation; HRESULT result; };
 #include "fp16_bridge_runtime.h"
 #include "fp16_crop_runtime.h"
 #include "vit_1080_runtime.h"
+#include "block39_1080_runtime.h"
 
 extern "C" __declspec(dllexport) const char *NAME = "DLSS5 AMD 1080p Runtime";
 extern "C" __declspec(dllexport) const char *DESCRIPTION =
@@ -118,6 +119,13 @@ struct RuntimeVit {
     Fp16Crop512RuntimePass crop;VitPredown1080Pass predown;VitFront1080Pass front[2];VitQkvPack1080Pass pack[8];VitSoftmax1080Pass softmax;VitOutput1080Pass output[2];
 } g_vit;
 std::atomic<bool> g_vit_ready{false};std::atomic<unsigned long long> g_vit_submissions{0};
+struct RuntimeD512 {
+    DmlGemmOperator prefix,gate[8],up[8],project[8],qkv[8],attention_project[8];
+    ID3D12Resource *main[2]{},*combined{},*prefix_raw{},*prefix_weight{},*prefix_bias{},*gate_out{},*up_out{},*hidden{},*project_raw{},*feature{},*qkv_raw{},*qkv_float{},*attention_float{},*attention{},*attention_raw{};
+    ID3D12Resource *gw[8]{},*uw[8]{},*pw[8]{},*qw[8]{},*aw[8]{},*fs[8]{},*as[8]{},*bias[8]{},*scale[8]{};
+    Block39_1080Pass prefix_pass;Swin512Boundary1080Pass boundary[8];Swin512Window1080Pass window[8];
+} g_d512;
+std::atomic<bool> g_d512_ready{false};std::atomic<unsigned long long> g_d512_submissions{0};
 
 struct FfxHeader { uint64_t type; FfxHeader *pNext; };
 struct FfxDimensions2D { uint32_t width, height; };
@@ -169,6 +177,7 @@ bool record_blocks9_14(ID3D12GraphicsCommandList *commands, unsigned long long f
 bool record_blocks15_22(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_blocks23_30(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_blocks31_38(ID3D12GraphicsCommandList *commands, unsigned long long frame);
+bool record_blocks39_47(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
@@ -184,7 +193,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
             if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
                                     dispatch->renderSize.width, dispatch->renderSize.height, n) &&
                 record_block0(commands, n))
-                if(record_blocks1_4(commands,n)&&record_blocks5_8(commands,n)&&record_blocks9_14(commands,n)&&record_blocks15_22(commands,n)&&record_blocks23_30(commands,n))record_blocks31_38(commands,n);
+                if(record_blocks1_4(commands,n)&&record_blocks5_8(commands,n)&&record_blocks9_14(commands,n)&&record_blocks15_22(commands,n)&&record_blocks23_30(commands,n)&&record_blocks31_38(commands,n))record_blocks39_47(commands,n);
         }
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
@@ -555,6 +564,17 @@ void initialize_blocks31_38(){
     dmlrt_check("vit init close",g_list->Close());ID3D12CommandList*lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("vit init signal",g_queue->Signal(g_fence,8));dmlrt_check("vit init event",g_fence->SetEventOnCompletion(8,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"vit init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto*r:uploads)r->Release();g_vit_ready.store(true);log("blocks31_38_ready input=%p output=%p tokens=%u\n",g_s512.main[0],g_vit.source[0],T);
 }
 
+void initialize_blocks39_47(){
+    constexpr UINT L=8,T=2560,C=512,H=256,Q=768,A=256;dmlrt_check("d512 allocator reset",g_allocator->Reset());dmlrt_check("d512 list reset",g_list->Reset(g_allocator,nullptr));g_d512.prefix.Create(g_dml,g_device,1,2040,1536,512);g_d512.prefix.RecordInitialization(g_recorder,g_list);
+    for(UINT i=0;i<L;i++){g_d512.gate[i].Create(g_dml,g_device,1,T,C,H);g_d512.up[i].Create(g_dml,g_device,1,T,C,H);g_d512.project[i].Create(g_dml,g_device,1,T,H,C);g_d512.qkv[i].Create(g_dml,g_device,1,T,C,Q);g_d512.attention_project[i].Create(g_dml,g_device,1,T,A,C);for(auto*op:{&g_d512.gate[i],&g_d512.up[i],&g_d512.project[i],&g_d512.qkv[i],&g_d512.attention_project[i]})op->RecordInitialization(g_recorder,g_list);}
+    auto gpu=[&](UINT64 n){return make_buffer(n,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);};const UINT64 main_bytes=UINT64(T)*C*2,hidden_bytes=UINT64(T)*H*2,qkv_bytes=UINT64(T)*Q*2;
+    g_d512.main[0]=gpu(main_bytes);g_d512.main[1]=gpu(main_bytes);g_d512.combined=gpu(2040ull*1536*2);g_d512.prefix_raw=gpu(2040ull*512*2);g_d512.gate_out=gpu(hidden_bytes);g_d512.up_out=gpu(hidden_bytes);g_d512.hidden=gpu(hidden_bytes);g_d512.project_raw=gpu(main_bytes);g_d512.feature=gpu(main_bytes);g_d512.qkv_raw=gpu(qkv_bytes);g_d512.qkv_float=gpu(qkv_bytes*2);g_d512.attention_float=gpu(hidden_bytes*2);g_d512.attention=gpu(hidden_bytes);g_d512.attention_raw=gpu(main_bytes);
+    std::vector<ID3D12Resource*>uploads;g_d512.prefix_weight=upload_runtime_resource(read_runtime_file(L"block39-directml-matrix.f16"),uploads);g_d512.prefix_bias=upload_runtime_resource(read_runtime_file(L"block39-directml-bias.f32"),uploads);const wchar_t*parts[9]={L"gate.f16",L"up.f16",L"project.f16",L"qkv.f16",L"attention_project.f16",L"ffn_skip.f32",L"attention_skip.f32",L"attention_bias.f32",L"attention_scale.f32"};
+    for(UINT i=0;i<L;i++){ID3D12Resource**dest[9]={&g_d512.gw[i],&g_d512.uw[i],&g_d512.pw[i],&g_d512.qw[i],&g_d512.aw[i],&g_d512.fs[i],&g_d512.as[i],&g_d512.bias[i],&g_d512.scale[i]};for(UINT j=0;j<9;j++){wchar_t name[128];swprintf(name,128,L"block%u-logical-effective-%ls",40+i,parts[j]);*dest[j]=upload_runtime_resource(read_runtime_file(name),uploads);}}
+    g_d512.prefix_pass.Create(g_device,g_vit.source[0],g_s512.main[0],g_d512.prefix_raw,g_d512.prefix_bias,g_d512.combined,g_d512.main[0]);g_d512.prefix.Bind(g_d512.combined,g_d512.prefix_weight,g_d512.prefix_raw);const UINT shifts[L]={1,3,2,0,1,3,2,0};for(UINT i=0;i<L;i++){UINT p=i&1,n=p^1;g_d512.gate[i].Bind(g_d512.main[p],g_d512.gw[i],g_d512.gate_out);g_d512.up[i].Bind(g_d512.main[p],g_d512.uw[i],g_d512.up_out);g_d512.project[i].Bind(g_d512.hidden,g_d512.pw[i],g_d512.project_raw);g_d512.qkv[i].Bind(g_d512.feature,g_d512.qw[i],g_d512.qkv_raw);g_d512.attention_project[i].Bind(g_d512.attention,g_d512.aw[i],g_d512.attention_raw);g_d512.boundary[i].Create(g_device,g_d512.gate_out,g_d512.up_out,g_d512.project_raw,g_d512.main[p],g_d512.fs[i],g_d512.attention_raw,g_d512.feature,g_d512.as[i],g_d512.hidden,g_d512.feature,g_d512.main[n]);g_d512.window[i].Create(g_device,g_d512.qkv_raw,g_d512.qkv_float,g_d512.bias[i],g_d512.scale[i],g_d512.attention_float,g_d512.attention,shifts[i]);}
+    dmlrt_check("d512 init close",g_list->Close());ID3D12CommandList*lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("d512 init signal",g_queue->Signal(g_fence,9));dmlrt_check("d512 init event",g_fence->SetEventOnCompletion(9,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"d512 init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto*r:uploads)r->Release();g_d512_ready.store(true);log("blocks39_47_ready vit=%p skip=%p output=%p\n",g_vit.source[0],g_s512.main[0],g_d512.main[0]);
+}
+
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
     if(!commands||!g_block0_ready.load())return false;
     if(g_front_submissions.load()){
@@ -609,10 +629,17 @@ bool record_blocks31_38(ID3D12GraphicsCommandList *commands,unsigned long long f
     if(!commands||!g_vit_ready.load())return false;
     auto uav=[&](ID3D12Resource*r){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=r;commands->ResourceBarrier(1,&b);};
     auto transition=[&](ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES z){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=r;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=a;b.Transition.StateAfter=z;commands->ResourceBarrier(1,&b);};
-    if(g_vit_submissions.load()){transition(g_vit.cropped,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_vit.predown_mid,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
+    if(g_vit_submissions.load()){if(g_d512_submissions.load())transition(g_vit.source[0],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_vit.cropped,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_vit.predown_mid,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
     transition(g_s512.main[0],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);g_vit.crop.Record(commands);transition(g_vit.cropped,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);g_vit.predown.Record(commands,0);transition(g_vit.predown_mid,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);g_vit.predown.Record(commands,1);uav(g_vit.source[0]);
     for(UINT i=0;i<8;i++){UINT p=i&1;g_vit.front[p].Record(commands,0);uav(g_vit.main);g_vit.expand[i].Record(g_recorder,commands);uav(g_vit.branch);g_vit.front[p].Record(commands,1);uav(g_vit.contract_input);g_vit.contract[i].Record(g_recorder,commands);uav(g_vit.contract_raw);g_vit.front[p].Record(commands,2);uav(g_vit.hidden);g_vit.qkv[i].Record(g_recorder,commands);uav(g_vit.qkv_out);g_vit.pack[i].Record(commands);uav(g_vit.q);uav(g_vit.k);uav(g_vit.v);g_vit.qk[i].Record(g_recorder,commands);uav(g_vit.score);g_vit.softmax.Record(commands);uav(g_vit.prob);g_vit.av[i].Record(g_recorder,commands);uav(g_vit.attention);g_vit.output[p].Record(commands,0);uav(g_vit.attention_input);g_vit.projection[i].Record(g_recorder,commands);uav(g_vit.projection_raw);g_vit.output[p].Record(commands,1);uav(g_vit.source[p^1]);}
     const auto n=++g_vit_submissions;if(n==1||n%120==0)log("blocks31_38_submit=%llu ffx_frame=%llu output=%p tokens=540\n",n,frame,g_vit.source[0]);return true;
+}
+
+bool record_blocks39_47(ID3D12GraphicsCommandList*commands,unsigned long long frame){
+    if(!commands||!g_d512_ready.load())return false;auto uav=[&](ID3D12Resource*r){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=r;commands->ResourceBarrier(1,&b);};auto transition=[&](ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES z){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=r;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=a;b.Transition.StateAfter=z;commands->ResourceBarrier(1,&b);};
+    transition(g_vit.source[0],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);g_d512.prefix_pass.Record(commands,0);uav(g_d512.combined);g_d512.prefix.Record(g_recorder,commands);uav(g_d512.prefix_raw);g_d512.prefix_pass.Record(commands,1);uav(g_d512.main[0]);
+    for(UINT i=0;i<8;i++){g_d512.gate[i].Record(g_recorder,commands);uav(g_d512.gate_out);g_d512.up[i].Record(g_recorder,commands);uav(g_d512.up_out);g_d512.boundary[i].Record(commands,0);uav(g_d512.hidden);g_d512.project[i].Record(g_recorder,commands);uav(g_d512.project_raw);g_d512.boundary[i].Record(commands,1);uav(g_d512.feature);g_d512.qkv[i].Record(g_recorder,commands);uav(g_d512.qkv_raw);g_d512.window[i].Record(commands,0);uav(g_d512.qkv_float);g_d512.window[i].Record(commands,1);uav(g_d512.attention_float);g_d512.window[i].Record(commands,2);uav(g_d512.attention);g_d512.attention_project[i].Record(g_recorder,commands);uav(g_d512.attention_raw);g_d512.boundary[i].Record(commands,2);uav(g_d512.main[(i&1)^1]);}
+    const auto n=++g_d512_submissions;if(n==1||n%120==0)log("blocks39_47_submit=%llu ffx_frame=%llu output=%p\n",n,frame,g_d512.main[0]);return true;
 }
 
 void run_warm_probe() {
@@ -748,6 +775,7 @@ DWORD WINAPI initialize_worker(void *) {
             initialize_blocks15_22();
             initialize_blocks23_30();
             initialize_blocks31_38();
+            initialize_blocks39_47();
         } catch (const DmlFailure &failure) {
             hr = failure.result;
             log("resident_execution_failed operation=%s hr=0x%08x\n",
