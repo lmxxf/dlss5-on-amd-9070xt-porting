@@ -1907,6 +1907,10 @@ front宿主增加14点GPU timestamp，把单轮拆为preblock+HWC 5.983ms及四�
 
 batched Attention先过独立矩阵门：`DML_BATCH=32640`、`64×16 · 16×64`在RX9070XT连续100轮平均2.158108ms、1.982TFLOPS。QKᵀ与softmax×V两次矩阵主体约4.316ms，显著低于当前四层旧Attention合计18.190ms，路线可继续。四层geometry完全相同，因此正式实现不需要8套compiled operator：一枚TransB QK与一枚AV固定绑定共享Q/K/V、score/prob scratch，每层在旧QKV之后覆盖pack、record同一对operator，再做mask/softmax和projection；先验收累积FP16误差，未过画质门前不替换exact DXBC路径。
 
+完整batched Attention推翻了上段乐观比较：4.316ms是**单层**两次GEMM，四层矩阵主体本身约17.265ms，已经接近旧四层Attention总计18.190ms，之前把单层与四层总量放在同一分母是口径错误。真候选用共享Q/K/V、267MB scores/prob与一对QK/AV operators，逐层执行normalize/window pack→QK→mask/bias/softmax→AV→FP32 projection；四层Attention分别15.048/17.591/17.316/17.284ms，front总93.717600ms。block4虽finite但corr0.9999778993、MAE0.005523、RMSE0.06061、max8.0、205万值差>0.01，性能和精度双败。
+
+该路线正式关闭。为不让失败候选即使关闭环境变量仍常驻约700MB scratch和额外JIT，它被隔离为`d3d12_directml_front_batched_attention.cpp`；已验收的`d3d12_directml_preblock_resident.cpp`恢复干净版本。下一优化应针对旧Attention内部重复norm/load或降低全分辨率stage工作量，而不是继续把小K window GEMM强塞DirectML。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -52,7 +52,18 @@
     "qk_plus_av_matrix_estimate_ms": 4.316216,
     "old_four_layer_attention_total_ms": 18.19024,
     "effective_tflops": 1.982,
-    "decision": "proceed with shared resident Q/K/V, score/prob buffers and one reusable QK/AV compiled-operator pair; validate pack, mask, softmax and projection before replacing the exact DXBC path"
+    "full_front_candidate": {
+      "source": "d3d12_directml_front_batched_attention.cpp",
+      "total_gpu_ms": 93.717600,
+      "attention_ms_per_block": [15.048120, 17.590960, 17.315560, 17.284440],
+      "block4_correlation": 0.99997789927105,
+      "block4_mae": 0.0055228835,
+      "block4_rmse": 0.060613398,
+      "block4_max_abs_error": 8.0,
+      "differences_over_0_01": 2059026,
+      "all_finite": true
+    },
+    "decision": "rejected: 4.316 ms is the matrix cost for one layer, not all four; four layers already cost about 17.265 ms before pack/softmax/projection, and the complete candidate is both slower and less accurate than DXBC"
   },
   "decision": "Do not replace blocks66-69 with DirectML. The existing SM6 FP32 HLSL path is exact and has comparable latency. Reuse that PSO inside the persistent addon/worker; DirectML remains selected for the wider matrix-bound stages."
 }
