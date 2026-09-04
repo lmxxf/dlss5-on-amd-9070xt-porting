@@ -1785,6 +1785,10 @@ resident final对旧block31 correlation0.9996383986、MAE0.00135754、RMSE0.0035
 
 八层binding生命周期先行验证。单个compiled operator若共用binding table并在录制期间反复`Reset`，前七次dispatch可能在GPU执行时看到最后一次descriptor；因此宿主改为每层独立持有Expand/Contract/QKV/QKᵀ/AV/Projection六个`DmlGemmOperator`，总计48个compiled operator、initializer、binding table与shader-visible heap。在同一DirectML device/command list一次性录制48个initializer，RX9070XT全部成功，无device removed；冷进程从启动、48次JIT/initialize、资源建立到单层zero-chain结束共514.835ms。该成本只在addon初始化支付，不属于逐帧预算。单层零链仍为4.675600ms，证明扩容未破坏原路径。严格下一步是为8层绑定独立Expand/QKV weights/scales，并以两张main FP16 ping-pong录制8×13 pass。
 
+八层参数与执行随后正式合并。宿主一次预载8套Expand FP16、QKV FP16与64-value scales共112.00MiB；Contract/Projection weight与skip共享。每层持有独立六个binding table，custom `QkvPackPass`亦逐层绑定自己的scale；两套`FrontPasses`/`OutputPasses`分别绑定FP32 source/final双缓冲，所有FP16 scratch跨层复用。一个command list依序录制8×13 pass，block偶数写finalF32、奇数写sourceF32。
+
+probe输入首跑八层resident为34.973520ms，输出2,211,840 floats与40进程DirectML累积oracle correlation1.0、MAE/max均0、逐byte100%，SHA同为`52bdd06d...952ae`；对旧ViT保持correlation0.990927457。frame56400同源输入再跑为31.706960ms，旧resident ViT为475.515ms，约15.0倍。新resident block38进入完全相同block39–70后，最终33,177,600-byte 4K R10 SHA仍为`251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1`，与旧ViT逐byte exact。八层resident的资源、同步、数值、GPU性能与最终画面全部通过。严格剩余：正式pipeline当前给ViT的是68×120 block30 body，resident exe暂收36×60 padded FP32；需把已有block30 pool/enter＋尾两行清零并入前端后再替换生产runner。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

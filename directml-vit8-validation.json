@@ -1,10 +1,12 @@
 {
-  "status": "eight-layer-cumulative-correctness-milestone-not-resident",
+  "status": "eight-layer-single-device-resident-passed",
   "date": "2026-09-04",
   "adapter": "AMD Radeon RX 9070 XT",
   "tokens": 2160,
   "old_resident_vit31_38_gpu_plus_copy_ms": 448.622,
   "directml_estimated_gpu_ms": 40.0,
+  "directml_resident_gpu_ms_probe": 34.973520,
+  "directml_resident_gpu_ms_frame56400": 31.706960,
   "block38_vs_old": {
     "elements": 2211840,
     "correlation": 0.9909274572586578,
@@ -16,6 +18,13 @@
     "directml_sha256": "52bdd06dcb305985fff6eeb8a3d75ba5f6904b35202ac2f094d26d47d03952ae",
     "old_sha256": "5323d89a6b3cd4176bf6cd0acdd95948030f73cf5e5f1a0e7b986cf2c0f8b2e5"
   },
+  "resident_vs_multiprocess_directml": {
+    "correlation": 1.0,
+    "mae": 0.0,
+    "max_abs_error": 0.0,
+    "exact_fraction": 1.0,
+    "sha256": "52bdd06dcb305985fff6eeb8a3d75ba5f6904b35202ac2f094d26d47d03952ae"
+  },
   "frame56400_downstream": {
     "path": "block39 through block70 with identical skips and backbuffer",
     "old_vit_r10_sha256": "251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1",
@@ -24,5 +33,5 @@
     "output_bytes": 33177600,
     "screenshot": "dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png"
   },
-  "strict_boundary": "Numerical and final-image acceptance pass, including byte-exact 4K R10 after block70. Blocks31-38 still execute as separate processes; the roughly 40 ms figure is a sum/estimate, not a resident eight-layer timestamp."
+  "strict_boundary": "Blocks31-38 now execute on one D3D12/DirectML device and one command list. Numerical and final-image acceptance pass, including byte-exact 4K R10 after block70. Production replacement still needs block30 predown/padding integrated into this resident executable."
 }
