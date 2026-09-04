@@ -2057,6 +2057,8 @@ group FFN实测：block70 FFN5.76844→4.59296ms有效，但front/decoder C32从
 
 block70 attention每个8×8窗口一个64线程组，将K/V及K范数放入groupshared，复用窗口内数据。单独替换block70时attention4.69968→2.704ms、全网54.66756ms。随后扩展到C32前端/解码，移位版保留原region mask，但全量替换反而使front10.39688、decoder9.11648ms，全网56.9654ms；block70仍2.62244ms。故恢复所有SHIFTED层原PSO，仅非移位层使用共享核。该路径由enable-shared-attention.txt启动开关控制；当前部署SHA4aa14d87c5790b0bd2e2ff83ceb6b61e769555c7363539526510652689138017，等待混合版复测。30fps尚未达成。
 
+非移位混合版复测：front8.47304、decoder C32 8.03012、block70 9.11212（attention2.6786），全网54.19568ms。进入洞窟后最近5秒cadence16.400/16.299fps，截图未见此前方格回归。相对上一轮56.94736ms再省2.75168ms。剩余目标仍是30fps@1080p。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
