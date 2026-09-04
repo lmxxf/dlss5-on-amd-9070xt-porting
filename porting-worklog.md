@@ -1801,6 +1801,8 @@ Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32�
 
 `DUMP_ATTENTION=1`再导出旧window Attention的有效68×120×256，补H72后进入新`d3d12_directml_swin512_projection.cpp`；该runner执行FP32→FP16 pack、DirectML `8640×256×512`、FFN feat residual×FP32 skip及E4M3。真机0.026280/0.043160/0.094400ms，合计0.163840ms；旧Attention Projection2.219ms，约13.54倍。对旧block40 final有效4,177,920 floats correlation1.0、MAE/RMSE/max均0、逐float100% exact，SHA`e7f86183...3679`。至此block40三个矩阵段独立闭合：FFN0.420520、QKV0.125465、Attention Projection0.163840ms，合计0.709825ms；加保留的旧window Attention约0.8ms，完整block性能目标约1.5ms。严格边界：Projection验证使用旧Attention输入；下一步需把DirectML QKV送入旧window Attention再接DirectML Projection，做完整block累积裁判。
 
+完整block累积裁判随后完成。旧runner新增`PRECOMPUTED_FFN`/`PRECOMPUTED_QKV`，SRV可直接绑定两份预计算upload资源并跳过旧FFN/QKV，保留完全相同window Attention；其输出再进入DirectML Projection并以DirectML FFN作为residual。最终有效68×120×512对旧block40 correlation1.0、MAE/RMSE/max均0、逐float100% exact，SHA同为`e7f86183...3679`。QKV的微小连续值误差经cosine normalization/window softmax与最终E4M3后完全消失，完整block数值风险关闭。性能按VRAM-local独立分段约0.420520＋0.125465＋0.795＋0.098280≈1.439ms；hybrid runner的Attention为1.431ms是从UPLOAD heap读取25MiB QKV造成，不作为resident预测。下一步将三套DirectML GEMM与原Attention PSO合并为单device blocks40–47链，并批量拆七层其余权重。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
