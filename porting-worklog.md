@@ -1977,6 +1977,8 @@ decoder blocks56–61接入DLL。block56 prefix从block55的padded72×120×256 F
 
 decoder blocks62–65接入DLL。block62从240×136×128的block61做2×nearest，DirectML `128→64`并加encoder block8的480×272×64 skip，随后以T130560/C64执行四层resident Swin；38份远端依赖权重全部存在。交叉编译SHA-256=`acd9a67c899eb3d2e72279bde5b6a26a9b2388116fcbc5a0b1f46f013848a4fd`；当前动态链覆盖blocks0–65。
 
+decoder blocks66–69接入DLL。block66先从block65的480×272×64 FP16做2×nearest，DirectML `64→32`，在GPU finish中加FP32 bias与encoder block4的960×544×32 FP32 skip，写FP16后由常驻bridge解为FP32。blocks66–69随后复用已验收的960×544 C32 FFN/QKV/Attention PSO与四份41,220-byte body参数，最终block69留在FP32 GPU resource。prefix与四份body的远端尺寸逐项正确；交叉编译SHA-256=`81ff76842e2a604c395a50b37659905d2fac82751e8c29a3db96467d4f75d191`。当前动态网络链覆盖blocks0–69，只剩block70与最终R10回写。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
