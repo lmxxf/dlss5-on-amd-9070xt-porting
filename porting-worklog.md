@@ -1775,6 +1775,8 @@ QKV pack设计随后去掉K显式转置。`DmlGemmOperator::Create`新增可选`
 
 `QkvPackPass`随后实现并插入resident链：一个32-thread group对应一个token/head，从DirectML FP16 QKV读取32维Q/K/V，以groupshared tree reduction求Q/K norm，乘64-value scale，并由偶数lane将相邻两维打包写入三张`[head,token,dim]` FP16 buffer。QKV GEMM后切custom heap执行该pass，三路UAV barrier后Q/K直接进入`TransB` QKᵀ。零链真机：Expand0.208400、Contract0.293040、QKV0.161920、normalize/pack0.061480、QKᵀ1.348000、softmax1.548200、AV1.329480、Projection0.069080ms，总计5.019600ms。DML→normalize/pack HLSL→DML→softmax HLSL→DML的完整中段拓扑已无CPU同步。严格边界：输入/权重/scale当前仍为clear零值，只证明执行与资源合同；下一步上传block31真参数，并补Expand/Contract/Projection边界后做resident真输出对拍。
 
+resident宿主新增由环境变量注入真中段数据的诊断模式：`block31-hidden-old.f32`在初始化阶段FP32→FP16并上传hidden，`block31-qkv-directml.f16`与64-value scales上传对应resident资源；计时链跳过Expand/Contract，从QKV GEMM一路执行到AV，最后仅为验证读回head-major FP16 attention。真机QKV0.158320、normalize/pack0.053160、QKᵀ1.383960、softmax1.272600、AV1.235080ms，中段合计4.103120ms；旧QKV＋Attention约39.6ms，约9.65倍。将读回结果重排token-major并执行原`F()`后，对旧AMD Attention全量2,211,840值correlation0.9999717267、MAE8.404e-5、RMSE0.00127166、max0.03125、99.372694%逐值exact，全finite。新resident QKV pack/TransB/softmax/AV真数据合同通过；严格剩余边界是把attention unpack＋`F()`留在GPU并接Projection，以及前端Expand/Contract真链。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
