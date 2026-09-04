@@ -8,6 +8,8 @@
 
 2026-09-04后续已把两张不同游戏帧各自执行到block70，并在运行中的swapchain完成两份R10结果热切换；全幅block70为520.721–539.875ms，自动入口为`run_dynamic_frame_pipeline.sh`。但严格动态审计发现两帧的neural output SHA逐byte相同：固定帧live-correction主链到block13已坍缩，后续skip虽重新带入差异，fixed-frame block70 spatial head仍将其映成同一输出。当前画面变化来自post合同的Color base，不是神经分支，因此目标仍未完成。反证和checkpoint SHA见`dlss5-amd-dynamic-fullchain.json`；下一步从动态路径移除固定帧校正并换回通用block70 prefix/body/outconv。
 
+最新明亮场景验收为frame56400主菜单：同帧Color/backbuffer SHA分别`fd201dba...d492a`／`c1fc1eaf...74d43`，全AMD blocks0–70输出R10 SHA为`251b7ef7...e1ca1`，截图人物、文字、发丝可辨且无周期条纹。端到端29.624秒、Windows network 10.858秒；这是DirectML ViT接入前的新视觉/性能基线，仍明确不是实时。证据见`dlss5-amd-frame56400-validation.json`与`dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png`。
+
 上述坍缩随后被解除：动态raw路径不再应用任何`*-live-correction.bin`，两张实景帧的差异已连续穿过blocks0–69与ViT；block70按225个局部tile分成9批执行，neural输出99.9999919%元素不同。通用head也已运行：CSR prefix仅2432个非零、全幅1H body约1.49–1.56s、outconv约37–41ms，两份最终RGBA SHA不同并在同一游戏进程热切换。证据见`dlss5-amd-dynamic-raw-general.json`。严格剩余问题是明显周期条纹：已知block70 prefix local physical-record排列未exact（旧固定帧上限约0.43 correlation）；5090当前离线，尚不能抓新多帧oracle闭合该排列。因此功能动态链已证明，但画质移植仍未完成。旧含固定帧校正的自动脚本已重命名为`run_dynamic_frame_pipeline_fixed_correction.sh`，避免误用。
 
 周期条纹随后确认并非network residual：旧probe在capture前执行了诊断fallback compute，未叠神经的backbuffer dump本身已有相同条纹。现已禁用无外部输出时的fallback，并把R10 capture移到任何override之前；新frame5400 clean capture无条纹。把通用head residual叠回clean R10后画面正常，两份clean结果在游戏内热切换成功。证据见`dlss5-amd-clean-display-validation.json`。严格保留一项边界：clean base与已算residual来自相近但非同一frame；下一步把raw pipeline改成单命令处理同一clean capture并测端到端延迟。

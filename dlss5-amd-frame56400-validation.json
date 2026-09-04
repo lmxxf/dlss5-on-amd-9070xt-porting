@@ -1,0 +1,24 @@
+{
+  "status": "correctness-and-visual-milestone-not-realtime",
+  "date": "2026-09-04",
+  "frame": 56400,
+  "input_color_sha256": "fd201dbace03360a379cd2b685bdf0151a9b32700e31a568ec702e7db81d492a",
+  "input_backbuffer_sha256": "c1fc1eaf0a0eceb3d4cef60d2eaae697c00aec6c0f30201826f3868e92474d43",
+  "output_r10_sha256": "251b7ef7a480ef6bd272d3fbff1e62e0e1b939ed8fe1a78aca6bc4529cde1ca1",
+  "screenshot": "dynamic-captures/dynamic-frame-56400-dlss5-synchronous.png",
+  "screenshot_sha256": "8c3af78b957e4ffb7dae112dc2b6cb3f731a4e0b9d69d0cabe0e79a7f463e216",
+  "pipeline_wall_seconds": 29.624,
+  "network_wall_ms": 10857.587,
+  "gpu_ms": {
+    "vit31_38_plus_copy": 466.393,
+    "block70_plus_copy": 71.795
+  },
+  "visual_audit": {
+    "scene": "Stellar Blade main menu",
+    "character_visible": true,
+    "text_visible": true,
+    "periodic_stripes": false,
+    "finite_output": true
+  },
+  "strict_boundary": "This validates a new bright coherent AMD output frame. The pipeline is not realtime and does not yet include the DirectML ViT replacement."
+}

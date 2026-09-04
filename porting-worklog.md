@@ -1735,6 +1735,8 @@ GPU `f32tof16`与NumPy RNE仅61.15% bit-exact，但最大绝对差2.42e-4，因�
 
 复核resident条件时发现上述0.427682ms仍让pack shader直接从UPLOAD heap读取source，和游戏内前一层输出驻留显存不一致。runner改为初始化阶段先copy到DEFAULT heap，计时区只读本地VRAM；300次后Expand完整边界降至0.273847ms，输出SHA仍为`2a6b74c1...b785a`逐byte不变。相同方式测`2160×4096×1024` Contract矩阵＋通用边界为0.327796ms。故正式性能基线必须采用VRAM-local source：完整Expand相对旧8.154–29.414ms约快30–107倍；0.427682ms保留为跨heap诊断值，不再作为resident预测。
 
+为给DirectML接入建立可肉眼审计的明亮固定帧，选取AMD机最后一组完整capture frame56400重跑现有全AMD同步管线。输入Color/backbuffer SHA为`fd201dba...d492a`／`c1fc1eaf...74d43`，输出R10 SHA为`251b7ef7...e1ca1`，截图SHA为`8c3af78b...63e216`。画面为《剑星》主菜单，人物、文字、发丝和背景均清晰可辨，无早期诊断fallback造成的周期条纹。端到端wall29.624秒，Windows network10.858秒，ViT31–38 GPU＋copy466.393ms，block70 71.795ms。它比旧49.594秒基线再降约40%，但仍非实时且尚未接入DirectML；证据固化于`dlss5-amd-frame56400-validation.json`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
