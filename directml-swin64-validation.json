@@ -9,5 +9,11 @@
   "ffn_vs_old": {"correlation": 0.9999999992896169, "mae": 1.001591775931564e-7, "max_abs_error": 0.5, "different_values": 116, "differences_over_0_01": 7},
   "full_block_vs_same_version_old": {"correlation": 0.9999734213725204, "mae": 0.01296116622055278, "max_abs_error": 0.5, "exact_fraction": 0.7656304752125459, "all_finite": true},
   "downstream_r10": {"byte_exact": false, "different_pixels": 827468, "different_pixel_fraction": 0.09976224922839506, "max_channel_deltas": [3,5,6]},
-  "diagnosis": "FFN-only replacement reproduces nearly all final differences. Whole-output FP16 rounding at 64 channels moves 116 FFN values across E4M3 boundaries; later attention diffuses them. Use K-split FP16 partials with FP32 accumulation before accepting this width."
+  "k_split_rejected": {
+    "split_1": {"different_values": 116, "mae": 1.001591775931564e-7},
+    "split_2": {"different_values": 20378, "mae": 4.875952e-6},
+    "split_3": {"different_values": 2617, "mae": 6.867974e-7},
+    "reason": "Each partial is independently rounded to FP16; additional partials introduce more rounding surfaces, so FP32 summation afterward cannot recover the lost bits."
+  },
+  "diagnosis": "FFN-only replacement reproduces nearly all final differences. Whole-output FP16 rounding at 64 channels moves 116 FFN values across E4M3 boundaries; later attention diffuses them. K-split partial FP16 was tested and rejected because it worsens rounding."
 }

@@ -1859,6 +1859,8 @@ decoder block56 prefix随后并入128 resident。`prepare_directml_upsample_pref
 
 完整DirectML block63对同版本即时旧oracle corr0.9999734214、MAE0.0129612、max0.5、76.5630% exact，全finite；继续到block70后R10有827,468/8,294,400像素不同（9.9762%），但10-bit RGB最大差仅3/5/6。分离替换确认只换FFN已复现几乎全部差异，QKV/Projection非主因：whole-output FP16 project rounding让116个FFN值跨E4M3边界，Attention再将稀疏差异扩散。故64档状态明确为性能通过、最终exact失败，不进入主线。下一步对FFN project按K维拆partial FP16，GPU FP32累加后再做residual/E4M3，避免最终总和先压成FP16。
 
+K-split实测否决该假设。通用FFN runner新增`SWIN_PROJECT_SPLIT`：hidden按K chunk转成batch-major，DirectML batch并行输出多份FP16 partial，finish shader FP32相加后再做residual/E4M3。split3(K32)为3.291440ms，FFN不同值从116增至2617、MAE6.868e-7、43值差>0.01；split2(K48)3.229240ms，不同值20378、MAE4.876e-6、51值差>0.01，均差于split1。原因是每个partial各自落FP16引入更多舍入面，事后FP32相加无法恢复。K-split路线关闭；64主线保留split1近似，当前最终R10最大channel delta6/1023，继续构建resident链并另寻全FP32 output/WMMA方案。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
