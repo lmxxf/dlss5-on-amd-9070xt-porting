@@ -189,11 +189,8 @@ bool on_main_device(void *resource) {
     if (!resource || !g_device) return false;
     ID3D12Device *device = nullptr;
     const HRESULT hr = static_cast<ID3D12Resource *>(resource)->GetDevice(IID_PPV_ARGS(&device));
-    IUnknown *resource_identity=nullptr,*main_identity=nullptr;
-    if(SUCCEEDED(hr))device->QueryInterface(IID_PPV_ARGS(&resource_identity));
-    if(g_device)g_device->QueryInterface(IID_PPV_ARGS(&main_identity));
-    const bool same = resource_identity && main_identity && resource_identity==main_identity;
-    if(resource_identity)resource_identity->Release();if(main_identity)main_identity->Release();
+    const LUID a=SUCCEEDED(hr)?device->GetAdapterLuid():LUID{},b=g_device?g_device->GetAdapterLuid():LUID{};
+    const bool same=SUCCEEDED(hr)&&a.HighPart==b.HighPart&&a.LowPart==b.LowPart;
     if (device) device->Release();
     return same;
 }
@@ -225,7 +222,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     if (is_upscale) {
         const auto *dispatch = &snapshot;
         const bool color_same=on_main_device(dispatch->color.resource),depth_same=on_main_device(dispatch->depth.resource),motion_same=on_main_device(dispatch->motionVectors.resource),output_same=on_main_device(dispatch->output.resource);
-        ID3D12Device*command_device=nullptr;IUnknown*command_identity=nullptr,*main_identity=nullptr;const bool command_get=dispatch->commandList&&SUCCEEDED(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList)->GetDevice(IID_PPV_ARGS(&command_device)));if(command_get)command_device->QueryInterface(IID_PPV_ARGS(&command_identity));if(g_device)g_device->QueryInterface(IID_PPV_ARGS(&main_identity));const bool command_same=command_identity&&main_identity&&command_identity==main_identity;if(command_identity)command_identity->Release();if(main_identity)main_identity->Release();if(command_device)command_device->Release();
+        ID3D12Device*command_device=nullptr;const bool command_get=dispatch->commandList&&SUCCEEDED(static_cast<ID3D12GraphicsCommandList*>(dispatch->commandList)->GetDevice(IID_PPV_ARGS(&command_device)));const LUID ca=command_get?command_device->GetAdapterLuid():LUID{},cb=g_device?g_device->GetAdapterLuid():LUID{};const bool command_same=command_get&&ca.HighPart==cb.HighPart&&ca.LowPart==cb.LowPart;if(command_device)command_device->Release();
         const bool resources_same_device=color_same&&depth_same&&motion_same&&output_same&&command_same;
         const bool target = dispatch->output.description.width == 1920 && dispatch->output.description.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);

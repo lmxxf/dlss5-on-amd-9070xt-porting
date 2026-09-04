@@ -1997,6 +1997,8 @@ snapshot修正版在第二次真游戏运行中仍显示ABI upscaleSize=0×0，�
 
 游戏切独占全屏1080后，FFX权威合同变为render1281×721（resource pad1284×724）、output1920×1080，`target1080=1`；blocks0–70与resident_ready再次通过。但原FSR返回后五项GetDevice均失败，说明仅复制dispatch结构不足以延长其中COM对象生命周期。修正为trampoline前对Color/Depth/Motion/Output与native command list全部AddRef，自有命令录完后Release。present每600帧同步记录当前backbuffer实际尺寸/format，以判断启动时3840×2160 swapchain是否随后resize。交叉编译SHA-256=`23592b5cc69f2fae91b7cb1b2135fd6b56416b2d002d0b57134ca2bafcf1fa9a`。
 
+AddRef版在真1080中仍得到device_parts=00000，而所有接口调用本身未崩，说明FFX/ReShade proxy device与swapchain native device有不同COM identity。完成门改为比较`ID3D12Device::GetAdapterLuid()`：资源device、command-list device与主swapchain device只要属于同一adapter即允许录制；这正对应目标“游戏原生RX9070XT device/queue”，不再把代理接口地址误当物理设备身份。该轮还确认swapchain从启动瞬间3840×2160在present600前resize为1920×1080 R10。LUID修正版SHA-256=`3dc1269622af02b600ebc2a5b7bb41be3d404f5d35d28e9adbe329158de2056a`。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
