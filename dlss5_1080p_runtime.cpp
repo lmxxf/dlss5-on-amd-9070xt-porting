@@ -19,6 +19,9 @@ struct DmlFailure { const char *operation; HRESULT result; };
 #define DMLRT_FAILURE(name, result) throw DmlFailure{name, result}
 #include "directml_gemm_runtime.h"
 #include "swin64_1080_runtime.h"
+#include "swin128_1080_runtime.h"
+#include "swin256_1080_runtime.h"
+#include "fp16_bridge_runtime.h"
 
 extern "C" __declspec(dllexport) const char *NAME = "DLSS5 AMD 1080p Runtime";
 extern "C" __declspec(dllexport) const char *DESCRIPTION =
@@ -84,6 +87,20 @@ Swin64Boundary1080Pass g_s64_boundary[4];
 Swin64Window1080Pass g_s64_window[4];
 std::atomic<bool> g_s64_ready{false};
 std::atomic<unsigned long long> g_s64_submissions{0};
+struct RuntimeS128 {
+    DmlGemmOperator gate[6],up[6],project[6],qkv[6],attention_project[6];
+    ID3D12Resource *main[2]{},*gate_out{},*up_out{},*hidden{},*project_raw{},*feature{},*qkv_raw{},*qkv_float{},*attention_float{},*attention{},*attention_raw{},*mid{},*input_fp32{},*down{},*enter{};
+    ID3D12Resource *gw[6]{},*uw[6]{},*pw[6]{},*qw[6]{},*aw[6]{},*fs[6]{},*as[6]{},*bias[6]{},*scale[6]{};
+    Fp16ToFp32RuntimePass bridge;Swin128Predown1080Pass predown;Swin128Boundary1080Pass boundary[6];Swin128Window1080Pass window[6];
+} g_s128;
+struct RuntimeS256 {
+    DmlGemmOperator gate[8],up[8],project[8],qkv[8],attention_project[8];
+    ID3D12Resource *main[2]{},*gate_out{},*up_out{},*hidden{},*project_raw{},*feature{},*qkv_raw{},*qkv_float{},*attention_float{},*attention{},*attention_raw{},*mid{},*input_fp32{},*down{},*enter{};
+    ID3D12Resource *gw[8]{},*uw[8]{},*pw[8]{},*qw[8]{},*aw[8]{},*fs[8]{},*as[8]{},*bias[8]{},*scale[8]{};
+    Fp16ToFp32RuntimePass bridge;Swin256Predown1080Pass predown;Swin256Boundary1080Pass boundary[8];Swin256Window1080Pass window[8];
+} g_s256;
+std::atomic<bool> g_s128_ready{false},g_s256_ready{false};
+std::atomic<unsigned long long> g_s128_submissions{0},g_s256_submissions{0};
 
 struct FfxHeader { uint64_t type; FfxHeader *pNext; };
 struct FfxDimensions2D { uint32_t width, height; };
@@ -131,6 +148,8 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_blocks1_4(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 bool record_blocks5_8(ID3D12GraphicsCommandList *commands, unsigned long long frame);
+bool record_blocks9_14(ID3D12GraphicsCommandList *commands, unsigned long long frame);
+bool record_blocks15_22(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
@@ -146,7 +165,7 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
             if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
                                     dispatch->renderSize.width, dispatch->renderSize.height, n) &&
                 record_block0(commands, n))
-                if(record_blocks1_4(commands, n))record_blocks5_8(commands, n);
+                if(record_blocks1_4(commands, n)&&record_blocks5_8(commands, n)&&record_blocks9_14(commands,n))record_blocks15_22(commands,n);
         }
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
@@ -338,6 +357,11 @@ std::vector<unsigned char> read_runtime_file(const wchar_t *name) {
     return data;
 }
 
+ID3D12Resource *upload_runtime_resource(const std::vector<unsigned char> &data,
+                                        std::vector<ID3D12Resource *> &uploads) {
+    ID3D12Resource *dst=make_buffer(data.size(),D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),*src=make_buffer(data.size(),D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ,D3D12_RESOURCE_FLAG_NONE);void *mapped=nullptr;D3D12_RANGE none{0,0};dmlrt_check("runtime upload map",src->Map(0,&none,&mapped));std::memcpy(mapped,data.data(),data.size());src->Unmap(0,nullptr);g_list->CopyBufferRegion(dst,0,src,0,data.size());D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=dst;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=D3D12_RESOURCE_STATE_COPY_DEST;b.Transition.StateAfter=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;g_list->ResourceBarrier(1,&b);uploads.push_back(src);return dst;
+}
+
 void initialize_block0() {
     constexpr UINT tiles = 8160;
     constexpr UINT64 p192 = UINT64(tiles) * 192 * 2;
@@ -456,6 +480,43 @@ void initialize_blocks5_8() {
     dmlrt_check("s64 init close",g_list->Close());ID3D12CommandList *lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("s64 init signal",g_queue->Signal(g_fence,4));dmlrt_check("s64 init event",g_fence->SetEventOnCompletion(4,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"s64 init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto *resource:uploads)resource->Release();g_s64_ready.store(true);log("blocks5_8_ready block4=%p block8=%p tokens=%u\n",g_front_main[1],g_s64_main[0],T);
 }
 
+template<class R, UINT L>
+void initialize_swin_stage(R &s, UINT T, UINT C, UINT H, UINT Q, UINT A,
+                           UINT first_block, ID3D12Resource *source,
+                           const wchar_t *down_name, const wchar_t *enter_name,
+                           const UINT (&shifts)[L], UINT64 fence_value,
+                           std::atomic<bool> &ready, const char *label) {
+    dmlrt_check("stage allocator reset",g_allocator->Reset());
+    dmlrt_check("stage list reset",g_list->Reset(g_allocator,nullptr));
+    for(UINT i=0;i<L;i++){
+        s.gate[i].Create(g_dml,g_device,1,T,C,H);s.up[i].Create(g_dml,g_device,1,T,C,H);
+        s.project[i].Create(g_dml,g_device,1,T,H,C);s.qkv[i].Create(g_dml,g_device,1,T,C,Q);
+        s.attention_project[i].Create(g_dml,g_device,1,T,A,C);
+        for(auto *op:{&s.gate[i],&s.up[i],&s.project[i],&s.qkv[i],&s.attention_project[i]})op->RecordInitialization(g_recorder,g_list);
+    }
+    const UINT64 main_bytes=UINT64(T)*C*2,hidden_bytes=UINT64(T)*H*2,qkv_bytes=UINT64(T)*Q*2,attention_bytes=UINT64(T)*A*2;
+    auto gpu=[&](UINT64 n){return make_buffer(n,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);};
+    s.main[0]=gpu(main_bytes);s.main[1]=gpu(main_bytes);s.gate_out=gpu(hidden_bytes);s.up_out=gpu(hidden_bytes);s.hidden=gpu(hidden_bytes);
+    s.project_raw=gpu(main_bytes);s.feature=gpu(main_bytes);s.qkv_raw=gpu(qkv_bytes);s.qkv_float=gpu(qkv_bytes*2);
+    s.attention_float=gpu(attention_bytes*2);s.attention=gpu(attention_bytes);s.attention_raw=gpu(main_bytes);
+    const UINT source_c=C/2,source_t=T*4; s.input_fp32=gpu(UINT64(source_t)*source_c*4);s.mid=gpu(UINT64(source_t)*source_c*4);
+    std::vector<ID3D12Resource*> uploads;
+    s.down=upload_runtime_resource(read_runtime_file(down_name),uploads);s.enter=upload_runtime_resource(read_runtime_file(enter_name),uploads);
+    const wchar_t *parts[9]={L"expand.f16",L"up.f16",L"project.f16",L"qkv.f16",L"attention_project.f16",L"ffn_skip.f32",L"attention_skip.f32",L"bias.f32",L"scale.f32"};
+    for(UINT i=0;i<L;i++){
+        ID3D12Resource **dest[9]={&s.gw[i],&s.uw[i],&s.pw[i],&s.qw[i],&s.aw[i],&s.fs[i],&s.as[i],&s.bias[i],&s.scale[i]};
+        for(UINT j=0;j<9;j++){wchar_t name[128];const wchar_t *flavor=(first_block==9&&i>=1&&i<=4)?L"effective":L"body-effective";swprintf(name,128,L"block%u-%ls-%ls",first_block+i,flavor,parts[j]);*dest[j]=upload_runtime_resource(read_runtime_file(name),uploads);}
+    }
+    D3D12_RESOURCE_BARRIER constants[2]{};ID3D12Resource *cr[2]={s.down,s.enter};
+    for(UINT i=0;i<2;i++){constants[i].Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;constants[i].Transition.pResource=cr[i];constants[i].Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;constants[i].Transition.StateBefore=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;constants[i].Transition.StateAfter=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;}g_list->ResourceBarrier(2,constants);
+    s.bridge.Create(g_device,source,s.input_fp32,source_t*source_c);s.predown.Create(g_device,s.down,s.enter,s.input_fp32,s.mid,s.main[0]);
+    for(UINT i=0;i<L;i++){UINT p=i&1,n=p^1;s.gate[i].Bind(s.main[p],s.gw[i],s.gate_out);s.up[i].Bind(s.main[p],s.uw[i],s.up_out);s.project[i].Bind(s.hidden,s.pw[i],s.project_raw);s.qkv[i].Bind(s.feature,s.qw[i],s.qkv_raw);s.attention_project[i].Bind(s.attention,s.aw[i],s.attention_raw);s.boundary[i].Create(g_device,s.gate_out,s.up_out,s.project_raw,s.main[p],s.fs[i],s.attention_raw,s.feature,s.as[i],s.hidden,s.feature,s.main[n]);s.window[i].Create(g_device,s.qkv_raw,s.qkv_float,s.bias[i],s.scale[i],s.attention_float,s.attention,shifts[i]);}
+    dmlrt_check("stage init close",g_list->Close());ID3D12CommandList *lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("stage init signal",g_queue->Signal(g_fence,fence_value));dmlrt_check("stage init event",g_fence->SetEventOnCompletion(fence_value,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"stage init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto *r:uploads)r->Release();ready.store(true);log("%s_ready input=%p output=%p tokens=%u\n",label,source,s.main[0],T);
+}
+
+void initialize_blocks9_14(){const UINT shifts[6]={0,1,3,2,0,1};initialize_swin_stage<RuntimeS128,6>(g_s128,32640,128,160,192,64,9,g_s64_main[0],L"block8-downsample-matrix.bin",L"block9-enter-64x128.bin",shifts,5,g_s128_ready,"blocks9_14");}
+void initialize_blocks15_22(){const UINT shifts[8]={0,1,3,2,0,1,3,2};initialize_swin_stage<RuntimeS256,8>(g_s256,8640,256,288,384,128,15,g_s128.main[0],L"block14-downsample-matrix.bin",L"block15-enter-128x256.bin",shifts,6,g_s256_ready,"blocks15_22");}
+
 bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
     if(!commands||!g_block0_ready.load())return false;
     if(g_front_submissions.load()){
@@ -480,11 +541,29 @@ bool record_blocks1_4(ID3D12GraphicsCommandList *commands, unsigned long long fr
 bool record_blocks5_8(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
     if(!commands||!g_s64_ready.load())return false;
     auto uav=[&](ID3D12Resource *resource){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=resource;commands->ResourceBarrier(1,&b);};
+    if(g_s128_submissions.load()){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=g_s64_main[0];b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;b.Transition.StateAfter=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;commands->ResourceBarrier(1,&b);}
     if(g_s64_submissions.load()){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=g_s64_mid;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;b.Transition.StateAfter=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;commands->ResourceBarrier(1,&b);}
     g_s64_predown.Record(commands,0);D3D12_RESOURCE_BARRIER mid{};mid.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;mid.Transition.pResource=g_s64_mid;mid.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;mid.Transition.StateBefore=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;mid.Transition.StateAfter=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;commands->ResourceBarrier(1,&mid);g_s64_predown.Record(commands,1);uav(g_s64_main[0]);
     for(UINT i=0;i<4;i++){g_s64_gate[i].Record(g_recorder,commands);uav(g_s64_gate_out);g_s64_up[i].Record(g_recorder,commands);uav(g_s64_up_out);g_s64_boundary[i].Record(commands,0);uav(g_s64_hidden);g_s64_project[i].Record(g_recorder,commands);uav(g_s64_project_raw);g_s64_boundary[i].Record(commands,1);uav(g_s64_feature);g_s64_qkv_op[i].Record(g_recorder,commands);uav(g_s64_qkv_raw);g_s64_window[i].Record(commands,0);uav(g_s64_qkv_float);g_s64_window[i].Record(commands,1);uav(g_s64_attention_float);g_s64_window[i].Record(commands,2);uav(g_s64_attention);g_s64_attention_project[i].Record(g_recorder,commands);uav(g_s64_attention_raw);g_s64_boundary[i].Record(commands,2);uav(g_s64_main[(i&1)^1]);}
     const auto submitted=++g_s64_submissions;if(submitted==1||submitted%120==0)log("blocks5_8_submit=%llu ffx_frame=%llu block8=%p\n",submitted,frame,g_s64_main[0]);return true;
 }
+
+template<class R, UINT L>
+bool record_swin_stage(R &s, ID3D12Resource *source, ID3D12GraphicsCommandList *commands,
+                       unsigned long long frame, std::atomic<bool> &ready,
+                       std::atomic<unsigned long long> &submissions, const char *label) {
+    if(!commands||!ready.load())return false;
+    auto uav=[&](ID3D12Resource *r){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=r;commands->ResourceBarrier(1,&b);};
+    auto transition=[&](ID3D12Resource *r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES bstate){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition.pResource=r;b.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;b.Transition.StateBefore=a;b.Transition.StateAfter=bstate;commands->ResourceBarrier(1,&b);};
+    if(submissions.load()){transition(s.main[0],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(s.input_fp32,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(s.mid,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
+    transition(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);s.bridge.Record(commands);transition(s.input_fp32,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    s.predown.Record(commands,0);transition(s.mid,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);s.predown.Record(commands,1);uav(s.main[0]);
+    for(UINT i=0;i<L;i++){s.gate[i].Record(g_recorder,commands);uav(s.gate_out);s.up[i].Record(g_recorder,commands);uav(s.up_out);s.boundary[i].Record(commands,0);uav(s.hidden);s.project[i].Record(g_recorder,commands);uav(s.project_raw);s.boundary[i].Record(commands,1);uav(s.feature);s.qkv[i].Record(g_recorder,commands);uav(s.qkv_raw);s.window[i].Record(commands,0);uav(s.qkv_float);s.window[i].Record(commands,1);uav(s.attention_float);s.window[i].Record(commands,2);uav(s.attention);s.attention_project[i].Record(g_recorder,commands);uav(s.attention_raw);s.boundary[i].Record(commands,2);uav(s.main[(i&1)^1]);}
+    const auto n=++submissions;if(n==1||n%120==0)log("%s_submit=%llu ffx_frame=%llu output=%p\n",label,n,frame,s.main[0]);return true;
+}
+
+bool record_blocks9_14(ID3D12GraphicsCommandList *commands,unsigned long long frame){return record_swin_stage<RuntimeS128,6>(g_s128,g_s64_main[0],commands,frame,g_s128_ready,g_s128_submissions,"blocks9_14");}
+bool record_blocks15_22(ID3D12GraphicsCommandList *commands,unsigned long long frame){return record_swin_stage<RuntimeS256,8>(g_s256,g_s128.main[0],commands,frame,g_s256_ready,g_s256_submissions,"blocks15_22");}
 
 void run_warm_probe() {
     constexpr UINT iterations = 100;
@@ -615,6 +694,8 @@ DWORD WINAPI initialize_worker(void *) {
             initialize_block0();
             initialize_blocks1_4();
             initialize_blocks5_8();
+            initialize_blocks9_14();
+            initialize_blocks15_22();
         } catch (const DmlFailure &failure) {
             hr = failure.result;
             log("resident_execution_failed operation=%s hr=0x%08x\n",
