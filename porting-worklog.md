@@ -1833,6 +1833,10 @@ encoder 256变体由同一已验收源码机械派生为L8、blocks15–22、shi
 
 两份block22再各自进入完全相同的旧block22→23 predown与blocks23–30。block30 correlation0.9999817488、MAE5.811e-5、RMSE0.000523504、max0.01171875、98.040843% exact，全finite；下游把MAE与max均压低，没有误差放大。encoder256数值/稳态性能通过。严格剩余：把block14 downsample/enter并入encoder resident，再将其一路送过DirectML ViT/decoder到最终R10；目前还不能仅凭block30宣布画面门通过。
 
+block14 predown随后并入encoder resident。首版输出全零的排查依次排除了DirectML initializer、SRV/UAV state与Dispatch维度；过程中把16,711,680-thread matrix pass改为X=65535、Y=4的2D dispatch，避免超过D3D12单轴group上限。真正根因是pool shader把累加器`v`和`p/o/x/y`写在同一条`uint`声明里，浮点乘积逐项截断为整数零；将`v`独立声明为float后恢复。input/down/enter固定转NON_PIXEL SRV态，mid写后显式UAV→SRV transition。
+
+修正后的`raw-16800-block14`→matrix→2×2 pool→128→256 enter→DirectML blocks15–22输出，与外部`raw-16800-block14-enter15`起跑版本逐byteexact；100轮每轮把mid转回UAV并重做predown，最终仍逐byteexact、SHA同为`a7f7df9c...b7780`，排除状态污染。包含predown的持久态GPU14.869602ms；旧blocks15–22 153.966ms外加旧predown约10ms，整段约11倍。严格剩余：encoder输出尚需跑至最终R10裁判；且该exe仍含从512模板遗留的unused block39/up资源与JIT，后续清理并并入持久生命周期。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

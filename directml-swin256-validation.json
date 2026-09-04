@@ -30,8 +30,12 @@
     "block30_after_old_downstream_correlation": 0.9999817487592847,
     "block30_mae": 5.811102250043084e-5,
     "block30_max_abs_error": 0.01171875,
-    "block30_exact_fraction": 0.9804084329044118
+    "block30_exact_fraction": 0.9804084329044118,
+    "predown_plus_blocks_gpu_ms_repeat_100": 14.869602,
+    "predown_output_matches_external_enter_path_byte_exact": true,
+    "repeat_100_matches_single_run_byte_exact": true,
+    "predown_chain_sha256": "a7f7df9cbacd6add0e6a13eb226114b64d9d6bee3aa7b9d5c1a2b296d20b7780"
   },
   "final_vs_old": {"elements": 8355840, "correlation": 1.0, "mae": 0.0, "max_abs_error": 0.0, "exact_fraction": 1.0, "sha256": "e5482c76d02db5ffc46e3932d917ec312a100b12ab6be6c294be11f4f3f86a91"},
-  "strict_boundary": "Decoder blocks49-55 and encoder blocks15-22 have separate resident implementations. Decoder block48 prefix and encoder block14 predown remain outside; encoder replacement still needs final-R10 validation."
+  "strict_boundary": "Decoder blocks49-55 and encoder block14 predown through block22 have separate resident implementations. Decoder block48 prefix remains outside; encoder replacement still needs final-R10 validation and persistent lifecycle integration."
 }
