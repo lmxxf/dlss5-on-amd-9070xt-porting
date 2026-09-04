@@ -1747,6 +1747,8 @@ QKV normalization随后并入联合GPU pass：每个token/head一个32-thread gr
 
 block31 runner再加入`VIT_PRECOMPUTED_QKV`入口，在相同旧Expand/Contract后跳过旧QKV，直接让GPU-normalized DirectML QKV进入原Attention＋Projection。尾链wall46.719ms；加DirectML QKV 0.201ms后整块约46.92ms，对旧五段block31最终输出correlation0.9999980898、MAE1.000e-5、RMSE2.589e-4、max0.015625、99.754503%逐值exact，全finite。误差穿过softmax attention后未放大，QKV完整算子替换通过；block31当前最大热点收敛为Attention约23ms。
 
+DirectML runner进一步支持4D batch维，按Attention的32 heads测试`batch=32, M=2160, K=32, N=2160`。300次GPU timestamp平均0.943629ms、10.126 TFLOPS；该形状正对应每头`Q×Kᵀ`，第二次`softmax×V` FLOPs与形状对称，因此两次矩阵主体约1.89ms，对比旧完整Attention约23ms已有约12倍理论空间。严格边界：当前是synthetic batched GEMM，仅首batch初始化用于数值smoke，值分布不影响固定shape dispatch计时；尚未包含head-major pack、约285MiB FP16 score、softmax与第二次GEMM的真实串联，不能把1.89ms写成完成后的Attention时间。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

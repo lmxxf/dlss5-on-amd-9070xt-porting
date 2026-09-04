@@ -191,6 +191,7 @@ Swin与ViT工作集也已全部迁成placed resources：ViT真实phase为92.81Mi
 - `d3d12_vit_linear_test.cpp`：通用AMD ViT线性层runner；支持SASS FFN多项式与residual skip。block31 Contract/Projection correlation 0.9298/0.9725。
 - `d3d12_directml_probe.cpp`：从现有D3D12 AMD adapter动态加载Windows系统`DirectML.dll`，不捆绑redist；RX9070XT已成功创建`IDMLDevice`并报告最高DirectML feature level 6.4。用于进入FP16矩阵核GEMM基准，不代表整网已经实时化。
 - `d3d12_directml_gemm.cpp` / `validate_directml_gemm.py`：DirectML FP16 GEMM真机基准、文件输入模式、抽样数值验证及同command-list GPU边界模式；显式修正MinGW对24-byte COM struct return的ABI差异。ViT Expand纯GEMM约0.15–0.17ms；activation先驻留本地VRAM后，pack→GEMM→unpack＋`F()`联合pass为0.273847ms，输出与分段oracle 35.4MB逐byte exact。
+- 同一runner现支持batched GEMM；ViT Attention的32 heads `2160×32×2160`在RX9070XT为0.943629ms／10.126 TFLOPS。QKᵀ与softmax×V两次矩阵主体合计约1.89ms，证明旧约23ms Attention具备数量级下降空间；softmax与Q/K/V重排尚待同command-list实测。
 - `d3d12_directml_boundary.cpp`：GPU原生FP32→FP16 pack与FP16→FP32＋原`F()` E4M3激活边界。block31的2.21M输入＋8.85M输出两段合计约0.57–0.59ms，unpack/激活逐值exact；用GPU pack真实喂回DirectML后，对旧shader抽样99.6045%逐值exact。
 - `run_original_vit_attention.cpp`：显式携带 QKV 更新后的 work/aux，独立运行原 Attention；block31 输出65,536 bytes、零NaN。
 - `run_original_fused_exact.cpp`：按5090 live 0x58 blob执行8H/4H/2H fused body，包含halo grid与aux view。
