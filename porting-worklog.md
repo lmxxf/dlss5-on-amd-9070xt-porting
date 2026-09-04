@@ -1985,6 +1985,8 @@ block70随后并入统一DLL，几何严格使用padded1920×1088、active1920×
 
 R10 swapchain回写随后进入present callback。block70的1920×1080 packed buffer保持GPU resident；主swapchain为1920×1080 R10G10B10A2时，ReShade同一D3D12 command queue的immediate list执行`UAV→COPY_SOURCE`、buffer-to-texture、backbuffer `COPY_DEST→PRESENT`，下一次block70再转回UAV。整个闭环不map、不readback、不创建每帧资源。交叉编译SHA-256=`b1efd3b6087c6c13eea3079a6d4514f816edcabd970f4ef3258688ea5eb41dd6`。代码层面已形成当前帧Color→blocks0–70→R10→游戏backbuffer，但完成状态仍等待真游戏连续帧、画面与≥10fps三项实测。
 
+首次自动前台验收尝试使用Windows互动式计划任务`DLSS5Launch`，以console session 1的`lmxxf`身份执行真实Steam路径`steam.exe -applaunch 3489700`。任务成功启动Steam PID6620，进程CommandLine与SessionId均核对正确；但75秒内未派生`SB-Win64-Shipping`，也没有创建runtime log。故当前阻塞点在Steam前台登录/更新/弹窗状态，而不是已观察到DLL加载或GPU初始化失败；不得把这次尝试记成游戏内通过或失败。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
