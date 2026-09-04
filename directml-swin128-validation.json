@@ -1,5 +1,5 @@
 {
-  "status": "block57-cumulative-correctness-passed-not-resident",
+  "status": "encoder-and-decoder-resident-segments-passed",
   "date": "2026-09-04",
   "block": 57,
   "channels": 128,
@@ -7,5 +7,7 @@
   "gpu_ms": {"ffn": 1.265760, "qkv": 0.717298, "attention_projection": 0.485600},
   "final_vs_same_version_old": {"correlation": 0.999999999950037, "mae": 7.43865966796875e-5, "max_abs_error": 0.015625, "exact_fraction": 0.9952392578125, "all_finite": true},
   "downstream_r10": {"byte_exact": true, "sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"},
-  "strict_boundary": "Block57 cumulative and final-image validation pass against a same-version freshly generated oracle. Encoder/decoder 128-channel resident chains remain to be built."
+  "decoder_blocks57_61": {"cold_gpu_ms": 26.118040, "persistent_gpu_ms": 11.988113, "old_gpu_ms": 102.584, "speedup": 8.557, "block61_numeric_exact_fraction": 1.0, "final_r10_byte_exact": true},
+  "encoder_blocks9_14": {"cold_gpu_ms": 24.549760, "persistent_gpu_ms": 14.440822, "old_gpu_ms": 125.272, "speedup": 8.675, "block14_correlation": 0.999999999980963, "block14_mae": 3.24249267578125e-5, "block14_max_abs_error": 0.015625, "block14_exact_fraction": 0.9979248046875},
+  "strict_boundary": "Encoder and decoder normal resident segments pass. Encoder block8 predown and decoder block56 prefix remain outside; encoder segment still needs final-R10 validation."
 }

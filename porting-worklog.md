@@ -1843,6 +1843,10 @@ encoder最终画面裁判随后完成。DirectML block14 predown＋resident bloc
 
 初次拿历史`raw-16800-block57`作final裁判出现225个`+384↔-384`翻转并导致0.024% R10像素变化；分层重跑后证明这是oracle谱系错配，不是DirectML不稳定：只替FFN的Attention对当次纯旧Attention逐floatexact；DirectML QKV后的Attentioncorr0.9999999777、max0.01144；同一当前runner即时生成的纯旧final与DirectML FFN＋QKV＋旧Projection逐floatexact，加入DirectML Projection后corr0.99999999995、MAE7.439e-5、max0.015625、99.523926% exact，无大翻转。两份同版本final再进入blocks58–70，4K R10 SHA均为`4868b7e4...be35`逐byteexact。教训再次固化：历史同名中间文件不能跨runner版本作裁判。128档算法门通过，下一步构建blocks57–61与9–14 resident链。
 
+128 decoder resident由256模板逐项特化为L5/T130560/C128/H160/Q192/A64、W480×H272、4 heads与shift `0/1/3/2/0`。审计修正机械替换造成的V offset64（应128）、Attention pack/UAV 128（应64）、Boundary 288/256（应160/128）及所有超65535-group pass的2D flatten。QKV resident采用紧凑T×192，不保留旧buffer后半空容量。blocks57–61真链冷26.118040ms、100轮稳态11.988113ms；旧102.584ms，约8.56倍。block61对同版本旧链逐float100% exact，进入blocks62–70后R10 SHA`4868b7e4...be35`逐byteexact。
+
+encoder128变体为L6 blocks9–14、shift `0/1/3/2/0/1`；loader正确处理9/14的`body-effective`与10–13历史`effective`命名。以同帧`block8-enter9`起跑，冷24.549760ms、100轮稳态14.440822ms；旧125.272ms，约8.67倍。block14对旧corr0.999999999981、MAE3.242e-5、RMSE0.000711786、max0.015625、99.792480% exact，全finite。严格剩余：把block8 downsample/enter并入encoder resident并走最终R10；decoder block56 upsample/prefix亦尚未并入。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
