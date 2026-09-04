@@ -1805,6 +1805,8 @@ Swin矩阵核化从512-channel block40开始。现有portable blob 984,080 FP32�
 
 `prepare_directml_swin512.py`批量拆出blocks41–47共七套DirectML参数并部署。先以shifted block41验证：FFN0.190400、QKV0.129090、原shift Attention0.820、Projection0.100320ms；最终对旧block41 4,177,920值逐float100% exact，SHA`f3c680e0...ab682`，证明token shift映射未被矩阵替换破坏。随后Windows侧连续执行blocks40–47，每层严格消费前一层hybrid final；Attention诊断改为保留完整H72 padding，消除逐层Linux补行。旧单进程链190.890ms，hybrid VRAM-local分段估计约12ms。最终block47对旧有效区correlation1.0、MAE/RMSE/max均0、所有float数值相等；bitwise有10,125/4,177,920不同（0.242345%），审计确认100%都是`+0.0`与`-0.0`符号位差异，无任何非零值差异或非finite。故严格表述为数值100% exact而非逐byte exact。八层算法风险关闭，下一步合并为单device resident 512-channel链。
 
+新增`d3d12_directml_swin512_resident.cpp`建立单device骨架：同一DirectML device创建8层×gate/up/project/QKV/attention-project五类共40个独立compiled operator/binding table，main两张FP16 ping-pong，gate/up/hidden/feat/QKV/attention scratch跨层复用，五套weight buffer逐层独立。全部资源clear后在一个command list连续执行40个真实GEMM＋UAV barrier，RX9070XT矩阵主体总计3.753200ms；48张default-heap资源仅68.84MiB，无device removed。冷进程含40次JIT/initializer、资源建立和执行为527.181ms，仅在未来addon初始化支付。严格边界：当前zero-chain尚未插FFN combine/residual、QKV FP32边界、原window Attention与attention residual；3.753ms不是完整八层时间，但证明40 operator共存、ping-pong绑定与矩阵成本成立。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
