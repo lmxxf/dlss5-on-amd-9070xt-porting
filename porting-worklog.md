@@ -1889,6 +1889,8 @@ encoder512主体也进入resident。`d3d12_directml_swin512_resident.cpp`新增`
 
 block22→23特殊predown随后并入512 resident：136×240×256 block22 body先乘256×256 matrix，再做2×2 average pool与256→512 enter；pool pass覆盖完整H72×W120×C512，H68之后显式写零，避免repeat沿用上一轮main内容。真输入单轮predown＋blocks23–30为16.186520ms，100轮每轮重建predown稳态8.923368ms；旧predown-v2＋八层185.640ms，约20.80倍。两路block30 4,177,920 floats逐float/byte 100% exact、全finite。因下游ViT/decoder为相同确定性输入，既有最终画面裁判直接继承；encoder512不再依赖外部block23或手工H72 padding。
 
+decoder block48 prefix随后并入256 resident。`UpsamplePass`从68×120×512 block47按2×nearest直接pack为32640×512 FP16，DirectML `512→256`后加FP32 bias与136×240×256 block22 skip，写main[0]再执行block48–55八层；权重由通用prefix splitter及`prepare_directml_swin.py`生成。真输入单轮17.388720ms、100轮每次重建prefix稳态10.784976ms；旧`--upsample`八层151.382ms，约14.04倍。block55对同版本旧链8,355,840值corr0.9999869541、MAE9.333e-5、RMSE0.0005249、max0.0234375，仅1941值差>0.01且全finite。两路继续跑blocks56–70后4K R10 SHA同为`4868b7e4...be35`逐byteexact；decoder256外置边界清零。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

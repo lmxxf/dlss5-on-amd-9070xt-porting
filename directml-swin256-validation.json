@@ -1,5 +1,5 @@
 {
-  "status": "decoder-blocks49-55-single-device-resident-passed",
+  "status": "decoder-block48-prefix-through-55-single-device-resident-passed",
   "date": "2026-09-04",
   "block": 49,
   "channels": 256,
@@ -15,6 +15,22 @@
     "block55_mae": 8.583676581289253e-5,
     "block55_max_abs_error": 0.0234375,
     "block55_exact_fraction": 0.9574102663526348,
+    "final_r10_byte_exact": true,
+    "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"
+  },
+  "resident_decoder_block48_prefix_through_55": {
+    "prefix": "2x nearest pack 512 channels -> DirectML 512x256 -> FP32 bias plus block22 skip",
+    "cold_gpu_ms": 17.388720,
+    "persistent_repeat_100_gpu_ms": 10.784976,
+    "old_gpu_plus_copy_ms": 151.382,
+    "speedup_persistent": 14.0365,
+    "block55_correlation": 0.9999869541485865,
+    "block55_mae": 0.00009333293,
+    "block55_rmse": 0.0005248512,
+    "block55_max_abs_error": 0.0234375,
+    "different_values": 370514,
+    "differences_over_0_01": 1941,
+    "all_finite": true,
     "final_r10_byte_exact": true,
     "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"
   },
@@ -39,5 +55,5 @@
     "final_r10_sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"
   },
   "final_vs_old": {"elements": 8355840, "correlation": 1.0, "mae": 0.0, "max_abs_error": 0.0, "exact_fraction": 1.0, "sha256": "e5482c76d02db5ffc46e3932d917ec312a100b12ab6be6c294be11f4f3f86a91"},
-  "strict_boundary": "Decoder blocks49-55 and encoder block14 predown through block22 have separate resident implementations and both pass final-R10 validation. Decoder block48 prefix remains outside, and persistent lifecycle integration is required before production rollout."
+  "strict_boundary": "Decoder block48 prefix through block55 and encoder block14 predown through block22 have separate resident implementations and both pass final-R10 validation. Persistent lifecycle integration is required before production rollout."
 }
