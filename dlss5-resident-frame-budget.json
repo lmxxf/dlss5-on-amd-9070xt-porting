@@ -1,0 +1,39 @@
+{
+  "status": "optimistic-resident-lower-bound-not-realtime",
+  "date": "2026-09-04",
+  "adapter": "AMD Radeon RX 9070 XT",
+  "resolution": "3840x2160 output, fixed network geometries",
+  "method": "sum the best measured initialized steady-state GPU time for each sequential stage; exclude process startup, file I/O, most readback, cross-stage barriers, game contention, and any unmeasured boundary cost",
+  "stages_ms": {
+    "front_block0_through_4": 39.567292,
+    "encoder_block4_predown_through_8": 24.478336,
+    "encoder_block8_predown_through_14": 18.282716,
+    "encoder_block14_predown_through_22": 14.869602,
+    "encoder_block22_predown_through_30": 8.923368,
+    "vit_block30_predown_through_38_observed": 31.669160,
+    "decoder_block39_through_47": 5.985188,
+    "decoder_block48_prefix_through_55": 10.784976,
+    "decoder_block56_prefix_through_61": 14.849870,
+    "decoder_block62_prefix_through_65": 21.467901,
+    "decoder_block66_prefix_through_69_exact": 60.051000,
+    "block70": 65.795000
+  },
+  "totals": {
+    "exact_or_best_validated_ms": 316.724409,
+    "exact_or_best_validated_fps": 3.157319,
+    "with_candidate_directml_block66_prefix_ms": 310.903657,
+    "with_candidate_directml_block66_prefix_fps": 3.216431
+  },
+  "largest_stages": [
+    {"stage": "block70", "ms": 65.795000, "fraction": 0.207736},
+    {"stage": "decoder_block66_prefix_through_69", "ms": 60.051000, "fraction": 0.189600},
+    {"stage": "front_block0_through_4", "ms": 39.567292, "fraction": 0.124927},
+    {"stage": "vit_block30_predown_through_38", "ms": 31.669160, "fraction": 0.099990}
+  ],
+  "required_total_speedup": {
+    "for_30_fps": 9.326,
+    "for_60_fps": 18.652
+  },
+  "interpretation": "This is an optimistic lower bound, not a whole-game benchmark. It proves that eliminating per-frame JIT/process/file overhead is necessary but insufficient. Realtime requires large algorithm/kernel gains in several stages, especially block70, both 32-channel full-resolution stages, and ViT; addon integration alone cannot close the gap.",
+  "completion_gate": "Do not claim realtime until the in-game addon shows consecutive changing frames at a stated measured cadence and the displayed output is visually validated."
+}
