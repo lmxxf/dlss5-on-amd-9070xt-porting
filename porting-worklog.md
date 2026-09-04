@@ -1839,6 +1839,10 @@ block14 predown随后并入encoder resident。首版输出全零的排查依次�
 
 encoder最终画面裁判随后完成。DirectML block14 predown＋resident blocks15–22与旧blocks15–22分别进入相同blocks23–30；两路block30再各自通过完整DirectML ViT31–38、integrated DirectML block39＋resident40–47、对应block22 skip的旧block48–55，以及共同block56–70。两份33,177,600-byte 4K R10 SHA-256均为`4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35`，逐byteexact。encoder256的数值、稳态性能与最终画面三门全部通过。严格剩余转为工程生命周期与其它宽度：不把每帧重做JIT的实验exe挂production，待持久worker/addon统一承载。
 
+128-channel从普通block57启动。geometry为T130560/C128/H160/Q192/A64、4 heads；纯矩阵benchmark Expand0.192522ms、QKV0.169455ms、Attention Projection0.036704ms、8160-batch window GEMM0.547163ms。通用FFN/Projection与DirectML boundary shader统一改为2D dispatch：当groups>65535时X=65535、Y=ceil(groups/65535)，HLSL以`id.x+id.y*4194240`展平，避免大tensor静默零化。真block57 FFN1.265760ms vs旧约12.98ms，16,711,680输出逐floatexact；QKV0.717298ms，对旧连续T×192 corr0.9999999778、MAE0.002689、max0.013527。
+
+初次拿历史`raw-16800-block57`作final裁判出现225个`+384↔-384`翻转并导致0.024% R10像素变化；分层重跑后证明这是oracle谱系错配，不是DirectML不稳定：只替FFN的Attention对当次纯旧Attention逐floatexact；DirectML QKV后的Attentioncorr0.9999999777、max0.01144；同一当前runner即时生成的纯旧final与DirectML FFN＋QKV＋旧Projection逐floatexact，加入DirectML Projection后corr0.99999999995、MAE7.439e-5、max0.015625、99.523926% exact，无大翻转。两份同版本final再进入blocks58–70，4K R10 SHA均为`4868b7e4...be35`逐byteexact。教训再次固化：历史同名中间文件不能跨runner版本作裁判。128档算法门通过，下一步构建blocks57–61与9–14 resident链。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

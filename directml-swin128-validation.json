@@ -1,0 +1,11 @@
+{
+  "status": "block57-cumulative-correctness-passed-not-resident",
+  "date": "2026-09-04",
+  "block": 57,
+  "channels": 128,
+  "tokens": 130560,
+  "gpu_ms": {"ffn": 1.265760, "qkv": 0.717298, "attention_projection": 0.485600},
+  "final_vs_same_version_old": {"correlation": 0.999999999950037, "mae": 7.43865966796875e-5, "max_abs_error": 0.015625, "exact_fraction": 0.9952392578125, "all_finite": true},
+  "downstream_r10": {"byte_exact": true, "sha256": "4868b7e487bd146a8a32448a0a1058c80645e7ad756f670c04d494592adabe35"},
+  "strict_boundary": "Block57 cumulative and final-image validation pass against a same-version freshly generated oracle. Encoder/decoder 128-channel resident chains remain to be built."
+}
