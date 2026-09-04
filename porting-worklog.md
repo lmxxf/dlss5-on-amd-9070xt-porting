@@ -2031,6 +2031,12 @@ production SHA`b0e0ada5...82219f`冷启动复验：日志明确`max_block=70 raw
 
 部署SHA-256为`4fe1d38d9815c1f6171be694cb9f2483271f02ba314305a99c03ff796a81ecbf`。进入同一洞窟后截图`grid-bug-after.png`已无修前`grid-bug-before.png`的满屏绿色周期网格；日志确认`display_residual generation=1320 mode=0`，并非关闭神经写入的截图。两项修正一起验证，尚未分别量化各自对方格的贡献。原20秒cadence脚本每120帧取一次计数有量化误差，不能把11.9838当作精确帧率证明。
 
+### 2026-09-05 30fps优化第一轮
+
+新增present侧5秒cadence日志，使用真实submission增量和GetTickCount64时间差，取代每120帧日志采样的粗略估计。block70的FP32展开FFN增加1920×1088可配置编译，使用DXC cs_6_2，启动时存在enable-block70-sm6.txt则加载候选；构建命令固定在build_block70_1080_sm6.ps1。C64/C128/C256 boundary只使用gate、完全不读取up，移除这些stage的冗余up GEMM与barrier，C512的gate×up保留。
+
+部署候选SHA为7e94524c9debf38659f29100ac08c54f7839c4322e73cce8d35b0b36bce57b8e。实测菜单5秒窗口约13.315–13.317fps；进入游戏加载期9.878/11.061，随后12.721/12.643fps。实际场景截图未见此前绿色网格。尚未达到30fps，且场景变化下这些数字不能独立证明两项候选各自的收益；下一步需要GPU分段timestamp定位热点，目标仍为33.3ms总帧预算。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

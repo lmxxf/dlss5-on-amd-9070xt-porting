@@ -1,5 +1,9 @@
+#ifndef WIDTH
 #define WIDTH 3840
+#endif
+#ifndef HEIGHT
 #define HEIGHT 2160
+#endif
 ByteAddressBuffer weights:register(t0);StructuredBuffer<float> input:register(t1),feature_unused:register(t2),qkv_unused:register(t3);RWStructuredBuffer<float> features:register(u0),output_unused:register(u1),qkv_output_unused:register(u2);
 float weight(uint i){return asfloat(weights.Load(i*4));}
 uint input_index(uint t,uint c){uint x=t%WIDTH,y=t/WIDTH,tile=(y/8)*(WIDTH/8)+x/8,local=((y%8)*8+x%8)*32+c;return tile*2048+local;}
