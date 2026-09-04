@@ -1883,6 +1883,10 @@ block4 predown并入encoder64后反而揭开旧runner静默截断：旧`d3d12_sw
 
 修正后的FP32 generic predown＋blocks5–8与DirectML integrated版本比较：33,423,360值corr0.9999999444、MAE1.028e-7、RMSE3.355e-5、max0.015625，仅543值不同、135值差>0.01。integrated单轮30.663440ms，100轮每次重做predown稳态24.478336ms，其中predown-only 5.555640ms。正确pre-down完整跑到block70得到4K R10 SHA`44f2517d44635c610bb15b1cc2e9d932793d5b7667b859f16f645111315e8d46`；画面干净，相对历史截断版仅176,434/8,294,400像素变化（2.1271%），RGB最大2/3/3个10-bit刻度。因此旧SHA不再作为该边界golden；这是修复历史执行缺口，不是DirectML回归。
 
+部署predown-v2后又从修正block4输出完整重跑block8→9、block14→15与block22→23三条后续边界，最终R10 SHA仍为`44f2517d...e8d46`；说明本帧可见变化全部由最早的block4截断修复决定，后续旧截断此前被上游零区遮蔽，但通用runner仍必须保留2D修复以覆盖其它帧。
+
+encoder512主体也进入resident。`d3d12_directml_swin512_resident.cpp`新增`DML_SWIN_FIRST_BLOCK`与`DML_SWIN_LAYERS`，shift按blocks23–30的`none/XY/Y/X`周期由真实block号推导，输出ping-pong按active layer奇偶选择。从同帧`raw-16800-block23`补H68→H72后起跑blocks24–30：单轮6.418760ms、100轮稳态5.020680ms；旧七层FP32 HLSL 177.965ms，约35.45倍。最终block30 4,177,920 floats与同版本旧链逐float/byte 100% exact且全finite。严格剩余是把block22的256-channel body经pool/256→512 enter直接送入block23，并做最终R10裁判。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -53,5 +53,16 @@
     "block47_max_abs_error": 0.0078125,
     "final_r10_byte_exact": true
   },
-  "strict_boundary": "Block39-47 now execute on one device and command list and pass final-image validation. The production trial was rolled back because per-frame process/JIT startup made wall time worse; persistent addon integration is required before rollout."
+  "encoder_blocks24_30": {
+    "input": "raw-16800-block23.f32 padded from H68 to H72",
+    "single_gpu_ms": 6.418760,
+    "steady_100_gpu_ms": 5.020680,
+    "old_gpu_plus_copy_ms": 177.965,
+    "steady_speedup_vs_old": 35.445,
+    "block30_values": 4177920,
+    "block30_byte_exact": true,
+    "block30_correlation": 1.0,
+    "all_finite": true
+  },
+  "strict_boundary": "Decoder block39-47 and encoder blocks24-30 now have resident DirectML implementations. Encoder block22-to-23 predown remains outside the DirectML graph, and persistent addon integration is required before rollout."
 }
