@@ -30,7 +30,7 @@
   },
   "runtime_dll": {
     "source": "dlss5_1080p_runtime.cpp",
-    "binary_sha256": "8d25f71c4814f5b53d790dbfe35e75a9bcc23dcc746db87ccf73b601f2cfc627",
+    "binary_sha256": "c48e77d01a0515de6230015d2b7bcb0c40e52f7ae236569bf0fd1cc5528e5866",
     "in_process_contract": [
       "main IDXGISwapChain3 device",
       "persistent DirectML device, queue, allocator, list and fence",
@@ -40,7 +40,14 @@
       "current-frame Color bilinear resize to 960x544 and direct 8x8 tile-major GPU buffer write"
     ],
     "persistent_frame_input": {"target": "960x544", "tiles": 8160, "bytes": 8355840, "descriptor_ring": 8},
-    "status": "compiled and deployed; first in-game frame-bridge load pending"
+    "persistent_block0": {
+      "operators": ["8160x192x256", "8160x256x256", "8160x256x2048"],
+      "passes": ["RGBA tile to RGB FP16", "SiLU1", "SiLU2", "output affine", "E4M3 tile-to-HWC"],
+      "output": "960x544x32 FP32 HWC resident UAV",
+      "weights": "loaded once during initialization",
+      "frame_input_transition": "UAV -> NON_PIXEL_SHADER_RESOURCE, restored to UAV before the next frame"
+    },
+    "status": "compiled and deployed; first in-game current-frame block0 load pending"
   },
   "next_boundary": "block4 matrix/pool/32-to-64 enter followed by resident blocks5-8 at 480x272"
 }

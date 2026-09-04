@@ -1943,6 +1943,10 @@ Zero将第一阶段目标明确为1080p至少10fps，严格4K留待后续。不�
 
 DLL随后接入第一个真实逐帧GPU pass。初始化worker创建常驻8,355,840-byte tile UAV、固定960×544 bilinear/tile PSO与8套双descriptor heaps；每次FFX upscale hook在调用原FSR前，以renderSize作为active范围从当帧RGBA16F Color `Texture2D.Load`做align-corners-false等价bilinear，直接按`[tile,8×8,RGBA]`写8160 tiles，并插UAV barrier。descriptor按frame&7轮转，避免CPU更新覆盖仍在GPU使用的SRV；Color只读、输出仅为自有buffer，不碰游戏画面。该pass即使游戏暂为4K也可验证当前帧桥，只有upscaleSize=1920×1080时才提升`frame_contract_1080`。全程仍无readback和中间文件。新版统一runtime SHA为`8d25f71c4814f5b53d790dbfe35e75a9bcc23dcc746db87ccf73b601f2cfc627`，下一前台启动日志应同时出现`ffx_frame`与`frame_bridge_submit`。
 
+block0完整执行随后搬入同一runtime。初始化worker一次加载DirectML三层FP16 matrix、三层bias、output scale/bias与4×512 tile map，创建`8160×192→256`、`8160×256→256`、`8160×256→2048`三枚compiled operator以及约180MB常驻scratch；initializer和权重copy在独立queue完成后才原子发布`block0_ready`。每帧frame bridge后在原FFX commandList连续record RGB FP16 pack→GEMM1→SiLU→GEMM2→SiLU→GEMM3→affine→E4M3 tile-to-HWC，最终写常驻960×544×32 FP32 UAV，不启动exe、不读回、不写文件。
+
+同步合同同时收紧：frame tile初态UAV；每帧写前若非首帧显式`NON_PIXEL→UAV`，写后UAV barrier再`UAV→NON_PIXEL`供block0 SRV读取，不能依赖standalone驱动对UAV状态下SRV读的宽松容忍。新版binary SHA为`c48e77d01a0515de6230015d2b7bcb0c40e52f7ae236569bf0fd1cc5528e5866`。当前严格边界：真实当帧Color已经在DLL内跑到block0 HWC，但尚未接blocks1–4或回写画面；首次游戏加载仍待前台验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

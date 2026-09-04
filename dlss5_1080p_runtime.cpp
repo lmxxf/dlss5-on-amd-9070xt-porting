@@ -3,6 +3,8 @@
 #include <atomic>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <vector>
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include <dxgi1_4.h>
@@ -53,6 +55,15 @@ ID3D12RootSignature *g_frame_bridge_root = nullptr;
 ID3D12PipelineState *g_frame_bridge_pso = nullptr;
 ID3D12DescriptorHeap *g_frame_bridge_heaps[8]{};
 ID3D12Resource *g_frame_tiles = nullptr;
+DmlGemmOperator *g_block0_l1 = nullptr, *g_block0_l2 = nullptr, *g_block0_l3 = nullptr;
+ID3D12Resource *g_block0_packed = nullptr, *g_block0_raw1 = nullptr, *g_block0_hidden1 = nullptr,
+                 *g_block0_raw2 = nullptr, *g_block0_hidden2 = nullptr, *g_block0_raw3 = nullptr,
+                 *g_block0_tile = nullptr, *g_block0_hwc = nullptr;
+ID3D12RootSignature *g_block0_root = nullptr;
+ID3D12PipelineState *g_block0_pso[5]{};
+ID3D12DescriptorHeap *g_block0_heap = nullptr;
+std::atomic<bool> g_block0_ready{false};
+std::atomic<unsigned long long> g_block0_submissions{0};
 
 struct FfxHeader { uint64_t type; FfxHeader *pNext; };
 struct FfxDimensions2D { uint32_t width, height; };
@@ -97,6 +108,7 @@ bool on_main_device(void *resource) {
 bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *color,
                          uint32_t render_width, uint32_t render_height,
                          unsigned long long frame);
+bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame);
 
 uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
     const auto n = ++g_ffx_frames;
@@ -107,10 +119,12 @@ uint32_t hook_ffx_dispatch(void **context, const FfxHeader *header) {
             on_main_device(dispatch->output.resource);
         const bool target = dispatch->upscaleSize.width == 1920 && dispatch->upscaleSize.height == 1080;
         g_frame_contract_ready.store(resources_same_device && target && dispatch->commandList != nullptr);
-        if (resources_same_device && dispatch->commandList && g_frame_bridge_ready.load())
-            record_frame_bridge(static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList),
-                                static_cast<ID3D12Resource *>(dispatch->color.resource),
-                                dispatch->renderSize.width, dispatch->renderSize.height, n);
+        if (resources_same_device && dispatch->commandList && g_frame_bridge_ready.load()) {
+            auto *commands = static_cast<ID3D12GraphicsCommandList *>(dispatch->commandList);
+            if (record_frame_bridge(commands, static_cast<ID3D12Resource *>(dispatch->color.resource),
+                                    dispatch->renderSize.width, dispatch->renderSize.height, n))
+                record_block0(commands, n);
+        }
         if (n == 1 || n % 120 == 0) {
             log("ffx_frame=%llu cmd=%p render=%ux%u output=%ux%u target1080=%u same_device=%u jitter=%.7g,%.7g color=%p[%u,%ux%u,s%u] depth=%p[%u,%ux%u,s%u] motion=%p[%u,%ux%u,s%u] output_resource=%p[%u,%ux%u,s%u]\n",
                 n, dispatch->commandList, dispatch->renderSize.width, dispatch->renderSize.height,
@@ -246,6 +260,15 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
     if (!commands || !color || !g_frame_bridge_ready.load() || !render_width || !render_height)
         return false;
     ID3D12DescriptorHeap *heap = g_frame_bridge_heaps[frame & 7];
+    if (g_frame_bridge_submissions.load()) {
+        D3D12_RESOURCE_BARRIER transition{};
+        transition.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        transition.Transition.pResource = g_frame_tiles;
+        transition.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        transition.Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        transition.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        commands->ResourceBarrier(1, &transition);
+    }
     auto cpu = heap->GetCPUDescriptorHandleForHeapStart();
     const auto desc = color->GetDesc();
     D3D12_SHADER_RESOURCE_VIEW_DESC srv{};
@@ -266,11 +289,122 @@ bool record_frame_bridge(ID3D12GraphicsCommandList *commands, ID3D12Resource *co
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
     barrier.UAV.pResource = g_frame_tiles;
     commands->ResourceBarrier(1, &barrier);
+    D3D12_RESOURCE_BARRIER transition{};
+    transition.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    transition.Transition.pResource = g_frame_tiles;
+    transition.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    transition.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    transition.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+    commands->ResourceBarrier(1, &transition);
     const auto submitted = ++g_frame_bridge_submissions;
     if (submitted == 1 || submitted % 120 == 0)
         log("frame_bridge_submit=%llu ffx_frame=%llu render=%ux%u color=%p format=%u\n",
             submitted, frame, render_width, render_height, color, static_cast<unsigned>(desc.Format));
     return true;
+}
+
+std::vector<unsigned char> read_runtime_file(const wchar_t *name) {
+    wchar_t path[MAX_PATH];
+    swprintf(path, MAX_PATH, LR"(D:\DLSSNR-Lab\%ls)", name);
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (!file) throw DmlFailure{"block0 weight file", HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)};
+    const size_t size = static_cast<size_t>(file.tellg());
+    file.seekg(0);
+    std::vector<unsigned char> data(size);
+    file.read(reinterpret_cast<char *>(data.data()), size);
+    return data;
+}
+
+void initialize_block0() {
+    constexpr UINT tiles = 8160;
+    constexpr UINT64 p192 = UINT64(tiles) * 192 * 2;
+    constexpr UINT64 h256 = UINT64(tiles) * 256 * 2;
+    constexpr UINT64 o2048 = UINT64(tiles) * 2048 * 2;
+    constexpr UINT64 out_bytes = UINT64(tiles) * 2048 * 4;
+    g_block0_l1 = new DmlGemmOperator();
+    g_block0_l2 = new DmlGemmOperator();
+    g_block0_l3 = new DmlGemmOperator();
+    g_block0_l1->Create(g_dml, g_device, 1, tiles, 192, 256);
+    g_block0_l2->Create(g_dml, g_device, 1, tiles, 256, 256);
+    g_block0_l3->Create(g_dml, g_device, 1, tiles, 256, 2048);
+
+    dmlrt_check("block0 allocator reset", g_allocator->Reset());
+    dmlrt_check("block0 list reset", g_list->Reset(g_allocator, nullptr));
+    g_block0_l1->RecordInitialization(g_recorder, g_list);
+    g_block0_l2->RecordInitialization(g_recorder, g_list);
+    g_block0_l3->RecordInitialization(g_recorder, g_list);
+
+    auto w1 = read_runtime_file(L"block0-directml-layer1_weight.f16");
+    auto b1 = read_runtime_file(L"block0-directml-layer1_bias.f32");
+    auto w2 = read_runtime_file(L"block0-directml-layer2_weight.f16");
+    auto b2 = read_runtime_file(L"block0-directml-layer2_bias.f32");
+    auto w3 = read_runtime_file(L"block0-directml-layer3_weight.f16");
+    auto b3 = read_runtime_file(L"block0-directml-layer3_bias.f32");
+    auto output_bias = read_runtime_file(L"block0-directml-output_bias.f32");
+    auto output_scale = read_runtime_file(L"block0-directml-output_scale.f32");
+    auto tile_map = read_runtime_file(L"block0-directml-tile-map.u16");
+    if (w1.size()!=192*256*2||b1.size()!=256*4||w2.size()!=256*256*2||b2.size()!=256*4||
+        w3.size()!=256*2048*2||b3.size()!=2048*4||output_bias.size()!=2048*4||
+        output_scale.size()!=2048*4||tile_map.size()!=4*512*2)
+        throw DmlFailure{"block0 weight size", E_INVALIDARG};
+
+    g_block0_packed = make_buffer(p192, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_raw1 = make_buffer(h256, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_hidden1 = make_buffer(h256, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_raw2 = make_buffer(h256, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_hidden2 = make_buffer(h256, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_raw3 = make_buffer(o2048, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_tile = make_buffer(out_bytes, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    g_block0_hwc = make_buffer(out_bytes, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+
+    struct Constant { ID3D12Resource *resource; std::vector<unsigned char> *data; };
+    std::vector<ID3D12Resource *> uploads;
+    auto upload = [&](const std::vector<unsigned char> &data) {
+        ID3D12Resource *dst = make_buffer(data.size(), D3D12_HEAP_TYPE_DEFAULT,
+            D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+        ID3D12Resource *src = make_buffer(data.size(), D3D12_HEAP_TYPE_UPLOAD,
+            D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_FLAG_NONE);
+        void *mapped = nullptr; D3D12_RANGE none{0,0};
+        dmlrt_check("block0 upload map", src->Map(0, &none, &mapped));
+        std::memcpy(mapped, data.data(), data.size()); src->Unmap(0, nullptr);
+        g_list->CopyBufferRegion(dst, 0, src, 0, data.size());
+        D3D12_RESOURCE_BARRIER barrier{}; barrier.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Transition.pResource=dst;barrier.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        barrier.Transition.StateBefore=D3D12_RESOURCE_STATE_COPY_DEST;barrier.Transition.StateAfter=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        g_list->ResourceBarrier(1,&barrier);uploads.push_back(src);return dst;
+    };
+    ID3D12Resource *rw1=upload(w1),*rb1=upload(b1),*rw2=upload(w2),*rb2=upload(b2),
+                     *rw3=upload(w3),*rb3=upload(b3),*rbo=upload(output_bias),
+                     *rscale=upload(output_scale),*rmap=upload(tile_map);
+
+    const char shader[] = R"(
+StructuredBuffer<float> src:register(t0),b1:register(t1),b2:register(t2),b3:register(t3),bo:register(t4),scale:register(t5);
+ByteAddressBuffer raw1:register(t6),raw2:register(t7),raw3:register(t8);StructuredBuffer<float> tile:register(t9);ByteAddressBuffer map:register(t10);
+RWByteAddressBuffer packed:register(u0),h1:register(u1),h2:register(u2);RWStructuredBuffer<float> output:register(u3),hwc:register(u4);
+float H(ByteAddressBuffer b,uint i){uint x=b.Load((i&~1)*2);return f16tof32((x>>((i&1)*16))&65535);}float silu(float x){return x/(1+exp(-x));}
+float F(float x){if(x==0)return 0;float q=x<0?-1:1,a=abs(x);if(a<.015625)return q*min(round(a*512),7)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e+=1;}return q*min(exp2(e)*(1+m/8),448.);}
+[numthreads(64,1,1)]void pack_input(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*192)return;float v[2];[unroll]for(uint z=0;z<2;z++){uint n=i+z,t=n/192,j=n%192;v[z]=src[t*256+(j/3)*4+j%3];}packed.Store(i*2,f32tof16(v[0])|(f32tof16(v[1])<<16));}
+[numthreads(64,1,1)]void post1(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*256)return;h1.Store(i*2,f32tof16(silu(H(raw1,i)+b1[i%256]))|(f32tof16(silu(H(raw1,i+1)+b1[(i+1)%256]))<<16));}
+[numthreads(64,1,1)]void post2(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*256)return;h2.Store(i*2,f32tof16(silu(H(raw2,i)+b2[i%256]))|(f32tof16(silu(H(raw2,i+1)+b2[(i+1)%256]))<<16));}
+[numthreads(64,1,1)]void post3(uint3 id:SV_DispatchThreadID){uint i=id.x+id.y*4194240;if(i<8160*2048){uint j=i%2048;output[i]=(H(raw3,i)+b3[j])*scale[j]+bo[j];}}
+[numthreads(64,1,1)]void reorder(uint3 id:SV_DispatchThreadID){uint z=id.x+id.y*4194240;if(z>=8160*2048)return;uint c=z%32,p=z/32,x=p%960,y=p/960,tileId=(y/8)*120+x/8,q=((y%8)/4)*2+(x%8)/4,local=((y%4)*4+x%4)*32+c,mi=q*512+local,word=map.Load((mi&~1)*2),rank=(word>>((mi&1)*16))&65535;hwc[z]=F(tile[tileId*2048+q*512+rank]);})";
+    const char *entries[5]={"pack_input","post1","post2","post3","reorder"};
+    ID3DBlob *error=nullptr;
+    for(UINT i=0;i<5;i++){ID3DBlob *code=nullptr;dmlrt_check("block0 compile",D3DCompile(shader,sizeof(shader)-1,nullptr,nullptr,nullptr,entries[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error));if(!g_block0_root){D3D12_DESCRIPTOR_RANGE ranges[2]={{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,11,0,0,0},{D3D12_DESCRIPTOR_RANGE_TYPE_UAV,5,0,0,11}};D3D12_ROOT_PARAMETER parameter{};parameter.ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;parameter.DescriptorTable={2,ranges};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=1;desc.pParameters=&parameter;ID3DBlob *signature=nullptr;dmlrt_check("block0 signature",D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&signature,&error));dmlrt_check("block0 root",g_device->CreateRootSignature(0,signature->GetBufferPointer(),signature->GetBufferSize(),IID_PPV_ARGS(&g_block0_root)));}D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};desc.pRootSignature=g_block0_root;desc.CS={code->GetBufferPointer(),code->GetBufferSize()};dmlrt_check("block0 pso",g_device->CreateComputePipelineState(&desc,IID_PPV_ARGS(&g_block0_pso[i])));}
+    D3D12_DESCRIPTOR_HEAP_DESC heap_desc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,16,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};
+    dmlrt_check("block0 heap",g_device->CreateDescriptorHeap(&heap_desc,IID_PPV_ARGS(&g_block0_heap)));
+    UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);auto cpu=g_block0_heap->GetCPUDescriptorHandleForHeapStart();D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Buffer.StructureByteStride=4;for(auto pair:{std::pair<ID3D12Resource*,UINT>{g_frame_tiles,8160*256},{rb1,256},{rb2,256},{rb3,2048},{rbo,2048},{rscale,2048}}){sv.Buffer.NumElements=pair.second;g_device->CreateShaderResourceView(pair.first,&sv,cpu);cpu.ptr+=step;}sv.Format=DXGI_FORMAT_R32_TYPELESS;sv.Buffer.StructureByteStride=0;sv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;for(auto pair:{std::pair<ID3D12Resource*,UINT64>{g_block0_raw1,h256},{g_block0_raw2,h256},{g_block0_raw3,o2048}}){sv.Buffer.NumElements=(UINT)(pair.second/4);g_device->CreateShaderResourceView(pair.first,&sv,cpu);cpu.ptr+=step;}sv.Format=DXGI_FORMAT_UNKNOWN;sv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_NONE;sv.Buffer.StructureByteStride=4;sv.Buffer.NumElements=(UINT)(out_bytes/4);g_device->CreateShaderResourceView(g_block0_tile,&sv,cpu);cpu.ptr+=step;sv.Format=DXGI_FORMAT_R32_TYPELESS;sv.Buffer.StructureByteStride=0;sv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;sv.Buffer.NumElements=(UINT)(tile_map.size()/4);g_device->CreateShaderResourceView(rmap,&sv,cpu);cpu.ptr+=step;D3D12_UNORDERED_ACCESS_VIEW_DESC uv{};uv.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uv.Format=DXGI_FORMAT_R32_TYPELESS;uv.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_RAW;for(auto pair:{std::pair<ID3D12Resource*,UINT64>{g_block0_packed,p192},{g_block0_hidden1,h256},{g_block0_hidden2,h256}}){uv.Buffer.NumElements=(UINT)(pair.second/4);g_device->CreateUnorderedAccessView(pair.first,nullptr,&uv,cpu);cpu.ptr+=step;}uv.Format=DXGI_FORMAT_UNKNOWN;uv.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_NONE;uv.Buffer.StructureByteStride=4;uv.Buffer.NumElements=(UINT)(out_bytes/4);g_device->CreateUnorderedAccessView(g_block0_tile,nullptr,&uv,cpu);cpu.ptr+=step;g_device->CreateUnorderedAccessView(g_block0_hwc,nullptr,&uv,cpu);
+
+    dmlrt_check("block0 init close",g_list->Close());ID3D12CommandList *lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);dmlrt_check("block0 init signal",g_queue->Signal(g_fence,3));dmlrt_check("block0 init event",g_fence->SetEventOnCompletion(3,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"block0 init wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};for(auto *resource:uploads)resource->Release();
+    g_block0_l1->Bind(g_block0_packed,rw1,g_block0_raw1);g_block0_l2->Bind(g_block0_hidden1,rw2,g_block0_raw2);g_block0_l3->Bind(g_block0_hidden2,rw3,g_block0_raw3);g_block0_ready.store(true);log("block0_ready tiles=8160 hwc=960x544 output=%p\n",g_block0_hwc);
+}
+
+bool record_block0(ID3D12GraphicsCommandList *commands, unsigned long long frame) {
+    if(!commands||!g_block0_ready.load())return false;
+    auto custom=[&](UINT pass,UINT64 threads){ID3D12DescriptorHeap *heaps[]={g_block0_heap};commands->SetDescriptorHeaps(1,heaps);commands->SetComputeRootSignature(g_block0_root);commands->SetComputeRootDescriptorTable(0,g_block0_heap->GetGPUDescriptorHandleForHeapStart());commands->SetPipelineState(g_block0_pso[pass]);UINT64 groups=(threads+63)/64;commands->Dispatch((UINT)std::min<UINT64>(groups,65535),(UINT)((groups+65534)/65535),1);};
+    auto barrier=[&](ID3D12Resource *resource){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=resource;commands->ResourceBarrier(1,&b);};
+    custom(0,8160*192/2);barrier(g_block0_packed);g_block0_l1->Record(g_recorder,commands);barrier(g_block0_raw1);custom(1,8160*256/2);barrier(g_block0_hidden1);g_block0_l2->Record(g_recorder,commands);barrier(g_block0_raw2);custom(2,8160*256/2);barrier(g_block0_hidden2);g_block0_l3->Record(g_recorder,commands);barrier(g_block0_raw3);custom(3,8160*2048);barrier(g_block0_tile);custom(4,8160*2048);barrier(g_block0_hwc);
+    const auto submitted=++g_block0_submissions;if(submitted==1||submitted%120==0)log("block0_submit=%llu ffx_frame=%llu hwc=%p\n",submitted,frame,g_block0_hwc);return true;
 }
 
 void run_warm_probe() {
@@ -399,6 +533,7 @@ DWORD WINAPI initialize_worker(void *) {
         try {
             run_warm_probe();
             initialize_frame_bridge();
+            initialize_block0();
         } catch (const DmlFailure &failure) {
             hr = failure.result;
             log("resident_execution_failed operation=%s hr=0x%08x\n",
