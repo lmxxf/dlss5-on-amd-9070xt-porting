@@ -1,0 +1,30 @@
+blocks56_61_submit=3360 ffx_frame=5143 output=00000002f47101d0
+blocks62_65_submit=3360 ffx_frame=5143 output=00000002f4308f90
+blocks66_69_submit=3360 ffx_frame=5143 output=00000002f4313530
+block70_submit=3360 ffx_frame=5143 output=display_residual
+display_residual generation=3360 mode=0
+cadence frames=96 elapsed_ms=5031 fps=19.082
+video_memory segment=0 usage_mib=8680.02 budget_mib=14953.53
+video_memory segment=1 usage_mib=162.95 budget_mib=31460.88
+ffx_frame=5160 cmd=00000002c7f5ad90 render=1281x721 abi_output=0x0 target1080=1 same_device=1 device_parts=11111 jitter=-0.1875,-0.1296296 color=000000023bed9070[4,1284x724,s4] depth=0000000249c946a0[28,1284x724,s4] motion=00000001129b62a0[18,1284x724,s4] output_resource=0000000348ea30a0[4,1920x1080,s2]
+present_backbuffer=5400 index=2 size=1920x1080 format=24
+present=5400 backend_ready=1 failed=0 ffx_hook=1 ffx_frames=5245 frame_contract_1080=1
+cadence frames=97 elapsed_ms=5031 fps=19.280
+video_memory segment=0 usage_mib=8680.02 budget_mib=14953.53
+video_memory segment=1 usage_mib=162.95 budget_mib=31460.88
+frame_bridge_submit=3480 ffx_frame=5263 render=1281x721 color=000000023bed9070 format=10
+block0_submit=3480 ffx_frame=5263 hwc=0000000111f0ac40
+front_blocks1_4_submit=3480 ffx_frame=5263 block4=000000013c3fda10
+blocks5_8_submit=3480 ffx_frame=5263 block8=000000013c3ff140
+blocks9_14_submit=3480 ffx_frame=5263 output=0000000198f79530
+blocks15_22_submit=3480 ffx_frame=5263 output=000000023413baf0
+blocks23_30_submit=3480 ffx_frame=5263 output=00000002d7055b20
+blocks31_38_submit=3480 ffx_frame=5263 output=00000001c177da40 tokens=540
+blocks39_47_submit=3480 ffx_frame=5263 output=0000000273b997a0
+blocks48_55_submit=3480 ffx_frame=5263 output=00000002d7b6f7e0
+blocks56_61_submit=3480 ffx_frame=5263 output=00000002f47101d0
+blocks62_65_submit=3480 ffx_frame=5263 output=00000002f4308f90
+blocks66_69_submit=3480 ffx_frame=5263 output=00000002f4313530
+block70_submit=3480 ffx_frame=5263 output=display_residual
+display_residual generation=3480 mode=0
+ffx_frame=5280 cmd=00000002ca3fa2a0 render=1281x721 abi_output=0x0 target1080=1 same_device=1 device_parts=11111 jitter=0.3125,0.2037037 color=000000023bed9070[4,1284x724,s4] depth=0000000249c946a0[28,1284x724,s4] motion=00000001129b62a0[18,1284x724,s4] output_resource=0000000348ea30a0[4,1920x1080,s2]
