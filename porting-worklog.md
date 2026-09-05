@@ -2465,6 +2465,14 @@ diagnose_native_c64_attention.py将FFN设identity，分别保留均匀attention�
 
 因此当前C64完整CPU参考已通过两组输入，不再把其称为仅均匀attention通过。Q/K推导布局受到完整非均匀原权重测试约束，但仍未声称独立逐权重basis验证。下一步据此实现AMD C64三矩阵FFN与双头attention，再接入resident链；目前AMD执行范围仍block0..4 DS。游戏DLL与公开ZIP未更新，最终剑星画面目标active。
 
+### 2026-09-06 完整C64接入AMD，RGB到block5整链逐值一致
+
+新增native_c64.h/hlsl，三阶段常驻GPU：64→256→分组64→投影64的FFN、每头32维attention-value、跨头64维输出投影。明确保留FFN末尾FP8边界，使用已验证的half norm/softmax加法图和每K32舍入；两head分别dispatch，最终跨头投影单独dispatch，避免组内同步误当跨组同步。资源全由D3D12维护，重放间UAV/SRV屏障，root SRV绑定原始系数解码后的常驻权重，无CPU中间传递。
+
+prepare_native_front_chain.py导出block5参数，d3d12_native_front_chain_test新增c64模式，输入仍是同一份128×64 RGB，复用AMD算出的block4 DS，不注入原版激活。MinGW编译通过，9070XT三次GPU执行全部replay pass。独立validate_native_c64_chain.py按此前探针恢复的原CUBIN cell映射解码block5输出，与实际AMD output-c64.f32比较32768/32768逐值相同，MAE/max0、nonfinite0，有exact断言。CPU完整C64及FFN随机测试复查仍通过。
+
+当前真实AMD闭合范围推进为block0..5（第0层另一路主输出之前仍有2个值差异待查），不是完整网络/最终RGB。尚未部署游戏addon；公开ZIP、游戏DLL不变。下一步处理block6/7的C64移位窗口和block8 DS，再继续更宽层，最终剑星实际画面验收目标保持active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

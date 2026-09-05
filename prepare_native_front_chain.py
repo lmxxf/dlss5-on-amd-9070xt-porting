@@ -15,5 +15,8 @@ layout=np.load('release/preblock-ffn-byte-layout/layout.npz')
 raw=np.fromfile('release/native-c32/block4.weights',np.uint8);assert raw.size==22720
 matrix=np.empty((64,32),np.float32);matrix[layout['w1_hidden'][:2048],layout['w1_input'][:2048]]=e4m3fn(raw[20656:22704])
 matrix.astype('<f4').tofile(a.output/'block4-ds.f32')
+fw=np.load('release/native-c64/ffn-layout/matrices.npz');aw=np.load('release/native-c64/attention-layout/full-matrices.npz')
+np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/'block5-ffn.f32')
+np.concatenate([aw[k].ravel() for k in ('Q','K','V','P','bias','scales','skip')]).astype('<f4').tofile(a.output/'block5-attention.f32')
 manifest={'input_extent':[128,64],'body_extent':[64,32],'shift_masks':[0,3,1,2],'ds_extent':[32,16],'files':{f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in a.output.glob('*.f32')}}
 (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
