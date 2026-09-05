@@ -2253,6 +2253,18 @@ repair_temporal_aa.ps1要求游戏已退出，幂等修改单一AA项，保留�
 
 本轮完成最终合成提交修复和同帧像素有效性证明，**未完成无网格的正确神经画质**。当前外置开发版保留真实提交及可选审计，未更新网盘ZIP，未改驱动/解析度/模型，尾端新矩阵优化仍关闭。抓取后游戏继续数千帧failed0，约18.7fps；最终退出游戏，不留异常画面运行。后续主线应是消除真实输出的周期错误，不是继续追FPS。
 
+### 2026-09-05 继续正确性移植：修复block70 CSR错位与主输入bank布局
+
+重新审查pack_block70_sparse_prefix.py与实际文件：CSR格式是2049个uint32 row ends（8196 bytes）后直接接indices和weights，最后一个row end本身就是nnz，不存在额外nnz字。运行时及两个旧runner把ibase/wbase写成8200，整段错读一项，末尾越界4 bytes。真实文件27652 bytes、nnz2432，准确公式8196+2432×8；旧prepare_block70_prefix_pairs.py还把缺失最后权重补零，掩盖格式错误。
+
+修复dlss5_1080p_runtime.cpp、d3d12_block70_chain.cpp、d3d12_block70_prefix_sparse.cpp中的偏移；runtime追加完整长度检查。pairs转换改为准确8196偏移并拒绝截断，不再补零。原权重文件没改。validate_block70_csr.py重建CSR，与原dense按1e-5阈值稀疏化后的矩阵逐值exact；RX9070XT执行1056组（1024个单输入basis+32随机输入），basis最大误差0、随机最大误差4.76837158203125e-7、nonfinite0，独立GPU1.121ms。pairs新hash c67c83a1，全部2432权重实际存在，未部署pairs候选到当前runtime。
+
+进一步发现原prefix主输入512元素排列为2×4×4×16 bank-major，而X(sample,i)按4×4×32 HWC解释。由原矩阵所有2048个输出的唯一主输入索引验证公式：(c//16)*256+((y//2)*4+x//2)*16+c%16，全量匹配。runtime及离线chain主分支地址恢复为plane=(i%256)/16、channel=i%16+(i/256)*16；skip尚未假定为同布局。该映射检查已加入回归脚本。
+
+部署CSR-only SHA6bf22f...后同帧残差均值1.3057/255、8×8相位方差解释95.99%；再修主bank映射后DLL SHAb210a4313047edef421ef7d6d149264df943ee9facfa576d44aaa8a094c7a47e，主菜单99.9968%像素改变、平均1.5696/255、CPU公式误差≤1个10-bit级，backbuffer与合成逐字节exact。相位方差解释96.22%，截图仍有网格；不能把两项数学修正误报为画质完成，两个主菜单抓取也不是同一输入帧的效果比较。详见display-audit-prefix-main-fixed.json。
+
+下一个明确缺口：当前局部prefix的skip只有384个非零连接，独立全尺寸block70-prefix-global-skip-effective.bin有1536个非零，输入2048物理元素分两个bank，而运行时仍从低分辨率g_block0_hwc按局部512元素获取。需恢复完整skip来源/尺寸/物理排列，不能直接把两矩阵当作同一输入合同或靠补零/平滑隐藏缺失。另block0-distilled仍是文档明确的近似代理，不应宣称精确原版移植。rtx5090 SSH已恢复，hostname NucBox_EVO-T1、实际GPU RTX5090，当前无剑星进程；没有修改5090环境。此次保留已证实的两项修复，结束AMD测试游戏，原发布ZIP仍未更换。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

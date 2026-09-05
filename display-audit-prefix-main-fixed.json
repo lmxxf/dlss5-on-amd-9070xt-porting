@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "generation": 120,
+    "width": 1920,
+    "height": 1080,
+    "row_pitch": 7680,
+    "body_bytes": 267386880,
+    "mode": 0,
+    "fence_completed": true,
+    "files_complete": true
+  },
+  "weight_abs_max": 0.0567706860601902,
+  "body_abs_max": 4.5,
+  "backbuffer_exactly_matches_composite": true,
+  "whole_frame": {
+    "changed_pixel_fraction": 0.9999676890432099,
+    "mean_abs_change_8bit_levels": 1.5695952600048435,
+    "max_abs_change_8bit_levels": 12.712609970674487,
+    "abs_change_8bit_percentiles_50_90_99": [
+      0.7478005865102639,
+      2.9912023460410557,
+      11.466275659824047
+    ],
+    "residual_abs_mean": 0.006222676020115614,
+    "residual_abs_max": 0.04985020309686661,
+    "residual_abs_percentiles_50_90_99": [
+      0.0026449053548276424,
+      0.01140319649130106,
+      0.04560460150241852
+    ],
+    "predicted_changed_pixel_fraction": 0.9999676890432099,
+    "observed_vs_formula_max_10bit_levels": 1,
+    "observed_vs_formula_over_1level_fraction": 0
+  },
+  "periodic_8x8": {
+    "variance_explained_by_phase": 0.9621571024376429
+  }
+}

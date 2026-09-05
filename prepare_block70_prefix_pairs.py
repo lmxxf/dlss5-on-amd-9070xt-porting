@@ -12,11 +12,13 @@ a = p.parse_args()
 raw = a.input.read_bytes()
 ends = np.frombuffer(raw, "<u4", count=2049)
 nnz = struct.unpack_from("<I", raw, 8192)[0]
-indices = np.frombuffer(raw, "<u4", count=nnz, offset=8200)
-weight_offset = 8200 + nnz * 4
+index_offset = 2049 * 4  # Last row end already contains nnz; no separate count word.
+if len(raw) != index_offset + nnz * 8:
+    raise SystemExit('invalid CSR size: refusing to invent missing weights')
+indices = np.frombuffer(raw, "<u4", count=nnz, offset=index_offset)
+weight_offset = index_offset + nnz * 4
 stored_weights = (len(raw) - weight_offset) // 4
-weights = np.zeros(nnz, dtype="<f4")
-weights[:stored_weights] = np.frombuffer(raw, "<f4", count=stored_weights, offset=weight_offset)
+weights = np.frombuffer(raw, "<f4", count=nnz, offset=weight_offset)
 degree = np.diff(ends)
 if ends[0] != 0 or ends[-1] != nnz or degree.min() != 1 or degree.max() != 2:
     raise SystemExit("expected every output to have one or two contributions")
