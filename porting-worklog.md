@@ -2491,6 +2491,14 @@ native_c64_reference支持DS记录和raw_output。check_native_c64_ds.py先比�
 
 这是CPU参考及原CUBIN的block8合同验证，尚未把block8接入AMD。下一步GPU实现需保留C64最终projection的FP16 raw供DS，不能从当前F8主输出倒推池化。现有AMD已验证范围仍block0..7；游戏DLL/公开ZIP未修改，最终画面目标active。
 
+### 2026-09-06 block8 DS接入AMD，RGB到C128输入整链逐值一致
+
+中断恢复后检查工作区仅既有run_nvidia_ui.ps1变更，AMD无残留native-front-chain-test进程。NativeC64/NativeC64Shift增加显式raw_output选项，默认保持旧FP8输出；只在block8路径保留最终projection FP16结果，crop后供DS使用。新增native_c64_ds.hlsl，实现横向half池化→FP8→64×128投影（两个K32半精度累计）→FP8。复用DS host的资源/屏障逻辑，新增c64_raw合同仅允许已经裁剪的raw输入，拒绝重复shift。
+
+prepare_native_front_chain.py导出block8原参数及8192个DS系数；测试host新增c64ds模式，按RGB→preblock→C32链及DS→C64链→Y移位block8 raw→DS串联执行，无NVIDIA中间激活注入、无CPU层间回传。MinGW编译成功，9070XT三次replay通过，GetDeviceRemovedReason与fence完成检查均成功（墙钟等待31/16/15ms不是1080p性能数据）。validate_native_c64_chain.py --ds按独立编码探针确定的8×16-channel banks和0/2/1/3顺序解码原block8 DS，实际GPU输出8×16×128=16384个值全部exact，MAE/max0、nonfinite0。原CPU block8编码/主输出/DS断言也复查通过。
+
+当前AMD整链闭合范围为block0..8 DS，尚未验证第9层起C128及后续网络，第0层另一路2个特征差异仍待查。游戏DLL与公开包未更新，不能把特征链逐值一致当成游戏最终RGB/面部效果验收。下一步继续C128四头网络，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

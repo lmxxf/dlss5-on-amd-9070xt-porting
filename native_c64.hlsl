@@ -1,3 +1,6 @@
+#ifndef RAW_OUTPUT
+#define RAW_OUTPUT 0
+#endif
 StructuredBuffer<float> input:register(t0),weights:register(t1),feature:register(t2);
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;}
@@ -50,5 +53,5 @@ groupshared float queries[2048],keys[2048],values[2048];
 }
 [numthreads(64,1,1)]void projection(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=width*height)return;
- [loop]for(uint row=0;row<64;row++){float a=H(feature[p*64+row]*weights[24578+row]);[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*64+g*32+j]*weights[12288+row*64+g*32+j];a=H(a+s);}output[p*64+row]=F(a);}
+ [loop]for(uint row=0;row<64;row++){float a=H(feature[p*64+row]*weights[24578+row]);[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*64+g*32+j]*weights[12288+row*64+g*32+j];a=H(a+s);}output[p*64+row]=RAW_OUTPUT?a:F(a);}
 }

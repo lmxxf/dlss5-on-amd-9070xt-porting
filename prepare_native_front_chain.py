@@ -19,9 +19,13 @@ fw=np.load('release/native-c64/ffn-layout/matrices.npz');aw=np.load('release/nat
 np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/'block5-ffn.f32')
 np.concatenate([aw[k].ravel() for k in ('Q','K','V','P','bias','scales','skip')]).astype('<f4').tofile(a.output/'block5-attention.f32')
 from native_c64_reference import unpack as unpack64
-for i in (6,7):
+for i in (6,7,8):
  fw,qkv,pw,bias,scales,skip=unpack64(f'release/native-c64/block{i}.weights')
  np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/f'block{i}-ffn.f32')
  np.concatenate([m.ravel() for m in (*qkv,pw,bias,scales,skip)]).astype('<f4').tofile(a.output/f'block{i}-attention.f32')
+layout64=np.load('release/native-c64/ffn-layout/layout.npz')
+raw8=np.fromfile('release/native-c64/block8.weights',np.uint8);assert raw8.size==69936
+ds8=np.empty((128,64),np.float32);ds8[layout64['w1_hidden'][:8192],layout64['w1_input'][:8192]]=e4m3fn(raw8[0xf130:])
+ds8.astype('<f4').tofile(a.output/'block8-ds.f32')
 manifest={'input_extent':[128,64],'body_extent':[64,32],'shift_masks':[0,3,1,2],'ds_extent':[32,16],'files':{f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in a.output.glob('*.f32')}}
 (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
