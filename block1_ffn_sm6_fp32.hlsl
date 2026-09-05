@@ -13,6 +13,14 @@ RWStructuredBuffer<float> output_unused : register(u1);
 RWStructuredBuffer<float> qkv_output_unused : register(u2);
 float weight(uint index) { return asfloat(weights.Load(index * 4)); }
 float quantize_e4m3(float value) {
+#ifdef BIT_QUANT
+    // Finite FP32 -> E4M3, round-to-nearest-even, saturating at 448.
+    float magnitude=abs(value);
+    if(magnitude<0.015625) return round(value*512.0)/512.0;
+    uint bits=asuint(min(magnitude,448.0));
+    bits=(bits+0x0007ffff+((bits>>20)&1))&0xfff00000;
+    return value<0?-asfloat(bits):asfloat(bits);
+#else
     if (value == 0) return 0;
     const float sign_value=value<0?-1:1,magnitude=abs(value);
     if (magnitude<0.015625) return sign_value*round(magnitude*512)/512;
@@ -20,6 +28,7 @@ float quantize_e4m3(float value) {
     float mantissa=round((magnitude/exp2(exponent)-1)*8);
     if(mantissa>=8){mantissa=0;exponent+=1;}
     return sign_value*min(exp2(exponent)*(1+mantissa/8),448.0);
+#endif
 }
 [numthreads(64,1,1)]
 void ffn(uint3 group:SV_GroupID,uint3 thread:SV_GroupThreadID){

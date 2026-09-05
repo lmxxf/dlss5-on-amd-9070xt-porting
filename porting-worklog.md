@@ -2081,6 +2081,12 @@ prefix直接把相同元素写入HWC地址，替代tile-major输出；下游FFN�
 
 GPU实测block70 prefix0.60996、FFN2.17924（此前4.48668）、QKV1.249、attention2.62916ms，block70合计6.66776，全网48.45452ms。实际洞窟连续5秒窗口18.142/18.200/18.146fps，截图未见原绿色网格；菜单19.6–19.8fps不是游戏帧率。测试版SHA2e1501a79ebbeea8784aa71813ffc47eb799b91b4cf0c153fe0c44d8bbba2946；补充开关组合保护后的构建SHAfb1ceae32811fb5a857e774de845fd4f428ee3f5bd5db3fb1d35871c3296e6ce。30fps仍未达成。
 
+### 2026-09-05 E4M3位元量化候选
+
+block1_ffn_sm6_fp32.hlsl新增BIT_QUANT可选实现：保留subnormal的1/512舍入，normal以FP32尾数位执行最近偶数舍入并饱和448，省略log2/exp2。test_e4m3_bit_quant.py对4000768个正负有限值（随机位模式、全部量化中点及相邻FP32值）与原公式比较零差异；这是CPU数值检查，不是GPU逐元素验证。
+
+enable-bit-quant.txt仅在HWC模式且未启用batch4时替换9个C32 FFN。热身profile全网48.0478ms，front7.99204、decoder C32 7.82368、block70 6.73472（FFN2.14184），相较上样本48.45452ms收益小且存在运行波动。删除候选标记、默认保留原量化HWC路径；源码及build_bit_quant.ps1保留，GPU数值对照未做，不能宣称精度验证完成。当前DLL SHAebef8b0daba8ff934709c92c2e9ea00676b5e3f6f38ec75418e860ba50107f62包含上述可选路径与HWC开关组合保护。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
