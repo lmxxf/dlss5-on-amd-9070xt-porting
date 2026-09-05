@@ -2093,6 +2093,14 @@ enable-bit-quant.txt仅在HWC模式且未启用batch4时替换9个C32 FFN。热�
 
 部署SHAf120fdbc5c8ce359ab30643a11ff0cdad5fa7a546d1ad731435041ff8e151908，GPU profile移位attention各层0.73964–0.75324ms（旧约1.1–1.3），front6.89848、decoder C32 7.1784、全网46.3954ms。实际洞窟连续窗口19.000/19.000/19.139fps，display_residual generation1560 mode0；截图未见此前绿色方格。保留该配置。画面检查与窗口枚举不等于逐元素GPU精度对照，30fps仍未达成。下一候选是缓存attention score，避免softmax两遍循环重复计算Q·K，需衡量LDS增加对占用率的影响。
 
+### 2026-09-05 attention分数快取及ViT细分
+
+block70尝试缓存首遍Q·K，避免softmax第二遍重算。CACHE_SCORES=1为16KB额外groupshared，attention反而从2.67524升至3.3376ms，全网47.17548，拒绝。CACHE_SCORES=2为每线程64个寄存器分数并展开两遍循环，attention2.46992ms、复测2.48768ms，全网46.0108/46.134ms，小幅收益；enable-score-cache.txt启用，build_cached_scores.ps1默认Mode2，Mode1仅作反证复现。窗口、通道及权重不变；未做GPU逐元素精度对照。
+
+profile扩大为49点，额外量首个ViT层的六段：FFN0.2014、QKV+pack0.06636、QK0.0564、softmax0.04028、AV0.16044、output projection0.0294ms，全ViT5.08912ms。因此softmax不是当前优先热点，不应仅因代码包含多次barrier便优先改它。诊断DLL SHA693bfac9235275095abc76540524ce85ab8dbb67676fe10b337eaa21e5f4f8da，仍只读回时间戳、不读回逐帧图像。30fps目标仍未达成。
+
+寄存器分数快取进入洞窟复验：cadence19.200/18.939/19.000fps，display_residual generation2400 mode0，截图未见旧绿色方格。实际帧率仍约19fps，不能将微小GPU收益包装成明显帧率提升。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
