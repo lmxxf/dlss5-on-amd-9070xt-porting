@@ -2345,6 +2345,18 @@ run_original_preblock_oracle可读取DLSS5_PREBLOCK_PARAMETER_FILE：保留已�
 
 新完整前端尚为Lab组合，两次GPU调用之间有读回文件，未作为性能测试或常驻游戏版。AMD安装仍b210a431且画质未修好；原发布ZIP未改。下一步应常驻化新前端、补全局坐标/动态seed/正确DS与full skip，再继续审主体层FP8矩阵容量，最终按目标实际部署DLL与真实画面验证。目标active。
 
+### 2026-09-06 新前端常驻GPU链及全局坐标验证
+
+新增native_preblock_runtime.h：一次Create建立input-mix/FFN、attention、finish三个PSO和常驻中间资源；Record不做CPU readback，输出full HWC32和half-resolution HWC32（FP32保存E4M3值），RAW FP16 tile保留用于审计。seed/width/height/local-oracle由root constants输入；非oracle模式用tile在整图中的真实坐标生成随机场，不再每8×8重置。preblock_finish.hlsl在FP8量化前池化，生成真正独立的DS分支。权重暂置UPLOAD heap用于正确性测试，性能未作为本轮验收。
+
+d3d12_native_preblock_test.cpp在9070XT反复执行5次：同seed三次完全一致，换seed输出变化，回原seed全部输出完全恢复，main/down/raw均有限。Lab profile与捕获的live scalar profile都通过。128×128、256独立CTA0控制的raw与先前两进程GPU链逐值一致，full主输出重排与DS重排也对各自CPU计算逐值一致；消除阶段间文件中转没有改变既有计算。
+
+扩展原始preblock oracle到可控全局尺寸（最多512、8对齐，禁止把权重扫描与大尺寸混用，分配更大输出区），用真实scalar profile在128×64上一次启动16×8个CTA。validate_global_preblock.py单独按post-skip两个bank gather解码main，按两16-channel全局bank解码DS，并拒绝原始NaN码。AMD resident使用global坐标、seed0，对原始全局kernel：main corr0.9999352303、96.279907% exact、MAE0.00099363178、max0.5；DS corr0.9999501591、95.729065% exact、MAE0.00081032515、max0.5，原始两路NaN码均0。仍有算术差异，不称逐值闭合。
+
+相同前128个RGB tiles和live scalar/seed0，旧local-oracle坐标重置模式的main特征8×8相位方差解释率32.9894%，global坐标降至0.58017%。这是前端特征，不是最终RGB，不能据此宣称全游戏网格修复。摘要native-preblock-resident-validation.json；夹具在release/native-preblock-resident与release/preblock-global，实际GPU文件在Lab/matrix-probe/native-preblock。
+
+当前组件尚未绑定游戏输入，AMD安装仍b210a431；本轮未替换游戏DLL或发布ZIP，目标active。后续仍须审全网络真实FP8矩阵容量/布局，接正确full skip/post，并在剑星真正输出端做数值和视觉验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

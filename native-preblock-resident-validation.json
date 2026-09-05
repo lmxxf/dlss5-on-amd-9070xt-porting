@@ -1,0 +1,14 @@
+{
+ "scope":"New preblock resident component, not the complete game network or final image",
+ "device":"AMD Radeon RX 9070 XT",
+ "passes":["native input mix and FP8-weight 128-wide FFN","32-wide attention retaining FP16 result","full-resolution main quantization and half-resolution downsample"],
+ "intermediate_cpu_transfers":0,
+ "replay":{"frames":5,"same_seed_replay":"all outputs exact","changed_seed":"main output changed","restored_seed":"all outputs returned exactly"},
+ "local_fixture":{"width":128,"height":128,"oracle_local_tiles":256,"raw_vs_previous_gpu_chain":"exact","main_hwc_reorder":"exact","downsample_hwc_reorder":"exact"},
+ "global_fixture":{"width":128,"height":64,"live_scalar_profile":true,"seed":0,
+   "main":{"correlation":0.9999352302941522,"exact_fraction":0.962799072265625,"mae":0.0009936317801475525,"max_error":0.5},
+   "downsample":{"correlation":0.999950159073677,"exact_fraction":0.9572906494140625,"mae":0.0008103251457214355,"max_error":0.5},
+   "oracle_nan_codes":0,
+   "phase_variance_explained":{"tile_reset":0.3298935294151306,"global_coordinates":0.005801677703857422}},
+ "remaining":["Larger and padded global dimensions","Whole-network weight types and dimensions","Live game input binding","Correct full skip and post path","DLL deployment and final visual comparison"]
+}

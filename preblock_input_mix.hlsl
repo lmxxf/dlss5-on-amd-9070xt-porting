@@ -3,6 +3,9 @@
 StructuredBuffer<float> weights : register(t0);
 StructuredBuffer<float> input : register(t1);
 RWStructuredBuffer<float> output : register(u0);
+#if DYNAMIC_PARAMETERS
+cbuffer RuntimeParameters:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;}
+#endif
 uint pcg(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>22)^w;}
 float uniform24(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return float(((w>>30)^(w>>8))+1)*5.9604644775390625e-8;}
 // Explicit IEEE nearest-even: SM5 f32tof16 may truncate toward zero.
@@ -19,7 +22,12 @@ float q8(float v){float a=abs(v),sg=v<0?-1:1;if(a<0.015625)return sg*round(a*512
 void main(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=TOTAL_OUTPUTS/32)return;
  uint x=p%8,y=(p/8)%8;
- uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^((uint)NOISE_SEED*0x9e3779b9u)^0x243f6a88u);
+ uint seed=NOISE_SEED;
+#if DYNAMIC_PARAMETERS
+ seed=runtime_seed;
+ if(!local_oracle){uint tile=p/64;x=(tile%(runtime_width/8))*8+p%8;y=(tile/(runtime_width/8))*8+(p%64)/8;}
+#endif
+ uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^(seed*0x9e3779b9u)^0x243f6a88u);
  float a=uniform24(h*0xcaa5b80d+0x21dd796b),b=uniform24(h*0x2c9277b5+0xac564b05);
  float c=uniform24(h*0x83232c31+0x3463e0ac),d=uniform24(h*0xfa6dc5f9+0x4712a88e);
  float r0=sqrt(-2*log(a)),r1=sqrt(-2*log(b));

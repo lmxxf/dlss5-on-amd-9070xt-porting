@@ -1,4 +1,5 @@
 #include <cuda.h>
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -54,7 +55,12 @@ int main(int argc, char **argv) {
     if (texture_slot < 0 || texture_slot > 3) return 2;
     const auto weights = read_file(argv[2]);
     const auto input = read_file(argv[3]);
-    constexpr size_t input_tile_bytes = 8 * 8 * 4 * sizeof(float);
+    const int width=std::getenv("DLSS5_PREBLOCK_WIDTH")?std::atoi(std::getenv("DLSS5_PREBLOCK_WIDTH")):8;
+    const int height=std::getenv("DLSS5_PREBLOCK_HEIGHT")?std::atoi(std::getenv("DLSS5_PREBLOCK_HEIGHT")):8;
+    if(width<=0||height<=0||width%8||height%8||width>512||height>512)return 2;
+    if(scan&&(width!=8||height!=8))return 2;
+    const size_t input_tile_bytes = size_t(width)*height*4*sizeof(float);
+    const size_t allocation_bytes=std::max<size_t>(1<<20,size_t(width)*height*32*4);
     if (weights.size() != 21696 || input.empty() || input.size() % input_tile_bytes) return 2;
     if(scan&&input.size()!=input_tile_bytes)return 2;
     const size_t tile_count = scan?scan->count:input.size() / input_tile_bytes;
@@ -75,14 +81,14 @@ int main(int argc, char **argv) {
     check("cuMemAlloc(weights)", cuMemAlloc(&device_weights, weights.size()));
     check("cuMemcpyHtoD(weights)",
         cuMemcpyHtoD(device_weights, weights.data(), weights.size()));
-    check("cuMemAlloc(main)", cuMemAlloc(&main_output, 1 << 20));
-    check("cuMemAlloc(downsample)", cuMemAlloc(&downsample_output, 1 << 20));
-    check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, 1 << 20));
-    check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, 1 << 20));
+    check("cuMemAlloc(main)", cuMemAlloc(&main_output, allocation_bytes));
+    check("cuMemAlloc(downsample)", cuMemAlloc(&downsample_output, allocation_bytes));
+    check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, allocation_bytes));
+    check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, allocation_bytes));
 
     CUDA_ARRAY3D_DESCRIPTOR array_desc{};
-    array_desc.Width = 8;
-    array_desc.Height = 8;
+    array_desc.Width = width;
+    array_desc.Height = height;
     array_desc.Format = CU_AD_FORMAT_FLOAT;
     array_desc.NumChannels = 4;
     CUarray array;
@@ -90,11 +96,11 @@ int main(int argc, char **argv) {
     CUDA_MEMCPY2D copy{};
     copy.srcMemoryType = CU_MEMORYTYPE_HOST;
     copy.srcHost = input.data();
-    copy.srcPitch = 8 * 4 * sizeof(float);
+    copy.srcPitch = width * 4 * sizeof(float);
     copy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
     copy.dstArray = array;
     copy.WidthInBytes = copy.srcPitch;
-    copy.Height = 8;
+    copy.Height = height;
     check("cuMemcpy2D", cuMemcpy2D(&copy));
 
     CUDA_RESOURCE_DESC resource_desc{};
@@ -131,7 +137,8 @@ int main(int argc, char **argv) {
         const uint32_t seed=static_cast<uint32_t>(std::strtoul(seed_text,nullptr,0));
         std::memcpy(params+0xc8,&seed,sizeof(seed));
     }
-    const unsigned long long dimensions = 8ull | (8ull << 32);
+    std::memcpy(params+0xd0,&height,4);std::memcpy(params+0xd4,&width,4);
+    const unsigned long long dimensions = uint64_t(height) | (uint64_t(width) << 32);
     const int texture_offsets[] = {0x00, 0x08, 0x18, 0x20};
     std::memcpy(params + texture_offsets[texture_slot], &texture, 8);
     std::memcpy(params + 0xd8, &main_output, 8);
@@ -145,10 +152,12 @@ int main(int argc, char **argv) {
         // Replace all captured texture/resource handles; retain scalar behavior.
         std::memset(params,0,0x48);
         std::memcpy(params+texture_offsets[texture_slot],&texture,8);
-        const float eight=8.0f,inverse=0.125f;const uint64_t down_dims=4ull|(4ull<<32);
-        for(int offset:{0x90,0x94})std::memcpy(params+offset,&eight,4);
-        for(int offset:{0x98,0x9c,0xa0,0xa4})std::memcpy(params+offset,&inverse,4);
-        for(int offset:{0xd0,0xd4})std::memcpy(params+offset,&extent,4);
+        const float fw=float(width),fh=float(height),iw=1.0f/width,ih=1.0f/height;
+        const uint64_t down_dims=uint64_t(height/2)|(uint64_t(width/2)<<32);
+        std::memcpy(params+0x90,&fw,4);std::memcpy(params+0x94,&fh,4);
+        for(int offset:{0x98,0xa0})std::memcpy(params+offset,&iw,4);
+        for(int offset:{0x9c,0xa4})std::memcpy(params+offset,&ih,4);
+        std::memcpy(params+0xd0,&height,4);std::memcpy(params+0xd4,&width,4);
         std::memcpy(params+0xd8,&main_output,8);std::memcpy(params+0xe0,&device_weights,8);
         std::memset(params+0xe8,0,8);std::memcpy(params+0xf0,&dimensions,8);
         std::memcpy(params+0xf8,&downsample_output,8);std::memcpy(params+0x100,&down_dims,8);
@@ -158,8 +167,8 @@ int main(int argc, char **argv) {
     }
 
     void *kernel_args[] = {params};
-    constexpr size_t main_tile_bytes = 8 * 8 * 32;
-    constexpr size_t downsample_tile_bytes = 4 * 4 * 32;
+    const size_t main_tile_bytes = size_t(width)*height*32;
+    const size_t downsample_tile_bytes = main_tile_bytes/4;
     std::vector<unsigned char> main_bytes(tile_count * main_tile_bytes);
     std::vector<unsigned char> downsample_bytes(tile_count * downsample_tile_bytes);
     for (size_t tile = 0; tile < tile_count; ++tile) {
@@ -171,10 +180,10 @@ int main(int argc, char **argv) {
         }
         copy.srcHost = input.data() + (scan?0:tile) * input_tile_bytes;
         check("cuMemcpy2D(tile)", cuMemcpy2D(&copy));
-        check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, 1 << 20));
-        check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, 1 << 20));
+        check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, allocation_bytes));
+        check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, allocation_bytes));
         check("cuLaunchKernel", cuLaunchKernel(
-            function, 1, 1, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
+            function, width/8, height/8, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
         check("cuCtxSynchronize", cuCtxSynchronize());
         check("cuMemcpyDtoH(main)", cuMemcpyDtoH(
             main_bytes.data() + tile * main_tile_bytes, main_output, main_tile_bytes));
