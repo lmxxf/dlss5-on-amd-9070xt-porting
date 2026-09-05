@@ -1,0 +1,11 @@
+{
+ "scope":"Original preblock attention-only, single 8x8 window repeated over 256 independent color tiles; not game validation",
+ "head_dimension":32,
+ "storage":{"QKV":"E4M3","projection":"E4M3","bias":"FP16","scale":"FP32","skip":"FP16"},
+ "connectivity":{"V":1024,"projection":1024,"bias":4096,"skip":32,"method":"binary input/spatial codes, no coefficient fitting"},
+ "QK_layout":"same packed QKV family as V; checked indirectly by whole-attention comparison, not a separate Q/K readback",
+ "arithmetic":"scaled Q before E4M3, FP16 norm and sums, half-bit exponential approximation, FP8 probability and V, K32 accumulation groups",
+ "cpu_vs_original":{"correlation":0.9999856041083448,"exact_fraction":0.9930152893066406,"mae":0.00019339844584465027,"max_error":0.25},
+ "amd_vs_original":{"exact_fraction":0.9930152893066406,"mae":0.000193398446,"max_error":0.25,"nonfinite":0,"submit_to_fence_ms":2.405},
+ "remaining":"Rounding/reduction differences; full preblock chain; live inputs and parameters; whole-network and actual game-image verification"
+}

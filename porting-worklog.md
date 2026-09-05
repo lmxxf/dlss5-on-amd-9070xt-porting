@@ -2323,6 +2323,18 @@ preblock_ffn_reference.py与preblock_input_mix.hlsl的FULL_FFN测试路径接真
 
 block0-cubin-layout.json更正矩阵storage/shape；SASS与字节容量还指向QKV三张32×32 FP8、projection32×32 FP8，而非旧head-dim16，此两项待独立basis验证。必须审其余主体层是否存在同样类型/维度错误，不能只替换第0层就宣称原模型复现。当前游戏DLL仍b210a431，未把未完成attention的实验路径注入，网格/最终画质目标保持active。
 
+### 2026-09-06 原版32维attention恢复与AMD验证
+
+recover_preblock_attention.py先以Q/K零、V/P单通道验证输出0.5其余0；随后通过输入二进制编码分别恢复V/P各1024个FP8连接，不能直接照抄FFN的排列（V输入/输出位序曾与假设相差50%，用实测映射替代）。64×64 bias以6组空间二进制颜色、逐FP16 bias置8，观察唯一变化的query像素与key位码，4096连接完整bijection。另恢复32-half attention skip到输出channel映射。Q/K暂采用同一QKV族V排列，通过整段对照约束，仍不夸成独立Q/K逐值读回。
+
+SASS没有标准EX2：scores先使用half仿射0.044921875*x+1.30078125，clip至[1.03125,1.5693359375]，half bits左移5加0x8000得到指数近似，再half归约/倒数、量化FP8概率。scale先乘归一化Q再FP8；残差使用未经FP8压缩的prefix。preblock_attention_reference.py按这些原指令逐步修正，标准exp等候选仅用于诊断、不代表权重拟合。
+
+preblock_attention_core.hlsl用24KiB groupshared存Q/K/V，32维头、显式FP16 nearest-even、原指数位运算与K32 AV累计；D3D host只接受完整8×8窗口，组内同步前使用uniform group判断。256独立RGB tiles共524288输出，CPU对原attention-only corr0.9999856041、99.30153% exact、MAE0.00019339845、max0.25；9070XT同误差/精确率，GPU2.405ms，nonfinite0。摘要preblock-attention-validation.json。仍有归约/舍入差异，未把高相关视为完全逐值复现或画质通过。
+
+另尝试5090只读live参数采样，preblock_live_parameters.cpp仅拦截backend+449a0并复制CPU参数，不改GPU资源。第一版错误地把kernel argument array当作by-value结构读取，所谓seed=1和dims的初报撤回，release/live-preblock是无效外层数据。反汇编明确该函数先解引用参数数组首指针，源码已修正并加入indirect-v2标记；修正版514e03cf部署成功后，Steam启动流程暂未产生新SB进程，现有日志仍是旧PID6828，不能当新采样。一次覆盖曾因游戏进程尚未释放DLL失败，随后改由deploy_nvidia_parameter_probe.ps1等待进程真正退出、校验文件后再启动，避免失败后启动旧DLL。源代码后加v2标记尚未重新构建部署。当前RTX无SB进程，Steam显示启动中且cloud最新；未重启Steam、未越过存档提示。此临时live采样问题不阻断本机原CUBIN继续验证，也未标goal blocked。
+
+AMD安装仍是b210a431，尚未将新完整前端放进游戏；本轮是attention正确性进展。全目标仍为实际剑星DLL画面验证，未完成且保持active。下一步串联新input mix/128宽FFN/32维attention及DS，再解决live参数和全分辨率skip，重新审余下主体的数据类型与维度。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

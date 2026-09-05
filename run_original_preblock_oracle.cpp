@@ -39,25 +39,25 @@ int main(int argc, char **argv) {
     }
     const int texture_slot = argc >= 7 ? std::atoi(argv[6]) : 3;
     const float gaussian_scale = argc >= 8 ? std::strtof(argv[7], nullptr) : 0.0f;
-    const bool adapter_scan=argc==9 && !std::strcmp(argv[8],"adapter-scan");
-    const bool prefix_scan=argc==9 && !std::strcmp(argv[8],"prefix-scan");
-    const bool ffn1_scan=argc==9 && !std::strcmp(argv[8],"ffn1-scan");
-    const bool ffn2_scan=argc==9 && !std::strcmp(argv[8],"ffn2-scan");
-    const bool ffn1_byte_scan=argc==9&&!std::strcmp(argv[8],"ffn1-byte-scan");
-    const bool ffn2_byte_scan=argc==9&&!std::strcmp(argv[8],"ffn2-byte-scan");
-    const bool byte_scan=ffn1_byte_scan||ffn2_byte_scan;
-    const bool ffn_skip_scan=argc==9&&!std::strcmp(argv[8],"ffn-skip-scan");
-    const bool scan=adapter_scan||prefix_scan||ffn1_scan||ffn2_scan||byte_scan||ffn_skip_scan;
-    const size_t scan_begin=ffn_skip_scan?4616:ffn1_scan?0:ffn2_scan?2048:4104;
-    const size_t scan_count=ffn_skip_scan?32:byte_scan?4096:(ffn1_scan||ffn2_scan)?2048:prefix_scan?512:224;
-    if(argc==9&&!scan)return 2;
+    struct Scan {const char*name;size_t begin,count,element;unsigned short one;};
+    const Scan scans[]={
+        {"adapter-scan",8208,224,2,0x3c00},{"prefix-scan",8208,512,2,0x3c00},
+        {"ffn1-scan",0,2048,2,0x3c00},{"ffn2-scan",4096,2048,2,0x3c00},
+        {"ffn1-byte-scan",0,4096,1,0x38},{"ffn2-byte-scan",4096,4096,1,0x38},
+        {"ffn-skip-scan",9232,32,2,0x3c00},
+        {"attention-skip-scan",21616,32,2,0x3c00},
+        {"v-byte-scan",11360,1024,1,0x38},{"projection-byte-scan",20592,1024,1,0x38},
+        {"bias-scan",12384,4096,2,0x4800}
+    };
+    const Scan*scan=nullptr;
+    if(argc==9){for(const auto&s:scans)if(!std::strcmp(argv[8],s.name))scan=&s;if(!scan)return 2;}
     if (texture_slot < 0 || texture_slot > 3) return 2;
     const auto weights = read_file(argv[2]);
     const auto input = read_file(argv[3]);
     constexpr size_t input_tile_bytes = 8 * 8 * 4 * sizeof(float);
     if (weights.size() != 21696 || input.empty() || input.size() % input_tile_bytes) return 2;
     if(scan&&input.size()!=input_tile_bytes)return 2;
-    const size_t tile_count = scan?scan_count:input.size() / input_tile_bytes;
+    const size_t tile_count = scan?scan->count:input.size() / input_tile_bytes;
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -147,15 +147,8 @@ int main(int argc, char **argv) {
     for (size_t tile = 0; tile < tile_count; ++tile) {
         if(scan){
             auto probe_weights=weights;
-            if(byte_scan){
-                const size_t begin=ffn1_byte_scan?0:4096;
-                std::memset(probe_weights.data()+begin,0,4096);
-                probe_weights[begin+tile]=0x38; // E4M3 1.0, not FP16 1.0
-            }else{
-                std::memset(probe_weights.data()+scan_begin*2,0,scan_count*2);
-                const unsigned short one_half=0x3c00;
-                std::memcpy(probe_weights.data()+(scan_begin+tile)*2,&one_half,2);
-            }
+            std::memset(probe_weights.data()+scan->begin,0,scan->count*scan->element);
+            std::memcpy(probe_weights.data()+scan->begin+tile*scan->element,&scan->one,scan->element);
             check("adapter probe upload",cuMemcpyHtoD(device_weights,probe_weights.data(),probe_weights.size()));
         }
         copy.srcHost = input.data() + (scan?0:tile) * input_tile_bytes;
