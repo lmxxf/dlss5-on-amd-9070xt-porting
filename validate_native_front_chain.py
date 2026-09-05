@@ -54,6 +54,7 @@ def main():
     # deliberately not disguised as an end-to-end image acceptance threshold.
     print(json.dumps(report, indent=2))
     assert np.array_equal(resident, chains['amd_ds_start']), 'resident wiring regression'
+    assert np.array_equal(resident, original), 'front chain differs from original CUBIN'
 
 
 if __name__ == '__main__':

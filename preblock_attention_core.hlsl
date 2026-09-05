@@ -17,17 +17,30 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   q[c]=H(a);k[c]=H(b);v[c]=F(H(z));
  }
  [unroll]for(uint i=0;i<16;i++){qs[i]=H(q[i]*q[i]+H(q[i+16]*q[i+16]));ks[i]=H(k[i]*k[i]+H(k[i+16]*k[i+16]));}
- [unroll]for(uint step=8;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
+ [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
+ [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
  [loop]for(uint c=0;c<32;c++){queries[t*32+c]=F(H(H(q[c]*qi)*H(weights[8192])));keys[t*32+c]=F(H(k[c]*ki));values[t*32+c]=v[c];}
  GroupMemoryBarrierWithGroupSync();
- float ex[64],sumtree[64],prob[64];
+ float ex[64],prob[64];
  [loop]for(uint key=0;key<64;key++){
   float dot=0;[loop]for(uint c=0;c<32;c++)dot+=queries[t*32+c]*keys[key*32+c];
-  ex[key]=fast_exp(H(dot+weights[4096+t*64+key]));sumtree[key]=ex[key];
+  ex[key]=fast_exp(H(dot+weights[4096+t*64+key]));
  }
- [unroll]for(uint step=32;step>0;step/=2){[loop]for(uint i=0;i<step;i++)sumtree[i]=H(sumtree[i*2]+sumtree[i*2+1]);}
- float inv=H(1/sumtree[0]);[loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
+ float parity[2];
+ [unroll]for(uint odd=0;odd<2;odd++){
+  float total=0;
+  [unroll]for(uint lane=0;lane<4;lane++){
+   uint base=odd+(lane%2)*2+(lane/2)*8;
+   float partial=H(ex[base]+ex[base+16]);
+   partial=H(partial+H(ex[base+4]+ex[base+20]));
+   partial=H(partial+H(ex[base+32]+ex[base+48]));
+   partial=H(partial+H(ex[base+36]+ex[base+52]));
+   total=lane==0?partial:H(total+partial);
+  }
+  parity[odd]=total;
+ }
+ float inv=H(1/H(parity[0]+parity[1]));[loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
  float av[32];
  [loop]for(uint c=0;c<32;c++){
   float a=0;[unroll]for(uint group=0;group<2;group++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[group*32+key]*values[(group*32+key)*32+c];a=H(a+s);}av[c]=F(a);

@@ -2389,6 +2389,16 @@ attention末端0xb2d0等HMUL2残差、0xb350等QMMA带残差初始值，故proje
 
 preblock_finish.hlsl及preblock_complete_validation.py同步横向半精度树。9070XT Lab重跑preblock五帧与前四层三帧均通过，主输出不变，完整第0层DS exact98.83728%、MAE0.000214875；原有attention差异仍保留。前四层完整链对原版exact59.41162%→62.23907%、MAE0.07457909→0.06666005、max2；GPU对CPU链逐值一致。这个修正改善真实数值链，但游戏最终RGB尚未验证，未覆盖游戏DLL，目标仍active。
 
+### 2026-09-06 前四层原始CUBIN与9070XT整链逐值闭合
+
+新增trace_preblock_softmax.py，从原始bias load（lane×16 bytes，0x3060..0x3e60）经QMMA C操作数、指数变换追踪到HADD2，再显式还原SEL/SHFL的warp转置。未知写入清空来源，不能凭寄存器旧标签继续推导。第一组32个query的每个分母均验证恰有64个唯一key、无跨query混合。每个half的key局部顺序是0/16、4/20、32/48、36/52四对逐次相加，四个lane基础偏移0/2/8/10再逐次相加，最后偶奇half相加；不是之前试过的任何平衡二叉树。native_c32_softmax_sum.py按该图实现，无权重拟合。
+
+进一步根据已恢复V矩阵的byte布局确认B寄存器+0/+8装的是偶/奇输出通道，而非连续8通道。故norm在16跨度的HMUL/HFMA后，应先相邻偶奇相加，再8/4/2跨度归约；上一轮16→8→4→2→1的假设修正。CPU attention-only在256独立tiles共524288值与原CUBIN全部exact，MAE/max0，增加明确assert。
+
+两处同步AMD shader后，9070XT实际preblock五帧（重复、换seed、恢复）和前四层三帧均通过。128×64全局第0层主输出262144值仅2个差异（exact99.999237%、MAE5.96046448e-8、max0.0078125，尚未定位，不标全exact）；DS的65536值全部exact。第1/2/3层各自原输入以及串联输入也全部exact。最关键：实际RGB输入→AMD block0→DS→block1→XY block2→X block3的最终65536值与原始CUBIN全链逐值一致，MAE/max0，不注入NVIDIA中间激活、不走CPU层间回传。validate_native_front_chain.py新增实际GPU对原CUBIN输出的exact断言。
+
+此结论仅覆盖固定128×64夹具的前四层，不能替代其余更宽网络、最终RGB和剑星实机画面验收。AMD游戏DLL、公开ZIP未修改；目标仍active。下一步应恢复block4的移位DS接口及C64层，以当前正确前段继续向全网络推进，同时保留第0层主分支2个差异的待查项。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -5,6 +5,7 @@ import numpy as np
 from decode_tinlayout_global import e4m3fn
 from encode_tinlayout_global import quantize
 from native_c32_normalize import normalize
+from native_c32_softmax_sum import denominator
 H=lambda x:np.asarray(x,np.float16).astype(np.float32)
 F=lambda x:e4m3fn(quantize(x))
 
@@ -37,8 +38,7 @@ def block(tiles,w,skip_first=True):
  scores=H(q@k.transpose(0,2,1)+bias)
  bits=np.clip(H(scores*np.float32(.044921875)+np.float32(1.30078125)),1.03125,1.5693359375).astype(np.float16).view(np.uint16).astype(np.uint32)
  exp=(((bits<<5)+0x8000)&65535).astype(np.uint16).view(np.float16).astype(np.float32)
- den=exp
- while den.shape[-1]>1:den=H(den[...,::2]+den[...,1::2])
+ den=denominator(exp)
  prob=F(H(exp*H(1/den)));av=np.zeros_like(tiles)
  for k in [0,32]:av=H(av+prob[:,:,k:k+32]@v[:,k:k+32])
  return F(H((F(av)@pw.T)+H(feature*ats)))

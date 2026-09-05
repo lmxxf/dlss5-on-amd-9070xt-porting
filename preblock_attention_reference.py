@@ -6,6 +6,7 @@ from preblock_mix_reference import inputs,unpack_mix
 from decode_tinlayout_global import e4m3fn
 from encode_tinlayout_global import quantize
 from native_c32_normalize import normalize as native_normalize
+from native_c32_softmax_sum import denominator
 p=argparse.ArgumentParser();p.add_argument('folder',type=Path);p.add_argument('--prepare',action='store_true');p.add_argument('--native-exp',action='store_true');p.add_argument('--half-norm',action='store_true');p.add_argument('--export-lab',type=Path);p.add_argument('--sum-order',default='1,2,4,8,16,32');a=p.parse_args();a.folder.mkdir(parents=True,exist_ok=True)
 raw=np.fromfile('/tmp/block0.weights',np.uint8);original=raw.view('<f2').copy()
 if a.prepare:
@@ -41,12 +42,21 @@ else:
  den=exp.sum(-1,keepdims=True)
  if a.half_norm:
   den=exp
-  order=[int(x) for x in a.sum_order.split(',')];assert sorted(order)==[1,2,4,8,16,32]
-  indices=np.arange(64)
-  for bit in order:
-   keep=np.flatnonzero((indices&bit)==0)
-   partner=np.array([np.flatnonzero(indices==(indices[i]^bit))[0] for i in keep])
-   den=h(den[...,keep]+den[...,partner]);indices=indices[keep]
+  if a.sum_order=='sass':
+   den=denominator(exp)
+  elif a.sum_order=='native-lanes':
+   partial=h(exp[...,:8]+exp[...,8:16])
+   for offset in (16,32,48):partial=h(partial+h(exp[...,offset:offset+8]+exp[...,offset+8:offset+16]))
+   lanes=h(partial[...,:2]+partial[...,2:4])
+   for offset in (4,6):lanes=h(lanes+partial[...,offset:offset+2])
+   den=h(lanes[...,:1]+lanes[...,1:2])
+  else:
+   order=[int(x) for x in a.sum_order.split(',')];assert sorted(order)==[1,2,4,8,16,32]
+   indices=np.arange(64)
+   for bit in order:
+    keep=np.flatnonzero((indices&bit)==0)
+    partner=np.array([np.flatnonzero(indices==(indices[i]^bit))[0] for i in keep])
+    den=h(den[...,keep]+den[...,partner]);indices=indices[keep]
  pm=np.argmax(np.abs(np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048)),axis=0)
  target=e4m3fn(np.fromfile(a.folder/'attention-main.fp8',np.uint8).reshape(-1,2048)[:,pm]).reshape(-1,64,32)
  if a.export_lab:
@@ -66,3 +76,5 @@ else:
   pred=f8(h((f8(av)@pw.T)+h(prefix*skip)));err=np.abs(pred-target)
   reports.append({'mode':mode,'correlation':float(np.corrcoef(pred.ravel(),target.ravel())[0,1]),'exact_fraction':float(np.mean(pred==target)),'mae':float(err.mean()),'max_error':float(err.max())})
  print(json.dumps({'scale':float(scale),'arithmetic_candidates':reports},indent=2))
+ if a.native_exp and a.half_norm and a.sum_order=='sass':
+  assert np.array_equal(pred,target), 'Attention-only original-CUBIN regression'
