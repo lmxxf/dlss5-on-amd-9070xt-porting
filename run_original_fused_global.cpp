@@ -49,6 +49,9 @@ int main(int argc, char **argv) {
     const size_t input_offset=argc>=17?std::strtoull(argv[16],nullptr,0):0;
     const size_t output_offset=argc>=18?std::strtoull(argv[17],nullptr,0):0;
     Params p{}; p.input=di+input_offset;p.output=doo+output_offset;p.weights=dw+weight_offset;p.width=width;p.height=height;p.field_y=shift?-4:height;p.field_x=shift?-4:width;unsigned long long dims=(unsigned)height|((unsigned long long)(unsigned)width<<32);p.optional4=(CUdeviceptr)dims;
+    // Native C32 ABI uses height,width then x/y window offsets, not extents.
+    if(mode==4){p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;}
+    if(mode==5){p.width=height;p.height=width;p.field_y=0;p.field_x=0;p.optional2=aux;}
     if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
     if(mode==3){p.optional3=aux;p.optional_dims=aux;p.optional4=(CUdeviceptr)dims;p.override_width=width/2;p.override_height=height/2;}

@@ -22,7 +22,7 @@ def main() -> None:
     values[4104:4136] = 1  # FFN skip region
     values[10296 : 10296 + args.tail_half_count] = 1  # attention skip probe
     raw = values.view(np.uint8)
-    raw[9768 * 2 : 9768 * 2 + 4] = np.frombuffer(struct.pack("<f", 1.0), dtype=np.uint8)
+    raw[9776 * 2 : 9776 * 2 + 4] = np.frombuffer(struct.pack("<f", 1.0), dtype=np.uint8)
     values.tofile(args.output)
     print(f"wrote {values.nbytes} bytes: {args.output}")
 

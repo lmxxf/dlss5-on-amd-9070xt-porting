@@ -2357,6 +2357,16 @@ d3d12_native_preblock_test.cpp在9070XT反复执行5次：同seed三次完全一
 
 当前组件尚未绑定游戏输入，AMD安装仍b210a431；本轮未替换游戏DLL或发布ZIP，目标active。后续仍须审全网络真实FP8矩阵容量/布局，接正确full skip/post，并在剑星真正输出端做数值和视觉验收。
 
+### 2026-09-06 原生C32层与GPU前四层串联检查点
+
+只读live探针增加kernel名称映射，捕获实际序列为preblock_ds→C32 inpview_tilesync→chained XY移位→chained X移位→ds_wait Y移位；不能再把第一层按普通plain视图读取。run_original_fused_global新增native模式4/5，修正H/W与移位参数合同；identity对照确认输入DS是两16通道bank，而普通C32输出为4×4 cell布局。受控边界实验确认移位是零填充，填充值仍参与attention分母，不是循环移位再屏蔽无效key。
+
+extract_native_weight_record.py直接提取原始记录；native_c32_reference.py按FP8 32→128→32、32维attention恢复block1/2/3，不使用旧FP16代理权重。逐层以原始上一层作输入，exact分别97.3175%、93.9423%、96.4417%。native_c32_stage.h及reframe shader在GPU完成tile打包、移位填充与裁剪；native_preblock_runtime增加RAW_INPUT接口。d3d12_native_front_chain_test.cpp在9070XT将RGB→block0→DS→block1→block2→block3单命令链执行，三次重放一致，中间无CPU回传。实验仍为128×64输入，不能当1080p性能结论。
+
+新增validate_native_front_chain.py可重跑隔离误差与累计误差检查。实际GPU链对同算法CPU链逐值完全一致（MAE/max均0），证实常驻接线没有额外引入差异。但对原始CUBIN全链最终exact仅52.2919%、MAE0.09724066、max4、corr0.99845471；从原始DS开始的CPU链最终exact64.3585%、MAE0.05967632。原始DS与AMD DS最初MAE0.00081033，经过block1/2/3后累计MAE依次0.00598994、0.02908400、0.09724066。小算术差异被后续层放大，不能因单层高相关而宣称整网正确；下一步应定位舍入/归约差异，并继续恢复后续DS及更宽通道层。
+
+本检查点未替换AMD游戏DLL，安装版本仍需以现场SHA复核（最近b210a431），原发布ZIP未修改。实际游戏网格和最终神经输出验收仍未完成。run_nvidia_ui.ps1旧窗口焦点实验不随本次提交，避免重新引入频繁黑屏切换。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

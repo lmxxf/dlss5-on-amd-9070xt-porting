@@ -21,6 +21,10 @@ float q8(float v){float a=abs(v),sg=v<0?-1:1;if(a<0.015625)return sg*round(a*512
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=TOTAL_OUTPUTS/32)return;
+ float prefix[32];
+#if RAW_INPUT
+ [loop]for(uint raw_channel=0;raw_channel<32;raw_channel++)prefix[raw_channel]=input[p*32+raw_channel];
+#else
  uint x=p%8,y=(p/8)%8;
  uint seed=NOISE_SEED;
 #if DYNAMIC_PARAMETERS
@@ -44,11 +48,11 @@ void main(uint3 id:SV_DispatchThreadID){
  [unroll]for(uint zero_channel=16;zero_channel<32;zero_channel++)output[p*32+zero_channel]=0;
  return;
 #endif
- float prefix[32];
  [loop]for(uint channel=0;channel<32;channel++){
   float sum=0;[unroll]for(uint i=0;i<16;i++)sum+=features[i]*weights[channel*16+i];
   prefix[channel]=half_round(sum);
  }
+#endif
 #if FULL_FFN
  float hidden[128];
  [loop]for(uint row=0;row<128;row++){
