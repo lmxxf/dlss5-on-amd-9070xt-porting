@@ -31,6 +31,9 @@ groupshared float scores[4096];
 float W(uint i){return asfloat(w.Load(i*4));}
 uint region(uint p,uint n){return p<n-8?0:(p<n-4?1:2);}
 float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return s*round(a*512)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e++;}return s*min(exp2(e)*(1+m/8),448.);}
+#ifdef WAVE_SIZE
+[WaveSize(WAVE_SIZE)]
+#endif
 [numthreads(64,1,1)]
 void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
     uint window=group.x+group.y*65535,query=lane.x;

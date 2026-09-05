@@ -2119,6 +2119,16 @@ E4M3有限输出用FP16能精确存放。test_packed_feature.py枚举254个带�
 
 PairProject最终attention3.40528ms、FFN1.63632、QKV1.28064，全网46.21744ms，仍比原FP32特征版45.41328慢。已删除enable-packed-feature.txt并重启恢复原配置；三类候选全部不进入默认路径。PairProject CSO SHA为972d7fc5d29fb9a550f033f7ecad0bb697ab6e2984c457d9f408ec48616e770f，保留源码/构建入口作反证。下一测试方向是显式WaveSize32/64，而不是继续假设“少一半存储必然更快”。30fps仍未达成。
 
+### 2026-09-05 Wave大小及显存压力核查
+
+block70 attention显式cs_6_6 WaveSize32为2.48556ms、WaveSize64为2.49808ms，与原约2.49ms相近，无实用收益；build_cached_scores.ps1保留-WaveSize 0/32/64，默认0已恢复cs_6_2编译。DirectML CompileOperator未设置DISABLE_META_COMMANDS，不能归因为主动关闭硬件优化。
+
+runtime每5秒cadence追加DXGI QueryVideoMemoryInfo（非图像readback），本地/非本地分段分别记录进程CurrentUsage与Budget。菜单本地5110.08MiB/15416.53MiB，非本地123.46MiB/31460.88MiB，未超预算。部署SHA dbad725a5e64439d54051ae798e30f473263e5769dda56ccedfd75c6953db066。下一结构性候选：统一DirectML及custom pass的shader-visible descriptor heap；当前每算子拥有单独heap、在GEMM与boundary之间反复切换。必须实际测量，不能仅据切换次数宣称它是根因。30fps仍未达成。
+
+洞窟读数：本地8513.74/15416.53MiB、非本地164.82/31460.88MiB，cadence19.082/18.939fps，当前场景也未超显存预算。
+
+统一heap候选实现备忘（尚未实施）：可保留原heap对象作为分配标识，注册到一个native-device shader-visible arena及offset；统一CreateDescriptorHeap、GetCPU/GPUDescriptorHandleForHeapStart、SetDescriptorHeaps的runtime helper，把descriptor写入和DirectML binding table句柄都指向arena切片、实际绑定同一个arena。仅处理native g_device的CBV/SRV/UAV shader-visible heap，FFX proxy-device bridge保持原路径。无需伪造COM heap对象或把代理对象交给native command list。header默认不开arena，让离线runner保持旧行为；启用后再量整网时间，不能只改DML heap而遗漏穿插的boundary/window heap。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

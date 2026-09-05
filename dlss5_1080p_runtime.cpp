@@ -1000,6 +1000,13 @@ void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
     if(device)device->Release();
 }
 
+void log_video_memory() {
+    static IDXGIAdapter3 *adapter=nullptr;
+    if(!adapter&&g_device){IDXGIFactory4 *factory=nullptr;if(SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))){factory->EnumAdapterByLuid(g_device->GetAdapterLuid(),IID_PPV_ARGS(&adapter));factory->Release();}}
+    if(!adapter)return;
+    for(UINT segment=0;segment<2;segment++){DXGI_QUERY_VIDEO_MEMORY_INFO info{};HRESULT hr=adapter->QueryVideoMemoryInfo(0,static_cast<DXGI_MEMORY_SEGMENT_GROUP>(segment),&info);if(SUCCEEDED(hr))log("video_memory segment=%u usage_mib=%.2f budget_mib=%.2f\n",segment,double(info.CurrentUsage)/1048576.0,double(info.Budget)/1048576.0);}
+}
+
 void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swapchain,
                 const reshade::api::rect *, const reshade::api::rect *, uint32_t,
                 const reshade::api::rect *) {
@@ -1023,7 +1030,7 @@ void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swa
         }
         g_gpu_profile.state.store(4);
     }
-    if(g_ready.load()&&generation){const auto now=GetTickCount64();if(!g_cadence_start){g_cadence_start=now;g_cadence_frames=generation;}else if(now-g_cadence_start>=5000){log("cadence frames=%llu elapsed_ms=%llu fps=%.3f\n",generation-g_cadence_frames,now-g_cadence_start,1000.0*(generation-g_cadence_frames)/(now-g_cadence_start));g_cadence_start=now;g_cadence_frames=generation;}}
+if(g_ready.load()&&generation){const auto now=GetTickCount64();if(!g_cadence_start){g_cadence_start=now;g_cadence_frames=generation;}else if(now-g_cadence_start>=5000){log("cadence frames=%llu elapsed_ms=%llu fps=%.3f\n",generation-g_cadence_frames,now-g_cadence_start,1000.0*(generation-g_cadence_frames)/(now-g_cadence_start));log_video_memory();g_cadence_start=now;g_cadence_frames=generation;}}
     if(native==g_main_swapchain&&g_ready.load()&&generation>g_display_generation){
         ID3D12Resource *back=nullptr;
         if(SUCCEEDED(native->GetBuffer(native->GetCurrentBackBufferIndex(),IID_PPV_ARGS(&back)))){
