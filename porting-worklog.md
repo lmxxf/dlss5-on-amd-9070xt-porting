@@ -2415,6 +2415,14 @@ d3d12_native_front_chain_test增加可选ds参数（保留原默认block0..3测�
 
 新增组件尚未接入游戏addon；实验输入仍128×64，输出32×16×64。不能把当前前五层闭合称为整网完成，更不能代替剑星最终画面验收。游戏DLL及公开ZIP未修改，下一步继续核对C64多头权重/布局并向后接线，目标active。
 
+### 2026-09-06 C64原版可重跑裁判与identity控制建立
+
+block5原记录61760 bytes，SHA1b905577285978107b21b5730aac2b0105d45f757b5e78334291d9b4ab5646bb。C64 kernel位于dlssnr-01.cubin（SHAa10a8083b9489622fe290d669f05f38db7308c3c10771d0f0d6f22718e3cb1ae），不是前段00。新增oracle mode7，因multihead 88-byte参数在input/output/weight后额外留8bytes，再H/W（offset32）、X/Y偏移（40）、override H/W（80）；后者清零让kernel回退主尺寸。32×16输入、grid4×2、block32×2启动cc_tinlayout_fused_swin_2h_64_2_inpview_fp8，输入使用原block4 DS。两次独立启动输出8MiB arena完全相同，SHA1cf1f2a2dad909c84bb5a3d2b2521f73b1ddcf57141100dfc4ee75c535b0f73e；有效32768bytes无FP8 NaN码，末有效索引32767。非zero和稳定仅证明裁判能运行，不代表AMD C64已完成。
+
+check_native_c64_identity.py将矩阵清零，0x7010..0x7090 FFN skip及0xf0b0..0xf130 attention skip置1，scale 0xe0a0处两float置1。原kernel输出与输入全部32768个FP8值的多重集合一致（仅统一正负零）；空间布局未验证，所以不是逐坐标identity声明。
+
+SASS还显示FFN区域0..0x4000、0x4000..0x6000后有0x6000区域矩阵load，QKV从0x70a0开始。不能照搬C32的两矩阵FFN简单扩宽；新增矩阵的确切维度、作用及排列仍需编码/basis探针，当前不把可能的分组/混合解释写成事实。下一步恢复C64输入输出坐标与这段矩阵，已有AMD block0..4 DS逐值测试保持不变。未更新游戏DLL，整网及画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -53,6 +53,8 @@ int main(int argc, char **argv) {
     if(mode==4){p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;}
     if(mode==5){p.width=height;p.height=width;p.field_y=0;p.field_x=0;p.optional2=aux;}
     if(mode==6){p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;p.optional3=aux;p.optional_dims=(unsigned)(height/2)|((unsigned long long)(unsigned)(width/2)<<32);p.optional4=0;}
+    // Multihead ABI inserts an unused pointer before H/W and X/Y offsets.
+    if(mode==7){p.width=0;p.height=0;p.field_y=height;p.field_x=width;p.optional0=(unsigned)((shift&1)?-4:0)|((unsigned long long)(unsigned)((shift&2)?-4:0)<<32);p.optional4=0;}
     if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
     if(mode==3){p.optional3=aux;p.optional_dims=aux;p.optional4=(CUdeviceptr)dims;p.override_width=width/2;p.override_height=height/2;}
