@@ -2587,6 +2587,16 @@ probe_native_c256_half_attention.py将V/P置单连接、FFN identity，以常量
 
 check_native_c64_shift.py扩展256及ceil窗口数，仅对C256普通kernel且有效height=4按行模4填充（X越界仍补零）；inpview block15的补零规则保持不变。block16..21各8192值全部与原CUBIN逐值相同，MAE/max0。此轮尚未接GPU，实际AMD闭合范围仍block0..15；下一步GPU包装需显式区分plain H4重复与inpview H4补零，游戏DLL/公开包未改，目标active。
 
+### 2026-09-06 C256普通移位链接入AMD，RGB到block21逐值一致
+
+NativeC64Shift增加显式PLAIN_SHORT_Y开关，仅在CHANNELS=256且有效height=4时对pack行坐标模4；第15层inpview保持默认补零。第16..21层分别用XY/X/Y/none/XY/X，输出资源、权重、状态均独立。测试host新增c256shift模式，直接接AMD block15输出，未注入NVIDIA中间值。
+
+新增native_shader_cache.h，仅缓存同一进程内的独立shader字节码，key包含完整源文本、entry和所有宏；有include时回退不缓存编译，资源/权重/激活不缓存。相同字节码复用减少多层重复编译，计算图与运行时常量不变。21层链实测15次编译、36次命中，避免六个C256层重复编译同一程序。
+
+9070XT三次replay、device/fence检查通过；validate_native_c64_chain.py --c256-shift对独立原block21解码的8192值全部exact，MAE/max0、nonfinite0。再运行同一新EXE的c256入口回归，三次通过且原block15的8192值仍exact，证明入口补零未混成普通层重复行。H4/H12六种控制探针复查亦通过。墙钟fence313/297/296ms等仅小夹具数据，不是1080p帧率。
+
+当前AMD正确特征前缀推进至block0..21，游戏DLL/公开包未更新，第0层旁路2个差异及其余网络/最终RGB仍待处理。下一步block22 C256→C512 DS，随后是与普通Swin不同的split/ViT路径，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
