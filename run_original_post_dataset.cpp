@@ -95,7 +95,10 @@ int main(int argc, char **argv) {
     check("output surface", cuSurfObjectCreate(&output_surface, &output_resource));
 
     std::vector<float> color(8 * 8 * 4, 0.0f);
-    for (size_t pixel = 0; pixel < 64; ++pixel) color[pixel * 4 + 3] = 1.0f;
+    for (size_t pixel = 0; pixel < 64; ++pixel) {
+        if(feature_mode)for(size_t c=0;c<3;++c)color[pixel*4+c]=0.5f;
+        color[pixel * 4 + 3] = 1.0f;
+    }
     CUDA_ARRAY3D_DESCRIPTOR texture_desc{};
     texture_desc.Width = texture_desc.Height = 8;
     texture_desc.Format = CU_AD_FORMAT_FLOAT;
@@ -234,12 +237,19 @@ int main(int argc, char **argv) {
                     function, 1, 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
                 check("feature sync", cuCtxSynchronize());
                 check("feature download", cuMemcpy2D(&download));
-                for (size_t pixel = 0; pixel < 64; ++pixel)
+                for (size_t pixel = 0; pixel < 64; ++pixel) {
+                    const float pos=positive_tile[pixel],neg=rgba_tile[pixel*4];
+                    if(!std::isfinite(pos)||!std::isfinite(neg)||
+                       ((pos<=0||pos>=1)&&(neg<=0||neg>=1))){
+                        std::fprintf(stderr,"invalid feature readout sample=%zu channel=%zu pixel=%zu pos=%g neg=%g\n",sample,channel,pixel,pos,neg);
+                        return 3;
+                    }
                     output[(sample * 64 + pixel) * 32 + channel] =
-                        std::abs(positive_tile[pixel] - 0.5f) >=
+                        std::abs(positive_tile[pixel] - 0.5f) <=
                         std::abs(0.5f - rgba_tile[pixel * 4])
                         ? (positive_tile[pixel] - 0.5f) / probe
                         : (0.5f - rgba_tile[pixel * 4]) / probe;
+                }
                 std::memcpy(scan_weight.data() + slot * 2, &zero_half, 2);
             }
             continue;

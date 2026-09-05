@@ -2265,6 +2265,20 @@ repair_temporal_aa.ps1要求游戏已退出，幂等修改单一AA项，保留�
 
 下一个明确缺口：当前局部prefix的skip只有384个非零连接，独立全尺寸block70-prefix-global-skip-effective.bin有1536个非零，输入2048物理元素分两个bank，而运行时仍从低分辨率g_block0_hwc按局部512元素获取。需恢复完整skip来源/尺寸/物理排列，不能直接把两矩阵当作同一输入合同或靠补零/平滑隐藏缺失。另block0-distilled仍是文档明确的近似代理，不应宣称精确原版移植。rtx5090 SSH已恢复，hostname NucBox_EVO-T1、实际GPU RTX5090，当前无剑星进程；没有修改5090环境。此次保留已证实的两项修复，结束AMD测试游戏，原发布ZIP仍未更换。
 
+### 2026-09-05 原始特征读口修复，完整skip重新恢复
+
+在本机GB10重编原始preblock CUDA oracle，256个8×8 RGB受控样本同时输出main2048与DS512 E4M3。旧候选布局下2×2均值与DS相关0.1292，起初误认为均值关系被否决；后续布局恢复推翻此判断，见下文。测试脚本audit_preblock_branches.py，不向游戏注入试验数据。
+
+重新跑run_original_post_dataset的global-skip-features发现全部输出为±512。源代码错误：feature模式Color纹理仍为0，却按0.5灰底反推；正负readout选择还使用>=，会优先选离灰底更远的截断侧。改为feature模式灰底0.5、选择距离较小侧；双侧均截断或非finite时拒绝结果。非feature普通RGB路径仍黑底，未改正式神经参数。修正后原版feature输出范围约±0.997，而非±512。
+
+用保留原prefix权重、FFN/attention旁路为identity的受控post，在完整256×144几何下，对两个1024-byte skip banks施加2048行±0.5 Hadamard，恢复2048×2048线性映射。新映射每输出恰1个非零、共2048个非零，输入索引构成2048项排列；旧global-skip矩阵只有1536非零、512列全零。旧非零列在新独立样本上基本一致，主要缺口正是丢失512列。新矩阵留在release/post-skip-basis/matrix.f32（SHA c0b7e115aeb9520883a8ce064d35172845a8103e06292cc47e1931ceca33f892），未上传Git/未覆盖历史权重/未直接部署游戏。
+
+audit_post_skip.py以独立64组均匀随机输入量化E4M3后验收：对原CUBIN correlation0.99999996877、MAE0.00006562623、max0.000457763672，nonfinite0。AMD d3d12_post_upsample_test同输入2048→2048输出与CPU矩阵逐值exact，对原版误差相同，GPU0.991ms。权威输入文件/tmp/block70.weights SHA197024afb1f78602dc08cfd5ae87c413385237c5f537dd5dcfeae742be85eca8；CUBIN /tmp/dlssnr-cubins/dlssnr-00.cubin SHA feb368ff5279a7408b1e55554db6e468d7f114a24b18b2af8d7e6989a410c612。恢复脚本recover_post_skip_basis.py使用正交变换，不是单帧外观拟合。
+
+新skip排列用于解释原preblock main，配合DS的双16通道bank-major解释后，2×2均值对DS相关升至0.9995802。均值再量化E4M3有67.4194%值exact，MAE0.03799759、max4；可能存在原版池化与量化次序差异，尚未exact。不能把“旧布局下不匹配”继续当作池化机制的反证，也不能将新高相关偷换为完整preblock验收。现有RGB-only蒸馏入口仍缺Gaussian/seq0完整合同。
+
+5090先因Steam无法同步存档暂停启动，未点强制继续；用户后确认存档已解决，现已启动原版用于装备菜单脸部对照。新增run_nvidia_ui.ps1，仅在交互session成功聚焦剑星后输入/截图。AMD游戏未启动，当前安装仍为上一checkpoint b210a431；这轮修复的是权威测量与待接入分支，不宣称脸部效果已恢复。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
