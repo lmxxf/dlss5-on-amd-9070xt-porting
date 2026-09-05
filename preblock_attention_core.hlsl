@@ -33,6 +33,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  }
  [loop]for(uint c=0;c<32;c++){
   float a=0;[loop]for(uint j=0;j<32;j++)a+=av[j]*weights[3072+c*32+j];
-  output[p*32+c]=F(H(H(a)+input[p*32+c]*weights[8193+c]));
+  float result=H(H(a)+input[p*32+c]*weights[8193+c]);
+  output[p*32+c]=RAW_OUTPUT?result:F(result);
  }
 }

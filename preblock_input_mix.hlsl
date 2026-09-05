@@ -19,17 +19,18 @@ float q8(float v){float a=abs(v),sg=v<0?-1:1;if(a<0.015625)return sg*round(a*512
 void main(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=TOTAL_OUTPUTS/32)return;
  uint x=p%8,y=(p/8)%8;
- uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^(0x3f800000u*0x9e3779b9u)^0x243f6a88u);
+ uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^((uint)NOISE_SEED*0x9e3779b9u)^0x243f6a88u);
  float a=uniform24(h*0xcaa5b80d+0x21dd796b),b=uniform24(h*0x2c9277b5+0xac564b05);
  float c=uniform24(h*0x83232c31+0x3463e0ac),d=uniform24(h*0xfa6dc5f9+0x4712a88e);
  float r0=sqrt(-2*log(a)),r1=sqrt(-2*log(b));
  float g0=half_round(r0*cos(6.283185482025146*c));
  float g1=half_round(r1*cos(6.283185482025146*d));
  float g2=half_round(r1*sin(6.283185482025146*d));
- float r=half_round(half_round(half_round(input[p*4])-0.5)*2);
- float g=half_round(half_round(half_round(input[p*4+1])-0.5)*2);
- float bl=half_round(half_round(half_round(input[p*4+2])-0.5)*2);
- float features[16]={g1,g2,g,bl,g0,1,0,1,r,g,0,0,bl,r,0,0};
+ float rgb_scale=LIVE_PROFILE?.125:2;
+ float r=half_round(half_round(half_round(input[p*4])-0.5)*rgb_scale);
+ float g=half_round(half_round(half_round(input[p*4+1])-0.5)*rgb_scale);
+ float bl=half_round(half_round(half_round(input[p*4+2])-0.5)*rgb_scale);
+ float features[16]={g1,g2,g,bl,g0,1,LIVE_PROFILE?.0078125:0,1,r,g,LIVE_PROFILE?1:0,LIVE_PROFILE?1:0,bl,r,LIVE_PROFILE?1:0,0};
 #if DEBUG_FEATURES
  [unroll]for(uint debug_channel=0;debug_channel<16;debug_channel++)output[p*32+debug_channel]=features[debug_channel];
  [unroll]for(uint zero_channel=16;zero_channel<32;zero_channel++)output[p*32+zero_channel]=0;
@@ -54,7 +55,8 @@ void main(uint3 id:SV_DispatchThreadID){
    float sum=0;[loop]for(uint i=0;i<32;i++)sum+=hidden[group*32+i]*weights[4608+c*128+group*32+i];
    accum=half_round(accum+sum);
   }
-  output[p*32+c]=q8(half_round(accum+prefix[c]*weights[8704+c]));
+  float result=half_round(accum+prefix[c]*weights[8704+c]);
+  output[p*32+c]=RAW_OUTPUT?result:q8(result);
  }
 #else
  [unroll]for(uint c=0;c<32;c++)output[p*32+c]=q8(prefix[c]);

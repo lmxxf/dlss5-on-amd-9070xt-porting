@@ -139,6 +139,24 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0xf0, &dimensions, 8);
     std::memcpy(params + 0xf8, &downsample_output, 8);
 
+    if(const char*parameter_file=std::getenv("DLSS5_PREBLOCK_PARAMETER_FILE")){
+        const auto captured=read_file(parameter_file);if(captured.size()!=sizeof(params))return 2;
+        std::memcpy(params,captured.data(),sizeof(params));
+        // Replace all captured texture/resource handles; retain scalar behavior.
+        std::memset(params,0,0x48);
+        std::memcpy(params+texture_offsets[texture_slot],&texture,8);
+        const float eight=8.0f,inverse=0.125f;const uint64_t down_dims=4ull|(4ull<<32);
+        for(int offset:{0x90,0x94})std::memcpy(params+offset,&eight,4);
+        for(int offset:{0x98,0x9c,0xa0,0xa4})std::memcpy(params+offset,&inverse,4);
+        for(int offset:{0xd0,0xd4})std::memcpy(params+offset,&extent,4);
+        std::memcpy(params+0xd8,&main_output,8);std::memcpy(params+0xe0,&device_weights,8);
+        std::memset(params+0xe8,0,8);std::memcpy(params+0xf0,&dimensions,8);
+        std::memcpy(params+0xf8,&downsample_output,8);std::memcpy(params+0x100,&down_dims,8);
+        if(const char*seed_text=std::getenv("DLSS5_PREBLOCK_SEED")){
+            const uint32_t seed=static_cast<uint32_t>(std::strtoul(seed_text,nullptr,0));std::memcpy(params+0xc8,&seed,4);
+        }
+    }
+
     void *kernel_args[] = {params};
     constexpr size_t main_tile_bytes = 8 * 8 * 32;
     constexpr size_t downsample_tile_bytes = 4 * 4 * 32;

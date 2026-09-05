@@ -2335,6 +2335,16 @@ preblock_attention_core.hlsl用24KiB groupshared存Q/K/V，32维头、显式FP16
 
 AMD安装仍是b210a431，尚未将新完整前端放进游戏；本轮是attention正确性进展。全目标仍为实际剑星DLL画面验证，未完成且保持active。下一步串联新input mix/128宽FFN/32维attention及DS，再解决live参数和全分辨率skip，重新审余下主体的数据类型与维度。
 
+### 2026-09-06 完整第0层串联及有效live参数
+
+新增ffn-raw/attention-raw测试模式保留最终FP16结果，避免在残差与DS前提前压成FP8。GPU输入混合→128宽FFN→32维attention串联，256张同输入原CUBIN完整preblock裁判：main corr0.999963913、96.225166% exact、MAE0.00398203、max4；从原始FP16输出池化后DS corr0.999962606、94.279480% exact、MAE0.00340112、max2。比旧“从FP8 main倒推DS”的67% exact更接近，但仍不是全逐值闭合。preblock_complete_validation.py保存正确比较口径；raw模式host里传入的旧分段oracle仅用于尺寸检查，其打印误差不是组合结果验收值。
+
+RTX Steam持续显示启动中但无SB进程，确认不是观察超时后，使用当前截图核对的取消按钮撤销空挂启动，绿色开始按钮恢复。重新部署带indirect-v2标记的只读探针（SHA2a72b304...），再启动得到新PID29116及8份有效参数。backend函数确实先解引用参数数组首指针，旧外层采样仍无效。真实source H/W2160/3840，network H/W2176/3840，grid480×272；texture仅slot0非零，seed c8为0..7逐帧递增。归一化/行为参数b0=1、b4=.0078125、b8/bc=1、c0整数1、c4=.0625，和helper旧默认不同。摘要preblock-live-profile.json，原始bin留release/live-preblock-v2，不把进程地址当可移植参数。
+
+run_original_preblock_oracle可读取DLSS5_PREBLOCK_PARAMETER_FILE：保留已捕获scalar/flag，替换所有纹理及输出/权重GPU句柄，缩放W/H与倒数到本地8×8控制；不复用跨进程地址。逐mix权重探针确认该捕获profile输入为[g1,g2,G,B,g0,1,.0078125,1,R,G,1,1,B,R,1,0]，RGB用0.125*(half(rgb)-0.5)，seed0。CPU混合对256原tile仅1/524288值不同；原始assert仍失败，未偷偷改成exact。AMD通过LIVE_PROFILE/NOISE_SEED编译参数独立实现同合同，也只有同1值差，MAE3.72529e-9、max.001953125、GPU.730ms。差异可能来自transcendental/半精度边界，不假装原版完整数据合同已经全面验证。
+
+新完整前端尚为Lab组合，两次GPU调用之间有读回文件，未作为性能测试或常驻游戏版。AMD安装仍b210a431且画质未修好；原发布ZIP未改。下一步应常驻化新前端、补全局坐标/动态seed/正确DS与full skip，再继续审主体层FP8矩阵容量，最终按目标实际部署DLL与真实画面验证。目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

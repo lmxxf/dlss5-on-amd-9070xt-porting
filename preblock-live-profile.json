@@ -1,0 +1,15 @@
+{
+ "source":"Original NVIDIA runtime backend +0x449a0, argument-array dereference, PID 29116; eight consecutive startup evaluations",
+ "probe_hash":"2a72b304f7fd66bbbdad7d8afcd95c09301a901a9d355c4eb64e95386ce67f76",
+ "format":"indirect-v2",
+ "source_extent_hw":[2160,3840],
+ "network_extent_hw":[2176,3840],
+ "launch_grid":[480,272,1],
+ "texture_slots_nonzero":[0],
+ "seed_parameter":"0xc8",
+ "seeds_observed":[0,1,2,3,4,5,6,7],
+ "scalar_parameters":{"0xb0":1.0,"0xb4":0.0078125,"0xb8":1.0,"0xbc":1.0,"0xc4":0.0625},
+ "integer_flags":{"0xa8":1,"0xc0":1},
+ "controlled_mix_validation":{"tiles":256,"output_values":524288,"differing_values":1,"mae":3.7252903e-9,"max_error":0.001953125,"device":"RX9070XT"},
+ "limits":"Captured preset/startup contract only. Test replaces texture handles, normalizes extents to an 8x8 control, and uses seed 0. Does not verify live image payload, global boundaries or complete image quality."
+}
