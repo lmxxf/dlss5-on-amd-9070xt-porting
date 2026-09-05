@@ -2441,6 +2441,14 @@ validate_native_c64_ffn.py再用128个byte scan确定64个FFN skip half的逻辑
 
 此轮C64 FFN为CPU参考对原CUBIN验证，尚未实现AMD C64 shader，也未恢复双头attention。当前AMD实际闭合范围仍block0..4 DS，游戏DLL未改、公开包未改。下一步恢复C64 QKV/P、bias及双头布局后整体接GPU，最终剑星画面目标保持active。
 
+### 2026-09-06 C64 V/P完整连接与原系数均匀attention逐值验证
+
+recover_native_c64_attention.py先将output projection置全1，QKV区逐字节激活，只有V能在其余V为零时产生非零输出。实测V共4096bytes分布于[0x78a0,0x7ca0)、[0x84a0,0x88a0)、[0x90a0,0x94a0)、[0x9ca0,0xa0a0)，不是简单的Q/K/V各连续4096bytes。--full用6位输入编码和共享latent代表恢复V/P各4096条唯一连接，P输出坐标依赖已验证C64 cell映射，latent标签在两矩阵间一致；结果在release/native-c64/attention-layout。
+
+validate_native_c64_uniform_attention.py使用原始V/P系数，只将FFN改identity、Q/K及bias置零、attention skip置零以隔离值路径，均匀权重1/64。CPU计算V的K32分段half累加→FP8→两个K32 attention-value累加→FP8→P分段half→FP8。独立随机seed31/σ0.25及seed47/σ3.0，各32768输出全部与原CUBIN逐值相同，MAE/max0，均有assert。这验证了真实V/P连接和该控制下的算术，不包括非均匀attention、Q/K、双头bias/归一化或完整block5。
+
+当前C64 FFN及均匀attention分别闭合，完整C64尚未接AMD。游戏DLL、发布ZIP未修改，实际AMD闭合范围仍block0..4 DS。下一步恢复Q/K与8192个bias条目的head/query/key布局，再串完整C64验证，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
