@@ -2511,6 +2511,16 @@ validate_native_c64_ffn.py --channels 128以原block9字节系数、原block8 DS
 
 当前C128完成的是CPU FFN原型和原CUBIN对照，尚无C128 GPU shader，也未恢复四头attention。AMD实际闭合范围仍block0..8 DS；游戏DLL、公开ZIP未改，最终剑星画面目标active。下一步恢复四头QKV/P/bias，再串完整C128并接GPU。
 
+### 2026-09-06 C128四頭attention及完整block9 CPU逐值闭合
+
+将V/P与bias编码工具参数化支持--channels 128。原QKV的49152bytes逐字节控制确认V为16个1024-byte分块，共16384bytes，而非连续一段；7位输入/latent编码恢复V及P各16384条唯一连接。四头bias通过六个空间位探针恢复16384项head/query/key完整bijection，每头4096项，控制输出每次仅一个head的一处query变化。位置/连接缓存留release/native-c128，未将权重推Git。
+
+native_c64_reference.py通用unpack/block支持C64及C128，C128用原0x18010 FFN skip、0x2c120四scales、0x2c130 projection、0x30130 attention skip，后者另做256-byte探针恢复128-slot顺序。Q/K按已识别V分块分别回移0x800/0x400，同族映射经过完整非均匀计算约束，仍不称独立Q/K逐字节basis证明。
+
+完整block9 CPU参考对原block8 DS输入16384值全部exact；--random新增独立seed113/σ0.25及seed127/σ3.0，两组各16384值也全部exact、max0，三组共49152值有硬断言。C64完整层及同两组随机输入回归全exact。重新执行通用化后的C64 V/P和双头bias恢复，所有缓存连接表与改动前逐值一致。
+
+当前完整C128仅完成CPU原型对原CUBIN验证，尚未实现AMD C128 shader。AMD实际闭合范围仍block0..8 DS，游戏DLL/公开ZIP不变。下一步把四头层接入GPU链，再向后推进；第0层旁路2个差异及最终剑星真实画面验收仍未完成，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
