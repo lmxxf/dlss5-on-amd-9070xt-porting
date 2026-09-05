@@ -2217,6 +2217,12 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 新增runtime_health每5秒分开报告Present、网络提交及显示generation进展；未初始化、无FFX或对照模式不标为neural_active。明确这些是提交进展，不是GPU完成证明或实际显示帧时间。该日志改动交叉编译通过，但尚未部署到游戏；当前游戏文件仍为b8a35f开发版，尾端两开关关闭。入口未调用的根因尚未解决、真实30fps仍未达成。
 
+### 2026-09-05 19:29 按用户要求直接撤回后续实验
+
+将dlss5_1080p_runtime.cpp及d3d12_ffn_compare.cpp完整恢复到最后一次成功记录的c5a3a8a，git diff对该commit两文件为空；不是只关实验开关。尾端矩阵接入及runtime_health均从执行源码撤掉，实验记录和诊断脚本保留。重新编译成功，DLL SHA b7d10855a3b1a6f128ed2214b4f439c4540d43550aba788d6fbaac34f5b239ae，远端游戏部署哈希核对一致。配置为SDK721、前端4层，尾端开关仍关闭，Engine.ini已恢复原备份。
+
+回退后启动PID17736，日志至present1800仍backend_ready=0/ffx_frames=0；代码回退已完成，但这次启动尚未恢复神经推理，不能宣称恢复19fps或修复入口。核对后结束测试游戏，不留下无效运行。系统驱动没有继续变更，发布ZIP未动。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

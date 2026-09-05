@@ -20,8 +20,7 @@ static void transition(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOUR
 int wmain(int argc,wchar_t**argv){
     if(argc!=6){std::printf("usage: compare weights.bin packed.f16 input.f32 old.cso new.cso\n");return 2;}
     auto weights=read(argv[1]),packed=read(argv[2]),input=read(argv[3]);
-    if(weights.size()!=41220||packed.size()!=8192||(input.size()!=960ull*544*32*4&&input.size()!=1920ull*1088*32*4))return 2;
-    const UINT groups=UINT(input.size()/(32*4*64));
+    if(weights.size()!=41220||packed.size()!=8192||input.size()!=960ull*544*32*4)return 2;
     const IID experiment={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};check("experimental",D3D12EnableExperimentalFeatures(1,&experiment,nullptr,nullptr));
     IDXGIFactory6*f=nullptr;check("factory",CreateDXGIFactory1(IID_PPV_ARGS(&f)));IDXGIAdapter1*adapter=nullptr;for(UINT i=0;;i++){IDXGIAdapter1*x=nullptr;if(f->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&x))==DXGI_ERROR_NOT_FOUND)break;if(x){DXGI_ADAPTER_DESC1 desc{};x->GetDesc1(&desc);if(desc.VendorId==0x1002&&!(desc.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)){adapter=x;break;}x->Release();}}if(!adapter)return 3;
     ID3D12Device*d=nullptr;check("device",D3D12CreateDevice(adapter,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&d)));
@@ -41,7 +40,7 @@ int wmain(int argc,wchar_t**argv){
     std::vector<float> reference(input.size()/4);UINT64 frequency=0;check("frequency",q->GetTimestampFrequency(&frequency));
     for(UINT variant=0;variant<2;variant++){
         check("reset allocator",alloc->Reset());check("reset list",c->Reset(alloc,pso[variant]));c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(root);auto gpu=heap->GetGPUDescriptorHandleForHeapStart();gpu.ptr+=UINT64(variant)*7*step;c->SetComputeRootDescriptorTable(0,gpu);
-        for(UINT iteration=0;iteration<110;iteration++){if(iteration==10)c->EndQuery(queries,D3D12_QUERY_TYPE_TIMESTAMP,0);c->Dispatch(groups,1,1);D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=out[variant];c->ResourceBarrier(1,&b);}
+        for(UINT iteration=0;iteration<110;iteration++){if(iteration==10)c->EndQuery(queries,D3D12_QUERY_TYPE_TIMESTAMP,0);c->Dispatch(8160,1,1);D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=out[variant];c->ResourceBarrier(1,&b);}
         c->EndQuery(queries,D3D12_QUERY_TYPE_TIMESTAMP,1);c->ResolveQueryData(queries,D3D12_QUERY_TYPE_TIMESTAMP,0,2,timeBuffer,0);transition(c,out[variant],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyResource(rb,out[variant]);submit();
         void*p=nullptr;D3D12_RANGE tr{0,16},none{0,0};check("times",timeBuffer->Map(0,&tr,&p));auto*times=static_cast<UINT64*>(p);std::printf("variant=%u gpu_ms=%.6f iterations=100\n",variant,1000.0*double(times[1]-times[0])/frequency/100.0);timeBuffer->Unmap(0,&none);
         D3D12_RANGE rr{0,input.size()};check("output",rb->Map(0,&rr,&p));auto*values=static_cast<float*>(p);if(!variant)std::copy(values,values+reference.size(),reference.begin());else{double absolute=0,squared=0,maximum=0;size_t different=0,nonfinite=0;for(size_t i=0;i<reference.size();i++){double delta=double(values[i])-reference[i];nonfinite+=!std::isfinite(values[i])||!std::isfinite(reference[i]);absolute+=std::abs(delta);squared+=delta*delta;maximum=std::max(maximum,std::abs(delta));different+=values[i]!=reference[i];}std::printf("values=%zu different=%zu nonfinite=%zu mae=%.9f rmse=%.9f max=%.9f\n",reference.size(),different,nonfinite,absolute/reference.size(),std::sqrt(squared/reference.size()),maximum);}rb->Unmap(0,&none);
