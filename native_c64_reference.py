@@ -13,7 +13,7 @@ def multiply(a,m,initial=None):
  return result
 
 def unpack(path):
- root=Path('release/native-c64');raw=np.fromfile(path,np.uint8);assert raw.size==61760
+ root=Path('release/native-c64');raw=np.fromfile(path,np.uint8);assert raw.size in (61760,69936)
  fl=np.load(root/'ffn-layout/layout.npz');al=np.load(root/'attention-layout/matrix-layout.npz');bl=np.load(root/'attention-layout/bias-layout.npz')
  ffn={}
  for name,begin,end,shape,ro,co in [('W1',0,0x4000,(256,64),'w1_hidden','w1_input'),('W2',0x4000,0x6000,(64,256),'w2_output','w2_hidden'),('W3',0x6000,0x7000,(64,64),'w3_output','w3_input')]:
@@ -28,7 +28,7 @@ def unpack(path):
  skip=np.empty(64,np.float32);skip[np.load(root/'attention-layout/skip-channels.npy')]=raw.view('<f2')[0xf0b0//2:0xf130//2]
  return ffn,qkv,projection,bias,raw[0xe0a0:0xe0a8].view('<f4'),skip
 
-def block(x,ffn,qkv,projection,bias,scales,skip):
+def block(x,ffn,qkv,projection,bias,scales,skip,raw_output=False):
  expanded=multiply(F(x),ffn['W1']);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
  hidden=F(H(expanded*poly));middle=F(multiply(hidden,ffn['W2']))
@@ -47,7 +47,8 @@ def block(x,ffn,qkv,projection,bias,scales,skip):
   prob=F(H(exp*H(1/denominator(exp))))
   av=H(H(prob[:,:,:32]@vh[:,:32])+prob[:,:,32:]@vh[:,32:])
   combined.append(F(av))
- return F(multiply(np.concatenate(combined,axis=-1),projection,H(feature*skip)))
+ result=multiply(np.concatenate(combined,axis=-1),projection,H(feature*skip))
+ return result if raw_output else F(result)
 
 if __name__=='__main__':
  root=Path('release/native-c64');folder=root/'attention-layout'

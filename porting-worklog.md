@@ -2483,6 +2483,14 @@ prepare_native_front_chain.py导出block5参数，d3d12_native_front_chain_test�
 
 当前AMD闭合范围推进到block0..7，仍非完整网络或最终RGB；第0层另一路2个差异待查。游戏DLL/公开ZIP未修改，下一步恢复block8 C64→C128 DS及后续宽层，最终剑星画面验收目标active。
 
+### 2026-09-06 block8 C64→C128主输出与DS原版逐值验证
+
+提取block8记录69936bytes，SHA687d906bc5d6748b57ee3e519c114f9382d93db560b7f779461c1ab90f5237ae。新增native oracle mode8沿用multihead H/W及移位字段，但DS指针在offset72、half H/W在offset80，对应原SASS c[0][0x3c8]/0x3d0。以原block7输出、32×16、Y=-4、grid4×3、block32×2调用原ds kernel，main有效32768bytes、aux16384bytes。
+
+native_c64_reference支持DS记录和raw_output。check_native_c64_ds.py先比较block8主输出32768值全部exact；再从未量化的最终FP16 attention结果横向half-add池化→FP8，使用0xf130起8192个FP8字节的64→128矩阵（映射复用已编码恢复W1前128行），每K32半精度累计后FP8。按8个16-channel bank、每四通道0/2/1/3顺序解码，DS16384值全部exact。独立128种唯一有限FP8行编码探针验证每个输出位置的行顺序，避开NaN/正负零歧义，不凭相关度挑布局。main、DS、编码探针均有assert。
+
+这是CPU参考及原CUBIN的block8合同验证，尚未把block8接入AMD。下一步GPU实现需保留C64最终projection的FP16 raw供DS，不能从当前F8主输出倒推池化。现有AMD已验证范围仍block0..7；游戏DLL/公开ZIP未修改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
