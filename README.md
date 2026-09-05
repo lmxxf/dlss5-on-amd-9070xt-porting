@@ -2,6 +2,8 @@
 
 ## 当前结果
 
+**2026-09-05 最终像素审计更正：** 已发现并修复ReShade immediate list未标记有命令、导致最终合成未可靠提交的问题。修复后同帧GPU读回证明主菜单/洞窟99.63%/99.89%像素改变，合成结果与实际backbuffer逐字节一致。但真实输出出现明显8×8周期网格，画质仍不正确；此前“无方格”“开关区别不大”的截图不能再作为正确输出验收。网盘旧包未更新，不应宣传为画质验证完成版。详见`display-audit-menu-fixed.json`、`display-audit-game-fixed.json`及worklog。
+
 **2026-09-05 补丁失效修复：** 游戏保存的`AntiAliasing=SB_GAMEUSERSETTINGS_OFF`会令实际`r.PostProcessAAQuality=0`，即使菜单显示FSR3/质量，也不进入FFX/神经网络。退出游戏后用`repair_temporal_aa.ps1`将该项恢复为HIGH（仅改这一项并保留备份），实际AAQuality恢复4；干净回退DLL已在1080p洞窟恢复blocks0–70和约19.1–19.2fps。不要用“DLL已加载”或角落60fps判断补丁有效，详见worklog最新根因记录。
 
 自包含实验包已生成：`release/DLSS5-AMD-1080p.zip`（不入Git）。内含ReShade加载器和嵌入全部权重/CSO的addon DLL，不再依赖`D:\DLSSNR-Lab`；使用说明见`bundled-runtime-readme.txt`。9070XT洞窟复测约19.2fps，尚非30fps完成版。

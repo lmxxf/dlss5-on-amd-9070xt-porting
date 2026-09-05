@@ -2241,6 +2241,18 @@ repair_temporal_aa.ps1要求游戏已退出，幂等修改单一AA项，保留�
 
 肉眼尚看不出稳定显著改善，用户“看不出差别”的反馈不能以“网络确实在执行”来反驳；后续若审效果，应测同帧合成前后差值与最终残差幅度/位置，而非继续假设视觉正确性已验收。本次截图采集后恢复mode0并退出游戏。
 
+### 2026-09-05 最终输出像素审计：修复未提交，暴露真实网格
+
+用户要求确认最终神经输出生效。新增runtime_display_audit.h：外置开发模式下，显式audit-display.txt单次请求捕获同帧合成前R10、合成后R10、CopyResource回游戏backbuffer后的R10、block70 body全267386880 bytes及384-byte真实输出权重。下一Present信号并等待fence完成后才Map保存；不会按正常帧持续读回。analyze_display_audit.py按shader顺序独立算32→3残差及R10量化，比较最终结果；原始大文件在忽略目录release/display-audit，不提交模型或activation。
+
+首轮所有readback包括应非零的游戏画面和常量权重均为零，证明该抓取无效，不能当模型零输出。查ReShade源：d3d12_impl_command_list_immediate.cpp的flush若_has_commands=false直接return；get_native后调用原生CopyResource/Dispatch不会设置该标记。原on_present全用原生命令，故合成与audit都可能被跳过，先前display_residual generation仅是CPU记账，不证明GPU提交。修复用ReShade API copy_resource执行真实copy-in以设置标记，完成原生合成/copy-back后显式queue->flush_immediate_command_list。未放大残差、改权重或关闭算法掩盖现象。
+
+修复开发DLL SHA7d62b71a689fba812239891cdc30ca862182ce81fa7ff673cff07f532664c98e。重新抓取：主菜单generation120，输出权重absmax0.056770686、body absmax4.5，99.6340%像素改变，平均RGB变化2.63359/255，最大18.6950/255；CPU按真实权重重算与GPU输出R10逐值完全一致。洞窟generation3988，body absmax48，99.8859%像素改变，平均3.52281/255，最大154.79472/255；公式差最多1个10-bit量化级，没有>1的值。两场景after.r10与backbuffer.r10逐字节完全一致，已证明最终输出写入实际游戏backbuffer，不再仅凭执行计数判断。
+
+真实提交后明显8×8网格重新出现，截图dynamic-captures/display-submission-fixed-game.png。残差按(x mod8,y mod8)相位分组，固定相位均值解释主菜单95.386%、洞窟74.324%的残差方差，说明强周期伪影已存在于神经输出，而不是截图动画差异；具体源头仍需审block70 prefix/layout及上游，不能仅凭周期就断言某个排列错误。详细数字存display-audit-menu-fixed.json与display-audit-game-fixed.json。此前“修好小方格”“开关差异很小”不再作为画质通过的证据。
+
+本轮完成最终合成提交修复和同帧像素有效性证明，**未完成无网格的正确神经画质**。当前外置开发版保留真实提交及可选审计，未更新网盘ZIP，未改驱动/解析度/模型，尾端新矩阵优化仍关闭。抓取后游戏继续数千帧failed0，约18.7fps；最终退出游戏，不留异常画面运行。后续主线应是消除真实输出的周期错误，不是继续追FPS。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

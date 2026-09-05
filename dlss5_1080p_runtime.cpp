@@ -1056,11 +1056,14 @@ void log_video_memory() {
     for(UINT segment=0;segment<2;segment++){DXGI_QUERY_VIDEO_MEMORY_INFO info{};HRESULT hr=adapter->QueryVideoMemoryInfo(0,static_cast<DXGI_MEMORY_SEGMENT_GROUP>(segment),&info);if(SUCCEEDED(hr))log("video_memory segment=%u usage_mib=%.2f budget_mib=%.2f\n",segment,double(info.CurrentUsage)/1048576.0,double(info.Budget)/1048576.0);}
 }
 
+#include "runtime_display_audit.h"
+
 void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swapchain,
                 const reshade::api::rect *, const reshade::api::rect *, uint32_t,
                 const reshade::api::rect *) {
     const auto n = ++g_presents;
     auto*native=reinterpret_cast<IDXGISwapChain3*>(static_cast<uintptr_t>(swapchain->get_native()));
+    if(native==g_main_swapchain)g_display_audit.Poll(reinterpret_cast<ID3D12CommandQueue*>(queue->get_native()));
     if(native==g_main_swapchain&&(n==1||n%600==0)){const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*b=nullptr;if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&b)))){const auto d=b->GetDesc();log("present_backbuffer=%llu index=%u size=%llux%u format=%u\n",n,index,(unsigned long long)d.Width,d.Height,(UINT)d.Format);b->Release();}}
     const auto generation=g_b70_submissions.load();
     if(native==g_main_swapchain&&g_gpu_profile.state.load()==2){
@@ -1085,13 +1088,21 @@ if(g_ready.load()&&generation){const auto now=GetTickCount64();if(!g_cadence_sta
         if(SUCCEEDED(native->GetBuffer(native->GetCurrentBackBufferIndex(),IID_PPV_ARGS(&back)))){
             const auto desc=back->GetDesc();
             if(desc.Width==1920&&desc.Height==1080&&desc.Format==DXGI_FORMAT_R10G10B10A2_UNORM){
-                auto *cmd=reinterpret_cast<ID3D12GraphicsCommandList*>(queue->get_immediate_command_list()->get_native());
+                auto *immediate=queue->get_immediate_command_list();
+                auto *cmd=reinterpret_cast<ID3D12GraphicsCommandList*>(immediate->get_native());
                 auto tr=[&](ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES z){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,z};cmd->ResourceBarrier(1,&b);};
                 if(g_display_generation)tr(g_display_texture,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);
-                tr(back,D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_COPY_SOURCE);cmd->CopyResource(g_display_texture,back);
+                tr(back,D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_COPY_SOURCE);
+                const bool auditing=g_display_audit.Begin(cmd,back,generation);
+                // Native calls do not set ReShade's _has_commands flag. Use a real
+                // API copy so flush submits this list rather than discarding it.
+                immediate->copy_resource(reshade::api::resource{reinterpret_cast<uint64_t>(back)},reshade::api::resource{reinterpret_cast<uint64_t>(g_display_texture)});
                 tr(g_display_texture,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
                 ID3D12DescriptorHeap *heaps[]={g_b70.output_heap[0]};runtime_set_descriptor_heaps(cmd,1,heaps);cmd->SetComputeRootSignature(g_b70.output_root);cmd->SetComputeRootDescriptorTable(0,runtime_gpu_handle(heaps[0]));cmd->SetComputeRoot32BitConstant(1,g_output_mode,0);cmd->SetPipelineState(g_b70.out_pso);cmd->Dispatch((1920*1080+63)/64,1,1);
-                tr(g_display_texture,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);tr(back,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);cmd->CopyResource(back,g_display_texture);tr(back,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_PRESENT);
+                tr(g_display_texture,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);tr(back,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);cmd->CopyResource(back,g_display_texture);
+                if(auditing)g_display_audit.End(cmd,g_display_texture,back);
+                tr(back,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_PRESENT);
+                queue->flush_immediate_command_list();
                 g_display_generation=generation;if(generation==1||generation%120==0)log("display_residual generation=%llu mode=%u\n",generation,g_output_mode);
             }
             back->Release();
