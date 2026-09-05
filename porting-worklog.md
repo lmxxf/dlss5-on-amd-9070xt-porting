@@ -2167,6 +2167,8 @@ prepare_runtime_release.ps1生成6文件发布包：ReShade d3d12.dll、内嵌�
 
 Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https://devblogs.microsoft.com/directx/announcing-agilitysdk-721-preview-and-more-shader-model-6-10-features/）。此时下一步涉及更换显示驱动，不包含在之前“先不换驱动”的范围里，需另获用户批准；尚未执行。30fps未达成，发行版仍为约19.2fps。
 
+## 工作纪律
+
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
 - 权重 block 是序列化分组，不直接等于网络层。
 - 工作假设写在本日志；二进制证实后再提升到 `reverse-engineering-notes.md`。
