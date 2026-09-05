@@ -62,12 +62,14 @@ void main(uint3 id:SV_DispatchThreadID){
   hidden[row]=q8(half_round(expanded*polynomial));
  }
  [loop]for(uint c=0;c<32;c++){
-  float accum=0;
+  // Ordinary C32 QMMA seeds the accumulator with a rounded residual.
+  // Keep preblock unchanged until its distinct instruction stream is checked.
+  float accum=RAW_INPUT?half_round(prefix[c]*weights[8704+c]):0;
   [unroll]for(uint group=0;group<4;group++){
    float sum=0;[loop]for(uint i=0;i<32;i++)sum+=hidden[group*32+i]*weights[4608+c*128+group*32+i];
    accum=half_round(accum+sum);
   }
-  float result=half_round(accum+prefix[c]*weights[8704+c]);
+  float result=RAW_INPUT?accum:half_round(accum+prefix[c]*weights[8704+c]);
   output[p*32+c]=RAW_OUTPUT?result:q8(result);
  }
 #else

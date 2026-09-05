@@ -52,8 +52,8 @@ def main():
     report['resident_vs_original'] = metrics(resident, original)
     # Wiring regression is exact; numerical agreement with NVIDIA is reported,
     # deliberately not disguised as an end-to-end image acceptance threshold.
-    assert np.array_equal(resident, chains['amd_ds_start']), 'resident wiring regression'
     print(json.dumps(report, indent=2))
+    assert np.array_equal(resident, chains['amd_ds_start']), 'resident wiring regression'
 
 
 if __name__ == '__main__':

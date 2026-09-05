@@ -24,13 +24,13 @@ def unpack(path):
  scale=np.frombuffer(raw.tobytes(),'<f4',1,19552)[0]
  return w1,w2,*matrices,bias,scale,fs,ats
 
-def block(tiles,w):
+def block(tiles,w,skip_first=True):
  w1,w2,qw,kw,vw,pw,bias,scale,fs,ats=w
  expanded=H(F(tiles)@w1.T);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
- hidden=F(H(expanded*poly));proj=np.zeros_like(tiles)
+ hidden=F(H(expanded*poly));proj=H(tiles*fs) if skip_first else np.zeros_like(tiles)
  for k in range(0,128,32):proj=H(proj+hidden[...,k:k+32]@w2[:,k:k+32].T)
- feature=H(proj+tiles*fs)
+ feature=proj if skip_first else H(proj+tiles*fs)
  q,k,v=[H(F(feature)@m.T) for m in [qw,kw,vw]]
  def norm(a):
   s=H(a*a)
