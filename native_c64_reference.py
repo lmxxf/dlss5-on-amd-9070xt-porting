@@ -13,11 +13,11 @@ def multiply(a,m,initial=None):
  return result
 
 def contract(C):
- return (0x7010,0xe0a0,0xe0b0,0xa0a0,0xf0b0) if C==64 else (0x18010,0x2c120,0x2c130,0x24120,0x30130)
+ return {64:(0x7010,0xe0a0,0xe0b0,0xa0a0,0xf0b0),128:(0x18010,0x2c120,0x2c130,0x24120,0x30130),256:(0x58010,0x98220,0x98240,0x88220,0xa8240)}[C]
 
 def unpack(path):
- raw=np.fromfile(path,np.uint8);assert raw.size in (61760,69936,197184,229936)
- C=128 if raw.size in (197184,229936) else 64;heads=C//32;hidden=4*C;b2=hidden*C;b3=b2+C*128;end3=b3+C*C
+ raw=np.fromfile(path,np.uint8);assert raw.size in (61760,69936,197184,229936,689232)
+ C=256 if raw.size==689232 else 128 if raw.size in (197184,229936) else 64;heads=C//32;hidden=4*C;b2=hidden*C;b3=b2+C*128;end3=b3+C*C
  fs,scale,p_begin,bias_begin,ats=contract(C);root=Path(f'release/native-c{C}')
  fl=np.load(root/'ffn-layout/layout.npz');al=np.load(root/'attention-layout/matrix-layout.npz');bl=np.load(root/'attention-layout/bias-layout.npz')
  ffn={}
@@ -57,8 +57,9 @@ def block(x,ffn,qkv,projection,bias,scales,skip,raw_output=False):
 
 if __name__=='__main__':
  import argparse
- parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128),default=64);parser.add_argument('--random',action='store_true');args=parser.parse_args()
- C=args.channels;heads=C//32;index=5 if C==64 else 9;width,height=(32,16) if C==64 else (16,8);count=width*height*C
+ parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128,256),default=64);parser.add_argument('--random',action='store_true');args=parser.parse_args()
+ C=args.channels;heads=C//32;index,width,height={64:(5,32,16),128:(9,16,8),256:(15,8,4)}[C];count=width*height*C
+ ww,hh=(width+7)//8*8,(height+7)//8*8
  root=Path(f'release/native-c{C}');folder=root/'attention-layout'
  original=np.fromfile(root/f'block{index}.weights',np.uint8);fs,scale,p_begin,bias_begin,ats=contract(C)
  inverse=np.argsort(np.load(root/'view/mapping.npz')['cell_output_to_hwc'])
@@ -67,19 +68,19 @@ if __name__=='__main__':
  np.full(64*C,0x38,np.uint8).tofile(folder/'skip-input.fp8')
  env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_NATIVE_SCAN_')}
  env.update(DLSS5_NATIVE_SCAN_OFFSET=str(ats),DLSS5_NATIVE_SCAN_COUNT=str(2*C))
- cubin='/tmp/dlssnr-cubins/dlssnr-01.cubin' if C==64 else '/tmp/dlssnr-cubins/dlssnr-02.cubin'
+ cubin=f'/tmp/dlssnr-cubins/dlssnr-{heads.bit_length()-1:02d}.cubin'
  subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(folder/'skip-control.weights'),str(folder/'skip-input.fp8'),str(folder/'skip-output.fp8'),str(folder/'unused.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{C}_{heads}_inpview_fp8','8','8','1','1',str(heads),'7','0'],env=env,check=True,capture_output=True)
  probe=np.fromfile(folder/'skip-output.fp8',np.uint8).reshape(2*C,4,16*C)[1::2,:,inverse].reshape(C,64,C)
  present=np.any(probe!=0,axis=1);assert np.all(present.sum(1)==1)
  skip_channels=np.argmax(present,axis=1);assert np.unique(skip_channels).size==C
  np.save(folder/'skip-channels.npy',skip_channels)
  parameters=unpack(root/f'block{index}.weights');ffn,qkv,projection,bias,scales,skip=parameters
- source='release/native-c32/block4-aux.fp8' if C==64 else 'release/native-c64/block8-aux.fp8'
+ source={64:'release/native-c32/block4-aux.fp8',128:'release/native-c64/block8-aux.fp8',256:'release/native-c128/block14-aux.fp8'}[C]
  raw=np.fromfile(source,np.uint8)[:count]
  x=e4m3fn(raw).reshape(C//16,height,width,16).transpose(1,2,0,3).reshape(height,width,C)
  c=np.arange(C);perm=(c&~3)|((c&1)<<1)|((c&2)>>1);x=x[...,perm]
- tiles=x.reshape(height//8,8,width//8,8,C).transpose(0,2,1,3,4).reshape(-1,64,C)
- y=block(tiles,*parameters).reshape(height//8,width//8,8,8,C).transpose(0,2,1,3,4).reshape(x.shape)
+ tiles=np.pad(x,((0,hh-height),(0,ww-width),(0,0))).reshape(hh//8,8,ww//8,8,C).transpose(0,2,1,3,4).reshape(-1,64,C)
+ y=block(tiles,*parameters).reshape(hh//8,ww//8,8,8,C).transpose(0,2,1,3,4).reshape(hh,ww,C)[:height,:width]
  target=e4m3fn(np.fromfile(root/f'block{index}-output.fp8',np.uint8)[:count].reshape(-1,16*C)[:,inverse]).reshape(height//4,width//4,4,4,C).transpose(0,2,1,3,4).reshape(x.shape)
  err=np.abs(y-target)
  print(json.dumps({'channels':C,'exact_fraction':float(np.mean(y==target)),'mae':float(err.mean()),'max_error':float(err.max()),'correlation':float(np.corrcoef(y.ravel(),target.ravel())[0,1])},indent=2))
@@ -92,9 +93,9 @@ if __name__=='__main__':
   for seed,amplitude in [(113,.25),(127,3.)]:
    x=F(np.random.default_rng(seed).normal(0,amplitude,(height,width,C)).astype(np.float32))
    quantize(x[...,perm]).reshape(height,width,C//16,16).transpose(2,0,1,3).copy().tofile(folder/'full-random-input.fp8')
-   subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(root/f'block{index}.weights'),str(folder/'full-random-input.fp8'),str(folder/'full-random-output.fp8'),str(folder/'full-random-aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{C}_{heads}_inpview_fp8',str(width),str(height),str(width//8),str(height//8),str(heads),'7','0'],env=environment,check=True,capture_output=True)
-   tiles=x.reshape(height//8,8,width//8,8,C).transpose(0,2,1,3,4).reshape(-1,64,C)
-   result=block(tiles,*parameters).reshape(height//8,width//8,8,8,C).transpose(0,2,1,3,4).reshape(x.shape)
+   subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(root/f'block{index}.weights'),str(folder/'full-random-input.fp8'),str(folder/'full-random-output.fp8'),str(folder/'full-random-aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{C}_{heads}_inpview_fp8',str(width),str(height),str(ww//8),str(hh//8),str(heads),'7','0'],env=environment,check=True,capture_output=True)
+   tiles=np.pad(x,((0,hh-height),(0,ww-width),(0,0))).reshape(hh//8,8,ww//8,8,C).transpose(0,2,1,3,4).reshape(-1,64,C)
+   result=block(tiles,*parameters).reshape(hh//8,ww//8,8,8,C).transpose(0,2,1,3,4).reshape(hh,ww,C)[:height,:width]
    target=e4m3fn(np.fromfile(folder/'full-random-output.fp8',np.uint8)[:count].reshape(-1,16*C)[:,inverse]).reshape(height//4,width//4,4,4,C).transpose(0,2,1,3,4).reshape(x.shape)
    print(json.dumps({'channels':C,'seed':seed,'amplitude':amplitude,'exact_fraction':float(np.mean(result==target)),'max_error':float(np.abs(result-target).max())}),flush=True)
    assert np.array_equal(result,target), 'random full multihead block regression'

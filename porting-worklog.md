@@ -2565,6 +2565,12 @@ derive_native_ffn_layout.py将已有C64/C128完整探针连接表表达为字节
 
 当前C256仅完成布局、边界控制和CPU FFN；八头attention未恢复，GPU执行范围仍block0..14 DS。游戏DLL/公开ZIP未修改，完整最终RGB及剑星画面目标active。下一步恢复C256 QKV/P/bias并验证整层，再把H4零填充包装接GPU。
 
+### 2026-09-06 C256八头完整CPU参考逐值闭合
+
+derive_native_attention_layout.py从已完整探测的C64/C128 V/P/bias表提炼地址bit排列，先逐数组核对两档全部实测表完全一致，再扩展C256 V/P各65536连接及32768个八头bias项。C256是布局规则推导加真实算术验证，不声称穷举了每个系数，也不拟合权重数值。native_c64_reference支持C256原记录/标量偏移，attention skip用512-byte探针独立恢复，H4输入按已验证规则补到H8，输出裁回H4。
+
+完整block15以真实block14 DS输入8192值逐值一致；seed113/σ0.25、seed127/σ3.0两组随机输入各8192值也全部exact、max0，合计24576值。C128/C64真实输入及相同随机输入回归均继续exact。当前尚未实现AMD C256，实际GPU闭合范围仍block0..14 DS，游戏DLL和公开包未修改；下一步接GPU补零/裁剪包装，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
