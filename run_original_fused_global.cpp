@@ -58,6 +58,21 @@ int main(int argc, char **argv) {
     if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
     if(mode==3){p.optional3=aux;p.optional_dims=aux;p.optional4=(CUdeviceptr)dims;p.override_width=width/2;p.override_height=height/2;}
-    void *args[]={&p}; check("launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr)); check("sync",cuCtxSynchronize());
+    void *args[]={&p};
+    if(const char* scan_count=std::getenv("DLSS5_NATIVE_SCAN_COUNT")){
+        const char* scan_offset=std::getenv("DLSS5_NATIVE_SCAN_OFFSET");
+        size_t count=std::strtoull(scan_count,nullptr,0),begin=scan_offset?std::strtoull(scan_offset,nullptr,0):0;
+        if(mode!=7||width!=8||height!=8||count==0||count>16384||begin>weights.size()||count>weights.size()-begin||weight_offset||input_offset||output_offset)return 2;
+        if(!std::all_of(weights.begin()+begin,weights.begin()+begin+count,[](unsigned char x){return x==0;}))return 2;
+        constexpr size_t span=8*8*64;std::vector<unsigned char> results(count*span);unsigned char one=0x38,zero=0;
+        for(size_t i=0;i<count;i++){
+            if(i)check("reset scanned byte",cuMemcpyHtoD(dw+begin+i-1,&zero,1));
+            check("set scanned byte",cuMemcpyHtoD(dw+begin+i,&one,1));check("clear scanned output",cuMemsetD8(doo,0,span));
+            check("scan launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr));check("scan sync",cuCtxSynchronize());
+            check("scan read",cuMemcpyDtoH(results.data()+i*span,doo,span));
+        }
+        write_file(argv[4],results.data(),results.size());std::printf("C64 byte_scan offset=%zu count=%zu sample_bytes=%zu\n",begin,count,span);return 0;
+    }
+    check("launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr)); check("sync",cuCtxSynchronize());
     for(auto item:{std::pair<const char*,CUdeviceptr>{argv[4],doo},{argv[5],aux}}){check("read",cuMemcpyDtoH(host.data(),item.second,arena_size));write_file(item.first,host.data(),host.size());size_t nz=0,last=0;for(size_t i=0;i<host.size();i++)if(host[i]){nz++;last=i;}std::printf("%s nonzero=%zu last=%zu\n",item.first,nz,last);}
 }

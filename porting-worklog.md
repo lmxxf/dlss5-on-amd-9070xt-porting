@@ -2431,6 +2431,16 @@ probe_native_c64_extra_matrix.py将所有矩阵和FFN skip清零，attention ski
 
 此轮为C64原CUBIN控制实验，未扩展AMD resident执行层数，游戏DLL未改。前五层AMD逐值结果仍为上一检查点，完整神经输出及剑星画面目标active。
 
+### 2026-09-06 C64三矩阵FFN连接恢复并逐值闭合
+
+原oracle增加受限批量byte scan：仅mode7、8×8、最多16384个字节、扫描区必须预先全零、禁止指针偏移；每次将一个字节设FP8 1，GPU执行后只读4096个有效输出，输出紧凑序列。单进程复用CUDA资源，避免每个basis重新加载上下文。
+
+recover_native_c64_ffn.py --full用输入通道6位编码、隐藏256通道8位编码、中间64通道6位编码恢复全部连接。W1 16384条对应64→256；W2 8192条对应256→64但每个输出仅128条分组连接；W3 4096条对应64→64。每一段连接唯一性、各行容量、隐藏代表编号均有assert；不存在拟合系数。完整映射在release/native-c64/ffn-layout/layout.npz。
+
+validate_native_c64_ffn.py再用128个byte scan确定64个FFN skip half的逻辑通道顺序。计算合同为W1每K32半精度累计→原门函数→FP8→分组W2每K32累计→FP8→W3每K32累计（初值是half(input×skip)）→FP8。原权重直接解码三张矩阵，禁止把未连接区域填成其他系数。关闭原版attention以隔离FFN，输入原block4 DS的32768个输出全部exact；两个独立随机输入seed44/σ0.25、seed55/σ3.0也各32768值全部exact，MAE/max0，三组都有硬断言。矩阵和激活只落release目录。
+
+此轮C64 FFN为CPU参考对原CUBIN验证，尚未实现AMD C64 shader，也未恢复双头attention。当前AMD实际闭合范围仍block0..4 DS，游戏DLL未改、公开包未改。下一步恢复C64 QKV/P、bias及双头布局后整体接GPU，最终剑星画面目标保持active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
