@@ -2223,6 +2223,18 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 回退后启动PID17736，日志至present1800仍backend_ready=0/ffx_frames=0；代码回退已完成，但这次启动尚未恢复神经推理，不能宣称恢复19fps或修复入口。核对后结束测试游戏，不留下无效运行。系统驱动没有继续变更，发布ZIP未动。
 
+### 2026-09-05 补丁失效根因查明并修复
+
+用临时GetProcAddress追踪定位：反复查询ffxConfigure的是Steam gameoverlayrenderer64.dll，并非AMD驱动；游戏实际获取ffxDispatch的调用点0x14159e606，保存槽0x146d6a320仍指向FFX导出0x1360，导出入口仍正确跳向addon。临时捕获ffxCreateContext，失效时根本没有创建调用，不是创建返回错误。追踪代码仅诊断使用，修复后已全部撤除，未提交到正式runtime。
+
+对Stellar Blade 1.4.1只读反查CVar注册点与实际内存：FSR3.Enabled=1、UseNativeDX12=1、UseRHI=0、r.DefaultFeature.AntiAliasing=2、r.TemporalAA.Upsampling=1，但r.PostProcessAAQuality=0。菜单仍显示FSR3/质量，因此只检查菜单及FSR开关会漏掉真正的时序处理门槛。Engine.ini强制AAQuality4被游戏重新覆写成0，随后撤回该无效修改。
+
+根因修复只改GameUserSettings.ini的AntiAliasing，从SB_GAMEUSERSETTINGS_OFF改成SB_GAMEUSERSETTINGS_HIGH；原文件备份D:\DLSSNR-Lab\matrix-probe\GameUserSettings-before-aa-repair.ini。重启后实际AAQuality变4，FFX创建type10000/result0，全部blocks0–70及display_residual mode0恢复。不能追认OFF最早由哪个操作写入，本次证实的是失效条件与修复效果，不再把尾端FFN实验当成已确认根因。
+
+随后换回无追踪、无尾端实验的干净DLL（源码c5a3a8a，SHA b7d10855a3b1a6f128ed2214b4f439c4540d43550aba788d6fbaac34f5b239ae）再次启动并进入洞窟。present3000 backend_ready1 failed0 ffx_frames2851 frame_contract_1080=1；display generation1080后持续增加；洞窟cadence19.200/19.200/19.078fps，截图角落20fps、GPU99%，未见旧满屏方格。主菜单约20.6fps，不混作洞窟数据。Engine.ini恢复原SHA3970aa1f，未开插帧、未改解析度或驱动，网盘ZIP未改。测试后退出游戏，HIGH保存在配置中，下次Steam启动应沿恢复后的路径。
+
+repair_temporal_aa.ps1要求游戏已退出，幂等修改单一AA项，保留原配置备份；-Restore只恢复备份中的AA值，不覆盖其他设置。inspect_ffx_imports.ps1为1.4.1专用只读诊断，并检查指令签名后才使用固定地址。修复的是补丁失效，30fps性能目标仍未完成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

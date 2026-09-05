@@ -2,6 +2,8 @@
 
 ## 当前结果
 
+**2026-09-05 补丁失效修复：** 游戏保存的`AntiAliasing=SB_GAMEUSERSETTINGS_OFF`会令实际`r.PostProcessAAQuality=0`，即使菜单显示FSR3/质量，也不进入FFX/神经网络。退出游戏后用`repair_temporal_aa.ps1`将该项恢复为HIGH（仅改这一项并保留备份），实际AAQuality恢复4；干净回退DLL已在1080p洞窟恢复blocks0–70和约19.1–19.2fps。不要用“DLL已加载”或角落60fps判断补丁有效，详见worklog最新根因记录。
+
 自包含实验包已生成：`release/DLSS5-AMD-1080p.zip`（不入Git）。内含ReShade加载器和嵌入全部权重/CSO的addon DLL，不再依赖`D:\DLSSNR-Lab`；使用说明见`bundled-runtime-readme.txt`。9070XT洞窟复测约19.2fps，尚非30fps完成版。
 
 开发分支现已在游戏设备创建前选择私有Agility721，并接入SM6.10矩阵接口：前端四层FFN约0.26ms/层，全网44.51ms，洞窟仍约19fps。该实验需要预览驱动与开发者模式，尚未更新上面的独立发行包；完整精度与性能记录见worklog。
