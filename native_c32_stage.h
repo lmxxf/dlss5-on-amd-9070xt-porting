@@ -29,4 +29,5 @@ public:
   pass(0,geometry[2]*geometry[3]/64);Barrier(c,packed,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);body.Record(c,0);pass(1,geometry[0]*geometry[1]/64);Barrier(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;
  }
  ID3D12Resource* Output()const{return output;}
+ ID3D12Resource* PooledWork()const{return body.Downsample();}
 };

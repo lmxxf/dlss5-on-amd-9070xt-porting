@@ -1,10 +1,13 @@
 """Compare native block4 DS projection with independent original CUBIN output."""
 import json
+import argparse
 import subprocess
 from pathlib import Path
 import numpy as np
 from native_c32_reference import block, unpack, H, F
 from decode_tinlayout_global import e4m3fn
+
+parser=argparse.ArgumentParser();parser.add_argument('--resident',type=Path);args=parser.parse_args()
 
 root=Path('release/native-c32')
 mapping=np.argmax(np.abs(np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048)),axis=0).reshape(8,8,32)[:4,:4]
@@ -45,3 +48,9 @@ reports['coded_projection_row_order']=physical_to_logical.tolist()
 reports['correct_view']=dict(exact_fraction=float(np.mean(aligned==target)),mae=float(np.abs(aligned-target).mean()),max_error=float(np.abs(aligned-target).max()))
 print(json.dumps(reports,indent=2))
 assert np.array_equal(aligned,target), 'block4 DS differs from original CUBIN'
+if args.resident:
+ gpu=np.fromfile(args.resident,'<f4').reshape(predicted.shape)
+ assert np.isfinite(gpu).all()
+ actual=gpu[...,physical_to_logical]
+ print(json.dumps({'resident_vs_original':{'exact_fraction':float(np.mean(actual==target)),'mae':float(np.abs(actual-target).mean()),'max_error':float(np.abs(actual-target).max())}}))
+ assert np.array_equal(actual,target), 'resident block0..4 DS differs from original CUBIN'

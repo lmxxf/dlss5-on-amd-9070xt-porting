@@ -2407,6 +2407,14 @@ DS追加64×32 FP8矩阵，原SASS四路load起点0x50b0=20656，而非普通记
 
 按四个16-channel bank加编码探针确定的行顺序解码，真实block4 DS全部32768值与原CUBIN逐值一致，MAE/max0，脚本有exact断言。native_c32_reference新增raw_output接口，为GPU learned-DS接线保留未量化残差。当前block4验证为CPU原型+原CUBIN；尚未把此层加入AMD resident chain，不能把上轮AMD前四层验收扩大成前五层。下一步实现GPU DS投影并接C64。游戏DLL和公开包未改，最终画面目标仍active。
 
+### 2026-09-06 AMD常驻链推进到第4层DS，整链逐值一致
+
+新增native_c32_ds.h/hlsl，以root SRV绑定第4层的work区域half-pool及原始字节解出的64×32投影权重；GPU完成移位后crop与FP8投影，输出逻辑HWC64。NativeC32Stage公开PooledWork接口，引用body内部raw-before-FP8池化，而非从最终main量化值倒推DS。D3D资源在重放间显式UAV/SRV转换，权重一次上传，层间无CPU回传。
+
+d3d12_native_front_chain_test增加可选ds参数（保留原默认block0..3测试和output.f32），串入Y移位block4及learned DS；输出独立output-ds.f32。prepare_native_front_chain.py生成block4 FFN/attention/DS原参数。MinGW以-std=c++17 -O2 -static -municode及d3d12/dxgi/d3dcompiler/dxguid编译通过，9070XT Lab实际运行ds路径三帧全部replay pass。check_native_c32_ds.py新增--resident，使用上一轮独立编码探针确定的原始视图解码，对actual RGB→block0→DS→block1/2/3/4→DS最终32768个值全部exact，MAE/max0。
+
+新增组件尚未接入游戏addon；实验输入仍128×64，输出32×16×64。不能把当前前五层闭合称为整网完成，更不能代替剑星最终画面验收。游戏DLL及公开ZIP未修改，下一步继续核对C64多头权重/布局并向后接线，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
