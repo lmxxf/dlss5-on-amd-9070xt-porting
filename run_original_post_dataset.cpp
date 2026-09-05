@@ -47,10 +47,12 @@ int main(int argc, char **argv) {
     constexpr size_t sample_bytes = main_bytes + skip_bytes;
     if (weights.size() != 21808 || blend.size() != 2 || samples.empty() ||
         samples.size() % sample_bytes) return 2;
+    const bool global_prefix_features =
+        argc == 8 && !std::strcmp(argv[7], "global-prefix-features");
     const bool global_skip_features =
         argc == 8 && !std::strcmp(argv[7], "global-skip-features");
     const bool feature_mode = argc == 8 &&
-        (!std::strcmp(argv[7], "features") || global_skip_features);
+        (!std::strcmp(argv[7], "features") || global_skip_features || global_prefix_features);
     const bool scan_weights = argc >= 8 && !feature_mode;
     const bool ablate_weights = argc == 9 && !std::strcmp(argv[8], "ablate");
     const bool head_weights = argc == 9 && !std::strcmp(argv[8], "head");
@@ -131,8 +133,8 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0x08, &skip_device, 8);
     std::memcpy(params + 0x10, &output_surface, 8);
     std::memcpy(params + 0x18, &weights_device, 8);
-    const int width = global_skip_features ? 256 : 8;
-    const int height = global_skip_features ? 144 : 8;
+    const int width = (global_skip_features || global_prefix_features) ? 256 : 8;
+    const int height = (global_skip_features || global_prefix_features) ? 144 : 8;
     std::memcpy(params + 0x20, &height, 4);
     std::memcpy(params + 0x24, &width, 4);
     const float input_scale = 0.03125f;
@@ -203,7 +205,12 @@ int main(int argc, char **argv) {
         }
         check("main clear", cuMemsetD8(main_device, 0, 1 << 20));
         check("skip clear", cuMemsetD8(skip_device, 0, 1 << 20));
-        if (global_skip_features) {
+        if (global_prefix_features) {
+            for(size_t bank=0;bank<2;++bank)for(size_t plane=0;plane<4;++plane)
+                check("global main plane",cuMemcpyHtoD(main_device+bank*147456+plane*2048,record+bank*256+plane*64,64));
+            check("global prefix skip bank0",cuMemcpyHtoD(skip_device,record+512,1024));
+            check("global prefix skip bank1",cuMemcpyHtoD(skip_device+32768,record+1536,1024));
+        } else if (global_skip_features) {
             check("global skip bank0", cuMemcpyHtoD(skip_device, record, 1024));
             check("global skip bank1", cuMemcpyHtoD(
                 skip_device + 32768, record + 1024, 1024));

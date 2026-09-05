@@ -2283,6 +2283,16 @@ audit_post_skip.py以独立64组均匀随机输入量化E4M3后验收：对原CU
 
 用户已进入5090游戏内装备页，桌面CopyFromScreen反复只抓到Steam，不能据此判断用户未进入游戏；停止窗口激活和菜单操作。用户F12后，从Steam截图目录取得20260906000813_1.jpg，保存为dynamic-captures/rtx5090-equipment-20260906.jpg。确认为装备页右侧角色大头像，可见脸部、眼镜和鼻侧阴影。该图作为场景定位与外观参考；没有对应关闭NR的同机位图，不能仅凭此图把脸部偏暗归因于神经输出，更不能用它宣称AMD已复现原版。
 
+### 2026-09-06 AMD完整post prefix算子闭合（尚未接错源到游戏）
+
+run_original_post_dataset新增global-prefix-features：完整256×144几何，仅CTA0，main512按两个256-byte banks、四个64-byte planes分别scatter到bank stride147456/plane stride2048；skip2048按两1024-byte banks scatter到0与32768。记录输入为main512+skip2048，合计2560，保留原prefix参数并用identity旁路后段读取prefix。
+
+prepare_full_post_prefix.py合并原main512→2048与本轮重新恢复的full-skip2048→2048，共4096稀疏连接。独立64组E4M3随机输入对原CUBIN：correlation0.999999938775、MAE0.00011104103、max0.00131225586、nonfinite0。AMD d3d12_block70_prefix_sparse.cpp扩展可选input-width（默认1024，完整合同2560），添加CSR总长/单调row ends/索引范围拒绝门。9070XT真实运行64样本输出对原版误差相同，首轮GPU0.762ms；原数据/候选CSR留在release/full-post-prefix及Lab/matrix-probe/post-skip-audit，不替换发布权重。
+
+此算子仍需要完整高分辨率skip来源；不能拿当前960×544 g_block0_hwc冒充1920×1088 skip。故未改当前游戏DLL，也未更新网盘包。当前安装保持b210a431，存在已记录网格，不宣称效果恢复。
+
+继续审第0层：新增adapter-scan到run_original_preblock_oracle，逐slot改变前224个half，保持原下游权重。224个输出彼此不同，尚未得到足够依据把slot指认为某RGB/噪声通道。此前试图将下游直接设为identity所得输出全零，包括旧front-identity控制文件也如此，故该控制不能作为输入不存在的证据。prepare_preblock_adapter_scan.py目前保留真实下游，下一步需恢复可信中间读口/确认原字段布局；不新增单帧拟合校正。原版装备页已由用户F12提供，后续不再用桌面强制聚焦反复触发全屏切换。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
