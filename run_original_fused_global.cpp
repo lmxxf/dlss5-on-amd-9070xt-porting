@@ -64,16 +64,16 @@ int main(int argc, char **argv) {
         const char* scan_offset=std::getenv("DLSS5_NATIVE_SCAN_OFFSET");
         size_t count=std::strtoull(scan_count,nullptr,0),begin=scan_offset?std::strtoull(scan_offset,nullptr,0):0;
         const size_t element=std::getenv("DLSS5_NATIVE_SCAN_HALF")?2:1;
-        if(mode!=7||width!=8||height!=8||count==0||count>16384||begin>weights.size()||count>(weights.size()-begin)/element||weight_offset||input_offset||output_offset)return 2;
+        if(mode!=7||width!=8||height!=8||(by!=2&&by!=4)||count==0||count>65536||begin>weights.size()||count>(weights.size()-begin)/element||weight_offset||input_offset||output_offset)return 2;
         if(!std::all_of(weights.begin()+begin,weights.begin()+begin+count*element,[](unsigned char x){return x==0;}))return 2;
-        constexpr size_t span=8*8*64;std::vector<unsigned char> results(count*span);unsigned short one=element==2?0x4800:0x38,zero=0;
+        const size_t span=8*8*32*by;std::vector<unsigned char> results(count*span);unsigned short one=element==2?0x4800:0x38,zero=0;
         for(size_t i=0;i<count;i++){
             if(i)check("reset scanned element",cuMemcpyHtoD(dw+begin+(i-1)*element,&zero,element));
             check("set scanned element",cuMemcpyHtoD(dw+begin+i*element,&one,element));check("clear scanned output",cuMemsetD8(doo,0,span));
             check("scan launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr));check("scan sync",cuCtxSynchronize());
             check("scan read",cuMemcpyDtoH(results.data()+i*span,doo,span));
         }
-        write_file(argv[4],results.data(),results.size());std::printf("C64 byte_scan offset=%zu count=%zu sample_bytes=%zu\n",begin,count,span);return 0;
+        write_file(argv[4],results.data(),results.size());std::printf("C%d scan offset=%zu count=%zu element_bytes=%zu sample_bytes=%zu\n",32*by,begin,count,element,span);return 0;
     }
     check("launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr)); check("sync",cuCtxSynchronize());
     for(auto item:{std::pair<const char*,CUdeviceptr>{argv[4],doo},{argv[5],aux}}){check("read",cuMemcpyDtoH(host.data(),item.second,arena_size));write_file(item.first,host.data(),host.size());size_t nz=0,last=0;for(size_t i=0;i<host.size();i++)if(host[i]){nz++;last=i;}std::printf("%s nonzero=%zu last=%zu\n",item.first,nz,last);}

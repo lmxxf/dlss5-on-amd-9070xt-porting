@@ -2499,6 +2499,18 @@ prepare_native_front_chain.py导出block8原参数及8192个DS系数；测试hos
 
 当前AMD整链闭合范围为block0..8 DS，尚未验证第9层起C128及后续网络，第0层另一路2个特征差异仍待查。游戏DLL与公开包未更新，不能把特征链逐值一致当成游戏最终RGB/面部效果验收。下一步继续C128四头网络，最终剑星画面目标active。
 
+### 2026-09-06 C128坐标及三矩阵FFN恢复、原权重逐值验证
+
+block9记录197184bytes，SHA934cebc771cfa1ed086f47f018426090e14ca4326dcb22843cbc17dff9851c32。原kernel位于dlssnr-02.cubin，cc_tinlayout_fused_swin_4h_128_4_inpview_fp8，沿用multihead mode7，输入原block8 DS的16×8×128，grid2×1、block32×4，有效输出16384bytes。
+
+将现有view探针扩展--channels 128，FFN skip0x18010、attention skip0x30130、scales0x2c120；14组位置编码恢复16384项完整bijection，seed13/29随机输入逐值验证通过。输出为4×4×128 cell，全部8个cell映射一致。没有以C64布局直接替代C128探测。
+
+批量oracle明确支持2/4个warp、8×8，单扫描最多65536项，sample大小64×32×warp数，保留全零扫描区及权重边界检查。recover_native_c64_ffn.py --channels 128 --full恢复W1 65536条（128→512）、W2 16384条（512→128，每输出128条分组连接）、W3 16384条（128→128），共98304条连接；每段唯一性与容量断言通过。文件仍是原工具的参数化扩展，不另堆v2副本。
+
+validate_native_c64_ffn.py --channels 128以原block9字节系数、原block8 DS输入及seed44/σ0.25、seed55/σ3.0两组随机输入验证三段FFN，三组各16384值全部exact、MAE/max0。C64同工具原权重回归仍通过；重新运行通用化后的C64全部连接恢复，六张连接表与扩展前缓存逐值一致。C128映射/矩阵仅保存在release/native-c128。
+
+当前C128完成的是CPU FFN原型和原CUBIN对照，尚无C128 GPU shader，也未恢复四头attention。AMD实际闭合范围仍block0..8 DS；游戏DLL、公开ZIP未改，最终剑星画面目标active。下一步恢复四头QKV/P/bias，再串完整C128并接GPU。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
