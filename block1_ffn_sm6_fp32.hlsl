@@ -8,7 +8,11 @@ ByteAddressBuffer weights : register(t0);
 StructuredBuffer<float> input : register(t1);
 StructuredBuffer<float> feature_unused : register(t2);
 StructuredBuffer<float> qkv_unused : register(t3);
+#ifdef PACKED_FEATURE
+RWByteAddressBuffer features : register(u0);
+#else
 RWStructuredBuffer<float> features : register(u0);
+#endif
 RWStructuredBuffer<float> output_unused : register(u1);
 RWStructuredBuffer<float> qkv_output_unused : register(u2);
 float weight(uint index) { return asfloat(weights.Load(index * 4)); }
@@ -41,10 +45,17 @@ void ffn(uint3 group:SV_GroupID,uint3 thread:SV_GroupThreadID){
         value=clamp(value,-4.0,4.0);
         hidden[j]=value*(0.89453125+value*(0.447265625-0.055908203125*abs(value)));
     }
+    uint low_half=0;
     [unroll]for(uint channel=0;channel<32;++channel){
         float value=0;
         [unroll]for(uint j=0;j<64;++j)value+=hidden[j]*weight(2048+channel*64+j);
         value+=input[token*32+channel]*weight(10241+channel);
+#ifdef PACKED_FEATURE
+        uint half_value=f32tof16(quantize_e4m3(value));
+        if((channel&1)==0)low_half=half_value;
+        else features.Store((token*16+channel/2)*4,low_half|(half_value<<16));
+#else
         features[token*32+channel]=quantize_e4m3(value);
+#endif
     }
 }

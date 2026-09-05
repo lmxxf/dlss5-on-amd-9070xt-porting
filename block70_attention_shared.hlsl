@@ -11,7 +11,18 @@
 #define WINDOW_SET 0
 #endif
 ByteAddressBuffer w:register(t0);
-StructuredBuffer<float> inp:register(t1),feat_in:register(t2),qkv_in:register(t3);
+StructuredBuffer<float> inp:register(t1),qkv_in:register(t3);
+#ifdef PACKED_FEATURE
+ByteAddressBuffer feat_in:register(t2);
+#ifdef NATIVE_HALF
+float Feature(uint i){return float(feat_in.Load<float16_t>(i*2));}
+#else
+float Feature(uint i){uint p=feat_in.Load((i/2)*4);return f16tof32((p>>((i&1)*16))&65535);}
+#endif
+#else
+StructuredBuffer<float> feat_in:register(t2);
+float Feature(uint i){return feat_in[i];}
+#endif
 RWStructuredBuffer<float> feat:register(u0),outp:register(u1),qkv_out:register(u2);
 groupshared float keys[1024],values[1024],key_norm[64];
 #if CACHE_SCORES == 1
@@ -80,10 +91,22 @@ void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
         den+=e;
         [unroll]for(uint d=0;d<16;d++)a[d]+=e*values[k*16+d];
     }
+#if defined(PACKED_FEATURE) && defined(NATIVE_HALF) && defined(PAIR_PROJECT)
+    [unroll]for(uint d=0;d<16;d++)a[d]/=den;
+    [loop]for(uint pair=0;pair<16;pair++){
+        uint c=pair*2;float z0=0,z1=0;
+        [unroll]for(uint d=0;d<16;d++){z0+=a[d]*W(5632+c*16+d);z1+=a[d]*W(5632+(c+1)*16+d);}
+        typedef vector<float16_t,2> HalfPair;
+        HalfPair f=feat_in.Load<HalfPair>((t*16+pair)*4);
+        outp[t*32+c]=F(z0+float(f.x)*W(10273+c));
+        outp[t*32+c+1]=F(z1+float(f.y)*W(10274+c));
+    }
+#else
 #if UNROLL_PROJECT
     [unroll]
 #else
     [loop]
 #endif
-    for(uint c=0;c<32;c++){float z=0;[unroll]for(uint d=0;d<16;d++)z+=(a[d]/den)*W(5632+c*16+d);outp[t*32+c]=F(z+feat_in[t*32+c]*W(10273+c));}
+    for(uint c=0;c<32;c++){float z=0;[unroll]for(uint d=0;d<16;d++)z+=(a[d]/den)*W(5632+c*16+d);outp[t*32+c]=F(z+Feature(t*32+c)*W(10273+c));}
+#endif
 }

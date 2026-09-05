@@ -2111,6 +2111,14 @@ profile扩大为49点，额外量首个ViT层的六段：FFN0.2014、QKV+pack0.0
 
 本地权重版洞窟复验：加载期cadence低至4.793fps，加载结束稳态19.000/19.139/19.143fps，display_residual generation2160 mode0；截图未见旧绿色方格。仅报告稳态约19fps，不把本次GPU局部提速夸大为显著端到端增长。下一方向可检查C32量化activation的存储带宽；DirectML32整段及裸FFN路线已有失败记录（directml-swin32-validation.json及本日志早期条目），不应从头重复相同候选。
 
+### 2026-09-05 block70 FP16特征存储候选
+
+E4M3有限输出用FP16能精确存放。test_packed_feature.py枚举254个带符号有限编码（含±0）及64×32打包地址，逐bit往返通过。新增PACKED_FEATURE分支：FFN每两通道写一个uint，QKV/attention读同一RAW SRV；全部乘加仍FP32，现有feature allocation暂保持原容量，只缩小逻辑视图/访问量。enable-packed-feature.txt在HWC模式下统一替换三PSO和两个descriptor，避免半套配置；当前DLL SHAe119ad1997dd597771888faadff7ad47f9649573a3e983da26bc50d70d38b99a。
+
+手动f16tof32版：FFN1.68576、QKV1.75352、attention3.6678，全网46.59888ms，比原45.41328慢。NativeHalf版的DXIL确认产生rawBufferLoad.f16：FFN1.62292、QKV1.24948、attention3.41488，全网46.09112ms。native载入恢复QKV，但attention仍退化，不能据FFN局部提速保留整版。接着测试PairProject：half2一次读取供两个输出通道、16维归一化显式提到投影循环之前；结果待测。数值表示测试不等于GPU整链精度对照。
+
+PairProject最终attention3.40528ms、FFN1.63632、QKV1.28064，全网46.21744ms，仍比原FP32特征版45.41328慢。已删除enable-packed-feature.txt并重启恢复原配置；三类候选全部不进入默认路径。PairProject CSO SHA为972d7fc5d29fb9a550f033f7ecad0bb697ab6e2984c457d9f408ec48616e770f，保留源码/构建入口作反证。下一测试方向是显式WaveSize32/64，而不是继续假设“少一半存储必然更快”。30fps仍未达成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
