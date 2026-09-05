@@ -2181,6 +2181,14 @@ Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https:
 
 矩阵接口实际计算验证：部署私有DXC v1.10.2605.24（dxc_preview_2026_05_22.zip），编译matrix_smoke.hlsl为cs_6_10/HLSL2021/native16。独立d3d12_matrix_smoke.cpp在721 runtime下调用LinAlg Thread Matrix×Vector：256条32维向量乘32×32 FP16全1矩阵，8192个GPU输出逐值匹配CPU明确答案，mismatches=0，首值16.5、末值132。不是只读功能旗标，也不是WARP；选择VendorId1002硬件adapter。该合成小测试不是FFN性能/真实模型精度验证，下一步仍需实际权重算子比较及游戏device接入。一次性安装任务已在确认退出0后移除；Intel驱动版本未变。WMI当前显示物理输出3840×2160，截图工具未显式DPI-aware，不能据旧截图尺寸断定何时变化；后续游戏测试仍需检查真实swapchain1920×1080，未擅自调整显示设置。
 
+### 2026-09-05 真正C32 FFN矩阵接口比较
+
+c32_ffn_linalg.hlsl以LinAlg Thread Matrix执行32→64→32两次乘法，FP32返回累加结果、保留原clamp/多项式激活及最终E4M3量化，矩阵与中间激活使用FP16。prepare_c32_linalg_weights.py从同一block1-effective.bin生成8192-byte矩阵包；原权重SHA551d47badd48f0bbf6346f3bbc280c3ebe2f5c9d8b4864c38c647ff34d1564c8在本地/远端相同。4096个矩阵权重转FP16均有变化，最大0.00021994114，不能宣称精度不变。
+
+d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真实frame56400预处理结果、960×544×32）对比原SM6.2 FFN和新shader，各热身10次、计时100次；数据/权重常驻DEFAULT heap，时间戳不含最终readback。旧0.569137ms，新0.257166ms；16711680输出中114240不同，MAE0.000585556、RMSE0.013272024、max0.5、nonfinite0。仅验证单层，不是全网精度或30fps完成证明。
+
+游戏接入核查：现有ReShade源码source/d3d12/d3d12.cpp在真正D3D12CreateDevice前load_addons并触发create_device事件，可尝试在那里选择私有Agility721和实验特性，而不是设备建成后再换SDK（Microsoft明确后者会移除设备）。SDKPath必须相对游戏EXE，候选应放入独立子目录，保留发行版回退。依据：https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12sdkconfiguration-setsdkversion 。尚未修改游戏设备路径。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
