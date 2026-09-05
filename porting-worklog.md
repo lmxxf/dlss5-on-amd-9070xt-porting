@@ -2157,7 +2157,15 @@ arena关闭版洞窟复验19.082/19.219fps，display_residual generation4680 mod
 
 prepare_runtime_release.ps1生成6文件发布包：ReShade d3d12.dll、内嵌模型addon、README、两份组件版权说明、SHA256SUMS。zip大小132124870 bytes，SHA256 9e38f15c2bc41bed45547caa7daa98c74bbdbe389a7667ef708c36ace2b91e07，Windows路径D:\DLSSNR-Lab\distribution\DLSS5-AMD-1080p.zip，本地release/DLSS5-AMD-1080p.zip。release目录已加入gitignore，未提交模型包/生成DLL/zip；只提交代码与说明。开发者模式与系统SDK均未改动。
 
-## 工作纪律
+### 2026-09-05 用户授权后恢复矩阵核心探针
+
+用户已明确授权开发者模式及Lab独立SDK实验。enable_matrix_developer_mode.ps1将AllowDevelopmentWithoutDevLicense设为1，原值备份至D:\DLSSNR-Lab\matrix-probe\developer-mode-before.json；没有换驱动、修改游戏或覆盖已发布zip。普通系统runtime即使开启Developer Mode仍最高6.8。
+
+从Microsoft NuGet下载Agility1.721.3-preview并在matrix-probe\D3D12独立部署，EXE导出SDKVersion721及相对SDKPath。D3D12EnableExperimentalFeatures成功、AMD device创建成功，打印路径确认载入私有D3D12Core；请求SM6.10返回6.9，LINEAR_ALGEBRA_SUPPORT查询成功但tier0。
+
+再以Agility1.717.1-preview隔离测试旧Cooperative Vector接口；同时开启ExperimentalShaderModels及CooperativeVectorExperiment两个GUID，均成功。SM6.9支持，但OPTIONS_EXPERIMENTAL的CooperativeVectorTier仍0。两代SDK的feature编号/结构均按各自下载header核对，未把API失败误判为硬件不支持。当前驱动32.0.31041.1004未向这两条实验路径暴露矩阵接口。
+
+Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https://devblogs.microsoft.com/directx/announcing-agilitysdk-721-preview-and-more-shader-model-6-10-features/）。此时下一步涉及更换显示驱动，不包含在之前“先不换驱动”的范围里，需另获用户批准；尚未执行。30fps未达成，发行版仍为约19.2fps。
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
 - 权重 block 是序列化分组，不直接等于网络层。
