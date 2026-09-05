@@ -2457,6 +2457,14 @@ native_c64_reference.py恢复attention skip的64-slot映射并尝试完整block5
 
 此前FFN与均匀attention分别逐值通过的结论不变；差异出现在完整非均匀attention组合中，下一步核对C64 Q/K的归一化寄存器顺序、分母树以及必要的独立Q/K控制。原先C32的加法顺序不能未经检验直接视为C64事实。新原型尚未接AMD、未更新游戏DLL/发布包；当前AMD闭合范围仍block0..4 DS，完整游戏画面目标active。
 
+### 2026-09-06 完整C64差异定位为FFN→attention量化边界并闭合
+
+diagnose_native_c64_attention.py将FFN设identity，分别保留均匀attention、真实bias但Q/K零、真实Q/K但bias零、完整真实attention，四种情况各32768值全部与原CUBIN逐值一致。这排除了上轮优先怀疑的Q/K归一化/分母树作为当前主因，继续修改那些已正确公式反而会走偏。
+
+实际错误是把C32的未量化FP16 FFN特征残差合同搬到C64。原C64在0x3c30..0x3ea0执行F2FP.SATFINITE.E4M3.F16，随后0x3e70/3eb0/3ec0/3ee0写共享内存；attention残差也取量化边界后的特征。native_c64_reference.py将FFN最终feature显式F8，再供QKV与attention skip共同使用。输入真实block4 DS时，完整block5从80.04761% exact变为32768/32768 exact、MAE/max0。新增独立随机seed79输入的full_block对照，同样全部exact；原四种隔离对照也继续全exact，全部加入assert。
+
+因此当前C64完整CPU参考已通过两组输入，不再把其称为仅均匀attention通过。Q/K推导布局受到完整非均匀原权重测试约束，但仍未声称独立逐权重basis验证。下一步据此实现AMD C64三矩阵FFN与双头attention，再接入resident链；目前AMD执行范围仍block0..4 DS。游戏DLL与公开ZIP未更新，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

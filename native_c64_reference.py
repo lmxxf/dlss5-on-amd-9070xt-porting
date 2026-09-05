@@ -16,7 +16,9 @@ def block(x,ffn,qkv,projection,bias,scales,skip):
  expanded=multiply(F(x),ffn['W1']);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
  hidden=F(H(expanded*poly));middle=F(multiply(hidden,ffn['W2']))
- feature=multiply(middle,ffn['W3'],H(x*ffn['skip']))
+ # Unlike C32, C64 stores this boundary as FP8 in shared memory; the
+ # attention residual must also consume that quantized feature.
+ feature=F(multiply(middle,ffn['W3'],H(x*ffn['skip'])))
  q,k,v=[multiply(F(feature),m) for m in qkv]
  combined=[]
  for head in range(2):
