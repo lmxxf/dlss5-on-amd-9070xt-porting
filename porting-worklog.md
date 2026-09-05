@@ -2373,6 +2373,16 @@ extract_native_weight_record.py直接提取原始记录；native_c32_reference.p
 
 同原始逐层输入，block1/2/3 exact从97.3175/93.9423/96.4417%提高到99.2523/98.3994/99.2249%，MAE分别0.000401706/0.001237214/0.001085550。从原始DS起算的三层累计exact64.3585%→75.6561%。9070XT更新Lab shader实跑三次重放通过，GPU与修正CPU链仍逐值相等。包含尚未修正第0层的完整链exact52.2919%→52.7100%，MAE0.09724066→0.09588987、max4→2.25；这也说明第0层误差仍是重要来源，不应夸大本次提升。未部署游戏DLL，最终画质目标未完成。
 
+### 2026-09-06 第0层FFN逐值闭合及attention舍入修正
+
+原始preblock SASS在0x2840等先HMUL2残差，再在0x3130等QMMA以残差寄存器为初始累加器，证实第0层与C32均应skip-first。同步修正preblock_input_mix.hlsl与preblock_ffn_reference.py后，256张独立tile的524288个FFN-only结果对原CUBIN全部exact，MAE/max0。参考脚本增加逐值assert，不能只打印相关度后通过。
+
+attention末端0xb2d0等HMUL2残差、0xb350等QMMA带残差初始值，故projection应H(dot+H(feature×skip))，而非H(H(dot)+feature×skip)。Q/K归一化0x6070/60a0等先对通道16..31平方做HMUL2，再HFMA2加0..15平方，随后8/4/2/1跨度归约；由+0x2660/+0x2460权重load与已恢复矩阵映射共同约束。新增native_c32_normalize.py，与HLSL同步该顺序。attention-only原版对照exact99.57199%、MAE0.000095915，仍有差异。
+
+9070XT实际重跑完整preblock五帧（重复、换seed、恢复seed均通过）与block0..3三帧链，当前全局128×64主输出exact99.26453%、MAE0.000224486；DS exact98.67249%、MAE0.000270426。C32各层原输入隔离exact99.52698/98.76862/99.52698%；从原始DS起算三层最终exact84.50012%、MAE0.02158725。实际AMD全前四层最终exact59.41162%、MAE0.07457909、max2；GPU链对更新CPU链仍逐值相同。还不是最终RGB，更不是游戏验收。
+
+另preblock_attention_reference.py增加--sum-order诊断参数，检查softmax分母的半精度归约顺序；降序32/16/8/4/2/1与8/16/32/4/2/1候选稍改善，但未取得完整指令映射，不写入runtime默认。下一步追分母真实树与DS池化舍入；后续更宽层及游戏完整链仍待恢复。未更新游戏DLL或发布ZIP，本轮测试文件仅Lab，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -31,10 +31,11 @@ else:
  polynomial=h(gate*h(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
  hidden=h(expanded*polynomial)
  hidden_q=q(hidden)
- projected=np.zeros((*hidden_q.shape[:-1],32),np.float32)
+ projected=h(prefix*fs)
  for start in range(0,128,32):
   projected=h(projected+hidden_q[...,start:start+32]@layout['W2'][:,start:start+32].T)
- predicted=q(h(projected+prefix*fs))
+ predicted=q(projected)
  target=e4m3fn(np.fromfile(a.folder/'ffn-main.fp8',np.uint8).reshape(-1,2048)[:,perm]).reshape(predicted.shape)
  error=np.abs(predicted-target)
  print(json.dumps({'correlation':float(np.corrcoef(predicted.ravel(),target.ravel())[0,1]),'exact_fraction':float(np.mean(predicted==target)),'mae':float(error.mean()),'max_error':float(error.max()),'skip_slot_to_channel':channel.tolist()},indent=2))
+ assert np.array_equal(predicted,target), 'FFN-only original-CUBIN regression'

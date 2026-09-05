@@ -4,6 +4,7 @@ import argparse,json
 import numpy as np
 from decode_tinlayout_global import e4m3fn
 from encode_tinlayout_global import quantize
+from native_c32_normalize import normalize
 H=lambda x:np.asarray(x,np.float16).astype(np.float32)
 F=lambda x:e4m3fn(quantize(x))
 
@@ -32,11 +33,7 @@ def block(tiles,w,skip_first=True):
  for k in range(0,128,32):proj=H(proj+hidden[...,k:k+32]@w2[:,k:k+32].T)
  feature=proj if skip_first else H(proj+tiles*fs)
  q,k,v=[H(F(feature)@m.T) for m in [qw,kw,vw]]
- def norm(a):
-  s=H(a*a)
-  while s.shape[-1]>1:s=H(s[...,::2]+s[...,1::2])
-  return H(a*H(1/np.sqrt(np.maximum(s,6.198883056640625e-5))))
- q=F(H(norm(q)*H(scale)));k=F(norm(k));v=F(v)
+ q=F(H(normalize(q)*H(scale)));k=F(normalize(k));v=F(v)
  scores=H(q@k.transpose(0,2,1)+bias)
  bits=np.clip(H(scores*np.float32(.044921875)+np.float32(1.30078125)),1.03125,1.5693359375).astype(np.float16).view(np.uint16).astype(np.uint32)
  exp=(((bits<<5)+0x8000)&65535).astype(np.uint16).view(np.float16).astype(np.float32)
@@ -44,7 +41,7 @@ def block(tiles,w,skip_first=True):
  while den.shape[-1]>1:den=H(den[...,::2]+den[...,1::2])
  prob=F(H(exp*H(1/den)));av=np.zeros_like(tiles)
  for k in [0,32]:av=H(av+prob[:,:,k:k+32]@v[:,k:k+32])
- return F(H(H(F(av)@pw.T)+feature*ats))
+ return F(H((F(av)@pw.T)+H(feature*ats)))
 
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('weights');p.add_argument('input');p.add_argument('oracle');p.add_argument('width',type=int);p.add_argument('height',type=int);p.add_argument('--output-cells',action='store_true');p.add_argument('--input-cells',action='store_true');p.add_argument('--shift-mask',type=int,default=0);p.add_argument('--export-lab',type=Path);a=p.parse_args()

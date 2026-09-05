@@ -14,9 +14,10 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  [loop]for(uint c=0;c<32;c++){
   float a=0,b=0,z=0;
   [loop]for(uint j=0;j<32;j++){float f=F(input[p*32+j]);a+=f*weights[c*32+j];b+=f*weights[1024+c*32+j];z+=f*weights[2048+c*32+j];}
-  q[c]=H(a);k[c]=H(b);v[c]=F(H(z));qs[c]=H(q[c]*q[c]);ks[c]=H(k[c]*k[c]);
+  q[c]=H(a);k[c]=H(b);v[c]=F(H(z));
  }
- [unroll]for(uint step=16;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}}
+ [unroll]for(uint i=0;i<16;i++){qs[i]=H(q[i]*q[i]+H(q[i+16]*q[i+16]));ks[i]=H(k[i]*k[i]+H(k[i+16]*k[i+16]));}
+ [unroll]for(uint step=8;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
  [loop]for(uint c=0;c<32;c++){queries[t*32+c]=F(H(H(q[c]*qi)*H(weights[8192])));keys[t*32+c]=F(H(k[c]*ki));values[t*32+c]=v[c];}
  GroupMemoryBarrierWithGroupSync();
@@ -33,7 +34,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  }
  [loop]for(uint c=0;c<32;c++){
   float a=0;[loop]for(uint j=0;j<32;j++)a+=av[j]*weights[3072+c*32+j];
-  float result=H(H(a)+input[p*32+c]*weights[8193+c]);
+  float result=H(a+H(input[p*32+c]*weights[8193+c]));
   output[p*32+c]=RAW_OUTPUT?result:F(result);
  }
 }

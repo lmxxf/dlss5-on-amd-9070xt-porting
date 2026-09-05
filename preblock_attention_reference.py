@@ -5,7 +5,8 @@ import numpy as np
 from preblock_mix_reference import inputs,unpack_mix
 from decode_tinlayout_global import e4m3fn
 from encode_tinlayout_global import quantize
-p=argparse.ArgumentParser();p.add_argument('folder',type=Path);p.add_argument('--prepare',action='store_true');p.add_argument('--native-exp',action='store_true');p.add_argument('--half-norm',action='store_true');p.add_argument('--export-lab',type=Path);a=p.parse_args();a.folder.mkdir(parents=True,exist_ok=True)
+from native_c32_normalize import normalize as native_normalize
+p=argparse.ArgumentParser();p.add_argument('folder',type=Path);p.add_argument('--prepare',action='store_true');p.add_argument('--native-exp',action='store_true');p.add_argument('--half-norm',action='store_true');p.add_argument('--export-lab',type=Path);p.add_argument('--sum-order',default='1,2,4,8,16,32');a=p.parse_args();a.folder.mkdir(parents=True,exist_ok=True)
 raw=np.fromfile('/tmp/block0.weights',np.uint8);original=raw.view('<f2').copy()
 if a.prepare:
  w=original.copy();w[:4096]=0;w[4616:4648]=1;w.tofile(a.folder/'attention-only.weights')
@@ -27,10 +28,7 @@ else:
  q,k,v=[h(feature@w.T) for w in [qw,kw,vw]]
  def normalize(v):
   if not a.half_norm:return h(v/np.sqrt(np.maximum(np.sum(v*v,-1,keepdims=True),1e-12)))
-  norm=h(v*v)
-  while norm.shape[-1]>1:norm=h(norm[...,0::2]+norm[...,1::2])
-  inverse=h(1/np.sqrt(np.maximum(norm,np.float32(6.198883056640625e-5))))
-  return h(v*inverse)
+  return native_normalize(v)
  q,k=normalize(q),normalize(k)
  if a.native_exp:
   scores=h(f8(h(q*h(scale)))@f8(k).transpose(0,2,1)+bias)
@@ -43,7 +41,12 @@ else:
  den=exp.sum(-1,keepdims=True)
  if a.half_norm:
   den=exp
-  while den.shape[-1]>1:den=h(den[...,0::2]+den[...,1::2])
+  order=[int(x) for x in a.sum_order.split(',')];assert sorted(order)==[1,2,4,8,16,32]
+  indices=np.arange(64)
+  for bit in order:
+   keep=np.flatnonzero((indices&bit)==0)
+   partner=np.array([np.flatnonzero(indices==(indices[i]^bit))[0] for i in keep])
+   den=h(den[...,keep]+den[...,partner]);indices=indices[keep]
  pm=np.argmax(np.abs(np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048)),axis=0)
  target=e4m3fn(np.fromfile(a.folder/'attention-main.fp8',np.uint8).reshape(-1,2048)[:,pm]).reshape(-1,64,32)
  if a.export_lab:
@@ -60,6 +63,6 @@ else:
    prob=f8(h(exp*h(1/den)))
    av=np.zeros_like(v)
    for start in [0,32]:av=h(av+prob[:,:,start:start+32]@f8(v[:,start:start+32]))
-  projected=h(f8(av)@pw.T);pred=f8(h(projected+prefix*skip));err=np.abs(pred-target)
+  pred=f8(h((f8(av)@pw.T)+h(prefix*skip)));err=np.abs(pred-target)
   reports.append({'mode':mode,'correlation':float(np.corrcoef(pred.ravel(),target.ravel())[0,1]),'exact_fraction':float(np.mean(pred==target)),'mae':float(err.mean()),'max_error':float(err.max())})
  print(json.dumps({'scale':float(scale),'arithmetic_candidates':reports},indent=2))
