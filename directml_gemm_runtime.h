@@ -1,4 +1,5 @@
 #pragma once
+#include "runtime_descriptor_arena.h"
 #include <DirectML.h>
 #include <d3d12.h>
 #include <algorithm>
@@ -54,17 +55,17 @@ public:
         }
         descriptorCount_ = std::max<UINT>(1, std::max(init.RequiredDescriptorCount, exec.RequiredDescriptorCount));
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,descriptorCount_,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};
-        dmlrt_check("CreateDescriptorHeap", dx->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap_)));
-        DML_BINDING_TABLE_DESC tableDesc{initializer_,heap_->GetCPUDescriptorHandleForHeapStart(),heap_->GetGPUDescriptorHandleForHeapStart(),descriptorCount_};
+        dmlrt_check("CreateDescriptorHeap", runtime_create_descriptor_heap(dx,&heapDesc, IID_PPV_ARGS(&heap_)));
+        DML_BINDING_TABLE_DESC tableDesc{initializer_,runtime_cpu_handle(heap_),runtime_gpu_handle(heap_),descriptorCount_};
         dmlrt_check("CreateBindingTable", dml->CreateBindingTable(&tableDesc, DMLRT_IID_TABLE, (void**)&table_));
     }
     void RecordInitialization(IDMLCommandRecorder* recorder, ID3D12GraphicsCommandList* commands) {
         ID3D12DescriptorHeap* heaps[] = {heap_};
-        commands->SetDescriptorHeaps(1, heaps);
+        runtime_set_descriptor_heaps(commands,1, heaps);
         recorder->RecordDispatch(commands, initializer_, table_);
     }
     void Bind(ID3D12Resource* a, ID3D12Resource* b, ID3D12Resource* output) {
-        DML_BINDING_TABLE_DESC tableDesc{compiled_,heap_->GetCPUDescriptorHandleForHeapStart(),heap_->GetGPUDescriptorHandleForHeapStart(),descriptorCount_};
+        DML_BINDING_TABLE_DESC tableDesc{compiled_,runtime_cpu_handle(heap_),runtime_gpu_handle(heap_),descriptorCount_};
         dmlrt_check("ResetBindingTable", table_->Reset(&tableDesc));
         DML_BUFFER_BINDING buffers[2] = {{a,0,ABytes()},{b,0,BBytes()}}, outBuffer{output,0,OutputBytes()};
         DML_BINDING_DESC inputs[3] = {{DML_BINDING_TYPE_BUFFER,&buffers[0]},{DML_BINDING_TYPE_BUFFER,&buffers[1]},{DML_BINDING_TYPE_NONE,nullptr}};
@@ -73,7 +74,7 @@ public:
     }
     void Record(IDMLCommandRecorder* recorder, ID3D12GraphicsCommandList* commands) {
         ID3D12DescriptorHeap* heaps[] = {heap_};
-        commands->SetDescriptorHeaps(1, heaps);
+        runtime_set_descriptor_heaps(commands,1, heaps);
         recorder->RecordDispatch(commands, compiled_, table_);
     }
     UINT64 ABytes() const { return UINT64(batch_)*m_*k_*2; }

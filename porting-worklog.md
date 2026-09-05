@@ -2129,6 +2129,18 @@ runtime每5秒cadence追加DXGI QueryVideoMemoryInfo（非图像readback），�
 
 统一heap候选实现备忘（尚未实施）：可保留原heap对象作为分配标识，注册到一个native-device shader-visible arena及offset；统一CreateDescriptorHeap、GetCPU/GPUDescriptorHandleForHeapStart、SetDescriptorHeaps的runtime helper，把descriptor写入和DirectML binding table句柄都指向arena切片、实际绑定同一个arena。仅处理native g_device的CBV/SRV/UAV shader-visible heap，FFX proxy-device bridge保持原路径。无需伪造COM heap对象或把代理对象交给native command list。header默认不开arena，让离线runner保持旧行为；启用后再量整网时间，不能只改DML heap而遗漏穿插的boundary/window heap。
 
+### 2026-09-05 统一descriptor heap实测
+
+实现runtime_descriptor_arena.h并覆盖runtime及13个依赖header的heap创建、CPU/GPU句柄与绑定点。只合并native g_device的shader-visible CBV/SRV/UAV，proxy bridge仍原样；原heap仅作分配标识，实际写入与绑定使用同一arena及独立offset，无伪造COM对象。enable-descriptor-arena.txt启用后分配2189个descriptor，完整blocks0–70持续提交840帧，GPU全网45.68044ms，与原45.4–45.6ms无实用收益，拒绝作为性能优化默认启用。
+
+删除标记后以快速直通分支复验：descriptor_arena_used=0、network45.58592ms。关闭时不进入map查找及锁；独立runner默认也不启用。新DLL SHA9cb32df2925bd031907fe0ab0c42f695b5a5f739a0429e316375b3d9212f8e06。统一heap未改变tensor布局与数值运算，但启用版未做逐元素GPU对照，不能称为精度验证完成。
+
+下一较大方向来自AMD官方MiniDXNN：原生DX12矩阵核心接口，可用于MLP；当前主线要求SM6.10、Agility1.721-preview、DXC1.10.2605.4及创建设备前开启实验特性，不能直接套进既有游戏设备。来源：https://github.com/GPUOpen-LibrariesAndSDKs/MiniDXNN#requirements 、https://gpuopen.com/learn/minidxnn-mlp-library-for-dx12/ 。尚未安装SDK/驱动或修改系统配置，先做能力探针。
+
+新增只读inspect_runtime_capabilities.ps1：Windows11 Insider 10.0.26340；9070XT驱动32.0.31041.1004；游戏加载system32 D3D12Core10.0.26100.9072、DirectML1.15.6；游戏目录d3d12.dll6.8.0.2155是现有ReShade代理，不能把其版本号当Shader Model。Developer Mode注册表值未检测到（null），不能当作已启用。下一步应在真实device查询高版本Shader Model、并在独立探针核对实验特性；如需升级驱动/启用系统开发者模式，先请用户决定，不静默修改。30fps仍未达成。
+
+arena关闭版洞窟复验19.082/19.219fps，display_residual generation4680 mode0，截图未见原绿色方格；独立d3d12_directml_swin32_resident.cpp语法检查通过，确认共用header默认直通路径仍可编译。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
