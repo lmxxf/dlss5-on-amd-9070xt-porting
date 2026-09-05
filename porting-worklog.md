@@ -2147,6 +2147,16 @@ arena关闭版洞窟复验19.082/19.219fps，display_residual generation4680 mod
 
 对照前述MiniDXNN官方要求，下一矩阵核心候选需要独立部署preview Agility/DXC并验证实验特性。Windows开发者模式的系统级变更尚未获授权，因此先向用户请求这一实验范围；不修改游戏DLL选型、不更换驱动、不宣称30fps已达成。现有游戏运行配置保持约19fps版本。探针可用x86_64-w64-mingw32-g++ -std=c++17 -O2 -static-libgcc -static-libstdc++ d3d12_shader_model_probe.cpp -o d3d12_shader_model_probe.exe -ld3d12 -ldxgi构建。
 
+### 2026-09-05 自包含DLL交付
+
+用户取消“用户提供原DLL的patch工具”，改为直接生成含权重DLL供其上传百度网盘。实现runtime_bundle.h：从自身PE RCDATA297读取DLSS5PK1资源包；572项真实启动依赖（187455856 bytes）包括权重、CSO及已验证开关。逐项SHA256和包边界由verify_runtime_bundle.py验证通过。build_runtime_bundle.ps1从完整启动trace采集清单，不把整个Lab或activation垃圾带入；runtime_bundle.rc负责链接资源。
+
+发布DLL使用DLSS5_REQUIRE_BUNDLE：缺资源拒绝加载；权重与CSO从内嵌包读取，不回落到D盘；配置固定max_block70、raw_r10_present关闭，enable开关只读内嵌清单。日志改到%TEMP%\dlss5-1080p-runtime.log。Windows导入表仅系统库及ReShade代理d3d12.dll，无Python、编译器、libwinpthread等部署依赖。开发模式仍支持不嵌资源的Lab路径，用于后续优化；注意发布版不会响应Lab的enable*.txt，实验时须切开发DLL或重新打包。
+
+发布DLL大小190138966 bytes，SHA256 ca668b23d81dd06964053d13a03315fba3bc04a920b93ac070c391058af6b415。实际游戏日志runtime_assets=embedded、failed=0，洞窟19.200/19.200/19.280fps，display_residual generation2160 mode0，截图未见旧方格。30fps优化目标仍未完成，此次完成的是自包含交付。
+
+prepare_runtime_release.ps1生成6文件发布包：ReShade d3d12.dll、内嵌模型addon、README、两份组件版权说明、SHA256SUMS。zip大小132124870 bytes，SHA256 9e38f15c2bc41bed45547caa7daa98c74bbdbe389a7667ef708c36ace2b91e07，Windows路径D:\DLSSNR-Lab\distribution\DLSS5-AMD-1080p.zip，本地release/DLSS5-AMD-1080p.zip。release目录已加入gitignore，未提交模型包/生成DLL/zip；只提交代码与说明。开发者模式与系统SDK均未改动。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

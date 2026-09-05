@@ -7,8 +7,8 @@ $Lab = 'D:\DLSSNR-Lab'
 $Game = 'C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64'
 $Source = Join-Path $Lab 'dlss5-1080p-runtime.addon64'
 $Target = Join-Path $Game 'dlss5-1080p-runtime.addon64'
-$Log = Join-Path $Lab 'logs\dlss5-1080p-runtime.txt'
-$ExpectedHash = '9CB32DF2925BD031907FE0AB0C42F695B5A5F739A0429E316375B3D9212F8E06'
+$Log = Join-Path ([IO.Path]::GetTempPath()) 'dlss5-1080p-runtime.log'
+$ExpectedHash = 'CA668B23D81DD06964053D13A03315FBA3BC04A920B93AC070C391058AF6B415'
 $OldAddons = @(
     (Join-Path $Game 'd3d12-dynamic-resource-probe.addon64'),
     (Join-Path $Game 'dlss5-resident-lifecycle.addon64')
