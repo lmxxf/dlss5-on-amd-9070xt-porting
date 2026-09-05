@@ -2449,6 +2449,14 @@ validate_native_c64_uniform_attention.py使用原始V/P系数，只将FFN改iden
 
 当前C64 FFN及均匀attention分别闭合，完整C64尚未接AMD。游戏DLL、发布ZIP未修改，实际AMD闭合范围仍block0..4 DS。下一步恢复Q/K与8192个bias条目的head/query/key布局，再串完整C64验证，目标active。
 
+### 2026-09-06 C64双头bias坐标恢复，完整层算术仍有差异
+
+批量oracle增加half探针（DLSS5_NATIVE_SCAN_HALF存在时逐FP16元素置8，范围校验乘元素字节数），旧byte模式不变。recover_native_c64_bias.py以通道0空间6位编码，同时令两head的V读同一输入、P将latent0/32分别送输出0/1，每次仅改变一个bias。8192项每次只影响一个head的一处query；六轮head/query一致，最终head×query×key完整bijection，每头4096项，保存在release/native-c64/attention-layout/bias-layout.npz。
+
+native_c64_reference.py恢复attention skip的64-slot映射并尝试完整block5。Q/K暂按V byte offsets分别减0x800/0x400的同族布局提取（属于待完整数值验证的布局推导，尚非独立Q/K basis证明）；原scales为2.382342及9.916067。与原block5裁判比较，当前exact80.04761%、MAE0.07538193、max4、corr0.99950066，远未闭合，末尾明确exact assert失败，不能把脚本执行或高相关当通过。
+
+此前FFN与均匀attention分别逐值通过的结论不变；差异出现在完整非均匀attention组合中，下一步核对C64 Q/K的归一化寄存器顺序、分母树以及必要的独立Q/K控制。原先C32的加法顺序不能未经检验直接视为C64事实。新原型尚未接AMD、未更新游戏DLL/发布包；当前AMD闭合范围仍block0..4 DS，完整游戏画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

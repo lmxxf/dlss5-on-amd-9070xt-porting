@@ -62,12 +62,13 @@ int main(int argc, char **argv) {
     if(const char* scan_count=std::getenv("DLSS5_NATIVE_SCAN_COUNT")){
         const char* scan_offset=std::getenv("DLSS5_NATIVE_SCAN_OFFSET");
         size_t count=std::strtoull(scan_count,nullptr,0),begin=scan_offset?std::strtoull(scan_offset,nullptr,0):0;
-        if(mode!=7||width!=8||height!=8||count==0||count>16384||begin>weights.size()||count>weights.size()-begin||weight_offset||input_offset||output_offset)return 2;
-        if(!std::all_of(weights.begin()+begin,weights.begin()+begin+count,[](unsigned char x){return x==0;}))return 2;
-        constexpr size_t span=8*8*64;std::vector<unsigned char> results(count*span);unsigned char one=0x38,zero=0;
+        const size_t element=std::getenv("DLSS5_NATIVE_SCAN_HALF")?2:1;
+        if(mode!=7||width!=8||height!=8||count==0||count>16384||begin>weights.size()||count>(weights.size()-begin)/element||weight_offset||input_offset||output_offset)return 2;
+        if(!std::all_of(weights.begin()+begin,weights.begin()+begin+count*element,[](unsigned char x){return x==0;}))return 2;
+        constexpr size_t span=8*8*64;std::vector<unsigned char> results(count*span);unsigned short one=element==2?0x4800:0x38,zero=0;
         for(size_t i=0;i<count;i++){
-            if(i)check("reset scanned byte",cuMemcpyHtoD(dw+begin+i-1,&zero,1));
-            check("set scanned byte",cuMemcpyHtoD(dw+begin+i,&one,1));check("clear scanned output",cuMemsetD8(doo,0,span));
+            if(i)check("reset scanned element",cuMemcpyHtoD(dw+begin+(i-1)*element,&zero,element));
+            check("set scanned element",cuMemcpyHtoD(dw+begin+i*element,&one,element));check("clear scanned output",cuMemsetD8(doo,0,span));
             check("scan launch",cuLaunchKernel(function,gx,gy,1,32,by,1,0,nullptr,args,nullptr));check("scan sync",cuCtxSynchronize());
             check("scan read",cuMemcpyDtoH(results.data()+i*span,doo,span));
         }
