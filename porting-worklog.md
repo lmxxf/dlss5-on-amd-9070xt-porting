@@ -2293,6 +2293,16 @@ prepare_full_post_prefix.py合并原main512→2048与本轮重新恢复的full-s
 
 继续审第0层：新增adapter-scan到run_original_preblock_oracle，逐slot改变前224个half，保持原下游权重。224个输出彼此不同，尚未得到足够依据把slot指认为某RGB/噪声通道。此前试图将下游直接设为identity所得输出全零，包括旧front-identity控制文件也如此，故该控制不能作为输入不存在的证据。prepare_preblock_adapter_scan.py目前保留真实下游，下一步需恢复可信中间读口/确认原字段布局；不新增单帧拟合校正。原版装备页已由用户F12提供，后续不再用桌面强制聚焦反复触发全屏切换。
 
+### 2026-09-06 活跃画面修复目标：原preblock布局与随机场恢复
+
+目标保持“修正画面并部署剑星验证正确”，本轮属于继续前端正确性定位，不是缩小完成标准。复查原始sm_120 SASS发现旧block0-tensor-layout不能用于CUBIN权重视图：FFN W1/W2实际从half0/2048开始；0x2010/0x2210两路load位于half4104开始的512-half输入混合区；FFN skip half4616，QKV从4656（旧表4648），bias6192，scale10288（旧表10280），projection10296、attention skip10808。完整分段容量21696 bytes，存block0-cubin-layout.json；旧布局表标为legacy，不直接改成新字段破坏历史引用。
+
+按新布局把FFN/attention分支置identity，扫描全部512个input-mix half，每个有响应的slot只影响一个逻辑channel的64像素，控制终于能隔离输入。224-adapter范围不能继续视为权威；packed_input_mix不是已验证row-major 32×7加DW。prefix-scan在512区先全清零再逐slot置1，避免保留未知前端系数造成假响应。
+
+受控slot0/1/8出现三张非恒定随机场，即使旧参数b0/b4所谓Gaussian开关/scale均为0。SASS显示随机种子来自参数c8；原helper把该字段初始化为float1的bits0x3f800000。新增DLSS5_PREBLOCK_SEED显式覆盖该uint32字段。preblock_noise_reference.py按原uint32乘法/XOR/移位恢复随机hash、四组uniform和三路Box–Muller输出，修正角度分配及readout通道顺序后，8×8 CTA0上三个种子0x3f800000、0x12345678、0各192个值经FP16→E4M3量化后对原CUBIN逐值exact、max0。验证失败会assert，不是只打印好看的相关数。
+
+上述是受控局部随机场正确性证明，尚未验证live种子/全局CTA地址/完整texture与input-mix合同，也没有将随机场随便加入旧代理。之前“RGB-only／四个Gaussian为零”的描述不能作为该CUBIN helper的事实。本轮未改AMD游戏DLL、未动两机游戏状态/存档，当前runtime仍为b210a431、网格未解决，目标继续active。下一步应恢复packed input-mix与完整前端计算，再接全分辨率skip和正确DS，最终进游戏重新做同帧数值及画面验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

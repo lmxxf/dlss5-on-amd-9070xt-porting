@@ -1,0 +1,26 @@
+{
+  "scope": "21696-byte weight view read by cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8, not the old block0_reference archive interpretation",
+  "evidence": "sm_120 SASS weight-relative loads and controlled identity/prefix scans",
+  "half_count": 10848,
+  "regions": [
+    {"name":"ffn_weight1","half_offset":0,"half_count":2048},
+    {"name":"ffn_weight2","half_offset":2048,"half_count":2048},
+    {"name":"padding","half_offset":4096,"half_count":8},
+    {"name":"packed_input_mix","half_offset":4104,"half_count":512,"note":"Physical mapping still under controlled recovery; do not assume row-major adapter plus depthwise."},
+    {"name":"ffn_skip","half_offset":4616,"half_count":32},
+    {"name":"padding","half_offset":4648,"half_count":8},
+    {"name":"qkv","half_offset":4656,"half_count":1536},
+    {"name":"attention_bias","half_offset":6192,"half_count":4096},
+    {"name":"attention_scale_and_padding","half_offset":10288,"half_count":8,"scale_storage":"float32"},
+    {"name":"projection","half_offset":10296,"half_count":512},
+    {"name":"attention_skip","half_offset":10808,"half_count":32},
+    {"name":"tail_padding","half_offset":10840,"half_count":8}
+  ],
+  "random_fields": {
+    "seed_parameter_offset":"0xc8",
+    "validated_controlled_output_count":3,
+    "validated_seeds":["0x3f800000","0x12345678","0x00000000"],
+    "quantized_exact_fraction":1.0,
+    "limits":"8x8 CTA0 controlled tests only; live seed, texture transforms, and global view integration still require validation. Legacy b0/b4 Gaussian labels did not suppress these fields."
+  }
+}

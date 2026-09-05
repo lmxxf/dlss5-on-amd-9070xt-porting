@@ -40,14 +40,16 @@ int main(int argc, char **argv) {
     const int texture_slot = argc >= 7 ? std::atoi(argv[6]) : 3;
     const float gaussian_scale = argc >= 8 ? std::strtof(argv[7], nullptr) : 0.0f;
     const bool adapter_scan=argc==9 && !std::strcmp(argv[8],"adapter-scan");
-    if(argc==9&&!adapter_scan)return 2;
+    const bool prefix_scan=argc==9 && !std::strcmp(argv[8],"prefix-scan");
+    const bool scan=adapter_scan||prefix_scan;
+    if(argc==9&&!scan)return 2;
     if (texture_slot < 0 || texture_slot > 3) return 2;
     const auto weights = read_file(argv[2]);
     const auto input = read_file(argv[3]);
     constexpr size_t input_tile_bytes = 8 * 8 * 4 * sizeof(float);
     if (weights.size() != 21696 || input.empty() || input.size() % input_tile_bytes) return 2;
-    if(adapter_scan&&input.size()!=input_tile_bytes)return 2;
-    const size_t tile_count = adapter_scan?224:input.size() / input_tile_bytes;
+    if(scan&&input.size()!=input_tile_bytes)return 2;
+    const size_t tile_count = scan?(prefix_scan?512:224):input.size() / input_tile_bytes;
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -115,6 +117,12 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0xb0, &gaussian_enabled, sizeof(gaussian_enabled));
     std::memcpy(params + 0xb4, &gaussian_scale, sizeof(gaussian_scale));
     std::memcpy(params + 0xc0, &zero, sizeof(zero));
+    // The legacy b0/b4 "Gaussian" labels do not disable the built-in random
+    // fields. SASS reads the integer random seed separately at parameter c8.
+    if(const char*seed_text=std::getenv("DLSS5_PREBLOCK_SEED")){
+        const uint32_t seed=static_cast<uint32_t>(std::strtoul(seed_text,nullptr,0));
+        std::memcpy(params+0xc8,&seed,sizeof(seed));
+    }
     const unsigned long long dimensions = 8ull | (8ull << 32);
     const int texture_offsets[] = {0x00, 0x08, 0x18, 0x20};
     std::memcpy(params + texture_offsets[texture_slot], &texture, 8);
@@ -129,14 +137,14 @@ int main(int argc, char **argv) {
     std::vector<unsigned char> main_bytes(tile_count * main_tile_bytes);
     std::vector<unsigned char> downsample_bytes(tile_count * downsample_tile_bytes);
     for (size_t tile = 0; tile < tile_count; ++tile) {
-        if(adapter_scan){
+        if(scan){
             auto probe_weights=weights;
-            std::memset(probe_weights.data(),0,224*2);
+            std::memset(probe_weights.data()+4104*2,0,(prefix_scan?512:224)*2);
             const unsigned short one_half=0x3c00;
-            std::memcpy(probe_weights.data()+tile*2,&one_half,2);
+            std::memcpy(probe_weights.data()+(4104+tile)*2,&one_half,2);
             check("adapter probe upload",cuMemcpyHtoD(device_weights,probe_weights.data(),probe_weights.size()));
         }
-        copy.srcHost = input.data() + (adapter_scan?0:tile) * input_tile_bytes;
+        copy.srcHost = input.data() + (scan?0:tile) * input_tile_bytes;
         check("cuMemcpy2D(tile)", cuMemcpy2D(&copy));
         check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, 1 << 20));
         check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, 1 << 20));
