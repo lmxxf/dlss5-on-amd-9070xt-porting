@@ -2571,6 +2571,14 @@ derive_native_attention_layout.py从已完整探测的C64/C128 V/P/bias表提炼
 
 完整block15以真实block14 DS输入8192值逐值一致；seed113/σ0.25、seed127/σ3.0两组随机输入各8192值也全部exact、max0，合计24576值。C128/C64真实输入及相同随机输入回归均继续exact。当前尚未实现AMD C256，实际GPU闭合范围仍block0..14 DS，游戏DLL和公开包未修改；下一步接GPU补零/裁剪包装，最终画面目标active。
 
+### 2026-09-06 C256接入AMD，H4窗口及RGB到block15逐值一致
+
+NativeC64允许256通道，沿用参数化三阶段shader及每头32维。NativeC64Shift支持非8对齐有效尺寸，将work extent设为ceil((有效尺寸+前侧shift)/8)×8，边界通过显式分支填零，最终crop回原有效尺寸；已对齐C64/C128时与旧work extent相同。block15以8×4×256输入、shift0包装为8×8计算，资源和通道均按256分配。
+
+测试host新增c256模式，原系数由prepare_native_front_chain.py导出，输入直接取AMD block14 DS。初始化期间进程CPU仍增长，持续等待同一已确认存活句柄，未因等待较长重启测试。最终9070XT三次replay与device/fence检查通过。validate_native_c64_chain.py --c256按已恢复C256 cell映射解码原block15，对实际GPU RGB→block0..15最终8192值全部exact，MAE/max0、nonfinite0。CPU H4/H8真实输入及两随机输入边界测试复查通过。fence墙钟140/110/109ms是小夹具日志，不能当1080p性能或游戏帧率。
+
+README同步当前前缀范围。游戏DLL、公开ZIP仍未更新；后续C256移位链/DS、更深网络及第0层旁路2个差异仍待处理。当前只是block0..15特征链实机正确，最终剑星RGB/角色面部效果验收仍未完成，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
