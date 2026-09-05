@@ -2423,6 +2423,14 @@ check_native_c64_identity.py将矩阵清零，0x7010..0x7090 FFN skip及0xf0b0..
 
 SASS还显示FFN区域0..0x4000、0x4000..0x6000后有0x6000区域矩阵load，QKV从0x70a0开始。不能照搬C32的两矩阵FFN简单扩宽；新增矩阵的确切维度、作用及排列仍需编码/basis探针，当前不把可能的分组/混合解释写成事实。下一步恢复C64输入输出坐标与这段矩阵，已有AMD block0..4 DS逐值测试保持不变。未更新游戏DLL，整网及画面目标active。
 
+### 2026-09-06 C64完整坐标映射及三矩阵串联探针
+
+recover_native_c64_view.py对32×16×64原始输入逐字节位置编码，用15组二进制identity探针恢复输出到输入的32768项映射，严格验证bijection；独立seed13/29随机FP8输入对该映射逐值一致（统一正负零）。再按已验证block4 DS四个16通道bank解码，确认C64输出为4×4×64 cell，cell内1024项映射在全部32个cell重复，cell按空间行优先排列。mapping.npz保存在release/native-c64/view，不把参数/激活放Git。
+
+probe_native_c64_extra_matrix.py将所有矩阵和FFN skip清零，attention skip置1，输入所有通道恒1，分别测试全零、仅0x6000置FP8 1、仅0与0x4000置1、三处同时置1。前3种全部零，三段连通才输出512个FP8 0x3a=1.25（其余零）。新增断言固定此受控结果。由此确认第三矩阵参与该FFN串联通路，不能视为无关padding或可忽略的辅助量；尚不能仅凭这几个字节确定全矩阵的维度/分组/排列，下一步编码恢复三段连接。
+
+此轮为C64原CUBIN控制实验，未扩展AMD resident执行层数，游戏DLL未改。前五层AMD逐值结果仍为上一检查点，完整神经输出及剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
