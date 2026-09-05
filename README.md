@@ -2,6 +2,8 @@
 
 ## 当前结果
 
+**2026-09-06 原生数值移植进度：** 正在依据原始 CUBIN 重新恢复混合 FP8/FP16 权重、舍入顺序和数据布局。当前 128×64 RGB 测试输入在 9070 XT 常驻 GPU 链上执行 block0→block14 DS，最终 8×4×256 特征与原版逐值一致，三次重放及设备/fence 检查通过。这个小夹具前缀不是整网或游戏画质验收：后续 C256/更深层仍待恢复，第0层另一主分支还有2个值差异待查。本轮未更新游戏 DLL 或网盘包；下文是历史记录，其中旧代理链的“移植完成”“无网格”等结论不能作为当前正确性证明。最新证据与撤回记录以 `porting-worklog.md` 为准。
+
 **2026-09-05 最终像素审计更正：** 已发现并修复ReShade immediate list未标记有命令、导致最终合成未可靠提交的问题。修复后同帧GPU读回证明主菜单/洞窟99.63%/99.89%像素改变，合成结果与实际backbuffer逐字节一致。但真实输出出现明显8×8周期网格，画质仍不正确；此前“无方格”“开关区别不大”的截图不能再作为正确输出验收。网盘旧包未更新，不应宣传为画质验证完成版。详见`display-audit-menu-fixed.json`、`display-audit-game-fixed.json`及worklog。
 
 **2026-09-05 补丁失效修复：** 游戏保存的`AntiAliasing=SB_GAMEUSERSETTINGS_OFF`会令实际`r.PostProcessAAQuality=0`，即使菜单显示FSR3/质量，也不进入FFX/神经网络。退出游戏后用`repair_temporal_aa.ps1`将该项恢复为HIGH（仅改这一项并保留备份），实际AAQuality恢复4；干净回退DLL已在1080p洞窟恢复blocks0–70和约19.1–19.2fps。不要用“DLL已加载”或角落60fps判断补丁有效，详见worklog最新根因记录。

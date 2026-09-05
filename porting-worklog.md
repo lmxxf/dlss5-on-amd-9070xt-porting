@@ -2549,6 +2549,14 @@ check_native_c64_ds.py参数化64/128，使用独立DS连接表；原block13输�
 
 当前block14为CPU原型与原CUBIN验证，尚未接AMD。AMD真实闭合范围仍block0..13，游戏DLL/公开ZIP未修改。下一步GPU DS接线使用本轮实测矩阵，不再复用FFN布局；输出8×4×256，后续非8对齐高度需正确处理，目标active。
 
+### 2026-09-06 block14 DS接入AMD，RGB到C256输入整链逐值一致
+
+native_c64_ds.hlsl参数化CHANNELS=64/128，维持每K32 half累计与pool的舍入顺序；DS host验证矩阵容量2C²，输出容量2C，raw输入必须已经crop。block14用NativeC64Shift的128通道XY移位raw模式，将最后projection的FP16值交DS；prepare_native_front_chain.py使用独立ds-layout表解码32768个系数，没有再次套用FFN布局。
+
+测试host新增c128ds模式，RGB→block0..14 DS全留GPU，最终输出4×8×256。MinGW编译通过，9070XT三次replay及device/fence检查成功，validate_native_c64_chain.py --c128-ds与原block14 DS的8192个值全部exact、MAE/max0、nonfinite0。CPU原block14及两个通道编码探针回归通过。随后用同一新shader/EXE重跑旧c64ds模式，三帧通过且block8 DS16384值仍exact，确认扩展没破坏旧路径。fence墙钟93/78/79ms等仅小夹具数据，不宣称1080p性能。
+
+README顶部补充当前数值移植状态及历史结论边界，避免旧代理链“完成/无网格”文字误导。当前AMD闭合范围block0..14 DS，后续C256输入高度4的非8对齐处理仍待实现；第0层旁路2个差异、完整网络及游戏最终画面尚未验收。游戏DLL和公开ZIP未改，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
