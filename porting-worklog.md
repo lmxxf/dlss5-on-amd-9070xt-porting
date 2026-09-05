@@ -2521,6 +2521,16 @@ native_c64_reference.py通用unpack/block支持C64及C128，C128用原0x18010 FF
 
 当前完整C128仅完成CPU原型对原CUBIN验证，尚未实现AMD C128 shader。AMD实际闭合范围仍block0..8 DS，游戏DLL/公开ZIP不变。下一步把四头层接入GPU链，再向后推进；第0层旁路2个差异及最终剑星真实画面验收仍未完成，目标active。
 
+### 2026-09-06 C128四头层接入AMD，RGB到block9整链逐值一致
+
+native_c64.h/hlsl参数化CHANNELS=64/128、HEADS=C/32，保持每head32维、每window64像素及24KiB组共享Q/K/V不变。FFN三段权重偏移按4C²/8C²/9C²计算，attention Q/K/V/P/bias/scales/skip独立按C和head数定位；输入/输出资源容量及attention dispatch同步随通道数扩展。保留默认C64和raw_output合同，未把head数误用到64-key的AV累计循环。
+
+prepare_native_front_chain.py导出block9原系数，测试host新增c128模式，以AMD block8 DS输出直接接C128层，没有读入NVIDIA激活。MinGW编译通过，9070XT RGB→block0..9三帧重放及device/fence检查全部成功，validate_native_c64_chain.py --c128对独立原block9布局解码的16384值全部exact，MAE/max0、nonfinite0。CPU完整C128原输入+两随机输入回归亦全exact。
+
+随后用同一新shader/EXE重跑c64ds终点，三帧通过，原block8 DS16384值仍全部exact，确认参数化没有改变已验证C64路径。墙钟fence等待47/31/16ms等仅小夹具测试日志，不作1080p帧率宣称。
+
+当前AMD闭合范围为block0..9，未验证第10层后的C128移位链及更宽层，也未解决第0层旁路2个差异。游戏DLL/公开包未修改，真实剑星最终RGB/面部效果验收仍未完成。下一步接C128移位层与DS，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
