@@ -2075,6 +2075,12 @@ C32 shifted无continue候选依然退化：front10.202、decoder C32 9.1012、�
 
 GPU profile扩展42点，对front/decoder各4层的FFN/QKV/attention单独计时；首层FFN窗口包含该段prefix转换，日志使用ffn_including_prefix_ms注明。当前诊断部署SHA885af038ff2f45a4a5f9830125917cc2c5d3e12d3fc20cdbdf97387174d56fc3。30fps尚未达成。
 
+### 2026-09-05 block70 HWC布局
+
+prefix直接把相同元素写入HWC地址，替代tile-major输出；下游FFN加载已有1920×1088 HWC核，QKV/attention不变，不添加中间copy。启动开关enable-block70-hwc.txt，开启时强制匹配的SM6 FFN并禁止tiled group FFN覆盖，防止独立开关组合导致错误布局。
+
+GPU实测block70 prefix0.60996、FFN2.17924（此前4.48668）、QKV1.249、attention2.62916ms，block70合计6.66776，全网48.45452ms。实际洞窟连续5秒窗口18.142/18.200/18.146fps，截图未见原绿色网格；菜单19.6–19.8fps不是游戏帧率。测试版SHA2e1501a79ebbeea8784aa71813ffc47eb799b91b4cf0c153fe0c44d8bbba2946；补充开关组合保护后的构建SHAfb1ceae32811fb5a857e774de845fd4f428ee3f5bd5db3fb1d35871c3296e6ce。30fps仍未达成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

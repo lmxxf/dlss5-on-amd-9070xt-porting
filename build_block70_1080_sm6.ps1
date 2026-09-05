@@ -6,6 +6,8 @@ $Output = Join-Path $Lab 'shader-cache\block70-1920x1088-ffn.cso'
 & $Compiler -T cs_6_2 -E ffn -O3 -D WIDTH=1920 -D HEIGHT=1088 $Source -Fo $Output
 if ($LASTEXITCODE) { throw 'Block70 SM6 compilation failed' }
 Get-FileHash -LiteralPath $Output -Algorithm SHA256
+& $Compiler -T cs_6_2 -E ffn -O3 -D WIDTH=1920 -D HEIGHT=1088 (Join-Path $Lab 'block1_ffn_sm6_fp32.hlsl') -Fo (Join-Path $Lab 'shader-cache\block1-v1-1920x1088-s0-ffn.cso')
+if ($LASTEXITCODE) { throw 'Block70 HWC FFN compilation failed' }
 $QkvOutput = Join-Path $Lab 'shader-cache\block70-parallel-qkv.cso'
 & $Compiler -T cs_6_2 -E main -O3 (Join-Path $Lab 'block70_qkv_parallel.hlsl') -Fo $QkvOutput
 if ($LASTEXITCODE) { throw 'Block70 parallel QKV compilation failed' }
