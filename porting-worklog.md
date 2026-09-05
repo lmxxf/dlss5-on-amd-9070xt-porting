@@ -2189,6 +2189,14 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 游戏接入核查：现有ReShade源码source/d3d12/d3d12.cpp在真正D3D12CreateDevice前load_addons并触发create_device事件，可尝试在那里选择私有Agility721和实验特性，而不是设备建成后再换SDK（Microsoft明确后者会移除设备）。SDKPath必须相对游戏EXE，候选应放入独立子目录，保留发行版回退。依据：https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12sdkconfiguration-setsdkversion 。尚未修改游戏设备路径。
 
+### 2026-09-05 游戏内SM6.10与首层矩阵FFN
+
+开发版注册ReShade create_device回调，在首个D3D12设备建立前SetSDKVersion721并开启ExperimentalShaderModels；只对外置资源开发版和enable-game-sdk721.txt生效，内嵌发行版跳过。SDK复制到游戏Win64\DLSS5-D3D12-721，不替换系统DLL、不改EXE或INI。原发行addon已校验并备份到matrix-probe\game-runtime-before-matrix.addon64，网盘zip未动。
+
+实际日志get/set/experimental均0，游戏device返回SM6.10、LinAlg tier0x10。先用原有全网在新SDK下进入洞窟，GPU45.57052ms、cadence19.000/18.740fps，画面未见旧网格，真实FFX输出仍1920×1080。
+
+随后加入可选initialize_linalg_front和独立矩阵descriptor表；FFN阶段绑定矩阵表，QKV之前恢复原表，避免t2矩阵/feature冲突。enable-linalg-front-ffn.txt指定前1–4层，当前仅1层。开发DLL SHA526eff5271590740ea79a0fcd7f1ed7aeb066a81b60917791bee6004e9cae2ce；日志linalg_front_layers1，第一FFN0.26728ms（原0.56052），全网45.85632ms，其他stage存在波动，不能据单层省时宣称全帧已提速。洞窟18.625/18.883/19.000fps、generation9120 mode0，未见旧方格。首层数值变化尚未完成全网逐像素对照。正在以对应真实输入检查其余三层。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

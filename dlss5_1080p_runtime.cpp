@@ -96,6 +96,10 @@ ID3D12Resource *g_front_main[2]{}, *g_front_feature = nullptr, *g_front_qkv = nu
                  *g_front_weights[4]{};
 ID3D12RootSignature *g_front_root = nullptr;
 ID3D12PipelineState *g_front_pso[4][3]{};
+ID3D12PipelineState *g_front_linalg_pso=nullptr;
+ID3D12DescriptorHeap *g_front_linalg_heap=nullptr;
+ID3D12Resource *g_front_linalg_weights[4]{};
+UINT g_front_linalg_count=0;
 ID3D12DescriptorHeap *g_front_heap = nullptr;
 std::atomic<bool> g_front_ready{false};
 std::atomic<unsigned long long> g_front_submissions{0};
@@ -559,6 +563,21 @@ void initialize_blocks1_4() {
     g_front_ready.store(true);log("front_blocks1_4_ready tokens=%u block4=%p bytes=%llu\n",tokens,g_front_main[1],(unsigned long long)tensor_bytes);
 }
 
+void initialize_linalg_front() {
+    if(runtime_bundle_present())return;
+    FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\enable-linalg-front-ffn.txt)",L"rb");if(!f)return;unsigned count=1;fscanf(f,"%u",&count);fclose(f);if(!count)return;if(count>4)throw DmlFailure{"linalg front layer count",E_INVALIDARG};
+    D3D12_FEATURE_DATA_SHADER_MODEL sm{static_cast<D3D_SHADER_MODEL>(0x6a)};if(FAILED(g_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL,&sm,sizeof(sm)))||unsigned(sm.HighestShaderModel)<0x6a){log("linalg_front_unavailable\n");return;}
+    ID3DBlob*code=nullptr;dmlrt_check("linalg front shader",runtime_read_shader(LR"(D:\DLSSNR-Lab\matrix-probe\c32_ffn_linalg.cso)",&code));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=g_front_root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};dmlrt_check("linalg front pso",g_device->CreateComputePipelineState(&pd,IID_PPV_ARGS(&g_front_linalg_pso)));code->Release();
+    dmlrt_check("linalg allocator",g_allocator->Reset());dmlrt_check("linalg list",g_list->Reset(g_allocator,nullptr));std::vector<ID3D12Resource*>uploads;
+    for(UINT b=0;b<count;b++){wchar_t name[128];swprintf(name,128,L"matrix-probe\\block%u-ffn-matrices.f16",b+1);auto data=read_runtime_file(name);if(data.size()!=8192)throw DmlFailure{"linalg matrix size",E_INVALIDARG};g_front_linalg_weights[b]=upload_runtime_resource(data,uploads);D3D12_RESOURCE_BARRIER barrier{};barrier.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;barrier.Transition.pResource=g_front_linalg_weights[b];barrier.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;barrier.Transition.StateBefore=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;barrier.Transition.StateAfter=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;g_list->ResourceBarrier(1,&barrier);}
+    dmlrt_check("linalg close",g_list->Close());ID3D12CommandList*lists[]={g_list};g_queue->ExecuteCommandLists(1,lists);ID3D12Fence*fence=nullptr;dmlrt_check("linalg fence",g_device->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));dmlrt_check("linalg signal",g_queue->Signal(fence,1));dmlrt_check("linalg event",fence->SetEventOnCompletion(1,g_event));if(WaitForSingleObject(g_event,30000)!=WAIT_OBJECT_0)throw DmlFailure{"linalg upload wait",HRESULT_FROM_WIN32(ERROR_TIMEOUT)};fence->Release();for(auto*r:uploads)r->Release();
+    D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,count*7,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};dmlrt_check("linalg heap",runtime_create_descriptor_heap(g_device,&hd,IID_PPV_ARGS(&g_front_linalg_heap)));auto cpu=runtime_cpu_handle(g_front_linalg_heap);UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);constexpr UINT64 tensor=960ull*544*32*4,qkv=960ull*544*48*4;
+    auto srv=[&](ID3D12Resource*r,UINT64 bytes,bool raw){D3D12_SHADER_RESOURCE_VIEW_DESC v{};v.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;v.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;v.Buffer.NumElements=UINT(bytes/4);if(raw){v.Format=DXGI_FORMAT_R32_TYPELESS;v.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;}else v.Buffer.StructureByteStride=4;g_device->CreateShaderResourceView(r,&v,cpu);cpu.ptr+=step;};
+    auto uav=[&](ID3D12Resource*r,UINT64 bytes){D3D12_UNORDERED_ACCESS_VIEW_DESC v{};v.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;v.Buffer.NumElements=UINT(bytes/4);v.Buffer.StructureByteStride=4;g_device->CreateUnorderedAccessView(r,nullptr,&v,cpu);cpu.ptr+=step;};
+    for(UINT b=0;b<count;b++){srv(g_front_weights[b],41220,true);srv(b?g_front_main[(b-1)&1]:g_block0_hwc,tensor,false);srv(g_front_linalg_weights[b],8192,true);srv(g_front_qkv,qkv,false);uav(g_front_feature,tensor);uav(g_front_main[b&1],tensor);uav(g_front_qkv,qkv);}
+    g_front_linalg_count=count;log("linalg_front_layers=%u\n",count);
+}
+
 void initialize_blocks5_8() {
     constexpr UINT L=4,T=130560,C=64,H=96,Q=96,A=32;
     dmlrt_check("s64 allocator reset",g_allocator->Reset());dmlrt_check("s64 list reset",g_list->Reset(g_allocator,nullptr));
@@ -702,7 +721,7 @@ bool record_blocks1_4(ID3D12GraphicsCommandList *commands, unsigned long long fr
     if(g_front_submissions.load()){transition(g_front_feature,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_qkv,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_main[0],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_main[1],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
     transition(g_block0_hwc,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     ID3D12DescriptorHeap *heaps[]={g_front_heap};runtime_set_descriptor_heaps(commands,1,heaps);commands->SetComputeRootSignature(g_front_root);const UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);constexpr UINT groups=(960*544+63)/64;
-for(UINT b=0;b<4;b++){if(b){transition(g_front_feature,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_qkv,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(b>=2)transition(g_front_main[b&1],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}auto gpu=runtime_gpu_handle(g_front_heap);gpu.ptr+=UINT64(b)*7*step;commands->SetComputeRootDescriptorTable(0,gpu);commands->SetPipelineState(g_front_pso[b][0]);{const UINT fgroups=groups*(g_batched_c32_ffn?16:1);commands->Dispatch(std::min(fgroups,65535u),(fgroups+65534)/65535,1);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,18+b*3);transition(g_front_feature,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);commands->SetPipelineState(g_front_pso[b][1]);{const UINT qgroups=groups*(g_parallel_c32_qkv?16:1);commands->Dispatch(std::min(qgroups,65535u),(qgroups+65534)/65535,1);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,19+b*3);transition(g_front_qkv,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(g_split_attention[0][0]&&(b!=0)){commands->SetPipelineState(g_split_attention[0][0]);commands->Dispatch(119*67,1,1);commands->SetPipelineState(g_split_attention[0][1]);commands->Dispatch(120+68-1,1,1);}else{commands->SetPipelineState(g_front_pso[b][2]);commands->Dispatch(groups,1,1);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,20+b*3);transition(g_front_main[b&1],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
+for(UINT b=0;b<4;b++){if(b){transition(g_front_feature,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);transition(g_front_qkv,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(b>=2)transition(g_front_main[b&1],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}auto gpu=runtime_gpu_handle(g_front_heap);gpu.ptr+=UINT64(b)*7*step;const bool matrix=b<g_front_linalg_count;if(matrix){ID3D12DescriptorHeap*h[]={g_front_linalg_heap};runtime_set_descriptor_heaps(commands,1,h);auto alt=runtime_gpu_handle(g_front_linalg_heap);alt.ptr+=UINT64(b)*7*step;commands->SetComputeRootDescriptorTable(0,alt);commands->SetPipelineState(g_front_linalg_pso);}else{commands->SetComputeRootDescriptorTable(0,gpu);commands->SetPipelineState(g_front_pso[b][0]);}{const UINT fgroups=groups*((!matrix&&g_batched_c32_ffn)?16:1);commands->Dispatch(std::min(fgroups,65535u),(fgroups+65534)/65535,1);}if(matrix){ID3D12DescriptorHeap*h[]={g_front_heap};runtime_set_descriptor_heaps(commands,1,h);commands->SetComputeRootDescriptorTable(0,gpu);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,18+b*3);transition(g_front_feature,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);commands->SetPipelineState(g_front_pso[b][1]);{const UINT qgroups=groups*(g_parallel_c32_qkv?16:1);commands->Dispatch(std::min(qgroups,65535u),(qgroups+65534)/65535,1);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,19+b*3);transition(g_front_qkv,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(g_split_attention[0][0]&&(b!=0)){commands->SetPipelineState(g_split_attention[0][0]);commands->Dispatch(119*67,1,1);commands->SetPipelineState(g_split_attention[0][1]);commands->Dispatch(120+68-1,1,1);}else{commands->SetPipelineState(g_front_pso[b][2]);commands->Dispatch(groups,1,1);}if(g_gpu_profile.state.load()==1)g_gpu_profile.Mark(commands,20+b*3);transition(g_front_main[b&1],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
     const auto submitted=++g_front_submissions;if(submitted==1||submitted%120==0)log("front_blocks1_4_submit=%llu ffx_frame=%llu block4=%p\n",submitted,frame,g_front_main[1]);return true;
 }
 
@@ -970,6 +989,7 @@ DWORD WINAPI initialize_worker(void *) {
                 const wchar_t* passes[]={L"ffn",L"qkv",L"attention"};for(UINT i=0;i<3;i++){wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\shader-cache\block70-packed-feature-%ls.cso)",passes[i]);ID3DBlob *code=nullptr;dmlrt_check("packed feature read",runtime_read_shader(path,&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=g_b70.body_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};ID3D12PipelineState *candidate=nullptr;dmlrt_check("packed feature pso",g_device->CreateComputePipelineState(&p,IID_PPV_ARGS(&candidate)));g_b70.body_pso[i]->Release();g_b70.body_pso[i]=candidate;code->Release();}
                 UINT step=g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);auto cpu=runtime_cpu_handle(g_b70.body_heap);cpu.ptr+=2ull*step;D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Format=DXGI_FORMAT_R32_TYPELESS;sv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;sv.Buffer.NumElements=1920*1088*16;g_device->CreateShaderResourceView(g_b70.feature,&sv,cpu);cpu.ptr+=2ull*step;D3D12_UNORDERED_ACCESS_VIEW_DESC uv{};uv.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uv.Format=DXGI_FORMAT_R32_TYPELESS;uv.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_RAW;uv.Buffer.NumElements=sv.Buffer.NumElements;g_device->CreateUnorderedAccessView(g_b70.feature,nullptr,&uv,cpu);g_parallel_qkv=true;g_group_ffn=false;log("block70_feature=packed_fp16\n");
             }
+            initialize_linalg_front();
             D3D12_HEAP_PROPERTIES display_heap{};display_heap.Type=D3D12_HEAP_TYPE_DEFAULT;
             dmlrt_check("display resource",g_device->CreateCommittedResource(&display_heap,D3D12_HEAP_FLAG_NONE,&display_desc,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&g_display_texture)));
             auto display_cpu=runtime_cpu_handle(g_b70.output_heap[0]);display_cpu.ptr+=2ull*g_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);D3D12_UNORDERED_ACCESS_VIEW_DESC display_uav{};display_uav.ViewDimension=D3D12_UAV_DIMENSION_TEXTURE2D;display_uav.Format=display_desc.Format;g_device->CreateUnorderedAccessView(g_display_texture,nullptr,&display_uav,display_cpu);
@@ -995,6 +1015,18 @@ DWORD WINAPI initialize_worker(void *) {
     return SUCCEEDED(hr) && SUCCEEDED(removed) ? 0 : 1;
 }
 
+bool on_create_device(reshade::api::device_api api,uint32_t &) {
+    if(api!=reshade::api::device_api::d3d12||runtime_bundle_present()||GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-game-sdk721.txt)")==INVALID_FILE_ATTRIBUTES)return false;
+    static std::atomic<bool> attempted{false};if(attempted.exchange(true))return false;
+    if(g_device){log("sdk721_skip_existing_device\n");return false;}
+    const GUID clsid={0x7cda6aca,0xa03e,0x49c8,{0x94,0x58,0x03,0x34,0xd2,0x0e,0x07,0xce}};
+    using GetInterfaceFn=HRESULT(WINAPI*)(REFCLSID,REFIID,void**);HMODULE d3d=GetModuleHandleW(L"d3d12.dll");auto get_interface=d3d?reinterpret_cast<GetInterfaceFn>(GetProcAddress(d3d,"D3D12GetInterface")):nullptr;
+    ID3D12SDKConfiguration *configuration=nullptr;HRESULT get=get_interface?get_interface(clsid,IID_PPV_ARGS(&configuration)):HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND),set=E_ABORT,experimental=E_ABORT;
+    if(SUCCEEDED(get)){set=configuration->SetSDKVersion(721,".\\DLSS5-D3D12-721\\");configuration->Release();}
+    if(SUCCEEDED(set)){const GUID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};experimental=D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr);}
+    log("sdk721_before_device get=%08x set=%08x experimental=%08x\n",unsigned(get),unsigned(set),unsigned(experimental));return false;
+}
+
 void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
     if (!resize) return;
     auto *native = reinterpret_cast<IDXGISwapChain3 *>(
@@ -1008,6 +1040,7 @@ void on_init_swapchain(reshade::api::swapchain *swapchain, bool resize) {
     }
     if(!g_main_swapchain){g_main_swapchain=native;g_main_swapchain->AddRef();}
     if(!g_device){g_device=device;device=nullptr;}
+    D3D12_FEATURE_DATA_SHADER_MODEL sm{static_cast<D3D_SHADER_MODEL>(0x6a)};HRESULT sm_hr=g_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL,&sm,sizeof(sm));UINT tier=0;HRESULT tier_hr=g_device->CheckFeatureSupport(static_cast<D3D12_FEATURE>(77),&tier,sizeof(tier));log("game_device_sm hr=%08x returned=%x linalg_hr=%08x tier=%x\n",unsigned(sm_hr),unsigned(sm.HighestShaderModel),unsigned(tier_hr),tier);
     DXGI_SWAP_CHAIN_DESC desc{};
     native->GetDesc(&desc);
     log("resident_start swapchain=%p device=%p size=%ux%u format=%u\n",
@@ -1092,11 +1125,13 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID) {
             return FALSE;
         DeleteFileW(kLog);
         if (!reshade::register_addon(instance)) return FALSE;
+        reshade::register_event<reshade::addon_event::create_device>(on_create_device);
         reshade::register_event<reshade::addon_event::init_swapchain>(on_init_swapchain);
         reshade::register_event<reshade::addon_event::present>(on_present);
         if (HANDLE thread = CreateThread(nullptr, 0, ffx_hook_worker, nullptr, 0, nullptr))
             CloseHandle(thread);
     } else if (reason == DLL_PROCESS_DETACH) {
+        reshade::unregister_event<reshade::addon_event::create_device>(on_create_device);
         reshade::unregister_event<reshade::addon_event::present>(on_present);
         reshade::unregister_event<reshade::addon_event::init_swapchain>(on_init_swapchain);
         reshade::unregister_addon(instance);
