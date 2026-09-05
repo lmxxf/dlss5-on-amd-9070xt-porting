@@ -80,5 +80,10 @@ void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
         den+=e;
         [unroll]for(uint d=0;d<16;d++)a[d]+=e*values[k*16+d];
     }
-    [loop]for(uint c=0;c<32;c++){float z=0;[unroll]for(uint d=0;d<16;d++)z+=(a[d]/den)*W(5632+c*16+d);outp[t*32+c]=F(z+feat_in[t*32+c]*W(10273+c));}
+#if UNROLL_PROJECT
+    [unroll]
+#else
+    [loop]
+#endif
+    for(uint c=0;c<32;c++){float z=0;[unroll]for(uint d=0;d<16;d++)z+=(a[d]/den)*W(5632+c*16+d);outp[t*32+c]=F(z+feat_in[t*32+c]*W(10273+c));}
 }

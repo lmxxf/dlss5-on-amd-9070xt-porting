@@ -2101,6 +2101,16 @@ profile扩大为49点，额外量首个ViT层的六段：FFN0.2014、QKV+pack0.0
 
 寄存器分数快取进入洞窟复验：cadence19.200/18.939/19.000fps，display_residual generation2400 mode0，截图未见旧绿色方格。实际帧率仍约19fps，不能将微小GPU收益包装成明显帧率提升。
 
+### 2026-09-05 前端权重本地化
+
+先测试block70 attention output projection 32通道循环全展开，attention从2.48768退化为3.54792ms，全网47.33492；build_cached_scores.ps1保留-UnrollProject复现门，默认0且已重新编译恢复。
+
+检查前后C32 FFN耗时差异，发现front四份41220-byte参数仍为UPLOAD heap，而decoder已使用DEFAULT heap。initialize_blocks1_4改为启动期CopyBufferRegion到DEFAULT，显式COPY_DEST→UAV→NON_PIXEL_SHADER_RESOURCE，一次独立fence确认上传后释放staging。没有每帧copy、权重重算或精度变化。独立fence避免复用已有初始化fence值导致过早放行。
+
+部署SHA4d001bfc6b04a77be080b789cb1820614dcd0b3ebd7da3fb5acf60b3363b639d，front FFN0.5538/0.51956/0.51644/0.51548ms（此前约0.64–0.68），front合计6.3656ms，全网45.41328ms。decoder保持约0.52ms/FFN，前后差距收敛。30fps仍未达成。
+
+本地权重版洞窟复验：加载期cadence低至4.793fps，加载结束稳态19.000/19.139/19.143fps，display_residual generation2160 mode0；截图未见旧绿色方格。仅报告稳态约19fps，不把本次GPU局部提速夸大为显著端到端增长。下一方向可检查C32量化activation的存储带宽；DirectML32整段及裸FFN路线已有失败记录（directml-swin32-validation.json及本日志早期条目），不应从头重复相同候选。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
