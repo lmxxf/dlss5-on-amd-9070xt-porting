@@ -2173,6 +2173,12 @@ Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https:
 
 官方下载地址：https://drivers.amd.com/drivers/amd-software-adrenalin-edition-26.10.07.02-win11-rc7-agility-sdk.exe 。完整包874669800 bytes，SHA256 cca61a1d5839b8b413b5dba4d932ad16504cdc54f81de475a6e08f7ba4fa08a2。CDN部分Range曾返回567，保留已完成部分后补齐；准备脚本再次核对长度、hash和Windows AMD Authenticode，验证通过才解包。此条记录时尚未执行安装，也未改Intel集显/游戏/发行包。
 
+### 2026-09-05 预览驱动安装成功，矩阵接口开放
+
+完整包及解包Setup.exe均通过AMD Authenticode（签名者Advanced Micro Devices，thumbprint33D35682079E201671B738B7209B4586103BC271）。以一次性SYSTEM任务执行官方Setup.exe -INSTALL -OUTPUT ... -LOG ...，未传-boot或清理/恢复出厂参数。独立driver-install-status.json记录PID42100，06:03:09Z启动、06:04:11Z退出0；厂商ResultCode0。驱动现为32.0.31007.2048、oem25.inf；开机时间仍2026-08-31，未重启，SSH正常。
+
+安装后立即重跑721探针：experimental_hr0、device_hr0、实际加载Lab私有D3D12Core；请求SM6.10现返回6.10，LINEAR_ALGEBRA_SUPPORT tier从0变为0x10（Tier1.0）。这证明预览驱动已暴露矩阵接口，不等于神经网络算子已迁移或30fps达标。后续要用DXC1.10实际编译/运行矩阵算子，验证精度和延迟。已发布ZIP及游戏addon未修改，回退驱动备份仍保留。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
