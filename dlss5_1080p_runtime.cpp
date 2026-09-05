@@ -1065,6 +1065,19 @@ void on_present(reshade::api::command_queue *queue, reshade::api::swapchain *swa
     auto*native=reinterpret_cast<IDXGISwapChain3*>(static_cast<uintptr_t>(swapchain->get_native()));
     if(native==g_main_swapchain&&(n==1||n%600==0)){const UINT index=native->GetCurrentBackBufferIndex();ID3D12Resource*b=nullptr;if(SUCCEEDED(native->GetBuffer(index,IID_PPV_ARGS(&b)))){const auto d=b->GetDesc();log("present_backbuffer=%llu index=%u size=%llux%u format=%u\n",n,index,(unsigned long long)d.Width,d.Height,(UINT)d.Format);b->Release();}}
     const auto generation=g_b70_submissions.load();
+    // Present/overlay FPS is not neural-output FPS. Report both progress counters,
+    // including when initialization never starts (no FFX dispatches).
+    static ULONGLONG health_tick=0, health_present=0, health_generation=0, health_display=0;
+    const ULONGLONG health_now=GetTickCount64();
+    if(!health_tick){health_tick=health_now;health_present=n;health_generation=generation;health_display=g_display_generation;}
+    else if(health_now-health_tick>=5000){
+        const auto neural_delta=generation-health_generation;
+        const auto display_delta=g_display_generation-health_display;
+        const bool active=g_ready.load()&&g_frame_contract_ready.load()&&neural_delta&&display_delta&&g_output_mode==0;
+        log("runtime_health neural_active=%u presents=%llu network_submissions=%llu display_generation_delta=%llu elapsed_ms=%llu mode=%u ffx_total=%llu (submission_progress_not_gpu_completion)\n",
+            active?1u:0u,n-health_present,neural_delta,display_delta,health_now-health_tick,g_output_mode,g_ffx_frames.load());
+        health_tick=health_now;health_present=n;health_generation=generation;health_display=g_display_generation;
+    }
     if(native==g_main_swapchain&&g_gpu_profile.state.load()==2){
         auto *native_queue=reinterpret_cast<ID3D12CommandQueue*>(queue->get_native());
         if(SUCCEEDED(native_queue->GetTimestampFrequency(&g_gpu_profile.frequency))&&SUCCEEDED(native_queue->Signal(g_gpu_profile.fence,1)))g_gpu_profile.state.store(3);

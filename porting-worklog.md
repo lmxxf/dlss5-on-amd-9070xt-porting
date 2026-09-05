@@ -2213,6 +2213,10 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 结束该游戏进程后，关闭尾端两个矩阵开关（移为.txt.disabled），恢复私有SDK721及前端四层配置。当前测试DLL SHA b8a35f0635bda3742d62c734c2eefa59d9babb844ddbff4a4683c2d989dc413b，仍含未验收尾端代码但开关关闭；不是逐字节旧DLL。新PID38532已记录present600，FFX仍0，继续排查游戏实际升频路径。未改游戏画质INI、未开插帧、未重启机器。inspect_game_windows.ps1在交互session枚举真实窗口，避免将SSH会话看不到窗口误判为退出。
 
+补充对照：Engine.ini原文件备份matrix-probe\Engine-before-native-fsr-test.ini；按AMD官方UE插件说明（https://gpuopen.com/learn/ue-fsr3/）临时设置FSR3.Enabled=1、UseNativeDX12=1、UseRHI=0、FI.Enabled=0。PID42208进入实际游戏后仍FFX0，此测试不支持“只需强制原生后端即可修复”的假设，也不证明该游戏版本接受了这些CVar。游戏内图形UI确认升频模式FSR3、质量档“质量”；没有通过菜单更改画质值。测试后已恢复Engine.ini备份并结束游戏，不留下强制CVar。
+
+新增runtime_health每5秒分开报告Present、网络提交及显示generation进展；未初始化、无FFX或对照模式不标为neural_active。明确这些是提交进展，不是GPU完成证明或实际显示帧时间。该日志改动交叉编译通过，但尚未部署到游戏；当前游戏文件仍为b8a35f开发版，尾端两开关关闭。入口未调用的根因尚未解决、真实30fps仍未达成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
