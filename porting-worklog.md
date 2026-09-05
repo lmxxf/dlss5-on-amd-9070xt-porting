@@ -2579,6 +2579,14 @@ NativeC64允许256通道，沿用参数化三阶段shader及每头32维。Native
 
 README同步当前前缀范围。游戏DLL、公开ZIP仍未更新；后续C256移位链/DS、更深网络及第0层旁路2个差异仍待处理。当前只是block0..15特征链实机正确，最终剑星RGB/角色面部效果验收仍未完成，目标active。
 
+### 2026-09-06 C256普通H4窗口重复规则与block16..21 CPU逐值闭合
+
+读取原launch序列，block16..21为XY/X/Y/none/XY/X移位，记录均689232bytes。首次直接复用inpview的H4补零规则，block16只有32.70% exact。diagnose_native_c256_plain.py拆解发现FFN-only逐值一致，但attention-only/uniform有明显差异；相同输入明确补成H8后，普通原kernel又与CPU逐值一致。因此差异不是三矩阵FFN或权重推导失败，而是plain H4半窗口行为与inpview不同。
+
+probe_native_c256_half_attention.py将V/P置单连接、FFN identity，以常量和单点local key8为输入。H4普通kernel：常量输出1而非补零预期0.5，单点均匀输出1/32而非1/64；对key8和缺失key40分别加bias8，query0同为0.875，证明缺失半窗口重复了前半窗口的值，不是仅屏蔽invalid key。H12尾窗口控制不同：常量0.5，单点1/64，对缺失key40加bias后仅0.001953125，仍为补零。两档六种控制均有固定结果assert，不能把H4整图退化规则推广为所有尾端半窗口重复。
+
+check_native_c64_shift.py扩展256及ceil窗口数，仅对C256普通kernel且有效height=4按行模4填充（X越界仍补零）；inpview block15的补零规则保持不变。block16..21各8192值全部与原CUBIN逐值相同，MAE/max0。此轮尚未接GPU，实际AMD闭合范围仍block0..15；下一步GPU包装需显式区分plain H4重复与inpview H4补零，游戏DLL/公开包未改，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
