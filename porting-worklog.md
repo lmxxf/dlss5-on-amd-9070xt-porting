@@ -2087,6 +2087,12 @@ block1_ffn_sm6_fp32.hlsl新增BIT_QUANT可选实现：保留subnormal的1/512舍
 
 enable-bit-quant.txt仅在HWC模式且未启用batch4时替换9个C32 FFN。热身profile全网48.0478ms，front7.99204、decoder C32 7.82368、block70 6.73472（FFN2.14184），相较上样本48.45452ms收益小且存在运行波动。删除候选标记、默认保留原量化HWC路径；源码及build_bit_quant.ps1保留，GPU数值对照未做，不能宣称精度验证完成。当前DLL SHAebef8b0daba8ff934709c92c2e9ea00676b5e3f6f38ec75418e860ba50107f62包含上述可选路径与HWC开关组合保护。
 
+### 2026-09-05 C32移位attention边界拆分
+
+共享移位核此前慢于原PSO；本轮将120×68窗口分为119×67=7973个内部窗口与187个边界窗口，两次dispatch写不重叠区域。内部核编译时消去region mask，边界核保持原mask及循环位移。索引枚举验证8160个窗口无重复、无遗漏；未跳过像素或attention项。新增build_split_attention.ps1及enable-split-attention.txt启动选择，front三层和decoder两层移位attention使用此路径。
+
+部署SHAf120fdbc5c8ce359ab30643a11ff0cdad5fa7a546d1ad731435041ff8e151908，GPU profile移位attention各层0.73964–0.75324ms（旧约1.1–1.3），front6.89848、decoder C32 7.1784、全网46.3954ms。实际洞窟连续窗口19.000/19.000/19.139fps，display_residual generation1560 mode0；截图未见此前绿色方格。保留该配置。画面检查与窗口枚举不等于逐元素GPU精度对照，30fps仍未达成。下一候选是缓存attention score，避免softmax两遍循环重复计算Q·K，需衡量LDS增加对占用率的影响。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

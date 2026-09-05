@@ -2,6 +2,8 @@
 
 ## 当前结果
 
+**2026-09-05 最新运行状态：** 1080p常驻游戏链已完整执行blocks0–70，实际洞窟场景约19.0fps，未见此前满屏绿色方格。block70 HWC prefix及C32移位窗口边界拆分后全网GPU时间46.40ms（不含FSR及显示合成），30fps目标仍未完成。当前优化与失败候选以`porting-worklog.md`末尾为准；下文保留历次移植里程碑，不应把早期“尚未接入”当作当前状态。
+
 严格审计后的固定输入离线移植已经完成。链路从真正的seq0 prefill数值输入开始，在RX9070XT连续执行blocks0–69，不注入NVIDIA中间activation；block70由四层HLSL spatial effective kernel完成。最终256×144内容ROI见`dlss5-seq0-to-rgb-amd-final.png`：checkerboard未训练像素Pearson correlation 0.918201、MAE 0.014286，AMD全量cosine 0.927845，block70最新耗时3.459ms。完整证据见`dlss5-amd-final-validation.json`。范围是固定输入离线correctness port，不宣称跨帧泛化或游戏内实时可用。
 
 动态产品化正在进行：`d3d12_dynamic_resource_probe.cpp`已在RX9070XT的《剑星》进程内稳定识别3840×2160主swapchain，并通过ReShade immediate command list闭合逐帧copy-in／AMD compute／copy-out。进一步直接hook官方`ffxDispatch`取得当前帧权威Color RGBA16F、Depth R32F、Motion RG16F与FSR输出合同；一张真实游戏帧已在AMD上连续执行DLSS5-derived block0与blocks1–3，四段耗时94.361/306.832/231.226/306.251ms。证据见`dlss5-amd-dynamic-milestone.json`。严格状态仍是未完成：blocks4–70尚未接入resident addon，当前屏幕compute仅为回写链诊断，不能称为DLSS5最终输出。

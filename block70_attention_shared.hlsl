@@ -7,6 +7,9 @@
 #ifndef SHIFTED
 #define SHIFTED 0
 #endif
+#ifndef WINDOW_SET
+#define WINDOW_SET 0
+#endif
 ByteAddressBuffer w:register(t0);
 StructuredBuffer<float> inp:register(t1),feat_in:register(t2),qkv_in:register(t3);
 RWStructuredBuffer<float> feat:register(u0),outp:register(u1),qkv_out:register(u2);
@@ -17,6 +20,13 @@ float F(float x){if(x==0)return 0;float s=x<0?-1:1,a=abs(x);if(a<.015625)return 
 [numthreads(64,1,1)]
 void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
     uint window=group.x+group.y*65535,query=lane.x;
+#if WINDOW_SET == 1
+    if(window>=(WIDTH/8-1)*(HEIGHT/8-1))return;
+    window=(window/(WIDTH/8-1))*(WIDTH/8)+window%(WIDTH/8-1);
+#elif WINDOW_SET == 2
+    if(window>=WIDTH/8+HEIGHT/8-1)return;
+    window=window<HEIGHT/8-1?window*(WIDTH/8)+WIDTH/8-1:(HEIGHT/8-1)*(WIDTH/8)+window-(HEIGHT/8-1);
+#endif
     if(window>=(WIDTH/8)*(HEIGHT/8))return;
     uint wx=(window%(WIDTH/8))*8,wy=(window/(WIDTH/8))*8;
     uint rx=wx+query%8,ry=wy+query/8;
@@ -32,13 +42,13 @@ void main(uint3 group:SV_GroupID,uint3 lane:SV_GroupThreadID){
     GroupMemoryBarrierWithGroupSync();
     float qnorm=rsqrt(max(qq,1e-12)),scale=W(10240),mx=-3.4e38;
     [loop]for(uint k=0;k<64;k++){
-        bool allowed=!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
+        bool allowed=WINDOW_SET==1||!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
         float dot=0;[unroll]for(uint d=0;d<16;d++)dot+=q[d]*keys[k*16+d];
         mx=max(mx,allowed?dot*qnorm*key_norm[k]*scale+W(6144+query*64+k):-3.4e38);
     }
     float den=0,a[16];[unroll]for(uint d=0;d<16;d++)a[d]=0;
     [loop]for(uint k=0;k<64;k++){
-        bool allowed=!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
+        bool allowed=WINDOW_SET==1||!SHIFTED||(region(rx,WIDTH)==region(wx+k%8,WIDTH)&&region(ry,HEIGHT)==region(wy+k/8,HEIGHT));
         float dot=0;[unroll]for(uint d=0;d<16;d++)dot+=q[d]*keys[k*16+d];
         float e=allowed?exp(dot*qnorm*key_norm[k]*scale+W(6144+query*64+k)-mx):0;den+=e;
         [unroll]for(uint d=0;d<16;d++)a[d]+=e*values[k*16+d];
