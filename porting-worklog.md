@@ -2179,6 +2179,8 @@ Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https:
 
 安装后立即重跑721探针：experimental_hr0、device_hr0、实际加载Lab私有D3D12Core；请求SM6.10现返回6.10，LINEAR_ALGEBRA_SUPPORT tier从0变为0x10（Tier1.0）。这证明预览驱动已暴露矩阵接口，不等于神经网络算子已迁移或30fps达标。后续要用DXC1.10实际编译/运行矩阵算子，验证精度和延迟。已发布ZIP及游戏addon未修改，回退驱动备份仍保留。
 
+矩阵接口实际计算验证：部署私有DXC v1.10.2605.24（dxc_preview_2026_05_22.zip），编译matrix_smoke.hlsl为cs_6_10/HLSL2021/native16。独立d3d12_matrix_smoke.cpp在721 runtime下调用LinAlg Thread Matrix×Vector：256条32维向量乘32×32 FP16全1矩阵，8192个GPU输出逐值匹配CPU明确答案，mismatches=0，首值16.5、末值132。不是只读功能旗标，也不是WARP；选择VendorId1002硬件adapter。该合成小测试不是FFN性能/真实模型精度验证，下一步仍需实际权重算子比较及游戏device接入。一次性安装任务已在确认退出0后移除；Intel驱动版本未变。WMI当前显示物理输出3840×2160，截图工具未显式DPI-aware，不能据旧截图尺寸断定何时变化；后续游戏测试仍需检查真实swapchain1920×1080，未擅自调整显示设置。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
