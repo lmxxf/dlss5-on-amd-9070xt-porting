@@ -1,0 +1,11 @@
+{
+ "scope":"Lab input mix plus original preblock FFN, attention disabled; not final image validation",
+ "dimensions":[32,128,32],
+ "matrix_storage":"E4M3, not FP16",
+ "weight_recovery":"Binary-coded byte probes, 4096 connections per matrix, bijective mappings; coefficients copied directly from original bytes",
+ "heldout_rgb_tiles":256,
+ "output_values":524288,
+ "cpu_vs_original":{"correlation":0.9999909135146476,"exact_fraction":0.99517822265625,"mae":0.0005858354270458221,"max_error":4.0},
+ "amd_vs_original":{"cosine":0.999990999933,"exact_fraction":0.99517822265625,"mae":0.000585835427,"max_error":4.0,"nonfinite":0,"submit_to_fence_ms":2.177},
+ "status":"Connectivity recovered; remaining arithmetic differences and attention not yet closed. Do not deploy as a complete replacement."
+}

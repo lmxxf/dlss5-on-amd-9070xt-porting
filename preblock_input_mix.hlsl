@@ -35,8 +35,28 @@ void main(uint3 id:SV_DispatchThreadID){
  [unroll]for(uint zero_channel=16;zero_channel<32;zero_channel++)output[p*32+zero_channel]=0;
  return;
 #endif
+ float prefix[32];
  [loop]for(uint channel=0;channel<32;channel++){
   float sum=0;[unroll]for(uint i=0;i<16;i++)sum+=features[i]*weights[channel*16+i];
-  output[p*32+channel]=q8(half_round(sum));
+  prefix[channel]=half_round(sum);
  }
+#if FULL_FFN
+ float hidden[128];
+ [loop]for(uint row=0;row<128;row++){
+  float sum=0;[loop]for(uint i=0;i<32;i++)sum+=q8(prefix[i])*weights[512+row*32+i];
+  float expanded=half_round(sum),gate=clamp(expanded,-4.0,4.0);
+  float polynomial=half_round(gate*half_round(abs(gate)*(-.055908203125)+.447265625)+.89453125);
+  hidden[row]=q8(half_round(expanded*polynomial));
+ }
+ [loop]for(uint c=0;c<32;c++){
+  float accum=0;
+  [unroll]for(uint group=0;group<4;group++){
+   float sum=0;[loop]for(uint i=0;i<32;i++)sum+=hidden[group*32+i]*weights[4608+c*128+group*32+i];
+   accum=half_round(accum+sum);
+  }
+  output[p*32+c]=q8(half_round(accum+prefix[c]*weights[8704+c]));
+ }
+#else
+ [unroll]for(uint c=0;c<32;c++)output[p*32+c]=q8(prefix[c]);
+#endif
 }

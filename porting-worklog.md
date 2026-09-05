@@ -2313,6 +2313,16 @@ prepare_full_post_prefix.py合并原main512→2048与本轮重新恢复的full-s
 
 当前验证范围严格是CTA0、固定helper参数、单Color纹理的输入混合；未完成live多纹理/全局边界/完整FFN-attention/DS及skip接线。新shader仍是Lab测试，不将它冒充完整block0，不覆盖游戏DLL。游戏安装仍b210a431，画质问题仍未解决，目标active。
 
+### 2026-09-06 FFN矩阵类型与宽度纠错：32→128→32
+
+最初half-one探针只看到奇数输入单独响应，曾怀疑门控关系；进一步读SASS确认主体使用QMMA.16832.F16.E4M3.E4M3。前8192字节实际是两张FP8矩阵，不是4096个FP16权重。写入FP16 1.0的bytes00/3c分别是FP8 0与1.5，正是半数响应与错误幅度来源，门控假设撤回，未写入正式模型。
+
+run_original_preblock_oracle增加ffn1-byte-scan/ffn2-byte-scan，以FP8 0x38=1逐字节探测。recover_preblock_ffn_layout.py用5位输入编码、7位隐藏编码与输出通道读口，恢复W1全部4096条、W2全部4096条连接；两边映射均完整一一对应，隐藏维为128，不是旧实现64。系数直接E4M3解码原记录，无拟合。另32-slot FFN skip探针恢复half向量到逻辑channel的顺序[0,1,4,5,8,9,12,13,2,3,6,7,10,11,14,15,16,17,20,21,24,25,28,29,18,19,22,23,26,27,30,31]。
+
+preblock_ffn_reference.py与preblock_input_mix.hlsl的FULL_FFN测试路径接真实128隐藏宽度，使用原输入混合、FP8 operand、FP16结果、clamp仅用于多项式门而线性乘数保留未clamp值、逐K32投影累加舍入和原skip。256张独立RGB tiles对原FFN-only：CPU corr0.9999909135、99.517822% exact、MAE0.0005858354、max4；AMD同误差/精确率、cosine0.999990999933、nonfinite0、GPU2.177ms。还有量化与累加差异，未声称逐值闭合。摘要preblock-ffn-validation.json；矩阵布局与原始GPU结果只在release目录。
+
+block0-cubin-layout.json更正矩阵storage/shape；SASS与字节容量还指向QKV三张32×32 FP8、projection32×32 FP8，而非旧head-dim16，此两项待独立basis验证。必须审其余主体层是否存在同样类型/维度错误，不能只替换第0层就宣称原模型复现。当前游戏DLL仍b210a431，未把未完成attention的实验路径注入，网格/最终画质目标保持active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
