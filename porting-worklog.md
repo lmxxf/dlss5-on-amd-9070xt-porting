@@ -2141,6 +2141,12 @@ runtime每5秒cadence追加DXGI QueryVideoMemoryInfo（非图像readback），�
 
 arena关闭版洞窟复验19.082/19.219fps，display_residual generation4680 mode0，截图未见原绿色方格；独立d3d12_directml_swin32_resident.cpp语法检查通过，确认共用header默认直通路径仍可编译。
 
+### 2026-09-05 系统DirectX能力探针
+
+新增d3d12_shader_model_probe.cpp，独立进程使用系统D3D12创建9070XT设备，只查询能力，不开启实验特性、不修改注册表、不注入游戏。实际结果：device创建成功；请求SM6.10(0x6a)返回E_INVALIDARG；请求6.9返回6.8；请求6.8成功。此结果限定为当前系统runtime与未开启实验特性的独立device，不是对显卡物理能力或所有Agility版本的否定。
+
+对照前述MiniDXNN官方要求，下一矩阵核心候选需要独立部署preview Agility/DXC并验证实验特性。Windows开发者模式的系统级变更尚未获授权，因此先向用户请求这一实验范围；不修改游戏DLL选型、不更换驱动、不宣称30fps已达成。现有游戏运行配置保持约19fps版本。探针可用x86_64-w64-mingw32-g++ -std=c++17 -O2 -static-libgcc -static-libstdc++ d3d12_shader_model_probe.cpp -o d3d12_shader_model_probe.exe -ld3d12 -ldxgi构建。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
