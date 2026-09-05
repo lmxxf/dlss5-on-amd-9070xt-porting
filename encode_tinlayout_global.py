@@ -14,8 +14,9 @@ def quantize(value: np.ndarray) -> np.ndarray:
     carry=mantissa>=8; encoded_exp=np.minimum(encoded_exp+carry,15);mantissa=np.where(carry,0,mantissa)
     mantissa=np.clip(mantissa,0,7);mantissa=np.where((encoded_exp==15)&(mantissa>6),6,mantissa)
     normal_byte=((encoded_exp<<3)|mantissa).astype(np.uint8)
-    sub=np.clip(np.rint(a*512),0,7).astype(np.uint8)
-    out=sign|np.where(normal,normal_byte,sub);out[a==0]=0
+    # Rounding the largest subnormal may carry into the smallest normal (0x08).
+    sub=np.clip(np.rint(a*512),0,8).astype(np.uint8)
+    out=sign|np.where(normal,normal_byte,sub);out[a>=448]=sign[a>=448]|np.uint8(0x7e);out[a==0]=0
     # E4M3FN finite saturation.
     bad=((out>>3)==15)&((out&7)==7);out[bad]=(out[bad]&0x80)|0x7e
     return out

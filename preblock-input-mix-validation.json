@@ -1,0 +1,12 @@
+{
+  "scope":"Original preblock input mix only; FFN and attention identity controls. Single color texture, CTA0 oracle geometry; not full game validation.",
+  "reference_kernel":"cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8",
+  "tiles":256,
+  "pixels":16384,
+  "output_channels":32,
+  "output_values":524288,
+  "cpu_vs_original":{"exact_fraction":1.0,"max_error":0.0},
+  "amd_gpu_vs_original":{"exact_fraction":1.0,"max_error":0.0,"mae":0.0,"nonfinite":0,"submit_to_fence_ms":0.727},
+  "conditions":["Full original 512-half input-mix region unpacked, no fitted image correction","Three original coordinate/seed hash random fields","Explicit FP16 round-to-nearest-even","E4M3 subnormal carry allowed"],
+  "remaining":["Live texture and parameter contract","Global CTA and boundary validation","Complete preblock FFN and attention","Full-resolution skip and downsample integration","Actual game image validation"]
+}

@@ -526,7 +526,7 @@ StructuredBuffer<float> src:register(t0),b1:register(t1),b2:register(t2),b3:regi
 ByteAddressBuffer raw1:register(t6),raw2:register(t7),raw3:register(t8);StructuredBuffer<float> tile:register(t9);ByteAddressBuffer map:register(t10);
 RWByteAddressBuffer packed:register(u0),h1:register(u1),h2:register(u2);RWStructuredBuffer<float> output:register(u3),hwc:register(u4);
 float H(ByteAddressBuffer b,uint i){uint x=b.Load((i&~1)*2);return f16tof32((x>>((i&1)*16))&65535);}float silu(float x){return x/(1+exp(-x));}
-float F(float x){if(x==0)return 0;float q=x<0?-1:1,a=abs(x);if(a<.015625)return q*min(round(a*512),7)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e+=1;}return q*min(exp2(e)*(1+m/8),448.);}
+float F(float x){if(x==0)return 0;float q=x<0?-1:1,a=abs(x);if(a<.015625)return q*round(a*512)/512;float e=clamp(floor(log2(a)),-6.,8.),m=round((a/exp2(e)-1)*8);if(m>=8){m=0;e+=1;}return q*min(exp2(e)*(1+m/8),448.);}
 [numthreads(64,1,1)]void pack_input(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*192)return;float v[2];[unroll]for(uint z=0;z<2;z++){uint n=i+z,t=n/192,j=n%192;v[z]=src[t*256+(j/3)*4+j%3];}packed.Store(i*2,f32tof16(v[0])|(f32tof16(v[1])<<16));}
 [numthreads(64,1,1)]void post1(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*256)return;h1.Store(i*2,f32tof16(silu(H(raw1,i)+b1[i%256]))|(f32tof16(silu(H(raw1,i+1)+b1[(i+1)%256]))<<16));}
 [numthreads(64,1,1)]void post2(uint3 id:SV_DispatchThreadID){uint i=(id.x+id.y*4194240)*2;if(i>=8160*256)return;h2.Store(i*2,f32tof16(silu(H(raw2,i)+b2[i%256]))|(f32tof16(silu(H(raw2,i+1)+b2[(i+1)%256]))<<16));}

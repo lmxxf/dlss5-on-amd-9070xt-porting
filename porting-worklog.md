@@ -2303,6 +2303,16 @@ prepare_full_post_prefix.py合并原main512→2048与本轮重新恢复的full-s
 
 上述是受控局部随机场正确性证明，尚未验证live种子/全局CTA地址/完整texture与input-mix合同，也没有将随机场随便加入旧代理。之前“RGB-only／四个Gaussian为零”的描述不能作为该CUBIN helper的事实。本轮未改AMD游戏DLL、未动两机游戏状态/存档，当前runtime仍为b210a431、网格未解决，目标继续active。下一步应恢复packed input-mix与完整前端计算，再接全分辨率skip和正确DS，最终进游戏重新做同帧数值及画面验收。
 
+### 2026-09-06 原版输入混合在9070XT逐值一致
+
+以prefix-scan对packed_input_mix做逐权重单位置探测，输入改为非零三色与空间渐变，确定权重slot到channel的映射c=(s//64)*4+(s//32%2)+2*(s//4%2)，feature=(s//8%4)*4+s%4。受控单Color/其余纹理为空的合同下，16个打包输入为[g1,g2,G,B,g0,1,0,1,R,G,0,0,B,R,0,0]，RGB先FP16再中心化/缩放，g来自上一轮原版PRNG；这不是原先猜测的row-major 7→32加3×3 DW。preblock_mix_reference.py用真实512-half混合区组合，256张独立RGB tiles对identity后段原kernel的524288个E4M3输出全exact。
+
+发现E4M3辅助量化器最大次正规数舍入被clip到7，正确应允许进位到code8；另大于最大有限值的输入需要显式SATFINITE，不能指数clip后变回256。encode_tinlayout_global.py修正两项，test_e4m3_quantize.py覆盖正负全部可表示值、所有相邻中点ties-to-even和大值饱和，3项通过。同步修正runtime及旧preblock resident的次正规carry源码；没有据此宣称旧代理已正确。
+
+新增preblock_input_mix.hlsl和d3d12_preblock_mix_test.cpp，在AMD实际生成随机场、RGB变换和32通道混合，不使用MLP。初版97.2929%一致；debug features显示FP16转换约半数比原版低一格，原因是SM5 f32tof16的截断语义。按Microsoft Direct3D浮点转换规范（https://microsoft.github.io/DirectX-Specs/d3d/archive/D3D11_3_FunctionalSpec.htm）及实测改用显式nearest-even位运算，重新执行后524288/524288逐值exact，MAE/RMSE/max均0，GPU0.727ms。原始输入/输出在release/preblock-mix-amd及Lab/matrix-probe/preblock-mix；摘要preblock-input-mix-validation.json。DEBUG_FEATURES只用于中间值诊断，该模式的旧通用host总误差不能当最终混合误差。
+
+当前验证范围严格是CTA0、固定helper参数、单Color纹理的输入混合；未完成live多纹理/全局边界/完整FFN-attention/DS及skip接线。新shader仍是Lab测试，不将它冒充完整block0，不覆盖游戏DLL。游戏安装仍b210a431，画质问题仍未解决，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
