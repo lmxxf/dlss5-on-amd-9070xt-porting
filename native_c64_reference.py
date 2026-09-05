@@ -16,8 +16,8 @@ def contract(C):
  return (0x7010,0xe0a0,0xe0b0,0xa0a0,0xf0b0) if C==64 else (0x18010,0x2c120,0x2c130,0x24120,0x30130)
 
 def unpack(path):
- raw=np.fromfile(path,np.uint8);assert raw.size in (61760,69936,197184)
- C=128 if raw.size==197184 else 64;heads=C//32;hidden=4*C;b2=hidden*C;b3=b2+C*128;end3=b3+C*C
+ raw=np.fromfile(path,np.uint8);assert raw.size in (61760,69936,197184,229936)
+ C=128 if raw.size in (197184,229936) else 64;heads=C//32;hidden=4*C;b2=hidden*C;b3=b2+C*128;end3=b3+C*C
  fs,scale,p_begin,bias_begin,ats=contract(C);root=Path(f'release/native-c{C}')
  fl=np.load(root/'ffn-layout/layout.npz');al=np.load(root/'attention-layout/matrix-layout.npz');bl=np.load(root/'attention-layout/bias-layout.npz')
  ffn={}

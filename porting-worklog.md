@@ -2539,6 +2539,16 @@ native_c64_shift.h/hlsl增加64/128通道参数，显式越界分支和root SRV�
 
 当前AMD闭合范围为block0..13。下一步block14 C128→C256 DS；此小夹具再下采样高度将成为4，后续必须正确处理非8对齐边界或建立更大原版夹具，不能偷偷用错误尺寸绕过。第0层旁路2个值差异及完整更深层/最终RGB仍未完成。游戏DLL/公开ZIP未改，最终剑星画面目标active。
 
+### 2026-09-06 block14 C128→C256下采样直接basis恢复并逐值闭合
+
+提取block14记录229936bytes，SHA6c7a05c82b823e09b0b843f5dd399af7a006410f3587191f62a43205a872724d。原4h ds kernel使用mode8，16×8输入、XY=-4、grid3×2、block32×4，有效main16384bytes、DS8192bytes。主输出CPU逐值一致；DS矩阵起点0x30230，32768bytes到记录末尾。
+
+首次套用FFN W1前256行的布局失败（DS exact2.06%，编码探针出现零通道），该假设撤回。新增recover_native_ds_projection.py，oracle批量扫描支持mode8直接读取DS输出（样本bytes=32×C，而非main的64×C）。主块identity，逐DS字节置FP8 1，以128输入通道7位编码恢复全部32768条输入/输出连接，输出定义遵守已用的16-channel bank及低两位交换坐标约定；连接bijection通过，不拟合系数。
+
+check_native_c64_ds.py参数化64/128，使用独立DS连接表；原block13输出→block14 raw→half横向池化→FP8→128到256投影每K32半精度累计→FP8，DS8192值全部exact、MAE/max0。另两轮base16行编码唯一覆盖256输出通道，无NaN编码/正负零歧义，验证空间恒定及通道bijection。C64→C128也重新独立恢复8192条DS连接，与先前正确的FFN映射恰好完全相同，原block8及两轮编码回归全exact；不能据该巧合推广到C128。
+
+当前block14为CPU原型与原CUBIN验证，尚未接AMD。AMD真实闭合范围仍block0..13，游戏DLL/公开ZIP未修改。下一步GPU DS接线使用本轮实测矩阵，不再复用FFN布局；输出8×4×256，后续非8对齐高度需正确处理，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
