@@ -2399,6 +2399,14 @@ preblock_finish.hlsl及preblock_complete_validation.py同步横向半精度树�
 
 此结论仅覆盖固定128×64夹具的前四层，不能替代其余更宽网络、最终RGB和剑星实机画面验收。AMD游戏DLL、公开ZIP未修改；目标仍active。下一步应恢复block4的移位DS接口及C64层，以当前正确前段继续向全网络推进，同时保留第0层主分支2个差异的待查项。
 
+### 2026-09-06 第4层移位DS原始合同与CPU逐值验证
+
+提取block4原记录22720 bytes（SHA f0d05533694577fa313f2655b00ada84f231f87ebc66ebbb7e8f0f7ea1ac88d2），新增oracle模式6：H/W按原始顺序、Y=-4、optional3接DS输出、optional_dims为half H/W。原CUBIN cc_tinlayout_fused_swin_1h_32_1_ds_fp8在64×32、grid8×5启动，main有效65536 bytes、aux32768 bytes。CPU新C32计算以原block3输出输入，block4主输出65536值全部exact。norm中出现FP16平方和溢出警告，但最终输出有限且逐值一致，不因此擅自改为FP32归一化。
+
+DS追加64×32 FP8矩阵，原SASS四路load起点0x50b0=20656，而非普通记录长度20672（替代普通尾padding，结束22704，余16bytes尾padding）。流程为未经最终FP8的block4 raw→横向half pool→FP8→64×32投影→half→FP8。check_native_c32_ds.py先用矩阵字节映射尝试输出视图，16-channel banks下恰有约半数通道错位；进一步独立编码探针：输入channel0恒1、所有主块identity、DS每行放唯一FP8字节8+row，原kernel每像素读回完整唯一行编码，确定每四通道按0/2/1/3存放，而非凭相关度拟合。
+
+按四个16-channel bank加编码探针确定的行顺序解码，真实block4 DS全部32768值与原CUBIN逐值一致，MAE/max0，脚本有exact断言。native_c32_reference新增raw_output接口，为GPU learned-DS接线保留未量化残差。当前block4验证为CPU原型+原CUBIN；尚未把此层加入AMD resident chain，不能把上轮AMD前四层验收扩大成前五层。下一步实现GPU DS投影并接C64。游戏DLL和公开包未改，最终画面目标仍active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

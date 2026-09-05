@@ -10,7 +10,8 @@ H=lambda x:np.asarray(x,np.float16).astype(np.float32)
 F=lambda x:e4m3fn(quantize(x))
 
 def unpack(path):
- raw=np.fromfile(path,np.uint8);assert raw.size==20672
+ raw=np.fromfile(path,np.uint8);assert raw.size in (20672,22720)
+ raw=raw[:20672]  # DS projection starts at 20656, replacing ordinary tail padding.
  ffn=np.load('release/preblock-ffn-byte-layout/layout.npz')
  att=np.load('release/preblock-attention-layout/matrix-layout.npz')
  bm=np.load('release/preblock-attention-layout/bias-layout.npz')
@@ -26,7 +27,7 @@ def unpack(path):
  scale=np.frombuffer(raw.tobytes(),'<f4',1,19552)[0]
  return w1,w2,*matrices,bias,scale,fs,ats
 
-def block(tiles,w,skip_first=True):
+def block(tiles,w,skip_first=True,raw_output=False):
  w1,w2,qw,kw,vw,pw,bias,scale,fs,ats=w
  expanded=H(F(tiles)@w1.T);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
@@ -41,7 +42,8 @@ def block(tiles,w,skip_first=True):
  den=denominator(exp)
  prob=F(H(exp*H(1/den)));av=np.zeros_like(tiles)
  for k in [0,32]:av=H(av+prob[:,:,k:k+32]@v[:,k:k+32])
- return F(H((F(av)@pw.T)+H(feature*ats)))
+ result=H((F(av)@pw.T)+H(feature*ats))
+ return result if raw_output else F(result)
 
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('weights');p.add_argument('input');p.add_argument('oracle');p.add_argument('width',type=int);p.add_argument('height',type=int);p.add_argument('--output-cells',action='store_true');p.add_argument('--input-cells',action='store_true');p.add_argument('--shift-mask',type=int,default=0);p.add_argument('--export-lab',type=Path);a=p.parse_args()

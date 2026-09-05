@@ -35,7 +35,7 @@ static void write_file(const char *path, const void *data, size_t size) {
 
 int main(int argc, char **argv) {
     if (argc < 14 || argc > 18) {
-        std::fprintf(stderr, "usage: %s cubin weights input main-out aux-out symbol width height grid-x grid-y block-y mode shift [optional2-input] [weight-offset] [input-offset] [output-offset]\nmode: 0=plain 1=inpview 2=1h-ds 3=multihead-ds\n", argv[0]);
+        std::fprintf(stderr, "usage: %s cubin weights input main-out aux-out symbol width height grid-x grid-y block-y mode shift [optional2-input] [weight-offset] [input-offset] [output-offset]\nlegacy modes: 0=plain 1=inpview 2=1h-ds 3=multihead-ds\nnative modes: 4=C32-plain 5=C32-inpview 6=C32-ds; shift bit0=X bit1=Y\n", argv[0]);
         return 2;
     }
     auto weights = read_file(argv[2]), input = read_file(argv[3]);
@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
     // Native C32 ABI uses height,width then x/y window offsets, not extents.
     if(mode==4){p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;}
     if(mode==5){p.width=height;p.height=width;p.field_y=0;p.field_x=0;p.optional2=aux;}
+    if(mode==6){p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;p.optional3=aux;p.optional_dims=(unsigned)(height/2)|((unsigned long long)(unsigned)(width/2)<<32);p.optional4=0;}
     if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
     if(mode==3){p.optional3=aux;p.optional_dims=aux;p.optional4=(CUdeviceptr)dims;p.override_width=width/2;p.override_height=height/2;}
