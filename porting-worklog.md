@@ -2531,6 +2531,14 @@ prepare_native_front_chain.py导出block9原系数，测试host新增c128模式�
 
 当前AMD闭合范围为block0..9，未验证第10层后的C128移位链及更宽层，也未解决第0层旁路2个差异。游戏DLL/公开包未修改，真实剑星最终RGB/面部效果验收仍未完成。下一步接C128移位层与DS，目标active。
 
+### 2026-09-06 C128移位链接入AMD，整链推进到block13
+
+提取block10..13原记录，均197184bytes。check_native_c64_shift.py参数化--channels 128，以原block9输出开始逐层调用原四头普通kernel，shift序列XY/X/Y/none，16×8尺寸；四层CPU原始系数计算均16384值exact。默认C64第6/7层CPU回归同样exact。
+
+native_c64_shift.h/hlsl增加64/128通道参数，显式越界分支和root SRV保护不变，资源字节数、通道循环和body编译宏同步变化。测试host新增c128shift模式，直接串AMD block9输出→block10..13，未注入原版中间激活。MinGW编译通过，9070XT三次replay及device/fence检查通过。validate_native_c64_chain.py --c128-shift独立解码原block13 cell布局，实际GPU最终8×16×128共16384值全部exact，MAE/max0、nonfinite0。墙钟fence78/79/62ms仅小夹具，不是1080p性能或游戏帧率。
+
+当前AMD闭合范围为block0..13。下一步block14 C128→C256 DS；此小夹具再下采样高度将成为4，后续必须正确处理非8对齐边界或建立更大原版夹具，不能偷偷用错误尺寸绕过。第0层旁路2个值差异及完整更深层/最终RGB仍未完成。游戏DLL/公开ZIP未改，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

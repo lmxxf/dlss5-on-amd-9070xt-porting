@@ -19,8 +19,8 @@ fw=np.load('release/native-c64/ffn-layout/matrices.npz');aw=np.load('release/nat
 np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/'block5-ffn.f32')
 np.concatenate([aw[k].ravel() for k in ('Q','K','V','P','bias','scales','skip')]).astype('<f4').tofile(a.output/'block5-attention.f32')
 from native_c64_reference import unpack as unpack64
-for i in (6,7,8,9):
- fw,qkv,pw,bias,scales,skip=unpack64(f'release/native-c{128 if i==9 else 64}/block{i}.weights')
+for i in range(6,14):
+ fw,qkv,pw,bias,scales,skip=unpack64(f'release/native-c{128 if i>=9 else 64}/block{i}.weights')
  np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/f'block{i}-ffn.f32')
  np.concatenate([m.ravel() for m in (*qkv,pw,bias,scales,skip)]).astype('<f4').tofile(a.output/f'block{i}-attention.f32')
 layout64=np.load('release/native-c64/ffn-layout/layout.npz')
