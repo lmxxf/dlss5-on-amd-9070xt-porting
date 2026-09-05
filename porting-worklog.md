@@ -2167,6 +2167,12 @@ prepare_runtime_release.ps1生成6文件发布包：ReShade d3d12.dll、内嵌�
 
 Microsoft 721发布说明指定AMD Developer Preview Edition26.10.07.02（https://devblogs.microsoft.com/directx/announcing-agilitysdk-721-preview-and-more-shader-model-6-10-features/）。此时下一步涉及更换显示驱动，不包含在之前“先不换驱动”的范围里，需另获用户批准；尚未执行。30fps未达成，发行版仍为约19.2fps。
 
+### 2026-09-05 用户授权预览驱动安装：准备
+
+用户明确授权更换预览驱动，目前人在河北霸州，远端操作先不自动重启。已唯一识别9070XT显示驱动32.0.31041.1004、oem201.inf（原名u0203304.inf）；pnputil成功导出127文件、782946427 bytes到D:\DLSSNR-Lab\matrix-probe\driver-backup\32.0.31041.1004，保留回退材料，不先卸载旧驱动。
+
+官方下载地址：https://drivers.amd.com/drivers/amd-software-adrenalin-edition-26.10.07.02-win11-rc7-agility-sdk.exe 。完整包874669800 bytes，SHA256 cca61a1d5839b8b413b5dba4d932ad16504cdc54f81de475a6e08f7ba4fa08a2。CDN部分Range曾返回567，保留已完成部分后补齐；准备脚本再次核对长度、hash和Windows AMD Authenticode，验证通过才解包。此条记录时尚未执行安装，也未改Intel集显/游戏/发行包。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
