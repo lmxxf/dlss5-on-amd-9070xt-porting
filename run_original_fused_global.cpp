@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
         const char* scan_offset=std::getenv("DLSS5_NATIVE_SCAN_OFFSET");
         size_t count=std::strtoull(scan_count,nullptr,0),begin=scan_offset?std::strtoull(scan_offset,nullptr,0):0;
         const size_t element=std::getenv("DLSS5_NATIVE_SCAN_HALF")?2:1;
-        if((mode!=7&&mode!=8)||width!=8||height!=8||(by!=2&&by!=4)||count==0||count>65536||begin>weights.size()||count>(weights.size()-begin)/element||weight_offset||input_offset||output_offset)return 2;
+        if((mode!=7&&mode!=8)||width!=8||height!=8||(by!=2&&by!=4&&by!=8)||count==0||count>65536||begin>weights.size()||count>(weights.size()-begin)/element||weight_offset||input_offset||output_offset)return 2;
         if(!std::all_of(weights.begin()+begin,weights.begin()+begin+count*element,[](unsigned char x){return x==0;}))return 2;
         const size_t span=(mode==8?32:64)*32*by;const CUdeviceptr scan_output=mode==8?aux:doo;std::vector<unsigned char> results(count*span);unsigned short one=element==2?0x4800:0x38,zero=0;
         for(size_t i=0;i<count;i++){

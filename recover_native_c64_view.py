@@ -5,10 +5,10 @@ import subprocess
 import numpy as np
 from encode_tinlayout_global import quantize
 
-parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128),default=64);args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128,256),default=64);args=parser.parse_args()
 channels=args.channels;heads=channels//32
-width,height,size,ffn_skip,attention_skip,scale=(32,16,61760,0x7010,0xf0b0,0xe0a0) if channels==64 else (16,8,197184,0x18010,0x30130,0x2c120)
-cubin='/tmp/dlssnr-cubins/dlssnr-01.cubin' if channels==64 else '/tmp/dlssnr-cubins/dlssnr-02.cubin'
+width,height,size,ffn_skip,attention_skip,scale={64:(32,16,61760,0x7010,0xf0b0,0xe0a0),128:(16,8,197184,0x18010,0x30130,0x2c120),256:(8,4,689232,0x58010,0xa8240,0x98220)}[channels]
+cubin=f'/tmp/dlssnr-cubins/dlssnr-{heads.bit_length()-1:02d}.cubin'
 folder=Path(f'release/native-c{channels}/view');folder.mkdir(parents=True,exist_ok=True)
 weights=np.zeros(size,np.uint8)
 weights.view('<f2')[ffn_skip//2:ffn_skip//2+channels]=1
@@ -19,7 +19,7 @@ count=width*height*channels
 environment={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_NATIVE_SCAN_')}
 def run(source):
  source.tofile(folder/'input.fp8')
- subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(folder/'identity.weights'),str(folder/'input.fp8'),str(folder/'output.fp8'),str(folder/'aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{channels}_{heads}_inpview_fp8',str(width),str(height),str(width//8),str(height//8),str(heads),'7','0'],check=True,capture_output=True,env=environment)
+ subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(folder/'identity.weights'),str(folder/'input.fp8'),str(folder/'output.fp8'),str(folder/'aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{channels}_{heads}_inpview_fp8',str(width),str(height),str((width+7)//8),str((height+7)//8),str(heads),'7','0'],check=True,capture_output=True,env=environment)
  result=np.fromfile(folder/'output.fp8',np.uint8)
  assert not np.any(result[count:]), 'unexpected output outside extent'
  return result[:count]

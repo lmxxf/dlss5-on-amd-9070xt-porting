@@ -4,10 +4,10 @@ from pathlib import Path
 import numpy as np
 from native_c32_reference import H,F
 from decode_tinlayout_global import e4m3fn
-parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128),default=64);args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--channels',type=int,choices=(64,128,256),default=64);args=parser.parse_args()
 C=args.channels;heads=C//32;hidden=4*C;b2=hidden*C;b3=b2+C*128;end3=b3+C*C
-width,height,index,fs,ats,scale_offset,qkv_begin,projection_begin=(32,16,5,0x7010,0xf0b0,0xe0a0,0x70a0,0xe0b0) if C==64 else (16,8,9,0x18010,0x30130,0x2c120,0x18120,0x2c130)
-cubin='/tmp/dlssnr-cubins/dlssnr-01.cubin' if C==64 else '/tmp/dlssnr-cubins/dlssnr-02.cubin'
+width,height,index,fs,ats,scale_offset,qkv_begin,projection_begin={64:(32,16,5,0x7010,0xf0b0,0xe0a0,0x70a0,0xe0b0),128:(16,8,9,0x18010,0x30130,0x2c120,0x18120,0x2c130),256:(8,4,15,0x58010,0xa8240,0x98220,0x58220,0x98240)}[C]
+cubin=f'/tmp/dlssnr-cubins/dlssnr-{heads.bit_length()-1:02d}.cubin'
 count=width*height*C
 root=Path(f'release/native-c{C}');folder=root/'ffn-layout'
 layout=np.load(folder/'layout.npz');view=np.load(root/'view/mapping.npz')['cell_output_to_hwc'];inverse=np.argsort(view)
@@ -17,7 +17,7 @@ def run(w,input_path,output,scan=False):
  env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_NATIVE_SCAN_')}
  if scan:env.update(DLSS5_NATIVE_SCAN_OFFSET=str(fs),DLSS5_NATIVE_SCAN_COUNT=str(2*C))
  ww,hh=(8,8) if scan else (width,height)
- subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(folder/'validate.weights'),str(input_path),str(output),str(folder/'aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{C}_{heads}_inpview_fp8',str(ww),str(hh),str(ww//8),str(hh//8),str(heads),'7','0'],env=env,check=True,capture_output=True)
+ subprocess.run(['/tmp/native-c32-global-oracle',cubin,str(folder/'validate.weights'),str(input_path),str(output),str(folder/'aux.fp8'),f'cc_tinlayout_fused_swin_{heads}h_{C}_{heads}_inpview_fp8',str(ww),str(hh),str((ww+7)//8),str((hh+7)//8),str(heads),'7','0'],env=env,check=True,capture_output=True)
 w=np.zeros_like(original);w.view('<f2')[ats//2:ats//2+C]=1;w.view('<f4')[scale_offset//4:scale_offset//4+heads]=1
 run(w,folder/'ones.fp8',folder/'skip-scan.fp8',True)
 probe=np.fromfile(folder/'skip-scan.fp8',np.uint8).reshape(2*C,4,16*C)[1::2,:,inverse].reshape(C,64,C)
@@ -27,7 +27,7 @@ skip=np.empty(C,np.float32);skip[skip_channels]=original.view('<f2')[fs//2:fs//2
 matrices=[]
 for begin,end,out_count,in_count,key_out,key_in in [(0,b2,hidden,C,'w1_hidden','w1_input'),(b2,b3,C,hidden,'w2_output','w2_hidden'),(b3,end3,C,C,'w3_output','w3_input')]:
  matrix=np.zeros((out_count,in_count),np.float32);matrix[layout[key_out],layout[key_in]]=e4m3fn(original[begin:end]);matrices.append(matrix)
-source=Path('release/native-c32/block4-aux.fp8' if C==64 else 'release/native-c64/block8-aux.fp8')
+source=Path({64:'release/native-c32/block4-aux.fp8',128:'release/native-c64/block8-aux.fp8',256:'release/native-c128/block14-aux.fp8'}[C])
 x=e4m3fn(np.fromfile(source,np.uint8)[:count]).reshape(C//16,height,width,16).transpose(1,2,0,3).reshape(height,width,C)
 channels=np.arange(C);perm=(channels&~3)|((channels&1)<<1)|((channels&2)>>1);x=x[...,perm]
 w=original.copy();w[qkv_begin:qkv_begin+3*C*C]=0;w[projection_begin:projection_begin+C*C]=0;w.view('<f2')[ats//2:ats//2+C]=1

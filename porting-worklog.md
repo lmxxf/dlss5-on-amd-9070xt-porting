@@ -2557,6 +2557,14 @@ native_c64_ds.hlsl参数化CHANNELS=64/128，维持每K32 half累计与pool的�
 
 README顶部补充当前数值移植状态及历史结论边界，避免旧代理链“完成/无网格”文字误导。当前AMD闭合范围block0..14 DS，后续C256输入高度4的非8对齐处理仍待实现；第0层旁路2个差异、完整网络及游戏最终画面尚未验收。游戏DLL和公开ZIP未改，目标active。
 
+### 2026-09-06 C256半窗口边界及FFN原型逐值验证
+
+block15记录689232bytes，SHAa3081eaee51296319ade0839add190cfdbe2adbf0f0a5e990df1f2a577ae9507；原8h kernel位于dlssnr-03.cubin，输入block14 DS为8×4×256，grid1×1、block32×8，main有效8192bytes。view探针扩展--channels 256并采用ceil窗口数，13位编码恢复8192坐标bijection，seed13/29逐值验证通过，输出仍为4×4 cell。check_native_c256_boundary.py对真实block14输出及seed211/σ0.25、seed227/σ3.0证明原kernel直接H4与显式补零H8再裁上半部的8192个值分别全部相同；这为后续GPU非8对齐输入提供控制证据，尚未实际接GPU。
+
+derive_native_ffn_layout.py将已有C64/C128完整探针连接表表达为字节地址bit到input/hidden/output bit的排列，两档六张表逐项完全相同，再扩展C256形成W1 262144、分组W2 32768、W3 65536连接。这里C256是地址布局推导，不宣称重新逐字节穷举了全部连接，也没有拟合数值系数。随后用原block15真实权重验证推导：FFN skip通过512-byte探针独立恢复；原block14输入及seed44/σ0.25、seed55/σ3.0三组各8192值全部exact、MAE/max0，支持该布局和计算合同。C64/C128同工具FFN回归继续全exact。
+
+当前C256仅完成布局、边界控制和CPU FFN；八头attention未恢复，GPU执行范围仍block0..14 DS。游戏DLL/公开ZIP未修改，完整最终RGB及剑星画面目标active。下一步恢复C256 QKV/P/bias并验证整层，再把H4零填充包装接GPU。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
