@@ -2197,6 +2197,14 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 随后加入可选initialize_linalg_front和独立矩阵descriptor表；FFN阶段绑定矩阵表，QKV之前恢复原表，避免t2矩阵/feature冲突。enable-linalg-front-ffn.txt指定前1–4层，当前仅1层。开发DLL SHA526eff5271590740ea79a0fcd7f1ed7aeb066a81b60917791bee6004e9cae2ce；日志linalg_front_layers1，第一FFN0.26728ms（原0.56052），全网45.85632ms，其他stage存在波动，不能据单层省时宣称全帧已提速。洞窟18.625/18.883/19.000fps、generation9120 mode0，未见旧方格。首层数值变化尚未完成全网逐像素对照。正在以对应真实输入检查其余三层。
 
+### 2026-09-05 前端四层矩阵FFN保留
+
+对应真实输入逐层比较：block2旧0.566229/new0.254033ms，261120/16711680值不同、MAE0.00137043、RMSE0.027576647、max1；block3旧0.567005/new0.253772ms，96950值不同、MAE0.000686007、RMSE0.022376783、max1；block4旧0.569958/new0.25393ms，24492值不同、MAE0.000004066、RMSE0.000137792、max0.03125。三层nonfinite均0；block2/3矩阵转FP16有舍入，block4矩阵本身FP16往返exact，但激活/累加路径仍不同。权重原文件本地/远端哈希逐项匹配。
+
+将enable-linalg-front-ffn.txt设为4，游戏日志确认linalg_front_layers4；四层FFN分别0.2682/0.25944/0.25628/0.25932ms，front合计5.3062ms（原SDK基线6.39956），整网44.50672ms（基线45.57052）。洞窟18.939/19.021/19.280fps、generation10200 mode0，截图未见旧网格；截图不是逐像素/跨帧稳定性完整验证。保留开发配置，发行包不更新。
+
+新增build_c32_linalg.ps1提供960/1920两种编译几何入口；restore_matrix_runtime.ps1在游戏退出后可恢复已校验的自包含基线addon并关闭SDK/矩阵前端标记，不改系统驱动。下一主目标仍30fps，接下来应把同类优化扩到decoder66–69与block70，再测整网，不要把单层2.2倍当成游戏2.2倍。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

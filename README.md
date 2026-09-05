@@ -4,6 +4,8 @@
 
 自包含实验包已生成：`release/DLSS5-AMD-1080p.zip`（不入Git）。内含ReShade加载器和嵌入全部权重/CSO的addon DLL，不再依赖`D:\DLSSNR-Lab`；使用说明见`bundled-runtime-readme.txt`。9070XT洞窟复测约19.2fps，尚非30fps完成版。
 
+开发分支现已在游戏设备创建前选择私有Agility721，并接入SM6.10矩阵接口：前端四层FFN约0.26ms/层，全网44.51ms，洞窟仍约19fps。该实验需要预览驱动与开发者模式，尚未更新上面的独立发行包；完整精度与性能记录见worklog。
+
 **2026-09-05 最新运行状态：** 1080p常驻游戏链已完整执行blocks0–70，实际洞窟场景约19.0fps，未见此前满屏绿色方格。block70 HWC prefix及C32移位窗口边界拆分后全网GPU时间46.40ms（不含FSR及显示合成），30fps目标仍未完成。当前优化与失败候选以`porting-worklog.md`末尾为准；下文保留历次移植里程碑，不应把早期“尚未接入”当作当前状态。
 
 严格审计后的固定输入离线移植已经完成。链路从真正的seq0 prefill数值输入开始，在RX9070XT连续执行blocks0–69，不注入NVIDIA中间activation；block70由四层HLSL spatial effective kernel完成。最终256×144内容ROI见`dlss5-seq0-to-rgb-amd-final.png`：checkerboard未训练像素Pearson correlation 0.918201、MAE 0.014286，AMD全量cosine 0.927845，block70最新耗时3.459ms。完整证据见`dlss5-amd-final-validation.json`。范围是固定输入离线correctness port，不宣称跨帧泛化或游戏内实时可用。
