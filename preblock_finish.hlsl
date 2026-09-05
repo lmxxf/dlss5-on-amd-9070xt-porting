@@ -8,6 +8,6 @@ uint index(uint x,uint y,uint c){uint tile=(y/8)*(width/8)+x/8;return (tile*64+(
  uint p=id.x;if(p>=width*height)return;uint x=p%width,y=p/width;
  [loop]for(uint c=0;c<32;c++){
   main_output[p*32+c]=F(raw[index(x,y,c)]);
-  if((x%2)==0&&(y%2)==0){float sum=raw[index(x,y,c)]+raw[index(x+1,y,c)]+raw[index(x,y+1,c)]+raw[index(x+1,y+1,c)];down_output[((y/2)*(width/2)+x/2)*32+c]=F(H(sum*.25));}
+  if((x%2)==0&&(y%2)==0){float top=H(raw[index(x,y,c)]+raw[index(x+1,y,c)]),bottom=H(raw[index(x,y+1,c)]+raw[index(x+1,y+1,c)]);down_output[((y/2)*(width/2)+x/2)*32+c]=F(H(H(top+bottom)*.25));}
  }
 }

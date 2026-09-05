@@ -2383,6 +2383,12 @@ attention末端0xb2d0等HMUL2残差、0xb350等QMMA带残差初始值，故proje
 
 另preblock_attention_reference.py增加--sum-order诊断参数，检查softmax分母的半精度归约顺序；降序32/16/8/4/2/1与8/16/32/4/2/1候选稍改善，但未取得完整指令映射，不写入runtime默认。下一步追分母真实树与DS池化舍入；后续更宽层及游戏完整链仍待恢复。未更新游戏DLL或发布ZIP，本轮测试文件仅Lab，目标active。
 
+### 2026-09-06 第0层下采样半精度树逐值确认
+
+原始SASS 0xbd60/0xbda0/0xbdd0为三次HADD2，0xbe10为HMUL2×0.25，旧finish用四值FP32平均只在末尾舍入不等价。新增check_preblock_pool.py，将FFN/attention置identity、保留原input mix，先确认524288个main量化结果逐值一致以隔离上游，再比较131072个DS结果。横向两值各HADD→两行HADD→HMUL×0.25全部exact；直接float平均99.62158%、纵向半精度99.49875%、对角99.50104%。加exact断言，固定helper尺寸/seed并隔离外部DLSS5_PREBLOCK环境变量，防止夹具受其他实验污染。
+
+preblock_finish.hlsl及preblock_complete_validation.py同步横向半精度树。9070XT Lab重跑preblock五帧与前四层三帧均通过，主输出不变，完整第0层DS exact98.83728%、MAE0.000214875；原有attention差异仍保留。前四层完整链对原版exact59.41162%→62.23907%、MAE0.07457909→0.06666005、max2；GPU对CPU链逐值一致。这个修正改善真实数值链，但游戏最终RGB尚未验证，未覆盖游戏DLL，目标仍active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

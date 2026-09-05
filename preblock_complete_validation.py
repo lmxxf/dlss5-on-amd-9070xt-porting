@@ -10,7 +10,9 @@ raw=np.fromfile(a.folder/'amd-raw.f32','<f4').reshape(-1,8,8,32);assert np.isfin
 main=e4m3fn(quantize(raw));target=e4m3fn(np.fromfile(a.folder/'main.fp8',np.uint8).reshape(-1,2048)[:,pm]).reshape(main.shape)
 y,x,c=np.indices((4,4,32));di=(c//16)*256+(y*4+x)*16+c%16
 ds=e4m3fn(np.fromfile(a.folder/'ds.fp8',np.uint8).reshape(-1,512)[:,di])
-pooled=e4m3fn(quantize(raw.reshape(-1,4,2,4,2,32).mean((2,4)).astype(np.float16).astype(np.float32)))
+h=lambda x:np.asarray(x,np.float16).astype(np.float32)
+rows=h(raw[:,:,::2]+raw[:,:,1::2])
+pooled=e4m3fn(quantize(h(h(rows[:,::2]+rows[:,1::2])*.25)))
 def metrics(got,want):
  return {'correlation':float(np.corrcoef(got.ravel(),want.ravel())[0,1]),'exact_fraction':float(np.mean(got==want)),'mae':float(np.abs(got-want).mean()),'max_error':float(np.abs(got-want).max())}
 print(json.dumps({'tiles':len(raw),'main':metrics(main,target),'downsample':metrics(pooled,ds),'scope':'composed preblock lab control, not final game image acceptance'},indent=2))
