@@ -2205,6 +2205,14 @@ d3d12_ffn_compare.cpp在同设备、同输入directml-block0-hwc-1080p.f32（真
 
 新增build_c32_linalg.ps1提供960/1920两种编译几何入口；restore_matrix_runtime.ps1在游戏退出后可恢复已校验的自包含基线addon并关闭SDK/矩阵前端标记，不改系统驱动。下一主目标仍30fps，接下来应把同类优化扩到decoder66–69与block70，再测整网，不要把单层2.2倍当成游戏2.2倍。
 
+### 2026-09-05 尾端矩阵实验与无效60fps排查（未验收）
+
+扩展可选矩阵FFN到decoder66–69及block70，独立开关，发行包未更新。算子比较输入来自旧raw-16800抓取中的真实通道向量切片；这只是逐token FFN比较，不是完整1080p场景验证。block66–69旧约0.564–0.569ms、新约0.250–0.252ms；block70旧2.232694ms、新1.010194ms。全部nonfinite0，但有数值差异；block70 MAE0.000272693、RMSE0.004418567、max0.5。不能直接将独立算子收益当游戏收益。
+
+用户反馈显示60fps但不流畅。该轮开发日志backend_ready=0、ffx_frames=0、frame_contract_1080=0，神经网络没有进入执行，60fps结果无效，不能计入优化。读取FFX导出入口及relay证实跳转仍指向本addon hook，未发现hook被覆盖；真正未调用原因尚未查明。切回已发布SHA ca668b23基线后，PID15612运行期间日志只记录第一帧，未恢复正常输出；不能据此认定新FFN是根因。
+
+结束该游戏进程后，关闭尾端两个矩阵开关（移为.txt.disabled），恢复私有SDK721及前端四层配置。当前测试DLL SHA b8a35f0635bda3742d62c734c2eefa59d9babb844ddbff4a4683c2d989dc413b，仍含未验收尾端代码但开关关闭；不是逐字节旧DLL。新PID38532已记录present600，FFX仍0，继续排查游戏实际升频路径。未改游戏画质INI、未开插帧、未重启机器。inspect_game_windows.ps1在交互session枚举真实窗口，避免将SSH会话看不到窗口误判为退出。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
