@@ -2473,6 +2473,16 @@ prepare_native_front_chain.py导出block5参数，d3d12_native_front_chain_test�
 
 当前真实AMD闭合范围推进为block0..5（第0层另一路主输出之前仍有2个值差异待查），不是完整网络/最终RGB。尚未部署游戏addon；公开ZIP、游戏DLL不变。下一步处理block6/7的C64移位窗口和block8 DS，再继续更宽层，最终剑星实际画面验收目标保持active。
 
+### 2026-09-06 C64移位层接入AMD，修复root SRV边界访问与验证漏洞
+
+提取block6/7原61760-byte记录，native_c64_reference新增通用unpack并与此前独立block5缓存逐数组核对一致。check_native_c64_shift.py用真实block5→block6 XY移位→block7 X移位原CUBIN输出，CPU零填充/crop与两层分别32768值逐值一致。
+
+新增native_c64_shift.h/hlsl的GPU HWC64 pack/body/crop，测试host增加c64shift模式。初版两次装置失效，device_removed_reason=0x887a0006；旧host在装置失效时fence事件也被唤醒，却先打印frame0 pass，之后第二帧才报错。因此这两次frame0 pass撤回，不计有效重放。host增加GetDeviceRemovedReason和GetCompletedValue检查（拒绝UINT64_MAX及未完成值），只在设备和fence成功后读取/验证结果。补强后先复查旧block0..5模式，三帧及原版exact仍通过。
+
+移位pack初版用三元表达式在越界时选0。root SRV无描述符长度边界保护，怀疑编译器提前执行负坐标load；改为[branch]越界分支先写0并return，再在有效路径读取。没有改TDR阈值、重启或掩盖错误。仅此shader改动后，c64shift三次重放通过，fence等待31/0/16ms（CPU墙钟采样，不作游戏FPS/性能结论），设备成功。validate_native_c64_chain.py --shift独立解码原block7输出，对实际AMD RGB→block0..7最终32768值全部exact，MAE/max0、nonfinite0。结果保存在release/native-front-chain/output-c64-shift.f32。
+
+当前AMD闭合范围推进到block0..7，仍非完整网络或最终RGB；第0层另一路2个差异待查。游戏DLL/公开ZIP未修改，下一步恢复block8 C64→C128 DS及后续宽层，最终剑星画面验收目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

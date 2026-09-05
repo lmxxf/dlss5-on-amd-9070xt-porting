@@ -12,6 +12,22 @@ def multiply(a,m,initial=None):
  for offset in range(0,m.shape[1],32):result=H(result+a[...,offset:offset+32]@m[:,offset:offset+32].T)
  return result
 
+def unpack(path):
+ root=Path('release/native-c64');raw=np.fromfile(path,np.uint8);assert raw.size==61760
+ fl=np.load(root/'ffn-layout/layout.npz');al=np.load(root/'attention-layout/matrix-layout.npz');bl=np.load(root/'attention-layout/bias-layout.npz')
+ ffn={}
+ for name,begin,end,shape,ro,co in [('W1',0,0x4000,(256,64),'w1_hidden','w1_input'),('W2',0x4000,0x6000,(64,256),'w2_output','w2_hidden'),('W3',0x6000,0x7000,(64,64),'w3_output','w3_input')]:
+  matrix=np.zeros(shape,np.float32);matrix[fl[ro],fl[co]]=e4m3fn(raw[begin:end]);ffn[name]=matrix
+ slots=np.arange(64);order=(slots//16)*16+(slots%8)*2+(slots%16//8)
+ ffn['skip']=np.empty(64,np.float32);ffn['skip'][order]=raw.view('<f2')[0x7010//2:0x7090//2]
+ qkv=[]
+ for delta in (-0x800,-0x400,0):
+  matrix=np.empty((64,64),np.float32);matrix[al['v_output'],al['v_input']]=e4m3fn(raw[al['v_offsets']+delta]);qkv.append(matrix)
+ projection=np.empty((64,64),np.float32);projection[al['p_output'],al['p_input']]=e4m3fn(raw[0xe0b0:0xf0b0])
+ bias=np.empty((2,64,64),np.float32);bias[bl['head'],bl['query'],bl['key']]=raw.view('<f2')[0xa0a0//2:0xe0a0//2]
+ skip=np.empty(64,np.float32);skip[np.load(root/'attention-layout/skip-channels.npy')]=raw.view('<f2')[0xf0b0//2:0xf130//2]
+ return ffn,qkv,projection,bias,raw[0xe0a0:0xe0a8].view('<f4'),skip
+
 def block(x,ffn,qkv,projection,bias,scales,skip):
  expanded=multiply(F(x),ffn['W1']);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
@@ -48,6 +64,7 @@ if __name__=='__main__':
  probe=np.fromfile(folder/'skip-output.fp8',np.uint8).reshape(128,4,1024)[1::2,:,inverse].reshape(64,64,64)
  present=np.any(probe!=0,axis=1);assert np.all(present.sum(1)==1)
  skip_channels=np.argmax(present,axis=1);assert np.unique(skip_channels).size==64
+ np.save(folder/'skip-channels.npy',skip_channels)
  skip=np.empty(64,np.float32);skip[skip_channels]=original.view('<f2')[0xf0b0//2:0xf130//2]
  qkv=[]
  for offset in (-0x800,-0x400,0):

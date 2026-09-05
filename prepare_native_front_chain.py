@@ -18,5 +18,10 @@ matrix.astype('<f4').tofile(a.output/'block4-ds.f32')
 fw=np.load('release/native-c64/ffn-layout/matrices.npz');aw=np.load('release/native-c64/attention-layout/full-matrices.npz')
 np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/'block5-ffn.f32')
 np.concatenate([aw[k].ravel() for k in ('Q','K','V','P','bias','scales','skip')]).astype('<f4').tofile(a.output/'block5-attention.f32')
+from native_c64_reference import unpack as unpack64
+for i in (6,7):
+ fw,qkv,pw,bias,scales,skip=unpack64(f'release/native-c64/block{i}.weights')
+ np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/f'block{i}-ffn.f32')
+ np.concatenate([m.ravel() for m in (*qkv,pw,bias,scales,skip)]).astype('<f4').tofile(a.output/f'block{i}-attention.f32')
 manifest={'input_extent':[128,64],'body_extent':[64,32],'shift_masks':[0,3,1,2],'ds_extent':[32,16],'files':{f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in a.output.glob('*.f32')}}
 (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
