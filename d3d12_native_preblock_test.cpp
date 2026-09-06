@@ -14,6 +14,8 @@
 #include "native_split_window.h"
 #include "native_vit_gather.h"
 #include "native_vit_block.h"
+#include "native_actual_decoder69.h"
+#include "native_post70.h"
 static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("D3D HRESULT="+std::to_string(unsigned(h)));}
 static std::vector<float> read(const wchar_t*p){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("input file missing");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("input size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("input truncated");return v;}
 static ID3D12Resource* buffer(ID3D12Device*d,UINT64 n,D3D12_HEAP_TYPE t,D3D12_RESOURCE_STATES s){D3D12_HEAP_PROPERTIES hp{};hp.Type=t;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=n;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;ID3D12Resource*r=nullptr;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,s,nullptr,IID_PPV_ARGS(&r)));return r;}
@@ -31,7 +33,7 @@ int wmain(int argc,wchar_t**argv){try{
  std::vector<float>noise_table;const wchar_t*noise_path=_wgetenv(L"DLSS5_NOISE_TABLE");if(noise_path)noise_table=read(noise_path);
  NativeRgbReflect reflect;if(reflect_input){if(!noise_path)throw std::runtime_error("reflect test requires native noise table");reflect.Create(device,input,1920,1080,1920,1152,argv[7]);}
  NativePreblockRuntime block;block.Create(device,reflect_input?reflect.Output():input,width,height,fw,aw,argv[7],live,raw_features,noise_path?&noise_table:nullptr);
- const bool frontvit=_wgetenv(L"DLSS5_FRONTVIT")!=nullptr;const bool fronthead=frontvit||_wgetenv(L"DLSS5_FRONTHEAD")!=nullptr;const bool front22=fronthead||_wgetenv(L"DLSS5_FRONT22")!=nullptr;const bool front14=front22||_wgetenv(L"DLSS5_FRONT14")!=nullptr;const bool front8=front14||_wgetenv(L"DLSS5_FRONT8")!=nullptr;const bool front4=front8||_wgetenv(L"DLSS5_FRONT4")!=nullptr;if(front4&&!reflect_input)throw std::runtime_error("front4 requires reflected valid RGB");NativeC32Stage stages[4];NativeC32Downsample ds;
+ const bool frontfinal=_wgetenv(L"DLSS5_FRONTFINAL")!=nullptr;const bool frontdecoder=frontfinal||_wgetenv(L"DLSS5_FRONTDECODER")!=nullptr;const bool frontvit=frontdecoder||_wgetenv(L"DLSS5_FRONTVIT")!=nullptr;const bool fronthead=frontvit||_wgetenv(L"DLSS5_FRONTHEAD")!=nullptr;const bool front22=fronthead||_wgetenv(L"DLSS5_FRONT22")!=nullptr;const bool front14=front22||_wgetenv(L"DLSS5_FRONT14")!=nullptr;const bool front8=front14||_wgetenv(L"DLSS5_FRONT8")!=nullptr;const bool front4=front8||_wgetenv(L"DLSS5_FRONT4")!=nullptr;if(front4&&!reflect_input)throw std::runtime_error("front4 requires reflected valid RGB");NativeC32Stage stages[4];NativeC32Downsample ds;
  if(front4){auto*source=block.Downsample();const UINT shifts[]={0,3,1,2};for(UINT i=0;i<4;i++){auto prefix=std::wstring(argv[7])+L"\\block"+std::to_wstring(i+1);stages[i].Create(device,source,960,576,shifts[i],read((prefix+L"-ffn.f32").c_str()),read((prefix+L"-attention.f32").c_str()),argv[7]);source=stages[i].Output();}ds.Create(device,stages[3].PooledWork(),960,576,2,read((std::wstring(argv[7])+L"\\block4-ds.f32").c_str()),argv[7]);}
  NativeC64Shift c64[4];NativeC32Downsample ds8;if(front8){auto*source=ds.Output();const UINT shifts[]={0,3,1,2};for(UINT i=0;i<4;i++){auto prefix=std::wstring(argv[7])+L"\\block"+std::to_wstring(i+5);c64[i].Create(device,source,480,288,shifts[i],read((prefix+L"-ffn.f32").c_str()),read((prefix+L"-attention.f32").c_str()),argv[7],i==3,64);source=c64[i].Output();}ds8.Create(device,source,480,288,0,read((std::wstring(argv[7])+L"\\block8-ds.f32").c_str()),argv[7],true,64);}
  NativeC64Shift c128[6];NativeC32Downsample ds14;if(front14){auto*source=ds8.Output();const UINT shifts[]={0,3,1,2,0,3};for(UINT i=0;i<6;i++){auto prefix=std::wstring(argv[7])+L"\\block"+std::to_wstring(i+9);c128[i].Create(device,source,240,144,shifts[i],read((prefix+L"-ffn.f32").c_str()),read((prefix+L"-attention.f32").c_str()),argv[7],i==5,128);source=c128[i].Output();}ds14.Create(device,source,240,144,0,read((std::wstring(argv[7])+L"\\block14-ds.f32").c_str()),argv[7],true,128);}
@@ -44,6 +46,17 @@ int wmain(int argc,wchar_t**argv){try{
  if(fronthead){outputs[0]=split[7].Output();outputs[1]=head.Output();sizes[0]=UINT64(60)*36*512*4;sizes[1]=UINT64(32)*20*1024*4;for(UINT i=0;i<2;i++){readback[i]->Release();readback[i]=buffer(device,sizes[i],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[i].resize(sizes[i]/4);}}
  NativeVitGather bridge;NativeVitBlock vit[8];
  if(frontvit){auto packed=read((std::wstring(argv[7])+L"\\hwc-to-vit.i32").c_str());std::vector<UINT>map(packed.size());std::memcpy(map.data(),packed.data(),packed.size()*4);bridge.Create(device,head.Output(),map,argv[7]);auto*source=bridge.Output();for(UINT i=0;i<8;i++){auto prefix=std::wstring(argv[7])+L"\\block"+std::to_wstring(31+i)+L"-";vit[i].Create(device,source,640,read((prefix+L"expand.f32").c_str()),read((prefix+L"contract.f32").c_str()),read((prefix+L"qkv.f32").c_str()),read((prefix+L"projection.f32").c_str()),argv[7]);source=vit[i].Output();}outputs[0]=source;sizes[0]=655360ull*4;readback[0]->Release();readback[0]=buffer(device,sizes[0],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[0].resize(sizes[0]/4);}
+ NativeActualDecoder69 decoder;NativePost70 final_post;
+ if(frontdecoder){decoder.Create(device,vit[7].Output(),split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),stages[3].Output(),argv[7]);outputs[0]=decoder.Output();sizes[0]=960ull*576*32*4;}
+ if(frontfinal){
+  if(_wgetenv(L"DLSS5_POST_BASE_ONLY"))throw std::runtime_error("diagnostic post cannot validate final chain");
+  // The post base is the SAME input RGB, reflected in HWC rather than tiled.
+  std::vector<float>color(1920ull*1152*4);for(UINT y=0;y<1152;y++){UINT sy=y<1080?y:2158-y;std::memcpy(color.data()+size_t(y)*1920*4,rgb.data()+size_t(sy)*1920*4,1920*4*sizeof(float));}
+  auto*base=buffer(device,color.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;ck(base->Map(0,&none,&p));std::memcpy(p,color.data(),color.size()*4);base->Unmap(0,nullptr);
+  auto coeff=[&](const wchar_t*name){return read((std::wstring(argv[7])+L"\\post70-"+name+L".f32").c_str());};
+  final_post.Create(device,decoder.Output(),block.Main(),base,1920,1152,coeff(L"scales"),coeff(L"ffn"),coeff(L"attention"),coeff(L"head"),argv[7]);base->Release();outputs[0]=final_post.Output();sizes[0]=1920ull*1152*3*4;
+ }
+ if(frontdecoder){readback[0]->Release();readback[0]=buffer(device,sizes[0],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[0].resize(sizes[0]/4);}
  UINT64 fence_value=0;
  auto submit=[&](){ck(c->Close());ID3D12CommandList*lists[]={c};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,++fence_value));ck(fence->SetEventOnCompletion(fence_value,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(device->GetDeviceRemovedReason());auto completed=fence->GetCompletedValue();if(completed==UINT64_MAX||completed<fence_value)throw std::runtime_error("invalid fence completion");};
  auto flush=[&](){submit();ck(allocator->Reset());ck(c->Reset(allocator,nullptr));};
@@ -53,6 +66,8 @@ int wmain(int argc,wchar_t**argv){try{
   UINT seed=live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);if(reflect_input)reflect.Record(c);block.Record(c,seed,!global);if(front4){for(auto&stage:stages)stage.Record(c);ds.Record(c);}if(front8){for(auto&stage:c64)stage.Record(c);ds8.Record(c);}if(front14){for(auto&stage:c128)stage.Record(c);ds14.Record(c);}if(front22){for(auto&stage:c256)stage.Record(c);ds22.Record(c);}
   if(fronthead){for(auto&stage:split)stage.Record(c);head.Record(c);}
   if(frontvit){bridge.Record(c);flush();for(auto&layer:vit)for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);flush();}}
+  if(frontdecoder)for(UINT stage=0;stage<decoder.StageCount();stage++){decoder.RecordStage(c,stage);flush();}
+  if(frontfinal)final_post.Record(c);
   for(UINT i=0;i<3;i++){barrier(c,outputs[i],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(readback[i],0,outputs[i],0,sizes[i]);barrier(c,outputs[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
   submit();
   for(UINT i=0;i<3;i++){D3D12_RANGE range{0,SIZE_T(sizes[i])};ck(readback[i]->Map(0,&range,&m));std::memcpy(data[i].data(),m,sizes[i]);readback[i]->Unmap(0,&none);for(float x:data[i])if(!std::isfinite(x))throw std::runtime_error("nonfinite output");}

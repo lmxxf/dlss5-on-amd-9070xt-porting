@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：主host接入实际0～70直连，编译通过待整链验收
+
+- `d3d12_native_preblock_test.cpp` 新增 `DLSS5_FRONTDECODER`（含FRONTVIT）与 `DLSS5_FRONTFINAL`（含decoder），将实际decoder39～69接入ViT输出，encoder30/22/14/8/4跳接直接使用GPU资源。decoder13阶段各提交/fence，不回读特征。
+- FINAL直接接NativePost70，skip为preblock.Main。post底图在初始化时从唯一RGB输入按同一反射规则生成HWC，禁止读取预制post颜色；禁止DLSS5_POST_BASE_ONLY诊断模式进入整链验收。最终main输出6635520 RGB分量，down保留head对照。
+- 检查Create参数时发现post的vector参数顺序虽能编译但不正确，已改成scales/ffn/attention/head并重新MinGW编译 `/tmp/native-frontfinal-test.exe` exit0。只证明构建，不是数值通过。
+- 这版尚需准备39～70系数、逆map和同源最终oracle后运行。当前仍在跑的0～38旧二进制不受本地改动影响：session34710/PID39212继续有编译成功输出，勿重启。游戏DLL未更新。
+- 下一步先收0～38结果并核对，准备完整夹具运行FRONTFINAL；全链还需动态RGB而不只是seed变化、实际游戏纹理/呈现验证。反射post底图仍是受控合同，不等于已确认游戏post纹理边界。
+
+
 ### 2026-09-07：整理实际decoder39～69 GPU直连组件，待主链接入
 
 - 新增 `native_actual_decoder69.h`：输入为ViT38及encoder30/22/14/8/4 GPU资源，内部接640逆gather、decoder39、60×36 split40～47、up48至120×72、实际尺寸NativeDecoderTail69；不上传中间特征。
