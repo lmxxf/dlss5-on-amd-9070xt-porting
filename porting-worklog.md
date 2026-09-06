@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：连续49～69整段GPU fixture打包完成
+
+- prepare_native_decoder_tail_game_gpu.py遍历21阶段，普通层检查原始pass/零差异/上游来源，放大层逐字节核对input.f32等于上一原始oracle，导出真实系数和最终block69 oracle。
+- 三路skip显式标记独立随机，未伪装encoder跳接；每阶段原始输出hash写provenance，AMD_verified=false。
+- ignored release/native-decoder-tail-game/amd打包成功；脚本随后补普通层与捕获移位表一致性检查（原始报告已记录对应移位）。尚未执行AMD21阶段整段，未部署DLL。
+
 ### 2026-09-06：连续decoder主分支到69原始对照完成
 
 - block66脚本支持--main-hwc/--output-root，主输入使用连续block65原始oracle，skip仍为固定seed3016独立随机，保留来源字段。
