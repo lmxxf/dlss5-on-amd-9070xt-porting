@@ -2615,6 +2615,16 @@ run_original_split_global.cpp增加独立native-inpview诊断模式，选择前�
 
 reader对权重严格要求原记录尺寸，仅输入可补零；native模式全零现在返回4并明确拒绝验收，旧模式保留。preblock_live_parameters.cpp新增kernel_create原始args_xyz/shared_arg只读日志，为下一轮核对真实线程配置准备；未构建部署该新增日志，不把源码变化说成已采集数据。AMD正确范围仍block0..22 DS，未修改游戏DLL/公开包，目标active。
 
+### 2026-09-06 C512 split调用修正与identity坐标闭合
+
+SASS显示最后proj的threadIdx.y每组处理64个通道，原诊断使用4组只覆盖256，native模式改为block32×8；FFN projection保留32×4。另identity测试发现ffwd_proj的指针顺序应是branch再residual，旧native传din/branch反了，修正后8×8和16×8的identity值集合完全一致。投影grid X也不能是ceil(W/4)：其CTA索引以完整8宽窗口分成两组，改为2×ceil(W/8)后4×4、8×4、4×8也通过identity值集合与输出范围检查。旧legacy模式保留，不能将之当修正后的原生裁判。
+
+新增check_native_split_identity.py，用四份全零矩阵、两段skip=1和scale=1控制完整四调用路径，4×4、8×4、4×8、8×8、16×8均通过（统一正负零）；4×2仍全零返回4，未解决且不计通过。probe_native_split_input.py扩展同尺寸常量检查，完整尺寸的四阶段有效数据范围已恢复。
+
+recover_native_split_view.py在非方形16×8×512上以16组位置编码恢复65536项输入→输出bijection，并用seed511/521随机FP8输入逐值验证。解码确认输出4×4×512 cell排列在全部8个cell重复，空间按行优先；这同时约束了当前H/W解释，超出单纯直方图检查。映射留release/native-c512/split-view。此结果仅为identity坐标合同，不是原始权重的完整split算术复现；下一步恢复gate/up、投影及QKV矩阵，同时审4×2小尺寸合同/真实模型padding要求。
+
+本轮未部署此前新增的5090创建参数探针，也未更新AMD游戏DLL/公开包。AMD实际正确前缀仍block0..22 DS，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
