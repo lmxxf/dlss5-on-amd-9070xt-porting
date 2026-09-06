@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8差异定位到attention第二head单query
+
+- isolate_block8_attention.py在诊断权重副本将projection设identity、最终skip置零，并解码检查矩阵确为单位阵。
+- 原始attention-control与参考有9值不同，全部query18、channel32～63（第二head），其他query/head一致；保存attention-original/reference.f32及报告。
+- 排除最后projection是最早差异点，下一步定位query18/head1的Q/K normalize、概率或AV累加。诊断副本未进生产路径，未部署游戏DLL。
+
 ### 2026-09-06：block8最小窗口FFN特征控制零差异
 
 - isolate_block8_ffn.py仅在诊断副本将attention projection置零、最终skip置1，保持FFN与原输入，原kernel输出暴露量化FFN residual。
