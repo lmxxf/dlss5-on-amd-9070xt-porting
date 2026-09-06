@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：RGBA16纹理入口动态精确通过，核实旧游戏输入范围
+
+- AMD进程查询未返回SB-Win64-Shipping；旧runtime日志尾部为render1281×721、color format10（RGBA16_FLOAT）、旧ViT540tokens。仅历史证据，不能当当前游戏合同；输入来源必须重新核对，不能将旧低分辨率FSR输入直接当1920×1080网络入口。
+- 纹理测试新增half模式，使用精确可表示的half数值（含负值/大于1）按真实row pitch上传RGBA16_FLOAT，保留RGBA32_FLOAT回归；两格式A/A/B/A/A各五帧、每帧两路各8847360值different=0。half会话96513 exit0，float32回归也exit0。
+- 证明两种已允许纹理格式的受控动态读取、反射与输出排列；不证明游戏颜色空间或选源正确。下一步从正确的全尺寸游戏纹理取图并处理提交/呈现关系，而不是加入猜测的1281→1920缩放。
+- 游戏DLL未改，无遗留运行任务。
+
+
 ### 2026-09-07：AMD游戏纹理入口float32双路动态精确通过
 
 - 新增 `d3d12_native_game_rgb_test.cpp`，创建真实1920×1080 RGBA32_FLOAT纹理，按GetCopyableFootprints上传，入口Record从COPY_DEST转换读取并恢复，回读tile-major及post-HWC两路。
