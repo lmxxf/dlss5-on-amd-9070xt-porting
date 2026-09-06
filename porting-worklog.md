@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：32×20原始repack双向恒等验证
+
+- 原始repack caller支持无需实际输入文件的--inverse地址映射探针。RTX正反两个方向各655360条映射唯一、两组随机输入通过。
+- check_native_repack640_roundtrip.py验证forward[inverse]和inverse[forward]均逐项等于恒等映射，different=0；结果ignored release/native-vit/repack640/roundtrip.json。
+- 这里只证明实际32×20物理字节布局能双向还原，不证明pool/head从36×60补到20×32的数值，也不证明decoder裁剪。游戏DLL未更新。
+
 ### 2026-09-06：实际几何汇总与32×20 repack映射
 
 - audit_native_1080_geometry.py读取launch0001的preblock（0000是16字节辅助kernel，不是preblock），确认pre/post HW1152/1920；encoder依次576/960、288/480、144/240、72/120、36/60，ViT20/32，decoder反向对应。输出native-1080-geometry-summary.json。

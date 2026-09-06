@@ -18,13 +18,13 @@ static void check(const char *name, CUresult result) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 3 && argc != 5 && argc != 7 && argc != 8) {
+  if (argc != 3 && argc != 5 && argc != 6 && argc != 7 && argc != 8) {
     std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height [input.fp8 output.fp8 [--inverse]]]\n",
                  argv[0]);
     return 2;
   }
-  const bool inverse=argc==8 && !std::strcmp(argv[7],"--inverse");
-  if(argc==8&&!inverse)return 2;
+  const bool inverse=(argc==8 && !std::strcmp(argv[7],"--inverse"))||(argc==6&&!std::strcmp(argv[5],"--inverse"));
+  if((argc==8||argc==6)&&!inverse)return 2;
   constexpr size_t arenaBytes = 4 * 1024 * 1024;
   const int width = argc >= 5 ? std::atoi(argv[3]) : 8;
   const int height = argc >= 5 ? std::atoi(argv[4]) : 8;
