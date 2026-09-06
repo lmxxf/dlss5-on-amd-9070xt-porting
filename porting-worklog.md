@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第70块独立种子及RGB舍入顺序修正（2026-09-06）：空间/头检查脚本增加--seed，原夹具保留。seed2819的常规half头有2个RGB差异，27位对齐头剩1个float32末位差异（1.4901161193847656e-8），未放宽标准。原因是先前将合成代数化简为0.25+0.25*head；原SASS先在编码域做float32(head*0.03125-0.03125)，再float32(encoded*8+0.5)，中间捨入不可省略。按原顺序后seed2819全部768个RGB值exact，seed2801回归也全部exact。失败计数保留本日志，当前hmma-validation报告反映修正后通过。
+
+这是两组16×16、恒底图的原版/CPU验证，尚未扩大尺寸或覆盖空间变化底图、可选混合纹理分支；AMD第70块与游戏最终画面仍未完成。游戏DLL未改，目标active。
+
 第70块首个空间随机数值闭合（2026-09-06）：check_native_post70_spatial.py生成seed2801，8×8×32主特征/16×16×32 skip随机FP8、底图恒RGB0.25，枚举有依据的少量物理布局与合流舍入。正确候选为main global16且不交换低两位（不同于multihead upsample输入），skip cell/preblock两种编码本夹具等价，合流H(H(main*scale_main)+skip*scale_skip)。普通半精度点积末次舍入时，768个RGB分量仅1个不同、max9.5367431640625e-7；仍按失败处理，不放宽标准。
 
 check_native_post70_hmma.py在同一份保存的原输出上，把最后两个K16的half矩阵积改成已测的操作数指数和对齐、27位向零截断乘积、加入前一half accumulator后half RNE。该1处差异消失，768个RGB值different0/max0，报告spatial-2801/hmma-validation.json。没有修正某个输出值或拟合系数；但仅验证当前单夹具，非普遍HMMA accumulator语义证明，仍需独立种子/较大尺寸及动态底图测试。

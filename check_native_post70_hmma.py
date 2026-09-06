@@ -1,10 +1,11 @@
 """Test measured HMMA product alignment in the post70 two-K16 output head."""
 from pathlib import Path
-import json
+import json,argparse
 import numpy as np
 from native_c32_reference import unpack_bytes,block,H
 from native_split_reference import bits
-root=Path('release/native-post70');fixture=root/'spatial-2801'
+p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2801);a=p.parse_args()
+root=Path('release/native-post70');fixture=root/f'spatial-{a.seed}'
 raw=np.fromfile(root/'smoke/weights.bin',np.uint8)
 ordinary=np.zeros(20672,np.uint8);ordinary[:0x2050]=raw[:0x2050];ordinary[0x2060:]=raw[0x20d0:0x5130]
 order=np.array([0,1,4,5,8,9,12,13,2,3,6,7,10,11,14,15,16,17,20,21,24,25,28,29,18,19,22,23,26,27,30,31])
@@ -21,7 +22,10 @@ def aligned(a,b,acc):
     return H(np.trunc(product/quantum[...,None]).sum(-1)*quantum+acc.astype(np.float64))
 value=aligned(features[:,:16],head[:,:16],np.zeros((256,3),np.float32))
 value=aligned(features[:,16:],head[:,16:],value)
-got=np.clip(.25+.25*value,0,1).reshape(16,16,3)
+# Preserve original float32 RGB encode/add/decode order; algebraic folding
+# into base + residual changes the last bit at cancellation boundaries.
+encoded=np.float32(value*np.float32(.03125)+np.float32(-.03125))
+got=np.clip(np.float32(encoded*np.float32(8)+np.float32(.5)),0,1).reshape(16,16,3)
 target=np.fromfile(fixture/'global-cell-out.f32','<f4').reshape(16,16,4)[:,:,:3]
 err=np.abs(got-target);report={'different':int(np.count_nonzero(err)),'max_error':float(err.max()),'scope':'single spatial post70 HMMA candidate, not general accumulator proof'}
 report['status']='pass' if report['different']==0 else 'fail'

@@ -1,17 +1,18 @@
 """Bounded post70 spatial layout candidates with fixed base RGB; no fitting."""
 from pathlib import Path
-import json,subprocess
+import json,subprocess,argparse
 import numpy as np
 from native_c32_reference import unpack_bytes,block,H,F
 from native_split_reference import bits
 from encode_tinlayout_global import quantize
-base=Path('release/native-post70');root=base/'spatial-2801';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2801);a=p.parse_args()
+base=Path('release/native-post70');root=base/f'spatial-{a.seed}';root.mkdir(exist_ok=False)
 raw=np.fromfile(base/'smoke/weights.bin',np.uint8)
 ordinary=np.zeros(20672,np.uint8);ordinary[:0x2050]=raw[:0x2050];ordinary[0x2060:]=raw[0x20d0:0x5130];body=unpack_bytes(ordinary)
 order=np.array([0,1,4,5,8,9,12,13,2,3,6,7,10,11,14,15,16,17,20,21,24,25,28,29,18,19,22,23,26,27,30,31])
 sm=np.empty(32,np.float32);ss=np.empty(32,np.float32);sm[order]=raw[0x2050:0x2090].view('<f2');ss[order]=raw[0x2090:0x20d0].view('<f2')
 head=np.empty((16,32),np.float32);head[bits(512,[2,5,6,7]),bits(512,[0,1,3,4,8])]=raw[0x5130:].view('<f2');head=head[[0,2,4]]
-rng=np.random.default_rng(2801);x=F(rng.normal(0,.25,(8,8,32)).astype(np.float32));skip=F(rng.normal(0,.25,(16,16,32)).astype(np.float32))
+rng=np.random.default_rng(a.seed);x=F(rng.normal(0,.25,(8,8,32)).astype(np.float32));skip=F(rng.normal(0,.25,(16,16,32)).astype(np.float32))
 x.tofile(root/'main-hwc.f32');skip.tofile(root/'skip-hwc.f32');color=np.full((16,16,4),.25,np.float32);color[:,:,3]=1;color.tofile(root/'color.f32')
 basis=np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048);full=np.argmax(abs(basis),axis=0).reshape(8,8,32);cell=full[:4,:4].ravel()
 def pack(v,kind):
