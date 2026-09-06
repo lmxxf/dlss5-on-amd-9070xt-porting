@@ -19,7 +19,7 @@ fw=np.load('release/native-c64/ffn-layout/matrices.npz');aw=np.load('release/nat
 np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/'block5-ffn.f32')
 np.concatenate([aw[k].ravel() for k in ('Q','K','V','P','bias','scales','skip')]).astype('<f4').tofile(a.output/'block5-attention.f32')
 from native_c64_reference import unpack as unpack64
-for i in range(6,22):
+for i in range(6,23):
  fw,qkv,pw,bias,scales,skip=unpack64(f'release/native-c{256 if i>=15 else 128 if i>=9 else 64}/block{i}.weights')
  np.concatenate([fw[k].ravel() for k in ('W1','W2','W3','skip')]).astype('<f4').tofile(a.output/f'block{i}-ffn.f32')
  np.concatenate([m.ravel() for m in (*qkv,pw,bias,scales,skip)]).astype('<f4').tofile(a.output/f'block{i}-attention.f32')
@@ -31,5 +31,9 @@ layout128=np.load('release/native-c128/ds-layout/layout.npz')
 raw14=np.fromfile('release/native-c128/block14.weights',np.uint8);assert raw14.size==229936
 ds14=np.empty((256,128),np.float32);ds14[layout128['output'],layout128['input']]=e4m3fn(raw14[0x30230:])
 ds14.astype('<f4').tofile(a.output/'block14-ds.f32')
+layout256=np.load('release/native-c256/ds-layout/layout.npz')
+raw22=np.fromfile('release/native-c256/block22.weights',np.uint8);assert raw22.size==820288
+ds22=np.empty((512,256),np.float32);ds22[layout256['output'],layout256['input']]=e4m3fn(raw22[0xa8440:])
+ds22.astype('<f4').tofile(a.output/'block22-ds.f32')
 manifest={'input_extent':[128,64],'body_extent':[64,32],'shift_masks':[0,3,1,2],'ds_extent':[32,16],'files':{f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in a.output.glob('*.f32')}}
 (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

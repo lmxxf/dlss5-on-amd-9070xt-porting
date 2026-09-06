@@ -2597,6 +2597,16 @@ NativeC64Shift增加显式PLAIN_SHORT_Y开关，仅在CHANNELS=256且有效heigh
 
 当前AMD正确特征前缀推进至block0..21，游戏DLL/公开包未更新，第0层旁路2个差异及其余网络/最终RGB仍待处理。下一步block22 C256→C512 DS，随后是与普通Swin不同的split/ViT路径，最终剑星画面目标active。
 
+### 2026-09-06 block22 C256→C512 DS与AMD整链逐值一致
+
+block22记录820288bytes，SHAcfb0343287054e38933dbf35c7dbb124fef50cfaf4234f7161575f00896cc02d。原8h ds kernel在8×4输入、Y=-4时主输出8192bytes；DS只有4096个有效FP8值，但物理存储占8192bytes，32个16-channel bank各按4×4空间预留，只有前2行有效，最后非零位置8063。不能截取前4096bytes当有效tensor。
+
+derive_native_ds_layout.py从C64/C128独立DS探针表提炼并逐项核对地址bit规则，再扩展C256 DS131072连接；check_native_c256_ds.py验证block22沿用plain H4重复行而非补零，raw half池化→FP8→512×256投影与原版4096有效值全部exact。三轮base16编码覆盖全部512输出通道并确认补齐行全零；真实block21输入以及seed313/σ0.25、seed317/σ3.0两组随机输入的主输出/DS均逐值一致，无系数拟合。
+
+GPU DS host允许已crop raw输入为偶数尺寸、支持256通道，shader增加明确尾线程分支保护。block22用256通道raw+PLAIN_SHORT_Y再接DS，输出逻辑HWC512不含物理padding洞。测试host新增c256ds模式，9070XT RGB→block0..22三次replay、device/fence检查通过；validate_native_c64_chain.py --c256-ds按原padding布局解码并裁有效行，4096/4096 exact，MAE/max0。RAW_OUTPUT宏只在projection入口启用，FFN/attention共用同字节码快取；实测12次编译、42次命中。回归c256shift到block21，三帧及8192值exact仍通过（11次编译/40次命中）。墙钟359/328/328ms仅小夹具数据，非1080p性能结论。
+
+当前AMD正确特征前缀推进到block0..22 DS，尚未恢复C512 split/ViT及后续解码器，第0层旁路2个差异仍待查。游戏DLL和公开ZIP未更新，最终剑星RGB/角色面部效果验收目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -17,7 +17,7 @@ public:
  ~NativeC32Downsample(){if(input)input->Release();if(weights)weights->Release();if(output)output->Release();if(root)root->Release();if(pso)pso->Release();}
  // c64_raw selects the 64->128 shader and requires already-cropped FP16 raw.
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,UINT shift,const std::vector<float>&w,const std::wstring&dir,bool c64_raw=false,UINT channels=64){
-  if(input||!d||!src||(channels!=64&&channels!=128)||(!c64_raw&&channels!=64)||w.size()!=(c64_raw?2*channels*channels:2048)||!width||!height||width%8||height%8||shift>3||(c64_raw&&shift))throw std::runtime_error("DS contract");
+  if(input||!d||!src||(channels!=64&&channels!=128&&channels!=256)||(!c64_raw&&channels!=64)||w.size()!=(c64_raw?2*channels*channels:2048)||!width||!height||(c64_raw?(width%2||height%2):(width%8||height%8))||shift>3||(c64_raw&&shift))throw std::runtime_error("DS contract");
   input=src;input->AddRef();geometry[0]=width/2;geometry[1]=height/2;geometry[3]=(shift&1)?2:0;geometry[4]=(shift&2)?2:0;geometry[2]=width/2+geometry[3]*2;
   if(c64_raw)geometry[2]=width;
   output=Buffer(d,UINT64(width/2)*(height/2)*(c64_raw?2*channels:64)*4,false);weights=Buffer(d,w.size()*4,true);void*ptr=nullptr;D3D12_RANGE empty{};Check(weights->Map(0,&empty,&ptr));std::memcpy(ptr,w.data(),w.size()*4);weights->Unmap(0,nullptr);
