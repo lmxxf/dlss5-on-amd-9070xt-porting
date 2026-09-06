@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际decoder39裁剪三帧精确通过
+
+- prepare_native_decoder_game_gpu.py解码原始decoder结果，extent host新增decoder39_game，上传独立随机main/skip和真实系数，调用生产NativeVitLinear decoder路径。
+- RX9070XT三次1105920值different=0/max_abs=0，finite/device/fence通过，提交等待12.393/5.523/5.769ms（独立算子）。回读gpu.f32与原始oracle字节级cmp一致。
+- fixture ignored release/native-decoder-game。这不证明encoder/ViT/decoder整链动态输入，亦未替换游戏DLL；下一步实际部分窗口与剩余decoder几何。
+
 ### 2026-09-06：AMD decoder39实际裁剪路径实现待测
 
 - NativeVitLinear允许明确640token/1024→512 decoder入口，输出分配按60×36×512，不再按640×4×512；skip容量按真实输出检查。
