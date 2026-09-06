@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：生产preblock接入可选时序RGB，待GPU回归
+
+- NativePreblockRuntime::Create增加可选temporal_input HWC float4 GPU buffer，限定live+noise table且非RAW_INPUT、容量完整；Record增加默认false的temporal_enabled，未绑定却启用则拒绝。保留原调用默认首帧路径。
+- 新t3 root SRV与第5个root constant绑定时序输入/开关；input_mix从tile-major线程索引换算HWC位置，只将half中心化缩放后的时序RGB写入13/2/3，当前RGB和噪声路径不变。
+- C++既有preblock host语法检查及diff通过，尚未编译/运行新增shader分支。root常量数量已改变，必须重编小尺寸首帧/时序GPU测试验证，不能用旧exe结果证明本次改动正确。
+- 下一步接GPU sampler输出，做开/关/恢复及原版dual-texture main/down逐值回归；运动前段坐标仍不完整。新神经DLL未部署。
+
+
 ### 2026-09-07：AMD时序五tap采样GPU原版half对照通过
 
 - 新增prepare_native_temporal_gpu.py，四组原版PC1800 holdout组成128个坐标，384个RGB期望值仅作half舍入，alpha=1；同一独立history输入，未用GPU输出生成oracle。

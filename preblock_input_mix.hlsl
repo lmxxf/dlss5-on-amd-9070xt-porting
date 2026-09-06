@@ -2,6 +2,10 @@
 // for every 8x8 tile. Live texture transforms/global seed contract not yet bound.
 StructuredBuffer<float> weights : register(t0);
 StructuredBuffer<float> input : register(t1);
+#if NATIVE_TEMPORAL_RGB
+// Reconstructed RGB in full processing HWC order, produced on the GPU.
+StructuredBuffer<float4> temporal_rgb : register(t3);
+#endif
 #if NATIVE_NOISE_TABLE
 // Universal function values for all 24-bit uniform inputs, not image features.
 StructuredBuffer<float> noise_table : register(t2);
@@ -9,7 +13,7 @@ uint uniform_index(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>30)
 #endif
 RWStructuredBuffer<float> output : register(u0);
 #if DYNAMIC_PARAMETERS
-cbuffer RuntimeParameters:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;}
+cbuffer RuntimeParameters:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint runtime_temporal_enabled;}
 #endif
 uint pcg(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>22)^w;}
 float uniform24(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return float(((w>>30)^(w>>8))+1)*5.9604644775390625e-8;}
@@ -71,6 +75,17 @@ void main(uint3 id:SV_DispatchThreadID){
  float g=half_round(half_round(half_round(input[p*4+1])-0.5)*rgb_scale);
  float bl=half_round(half_round(half_round(input[p*4+2])-0.5)*rgb_scale);
  float features[16]={g1,g2,g,bl,g0,1,LIVE_PROFILE?.0078125:0,1,r,g,LIVE_PROFILE?1:0,LIVE_PROFILE?1:0,bl,r,LIVE_PROFILE?1:0,0};
+#if NATIVE_TEMPORAL_RGB
+ if(runtime_temporal_enabled){
+  uint tile=p/64;
+  uint tx=(tile%(runtime_width/8))*8+p%8;
+  uint ty=(tile/(runtime_width/8))*8+(p%64)/8;
+  float3 history=temporal_rgb[ty*runtime_width+tx].xyz;
+  features[13]=half_round(half_round(half_round(history.x)-.5)*.125);
+  features[2]=half_round(half_round(half_round(history.y)-.5)*.125);
+  features[3]=half_round(half_round(half_round(history.z)-.5)*.125);
+ }
+#endif
 #if DEBUG_FEATURES
  [unroll]for(uint debug_channel=0;debug_channel<16;debug_channel++)output[p*32+debug_channel]=features[debug_channel];
  [unroll]for(uint zero_channel=16;zero_channel<32;zero_channel++)output[p*32+zero_channel]=0;
