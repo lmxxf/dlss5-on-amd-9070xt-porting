@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD decoder39实际裁剪路径实现待测
+
+- NativeVitLinear允许明确640token/1024→512 decoder入口，输出分配按60×36×512，不再按640×4×512；skip容量按真实输出检查。
+- shader按32宽读取main、nearest展开，坐标超60×36时跳过写入，保留左上区域；有效区域原四分区投影/融合残差算术不改。
+- 编译通过、diff检查通过；尚未在GPU执行此新路径，不能宣称AMD裁剪验证完成。下一步独立原始oracle对照及重放，未部署游戏DLL。
+
 ### 2026-09-06：decoder39真实尺寸左上裁剪原始对照通过
 
 - check_native_decoder_game_extent.py独立随机20×32×1024 main及36×60×512 skip，真实block39权重，原始kernel参数input20/32/output36/60、grid16×5×4、16MiB arena。

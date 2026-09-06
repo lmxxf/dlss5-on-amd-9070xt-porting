@@ -15,9 +15,12 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   total=part==0?a:H(total+a);
  }
  // Explicit square main extents through128 (block66); contracts checked by host.
- uint width=tokens==16384?128:tokens==4096?64:tokens==1024?32:tokens==256?16:8;
+ uint width=tokens==640?32:tokens==16384?128:tokens==4096?64:tokens==1024?32:tokens==256?16:8;
+ uint output_width=tokens==640?60:width*2,output_height=tokens==640?36:width*2;
  [unroll]for(uint dy=0;dy<2;dy++)[unroll]for(uint dx=0;dx<2;dx++){
-  uint index=((token/width*2+dy)*(width*2)+token%width*2+dx)*OUTPUT_CHANNELS+row;
+  uint x=token%width*2+dx,y=token/width*2+dy;
+  if(x>=output_width||y>=output_height)continue;
+  uint index=(y*output_width+x)*OUTPUT_CHANNELS+row;
   float merged=H(total+F(residual[index])*weights[INPUT_CHANNELS*OUTPUT_CHANNELS+row]);
   output[index]=OUTPUT_CHANNELS==32?merged:F(merged);
  }
