@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：明确显示输出裁剪/格式候选，尚未GPU或游戏验收
+
+- 检查现有probe与游戏接入历史：原版CPU参数探针只能给kernel参数，不能证明实际RGB取自哪个渲染阶段；历史swapchain为R10G10B10A2，而旧FFX输入是低分辨率RGBA16。必须重新在实际游戏确认取图和颜色空间，不能把二者混同。
+- 新增 `native_game_rgb_output.hlsl`，将1920×1152 contiguous float RGB的前1080行转换为1920×1080 R10G10B10A2_UNORM packed buffer，alpha=3，行距7680字节满足256对齐；不混入底部72行。此为SDR候选编码，不进行/不声称HDR或色调映射。
+- Windows D3DCompile检查exit0，bytecode1280字节；仅编译，没有GPU输出复制或游戏部署。下一步需包装输出buffer→纹理复制并逐像素验证，再与实际swapchain格式/颜色空间和提交顺序绑定。
+- 游戏DLL未更新，无运行任务遗留。
+
+
 ### 2026-09-07：RGBA16纹理入口动态精确通过，核实旧游戏输入范围
 
 - AMD进程查询未返回SB-Win64-Shipping；旧runtime日志尾部为render1281×721、color format10（RGBA16_FLOAT）、旧ViT540tokens。仅历史证据，不能当当前游戏合同；输入来源必须重新核对，不能将旧低分辨率FSR输入直接当1920×1080网络入口。
