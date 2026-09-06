@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：1080p配置已备份，首次启动未产生游戏进程
+
+- capture_nvidia_1080_geometry.ps1 检查无游戏进程、实际配置键唯一、启动排程目标Steam/app3489700；备份后仅改ResolutionSizeX/Y=1920/1080、FullscreenMode/PreferredFullscreenMode=2。
+- 原始配置备份：C:\Users\Seth\AppData\Local\SB\Saved\Config\WindowsNoEditor\GameUserSettings.ini.before-1080-probe-20260906-211332-516，备份hash校验通过。未改存档。
+- 21:13:32调用DLSSNR-Launch-StellarBlade，LastTaskResult=0，但随后实查只有Steam PID20816，无SB游戏进程；gameprocess_log最后一条游戏运行仍为19:32启动、19:43退出，参数捕获未更新。不能把排程成功当游戏启动或1080p捕获成功。
+- 当前保留1080p窗口配置待排查启动阻碍，没有重复启动或终止Steam。游戏DLL未更换；下一步检查交互桌面/Steam启动状态，继续真实几何捕获。
+
 ### 2026-09-06：真实1080p捕获前环境核对
 
 - 新增只读 inspect_nvidia_geometry.ps1，避免复杂SSH引号使检查静默失败。当前RTX用户Seth，实际配置路径为 C:\Users\Seth\AppData\Local\SB\Saved\Config\WindowsNoEditor\GameUserSettings.ini。
