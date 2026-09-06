@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB encoder9～14原始主分支通过
+
+- 原始capture和CPU main验证脚本增加--c128，从block8-down继续9～14，实际240×144、shift0/3/1/2/0/3，14下采样输出亦捕获。
+- 六层主分支各4423680值零差异、finite通过；block14 down仅长度/FP8 NaN检查，尚未算术对照。
+- ignored encoder-c128保存来源、权重、原始输出与main-validation。下一步验证down14及AMD同RGB整链，未部署DLL。
+
 ### 2026-09-07：修复后同valid1080 RGB GPU0～8双分支通过
 
 - runner支持-Front8并清理未选环境开关。生产reflect→preblock→C32四层/DS→C64四层/DS五帧seed0/0/0/1/0重放及seed影响检查通过。
