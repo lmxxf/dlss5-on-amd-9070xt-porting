@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：原始 256-token projection 精确通过
+
+- projection caller 的输入容量从固定 128 tokens 改为向上按128取整，允许64/256；RTX runner 使用 gridX=16、gridZ=4、计数器 -1。
+- 使用已验证 QKV→attention 的原始 attention 输出，残差为该 QKV 的原始输入（seed=3003），block31 projection 权重。两次 SHA256 均为 `ef4d90e77c34d305b247fc637639bafad3b4f65371ae729f8555f45e04eaaa01`。
+- `check_native_projection_extent.py` 对照 262144 个值，different=0 / max_abs=0，finite、尾部零、replay 一致。导出 AMD fixture 到 ignored release/native-vit/projection-256-3003。
+- 这是 QKV→attention→projection 分段输入对照，不含 expand/contract 的完整 ViT，AMD projection 尚未扩展、游戏 DLL 尚未更新。
+
 ### 2026-09-06：AMD 256-token contract 精确通过
 
 - NativeVitLinear 允许已对照的 256-token contract（4096→1024），projection 仍未放宽。

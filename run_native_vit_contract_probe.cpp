@@ -12,8 +12,8 @@ int main(int argc,char**argv){
  const bool projection=argc==8&&!std::strcmp(argv[7],"projection");if(argc==8&&!projection)return 2;
  uint64_t tokens=std::strtoull(argv[5],nullptr,0);unsigned gx=std::strtoul(argv[6],nullptr,0);if(!tokens||tokens>256||!gx||gx>128)return 2;
  if(tokens!=16&&tokens!=64&&tokens!=128&&tokens!=256)return 2;
- if(projection&&tokens!=64)return 2;
- size_t padded=projection?128:size_t((tokens+31)/32*32),capacity=4*1024*1024;
+ if(projection&&tokens!=64&&tokens!=256)return 2;
+ size_t padded=projection?size_t((tokens+127)/128*128):size_t((tokens+31)/32*32),capacity=4*1024*1024;
  auto branch=read(argv[1],padded*(projection?1024:4096),false),residual=read(argv[2],padded*1024,false),weights=read(argv[3],projection?1050624:4196352,true);
  ck(cuInit(0));CUdevice d;ck(cuDeviceGet(&d,0));CUcontext context;ck(cuDevicePrimaryCtxRetain(&context,d));ck(cuCtxSetCurrent(context));CUmodule module;const char*cubin=std::getenv("DLSS5_VIT_CUBIN");ck(cuModuleLoad(&module,cubin?cubin:"/tmp/dlssnr-cubins/dlssnr-05.cubin"));CUfunction f;ck(cuModuleGetFunction(&f,module,projection?"cc_vit_1d_projection_fp8":"cc_vit_1d_ffn_contract_fp8"));
  CUdeviceptr a,b,out,w,work,aux;ck(cuMemAlloc(&a,branch.size()));ck(cuMemAlloc(&b,residual.size()));ck(cuMemAlloc(&w,weights.size()));for(auto*p:{&out,&work,&aux}){ck(cuMemAlloc(p,capacity));ck(cuMemsetD8(*p,0,capacity));}
