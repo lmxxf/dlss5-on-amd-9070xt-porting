@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：post70实际1920×1152最终RGB逐值通过
+
+- check_native_post70_game.py以16行对齐条带调用原生参考，post shift0的8×8窗口不跨条带，降低内存占用而不改变计算；保留每条带结果。
+- 全部6635520个RGB值与原始post70输出零差异、max_abs0、finite通过；原始RGBA前三通道导出oracle.f32。
+- ignored release/native-post70/game/validation.json。仍为独立随机main/skip/color，未证明真实RGB网络全链或AMD实际尺寸post70，未部署游戏DLL。
+
 ### 2026-09-06：post70实际1920×1152原始输出捕获
 
 - 原始post native模式增加明确1920×1152尺寸，激活容量按像素×32+65536计算，main/skip读取有有效长度检查；编译通过。
