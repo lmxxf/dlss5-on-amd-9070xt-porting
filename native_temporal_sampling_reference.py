@@ -31,12 +31,15 @@ def geometry(x,y,width,height):
                       wx[...,1]*wy[...,1],wx[...,1]*wy[...,2],wx[...,2]*wy[...,1]],-1)
     return xy,weights/weights.sum(axis=-1,keepdims=True)
 
-def bilinear(image,xy):
+def bilinear(image,xy,fraction_bits=None):
     image=np.asarray(image,dtype=np.float64);h,w,_=image.shape
     x=np.clip(xy[...,0]-.5,0,w-1);y=np.clip(xy[...,1]-.5,0,h-1)
     x0=np.floor(x).astype(int);y0=np.floor(y).astype(int)
     x1=np.minimum(x0+1,w-1);y1=np.minimum(y0+1,h-1)
     a=(x-x0)[...,None];b=(y-y0)[...,None]
+    if fraction_bits is not None:
+        scale=2**fraction_bits
+        a=np.rint(a*scale)/scale;b=np.rint(b*scale)/scale
     return (image[y0,x0]*(1-a)+image[y0,x1]*a)*(1-b)+(image[y1,x0]*(1-a)+image[y1,x1]*a)*b
 
 def sample(image,x,y):

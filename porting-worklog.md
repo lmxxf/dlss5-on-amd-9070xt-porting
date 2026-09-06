@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版时序采样中间RGB已抓取，数学参考尚未对齐
+
+- 新增debug_native_temporal_sample.gdb，在原preblock PC1800（五点RGB重建结束、half转换前）抓warp0共32线程R47/R64/R59及PC；使用8×8受控双纹理、slot10常量0.125，CUDA-GDB运行成功，未改原CUBIN。ignored `native-temporal-inputs-gates/sample-registers.json`。
+- 新增check_native_temporal_sample.py：按候选像素中心+.125位移比较96分量。理想bilinear max_abs0.0007034572、half不同57；8bit fraction nearest量化候选max_abs0.0005326888、half不同42，仍失败。未放宽标准，不能把接近当已恢复。
+- 数学参考的bilinear新增可选fraction_bits，默认保持原数学行为；8bit只是试验候选，不是已验证CUDA采样规则。下一步直接抓5个TEX坐标和权重，区分坐标误差与纹理插值误差，避免继续盲猜。
+- 原版游戏未操作，新神经DLL未部署，目标未完成。
+
+
 ### 2026-09-07：五点稳态RGB重建数学参考初稿
 
 - 从原SASS PC1110～13f0恢复单轴权重：w0=t²−0.5(t+t³)，w1=1+1.5t³−2.5t²，w3=0.5(t³−t²)，w2=1−w0−w1−w3；合并中间两权重及对应双线性位置。五tap为上/左/中/下/右，省去角点后重新归一化，对应PC1590～17f0。
