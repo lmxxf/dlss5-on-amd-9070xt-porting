@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+256-token反例定位到当前Spark执行路径（2026-09-06）：对完全相同原attention探针做Compute Sanitizer memcheck，0 errors，但输出与先前普通执行不同；racecheck报2组共享内存读写冲突，写PC0x3570/0x32e0对应UBLKCP.S.G，读PC包括0x1680/0x1c60/0x25e0/0x2c20及0x1090/0x10a0/0x1d90/0x1e60。不能把无越界等同无竞态，也不能直接指责模型数学或AMD移植。
+
+新增最小Windows nvcuda导入定义、原探针可显式选择CUBIN路径及run_nvidia_vit_extent.ps1，将同一CUBIN和同一Q/K/V文件放5090独立实验目录native-vit-extent-256。未启动/关闭/切换游戏。5090两次输出SHA均FFB3BDE38AC214BE12E17CD2E11262B33354D763D76FFE91FBBAD3FF8F0083E8，下载后262144值全部对上量化exp/half累计参考，所有query一致，尾部零。报告validation-rtx-output-1.json为control_pass。
+
+因此该256-token失败不能继续当作通用长度/布局反证：当前Spark原kernel执行会受运行条件影响，而5090这项控制稳定正确。尚未单独归因GPU架构、驱动或调用同步差异；后续较长序列的权威原输出优先在5090生成，仍需随机Q/K与真实长度验证。原Spark失败、memcheck/racecheck输出保留，游戏神经DLL未改，目标active。
+
 ViT更长序列的非均匀V控制（2026-09-06）：新增check_native_vit_uniform_qk.py，Q/K零而V逐token/通道取不同二进制可表示值。最初将输出当普通均值，64-token也失败（3776差）；这是裁判遗漏F(exp)与未量化exp分母之差，不是已有64-token实现失效。改为原量化exp×V、每K32 half累计及half倒数归一化，读取同一原输出重新比较，64/128-token分别65536/131072值全exact。原均值失败报告保留，修正裁判报告另写validation-exp.json；期间修复F工具不接受scalar的测试代码错误，未改原输出。
 
 256-token仍77824/262144值不同、max0.05078125；Q/K相同却不同query输出不相同，按每32条query的差异为30912/30912/0/0/8000/8000/0/0。这提示布局/读取或调用合同问题，不能放宽容差或直接解除64-token限制。重新查原kernel_create日志，attention普通/chained均为32×4×1，未猜测改线程数。所有小测试已退出，下一步核对256-token原QKV生成的V物理输出及attention读取范围。游戏神经DLL未改。
