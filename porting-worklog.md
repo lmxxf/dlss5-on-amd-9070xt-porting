@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8清零Q/K诊断均精确
+
+- isolate_block8_qk.py分别在identity-projection诊断权重副本清零Q或K，保持FFN、V、bias及其余参数，原始kernel各4096值与参考零差异/finite。
+- 说明差异依赖非零QK得分路径；不能完全排除概率变化引起的AV舍入问题，但下一步应优先核对实际Q/K归一化或QK+bias得分。
+- ignored window46-18/qk-controls.json，未修改生产权重或部署DLL。
+
 ### 2026-09-06：实际query输入的近似倒数指令控制
 
 - probe_normalize_intrinsics.cu使用PTX rcp.approx.ftz/rsqrt.approx.ftz，对最小窗口参考Q/K平方和及softmax分母运行本地sm121 GPU。
