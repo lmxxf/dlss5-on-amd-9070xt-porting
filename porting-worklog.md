@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block48真实120×72原始随机对照通过
+
+- check_native_upsample48_game.py构造独立36×60×512 main(global16低通道位交换)及72×120×256 skip(cell)，block48真实权重，shift0/grid15×9运行原始kernel。
+- 原始放大、skip融合、C256 Swin完整输出2211840值与参考零差异，finite/tail检查通过。ignored release/native-upsample48/game导出输入/skip/oracle。
+- 这是独立随机输入而非block47/encoder22真实串联；AMD120×72 block48尚未验证，未部署游戏DLL。
+
 ### 2026-09-06：AMD实际decoder40～47八层GPU串联通过
 
 - decoder40_47_game模式60×36，实际移位0/3/1/2/0/3/1/2，八层GPU资源直接串联，无中间CPU传输。
