@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB block14下采样逐值通过
+
+- validate_native_valid1080_ds14.py从block13原始主输出重算shift3 raw half、水平pair池化/FP8及原始C128→C256矩阵投影，解码下采样global16低通道位交换。
+- 2211840下采样值different0/max_abs0/finite通过，保存encoder-c128/down-validation.json、block14-down.f32、block14-ds.f32。
+- 原始9～14主/down均通过，尚未AMD同RGB0～14整链验收，未部署DLL。
+
 ### 2026-09-07：同valid1080 RGB encoder9～14原始主分支通过
 
 - 原始capture和CPU main验证脚本增加--c128，从block8-down继续9～14，实际240×144、shift0/3/1/2/0/3，14下采样输出亦捕获。
