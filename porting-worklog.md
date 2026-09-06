@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD640-token attention精确通过
+
+- NativeVitAttention开放640tokens，HLSL暂存扩至640；GPU夹具打包使用ceil(log2(N)) token位，避免非2次方长度别名。
+- RX9070XT独立测试三次各655360值different=0/max_abs=0，finite/device/fence通过；回读保存release/native-vit/attention-random-640-3006/gpu.f32，参考验证器再次与原始RTX输出比对通过。
+- 此为实际ViT长度上的随机attention算子测试，不含640token QKV/linear/完整模型。未修改运行中游戏，也未更新DLL。
+
 ### 2026-09-06：640-token原始attention首次逐值通过
 
 - caller支持实际32×20、grid32×3，保持4MiB输出/工作区；随机fixture打包修正高token地址位为ceil(log2(N))，旧公式在640导致非双射并被assert阻止，seed3005未运行GPU。保留失败目录，使用seed3006重新生成。

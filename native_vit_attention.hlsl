@@ -5,7 +5,7 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 uint key_index(uint c){return ((c&16)>>4)|((c&1)<<1)|((c&2)<<1)|(c&8)|((c&4)<<2)|(c&32);}
 [numthreads(64,1,1)]void main(uint3 id:SV_DispatchThreadID){
- if(id.x>=tokens*32)return;uint query=id.x/32,head=id.x%32;float ex[256],quantized[256];
+ if(id.x>=tokens*32)return;uint query=id.x/32,head=id.x%32;float ex[640],quantized[640];
  [loop]for(uint key=0;key<tokens;key++){
   float score=0;[loop]for(uint c=0;c<32;c++)score+=input[query*1024+head*32+c]*input[(tokens+key)*1024+head*32+c];
   float affine=clamp(H(H(score)*f16tof32(0x2dbb)+1.708984375),1.439453125,1.9775390625);
