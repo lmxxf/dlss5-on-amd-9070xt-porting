@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：关键稳态合同缺口——首帧单槽，后续启用额外输入
+
+- 从当前5090 PID3536下载preblock-live0～7及首次post blob，日志确认本PID/seed0..7/处理1152×1920。ignored `release/native-game-present/temporal-3536` 保存原始证据。
+- 新审计脚本与pointer-free报告 `native-temporal-slot-audit.json`：frame0仅leading slot0非零；frame1～7非零槽为0、8、10、30、38（十六进制offset）。尚不能把每个64bit槽都命名为纹理，须结合原kernel ABI/SASS查用途。
+- 首次post槽38非零、58/60为零。单RGB静态/动态精确验证仍有效，但只覆盖受控首帧式路径；不能据此宣称实际稳态时序输入已移植。此前“准备接游戏”不能跳过这个已出现的反证。
+- 下一步定位额外槽的历史/guide/warp用途，补齐稳态输入混合，再用连续原版帧核对。5090仍运行PID3536，AMD已退出，新神经DLL未部署。目标未完成。
+
+
 ### 2026-09-07：5090原版DLSSNR实际资源合同采样成功
 
 - Alt+F4使旧PID7528正常退出，Steam记录exit0。备份旧probe为`.before-nr-keys`后部署NR键版。初次重启失败原因已定位：DLSSNR-Launch-StellarBlade上次拉起Steam后任务仍Running，MultipleInstances=IgnoreNew导致2147946720；不是本次游戏崩溃。新增独立DLSSNR-GameRequest任务发送-applaunch，原Steam无需重启。
