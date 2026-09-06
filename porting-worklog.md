@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原RGB衍生链推进第65块（2026-09-06）：直接执行原C128 block61 outview（64×64、shift0、mode7、32×4），正常返回；validator新增--block61，global16/低两位交换解码与plain输出524288值全exact。prepare_native_rgb512_upsample56.py增加--block62，真实原block61 outview和block8-main跳接接入原第62块，给定shift0最终128×128×64的1048576值CPU/原全exact，报告upsample62-shift0/validation.json。
+
+普通decoder检查器扩展C64 block63～65，使用各自61760-byte记录，测试给定shift0/1/3，连续只消费前一原输出；三块各1048576值different0/max0，有效区外零、无NaN，导出参数及原final oracle。此移位序列目前是待核对的调用配置，不能说已证明原游戏调度同样如此；本轮仅证明所给配置下数值一致，不是最终画质验收。各报告在decoder-block63..65。
+
+下一步AMD63～65独立链与第66块C32上采样，随后67～70及全连续/真实游戏合同核对。AMD全RGB已验范围仍48，游戏DLL未改。
+
 AMD第62块独立通过（2026-09-06）：原生投影合同新增128→64、64或4096-token（主宽度8/64），宿主upsample62显式使用64×64主→128×128输出/skip，投影合流后直接接C64 NativeC64Shift。导出/运行/验证脚本增加互斥Block62选择，使用原seed2607/shift3夹具及其实际原输出。
 
 部署native-upsample62，三帧各1048576值different0/max0，device/fence/finite/replay通过。下载gpu.f32再核对全exact，SHA13bb952fbdb7a0e658532502aeccd2ac802a09de2366adb05354e129328300f1；报告release/native-upsample62/amd/validation.json明确独立上采样，不是RGB链。main/FFN/attention/projection编译分别34/2038/1909/157ms，非游戏帧时间。测试已正常退出。
