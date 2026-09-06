@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD退出与Steam云同步完成
+
+- 实时截图确认AMD仍主菜单base模式，MainWindowHandle=0。修正focus_game_key：按PID查UnrealWindow，核对前台PID才发键；增加Alt修饰并finally释放按键。发送Alt+F4任务返回0，但进程未退出、截图停住，未把发送成功当退出成功。
+- 依据用户此前允许直接结束游戏进程，核对PID34376名称后仅Stop-Process该Shipping。首次查询仍短暂存在，再查已消失；Steam04:16:39移除Shipping/launcher/crs-handler，退出码-1明确为强制结束，不称正常退出。
+- Steam AppID3489700日志：AutoCloud complete、global change74已同步、Upload complete；StellarBladeSave00.sav明确Skipping un-modified，设置文件由Steam正常同步。没有选择本地/云端覆盖。
+- 下一步5090取消旧云过期提示并重新启动已部署原版参数探针，核对实际NGX Color资源。AMD已无游戏进程，5090尚无Shipping，修复目标未完成。
+
+
 ### 2026-09-07：原版参数探针已部署5090，Steam云状态阻止启动
 
 - 确认5090游戏未运行，新增 `D:\SteamLibrary\steamapps\common\StellarBlade\SB\Binaries\Win64\native-ngx-input-contract.addon64`（已修NGX ABI版本），未替换原版DLL。启动任务DLSSNR-Launch-StellarBlade执行0但没有Shipping新进程，旧gameprocess日志无新启动。
