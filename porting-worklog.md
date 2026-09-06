@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第70块512×512变化底图参考通过（2026-09-06）：先对seed2819保持同一神经特征，换逐像素RGB渐变底图，768个RGB值全exact。新增native_post70_reference.py，明确仅texture_mask1/rgb_mode1，不含可选混合纹理分支；以固定记录直接解码主体/系数/FP16头，批量处理避免全幅乘积临时数组爆大。新测试64×64/seed2833、随机主/skip及变化底图的12288个RGB值全exact。
+
+首次512×512/seed2843有31/786432值不同、max1.9073486328125e-6，原fail报告保留。离线累加消融发现第二个K16的对齐指数必须同时考虑frexp(accumulator).exponent+1，相当于将accumulator×1也纳入操作数指数和的最大值；只考虑乘积、或只加accumulator指数本身均仍31差。加入+1后原失败夹具全部RGB exact。是否另截断acc在这些输入上无区分，未冒称已证明所有极端范围。
+
+更新默认对齐规则后再新建512×512/seed2851独立随机特征/渐变底图，原kernel与CPU最终786432个RGB值different0/max0。报告release/native-post70/reference-512-2851/validation.json为pass；原2843失败与accumulator-candidates报告完整保留，不覆盖反例。当前完成的是原版/CPU该后处理模式的数值参考，AMD第70块、RGB全网最终输出、1080p及游戏实际输入/移位合同仍待验收。游戏DLL未改，目标active。
+
 第70块独立种子及RGB舍入顺序修正（2026-09-06）：空间/头检查脚本增加--seed，原夹具保留。seed2819的常规half头有2个RGB差异，27位对齐头剩1个float32末位差异（1.4901161193847656e-8），未放宽标准。原因是先前将合成代数化简为0.25+0.25*head；原SASS先在编码域做float32(head*0.03125-0.03125)，再float32(encoded*8+0.5)，中间捨入不可省略。按原顺序后seed2819全部768个RGB值exact，seed2801回归也全部exact。失败计数保留本日志，当前hmma-validation报告反映修正后通过。
 
 这是两组16×16、恒底图的原版/CPU验证，尚未扩大尺寸或覆盖空间变化底图、可选混合纹理分支；AMD第70块与游戏最终画面仍未完成。游戏DLL未改，目标active。

@@ -1,10 +1,10 @@
 """Test measured HMMA product alignment in the post70 two-K16 output head."""
 from pathlib import Path
-import json,argparse
+import json,argparse,subprocess
 import numpy as np
 from native_c32_reference import unpack_bytes,block,H
 from native_split_reference import bits
-p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2801);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2801);p.add_argument('--varying-color',action='store_true');a=p.parse_args()
 root=Path('release/native-post70');fixture=root/f'spatial-{a.seed}'
 raw=np.fromfile(root/'smoke/weights.bin',np.uint8)
 ordinary=np.zeros(20672,np.uint8);ordinary[:0x2050]=raw[:0x2050];ordinary[0x2060:]=raw[0x20d0:0x5130]
@@ -24,10 +24,20 @@ value=aligned(features[:,:16],head[:,:16],np.zeros((256,3),np.float32))
 value=aligned(features[:,16:],head[:,16:],value)
 # Preserve original float32 RGB encode/add/decode order; algebraic folding
 # into base + residual changes the last bit at cancellation boundaries.
-encoded=np.float32(value*np.float32(.03125)+np.float32(-.03125))
+color=np.full((16,16,3),.25,np.float32);destination=fixture;target_path=fixture/'global-cell-out.f32'
+if a.varying_color:
+    destination=fixture/'varying-color';destination.mkdir(exist_ok=False)
+    yy,xx=np.indices((16,16),dtype=np.float32)
+    color=np.stack([.125+xx/32,.125+yy/32,.125+(xx+yy)/64],axis=-1)
+    rgba=np.concatenate([color,np.ones((16,16,1),np.float32)],axis=-1);rgba.tofile(destination/'color.f32')
+    target_path=destination/'output.f32'
+    subprocess.run(['timeout','--kill-after=2s','15s','/tmp/native-post70-oracle','/tmp/dlssnr-cubins/dlssnr-00.cubin','cc_tinlayout_fused_post_block_swin_1h_32_fp8',
+        str(fixture/'global-cell-main.fp8'),str(fixture/'global-cell-skip.fp8'),str(root/'smoke/weights.bin'),str(root/'smoke/blend.bin'),str(destination/'color.f32'),str(target_path),'16','16','1','1','0.03125','native'],check=True,timeout=20)
+base_encoded=np.float32(color.reshape(-1,3)*np.float32(.125)-np.float32(.0625))
+encoded=np.float32(value*np.float32(.03125)+base_encoded)
 got=np.clip(np.float32(encoded*np.float32(8)+np.float32(.5)),0,1).reshape(16,16,3)
-target=np.fromfile(fixture/'global-cell-out.f32','<f4').reshape(16,16,4)[:,:,:3]
-err=np.abs(got-target);report={'different':int(np.count_nonzero(err)),'max_error':float(err.max()),'scope':'single spatial post70 HMMA candidate, not general accumulator proof'}
+target=np.fromfile(target_path,'<f4').reshape(16,16,4)[:,:,:3]
+err=np.abs(got-target);report={'different':int(np.count_nonzero(err)),'max_error':float(err.max()),'varying_color':a.varying_color,'scope':'single spatial post70 HMMA candidate, not general accumulator proof'}
 report['status']='pass' if report['different']==0 else 'fail'
-(fixture/'hmma-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+(destination/'hmma-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 assert report['status']=='pass','post70 aligned head differs'
