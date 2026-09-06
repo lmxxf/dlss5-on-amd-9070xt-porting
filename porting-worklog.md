@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际几何汇总与32×20 repack映射
+
+- audit_native_1080_geometry.py读取launch0001的preblock（0000是16字节辅助kernel，不是preblock），确认pre/post HW1152/1920；encoder依次576/960、288/480、144/240、72/120、36/60，ViT20/32，decoder反向对应。输出native-1080-geometry-summary.json。
+- repack caller原先参数16/20传width/height，方形实验无法发现；按实际捕获H/W修正，增加Windows CUBIN路径。
+- RTX 32×20原始forward repack地址位探针26次launch，655360条映射全部唯一，source0..655359，两组held-out随机验证通过；ignored release/native-vit/repack640/forward.i32/json。
+- encoder末端36×60→ViT20×32不是无padding简单二倍，后续需验证pool/head及逆映射/裁剪。此次未部署游戏DLL，仍未完成真实图像路径。
+
 ### 2026-09-06：640-token八block原始与AMD分块整链通过
 
 - 原始31～38八block整链两次运行完成；check_native_block256.py --tokens640 --last-block38 共56阶段全部逐值通过。原始最终FP8 SHA256 96529fff888be2138ce032d1885627034c9f919408da13ba5fbe2d25cec93895。

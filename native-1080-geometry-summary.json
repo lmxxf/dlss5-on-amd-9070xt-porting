@@ -1,0 +1,104 @@
+{
+  "source": "release/native-kernel-params-25972-17399312",
+  "preblock_HW_at_f0": [
+    1152,
+    1920
+  ],
+  "encoder": [
+    {
+      "block": 1,
+      "HW": [
+        576,
+        960
+      ]
+    },
+    {
+      "block": 5,
+      "HW": [
+        288,
+        480
+      ]
+    },
+    {
+      "block": 9,
+      "HW": [
+        144,
+        240
+      ]
+    },
+    {
+      "block": 15,
+      "HW": [
+        72,
+        120
+      ]
+    },
+    {
+      "block": 23,
+      "HW": [
+        36,
+        60
+      ]
+    },
+    {
+      "block": 30,
+      "HW": [
+        36,
+        60
+      ]
+    }
+  ],
+  "vit_HW": [
+    20,
+    32
+  ],
+  "decoder": [
+    {
+      "block": 40,
+      "HW": [
+        36,
+        60
+      ]
+    },
+    {
+      "block": 48,
+      "HW": [
+        72,
+        120
+      ]
+    },
+    {
+      "block": 56,
+      "HW": [
+        144,
+        240
+      ]
+    },
+    {
+      "block": 62,
+      "HW": [
+        288,
+        480
+      ]
+    },
+    {
+      "block": 66,
+      "HW": [
+        576,
+        960
+      ]
+    },
+    {
+      "block": 69,
+      "HW": [
+        576,
+        960
+      ]
+    }
+  ],
+  "post_HW": [
+    1152,
+    1920
+  ],
+  "scope": "captured parameter geometry, not inferred valid texel region or game pixel acceptance"
+}

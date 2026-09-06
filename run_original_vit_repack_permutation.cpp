@@ -40,8 +40,8 @@ int main(int argc, char **argv) {
   check("context", cuDevicePrimaryCtxRetain(&context, device));
   check("set", cuCtxSetCurrent(context));
   CUmodule module;
-  check("module",
-        cuModuleLoad(&module, "/tmp/dlssnr-cubins/dlssnr-05.cubin"));
+  const char*cubin=std::getenv("DLSS5_VIT_CUBIN");
+  check("module",cuModuleLoad(&module,cubin?cubin:"/tmp/dlssnr-cubins/dlssnr-05.cubin"));
   CUfunction repack;
   check("function", cuModuleGetFunction(
                         &repack, module, inverse?"cc_vit_1d_repack_1d_to_2d_fp8":"cc_vit_1d_repack_2d_to_1d_fp8"));
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
   unsigned char params[0x18]{};
   std::memcpy(params + 0, &source, 8);
   std::memcpy(params + 8, &destination, 8);
-  std::memcpy(params + 16, &width, 4);
-  std::memcpy(params + 20, &height, 4);
+  std::memcpy(params + 16, &height, 4);
+  std::memcpy(params + 20, &width, 4);
   void *arguments[] = {params};
 
   auto launch = [&]() {
