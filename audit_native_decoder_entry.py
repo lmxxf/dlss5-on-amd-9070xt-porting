@@ -35,11 +35,22 @@ body = matches[0]
 ops = sorted(set(re.findall(r'\b(?:Q|H)MMA\.[A-Z0-9.]+', body)))
 if 'QMMA.16832.F16.E4M3.E4M3' not in ops:
     raise ValueError('expected FP8 matrix instruction missing')
+tail_loads = [line.split(';')[0].strip() for line in body.splitlines()
+              if 'LDG.' in line and '+0x80000]' in line]
+if not tail_loads:
+    raise ValueError('expected separate tail loads missing')
 print(json.dumps({
     'status': 'static_audit_pass', 'kernel': name,
     'payload_bytes': len(raw), 'container_element_count': r['element_count'],
     'payload_sha256': hashlib.sha256(raw).hexdigest(),
     'matrix_instructions': ops,
+    'separate_tail_loads': tail_loads,
+    'candidate_storage_split': {
+        'matrix_bytes': 0x80000, 'matrix_fp8_shape_candidate': [512, 1024],
+        'tail_bytes': len(raw) - 0x80000,
+        'tail_half_count_if_fp16': (len(raw) - 0x80000) // 2,
+        'status': 'address-supported candidate; logical permutation and tail role unverified',
+    },
     'constant_load_offsets': sorted(set(re.findall(r'c\[0x0\]\[(0x[0-9a-f]+)\]', body))),
     'unverified': ['matrix byte layout and tail semantics', 'input/skip/output layouts',
                    'launch geometry', 'numerical equivalence', 'final game image'],

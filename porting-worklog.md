@@ -2975,6 +2975,8 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第39块权重边界追踪（2026-09-06）：原SASS在0x0b50将参数+0x38权重指针装入UR20；0x2000构造UR20+4*index地址，0x2080从该地址+0x80000读32位值。共找到16处带+0x80000的LDG，审计脚本已输出其PC。结合总payload525312，支持“524288字节矩阵区＋1024字节尾区”候选，容量可容纳完整512×1024 FP8矩阵，而不是旧262144个FP16的两组投影假设。尾区可容纳512个half，但具体通道排列及乘加角色尚待追踪，不能只凭容量宣布解码实现正确。没有运行新GPU实验或改游戏文件。
+
 第39块恢复审计（2026-09-06）：audit_native_decoder_entry.py直接读取原DLL记录并检查CUBIN非tilesync入口，不运行GPU。实测payload为525312 bytes，SHA256 e7fa32bd2a8fe680eb90cfddbae7492ffedbb87fd7284cc229a2a122dc8c4fb8；262656是容器element_count，不是字节数，恢复摘要中的字节数错误已纠正。SASS矩阵指令为QMMA.16832.F16.E4M3.E4M3，因此旧build_block39_logical.py按整包FP16解释和operation-graph的容量分组推断不能作为原生实现依据。现有run_original_block39_basis.cpp仍是历史调用器，其launch/skip合同未重新验收，不启动大规模basis实验。下一步需从原指令恢复地址与尾部参数，再建立有超时的最小原生输入/skip探针；此静态审计不代表解码器数值通过。
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
