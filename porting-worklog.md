@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD pool/head补齐路径实现，待GPU验收
+
+- NativeC32Downsample对明确60×36 C512 raw输入设置32×20输出、30×18有效池化区域；输出buffer按实际geometry分配。旧整除8尺寸路径保持原几何。
+- native_c64_ds.hlsl在有效区域外显式写1024通道零并返回，避免读取源边界外数据；有效区域半精度池化/投影算术不改。
+- 现有host编译通过，尚未执行新尺寸GPU对照；下一步构造原始pool→head最终oracle验证。不得将本次实现记为已通过，未部署游戏DLL。
+
 ### 2026-09-06：真实projection系数与非零attention的pool边缘通过
 
 - check_native_pool_game_extent.py增加--real-weights：block30真实projection/skip权重，非零随机attention与非零FFN，实际36×60→20×32尺寸，pool输出预填FP8 1。

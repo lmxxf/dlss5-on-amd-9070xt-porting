@@ -8,6 +8,11 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 [numthreads(64,1,1)]void main(uint3 id:SV_DispatchThreadID){
  uint p=id.x;[branch]if(p>=width*height)return;uint base=((p/width)*2*source_width+(p%width)*2)*CHANNELS;
+ // Optional valid pooled rectangle: padded cells are explicitly overwritten.
+ if(unused_x!=0&&(p%width>=unused_x||p/width>=unused_y)){
+  [loop]for(uint row=0;row<2*CHANNELS;row++)output[p*(2*CHANNELS)+row]=0;
+  return;
+ }
  float pooled[CHANNELS];[loop]for(uint c=0;c<CHANNELS;c++){
   float top=H(raw[base+c]+raw[base+CHANNELS+c]);
   float bottom=H(raw[base+source_width*CHANNELS+c]+raw[base+(source_width+1)*CHANNELS+c]);

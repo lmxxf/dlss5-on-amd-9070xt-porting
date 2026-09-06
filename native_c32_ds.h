@@ -17,11 +17,13 @@ public:
  ~NativeC32Downsample(){if(input)input->Release();if(weights)weights->Release();if(output)output->Release();if(root)root->Release();if(pso)pso->Release();}
  // Raw path pools already-cropped half-valued HWC, then projects C -> 2C.
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,UINT shift,const std::vector<float>&w,const std::wstring&dir,bool c64_raw=false,UINT channels=64){
-  if(channels==512&&(width<8||height<8||width%8||height%8))throw std::runtime_error("unverified split pool/head extent");
+  const bool padded_head=c64_raw&&channels==512&&width==60&&height==36;
+  if(channels==512&&!padded_head&&(width<8||height<8||width%8||height%8))throw std::runtime_error("unverified split pool/head extent");
   if(input||!d||!src||(channels!=64&&channels!=128&&channels!=256&&channels!=512)||(!c64_raw&&channels!=64)||w.size()!=(c64_raw?2*channels*channels:2048)||!width||!height||(c64_raw?(width%2||height%2):(width%8||height%8))||shift>3||(c64_raw&&shift))throw std::runtime_error("DS contract");
   input=src;input->AddRef();geometry[0]=width/2;geometry[1]=height/2;geometry[3]=(shift&1)?2:0;geometry[4]=(shift&2)?2:0;geometry[2]=width/2+geometry[3]*2;
   if(c64_raw)geometry[2]=width;
-  output=Buffer(d,UINT64(width/2)*(height/2)*(c64_raw?2*channels:64)*4,false);weights=Buffer(d,w.size()*4,true);void*ptr=nullptr;D3D12_RANGE empty{};Check(weights->Map(0,&empty,&ptr));std::memcpy(ptr,w.data(),w.size()*4);weights->Unmap(0,nullptr);
+  if(padded_head){geometry[0]=32;geometry[1]=20;geometry[3]=width/2;geometry[4]=height/2;}
+  output=Buffer(d,UINT64(geometry[0])*geometry[1]*(c64_raw?2*channels:64)*4,false);weights=Buffer(d,w.size()*4,true);void*ptr=nullptr;D3D12_RANGE empty{};Check(weights->Map(0,&empty,&ptr));std::memcpy(ptr,w.data(),w.size()*4);weights->Unmap(0,nullptr);
   D3D12_ROOT_PARAMETER parameters[4]{};parameters[0].ParameterType=parameters[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;parameters[1].Descriptor.ShaderRegister=1;parameters[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;parameters[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;parameters[3].Constants={0,0,5};
   D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=4;desc.pParameters=parameters;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();error=nullptr;
   auto channel_text=std::to_string(channels);D3D_SHADER_MACRO macros[]={{"CHANNELS",channel_text.c_str()},{nullptr,nullptr}};
