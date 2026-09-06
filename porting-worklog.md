@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：60×36部分窗口原始decoder40/41对照
+
+- check_native_decoder_split.py新增--game-extent，按实际60×36解码cell并执行原kernel，保留旧16×16默认。
+- 原始decoder39输出作为block40输入，shift0四阶段branch/ffn/attention/final均零差异。再将block40输出送入block41，使用实际shift3，检查相同四阶段。
+- 结果保存在ignored release/native-decoder-game-split，各block validation.json为判据；这仍是原始/CPU对照，未验证AMD部分窗口GPU链、未部署游戏DLL。
+
 ### 2026-09-06：AMD实际decoder39裁剪三帧精确通过
 
 - prepare_native_decoder_game_gpu.py解码原始decoder结果，extent host新增decoder39_game，上传独立随机main/skip和真实系数，调用生产NativeVitLinear decoder路径。

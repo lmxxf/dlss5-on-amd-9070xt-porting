@@ -12,7 +12,9 @@ p.add_argument('--block',type=int,choices=range(40,48),required=True)
 p.add_argument('--shift',type=int,choices=range(4),required=True)
 p.add_argument('--input',type=Path,required=True)
 p.add_argument('--output-root',type=Path,default=Path('release/native-rgb512'))
+p.add_argument('--game-extent',action='store_true')
 a=p.parse_args();root=a.output_root/f'decoder-block{a.block}'
+width,height=(60,36) if a.game_extent else (16,16)
 root.mkdir(parents=True,exist_ok=False)
 report={'status':'running','block':a.block,'shift':a.shift,'input':str(a.input),'scope':'original/CPU split stages, not AMD or runtime shift proof'}
 def save(): (root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -24,13 +26,14 @@ try:
     env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_SPLIT_')}
     output=root/'output.fp8'
     subprocess.run(['timeout','--kill-after=2s','15s','/tmp/native-split-global-oracle',str(a.input),str(output),
-                    *[str(root/f'block{a.block}-{i}.weights') for i in range(4)],'16','16',str(a.shift),'native-plain'],
+                    *[str(root/f'block{a.block}-{i}.weights') for i in range(4)],str(width),str(height),str(a.shift),'native-plain'],
                    env=env,check=True,timeout=20)
     inverse=np.argsort(np.load('release/native-c512/split-view/mapping.npz')['cell_output_to_hwc'])
     def decode(path):
         v=np.fromfile(path,np.uint8)
-        assert v.size>=131072 and not np.any(v[131072:]) and not np.any((v[:131072]&127)==127)
-        return e4m3fn(v[:131072].reshape(-1,8192)[:,inverse]).reshape(4,4,4,4,512).transpose(0,2,1,3,4).reshape(16,16,512)
+        count=width*height*512
+        assert v.size>=count and not np.any(v[count:]) and not np.any((v[:count]&127)==127)
+        return e4m3fn(v[:count].reshape(-1,8192)[:,inverse]).reshape(height//4,width//4,4,4,512).transpose(0,2,1,3,4).reshape(height,width,512)
     x=decode(a.input);fw,fp,qkv,bias,scales,projection=unpack(root,a.block)
     branch=ffwd(x,fw);feature=F(multiply(branch,fp['matrix'],H(x*fp['skip'])))
     attended=attention_window(feature,qkv,bias,scales,a.shift)
