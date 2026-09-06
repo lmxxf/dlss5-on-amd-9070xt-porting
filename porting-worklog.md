@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原问题窗口tap全512值一致，剩余错误转向y55区域
+
+- 配套当前motion、sampler与tap诊断shader，session48749实际回读block14 warp1的512个UV/权重值与原PC1590全部bit-exact；证据gpu-taps-motionfma.f32/validation.json。此前被反复追踪的lane1/9座标偏差已修复，但仅限该捕获窗口。
+- 测试五tap累加四处显式double3 fma，session89148完整回归仍45/14，已撤回并同步正常sampler。accumfma读回在原窗口96个RGB值转half全部一致，float最大差1.19209e-7；无改善实验不保留在生产路径。
+- 验证器新增每路前8个HWC失配位置与数值，不改变严格通过标准。当前首个main失配为x37/y55（多个通道），后续x24/y60；down首个x18/y27。后续应抓原block(4,6)、warp1对应y52..55/x32..39，再对照当前GPU，不再以已通过的block14/warp1解释剩余错误。
+- 游戏DLL未改，目标仍未完成。已有完整网络单帧实验不能替代时序及游戏验收。
+
 ### 2026-09-07：运动UV融合乘加修正，捕获窗口64值全一致
 
 - 前轮有有效进展，本轮继续针对前级唯一1ULP偏差。native_temporal_coordinates.hlsl的previous_uv显式double fma转float；session39359五帧完成，捕获block14 warp1的64值从1处差异变为全部bit-exact。新增check_native_motion_uv_capture.py，证据large/motionfma/uv-validation.json。

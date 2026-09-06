@@ -23,7 +23,12 @@ checks=[]
 for name,expected in [('main',main),('down',down)]:
     actual=np.fromfile(gpu/f'{prefix}{name}.f32',np.float32)
     assert actual.shape==expected.shape and np.isfinite(actual).all()
-    checks.append({'branch':name,'values':actual.size,'different':int(np.count_nonzero(actual!=expected))})
+    bad=np.flatnonzero(actual!=expected)
+    row_width=width if name=='main' else width//2
+    checks.append({'branch':name,'values':actual.size,'different':int(bad.size),
+                   'first_mismatches':[{'y':int(i//(row_width*32)),
+                     'x':int(i//32%row_width),'channel':int(i%32),
+                     'actual':float(actual[i]),'expected':float(expected[i])} for i in bad[:8]]})
 report={'scope':'single input regression' if args.single else 'GPU motion coordinates -> sampler -> preblock; controlled 8x8 no slot18 branch' if args.motion else 'GPU sampler directly into preblock; supplied transformed coordinates, not full motion path' if args.direct else 'CPU-supplied temporal RGB into production GPU preblock; sampler not directly connected',
         'checks':checks,'pass':all(c['different']==0 for c in checks)}
 if args.variable:report['scope']='GPU spatially varying motion -> sampler -> preblock; controlled 8x8 no slot18 branch'
