@@ -3,13 +3,20 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import argparse
 
 base = Path('release/native-rgb-valid1080')
-report = json.loads((base / 'upsample48/validation.json').read_text())
+p = argparse.ArgumentParser()
+p.add_argument('--c128', action='store_true')
+args = p.parse_args()
+entry = 56 if args.c128 else 48
+report = json.loads((base / f'upsample{entry}/validation.json').read_text())
 assert report['different'] == 0 and report['finite'] and report['tail_zero']
-previous = base / 'upsample48/output.fp8'
-root = base / 'decoder-c256'
-for block, shift in zip(range(49, 56), (3, 1, 2, 0, 3, 1, 2)):
+previous = base / f'upsample{entry}/output.fp8'
+root = base / ('decoder-c128' if args.c128 else 'decoder-c256')
+blocks = range(57, 62) if args.c128 else range(49, 56)
+shifts = (2, 0, 3, 1, 2) if args.c128 else (3, 1, 2, 0, 3, 1, 2)
+for block, shift in zip(blocks, shifts):
     subprocess.run([sys.executable, 'check_native_decoder_c256.py',
                     '--block', str(block), '--shift', str(shift),
                     '--input', str(previous), '--output-root', str(root),

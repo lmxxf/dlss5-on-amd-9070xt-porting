@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同 RGB 原版56～61连续通过
+
+- block56 验证器新增 `--skip-hwc`，保留原随机模式。此次 main明确使用同 RGB `decoder-c256/decoder-block55/oracle.f32`，skip使用 `encoder-c128/block14-main.f32`；输出4423680值different=0，finite/tail_zero通过。ignored `release/native-rgb-valid1080/upsample56/validation.json`记录两个来源。
+- 同源解码链运行器 `check_native_valid1080_decoder49_55.py --c128` 接57～61，实际移位2/0/3/1/2，5层各4423680值different=0/status=pass。ignored `release/native-rgb-valid1080/decoder-c128`。
+- AMD head测试继续轮询session44927，仍有512通道attention/projection成功编译输出，未结束，未重启。其结果仍待GPU回读验证；游戏DLL未更新。下一步同源62～65（encoder8跳接）并收取AMD任务结果。
+
+
 ### 2026-09-07：同 RGB 原版48～55连续通过
 
 - `check_native_upsample48_game.py --valid1080` 使用同 RGB decoder47输出和encoder22的FP8 main跳接，实际120×72输出2211840值different=0/max_abs=0，finite/tail_zero通过。旧独立随机测试模式保留。
