@@ -11,7 +11,7 @@ int main(int argc,char**argv){
  uint64_t tokens=std::strtoull(argv[4],nullptr,0);unsigned gx=std::strtoul(argv[5],nullptr,0);if(!tokens||tokens>256||!gx||gx>128)return 2;
  if(tokens!=16&&tokens!=64&&tokens!=128&&tokens!=256)return 2;
  const size_t capacity=4*1024*1024;auto input=read(argv[1],size_t((tokens+31)/32*32)*1024,false),weights=read(argv[3],4194320,true);
- ck(cuInit(0));CUdevice d;ck(cuDeviceGet(&d,0));CUcontext context;ck(cuDevicePrimaryCtxRetain(&context,d));ck(cuCtxSetCurrent(context));CUmodule module;ck(cuModuleLoad(&module,"/tmp/dlssnr-cubins/dlssnr-05.cubin"));CUfunction f;ck(cuModuleGetFunction(&f,module,"cc_vit_1d_ffn_expand_fp8"));
+ ck(cuInit(0));CUdevice d;ck(cuDeviceGet(&d,0));CUcontext context;ck(cuDevicePrimaryCtxRetain(&context,d));ck(cuCtxSetCurrent(context));CUmodule module;const char*cubin=std::getenv("DLSS5_VIT_CUBIN");ck(cuModuleLoad(&module,cubin?cubin:"/tmp/dlssnr-cubins/dlssnr-05.cubin"));CUfunction f;ck(cuModuleGetFunction(&f,module,"cc_vit_1d_ffn_expand_fp8"));
  CUdeviceptr src,dst,weight,aux;ck(cuMemAlloc(&src,input.size()));ck(cuMemAlloc(&dst,capacity));ck(cuMemAlloc(&aux,capacity));ck(cuMemAlloc(&weight,weights.size()));ck(cuMemcpyHtoD(src,input.data(),input.size()));ck(cuMemsetD8(dst,0,capacity));ck(cuMemsetD8(aux,0,capacity));ck(cuMemcpyHtoD(weight,weights.data(),weights.size()));
  alignas(8) unsigned char p[0x48]{};std::memcpy(p,&src,8);std::memcpy(p+16,&dst,8);std::memcpy(p+24,&weight,8);std::memcpy(p+56,&aux,8);std::memcpy(p+64,&tokens,8);void*args[]={p};
  const unsigned width=tokens==16?4:tokens==64?8:16,height=unsigned(tokens)/width;const unsigned dims[]={height,width};std::memcpy(p+64,dims,8);

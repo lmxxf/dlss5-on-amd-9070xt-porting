@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：256-token 原始 expand 精确验证
+
+- 原始 expand caller 增加 Windows CUBIN 环境路径，`run_nvidia_expand_extent.ps1` 在 RTX 5090 独立运行 256 tokens / gridX=64。
+- seed=3003 随机输入、block31 原始权重，两次输出 SHA256 均为 `c259149373f24c9089d5dcfa43fe91d79952cb36375218d46af5a5304da2d777`。
+- `check_native_expand_extent.py` 验证扩展后的 token 地址位与既有原生 expand 算术，1048576 个值全部 different=0 / max_abs=0，finite、尾部零、replay 一致。数据 ignored `release/native-vit/expand-256-3003/`。
+- 仅原始内核对照；AMD expand / contract / projection 的新尺寸仍未验证，未部署游戏 DLL。
+
 ### 2026-09-06：256-token AMD QKV→attention GPU 串联通过
 
 - extent test 新增 qkv_attention 模式：生产 NativeVitQkv.Output() 直接作为 NativeVitAttention 输入，同一 command list 内执行，无中间 CPU 回读/注入。
