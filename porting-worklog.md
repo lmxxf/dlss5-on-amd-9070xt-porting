@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同RGB GPU0～22运行中，尚无验收结果
+
+- runner增加-Front22并清理该开关；验证器增加--front22对应raw main2211840值（按FP8边界比较）及down1105920值。
+- 已部署独立native-valid1080-front22实验目录并启动，当前统一exec session7712仍运行。远端PID31784连续实查活跃，CPU时间25.2→119.2→237.0秒、内存增长，尚未输出五帧结果；未重启/误判完成。
+- 下一次继续poll同一session7712或核对PID31784，不重新启动。输出成功后需下载gpu-main/down并运行validate_native_valid1080_front8_gpu.py --front22。未部署游戏DLL。
+
 ### 2026-09-07：同RGB GPU0～22整链准备
 
 - prepare_native_valid1080_front22_gpu.py核对原始15～22 main/down22通过，导出C256八层系数及原始主/down答案，继承同一有效RGB与0～14参数。
