@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block62实际480×288原始对照通过
+
+- 原始fused探针对mode9/by2/480×288使用16MiB arena，输出8847360字节超过旧8MiB，明确扩容后运行。
+- check_native_upsample62_game.py使用独立非零随机240×144×128 main、480×288×64 skip、真实block62权重、shift0/grid60×36。
+- 原始完整放大/融合/Swin输出8847360值与参考全部零差异，finite/tail通过。ignored release/native-upsample62/game保存fixture；尚未AMD新尺寸验证，未部署游戏DLL。
+
 ### 2026-09-06：AMD实际decoder57～61五层GPU链通过
 
 - host增加decoder57_61_game，240×144 C128、实际shift2/0/3/1/2，生产NativeC64Shift五层GPU直接串联。
