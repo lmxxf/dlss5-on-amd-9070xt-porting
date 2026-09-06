@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080 GPU0～4整链host接入待测
+
+- preblock test新增DLSS5_FRONT4，强制reflect valid1080模式，GPU reflect→preblock→四层C32→DS直接串联，尺寸960×576/480×288，shift0/3/1/2。
+- 两个主要回读改为block4 main及DS，保留preblock raw诊断；沿用seed0/0/0/1/0重放检查。
+- C++编译通过、diff检查通过，尚未运行此新路径；下一步原始双oracle对照，未部署游戏DLL。
+
 ### 2026-09-06：valid1080 RGB0～4整链GPU fixture准备
 
 - prepare_native_valid1080_front_gpu.py检查四主分支与down参考通过，直接解码原始1～4系数及block4 DS矩阵。
