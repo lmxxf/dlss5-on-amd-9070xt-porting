@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第39块旧探针反证与新探针（2026-09-06）：原SASS 0x0720读取CTAID.Z至UR25，0x1660比较Z>=3，Z<3跳去partial路径；旧run_original_block39_basis.cpp仅gridZ=2，且把参数+0x30读回当输出，因而未执行最终Z3解码分支。原最终量化/存储使用+0x10指针，+0x30为中间区，+0x20为分区计数器。0x15c0～0x1630等待counter>=Z-1，0x6a80写入当前Z；新探针counter初始设-1，避免Z1提前越过Z0。
+
+新增run_native_decoder_entry_probe.cpp及同名.sh，默认仅文件/参数预检，不初始化CUDA；显式--run才启动一次候选grid=(2*ceil(W/4),ceil(H/4),4)、block=(32,2,1)、cluster=(1,1,4)。最终output、partial、counter分别完整保存2MiB，不截前8KiB，不将运行成功标为数值通过；拒绝覆盖既有结果。shell对进程设15秒观察上限，但不承诺能中断失控GPU kernel。当前只通过g++语法检查和bash语法检查，未执行新GPU探针；几何、真实输入布局与skip尺寸仍属待验候选。游戏DLL未更换。
+
 第39块权重边界追踪（2026-09-06）：原SASS在0x0b50将参数+0x38权重指针装入UR20；0x2000构造UR20+4*index地址，0x2080从该地址+0x80000读32位值。共找到16处带+0x80000的LDG，审计脚本已输出其PC。结合总payload525312，支持“524288字节矩阵区＋1024字节尾区”候选，容量可容纳完整512×1024 FP8矩阵，而不是旧262144个FP16的两组投影假设。尾区可容纳512个half，但具体通道排列及乘加角色尚待追踪，不能只凭容量宣布解码实现正确。没有运行新GPU实验或改游戏文件。
 
 第39块恢复审计（2026-09-06）：audit_native_decoder_entry.py直接读取原DLL记录并检查CUBIN非tilesync入口，不运行GPU。实测payload为525312 bytes，SHA256 e7fa32bd2a8fe680eb90cfddbae7492ffedbb87fd7284cc229a2a122dc8c4fb8；262656是容器element_count，不是字节数，恢复摘要中的字节数错误已纠正。SASS矩阵指令为QMMA.16832.F16.E4M3.E4M3，因此旧build_block39_logical.py按整包FP16解释和operation-graph的容量分组推断不能作为原生实现依据。现有run_original_block39_basis.cpp仍是历史调用器，其launch/skip合同未重新验收，不启动大规模basis实验。下一步需从原指令恢复地址与尾部参数，再建立有超时的最小原生输入/skip探针；此静态审计不代表解码器数值通过。
