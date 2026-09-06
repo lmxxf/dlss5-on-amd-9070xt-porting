@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD256-token八block全GPU串联通过
+
+- extent test 增加 chain31_38，八个生产 NativeVitBlock 依次创建，上一block GPU输出直接作为下一block输入。只上传初始特征和32份权重，不上传中间特征。
+- RX9070XT三次完整串联，最终262144值全部different=0/max_abs=0，finite/device/fence检查通过；回读gpu.f32与原始整链oracle字节级cmp一致。ignored release/native-vit/chain256-3003/gpu.f32。
+- 固定随机输入、256-token完整ViT通过；仍需真实1080p几何/部分窗口、输入纹理契约及游戏DLL最终画面验证，本轮没有部署游戏DLL。
+
 ### 2026-09-06：原始256-token八block ViT参考链通过
 
 - run_nvidia_block256.ps1 增加 LastBlock=38，分别加载31..38各自权重，上一block projection传入下一block，整链重复两次。
