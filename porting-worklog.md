@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：decoder39真实尺寸左上裁剪原始对照通过
+
+- check_native_decoder_game_extent.py独立随机20×32×1024 main及36×60×512 skip，真实block39权重，原始kernel参数input20/32/output36/60、grid16×5×4、16MiB arena。
+- 原始输出与四分区半精度投影→nearest二倍→左上36×60→融合skip参考1105920值全部一致、finite/tail通过。偏移2/2和4/4裁剪分别1085188、1085351值不同。
+- ignored release/native-decoder-game保留输入、权重、输出及partial/counters；单次本地Spark原始探针，不是AMD新尺寸或游戏验收。下一步将显式主尺寸/输出尺寸接进AMD decoder，未部署DLL。
+
 ### 2026-09-06：decoder39实际裁剪尺寸及探针容量修正
 
 - launch0099参数0x40为inputHW20/32、outputHW36/60。原版显式输出60×36，不是64×40后任意解释；geometry summary新增直接证据。
