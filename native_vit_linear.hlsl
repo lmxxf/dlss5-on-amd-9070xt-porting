@@ -7,15 +7,16 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  uint token=id.x/OUTPUT_CHANNELS,row=id.x%OUTPUT_CHANNELS;if(token>=tokens)return;
 #if DECODER_ENTRY
  float total=0;
- [loop]for(uint part=0;part<4;part++){
+ const uint partitions=INPUT_CHANNELS==1024?4:1;
+ [loop]for(uint part=0;part<partitions;part++){
   float a=0;
-  [loop]for(uint k=part*256;k<(part+1)*256;k+=32){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[token*1024+k+j]*weights[row*1024+k+j];a=H(a+s);}
+  [loop]for(uint k=part*(INPUT_CHANNELS/partitions);k<(part+1)*(INPUT_CHANNELS/partitions);k+=32){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[token*INPUT_CHANNELS+k+j]*weights[row*INPUT_CHANNELS+k+j];a=H(a+s);}
   total=part==0?a:H(total+a);
  }
  // Independently verified geometry: 8x8 main -> 16x16 output/skip.
  [unroll]for(uint dy=0;dy<2;dy++)[unroll]for(uint dx=0;dx<2;dx++){
-  uint index=((token/8*2+dy)*16+token%8*2+dx)*512+row;
-  output[index]=F(H(total+F(residual[index])*weights[524288+row]));
+  uint index=((token/8*2+dy)*16+token%8*2+dx)*OUTPUT_CHANNELS+row;
+  output[index]=F(H(total+F(residual[index])*weights[INPUT_CHANNELS*OUTPUT_CHANNELS+row]));
  }
 #elif EXPAND
  float a=0;

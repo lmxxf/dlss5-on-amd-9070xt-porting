@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第48块独立移植通过（2026-09-06）：NativeVitLinear的显式decoder模式扩展512→256输入投影，K512单分区每K32 half累计；1024→512第39块仍保留四K256分区。nearest2倍及FP8融合skip后直接接NativeC64Shift(C256)完成Swin，常驻GPU无中间CPU传输。当前投影几何仍只开放64-token主输入，未偷扩到RGB链所需16×16主输入。
+
+d3d12_native_pool_head_test.cpp新增upsample48模式，shift从验证夹具单值文件严格读取，prepare_native_upsample48_gpu.py导出原seed2411/shift3最终oracle及直接解码系数。部署D:\DLSSNR-Lab\matrix-probe\native-upsample48，三帧各65536值different0/max0，device/fence/finite/replay检查通过。下载再由validate_native_upsample48_gpu.py全exact，SHA d86ccbf8c2b524c38c0023344a1d33fc03dab7c3ca56b70213008762fab39445。编译日志main38ms、FFN28401ms、attention3135ms、projection10591ms，不是运行帧耗时。
+
+由于复用了线性类，另将同一新exe与shader在native-decoder39目录执行decoder39回归，三帧各131072值仍全exact，避免修改投影分区损坏已通过算子。宿主最终日志类名仍为native_vit_linear，本轮实际模式由命令upsample48/decoder39区分。第48块尚未接RGB连续链，需扩展16×16主输入尺寸、原block47 outview和block22跳接连接，之后推进49～70；游戏DLL未改，目标active。
+
 第48块随机反例修复：主输入是global16而非cell（2026-09-06）。原SASS初始输入地址随K增量跨全幅，且CUBIN04存在split projection outview版本；据此测试global16主输入排列。plain global16单位投影仍32296值不同，而在全域16通道分组内交换逻辑通道索引最低两位后，单位投影65536值全exact。编码为quantize(x[...,perm]).reshape(H,W,32,16).transpose(2,0,1,3)，perm=(c&~3)|((c&1)<<1)|((c&2)>>1)。此前C512 cell和两个C256 cell候选失败，问题实际在原主输入物理布局，不是已恢复矩阵系数。
 
 随后使用原block48权重，seed2401/shift0以及独立seed2411/shift3两次随机主/skip测试各65536值different0/max0，包括双轴移位的零填充边界。native_upsample48_reference.py的逻辑HWC算法无需改变：投影→nearest2倍→half融合skip→FP8→C256 Swin。通过报告为release/native-upsample48/spatial-2401-0-global-swap及spatial-2411-3-global-swap/validation.json。失败目录完整保留；新脚本--main-global swap显式选正确原版编码，其他布局选项仍作诊断。
