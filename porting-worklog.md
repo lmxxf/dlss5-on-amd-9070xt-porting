@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080 block4下采样参考首轮失败
+
+- validate_native_valid1080_ds4.py从已验证block3主输出重算block4 raw half，水平pair半精度池化，再用既有block4-ds矩阵投影。
+- 按global16解释原始C64 down后，8847360值中6121052不同、max_abs49、最终finite；进程assert失败，结果保存encoder-c32/down-validation.json，未导出通过oracle。
+- 此结果不推翻已验证block4主分支，但说明当前down算术/矩阵通道或物理布局假设尚未成立。下一步先核对原始C64 down布局，不吞错误继续整链。未部署DLL。
+
 ### 2026-09-06：同valid1080输入encoder1～4主分支逐值通过
 
 - validate_native_valid1080_c32.py从原始block0-down逻辑global16读取，按shift0/3/1/2逐层计算，四层各17694720主分支值与原kernel零差异、最终finite。
