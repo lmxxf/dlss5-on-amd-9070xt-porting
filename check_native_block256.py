@@ -7,8 +7,9 @@ from decode_tinlayout_global import e4m3fn
 from native_vit_linear_reference import expand,unpack_expand,unpack_residual,residual_projection
 from native_vit_qkv_reference import qkv,unpack
 from native_vit_attention_reference import attention
-p=argparse.ArgumentParser();p.add_argument('--last-block',type=int,choices=range(31,39),default=31);p.add_argument('--tokens',type=int,choices=[256,640],default=256);args=p.parse_args()
-n=args.tokens;seed=3006 if n==640 else 3003;base=Path('release/native-vit');job=base/f'{"block" if args.last_block==31 else "chain"}{n}-{seed}';root=job;reports=[]
+p=argparse.ArgumentParser();p.add_argument('--last-block',type=int,choices=range(31,39),default=31);p.add_argument('--tokens',type=int,choices=[256,640],default=256);p.add_argument('--valid1080',action='store_true');args=p.parse_args()
+if args.valid1080 and (args.tokens!=640 or args.last_block!=38):p.error('valid1080 requires 640 tokens and last block 38')
+n=args.tokens;seed=3006 if n==640 else 3003;base=Path('release/native-vit');job=Path('release/native-rgb-valid1080/vit') if args.valid1080 else base/f'{"block" if args.last_block==31 else "chain"}{n}-{seed}';root=job;reports=[]
 def check(name,expected,part=None):
  c=expected.shape[1];size=n*c;b=c.bit_length()
  high=list(range(b+5,b-1+(n-1).bit_length()))
@@ -21,7 +22,7 @@ def check(name,expected,part=None):
  (job/'validation.json').write_text(json.dumps({'scope':'original sequential block reference, not AMD/game','tokens':n,'stages':reports},indent=2)+'\n')
  assert r['different']==0 and r['finite'] and r['tail_zero'] and r['replay_identical']
  return actual
-x=np.load(base/f'attention-random-{n}-{seed}/logical.npz')['q']
+x=np.fromfile(job/'input.f32',np.float32).reshape(n,1024) if args.valid1080 else np.load(base/f'attention-random-{n}-{seed}/logical.npz')['q']
 x.tofile(job/'input.f32')
 for block in range(31,args.last_block+1):
  root=job if args.last_block==31 else job/f'block{block}'

@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同 RGB 原版 ViT31～38 全部对齐；AMD head 测试运行中
+
+- 新增 `prepare_native_valid1080_vit.py`：从已验证的原版 head.fp8 经原版 32×20 repack 映射生成 ViT 输入，独立与 head.f32 的 GPU 逻辑 gather 路径比对，655360 个输入值精确一致；不使用随机 ViT 输入。
+- RTX5090 独立测试目录 `D:\DLSSNR-Lab\native-valid1080-vit`，原版 31～38 层连续运行两次完成。未操作游戏界面或存档。
+- `check_native_block256.py --tokens 640 --last-block 38 --valid1080` 返回 0；8 层×7 阶段共 56 项 different=0，finite/tail_zero/replay_identical 全通过。产物在 ignored `release/native-rgb-valid1080/vit`，其中 oracle.f32 是同 RGB block38 原版逻辑输出。此结果不是 AMD ViT 验收或游戏最终画面验证。
+- AMD 连续 0～30/head 测试已启动：远端 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-head`，PID28224，当前 unified exec session44927。已观察到进程 CPU 时间增长及 shader_compile_end 成功日志，尚在初始化、未读回结果。后续先轮询同一 session/进程，禁止仅因等待时间长重启。启动时脚本策略拒绝过一次（未启动 exe），随后用进程级 ExecutionPolicy Bypass 成功，未修改系统策略。
+- 下一步：收取 AMD gpu-main/down 输出并运行 head 验证器，再接同 RGB ViT 和 decoder；游戏 DLL 仍未更新。
+
+
 ### 2026-09-07：接回同 RGB GPU0～30/head 验证入口（尚未 GPU 验收）
 
 - 用户已将桌面改为 1080p、游戏改为无边框窗口，5090 停在主菜单；本轮未操作游戏或修改存档。
