@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD完整RGB512→RGB通过（2026-09-06）：同一会话21197正常exit0，33个shader编译/228次缓存命中，三帧fence等待2469/2406/2390ms及device/fence/finite/replay通过。下载output-rgb512-final.f32后严格最终比较786432值different0/max0，SHA66a3d99a2e0a2111c87373731ca58c0331c2d96ff28086e13cbed96810fa181a；final-validation.json为pass，相对原RGB有786293分量变化大于1e-5。此为完整GPU初始RGB→神经网络→最终RGB，不是独立段拼接。五个DS文件重新下载核对也全exact。
+
+等待期间核对真实尺寸线索：原preblock参数0xf0/0xf4为2176/3840，原caller证明顺序H/W；1080p候选应核对1920×1088输入，旧表960×544不能混当preblock输入。检查当前源代码，ViT仍64-token限定，post≤512，decoder tail固定尺寸，且原游戏移位/多纹理合同未重新验证。因此不部署512实验冒充1080p。新增native-runtime-contract.md集中列明真实运行前的剩余条件，防止历史README成功宣称与当前范围混淆。当前无待观察测试进程，游戏DLL未改，目标active。
+
 原RGB512最终RGB对齐、AMD整网回归启动（2026-09-06）：原C32 block69 outview实际执行后，global16不交换通道低两位的解码与plain输出2097152值全exact。prepare_native_rgb512_post70.py取真实原block69 outview、原preblock主分支及同一张RGB输入，mask1/mode1运行原post70，CPU最终786432个RGB分量different0/max0。报告release/native-rgb512/post70/validation.json，范围仍为当前控制配置，不是原游戏所有输入/移位模式。
 
 front-chain增加rgb512final，把NativePost70接到GPU69和pre.Main。底图独立UPLOAD但逐像素核对其与编码器tile输入为同一RGB，仅初始输入布局不同，不是中间特征注入。拒绝DLSS5_POST_BASE_ONLY诊断变量，FinalRGB入口清除该变量。输出独立output-rgb512-final.f32；导出及严格验证器已加入，MinGW编译通过。整网仅在实验目录部署，游戏DLL未改。
