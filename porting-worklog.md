@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第70块原版神经分支因果响应（2026-09-06）：扩展smoke脚本，保持16×16底图RGB0.25及全部标量参数不变，单独main恒FP8 0.5或skip恒0.5。两例原kernel均正常返回、RGBA全finite，768个RGB分量全部改变；相对底图max差分别0.001178741455078125和0.00431060791015625。报告smoke-main/smoke-skip，输出SHA分别617b4b433e9485cc924ec8b5dcd7e1500eaa303fff42a6977cfd7f039650b724、6df8c6b78ade7fa2cb6a446687d4380f10b1b25d103d1ef106876c9ceeb77554。
+
+进一步只将权重0x5130后的1024字节清零，其他输入/主体权重/参数保持不变，两个非零输入例的RGB都逐值恢复底图0.25。记录effective_weights SHA，区分原提取记录和控制记录。此消融证明在该原版夹具中，main/skip造成的RGB变化依赖最后权重区，不是单纯底图采样差异；不代表AMD第70块已经移植。
+
+audit_native_post70_head.py按候选FP16片段排列检查尾部512个half，16×32候选矩阵只有行0/2/4/6非零（各32项），blend half=0.73974609375。行的颜色/控制语义与运算舍入仍未证明，不能直接把“16行”说成16个实际输出通道。下一步恢复主体前合流、最终head和RGB合成的数值合同。游戏DLL未改，目标active。
+
 AMD RGB512→69完整连续通过（2026-09-06）：同一会话32104正常exit0；31个shader编译、228次缓存命中，三帧提交至fence等待2390/2329/2390ms，device/fence/finite/replay检查通过。下载最终block69结果后2097152值different0/max0，SHA b9ce77048ae6064b165fd423df82d3072126fe839ab925b46253a6938dbf5d4a；报告amd/tail69-validation.json为pass。五份DS读回重新下载比较，DS0/4/8/14/22也全exact。此前未独立GPU验证的63～65和67～69现在被该连续链最终检查覆盖，但不声称逐块GPU中间读回全做过。
 
 第70块原版小尺寸入口（2026-09-06）：旧post probe要求main/skip各320MiB且硬编码4K纹理坐标、指针+0x2800，不适合新紧凑夹具。新增显式native模式，限制16～512的16倍数尺寸，按尺寸分配buffer，输入有效区外必须零，原数据指针从buffer起点，纹理尺寸/倒数和输出rect按实际尺寸设置；旧features与默认模式仍保留，blend额外空间确定性清零。该模式尚非完整参数合同证明。
