@@ -2659,6 +2659,14 @@ d3d12_native_split_test.cpp在9070XT、16×8×512独立输入上逐段检查bran
 
 这证明C512独立层GPU正确与资源重用，不等于RGB→block23整链已闭合：当前前端小夹具到block22仅4×2有效尺寸，原split的4×2调用仍全零，需要核对物理padding/尺寸合同或建立符合原调度的大夹具。实际连续RGB前缀仍block0..22 DS，独立C512仅16×8测试通过；游戏DLL、公开ZIP未更新，后续split/ViT/解码器及最终剑星画面目标active。
 
+### 2026-09-06 C512小窗口及移位合同：20组原版逐值对照
+
+check_native_split_small.py分别比较4×4、8×4、4×8、8×12、12×8五种尺寸，以及none/X/Y/XY四种QKV移位，全部使用真实block23四份记录。FFWD与FFN projection在所有情况下逐值一致；attention中有效维度恰为4的轴要重复，较大尺寸的尾端半窗口仍补零。4×4需重复两轴，8×4只重复Y，4×8只重复X，8×12/12×8的尾端不能循环回图像开头。20组对应规则下attn/final也全部exact，而错误规则均保留为对照。
+
+新增native_split_reference.attention_window可重用实现，明确只接受已验证的至少4、4对齐尺寸，拒绝4×2等未闭合合同；独立候选构造及原CUBIN输出再次验证该函数，四个shift汇总均all_expected_modes_exact。各尺寸/shift的输入及原版四段oracle保存在release/native-c512/small-check，供GPU窗口包装验证，非拟合目标。
+
+这一轮未改变AMD代码或游戏DLL：GPU连续RGB前缀仍block0..22 DS，C512独立GPU仍为16×8五帧验证。接回整链还要解决前缀4×2与C512物理尺寸合同，不能把本次4×4以上通过说成4×2已修复。最终游戏画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

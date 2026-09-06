@@ -36,6 +36,22 @@ def attention(tiles,qkv,bias,scales):
   parts.append(F(H(H(prob[:,:,:32]@vh[:,:32])+prob[:,:,32:]@vh[:,32:])))
  return np.concatenate(parts,axis=-1)
 
+def attention_window(feature,qkv,bias,scales,shift=0):
+ """Verified split window contract for extents divisible by four, at least four."""
+ height,width,channels=feature.shape
+ if channels!=512 or min(width,height)<4 or width%4 or height%4 or shift not in range(4):
+  raise ValueError('unverified split window extent or shift')
+ px=4 if shift&1 else 0;py=4 if shift&2 else 0
+ ww=(width+px+7)//8*8;hh=(height+py+7)//8*8
+ xs=np.arange(ww)-px;ys=np.arange(hh)-py
+ valid_x=np.ones(ww,bool) if width==4 else (xs>=0)&(xs<width)
+ valid_y=np.ones(hh,bool) if height==4 else (ys>=0)&(ys<height)
+ xs=xs%4 if width==4 else np.clip(xs,0,width-1)
+ ys=ys%4 if height==4 else np.clip(ys,0,height-1)
+ padded=feature[ys[:,None],xs[None,:]].copy();padded[~(valid_y[:,None]&valid_x[None,:])]=0
+ tiles=padded.reshape(hh//8,8,ww//8,8,512).transpose(0,2,1,3,4).reshape(-1,64,512)
+ return attention(tiles,qkv,bias,scales).reshape(hh//8,ww//8,8,8,512).transpose(0,2,1,3,4).reshape(hh,ww,512)[py:py+height,px:px+width]
+
 if __name__=='__main__':
  root=Path('release/native-c512');folder=root/'full-check';folder.mkdir(parents=True,exist_ok=True)
  fw=np.load(root/'ffwd-check/matrices.npz');fp=np.load(root/'projection-check/matrices.npz')
