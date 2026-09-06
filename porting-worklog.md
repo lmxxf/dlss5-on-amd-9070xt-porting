@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080 GPU镜像→preblock双分支精确通过
+
+- 远端原生functions.f32实际存在且201326592字节。运行NativeRgbReflect→NativePreblockRuntime，五帧seed0/0/0/1/0通过重放与seed影响检查，所有中间数据在GPU。
+- 下载seed0最终main/down，validate_native_reflect_preblock_gpu.py与原始valid1080纹理输出比对：main70778880值、down17694720值均finite/零差异/max_abs0。
+- ignored release/native-rgb-valid1080/amd-preblock/validation.json。seed1本次仅检查输出变化，未与原始seed1逐值对照；仍是单纹理受控RGB，不代表完整游戏多纹理合同。下一步同输入encoder/skip整链，未部署DLL。
+
 ### 2026-09-06：reflect→preblock GPU测试入口接好待运行
 
 - d3d12_native_preblock_test新增DLSS5_REFLECT_VALID1080模式，输入严格1920×1080/live/global、强制存在原生噪声表，GPU反射输出直接传NativePreblockRuntime，处理1152高。
