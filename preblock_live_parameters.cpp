@@ -59,7 +59,7 @@ DWORD WINAPI worker(void*){
  if(!CreateDirectoryW(parameter_directory,nullptr))parameter_directory[0]=0;
  const auto init=MH_Initialize();const auto create=MH_CreateHook(target,reinterpret_cast<void*>(&hook),reinterpret_cast<void**>(&original));
  const auto create_get=MH_CreateHook(getter,reinterpret_cast<void*>(&get_hook),reinterpret_cast<void**>(&original_get));
- if(FILE*f=_wfopen(Log,L"wb")){fprintf(f,"format=indirect-v3 init=%d create=%d create_get=%d pid=%lu\n",int(init),int(create),int(create_get),GetCurrentProcessId());fclose(f);}
+ if(FILE*f=_wfopen(Log,L"wb")){fprintf(f,"format=indirect-v4 bounded_all_parameters=1 init=%d create=%d create_get=%d pid=%lu\n",int(init),int(create),int(create_get),GetCurrentProcessId());fclose(f);}
  if(create!=MH_OK||create_get!=MH_OK)return 3;
  if(MH_EnableHook(getter)!=MH_OK)return 5;
  return MH_EnableHook(target)==MH_OK?0:6;

@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+只读探针部署与直接参数解码（2026-09-06，跨用户中断恢复）：新v4探针SHA d7887caeb9ccf8713ba63079ffb8de95877b008f2a0d09487610c3fd99e36c38已编译并部署5090，旧探针SHA c256f1a5...备份为preblock-live-parameters.addon64.backup-20260906-113147-633。部署脚本改为游戏运行则拒绝、先备份验证，再安装；启动需显式-Launch，不自动杀游戏。使用核对过的Steam -applaunch3489700任务，实际游戏PID24064、19:32:34启动，v4日志和200份参数blob已下载至release/native-kernel-params-24064-11278468。期间曾尝试CloseMainWindow返回False，不能声称已退出；用户随后允许继续使用两台机器。未改AMD神经DLL或存档。
+
+用户在5090实际游戏中用F6观察到角色变暗，确认该开关有可见影响；这是用户现场观察，不冒称同帧GPU输出审计。ReShade日志的EvaluateFeature_C入口错误后仍有普通EvaluateFeature挂钩及feature18多次evaluate成功，本轮参数捕获也完整；已向用户区分“执行”和“最终回写”证据。
+
+decode_native_runtime_parameters.py逐blob长度核对，导出不含指针值的native-runtime-parameters.json。编码器1～30移位与现有配置一致。解码器40～47=0/3/1/2/0/3/1/2，48～55=0/3/1/2/0/3/1/2，56～61=1/2/0/3/1/2，62～65及66～69均0/3/1/2。ViT各阶段H/W均36/60；post H/W2176/3840、input_scale0.03125、rgb_mode1、仅0x38纹理存在，0x58/0x60为零，支持目前post简化模式但仍属4K启动捕获，不是新1080p/装备帧。
+
+新增native_runtime_shifts.h作为全链唯一解码器移位表，front40～47和tail49～69已切换（尤其56改为X移位）。MinGW语法检查通过，尚未编译部署新AMD全链或重建对应原oracle；所有旧配置pass保留但不视作新配置通过。探针构建脚本及备份部署流程一并保存，run_nvidia_ui.ps1既有修改未纳入提交。下一步在新目录重建真实移位配置的原/CPU/GPU回归，再推进1080p，目标active。
+
 原游戏移位合同发现实质差异（2026-09-06）：只读检查5090，未见游戏进程；现有preblock日志仍为04:38旧捕获，未启动游戏或切换窗口。下载保存到release/live-preblock-v2/launches.txt，包含完整第一帧launch0～154。新增audit_native_live_shifts.py按原preblock H/W2176/3840及8×8窗口、每轴0/-4假设枚举可兼容grid的mask，输出native-live-shift-audit.json并保留日志SHA。
 
 48～69可唯一推导：48=0；49～55=3/1/2/0/3/1/2；56=1；57～61=2/0/3/1/2；62=0；63～65=3/1/2；66=0；67～69=3/1/2。与当前512控制配置多处不同，不能把此前原kernel/AMD按给定参数的exact提升为原游戏配置exact。40～47输入H68时Y0/-4均得到gridY9，日志只能确定X，不能擅自猜Y。原ViT attention grid32×9、expand544等也表明64-token不是原游戏规模；具体H/W/padding仍需blob，未从grid直接宣布token数。
