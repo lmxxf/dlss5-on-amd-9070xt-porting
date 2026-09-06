@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：连续decoder主分支到69原始对照完成
+
+- block66脚本支持--main-hwc/--output-root，主输入使用连续block65原始oracle，skip仍为固定seed3016独立随机，保留来源字段。
+- 原始66及67～69按实际尺寸与shift0/3/1/2依次运行，每层17694720值零差异。新结果ignored release/native-decoder-tail-game，未覆盖独立fixtures。
+- 至此从既有原始block48输出到69主分支连续，三路skip仍独立随机。下一步导出整段49～69 GPU测试资料，不宣称RGB encoder或游戏验收完成，未部署DLL。
+
 ### 2026-09-06：连续decoder主分支推进到65
 
 - block62脚本新增--main-hwc/--output-root，用连续block61原始oracle替换随机main，skip保持seed3015独立随机。原始62及随后63/64/65逐层零差异，C64各8847360值。
