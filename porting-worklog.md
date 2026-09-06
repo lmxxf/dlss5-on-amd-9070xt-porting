@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第48块扩大到32×32及原block47 outview验证（2026-09-06）：空间测试增加--size32，16×16×512主/32×32×256 skip，seed2423/shift0、seed2429/shift3各262144值CPU对原版全exact。NativeVitLinear仅为512→256 decoder模式开放256-token，宽度按已验64/256-token取8/16；ViT与第39块仍限64-token。宿主upsample48wide和-Wide脚本显式选32×32，旧小尺寸模式保留。
+
+AMD独立wide测试部署native-upsample48-wide，三帧各262144值different0/max0；下载复核pass，SHA e0d3cd4d1f829f6ce1684c313c5201d63fe5983aceae2078a587881f17a8e947。报告release/native-upsample48/amd32/validation.json。该结果仍为独立随机输入，不冒称RGB全链已到48。
+
+同时为原block47→48连接新增native-outview模式，直接选择cc_split_swin_16h_proj_512_outview_fp8。首次沿用plain projection的32×8线程导致CUDA700，测试已退出；核对后改为outview的32×4线程，正常返回且输出finite。不是“多了指针参数”的既定结论。validate_native_block47_outview.py将原outview按global16/低两位交换解码，与此前plain输出的逻辑HWC全部131072值exact。由此取得真实原outview数据而非CPU重排替代，可以接下一轮原block48。相关报告block47-outview-validation.json为pass；尚未运行专用内存检查，不能将返回正常等同完全排除越界。游戏DLL未改，目标active。
+
 AMD第48块独立移植通过（2026-09-06）：NativeVitLinear的显式decoder模式扩展512→256输入投影，K512单分区每K32 half累计；1024→512第39块仍保留四K256分区。nearest2倍及FP8融合skip后直接接NativeC64Shift(C256)完成Swin，常驻GPU无中间CPU传输。当前投影几何仍只开放64-token主输入，未偷扩到RGB链所需16×16主输入。
 
 d3d12_native_pool_head_test.cpp新增upsample48模式，shift从验证夹具单值文件严格读取，prepare_native_upsample48_gpu.py导出原seed2411/shift3最终oracle及直接解码系数。部署D:\DLSSNR-Lab\matrix-probe\native-upsample48，三帧各65536值different0/max0，device/fence/finite/replay检查通过。下载再由validate_native_upsample48_gpu.py全exact，SHA d86ccbf8c2b524c38c0023344a1d33fc03dab7c3ca56b70213008762fab39445。编译日志main38ms、FFN28401ms、attention3135ms、projection10591ms，不是运行帧耗时。

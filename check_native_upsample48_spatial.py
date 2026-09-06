@@ -6,14 +6,15 @@ from native_upsample48_reference import unpack,upsample
 from native_c32_reference import F
 from encode_tinlayout_global import quantize
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2401);p.add_argument('--shift',type=int,choices=range(4),default=0);p.add_argument('--main-banks',action='store_true');p.add_argument('--main-global',choices=['plain','swap']);controls=p.add_mutually_exclusive_group();controls.add_argument('--skip-control',action='store_true');controls.add_argument('--projection-control',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2401);p.add_argument('--size',type=int,choices=[16,32],default=16);p.add_argument('--shift',type=int,choices=range(4),default=0);p.add_argument('--main-banks',action='store_true');p.add_argument('--main-global',choices=['plain','swap']);controls=p.add_mutually_exclusive_group();controls.add_argument('--skip-control',action='store_true');controls.add_argument('--projection-control',action='store_true');a=p.parse_args()
 if a.main_banks and a.main_global:p.error('choose bank or global layout')
-base=Path('release/native-upsample48');root=base/f'spatial-{a.seed}-{a.shift}{"-skip-control" if a.skip_control else "-projection-control" if a.projection_control else ""}{"-banks" if a.main_banks else ""}{"-global-"+a.main_global if a.main_global else ""}';root.mkdir(exist_ok=False)
-report={'status':'running','seed':a.seed,'shift':a.shift,'skip_control':a.skip_control,'projection_control':a.projection_control,'scope':'original/CPU block48 spatial 16x16 output only'}
+size=a.size;low_size=size//2;count=size*size*256
+base=Path('release/native-upsample48');root=base/f'spatial-{a.seed}-{a.shift}{"-skip-control" if a.skip_control else "-projection-control" if a.projection_control else ""}{"-banks" if a.main_banks else ""}{"-global-"+a.main_global if a.main_global else ""}{"-size32" if size==32 else ""}';root.mkdir(exist_ok=False)
+report={'status':'running','seed':a.seed,'shift':a.shift,'output_extent':[size,size,256],'skip_control':a.skip_control,'projection_control':a.projection_control,'scope':'original/CPU block48 spatial output only'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
 try:
-    rng=np.random.default_rng(a.seed);x=F(rng.normal(0,.25,(8,8,512)).astype(np.float32));skip=F(rng.normal(0,.25,(16,16,256)).astype(np.float32))
+    rng=np.random.default_rng(a.seed);x=F(rng.normal(0,.25,(low_size,low_size,512)).astype(np.float32));skip=F(rng.normal(0,.25,(size,size,256)).astype(np.float32))
     def mapping(c):return np.argsort(np.load(f'release/native-c{c}/'+('split-view' if c==512 else 'view')+'/mapping.npz')['cell_output_to_hwc'])
     def encode(v,path):
         h,w,c=v.shape;cells=quantize(v).reshape(h//4,4,w//4,4,c).transpose(0,2,1,3,4).reshape(-1,16*c)
@@ -23,9 +24,9 @@ try:
     report['main_global']=a.main_global
     if a.main_global:
         c=np.arange(512);order=((c&~3)|((c&1)<<1)|((c&2)>>1)) if a.main_global=='swap' else c
-        quantize(x[...,order]).reshape(8,8,32,16).transpose(2,0,1,3).copy().tofile(root/'input.fp8')
+        quantize(x[...,order]).reshape(low_size,low_size,32,16).transpose(2,0,1,3).copy().tofile(root/'input.fp8')
     if a.main_banks:
-        cells=quantize(x).reshape(2,4,2,4,2,256).transpose(0,2,4,1,3,5).reshape(-1,4096)
+        cells=quantize(x).reshape(low_size//4,4,low_size//4,4,2,256).transpose(0,2,4,1,3,5).reshape(-1,4096)
         packed=np.empty_like(cells);packed[:,mapping(256)]=cells;packed.tofile(root/'input.fp8')
     weights=base/('skip-control.weights' if a.skip_control else 'block48.weights')
     if a.projection_control:
@@ -38,9 +39,9 @@ try:
     env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_NATIVE_SCAN_')}
     subprocess.run(['timeout','--kill-after=2s','15s','/tmp/native-upsample-global-oracle','/tmp/dlssnr-cubins/dlssnr-03.cubin',
         str(weights),str(root/'input.fp8'),str(root/'output.fp8'),str(root/'skip-copy.fp8'),
-        'cc_tinlayout_fused_swin_8h_256_8_upsample_fp8','16','16',str(3 if a.shift&1 else 2),str(3 if a.shift&2 else 2),'8','9',str(a.shift),str(root/'skip.fp8')],env=env,check=True,timeout=20)
-    raw=np.fromfile(root/'output.fp8',np.uint8);assert not np.any(raw[65536:]) and not np.any((raw[:65536]&127)==127)
-    target=e4m3fn(raw[:65536].reshape(-1,4096)[:,mapping(256)]).reshape(4,4,4,4,256).transpose(0,2,1,3,4).reshape(16,16,256)
+        'cc_tinlayout_fused_swin_8h_256_8_upsample_fp8',str(size),str(size),str((size+(4 if a.shift&1 else 0)+7)//8),str((size+(4 if a.shift&2 else 0)+7)//8),'8','9',str(a.shift),str(root/'skip.fp8')],env=env,check=True,timeout=20)
+    raw=np.fromfile(root/'output.fp8',np.uint8);assert not np.any(raw[count:]) and not np.any((raw[:count]&127)==127)
+    target=e4m3fn(raw[:count].reshape(-1,4096)[:,mapping(256)]).reshape(size//4,size//4,4,4,256).transpose(0,2,1,3,4).reshape(size,size,256)
     got=skip if a.skip_control else np.repeat(np.repeat(x[:,:,:256],2,0),2,1) if a.projection_control else upsample(x,skip,unpack(base/'block48.weights'),a.shift);err=np.abs(got-target)
     report.update(different=int(np.count_nonzero(err)),max_error=float(err.max()),values=int(target.size))
     assert report['different']==0,'block48 spatial mismatch'
