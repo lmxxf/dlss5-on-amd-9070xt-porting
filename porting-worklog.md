@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：24×16原版坐标三方比较与倒数实验，最终差异仍未解决
+
+- 原PC10d0 block0 warp0坐标capture已保存native-temporal-rect/sample-registers-10d0.json。归一化坐标乘valid尺寸并舍入float32后，CPU参考64分量与原版一致；旧AMD差29分量。不能由全图CPU比较替代原版其他block证据。
+- shader内double除法候选导致更大错误（坐标差745/max16.76，main7220/down1639），已撤下该表达式，不猜测编译器具体原因。失败产物保留reciprocal-fix。
+- 改为host以double计算尺寸倒数再转float，作为4个metadata root constants传入（12→16），没有像素补丁。新exe/session47268五帧完成；全图GPU坐标对CPU由323降至14差/max1.907e-6，但main/down仍差7/3，尚未修复最终输出。产物独立uniform-reciprocal。
+- 下一步对原版采样分数/half特征逐层比对，寻找直接造成7/3差异的位置；不要把倒数误差缩小当任务完成。新增root布局还需8×8回归，新神经DLL未部署。
+
+
 ### 2026-09-07：24×16偏差定位到时序坐标前段候选，single全exact
 
 - 原版同尺寸单RGB控制及AMD新root单图五帧完成session2501 exit0，validator --rect --single：main12288/down3072全different=0，排除该样本基本preblock路径。
