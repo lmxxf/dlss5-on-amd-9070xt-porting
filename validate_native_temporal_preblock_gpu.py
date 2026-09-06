@@ -3,9 +3,10 @@ from pathlib import Path
 import argparse,json
 import numpy as np
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');args=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');p.add_argument('--variable',action='store_true');args=p.parse_args()
 root=Path('release/native-temporal-inputs-gates');gpu=root/('amd-motion' if args.motion else 'amd-direct' if args.direct else 'amd-preblock')
 case='single' if args.single else 'both_shifted'
+if args.variable:root=Path('release/native-temporal-variable');gpu=root;case='original'
 prefix='gpu-single-' if args.single else 'gpu-'
 basis=np.fromfile('release/post-skip-basis/matrix.f32',np.float32).reshape(2048,2048)
 mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()
@@ -20,4 +21,5 @@ for name,expected in [('main',main),('down',down)]:
     checks.append({'branch':name,'values':actual.size,'different':int(np.count_nonzero(actual!=expected))})
 report={'scope':'single input regression' if args.single else 'GPU motion coordinates -> sampler -> preblock; controlled 8x8 no slot18 branch' if args.motion else 'GPU sampler directly into preblock; supplied transformed coordinates, not full motion path' if args.direct else 'CPU-supplied temporal RGB into production GPU preblock; sampler not directly connected',
         'checks':checks,'pass':all(c['different']==0 for c in checks)}
+if args.variable:report['scope']='GPU spatially varying motion -> sampler -> preblock; controlled 8x8 no slot18 branch'
 (gpu/f'{case}-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));assert report['pass']

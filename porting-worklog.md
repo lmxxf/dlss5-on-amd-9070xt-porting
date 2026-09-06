@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：空间变化motion的完整GPU前端精确通过
+
+- 新增prepare_native_temporal_variable_gpu.py，使用同一当前RGB/独立history与seed7304空间motion[-.75,.75]，原版caller重新执行双纹理生成main/down；无预制采样RGB/坐标参与AMD输入。
+- 独立远端native-temporal-variable，五帧seed0/0/0/1/0运行完成session29214 exit0。下载本地ignored release/native-temporal-variable，validator新增--variable：main2048/down512值different=0/pass=true。
+- 证明8×8无slot18分支在非恒定motion下运动→五tap→preblock全GPU直连仍精确。仍未覆盖大尺寸、非幂次倒数、valid/padding、history更新及实际游戏。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：运动图→坐标→采样→preblock全GPU直连精确通过
 
 - 主host新增DLSS5_TEST_TEMPORAL_MOTION，必须有history，当前限定valid=processing；读原始motion float4，GPU NativeTemporalCoordinates输出直接接NativeTemporalSample，再接preblock t3。此模式不读取temporal-coordinates文件或CPU重建RGB。
