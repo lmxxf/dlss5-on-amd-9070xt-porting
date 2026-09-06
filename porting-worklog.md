@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：五点稳态RGB重建数学参考初稿
+
+- 从原SASS PC1110～13f0恢复单轴权重：w0=t²−0.5(t+t³)，w1=1+1.5t³−2.5t²，w3=0.5(t³−t²)，w2=1−w0−w1−w3；合并中间两权重及对应双线性位置。五tap为上/左/中/下/右，省去角点后重新归一化，对应PC1590～17f0。
+- 新增 `native_temporal_sampling_reference.py`，输入是已经过motion/transform的像素中心坐标。像素中心identity与随机越界坐标常量保持测试通过。尚使用float64数学及理想bilinear，不含原FFMA/FTZ/RCP误差、CUDA纹理插值量化，也未恢复前段motion坐标，绝不称原版逐值通过。
+- 下一步抓原版对应采样中间结果，校准位置、权重、硬件插值与特征写入，再实现AMD稳态路径。游戏DLL未更新。
+
+
 ### 2026-09-07：双纹理门控与同图零位移基线闭合
 
 - 原SASS PC03e0/0450建立P1=(slot10==0 OR slot8==0)，PC0bb0为真跳至1880，绕过双纹理路径。slot10 TEX→坐标FFMA→floor/fraction及三次多项式→slot8五次RGB TEX(1590/15c0/15d0/15e0/15f0)→权重和RCP归一化→half中心化/缩放，不是两图简单加权混合。
