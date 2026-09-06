@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整理实际decoder39～69 GPU直连组件，待主链接入
+
+- 新增 `native_actual_decoder69.h`：输入为ViT38及encoder30/22/14/8/4 GPU资源，内部接640逆gather、decoder39、60×36 split40～47、up48至120×72、实际尺寸NativeDecoderTail69；不上传中间特征。
+- 暴露13个RecordStage，调用端可在阶段间提交/fence：inverse、entry、8个split、up48投影、up48主体、49～69尾链。尾链仍为现有整段提交，后续整体测试必须检查TDR及重放，不能凭独立段通过认定稳定。
+- 头文件独立MinGW语法检查首次发现漏include NativeSplitWindow，已补齐并复查exit0（仅pragma once主文件警告）；git diff检查通过。组件尚未接入主host或在AMD运行。
+- 0～38直连测试仍为session34710/PID39212，轮询有持续成功编译输出，未结束、未重启。下轮仍先轮询原handle，再接decoder组件及最终post。游戏DLL未更新。
+
+
 ### 2026-09-07：AMD0～38直连测试已启动，等待同一进程
 
 - 部署 `/tmp/native-frontvit-test.exe` 至 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-frontvit\native-preblock-test.exe`；使用 `amd-frontvit` 全部系数和唯一RGB输入，以及当前ViT shader/half-square依赖。不是旧独立ViT exe。
