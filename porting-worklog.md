@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD decoder49～55实际七层GPU链通过
+
+- decoder49_55_game模式120×72、实际shift3/1/2/0/3/1/2，七层生产NativeC64Shift资源直接串联。
+- RX9070XT三帧最终2211840值different=0/max_error=0，finite/device/fence/replay通过，回读gpu.f32与原始最终oracle-0.f32字节级cmp一致。
+- 初始化期间PID21704活跃，无重启。结果ignored release/native-decoder-game-c256/amd-decoder49-55。同步更新runtime-contract的640token和独立算子证据边界，未部署游戏DLL。
+
 ### 2026-09-06：AMD实际C256七层整链入口准备
 
 - prepare_native_decoder_c256_gpu.py --game-extent核对49～55原始零差异、2211840值、逐层来源及实际shift3/1/2/0/3/1/2，导出七层系数与最终oracle。
