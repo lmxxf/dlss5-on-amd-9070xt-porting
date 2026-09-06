@@ -42,4 +42,6 @@ public:
   pass(0,main_input,skip_input,merged,32);barrier(c,merged,false);body.Record(c);pass(1,body.Output(),color_input,output,3);barrier(c,output,false);recorded=true;
  }
  ID3D12Resource*Output()const{return output;}
+ ID3D12Resource*Merged()const{return merged;}
+ ID3D12Resource*Features()const{return body.Output();}
 };

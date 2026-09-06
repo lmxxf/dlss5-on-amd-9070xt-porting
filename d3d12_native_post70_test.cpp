@@ -25,7 +25,18 @@ int wmain(int argc,wchar_t**argv){try{
   void*p=nullptr;D3D12_RANGE range{0,SIZE_T(bytes)},none{};ck(rb->Map(0,&range,&p));std::vector<float>result(oracle.size());std::memcpy(result.data(),p,bytes);rb->Unmap(0,&none);size_t different=0;float maximum=0;
   for(size_t i=0;i<result.size();i++){if(!std::isfinite(result[i]))throw std::runtime_error("post nonfinite");different+=result[i]!=oracle[i];maximum=std::max(maximum,std::abs(result[i]-oracle[i]));}
   std::ofstream out(file(_wgetenv(L"DLSS5_POST_BASE_ONLY")?L"gpu-base.f32":L"gpu.f32").c_str(),std::ios::binary);if(!out.write((char*)result.data(),bytes))throw std::runtime_error("post readback write");out.close();
-  std::printf("frame=%u values=%zu different=%zu max_error=%.9g\n",frame,result.size(),different,maximum);std::fflush(stdout);if(different)throw std::runtime_error("original post RGB mismatch");if(!frame)baseline=result;else if(result!=baseline)throw std::runtime_error("post replay differs");
+  std::printf("frame=%u values=%zu different=%zu max_error=%.9g\n",frame,result.size(),different,maximum);std::fflush(stdout);
+  if(different){
+   // Failure-only readback after the submission fence; no CPU feature injection.
+   UINT serial=100;
+   for(auto item:std::vector<std::pair<ID3D12Resource*,const wchar_t*>>{{post.Merged(),L"gpu-merged.f32"},{post.Features(),L"gpu-features.f32"}}){
+    UINT64 n=UINT64(pixels)*32*4;auto*diagnostic=buffer(d,n,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
+    ck(allocator->Reset());ck(cmd->Reset(allocator,nullptr));b.Transition={item.first,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};cmd->ResourceBarrier(1,&b);cmd->CopyBufferRegion(diagnostic,0,item.first,0,n);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);cmd->ResourceBarrier(1,&b);ck(cmd->Close());ID3D12CommandList*dl[]={cmd};q->ExecuteCommandLists(1,dl);ck(q->Signal(fence,serial));ck(fence->SetEventOnCompletion(serial,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("diagnostic timeout");ck(d->GetDeviceRemovedReason());if(fence->GetCompletedValue()==UINT64_MAX||fence->GetCompletedValue()<serial)throw std::runtime_error("diagnostic fence");serial++;
+    D3D12_RANGE dr{0,SIZE_T(n)};ck(diagnostic->Map(0,&dr,&p));std::ofstream f(file(item.second).c_str(),std::ios::binary);if(!f.write((char*)p,n))throw std::runtime_error("diagnostic write");diagnostic->Unmap(0,&none);diagnostic->Release();
+   }
+   throw std::runtime_error("original post RGB mismatch");
+  }
+  if(!frame)baseline=result;else if(result!=baseline)throw std::runtime_error("post replay differs");
  }
  std::puts(_wgetenv(L"DLSS5_POST_BASE_ONLY")?"post70_base_only=exact NOT_neural_acceptance":"post70=exact frames=3 intermediate_CPU_transfers=0");return 0;
 }catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());return 1;}}

@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第70块首差异定位并独立通过（2026-09-06）：宿主在数值失败后（已等原提交fence）额外读回merge及raw-half主体，不注入CPU数据。diagnose_native_post70_gpu.py核对两份各8388608值：merge对CPU全exact，主体对GPU merge的CPU计算全exact，确认错误位于最后head/合成，不修改已通过前段。
+
+原double head结果接近second-only但不完全相等；禁止double合并未改变失败。dump_native_shader.cpp导出DXBC，能看到第二段确有ftod/dadd累加，并含enable11_1DoubleExtensions，因此没有证据断言“编译器漏加了acc”，也不直接归因某条驱动指令。改为等价整数实现：27位乘积对齐累计、signed magnitude合并half accumulator、整数位舍入到half。若scaled accumulator不是整数或越出该实现界限，显式输出NaN触发测试失败，不静默近似。此范围限制仍需未来真实输入验证。
+
+512/seed2851完整post GPU三帧最终各786432个RGB值different0/max0，device/fence/finite/replay通过，下载再验证全exact。成功读回单独存amd/gpu-integer-head.f32，SHA0538b303385c1d6330502cc59561c0bb6142ce3380bd5cada74d38831b35ae29，validation-integer-head.json为pass；初始全零与RGB修复后的失败文件/报告保留。去除已不用的double函数后重新编译反汇编，globalFlags仅refactoringAllowed，未出现double转换/运算指令。
+
+当前仅独立AMD第70块texture_mask1/rgb_mode1成功，不能将它与RGB→69的pass直接合称整网RGB完成；下一步连接实际block69输出、原preblock skip及底图并做完整RGB回归。游戏DLL未改，目标active。
+
 AMD第70块首次实测失败、底图路径分离（2026-09-06）：新增独立宿主/参数导出/读回验证器，使用原512/seed2851变化底图夹具，实际shader编译与执行完成。首次最终786432值全零，max0.6320953369，明确fail；本地amd/gpu.f32及validation.json保留该失败。新增POST_BASE_ONLY诊断1直接底图回写三帧全exact，说明这条资源/输出接线可用，不计入神经验收。
 
 诊断2跳过head计算但保留RGB编码/解码，使用double表达式时也全零；改为逐步precise float，诊断2三帧全exact。这是可重现代码路径差异，未未经证据归因驱动或硬件。保留原SASS的float32运算顺序，无公式代数折叠。随后恢复正常神经计算，输出已非零，但786237/786432值不同、max0.016986846923828125，仍fail；读回另存gpu-after-rgb-fix.f32，SHA b30050f7afbbf00379216011873b1d26e8a40569b9bf0327f0efdfd75f6f2aaf，对应validation-after-rgb-fix.json，不覆盖初始失败。
