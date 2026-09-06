@@ -41,12 +41,17 @@ int main(int argc,char** argv) {
   const bool run=argc==9 && !std::strcmp(argv[8],"--run");
   if (argc==9 && !run) return 2;
   const unsigned w=number(argv[6]),h=number(argv[7]);
-  constexpr size_t capacity=2*1024*1024;
+  const bool game_extent=std::getenv("DLSS5_DECODER_GAME_EXTENT")!=nullptr;
+  if(game_extent&&(w!=32||h!=20))return 2;
+  const unsigned output_w=game_extent?60:w*2,output_h=game_extent?36:h*2;
+  // Four half-valued partial outputs at the captured geometry exceed 2 MiB.
+  const size_t capacity=game_extent?16*1024*1024:2*1024*1024;
   auto main=read(argv[2],capacity),skip=read(argv[3],capacity),weights=read(argv[4],525312,true);
   for (const char* suffix:{".output.fp8",".partial.bin",".counters.i32"})
     if (std::ifstream(std::string(argv[5])+suffix).good()) return 2;
   const unsigned gx=2*((w+3)/4),gy=(h+3)/4;
   std::printf("candidate grid=%u,%u,4 block=32,2,1 main=%zu skip=%zu weights=%zu counters=-1\n",gx,gy,main.size(),skip.size(),weights.size());
+  std::printf("input=%ux%u output=%ux%u arena=%zu\n",w,h,output_w,output_h,capacity);
   if (!run) { std::puts("preflight only; no CUDA initialization or numerical acceptance"); return 0; }
   std::fflush(stdout);
   ck(cuInit(0)); CUdevice d; ck(cuDeviceGet(&d,0)); CUcontext context;
@@ -65,7 +70,7 @@ int main(int argc,char** argv) {
   // +0x10 is final output; +0x20 is Z-order counters; +0x30 partial sums.
   CUdeviceptr fields[]={input,encoder,output,0,counters,0,partial,weight};
   alignas(8) unsigned char params[0x50]{}; std::memcpy(params,fields,sizeof(fields));
-  unsigned dims[]={h,w,h*2,w*2}; std::memcpy(params+0x40,dims,sizeof(dims));
+  unsigned dims[]={h,w,output_h,output_w}; std::memcpy(params+0x40,dims,sizeof(dims));
   void* args[]={params};
   // Z partitions communicate through global counters. Keep all four in a cluster.
   CUlaunchAttribute attr{}; attr.id=CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION;

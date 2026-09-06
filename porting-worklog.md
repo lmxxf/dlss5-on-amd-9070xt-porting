@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：decoder39实际裁剪尺寸及探针容量修正
+
+- launch0099参数0x40为inputHW20/32、outputHW36/60。原版显式输出60×36，不是64×40后任意解释；geometry summary新增直接证据。
+- 原始decoder entry探针增加显式DLSS5_DECODER_GAME_EXTENT，仅允许32×20输入并传60×36输出，旧默认尺寸行为保留。
+- 实际尺寸四份half partial超过旧2MiB工作区，game模式扩大到16MiB以容纳；编译通过，但未运行原始数值测试，裁剪坐标/布局仍待实证。未更新AMD decoder或游戏DLL。
+
 ### 2026-09-06：AMD实际补齐pool/head三帧精确通过
 
 - extent host新增pool_head模式，明确输入36×60×512、输出20×32×1024，调用生产NativeC32Downsample的新补齐路径。
