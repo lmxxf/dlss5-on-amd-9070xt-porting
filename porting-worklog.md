@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：直接读回AMD五tap座标与权重，建立首处分歧定位工具
+
+- 用户将5090桌面设1080p、游戏无边框窗口，报告停在主菜单；本轮未操作游戏或存档。读取NGX旧日志仍有1920×1080资源记录，但未将旧日志冒称本轮实时尺寸验证。
+- AMD正常120×72 sampler重新执行五帧（session33769），回读subrect/gpu-temporal-coordinates.f32和sampled。block14 warp1运动UV的64值中63值bit-exact，lane3的y差1ULP；先前half出错lane1/9的输入UV相同。
+- 新增native_temporal_taps.hlsl及check_native_gpu_temporal_taps.py，在独立D:\DLSSNR-Lab\native-temporal-taps目录执行（session97520）。仅用于读回前count/4像素的五tap UV及两轴权重，输出不是RGB，后续preblock数值不用于任何画质验收。正式sampler和游戏DLL未替换。
+- 与原PC1590的block14 warp1比较512值有319个bit差异，包括lane1中央u：AMD 0x3f716bbf、原版0x3f716bc1。证据保存release/native-temporal-large/gpu-taps.f32及gpu-taps-validation.json。下一步区分axis FMA是否真正融合、以及history subrect操作的具体舍入；诊断shader可能改变编译分配，不能仅凭此断言驱动问题。
+
 ### 2026-09-07：剩余窗口捕获TEX重建全half一致，倒数精化无效已撤回
 
 - 抓原120×72 block14 warp1 PC10d0/1590/1800，软件自生成坐标仍有lane1/9 half偏差；改用原捕获五tap normalized UV与权重、21bit trunc及边际保持量化重建，则96half全一致，max float1.19e-7。新增check_native_captured_temporal_taps.py保存该隔离证据，不把使用原中间值的重建当完整验收。
