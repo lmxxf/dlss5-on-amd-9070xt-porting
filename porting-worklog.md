@@ -2643,6 +2643,14 @@ validate_native_split_projection.py进一步使用真实record0和record1（512�
 
 当前仍为本地CUDA原版对CPU参考，未接AMD C512；QKV/attention、最后投影和4×2小尺寸合同仍待解决。5090新live数据仍未取得，AMD游戏DLL/公开包未改，已验证GPU范围仍block0..22 DS，最终画面目标active。
 
+### 2026-09-06 C512 split完整四阶段CPU数值闭合
+
+新增native_split_reference.py，在16×8×512的有效原生调用尺寸下，以真实block23四份记录验证完整split层。沿用已验证的512混合＋8组64→256→64 ffwd，接真实FFN外部投影/skip；QKV按FP8 512×512三矩阵分块，16 heads×32维，bias为16×64×64 FP16，16个FP32 scales；最后为512×512 FP8投影＋FP16 skip。矩阵地址规则与既有小通道实测布局同族，最终由真实算术约束，不拟合系数。
+
+seed661/σ0.25、seed673/σ1.0两组输入，各自branch、ffn、attn、final四个阶段的65536值全部与原CUBIN逐值相同，MAE/max0；不是只比较最终图或直方图。输出范围、FP8 NaN码和每阶段exact均有断言，attention参数仅存release/native-c512/full-check。全四阶段至此具备CPU参考，但并未将小尺寸4×2的不正确调用当成裁判。
+
+当前C512仍未接AMD，实际GPU正确前缀保持block0..22 DS。下一步实现split GPU阶段，并核对进入C512时的物理padding/有效尺寸合同（4×2现仍全零，不擅自视为已解决）；游戏DLL、公开ZIP未改，最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
