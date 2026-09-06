@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：preblock有效纹理范围与网络补齐范围不同
+
+- audit_preblock_scalar_profiles.py对比旧4K与新PID25972非资源字段0x48..0xd7，仅0x90/94/98/9c/a0/a4/d0/d4不同，其他所查标量一致。
+- 新捕获0x90/94=1920/1080，0xd0/d4=1080/1920；与已知0xf0/f4=1152/1920区分开。原始caller当前覆盖有效尺寸/倒数为处理范围，所以release/native-rgb-game仍是受控1152高纹理，不是游戏真实边缘采样合同。
+- pointer-free比较保存preblock-scalar-profile-comparison.json，runtime-contract显式记录缺口。下一步分离texture extent与processing extent；未部署游戏DLL。
+
 ### 2026-09-06：实际尺寸受控RGB整链起点建立
 
 - 原始preblock caller支持明确1920×1152，容量按像素×32×4分配。
