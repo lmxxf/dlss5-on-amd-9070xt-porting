@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080 C64主分支5～7精确，8仍有3值差异
+
+- validate_native_valid1080_c64.py按已验证global16低通道位交换解码block4-down，实际480×288依次验证5～8。
+- 5/6/7各8847360值零差异；block8仅3值不同、max_abs0.5、最终finite，assert失败，未导出通过oracle。报告encoder-c64/main-validation.json保留失败。
+- 脚本补充失败位置记录供下次定位，本次尚未重跑该位置记录。不能用容差或多数一致标成通过，down8也尚未验证；未部署DLL。
+
 ### 2026-09-06：同valid1080 RGB原始encoder5～8捕获
 
 - build_native_valid1080_c64.py从block4-down继续5～8，实际480×288 C64、shift0/3/1/2，5为inpview、8为ds，真实提取权重。
