@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实现实际RGB0～38 GPU直连入口，编译通过待运行
+
+- `d3d12_native_preblock_test.cpp` 新增 `DLSS5_FRONTVIT`，隐含FRONTHEAD：head.Output直接接640映射NativeVitGather，再直接接8层NativeVitBlock；不读取预制head/ViT特征作为输入。
+- ViT沿用已验证的StageChunks/RecordStageChunk，每块独立提交并等待fence，GPU资源全程常驻。fence改为全局单调递增，避免多个提交复用frame+1；等待完成并检查device/fence之后才重置allocator。输出main改为block38，down保留head，仍有5帧seed0/0/0/1/0检查。
+- MinGW编译 `/tmp/native-frontvit-test.exe` 成功。新增 `prepare_native_valid1080_frontvit_gpu.py` 生成ignored `release/native-rgb-valid1080/amd-frontvit`：唯一图像输入为input.f32，附0～38系数及head/ViT比较对照。此新直连代码尚未在AMD运行，不能用旧分段通过结果替代。
+- 下一步部署新exe/完整shader依赖和该目录系数，运行时设置DLSS5_FRONTVIT=1、反射1080输入及noise table；完成后分别比对gpu-main与oracle-vit、gpu-down与oracle-head。预计encoder编译仍较慢，需保留具体进程句柄并持续汇报。游戏DLL尚未更新。
+
+
 ### 2026-09-07：AMD同源post70最终RGB三次精确通过
 
 - 新独立目录 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-post` 使用同RGB `post70/amd` 的全部输入、对照和系数；部署当前 `native_half_square.hlsli` 与 `preblock_attention_core.hlsl`，没有沿用旧半精度归一化着色器。
