@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际补齐pool/head三帧精确通过
+
+- extent host新增pool_head模式，明确输入36×60×512、输出20×32×1024，调用生产NativeC32Downsample的新补齐路径。
+- RX9070XT三次各655360值零差异，finite/device/fence通过；提交到fence32.433/19.650/19.001ms（仅本算子，不是游戏FPS）。gpu-head.f32回读cmp原始head-oracle一致。
+- 输入raw-projection.f32来自CPU参考，因此证明独立pool/head而非整个encoder GPU链；最终oracle来自原始pool→head，未用AMD自验答案。fixture ignored release/native-c512/pool-game-real。
+- 未部署游戏DLL；下一步实际部分窗口encoder及decoder几何衔接。
+
 ### 2026-09-06：实际补齐pool→head原始最终oracle准备完成
 
 - prepare_native_padded_pool_head.py将真实projection系数、非零attention控制的原始pool输出送入原始head，使用32×20及grid16×3。

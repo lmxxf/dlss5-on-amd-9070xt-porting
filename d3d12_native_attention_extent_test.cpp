@@ -8,6 +8,7 @@
 #include "native_vit_qkv.h"
 #include "native_vit_linear.h"
 #include "native_vit_block.h"
+#include "native_c32_ds.h"
 static void ck(HRESULT hr){if(FAILED(hr))throw std::runtime_error("HRESULT="+std::to_string(unsigned(hr)));}
 static std::vector<float> read(const std::wstring& path){
  std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("missing fixture");
@@ -20,10 +21,11 @@ static ID3D12Resource* buffer(ID3D12Device*d,UINT64 bytes,D3D12_HEAP_TYPE type,D
  ID3D12Resource*r=nullptr;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&desc,state,nullptr,IID_PPV_ARGS(&r)));return r;
 }
 int wmain(int argc,wchar_t**argv){try{
- if(argc!=2&&argc!=3)return 2;bool full_chain=argc==3&&!wcscmp(argv[2],L"chain31_38");bool block_mode=full_chain||(argc==3&&!wcscmp(argv[2],L"block31")),projection_mode=argc==3&&!wcscmp(argv[2],L"projection");bool qkv_mode=argc==3&&!wcscmp(argv[2],L"qkv"),chain_mode=argc==3&&!wcscmp(argv[2],L"qkv_attention"),expand_mode=argc==3&&!wcscmp(argv[2],L"expand"),contract_mode=projection_mode||(argc==3&&!wcscmp(argv[2],L"contract"));if(argc==3&&!qkv_mode&&!chain_mode&&!expand_mode&&!contract_mode&&!block_mode)return 2;
+ if(argc!=2&&argc!=3)return 2;bool pool_mode=argc==3&&!wcscmp(argv[2],L"pool_head");bool full_chain=argc==3&&!wcscmp(argv[2],L"chain31_38");bool block_mode=full_chain||(argc==3&&!wcscmp(argv[2],L"block31")),projection_mode=argc==3&&!wcscmp(argv[2],L"projection");bool qkv_mode=argc==3&&!wcscmp(argv[2],L"qkv"),chain_mode=argc==3&&!wcscmp(argv[2],L"qkv_attention"),expand_mode=argc==3&&!wcscmp(argv[2],L"expand"),contract_mode=projection_mode||(argc==3&&!wcscmp(argv[2],L"contract"));if(argc==3&&!qkv_mode&&!chain_mode&&!expand_mode&&!contract_mode&&!block_mode&&!pool_mode)return 2;
  std::wstring dir=argv[1];auto values=read(dir+L"\\input.f32"),oracle=read(dir+L"\\oracle.f32");
  UINT tokens=UINT(((qkv_mode||expand_mode)?values.size():oracle.size())/1024);
- if(contract_mode?(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*(projection_mode?1:4)):(expand_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*4):((chain_mode||block_mode)?(values.size()!=oracle.size()||oracle.size()!=size_t(tokens)*1024):(qkv_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*3):(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*3)))))throw std::runtime_error("geometry");
+ if(pool_mode){if(values.size()!=36*60*512||oracle.size()!=20*32*1024)throw std::runtime_error("pool geometry");}
+ else if(contract_mode?(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*(projection_mode?1:4)):(expand_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*4):((chain_mode||block_mode)?(values.size()!=oracle.size()||oracle.size()!=size_t(tokens)*1024):(qkv_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*3):(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*3)))))throw std::runtime_error("geometry");
  for(float v:values)if(!std::isfinite(v))throw std::runtime_error("nonfinite input");
  IDXGIFactory6*factory=nullptr;ck(CreateDXGIFactory2(0,IID_PPV_ARGS(&factory)));IDXGIAdapter1*adapter=nullptr;
  for(UINT i=0;;i++){IDXGIAdapter1*a=nullptr;if(factory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&a))==DXGI_ERROR_NOT_FOUND)break;
@@ -31,13 +33,15 @@ int wmain(int argc,wchar_t**argv){try{
  if(!adapter)throw std::runtime_error("AMD missing");ID3D12Device*d=nullptr;ck(D3D12CreateDevice(adapter,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&d)));
  auto*input=buffer(d,values.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*m=nullptr;D3D12_RANGE empty{};
  ck(input->Map(0,&empty,&m));std::memcpy(m,values.data(),values.size()*4);input->Unmap(0,nullptr);
+ NativeC32Downsample pool;
+ if(pool_mode)pool.Create(d,input,60,36,0,read(dir+L"\\weights.f32"),dir,true,512);
  NativeVitAttention attention;NativeVitQkv qkv;NativeVitLinear linear;NativeVitBlock blocks[8];UINT block_count=full_chain?8:1;
  if(block_mode){auto*source=input;for(UINT i=0;i<block_count;i++){auto sub=full_chain?dir+L"\\block"+std::to_wstring(i+31):dir;blocks[i].Create(d,source,tokens,read(sub+L"\\expand.f32"),read(sub+L"\\contract.f32"),read(sub+L"\\qkv.f32"),read(sub+L"\\projection.f32"),dir);source=blocks[i].Output();std::printf("initialized block=%u\n",i+31);std::fflush(stdout);}}
  if(contract_mode){auto data=read(dir+L"\\residual.f32");if(data.size()!=oracle.size())throw std::runtime_error("residual geometry");for(float v:data)if(!std::isfinite(v))throw std::runtime_error("nonfinite residual");auto*skip=buffer(d,data.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);ck(skip->Map(0,&empty,&m));std::memcpy(m,data.data(),data.size()*4);skip->Unmap(0,nullptr);linear.Create(d,input,skip,tokens,projection_mode?1024:4096,1024,false,read(dir+L"\\weights.f32"),dir);skip->Release();}
  if(expand_mode)linear.Create(d,input,nullptr,tokens,1024,4096,true,read(dir+L"\\weights.f32"),dir);
  if(qkv_mode||chain_mode)qkv.Create(d,input,tokens,read(dir+L"\\weights.f32"),dir);
- if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Create(d,chain_mode?qkv.Output():input,tokens,dir);
- auto*output=block_mode?blocks[block_count-1].Output():(expand_mode||contract_mode)?linear.Output():qkv_mode?qkv.Output():attention.Output();
+ if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode&&!pool_mode)attention.Create(d,chain_mode?qkv.Output():input,tokens,dir);
+ auto*output=pool_mode?pool.Output():block_mode?blocks[block_count-1].Output():(expand_mode||contract_mode)?linear.Output():qkv_mode?qkv.Output():attention.Output();
  ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));
  ID3D12CommandAllocator*alloc=nullptr;ck(d->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&alloc)));
  ID3D12GraphicsCommandList*cmd=nullptr;ck(d->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,alloc,nullptr,IID_PPV_ARGS(&cmd)));
@@ -54,7 +58,7 @@ int wmain(int argc,wchar_t**argv){try{
  };
  for(UINT frame=0;frame<3;frame++){
   std::printf("begin frame=%u device=0x%08x\n",frame,unsigned(d->GetDeviceRemovedReason()));std::fflush(stdout);
-  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++){if(staged){for(UINT s=0;s<5;s++){for(UINT chunk=0;chunk<blocks[i].StageChunks(s);chunk++){blocks[i].RecordStageChunk(cmd,s,chunk);submit_stage(frame,i,s);}}}else blocks[i].Record(cmd);}}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
+  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(pool_mode)pool.Record(cmd);if(block_mode){for(UINT i=0;i<block_count;i++){if(staged){for(UINT s=0;s<5;s++){for(UINT chunk=0;chunk<blocks[i].StageChunks(s);chunk++){blocks[i].RecordStageChunk(cmd,s,chunk);submit_stage(frame,i,s);}}}else blocks[i].Record(cmd);}}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode&&!pool_mode)attention.Record(cmd);
   D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={output,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
   cmd->ResourceBarrier(1,&b);cmd->CopyBufferRegion(rb,0,output,0,bytes);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);cmd->ResourceBarrier(1,&b);ck(cmd->Close());
   LARGE_INTEGER start,stop,frequency;QueryPerformanceFrequency(&frequency);QueryPerformanceCounter(&start);
