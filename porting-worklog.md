@@ -2675,6 +2675,18 @@ prepare_native_split_window_gpu.py直接导出此前保存的原CUBIN小窗口fi
 
 本轮未把C512接到RGB前缀，4×2逻辑尺寸与C512物理尺寸的銜接仍待核对；不能把4×4以上GPU通过称为4×2已解决。AMD连续RGB正确范围仍block0..22 DS，游戏DLL/公开包未更新，最终画面目标active。
 
+### 2026-09-06 RGB128×128接入split：保留失败，首个差异定位到preblock
+
+新增build_native_rgb128_oracle.py、prepare_native_rgb128_gpu.py及rgb128split测试模式，将RGB128×128连续经过block0..22 DS后接block23。此时C512有效尺寸为4×4，不再使用未闭合的4×2调用。check_split_physical_extent.py另证实同一4×4物理buffer按height2调用仍全零，按height4可对上CPU；这不证明真实游戏调度使用物理高度，live尺寸合同仍未解决。
+
+AMD执行三帧，device/fence及重放检查通过，18次shader编译、42次缓存命中，神经层间无CPU传输；但validate_native_rgb128_gpu.py对原CUBIN最终输出只有25.1953125% exact，MAE0.277323、max2，严格判失败。首次上传遗漏input.rgba32f导致missing input，仅是启动失败，显式补传后才执行，不计入GPU验收。没有部署游戏DLL或修改公开包。
+
+在整链结束后新增DS0/4/8/14/22只读检查点，并重跑三帧。compare_native_rgb128_checkpoints.py独立解码原输出、打印坐标和值，任何差异返回非零：不同值数量分别为7/1436/15288/11446/6305，对应总量131072/65536/32768/16384/8192。最早检查点block0 DS已有7处差异，集中于(y32..33,x32..33)与(y58,x3)，最大0.03125。深层误差不能仅凭该观察全归因于这7处；其余层是否还有独立误差需要受控输入继续分离。
+
+进一步独立运行128×128 preblock五帧（seed0/0/0/1/0），重放及seed变化检查通过。diagnose_native_rgb128_preblock.py证明：独立AMD DS与整链DS逐值相同；AMD raw交CPU按half舍入池化与AMD DS逐值相同；因此当前7处DS差异不是整链接线或finish池化GPU实现造成。CPU完整参考DS与原版有8处差异（包含AMD的7处），CPU raw与AMD raw有85/524288处不同，最大0.0100708008；CPU同样不完全正确，不能据此直接改GPU去迁就CPU。下一步分离输入混合/随机数、FFN、attention的原生中间合同，禁止拟合修正、放宽阈值或以重放通过代替数值通过。
+
+当前此前RGB128×64的block0..22 DS结论限于旧夹具，不外推到新尺寸；新128×128整链明确失败，最终剑星画面尚未修复/验收。脚本与检查点主机代码提交，所有原权重/激活留release，不提交二进制数据。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
