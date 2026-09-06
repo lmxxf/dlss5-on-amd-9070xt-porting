@@ -2853,6 +2853,16 @@ check_native_vit_v.py采用测得V输出token bits[1,0,4,5]、channel bits[6,3,9
 
 这一轮只证明V；Q/K的scale应用、归一化和输出坐标还未验收，不能称完整QKV通过。AMD已验连续范围仍RGB256→block30/head，游戏DLL与公开包未更改，最终画面目标active。
 
+### 2026-09-06 ViT31完整Q/K/V原生数值与坐标对照通过
+
+check_native_vit_qk.py先独立比较矩阵与归一化候选，保留为探索脚本并明确返回未验收状态。Q在原SASS 0x2c40等位置先HMUL2乘5.65625，再乘头部float32转half的scale；不能只归一化后乘scale。Q/K均需两个K512分区分别K32 half累计再half相加。归一化前将ViT每32维低位按[1,0,4,2,3]变换到已验证tensor通道序，执行原half平方/求和/倒平方根语义，再还原通道序。按旧通道序K仍有19个排序值差异，改正后Q/K排序值全部一致。
+
+坐标验证进一步证明Q沿用1d主视图；K需要交换物理地址bit2/bit3。该单一全局位交换在真实入口上发现，并在两份独立随机入口保持不变。Q token bits[2,6,7,8]、channel bits[0,1,3,4,5,9..13]；K token bits[3,6,7,8]、channel bits[0,1,2,4,5,9..13]。V仍按先前地址探针定义，不混用Q/K视图。
+
+新增native_vit_qkv_reference.py纯算术及原始权重解码；validate_native_vit_qkv.py重新执行原CUBIN，严格核对三个输出的坐标、有效范围和NaN码。真实RGB256编码器经原FFN的入口、seed1901和1907两组独立入口，各自Q/K/V每路16384值全exact，MAE/max0。不是仅排序或直方图匹配，也未修改任何模型权重。
+
+当前CPU/原CUBIN已闭合ViT31的expand、contract、完整QKV。attention和最终projection尚待恢复，AMD连续范围仍RGB256→block30/head，游戏DLL/公开包未更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
