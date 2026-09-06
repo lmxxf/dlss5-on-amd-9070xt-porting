@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB block8下采样精确通过
+
+- validate_native_valid1080_ds8.py从block7原始主输出重算修复后的block8 raw half，原生水平pair池化→FP8→按K32顺序矩阵投影，按已验证global16低通道位交换解码原始down。
+- 输出4423680值different0/max_abs0/finite通过，保存encoder-c64/down-validation.json、block8-down.f32与DS矩阵。
+- encoder5～8主分支及down8 CPU/原始合同现在均通过；AMD仍需同RGB整段前端回归，未部署游戏DLL。
+
 ### 2026-09-07：融合平方修复后640token八层ViT GPU回归通过
 
 - 更新远端native_vit_qkv.hlsl和native_half_square.hlsli，分块fence整链31～38三帧655360最终值均零差异，device正常。
