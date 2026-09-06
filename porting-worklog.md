@@ -2809,6 +2809,16 @@ README顶部同步当前范围。仍待ViT31～38、解码器/最终RGB和真实
 
 AMD代码及游戏DLL此轮未改，已验连续范围仍256×256 RGB→block30/head；ViT本体未完成，最终游戏画面目标active。
 
+### 2026-09-06 ViT31 expansion地址探针及融合激活数值闭合
+
+当前独立诊断源为run_native_vit_expand_probe.cpp，旧run_original_vit_expand.cpp已保留原接口，避免破坏历史调用。本轮新增DLSS5_VIT_EXPAND_LAYOUT_SCAN：零权重中只开offset0及22个地址bit对应的单位FP8系数，用四组4-bit源地址编码读取每个输出实际访问的输入位置。所有控制在release下，不拟合真实模型系数。
+
+第一轮将输出当纯copy解码失败，进一步SASS核对发现0x4930起HFMA2/HMUL2已执行激活：expand本身包含clamp(-4,4)及half多项式，不是等contract才激活。使用16个激活后仍可唯一识别的编码值恢复地址：输出与输入低位都不同于Swin。测得矩阵output bits[6,3,9,7,8,10..16]，input bits[0,1,2,4,5,17..21]；每个单位系数恰对应16个token输出。probe_native_vit_expand_layout.py保存23组位置/源地址，形成可复查证据。
+
+check_native_vit_expand.py直接按该bit规则解码完整原block31.layer0记录，K32 half累计后先执行half激活再FP8，不插入激活前FP8。16-token原RGB256连续链入口的65536值全部与原CUBIN一致；另外独立seed1901/1907随机FP8输入各65536值也全exact，max0。旧Swin-bit、旧ViT unpack等失败候选保留为对照，但最终门槛只接受新原生公式全exact。matrix仅导出release/private夹具目录，不提交权重。
+
+还核对了原1d重排与head canonical坐标：14个物理地址bit对应mask[2,1,8192,16,4,8,1024,2048,4096,32,64,128,256,512]，说明进入ViT不能直接把旧HWC通道序当相同坐标。当前通过的是原CUBIN/CPU expansion，不是AMD ViT或完整block31；收缩层、QKV、attention、projection仍待恢复，AMD已验范围仍RGB256→block30/head。游戏DLL/公开包未改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
