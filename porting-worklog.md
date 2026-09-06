@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同RGB GPU0～22整链准备
+
+- prepare_native_valid1080_front22_gpu.py核对原始15～22 main/down22通过，导出C256八层系数及原始主/down答案，继承同一有效RGB与0～14参数。
+- preblock host新增DLSS5_FRONT22自动包含前级，120×72 C256八层shift0/3/1/2/0/3/1/2及DS22串联，回读raw main与60×36 C512 down。
+- C++编译/diff检查通过，新0～22 GPU链尚未执行，未部署DLL。
+
 ### 2026-09-07：同valid1080 RGB block22下采样通过
 
 - validate_native_valid1080_ds22.py从已验证block21主输出，计算shift2 raw half、原生池化/FP8及C256→512矩阵投影，按global16低位交换解码原始down。
