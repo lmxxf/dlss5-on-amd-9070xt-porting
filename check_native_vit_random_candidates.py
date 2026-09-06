@@ -54,17 +54,24 @@ t = bits(n*1024, [2,6,7,8,14,15] + list(range(16,10+n.bit_length()-1)))
 c = bits(n*1024, [0,1,3,4,5,9,10,11,12,13])
 actual = np.empty((n,1024), np.float32)
 actual[t,c] = e4m3fn(raw[:n*1024])
-report = {'scope': 'diagnostic candidates only; no runtime changes', 'tokens': n, 'candidates': {}}
+report = {'scope': 'isolated attention numerical validation; not game or full-chain acceptance', 'tokens': n, 'candidates': {}}
 for name, den in candidates.items():
     expected = F(H(num * H(1/den))).transpose(1,0,2).reshape(n,1024)
     delta = np.abs(expected-actual)
     report['candidates'][name] = {'different': int(np.count_nonzero(delta)), 'max_abs': float(delta.max())}
-print(json.dumps(report, indent=2))
 reference = attention(data['q'], data['k'], data['v'])
 report['reference_different'] = int(np.count_nonzero(reference != actual))
 report['reference_finite'] = bool(np.isfinite(reference).all() and np.isfinite(actual).all())
 report['replay_identical'] = (a.folder / 'rtx-output-1.fp8').read_bytes() == (a.folder / 'rtx-output-2.fp8').read_bytes()
 report['tail_zero'] = not bool(np.any(raw[n*1024:]))
+if (a.folder / 'gpu.f32').exists():
+    gpu = np.fromfile(a.folder / 'gpu.f32', np.float32)
+    assert gpu.size == actual.size
+    gpu = gpu.reshape(actual.shape)
+    report['amd_finite'] = bool(np.isfinite(gpu).all())
+    report['amd_different'] = int(np.count_nonzero(gpu != actual))
+    assert report['amd_finite'] and report['amd_different'] == 0
+print(json.dumps(report, indent=2))
 (a.folder / 'candidate-validation.json').write_text(json.dumps(report, indent=2)+'\n')
 assert report['reference_finite'] and report['replay_identical'] and report['tail_zero']
 assert report['reference_different'] == 0, report

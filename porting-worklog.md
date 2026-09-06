@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD 可变长度 attention 首次 GPU 精确通过
+
+- `native_vit_attention.h/.hlsl` 扩展到 64/128/256 tokens；每 64-token 分母使用原生求和图，再顺序半精度相加，分子继续每 32 keys 半精度累计。尚不支持任意游戏尺寸。
+- 新独立测试 `d3d12_native_attention_extent_test.cpp` 直接调用生产 `NativeVitAttention`，输入为随机 Q/K/V，oracle 直接解码 RTX 原始输出而非 CPU 参考。明确选择 AMD，检查 finite、device removed、fence、30 秒 timeout，三次 replay 均逐值校验。
+- RX 9070 XT：64-token seed=3004（65536 值）、128-token seed=3002（131072 值）、256-token seed=3003（262144 值），各三次全部 different=0 / max_abs=0。下载 gpu.f32 后再与原始 RTX 输出独立解码复验，全通过。
+- `prepare_native_attention_extent_gpu.py` 负责测试打包；`check_native_vit_random_candidates.py` 增加 GPU 回读精确验证。数据留在 ignored release/native-vit/attention-random-* 下，未提交权重或激活。
+- 只更新独立实验室 executable/shader，未替换剑星 addon/DLL。QKV、线性层、完整游戏分辨率及实际纹理契约仍需继续，不能将此结果当成游戏画面验收。
+
 ### 2026-09-06：随机 attention 跨 seed / token 长度复验
 
 - 新增 128-token seed=3002、256-token seed=3003 原始 RTX 对照，各运行两次输出一致；SHA256 分别为 `56e457e3982873823130e861b7063da4ce2013e347dac2e414f4376cfc91acfe`、`e69dd199ca06f8ddbef2f6a9d23326025c863d3de2d82f949678430bd94c6f28`。
