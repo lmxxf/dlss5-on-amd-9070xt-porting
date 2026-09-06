@@ -14,3 +14,6 @@ expected=expand(x,unpack_expand('release/native-vit/block31-expand.weights'))
 report={'tokens':n,'values':actual.size,'different':int(np.count_nonzero(actual!=expected)),'max_abs':float(np.abs(actual-expected).max()),'finite':bool(np.isfinite(actual).all() and np.isfinite(expected).all()),'tail_zero':not bool(raw[n*channels:].any()),'replay_identical':(root/'expand-1.fp8').read_bytes()==(root/'expand-2.fp8').read_bytes(),'scope':'original expand only; not AMD or game acceptance'}
 print(json.dumps(report,indent=2));(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 assert report['different']==0 and report['finite'] and report['tail_zero'] and report['replay_identical']
+x.astype('<f4').tofile(root/'input.f32')
+actual.astype('<f4').tofile(root/'oracle.f32')
+unpack_expand('release/native-vit/block31-expand.weights').astype('<f4').tofile(root/'weights.f32')

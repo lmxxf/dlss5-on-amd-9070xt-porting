@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD 256-token expand 三次精确通过
+
+- 生产 NativeVitLinear 仅针对 expand 开放 tokens=256，其他未验证线性模式仍限制原尺寸；HLSL 算术和索引未改。
+- extent test 新增 expand 模式，上传原始特征及解码原始权重，对照 RTX 原始输出。RX 9070 XT 三次各 1048576 值全部 different=0 / max_abs=0，finite/device/fence 检查通过。
+- GPU 输出下载到 ignored release/native-vit/expand-256-3003/gpu.f32，与 oracle.f32 字节级 cmp 一致。
+- 未更新游戏 DLL，256-token contract/projection 和完整 ViT 串联仍待完成，更不代表真实1080p游戏画面已验证。
+
 ### 2026-09-06：256-token 原始 expand 精确验证
 
 - 原始 expand caller 增加 Windows CUBIN 环境路径，`run_nvidia_expand_extent.ps1` 在 RTX 5090 独立运行 256 tokens / gridX=64。
