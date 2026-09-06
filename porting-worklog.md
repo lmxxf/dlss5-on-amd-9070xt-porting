@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：新增时序特征preblock主/DS双支GPU逐值通过
+
+- preblock host增加DLSS5_TEST_TEMPORAL_RGB隔离验证入口，上传已重建HWC时序RGB并启用新t3/constant路径；新增prepare_native_temporal_preblock_gpu.py生成8×8 fixture，沿用生产noise table和原block0系数。
+- 新exe部署独立 `D:\DLSSNR-Lab\native-temporal-preblock`，当前input_mix/attention/finish及half-square全部部署；session5569 exit0，seed0/0/0/1/0五帧重放通过。
+- 下载gpu输出，与原版同源both_shifted（slot8 history、slot10=0.125）解码比较：main2048值different=0，down512值different=0。raw half输入→时序特征13/2/3→生产混合/FFN/attention/DS精确闭合。
+- 本轮时序RGB由CPU sample32提供，只验证新增preblock绑定/特征接线，不宣称GPU采样器已直连。关闭时序分支的新增root回归也尚待单独执行。下一步GPU sampler→preblock连通、on/off/replay及其它位移/实际几何验证，再补运动坐标。新神经DLL未部署。
+
+
 ### 2026-09-07：生产preblock接入可选时序RGB，待GPU回归
 
 - NativePreblockRuntime::Create增加可选temporal_input HWC float4 GPU buffer，限定live+noise table且非RAW_INPUT、容量完整；Record增加默认false的temporal_enabled，未绑定却启用则拒绝。保留原调用默认首帧路径。
