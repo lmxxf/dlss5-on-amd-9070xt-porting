@@ -10,23 +10,26 @@ from native_c32_reference import H,F
 from decode_tinlayout_global import e4m3fn
 def unpack(path):
     raw=np.fromfile(path,np.uint8)
-    if raw.size!=820784:raise ValueError('block48 record size')
-    ordinary=np.zeros(689232,np.uint8)
-    ordinary[:0x58000]=raw[:0x58000]
-    ordinary[0x58010:0x58210]=raw[0x78000:0x78200]
-    ordinary[0x58220:]=raw[0x78400:]
-    matrix=np.empty((256,512),np.float32)
-    matrix[bits(131072,[3,6,7,8,9,10,11,12]),bits(131072,[1,0,4,5,2,13,14,15,16])]=e4m3fn(raw[0x58000:0x78000])
-    c=np.arange(256);order=(c//16)*16+(c%8)*2+(c%16//8)
-    scale=np.empty(256,np.float32);scale[order]=raw[0x78200:0x78400].view('<f2')
+    if raw.size==820784:C,n,begin,ffskip,qkv_old=256,689232,0x58000,0x78000,0x58220
+    elif raw.size==230176:C,n,begin,ffskip,qkv_old=128,197184,0x18000,0x20000,0x18120
+    else:raise ValueError('native upsample record size')
+    ordinary=np.zeros(n,np.uint8)
+    ordinary[:begin]=raw[:begin]
+    ordinary[begin+16:begin+16+2*C]=raw[ffskip:ffskip+2*C]
+    ordinary[qkv_old:]=raw[ffskip+4*C:]
+    ob=C.bit_length()-1;count=2*C*C
+    matrix=np.empty((C,2*C),np.float32)
+    matrix[bits(count,[3]+list(range(6,ob+5))),bits(count,[1,0,4,5,2]+list(range(ob+5,2*ob+1)))]=e4m3fn(raw[begin:ffskip])
+    c=np.arange(C);order=(c//16)*16+(c%8)*2+(c%16//8)
+    scale=np.empty(C,np.float32);scale[order]=raw[ffskip+2*C:ffskip+4*C].view('<f2')
     return matrix,scale,unpack_bytes(ordinary)
 def upsample(x,skip,params,shift=0):
     matrix,scale,body=params;h,w,c=skip.shape
-    if c!=256 or x.shape!=(h//2,w//2,512) or h%8 or w%8 or shift not in range(4):raise ValueError('upsample48 geometry')
+    if c not in (128,256) or x.shape!=(h//2,w//2,2*c) or h%8 or w%8 or shift not in range(4):raise ValueError('native upsample geometry')
     low=multiply(x,matrix)
     merged=F(H(np.repeat(np.repeat(low,2,0),2,1)+skip*scale))
     px=4 if shift&1 else 0;py=4 if shift&2 else 0;ww=(w+px+7)//8*8;hh=(h+py+7)//8*8
     padded=np.pad(merged,((py,hh-h-py),(px,ww-w-px),(0,0)))
-    tiles=padded.reshape(hh//8,8,ww//8,8,256).transpose(0,2,1,3,4).reshape(-1,64,256)
-    result=block(tiles,*body).reshape(hh//8,ww//8,8,8,256).transpose(0,2,1,3,4).reshape(hh,ww,256)
+    tiles=padded.reshape(hh//8,8,ww//8,8,c).transpose(0,2,1,3,4).reshape(-1,64,c)
+    result=block(tiles,*body).reshape(hh//8,ww//8,8,8,c).transpose(0,2,1,3,4).reshape(hh,ww,c)
     return result[py:py+h,px:px+w]

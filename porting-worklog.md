@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD decoder49～55獨立链通过（2026-09-06）：会话57124正常exit0，七个常驻NativeC64Shift三帧最终各262144值different0/max0，device/fence/finite/replay通过。下载gpu-0.f32后--c256验证器再次全exact，SHA eb7bf99bf25e96b58741d48d6d1058732717560a6760a362eae98c508f9a49ed。报告release/native-rgb512/amd-decoder49-55/validation.json。输入仍为原block48夹具；AMD已验RGB连续范围仍到48，未拼称全链到55。
+
+第56块原生参考恢复（2026-09-06）：原记录230176 bytes，SHA f73035bd13f1ce40ec2768b49eee02564e1ef5f7a4860375e7b1901c8e41ae83。SASS支持输入投影0x18000..0x20000、FFN skip0x20000、合流skip0x20100、QKV起0x20200、attention scale0x34200、最终skip0x38210。native_upsample48_reference.py按记录尺寸支持C128，普通C128尾段平移0x80e0，继续复用直接字节解码与已验数学；原mode9开放blockY4，不改旧C256调用。
+
+check_native_upsample56_spatial.py对原kernel进行独立随机测试：输出16×16/seed2501/shift0的32768值全exact；输出64×64/seed2507/shift3的524288值全exact，输入为global16低两位交换、skip为C128 cell，含移位边界。报告在release/native-upsample56/spatial-16-2501-0及spatial-64-2507-3。共用参考修改后另以C256第48块32×32/seed2431/shift3回归，262144值全exact。第56块尚未AMD实现或接RGB链，游戏DLL未改。
+
 AMD RGB512→48完整连续通过（2026-09-06）：同一会话32754正常exit0，28个shader编译/177次缓存命中；三帧fence等待2109/1984/2063ms、replay与device/fence/finite通过。下载最终output-rgb512-upsample48.f32后严格验证262144值different0/max0，SHA0ceac820a2ad341f463a771af0b9f5492148003d0062ef024f754d96eea18618，报告amd/upsample48-validation.json。重新下载五个DS文件再比对，DS0/4/8/14/22均全exact。GPU从RGB到48无CPU中间特征注入，不是拼接独立pass；但仍未完成最终RGB/游戏验收。
 
 等待期间已把宿主新增decoder49_55模式：七个NativeC64Shift(C256)、32×32、各自原权重，参数导出脚本严格核对原链输入连续性与pass。编译/部署完成，前一GPU任务退出后才启动新独立回归；当前SSH会话57124，目录native-decoder49-55，已打印ffn编译开始。第49～55块AMD结果pending，不重启同一任务。新增-C256入口与对应验证器选择，旧40～47模式保留。游戏DLL未改，目标active。
