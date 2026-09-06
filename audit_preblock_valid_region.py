@@ -14,6 +14,8 @@ for name in ('main','down'):
   arrays=[a.reshape(2,h//2,w//2,16).transpose(1,2,0,3).reshape(h//2,w//2,32) for a in arrays];valid=540
  delta=arrays[0]!=arrays[1];rows=delta.sum(axis=(1,2));ys=np.flatnonzero(rows)
  results[name]={'different_values':int(rows.sum()),'first_changed_row':int(ys[0]) if len(ys) else None,'last_changed_row':int(ys[-1]) if len(ys) else None,'valid_region_differences':int(rows[:valid].sum()),'padding_region_differences':int(rows[valid:].sum()),'per_row':rows.tolist()}
+ results[name]['padding_nonzero_values']=int(np.count_nonzero(arrays[1][valid:]&127))
+ results[name]['padding_unique_codes']=np.unique(arrays[1][valid:]).tolist()
 report={'scope':'original output spatial difference audit; no AMD acceptance','branches':results}
 (root/'spatial-difference.json').write_text(json.dumps(report,indent=2)+'\n')
-print(json.dumps({k:{x:y for x,y in v.items() if x!='per_row'} for k,v in results.items()},indent=2))
+print(json.dumps({k:{x:y for x,y in v.items() if x not in ('per_row','padding_unique_codes')} for k,v in results.items()},indent=2))

@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：preblock简单补齐候选继续排除
+
+- 空间审计新增padding非零统计：valid1080原始main补齐区4415795个非零值、down1104059，排除直接输出全零。
+- 原始等尺寸纹理补齐RGB0候选仍main4364004/down1103270差异；RGB0.5候选main3826123/down888244差异。均独立保存在release/native-rgb-fill*-1080，未覆盖已有实验。
+- 边缘复制、黑色、灰色三种输入填充均不能重现valid纹理合同；下步应检查SASS有效范围/坐标/噪声分支，不将候选用于AMD发布路径。未部署DLL。
+
 ### 2026-09-06：valid1080差异仅在补齐区，RGB边缘复制候选失败
 
 - audit_preblock_valid_region.py按逻辑像素解码：main前1080行零差异，变化仅1080～1151；down前540行零差异，变化仅540～575。结果release/native-rgb-valid1080/spatial-difference.json。
