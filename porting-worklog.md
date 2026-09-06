@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原顺序float32/FMA消除最后half差异，四holdout全half精确
+
+- 参考新增axis32/sample32，按原SASS单轴多项式舍入顺序、五tap乘积权重、top→left→center→bottom→right FMA及未归一化权重和/倒数顺序执行。使用fraction8/product8纹理候选，不再用float64最终平均替代原顺序。
+- validate_native_temporal_sample32.py对保存的四组原PC1800 warp0捕获核对：384个half分量全部different=0；原失败case1的96个float32值也全部exact，其他case最大浮点差5.96e-8/2.98e-8/2.98e-8。数学不变量回归通过。
+- 仅采样器输出half在四个8×8恒定位移holdout通过；并非所有float32中间值精确，MUFU近似/TEX舍入仍有细节，motion前段坐标、特征落位及AMD完整稳态尚未完成。下一步将已校准采样加入稳态特征输入并做原版preblock逐值验证。新神经DLL未部署。
+
+
 ### 2026-09-07：时序采样独立位移holdout支持8bit乘积量化，剩1个half差异
 
 - gdb脚本支持独立输出目录；新增check_native_temporal_holdout.py，以新seed7303当前/历史图、四组位移(0.37,-0.29)、(-0.63,0.81)、(1/64,31/64)、(0.72,0.23)，抓原版PC1800 warp0。4case运行完成session45448 exit0，证据ignored `release/native-temporal-holdout`。

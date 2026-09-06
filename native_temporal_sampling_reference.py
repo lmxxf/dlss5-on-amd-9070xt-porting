@@ -51,6 +51,33 @@ def sample(image,x,y):
     h,w,_=image.shape;xy,weight=geometry(x,y,w,h)
     return (bilinear(image,xy)*weight[...,None]).sum(axis=-2)
 
+def fma32(a,b,c):
+    return (np.asarray(a,np.float32).astype(np.float64)*np.asarray(b,np.float32).astype(np.float64)+np.asarray(c,np.float32).astype(np.float64)).astype(np.float32)
+
+def axis32(position,extent):
+    p=np.asarray(position,np.float32)
+    center=(np.floor(p-np.float32(.5))+np.float32(.5)).astype(np.float32)
+    t=np.clip(p-center,0,1).astype(np.float32);t2=t*t;t3=t2*t
+    left=fma32(t+t3,-.5,t2)
+    inner_left=fma32(t3,1.5,-(t2*np.float32(2.5)))+np.float32(1)
+    right=(t3-t2)*np.float32(.5)
+    inner_right=((np.float32(1)-left)-inner_left)-right
+    middle=inner_left+inner_right
+    position=fma32(inner_right,np.float32(1)/middle,center)
+    return np.stack([np.clip(v,.5,extent-.5) for v in (center-1,position,center+2)],-1),np.stack([left,middle,right],-1)
+
+def sample32(image,x,y):
+    """SASS-ordered candidate; MUFU reciprocal and TEX rounding still audited."""
+    h,w,_=image.shape;px,wx=axis32(x,w);py,wy=axis32(y,h)
+    xy=np.stack([np.stack([px[...,i],py[...,j]],-1) for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-2)
+    weights=np.stack([wx[...,i]*wy[...,j] for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-1)
+    pixels=bilinear(image,xy,8,8).astype(np.float32)
+    total=pixels[...,0,:]*weights[...,0,None]
+    for i in range(1,5):total=fma32(pixels[...,i,:],weights[...,i,None],total)
+    denominator=weights[...,1]+weights[...,0]
+    for i in range(2,5):denominator=denominator+weights[...,i]
+    return total*(np.float32(1)/denominator)[...,None]
+
 if __name__=='__main__':
     import json
     rng=np.random.default_rng(7302);image=rng.random((8,8,3))
