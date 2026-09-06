@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：valid1080时序前端全部exact，补偿乘加消除最后两值
+
+- 新增native_temporal_axis_steps.hlsl隔离Y轴逐步读回，session64467显示t/t²/t³/left/scaled/middle/倒数均与参考一致，但inner为0x3f37d3f7（应f8），other为0x3eccd07a（应78），position为0x43aaedcc（应cb）。原PC1320捕获session1755仍触发CUDA-GDB内部SIGABRT，不继续撞同一点，利用已捕获的上下游和精确算术定位。
+- temporal_inner_product用float乘法误差恢复及TwoSum补偿重建1.5*cube-scaled_square融合结果，避开此前直接double fma的大幅失配。CPU 2000001个[0,1]样本与float64融合参考全部一致。session37902 GPU诊断inner/other/position/UV全部对齐原值，数据gpu-axis-compensated.f32。
+- session52937 full valid1080五帧运行结束，session83521全量严格比较：main70778880、down17694720值全部exact，0/2→0/0。证据release/native-temporal-valid1080/compensated/original-validation.json。
+- session9689同版120×72五帧回归main276480/down69120全exact。新增诊断/补偿测试与生产修正一并提交，游戏DLL未改。
+- 里程碑只覆盖受控1920×1080 current/history/motion→1920×1152 preblock，slot18 absent；尚未证明逐帧历史更新语义、完整时序网络、真实游戏输入采集及最终动态显示。下一步接完整网络和历史资源生命周期，不能把本次前端通过冒称游戏移植完成。
+
 ### 2026-09-07：最后窗口GPU仅中央Y UV差1ULP，inner FMA试改失败撤回
 
 - 新增valid1080 tap诊断wrapper偏移652800，隔离目录native-temporal-valid1080-taps；session11418五帧完成，session79422回读512值与原PC1590比较仅3个不同：lane13三处共用中央Y UV，GPU 0x3ea210e0、原0x3ea210df，其余UV/权重全部一致。诊断输出不是RGB，不用于神经验收。

@@ -18,6 +18,15 @@ float temporal_reciprocal(float x) {
     return 1.0/x;
 }
 
+float temporal_inner_product(float cube,float scaled_square) {
+    precise float product=cube*1.5;
+    precise float product_error=(cube-product)+cube*.5;
+    precise float sum=product-scaled_square;
+    precise float virtual_b=sum-product;
+    precise float sum_error=(product-(sum-virtual_b))+(-scaled_square-virtual_b);
+    precise float corrected=sum+(sum_error+product_error);
+    return corrected;
+}
 void axis(float p,uint extent,out float3 positions,out float3 weights) {
 #if NORMALIZED_COORDINATES
     precise float center=floor(mad(p,float(extent),-.5))+.5;
@@ -32,7 +41,7 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     precise float sum=t+t3;
     precise float left=mad(sum,-.5,t2);
     precise float scaled=t2*2.5;
-    precise float inner=mad(t3,1.5,-scaled);
+    precise float inner=temporal_inner_product(t3,scaled);
     inner=inner+1;
     precise float right=(t3-t2)*.5;
     precise float other=1-left;other=other-inner;other=other-right;
