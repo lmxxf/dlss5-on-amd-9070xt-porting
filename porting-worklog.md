@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：抽取後NativeActualNetwork70全RGB回归精确通过
+
+- session15638/PID38016已exit0：NativeActualNetwork70配NativeGameSubmission三帧各6635520个最终RGB值different=0，extracted_network70=exact。
+- 下载独立 `release/native-rgb-valid1080/amd-full/gpu-network70.f32`，与oracle-final.f32经cmp逐byte一致，SHA256 `c1d6ab580e4d3bfb46acb90646d1a65d609cbcf6dbdcdde12d1bef18703afbe3`。未覆盖此前host/动态回读。
+- 现在抽取后的实际0～70组件及自有提交器正常路径已全链回归，不再仅语法通过；仍是单RGB受控反射合同、三帧同输入，实际游戏颜色空间、多纹理及呈现未验收。
+- 下一步组合已验证的纹理输入、网络、R10输出与游戏主queue生命周期，现场核验正确图像来源及最终呈现。游戏DLL尚未更新，无遗留运行任务。
+
+
 ### 2026-09-07：抽取网络组件全RGB回归已启动
 
 - 新增 `d3d12_native_network70_test.cpp`，使用同源valid1080输入、GPU反射、NativeActualNetwork70::Create/Run与NativeGameSubmission，三帧最终RGB逐值比较原版oracle。输出独立 `gpu-network70.f32`，不覆盖旧gpu-main精确结果。
