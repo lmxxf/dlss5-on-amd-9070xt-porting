@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+真实移位AMD整网回归启动（2026-09-06）：check_native_runtime_shift_consistency.py逐项核对原捕获decoder40～69、C++表与新原/CPU报告，30块全部一致，第70块原final报告pass。验证器支持独立decoder-root并保留encoder-root。新exe编译完成。
+
+stage_native_runtime_rgb512.ps1建立独立AMD实验目录native-runtime-rgb512，只复制输入、系数、shader、索引等必要文件，排除output/audit/gpu/lut及JSON报告；现场查询无oracle文件。原native-rgb512目录和本地旧配置结果保留。唯一回归已启动：统一会话36919，PID31832，20:07:18启动；CPU38.53125秒，shader1～8完成、第9开始。尚未读回最终RGB，不宣布新配置GPU通过。下一轮继续观察同一进程，不重复启动。游戏神经DLL未更新。
+
 真实移位新配置最终RGB参考通过（2026-09-06）：新目录native-runtime-rgb512继续63～65按3/1/2各1048576值原/CPU全exact，原65 outview验证通过；66 shift0及67～69按3/1/2各2097152值全exact。原69 outview验证通过后，接同一编码器preblock skip与初始RGB，新配置最终post70共786432个RGB分量different0/max0。完整新报告在native-runtime-rgb512/post70/validation.json；旧native-rgb512控制配置未覆盖。
 
 66/C32/post70脚本增加独立decoder/output root与encoder root，避免拷贝旧后段或混淆输入来源。所有原调用已正常退出，当前未运行AMD新配置全链。下一步以本新裁判重跑已修正移位的AMD全链，再进入1080p，游戏补丁未更新。
