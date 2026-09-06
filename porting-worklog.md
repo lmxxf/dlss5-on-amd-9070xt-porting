@@ -2799,6 +2799,16 @@ d3d12_native_front_chain_test.cpp新增rgb256head模式，前端各阶段宽/高
 
 README顶部同步当前范围。仍待ViT31～38、解码器/最终RGB和真实游戏尺寸、画面验证；游戏DLL、公开包未更新。不能把实验编码器全部exact称为剑星DLSS5画面已修复，目标active。
 
+### 2026-09-06 ViT31 expansion初步调用与物理token padding诊断（数值未通过）
+
+新增run_original_vit_expand.cpp独立调用cc_vit_1d_ffn_expand_fp8，按元数据0x48参数及原runner/SASS配置input0、output16、weights24、状态buffer56、token数64。block31.layer0原记录4194320字节，直接提取，不用旧effective矩阵。check_native_vit_expand.py将已验证的block30 head按原repack映射构造16-token物理输入。
+
+首次gridX16只写32768字节，改为gridX32后获得完整65536字节（16×4096）非零/有限输出。尚不能外推所有token数的网格规则。直接套Swin通用bit矩阵排列及旧ViT原字节unpack两种候选均失败：分别65271、64352个值不同；排序比较亦不同，不只是输出位置差异。验证器明确返回失败，不继续运行后续层，也不拟合校正。
+
+进一步将输入分配从宽松4MiB收紧到16×1024字节，Compute Sanitizer发现原kernel在+0x880读取第16384字节起的1024字节，越界；该诊断进程CUDA719退出。输入明确零填充到32×1024字节后，保持逻辑token16、gridX32、32×4线程，memcheck0 errors，输出仍完整65536字节。这确认当前16-token调用需要更大的物理输入读域；不是把padding行当有效token或验收结果。下一步恢复原ViT矩阵/激活地址规则，不能把执行无错误当算术正确。
+
+AMD代码及游戏DLL此轮未改，已验连续范围仍256×256 RGB→block30/head；ViT本体未完成，最终游戏画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
