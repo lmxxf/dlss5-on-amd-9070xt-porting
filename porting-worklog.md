@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同 RGB 原版解码器39～47连续对齐
+
+- `check_native_valid1080_decoder39.py` 从同 RGB ViT38 原版输出经过实际逆 repack 接入 decoder39，并独立与逻辑逆 gather 比对；skip 来自同 RGB encoder30 的原版 FP8 main（不是 raw half，也不是独立随机 skip）。32×20 投影后 nearest2×，左上裁剪至60×36。
+- 原版 decoder39 的1105920个输出值与数值参考 different=0，finite/tail_zero/逆布局比对通过。输入及输出在 ignored `release/native-rgb-valid1080/decoder39`。
+- `check_native_valid1080_decoder_split.py` 连续运行原版40～47层，实际移位0/3/1/2/0/3/1/2；8层共32项中间结果 different=0，全部status=pass。ignored `release/native-rgb-valid1080/decoder-split`。
+- AMD head 测试继续沿用 PID28224 / unified exec session44927，已确认进程CPU增长并持续输出成功编译日志；还没有本轮 GPU 回读验收结果。不得把从 front22 复制来的旧 gpu-main/down 文件当成此次结果，须等待当前进程 exit0 后再收取并检查尺寸、时间及数值。
+- 上述39～47通过仅是同 RGB 原版/CPU参考，尚未证明 AMD 连续链或游戏 DLL。下一步等待既有AMD任务结束、验证head，再继续同源48～70及实际游戏部署。
+
+
 ### 2026-09-07：同 RGB 原版 ViT31～38 全部对齐；AMD head 测试运行中
 
 - 新增 `prepare_native_valid1080_vit.py`：从已验证的原版 head.fp8 经原版 32×20 repack 映射生成 ViT 输入，独立与 head.f32 的 GPU 逻辑 gather 路径比对，655360 个输入值精确一致；不使用随机 ViT 输入。
