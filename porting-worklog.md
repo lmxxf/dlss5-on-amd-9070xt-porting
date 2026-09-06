@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实际0～70网络抽成游戏可调用GPU组件，待回归
+
+- 新增 `native_actual_network70.h`，从已验证完整host提取实际尺寸encoder0～30/head、640 gather/ViT、decoder39～69、post70创建与提交；输入是外部GPU tile-major RGB和HWC post base，唯一CPU数据为系数/映射/函数表，不读oracle或预制特征。
+- Run使用NativeGameSubmission，encoder/head/bridge同段、ViT逐chunk、decoder逐stage、最后post；固定实际几何和已验证shift，保留raw encoder跳接由原decoder F量化。检查RGB buffer容量/同device/noise长度，禁止post诊断；异常后网络poison不复用。
+- 完整帧串行与输入producer已提交仍是调用方责任；GPU超时必须保留整个网络及外部资源。组件不操作游戏list，也不含游戏颜色空间/取图选择假设。
+- MinGW独立语法检查exit0，尚未GPU运行这份提取组件；此前完整host通过不能自动等同于本次抽取通过。下一步用同源fixture回归此类，并组合纹理入口/显示输出和ReShade生命周期。游戏DLL未更新，无运行任务遗留。
+
+
 ### 2026-09-07：自有提交器在AMD纹理写回测试实测通过
 
 - `d3d12_native_game_output_test.cpp` 改用NativeGameSubmission，移除原测试自行管理的allocator/list/fence逻辑；每帧先提交R10写入，再单独提交纹理回读，A/A/B/A/A共10次自有命令提交。
