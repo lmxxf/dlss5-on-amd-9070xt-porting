@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：分阶段提交将640-token TDR定位到expand
+
+- NativeVitBlock新增RecordStage；extent host可用DLSS5_VIT_STAGED分五阶段独立提交/fence，资源全留GPU、算法不改，独立stage fence避免与帧fence计数冲突。
+- 首帧stage耗时(ms)：expand1759.599、contract1587.586、QKV38.599、attention22.315、projection15.802，最终655360值仍零差异。
+- 第二帧stage0 expand在2216.102ms返回device=0x887A0006，测试exit1。单独提交依然失败，说明仅拆block不能解决；下步针对线性层单次dispatch工作量分块或优化，不调整TDR，不将首帧算术通过当稳定完成。
+- 未部署游戏DLL，记录当前失败以防后续误报。run_native_staged_block.ps1为可复现入口。
+
 ### 2026-09-06：640block重放错误确认伴随AMD watchdog
 
 - 只读inspect_amd_gpu_failure.ps1查得21:26:35/59两条WER1001，LiveKernelEvent141，bucket LKD_0x141_Tdr:6_IMAGE_amdkmdag.sys，关联同一WATCHDOG-20260906-2126.dmp。不将两条报告误当两次独立GPU故障。

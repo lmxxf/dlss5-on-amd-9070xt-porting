@@ -13,5 +13,6 @@ public:
   projection.Create(d,attention.Output(),contract.Output(),tokens,1024,1024,false,pw,dir);
  }
  void Record(ID3D12GraphicsCommandList*c){expand.Record(c);contract.Record(c);qkv.Record(c);attention.Record(c);projection.Record(c);}
+ void RecordStage(ID3D12GraphicsCommandList*c,UINT stage){switch(stage){case 0:expand.Record(c);break;case 1:contract.Record(c);break;case 2:qkv.Record(c);break;case 3:attention.Record(c);break;case 4:projection.Record(c);break;default:throw std::runtime_error("invalid ViT stage");}}
  ID3D12Resource* Output()const{return projection.Output();}
 };

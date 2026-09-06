@@ -43,9 +43,18 @@ int wmain(int argc,wchar_t**argv){try{
  ID3D12GraphicsCommandList*cmd=nullptr;ck(d->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,alloc,nullptr,IID_PPV_ARGS(&cmd)));
  ID3D12Fence*fence=nullptr;ck(d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));HANDLE event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("event");
  UINT64 bytes=oracle.size()*4;auto*rb=buffer(d,bytes,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);std::vector<float> result(oracle.size());
+ const bool staged=_wgetenv(L"DLSS5_VIT_STAGED")!=nullptr;if(staged&&!block_mode)throw std::runtime_error("staging requires block mode");
+ ID3D12Fence*stage_fence=nullptr;UINT64 stage_value=0;if(staged)ck(d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&stage_fence)));
+ auto submit_stage=[&](UINT frame,UINT block,UINT stage){
+  ck(cmd->Close());LARGE_INTEGER a,b,f;QueryPerformanceFrequency(&f);QueryPerformanceCounter(&a);
+  ID3D12CommandList*lists[]={cmd};q->ExecuteCommandLists(1,lists);ck(q->Signal(stage_fence,++stage_value));ck(stage_fence->SetEventOnCompletion(stage_value,event));
+  auto wait=WaitForSingleObject(event,30000);QueryPerformanceCounter(&b);auto reason=d->GetDeviceRemovedReason();auto done=stage_fence->GetCompletedValue();
+  std::printf("stage frame=%u block=%u stage=%u ms=%.3f device=0x%08x wait=%lu\n",frame,block+31,stage,1000.0*(b.QuadPart-a.QuadPart)/f.QuadPart,unsigned(reason),wait);std::fflush(stdout);
+  if(wait!=WAIT_OBJECT_0)throw std::runtime_error("stage timeout");ck(reason);if(done==UINT64_MAX||done<stage_value)throw std::runtime_error("stage fence");ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));
+ };
  for(UINT frame=0;frame<3;frame++){
   std::printf("begin frame=%u device=0x%08x\n",frame,unsigned(d->GetDeviceRemovedReason()));std::fflush(stdout);
-  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++)blocks[i].Record(cmd);}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
+  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++){if(staged){for(UINT s=0;s<5;s++){blocks[i].RecordStage(cmd,s);submit_stage(frame,i,s);}}else blocks[i].Record(cmd);}}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
   D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={output,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
   cmd->ResourceBarrier(1,&b);cmd->CopyBufferRegion(rb,0,output,0,bytes);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);cmd->ResourceBarrier(1,&b);ck(cmd->Close());
   LARGE_INTEGER start,stop,frequency;QueryPerformanceFrequency(&frequency);QueryPerformanceCounter(&start);
