@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD0～38直连精确通过，完整0～70测试启动
+
+- 旧session34710已exit0：5帧seed0/0/0/1/0 replay_check全部pass，resident_chain=pass，处理中间无CPU特征传输。反射有效1080 RGB经encoder/head、GPU gather直接进入640token ViT，不使用预制中间特征输入。
+- 新下载到 `release/native-rgb-valid1080/amd-frontvit` 的gpu-main/down经验证器检查：block38和head各655360值different=0/max_abs=0，pass=true。此为真正0～38直连数值验收，尚不是最终RGB或游戏验收。
+- 确认上一进程结束后，通过已部署 `native-valid1080-full/run_native_valid1080_full.ps1` 启动完整0～70测试，unified exec session21947，已输出反射shader编译成功。目前初始化中，尚未获得最终RGB。后续只轮询该handle，不重启，不并发另一份。
+- 完整测试exe SHA仍为8581e32b0a75ce96e60ba43199a23289301eef18a907cdfc03ac7b6f22daa53c。游戏DLL未更新；完整结果出来后仍需动态输入、实际纹理与游戏呈现验证。
+
+
 ### 2026-09-07：完整GPU测试包已部署到独立目录，尚未启动
 
 - 完成向 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-full` 传输完整系数、输入、oracle、映射、shader依赖及运行脚本；传输session80263已exit0。目录210文件，oracle-final.f32为26542080字节。
