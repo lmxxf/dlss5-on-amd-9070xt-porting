@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同RGB GPU0～14整链准备
+
+- prepare_native_valid1080_front14_gpu.py核对原始9～14 main/down14精确结果，直接解码六层权重，继承0～8系数/同RGB输入，导出block14 raw边界对应FP8 main及down oracle。
+- preblock host增加DLSS5_FRONT14，自动包含front8/4，240×144 C128六层实际shift0/3/1/2/0/3及ds14 GPU串联；回读block14 raw main/down。
+- C++编译及diff检查通过，新GPU0～14尚未执行，未部署游戏DLL。
+
 ### 2026-09-07：同valid1080 RGB block14下采样逐值通过
 
 - validate_native_valid1080_ds14.py从block13原始主输出重算shift3 raw half、水平pair池化/FP8及原始C128→C256矩阵投影，解码下采样global16低通道位交换。
