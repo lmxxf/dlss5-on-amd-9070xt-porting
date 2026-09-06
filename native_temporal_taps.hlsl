@@ -7,7 +7,8 @@
 float2 tap_uv(float2 xy) {
     precise float2 normalized=xy*float2(inverse_width,inverse_height);
     precise float2 pixel=mad(normalized,float2(width,height),float2(0,0));
-    return pixel*float2(inverse_width,inverse_height);
+    precise float2 uv=pixel*float2(inverse_width,inverse_height);
+    return uv;
 }
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID) {

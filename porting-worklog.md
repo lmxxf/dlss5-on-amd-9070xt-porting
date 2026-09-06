@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：排除wide-axis试改，保留DXBC审计证据
+
+- 上轮属于有效进展（已获得实际GPU tap读回）；本轮继续隔离，不操作游戏DLL。
+- axis乘加临时改用double乘加再转float，session12475五帧结束，tap差异319→353，且部分y权重明显异常。已撤回全部wide-axis改动，本地native_temporal_sample.hlsl无diff，远端诊断目录production副本已恢复。失败输出保留gpu-taps-wide.f32/validation.json，不能据此声称融合乘加已修复。
+- dump_native_shader.cpp新增可选temporal模式，保留旧finish入口默认。成功编译并运行D3DDisassemble，release/native-temporal-large/taps.asm显示DXBC仍有normalized乘法、尺寸mad及最终乘法，中间带precise；因此不能把结果直接归因于D3DCompile删除往返。
+- 定点例子111.5/120：CPU float逐步为0x3f6ddddf→111.50001→0x3f6ddde0，原版末值为0x3f6ddde0，AMD诊断末值为0x3f6ddddf。诊断tap_uv最终乘法增加precise变量后session76564仍319/512差异，无改善；该例仅定位差异，尚未证明驱动重排。
+- check_native_gpu_temporal_taps.py支持--prefix保留各变体证据，默认仅打印摘要避免上千行日志。后续需要独立算术微测试/中间值读回来区分MAD语义、最终驱动编译及诊断代码变化，正式神经输出72/21问题仍未解决。
+
 ### 2026-09-07：直接读回AMD五tap座标与权重，建立首处分歧定位工具
 
 - 用户将5090桌面设1080p、游戏无边框窗口，报告停在主菜单；本轮未操作游戏或存档。读取NGX旧日志仍有1920×1080资源记录，但未将旧日志冒称本轮实时尺寸验证。
