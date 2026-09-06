@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第39块矩阵/skip候选数值核对（2026-09-06）：新增check_native_decoder_entry_candidates.py，直接解码原权重，使用已有C512 cell排列读取最终16×16×512输出。512×1024矩阵物理output bits=[3,6,7,8,9,10,11,12,13]、input bits=[1,0,4,5,2,14,15,16,17,18]；四个K256分区内每K32 half累加，分区间依序half相加。main恒0.5、skip零时131072值全exact。尾区按split projection的order=(c//16)*16+(c%8)*2+(c%16//8)恢复，main零/skip恒0.5时全exact；线性读取尾区则101376值不同。
+
+新增seed2301逐通道随机、空间常量的双路输入（smoke-h9cyqj1o），主1024通道按两个C512 cell bank编码，skip512按C512 cell编码。单次原kernel正常返回、counter全3、NaN0。上述矩阵候选加最终H(main_sum+skip_input*tail_scale)再FP8，全部131072值exact；若先单独H(skip*scale)再相加则256值不同、max0.001953125，因此本夹具明确区分了最终half fused乘加与提前舍入。没有拟合矩阵或修正值。空间上仍为常量，尚不能证明2倍上采样/边界/ViT实际重排；下一步用空间变化输入恢复插值合同。当前仍无AMD第39块实现或最终游戏画面验收。
+
 第39块新原版入口小测试（2026-09-06）：check_native_decoder_entry_smoke.py建立8×8主输入/16×16 skip，直接抽取原权重，编译并预检后每次仅运行一个有15秒进程超时的kernel。三次均快速正常返回：零输入最终2MiB全零（release/smoke-bsffe819）；仅main填FP8 0x30时最终130816字节非零、NaN0（smoke-5aqzrlcy，SHA694f314a372f05367359b56ca3f1f3a7ea79cff54070dc88fb1e230a96219d63）；仅skip填0x30时131072字节非零、NaN0（smoke-q79uxg0f，SHA93ad5096b0912d18ae143bcba16cd22f6e4b2b5904eaeb8836f15ce47bf26121）。八个tile counter均为3，零测试另用od核对也为3。主/skip两路都实际影响最终+0x10输出。
 
 这些结果建立原版探针对最终分支的可观测性，不证明地址排列、整个有效区、矩阵运算或AMD实现正确；尚未跑内存检查，不把大buffer兜底等同越界排除。脚本报告明确smoke范围，失败写fail，原数据及可执行文件留ignored release目录。下一步以此独立原输出恢复矩阵排列及skip尾系数，之后接真实RGB512→ViT输入。游戏DLL未改，目标active。

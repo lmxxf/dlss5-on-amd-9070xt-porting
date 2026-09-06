@@ -8,7 +8,7 @@ import tempfile
 import struct
 
 p = argparse.ArgumentParser(description=__doc__)
-p.add_argument('--case', choices=['zero', 'main', 'skip'], default='zero')
+p.add_argument('--case', choices=['zero', 'main', 'skip', 'channels'], default='zero')
 a = p.parse_args()
 base = Path(__file__).resolve().parent
 root = Path(tempfile.mkdtemp(prefix='smoke-', dir=base / 'release'))
@@ -20,6 +20,21 @@ save()
 try:
     (root / 'main.fp8').write_bytes(bytes([0x30 if a.case == 'main' else 0]) * (8 * 8 * 1024))
     (root / 'skip.fp8').write_bytes(bytes([0x30 if a.case == 'skip' else 0]) * (16 * 16 * 512))
+    if a.case == 'channels':
+        import numpy as np
+        from native_c32_reference import F
+        from encode_tinlayout_global import quantize
+        rng=np.random.default_rng(2301)
+        main=F(rng.normal(0,.25,1024).astype(np.float32))
+        skip=F(rng.normal(0,.25,512).astype(np.float32))
+        main.tofile(root/'main-channels.f32'); skip.tofile(root/'skip-channels.f32')
+        inverse=np.argsort(np.load(base/'release/native-c512/split-view/mapping.npz')['cell_output_to_hwc'])
+        cells=np.broadcast_to(quantize(main).reshape(2,512)[:,None,:],(2,16,512)).reshape(2,8192)
+        packed=np.empty_like(cells); packed[:,inverse]=cells
+        np.tile(packed.ravel(),4).tofile(root/'main.fp8')
+        cells=np.broadcast_to(quantize(skip),(16,512)).reshape(1,8192)
+        packed=np.empty_like(cells); packed[:,inverse]=cells
+        np.tile(packed.ravel(),16).tofile(root/'skip.fp8')
     subprocess.run(['python3', str(base / 'extract_native_weight_record.py'),
                     '/home/lmxxf/work/tmp-test/nvngx_dlssnr.dll',
                     'block39.layer0.layer', str(root / 'weights.bin')], check=True, timeout=5)
