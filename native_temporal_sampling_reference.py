@@ -41,8 +41,9 @@ def bilinear(image,xy,fraction_bits=None,product_bits=None):
         scale=2**fraction_bits
         a=np.rint(a*scale)/scale;b=np.rint(b*scale)/scale
     if product_bits is not None:
-        weights=np.stack([(1-a)*(1-b),a*(1-b),(1-a)*b,a*b],axis=-2)
-        weights=np.rint(weights*2**product_bits)/2**product_bits
+        corner=np.rint((1-a)*(1-b)*2**product_bits)/2**product_bits
+        adjacent_x=(1-b)-corner;adjacent_y=(1-a)-corner
+        weights=np.stack([corner,adjacent_x,adjacent_y,a-adjacent_x],axis=-2)
         pixels=np.stack([image[y0,x0],image[y0,x1],image[y1,x0],image[y1,x1]],axis=-2)
         return (weights*pixels).sum(axis=-2)
     return (image[y0,x0]*(1-a)+image[y0,x1]*a)*(1-b)+(image[y1,x0]*(1-a)+image[y1,x1]*a)*b

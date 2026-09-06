@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版双线性量化临界权重保持行列和，24×16差异缩至1/2
+
+- GDB支持指定blockXY/threadY条件断点，定位原主差异像素(y6,x12)于block1 warp1 lane20。PC1800该像素三RGB half偏差，PC10d0坐标一致至float；PC1590采样位置近一致，中央点分数量化为153/256与128/256。
+- PC1730原中央TEX返回值由四权重(52,76,51,77)/256复现到1.62e-8；独立nearest-even得到(52,76,52,76)/256错误。采用先量化左上角，再由横/纵边际推导其它三项保持行列和的候选规则，非逐像素修正。
+- 更新CPU bilinear及GPU运动/历史采样两shader，四组原holdout384half仍全通过。24×16五帧session35078 exit0，原版main差7→1、down差3→2，仍未通过。旧失败输出保留，新增balanced目录保存新回读。
+- 下一步定位剩余half/特征偏差，扩大临界权重规则的独立验证。不得把误差减少当修复完成，新神经DLL未部署。
+
+
 ### 2026-09-07：24×16原版坐标三方比较与倒数实验，最终差异仍未解决
 
 - 原PC10d0 block0 warp0坐标capture已保存native-temporal-rect/sample-registers-10d0.json。归一化坐标乘valid尺寸并舍入float32后，CPU参考64分量与原版一致；旧AMD差29分量。不能由全图CPU比较替代原版其他block证据。

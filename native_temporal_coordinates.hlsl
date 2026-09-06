@@ -12,8 +12,11 @@ float2 fetch_motion(float2 pixel) {
     precise float2 p=clamp(pixel-.5,0,float2(motion_width-1,motion_height-1));
     uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(motion_width-1,motion_height-1));
     precise float2 f=round((p-float2(lo))*256.0)/256.0;
-    precise float4 w=float4((1-f.x)*(1-f.y),f.x*(1-f.y),(1-f.x)*f.y,f.x*f.y);
-    w=round(w*256.0)/256.0;
+    precise float corner=round(((1-f.x)*(1-f.y))*256.0)/256.0;
+    precise float adjacent_x=(1-f.y)-corner;
+    precise float adjacent_y=(1-f.x)-corner;
+    precise float opposite=f.x-adjacent_x;
+    precise float4 w=float4(corner,adjacent_x,adjacent_y,opposite);
     double2 v=double2(motion[lo.y*motion_width+lo.x].xy)*double(w.x);
     v+=double2(motion[lo.y*motion_width+hi.x].xy)*double(w.y);
     v+=double2(motion[hi.y*motion_width+lo.x].xy)*double(w.z);
