@@ -2875,6 +2875,18 @@ SASS恢复的exp公式与Swin不同：score先half，乘half系数0x2dbb，加1.
 
 当前attention仅原CUBIN/CPU64-token独立测试通过；现有RGB256编码器入口为16-token，尚不能直接与此段拼成有效完整ViT，后续需更大连续夹具或进一步核对小尺寸调度。最终projection、AMD ViT及解码器仍待完成，游戏DLL/公开包未更新，最终画面目标active。
 
+### 2026-09-06 ViT31 projection与完整64-token层闭合；更正FFN尺寸参数
+
+run_native_vit_contract_probe.cpp增加独立projection模式，使用原cc_vit_1d_projection_fp8、1050624字节真实block31.layer4、四个cluster-Z分组及-1初始计数器。projection参数末尾为H/W而非token标量。check_native_vit_projection.py在64-token已验证attention输出上，使用对应随机残差输入做独立尾投影测试；四个K256分区各自K32 half累计，残差仅Z0初值，再Z0/1/2/3顺序half相加、FP8。seed2017/2027/2029各65536值全exact，max0；memcheck0 errors且完整输出文件与普通运行相同。
+
+复查SASS发现expand/contract末尾0x40也会将两个32位值相乘。此前诊断写入uint64 token数的接口解释错误，已改为明确H/W（16-token=4×4、64-token=8×8），projection模式同样使用此表示。重新运行16-token expand/contract仍全exact；原先数值公式未因这次参数修正改变，但后续必须使用修正后的ABI，不能沿用旧scalar解释。64-token expand/contract的memcheck均0 errors，输出与普通执行逐byte相同。
+
+新增native_vit_linear_reference.py统一已验证ViT矩阵解码、融合激活、分区残差投影；旧独立检查器增加对该可复用实现的严格对照。expand、contract及三份projection回归全部通过。
+
+新增validate_native_vit_block31.py，64-token源输入一次生成，原CUBIN按expand→contract→QKV→attention→projection连续传递自己的输出，CPU参考在每段独立对照，不注入CPU校正结果。seed2101、2107两份完整层测试：expand各262144值，contract/Q/K/V/attention/projection各65536值，全部different0、max0。QKV64-token的Q/K/V物理排列也在此首次完整逐段回归。该结果是完整block31原CUBIN/CPU闭合，不是AMD ViT或RGB到block31连续GPU验收。
+
+仍待ViT32～38、AMD ViT接入、解码器/最终RGB及真实剑星画面验证。AMD已验连续范围保持RGB256→block30/head；16/32-token attention的异常未因本轮FFN ABI修正而宣称解决。游戏DLL与网盘包未更改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

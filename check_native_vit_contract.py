@@ -41,4 +41,6 @@ for kind in ['first_partition_residual','quarter_residual','residual_after_sum']
   if different<best:
    best=different;print(json.dumps({'candidate':kind,'order':order,'different':different,'max_error':float(np.max(np.abs(predicted-target)))}),flush=True)
 assert native_exact,'native first-partition residual and Z0/1/2/3 reduction differ'
+from native_vit_linear_reference import unpack_residual,residual_projection
+assert np.array_equal(residual_projection(x,residual,*unpack_residual(weight_path,4096)),target),'reusable contraction reference differs'
 print(json.dumps({'native_contract_exact':True,'replays':args.replays,'fixture':str(root)}))

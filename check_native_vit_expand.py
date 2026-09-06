@@ -46,4 +46,6 @@ correct=F(H(expanded*poly))
 error=np.abs(correct-target)
 print(json.dumps({'candidate':'measured_bits_and_fused_activation','different':int(np.count_nonzero(error)),'max_error':float(error.max())}),flush=True)
 assert np.array_equal(correct,target),'measured native ViT expansion differs'
+from native_vit_linear_reference import unpack_expand,expand
+assert np.array_equal(expand(x,unpack_expand(folder/'block31-expand.weights')),target),'reusable expansion reference differs'
 measured.tofile(folder/'expand-matrix.f32')
