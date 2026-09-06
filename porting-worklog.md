@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：key8量化前差异与normalize乘法操作数直读
+
+- PC46a0 lane16 R12高half为-.0244140625，参考-.0244293212890625；此前46d0的R12低16码8c2a在后续merge移入高位，解释byte3来源不是R11。
+- PC41d0 HMUL2 R12,R96,R138直接读取：R96高half=-.478271484375（与参考原始K一致），R138两half=.051055908203125。
+- inspect_key8_prequant.py保存normalize操作数，下一步核对原始平方和与倒数；未用单值更改模型，未部署DLL。
+
 ### 2026-09-07：key8候选字节定位及量化前断点
 
 - K位布局诊断定位差异在lane16/R12/byte3；新增记录lane/register/byte字段。
