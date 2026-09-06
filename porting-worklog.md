@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：key8原始平方和383.5，参考383.25
+
+- inspect_key8_norm_sum.py确认参考inverse .05108642578125与原始.051055908203125不同，分别产生已观察的两种half归一化值。
+- cuda-gdb于PC4030前读取lane16/R142，两个half均383.5；参考相同K向量平方和383.25。差异已定位到归一化平方和输入，而非MUFU近似或FP8转换本身。
+- 保存qk-registers-4030.json与key8-norm-sum.json，下一步还原C64 norm归约/通道配对并全量回归；尚未修改生产算法或部署DLL。
+
 ### 2026-09-07：key8量化前差异与normalize乘法操作数直读
 
 - PC46a0 lane16 R12高half为-.0244140625，参考-.0244293212890625；此前46d0的R12低16码8c2a在后续merge移入高位，解释byte3来源不是R11。
