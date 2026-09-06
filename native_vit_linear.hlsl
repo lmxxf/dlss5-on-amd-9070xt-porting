@@ -15,7 +15,7 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  // Independently verified geometry: 8x8 main -> 16x16 output/skip.
  [unroll]for(uint dy=0;dy<2;dy++)[unroll]for(uint dx=0;dx<2;dx++){
   uint index=((token/8*2+dy)*16+token%8*2+dx)*512+row;
-  output[index]=F(H(total+residual[index]*weights[524288+row]));
+  output[index]=F(H(total+F(residual[index])*weights[524288+row]));
  }
 #elif EXPAND
  float a=0;

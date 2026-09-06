@@ -1,5 +1,7 @@
-param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-rgb128',[uint32]$Seed=0,[switch]$Chain,[switch]$Tail,[switch]$Head,[switch]$Vit,[ValidateSet(128,256,512)][int]$Width=128)
+param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-rgb128',[uint32]$Seed=0,[switch]$Chain,[switch]$Tail,[switch]$Head,[switch]$Vit,[switch]$Decoder,[ValidateSet(128,256,512)][int]$Width=128)
 $ErrorActionPreference='Stop'
+$env:DLSS5_SHADER_PROGRESS='1'
+if ($Decoder -and (-not $Chain -or $Head -or $Vit)) { throw '-Decoder requires -Chain and cannot combine with -Head/-Vit' }
 if ($Tail -and -not $Chain) { throw '-Tail requires -Chain' }
 if ($Head -and -not $Chain) { throw '-Head requires -Chain' }
 if ($Vit -and -not $Chain) { throw '-Vit requires -Chain' }
@@ -11,7 +13,7 @@ if ((Get-Item $env:DLSS5_NOISE_TABLE).Length -ne 201326592) { throw 'Noise table
 if ($Chain) {
  if ($Tail) { $env:DLSS5_SPLIT_TAIL='1' } else { Remove-Item Env:DLSS5_SPLIT_TAIL -ErrorAction SilentlyContinue }
  if ($Seed -ne 0) { throw 'Current chain oracle only supports seed 0' }
- $mode=if ($Vit) { 'rgb512vit' } elseif ($Head) { 'rgb256head' } else { 'rgb128split' }
+ $mode=if ($Decoder) { 'rgb512decoder' } elseif ($Vit) { 'rgb512vit' } elseif ($Head) { 'rgb256head' } else { 'rgb128split' }
  & (Join-Path $Folder 'native-front-chain-test.exe') $Folder $mode
  if ($LASTEXITCODE -ne 0) { throw "Chain test failed: $LASTEXITCODE" }
  exit 0

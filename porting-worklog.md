@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD RGB512→第39块接线待验（2026-09-06）：front-chain新增rgb512decoder，ViT38→NativeVitGather(vit-to-decoder.i32)→decoder39直接GPU串联，skip来自常驻block30 raw-half输出，decoder shader先F(skip)恢复原FP8跳接再乘尾系数。输出独立命名output-rgb512-decoder39.f32；新增validate_native_rgb512_decoder.py对原连续链裁判严格比较，尚未运行验证器，不复用独立第39块pass。
+
+新exe、shader、map、weights和-Chain -Decoder入口已部署实验目录native-rgb512。当前测试仍在运行：AMD PID28652，SSH统一会话93511；多次查询CPU累计54.34→78.55→118.42→177.5秒，尚未打印shader总数/第一帧，不能认作完成或GPU通过。未启动第二份测试、未改游戏DLL。下一轮必须继续观察该会话/进程，不能因暂时无输出而重新运行。另为下次编译加入DLSS5_SHADER_PROGRESS逐shader开始/结束日誌，源代码语法检查通过；该日志修改尚未编入正在运行的exe。
+
 RGB512原版链延伸第39块（2026-09-06）：run_original_vit_repack_permutation.cpp新增显式--inverse，直接运行cc_vit_1d_repack_1d_to_2d_fp8；此方向按每线程4字节、block256×1调用，不沿用反方向32×4的grid。恢复65536地址双射、两份随机留出与实际block38 projection全部通过；映射逐项等于已验2d→1d映射的逆。输出block38-2d.fp8由原kernel生成，不由CPU映射代替。
 
 prepare_native_rgb512_decoder.py将实际原RGB512→ViT38→原repack接入原decoder39，以原block30-pool-main.fp8的有效16×16×512区作为skip（该文件与block30 main全byte一致，见生成器检查）。首次预检因该skip文件带4MiB零尾超过探针2MiB上限退出2，尚未启动GPU；确认有效区外全零后另导出131072-byte紧凑skip，重跑正常返回。CPU原生参考与最终131072值全exact，报告decoder39-validation.json为pass。此处是按当前block30 main跳接合同搭建的原版链，未新抓取原游戏层对象的skip指针；不能把该连接推断写成新的运行时指针证据。

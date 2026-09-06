@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <chrono>
 // Process-local cache for standalone shaders. The key contains the exact
 // source, entry and macros; resources, weights and root constants are never cached.
 struct NativeShaderCacheState {
@@ -29,7 +32,11 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
   HRESULT hr=D3DCreateBlob(found->second.size(),code);if(FAILED(hr))return hr;
   std::memcpy((*code)->GetBufferPointer(),found->second.data(),found->second.size());state.hits++;return S_OK;
  }
+ const bool progress=_wgetenv(L"DLSS5_SHADER_PROGRESS")!=nullptr;
+ auto started=std::chrono::steady_clock::now();
+ if(progress){std::fprintf(stderr,"shader_compile_begin index=%zu entry=%s path=%ls\n",state.compiles+1,entry,path.c_str());std::fflush(stderr);}
  HRESULT hr=D3DCompile(source.data(),source.size(),"native-standalone",macros,nullptr,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);state.compiles++;
+ if(progress){auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();std::fprintf(stderr,"shader_compile_end index=%zu ms=%lld hr=0x%08x\n",state.compiles,(long long)ms,unsigned(hr));std::fflush(stderr);}
  if(SUCCEEDED(hr)){auto*begin=static_cast<const unsigned char*>((*code)->GetBufferPointer());state.entries.emplace(std::move(key),std::vector<unsigned char>(begin,begin+(*code)->GetBufferSize()));}
  return hr;
 }
