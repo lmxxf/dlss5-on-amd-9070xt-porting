@@ -2899,6 +2899,16 @@ seed2101、2107两组64-token链均从block31连续到block38，各56个检查�
 
 至此64-token原CUBIN/CPU ViT八层连续链已闭合，但AMD ViT尚未实现/验证，RGB256编码器输出仍为16-token，不能和这条64-token链冒充完整GPU路径。下一步实现AMD ViT并建立足够尺寸的RGB连续夹具，再继续解码器与最终游戏画面。游戏DLL/公开包未更改，目标active。
 
+### 2026-09-06 AMD ViT三种原生线性算子独立验证通过
+
+新增native_vit_linear.h/hlsl，支持已验64-token下1024→4096 expand、4096→1024 contract、1024→1024 projection。每K32明确half RNE；expand融合原half激活后FP8；两个残差投影均保留四分组累计，残差只入第一组，组间按固定次序half相加。参数/资源常驻，Record内无CPU读回或中间值注入，未做速度优化或舍入放宽。
+
+d3d12_native_pool_head_test.cpp增加三个显式linear模式，原双参数pool/head模式保留。prepare_native_vit_linear_gpu.py只从已通过的seed2107八层原版链导出block31三个独立算子的输入、原CUBIN输出与直接解码系数，并先检查validation.json的pass及56个零差异检查点。输出/系数均在release/native-vit/amd-linear，不提交权重。
+
+9070XT逐一执行：expand每帧262144值、contract每帧65536值、projection每帧65536值，三个算子各三帧均different0、max0；device/fence、finite及重放检查通过。GPU文件下载后再次与各自原oracle逐值比较，全exact。测试入口是原版相应中间特征，明确是独立算子验证，不是GPU从RGB生成或三算子已直连，更不代表完整ViT。
+
+下一步实现AMD QKV与attention并连接线性算子，再做完整block31及八层GPU链验证。AMD全连续范围仍RGB256→block30/head，游戏DLL/公开包未更改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
