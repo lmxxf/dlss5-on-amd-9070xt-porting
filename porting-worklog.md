@@ -2717,6 +2717,18 @@ preblock_input_mix.hlsl新增显式NATIVE_NOISE_TABLE路径：GPU计算整数has
 
 当前仅AMD独立preblock启用了表；RGB→block23整链还未重跑，连续链旧结果仍是失败，最终游戏DLL未更新、画面未验收。已有run_nvidia_ui.ps1无关修改保留，不纳入提交。
 
+### 2026-09-06 修正输入混合捨入；AMD连续RGB→block23全exact
+
+对留出seed0x12345678继续分段控制：原HFMA2激活公式改为float64乘加后直接half仍有同一FFN差异，排除此候选；只将输入混合16项点积改成float64精确累加再直接half，FFN524288值全exact。额外skip-only及逐组截断控制保留于diagnose_native_rgb128_stages.py，未修改真实权重。该案例说明“mix的FP8输出一致”不足以证明原始half prefix一致，后续FFN残差仍消费half值。
+
+preblock_input_mix.hlsl在通用函数表路径下使用double累计half×half的16项点积，并新增half_round_exact直接实现half RNE：按half步长缩放、整数下界、余数与奇偶位决策，避免double先转float再转half的双重捨入。旧无表路径保留，不暗改尚未验收的游戏路径。9070XT留出seed0x12345678五帧正常，主524288/DS131072均与重新执行的原CUBINexact；随后seed1五帧也双分支exact，device/fence有效。未变更系数或放宽阈值。
+
+d3d12_native_front_chain_test.cpp接入可选DLSS5_NOISE_TABLE，run_native_noise_preblock.ps1 -Chain运行seed0的128×128 RGB→block23，拒绝假装支持其他chain seed。实际三帧重放通过，18次shader编译、42次缓存命中，fence等待406/375/360ms（不是游戏FPS或纯GPU性能）。神经层间无CPU读回或激活注入，函数表只在初始化上传。
+
+执行结束后下载检查点，compare_native_rgb128_checkpoints.py：DS0/4/8/14/22分别131072/65536/32768/16384/8192值全部different0、MAE/max0；validate_native_rgb128_gpu.py最终4×4×512共8192值全部exact。之前同一较大夹具最终25.1953125% exact的失败至此修复，前缀连续正确范围扩展至block23。表仍为192MiB常驻UPLOAD正确性原型，性能优化后续处理。
+
+README顶部更新为当前范围，旧“整网已完成”等历史结论仍不作证明。尚未完成block24之后的真实数值链、真实游戏尺寸合同与最终RGB输出验证；游戏DLL、公开包未部署更新，目标继续active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

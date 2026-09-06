@@ -23,6 +23,20 @@ float half_round(float v){
  return asfloat(sg|rounded);
 }
 float q8(float v){float a=abs(v),sg=v<0?-1:1;if(a<0.015625)return sg*round(a*512)/512;float e=floor(log2(a));float m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#if NATIVE_NOISE_TABLE
+// Direct double -> half RNE. Casting to float first can double-round at ties.
+float half_round_exact(double value){
+ bool negative=value<0.0;double magnitude=negative?-value:value;
+ if(magnitude>=65520.0)return asfloat(negative?0xff800000u:0x7f800000u);
+ float approx=(float)magnitude;
+ int exponent=max(int((asuint(approx)>>23)&255u)-127,-14)-10;
+ float step=exp2(float(exponent));double scaled=magnitude*(double)exp2(float(-exponent));
+ uint lower=(uint)(float)scaled;if((double)lower>scaled)lower--;
+ double remainder=scaled-(double)lower;
+ if(remainder>0.5||(remainder==0.5&&(lower&1u)))lower++;
+ return (negative?-1.0:1.0)*float(lower)*step;
+}
+#endif
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=TOTAL_OUTPUTS/32)return;
@@ -63,8 +77,14 @@ void main(uint3 id:SV_DispatchThreadID){
  return;
 #endif
  [loop]for(uint channel=0;channel<32;channel++){
+#if NATIVE_NOISE_TABLE
+  // Both operands are half values; 16 products fit an exact double sum.
+  double sum=0.0;[unroll]for(uint i=0;i<16;i++)sum+=(double)features[i]*(double)weights[channel*16+i];
+  prefix[channel]=half_round_exact(sum);
+#else
   float sum=0;[unroll]for(uint i=0;i<16;i++)sum+=features[i]*weights[channel*16+i];
   prefix[channel]=half_round(sum);
+#endif
  }
 #endif
 #if FULL_FFN

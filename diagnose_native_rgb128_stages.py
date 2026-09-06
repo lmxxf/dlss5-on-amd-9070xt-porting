@@ -41,12 +41,33 @@ if trace.exists():
  ff=H(cuda_prefix*fw[8704:])
  for k in range(0,128,32):ff=H(ff+hd[...,k:k+32]@w2[:,k:k+32].T)
  cases.append(('ffn_cuda_trace',ff))
+ # HFMA2 rounds once directly to half; float32 then half can double-round.
+ inner=H(np.abs(gt).astype(np.float64)*(-.055908203125)+.447265625)
+ exact_poly=H(gt.astype(np.float64)*inner.astype(np.float64)+.89453125)
+ exact_hidden=F(H(ex*exact_poly));exact_ff=H(cuda_prefix*fw[8704:])
+ for k in range(0,128,32):exact_ff=H(exact_ff+exact_hidden[...,k:k+32]@w2[:,k:k+32].T)
+ cases.append(('ffn_cuda_half_fma',exact_ff))
+ prefix64=H(native_features.astype(np.float64)@fw[:512].reshape(32,16).astype(np.float64).T)
+ ex64=H(F(prefix64)@fw[512:4608].reshape(128,32).T);gt64=np.clip(ex64,-4,4)
+ hd64=F(H(ex64*H(gt64*H(np.abs(gt64)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))))
+ ff64=H(prefix64*fw[8704:])
+ for k in range(0,128,32):ff64=H(ff64+hd64[...,k:k+32]@w2[:,k:k+32].T)
+ cases.append(('ffn_cuda_prefix64',ff64))
+ print(json.dumps({'prefix_half_changed_by_float64':int(np.count_nonzero(prefix64!=cuda_prefix))}),flush=True)
+ accum=H(cuda_prefix*fw[8704:]);cases.append(('ffn_skip_only',accum.copy()))
+ for group in range(4):
+  k=group*32;accum=H(accum+hd[...,k:k+32]@w2[:,k:k+32].T)
+  cases.append((f'ffn_through_group{group}',accum.copy()))
 for name,predicted in cases:
  w=original.copy();w[4656:6192]=0;w[10296:10808]=0;w[10808:10840]=1;w.view('<f4')[10288//2]=1
  if name.startswith('mix'):w[:4096]=0;w[4616:4648]=1
  if name=='mix_no_noise':
   slots=np.arange(512);features=(slots//8%4)*4+slots%4
   w[4104+slots[np.isin(features,[0,1,4])]]=0
+ if name=='ffn_skip_only':w[:4096]=0
+ if name.startswith('ffn_through_group'):
+  group=int(name[-1]);layout=np.load('release/preblock-ffn-byte-layout/layout.npz')
+  w.view(np.uint8)[4096+np.flatnonzero(layout['w2_hidden']>=32*(group+1))]=0
  path=out/f'{name}.weights';w.tofile(path)
  main=out/f'{name}-main.fp8';ds=out/f'{name}-ds.fp8'
  subprocess.run(['/tmp/preblock-branch-oracle','/tmp/dlssnr-cubins/dlssnr-00.cubin',str(path),str(root/'input-hwc.rgba32f'),str(main),str(ds),'0','0'],env=env,check=True,capture_output=True)
