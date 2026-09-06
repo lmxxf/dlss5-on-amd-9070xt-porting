@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏RGB纹理入口GPU组件封装完成，待执行验证
+
+- 新增 `native_game_rgb_input.h`：稳定绑定单张1920×1080纹理，创建tile-major及HWC post两个常驻输出，Record由调用方提供原始资源状态并在结束恢复；不提交、关闭或重置游戏command list。重复Record前恢复两个输出UAV状态。
+- 目前显式限定同device、单层单mip单采样、可SRV、RGBA32_FLOAT或RGBA16_FLOAT，不接受未验证的typeless/sRGB/压缩格式或隐式缩放。游戏包装device需要先正确unwrap，不能只按相同显卡LUID混用资源。
+- MinGW头文件独立语法检查exit0（仅pragma once主文件警告），尚未GPU执行、尚未接入游戏。调用方必须确保描述符/纹理生命期、输入已经提交、全部使用者fence完成后销毁；Record改变命令列表绑定，游戏接入必须恢复或隔离状态。
+- 下一步用真实D3D12纹理上传测试两路GPU输出与现有反射参考逐值一致，再接完整神经管线。没有运行任务遗留，游戏DLL未更新。
+
+
 ### 2026-09-07：游戏纹理输入候选shader编译通过，待GPU边界验证
 
 - 检查旧 `initialize_frame_bridge` 确认它双线性缩放到960×544并saturate，这与新受控1920×1080→1920×1152合同不同，不能直接复用旧像素入口。
