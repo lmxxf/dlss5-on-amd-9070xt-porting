@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第48块原生入口恢复与小测试（2026-09-06）：原记录820784 bytes，SHA7e832b24266b5565b4660a32a4789ce3b15d5835e01df4872e0cee52f82dfcb7，不可塞入普通C256的689232-byte解码器。原CUBIN03存在cc_tinlayout_fused_swin_8h_256_8_upsample_fp8；SASS初段权重地址+0x58200进入QMMA，skip系数读+0x78200，后段尾系数读+0xc8420，说明插入输入投影后布局已改变，不采用普通层尾部简单追加假设。
+
+run_original_fused_global.cpp新增mode9：+0x18为skip指针，+0x20/24为输出H/W，+0x28/2c为窗口偏移；输入为半分辨率双通道。仅开放C256/blockY8、8倍数小尺寸，清零输入/skip缓冲后上传，保留旧模式不变。8×8×512→16×16×256三次原版小调用均正常返回：全零输出全零；main恒0.5/skip零时65532值非零；main零/skip恒0.5时65368值非零。有效输出外全零，无NaN。check_native_upsample48_smoke.py检查并保存smoke报告，仅证明入口可调用及两路影响输出，不证明CPU/AMD数值正确。原输出保存在release/native-upsample48。下一步恢复插入投影/融合skip与后续普通C256部分的精确布局和舍入，游戏DLL未改。
+
 AMD decoder40～47八块独立连续链通过（2026-09-06）：d3d12_native_split_window_test.cpp新增decoder40_47模式，以16×16×512原decoder39输入开始，八个NativeSplitWindow分别加载自己的参数，shift按0/1/3/2/0/1/3/2，GPU层间直接传递，无CPU读回/修正。prepare_native_decoder_split_gpu.py先核对八份pass/32检查点及原输入路径连续性，再导出原block47最终oracle。部署独立目录D:\DLSSNR-Lab\matrix-probe\native-decoder40-47。
 
 六个shader编译日志已生效：ffwd2833ms、ffwd_projection1127ms、attention5702ms、projection30881ms、pack16ms、crop8ms；这明确展示至少本轮大段等待位于shader编译，非GPU逐帧执行时间。三帧最终131072值全部different0/max0，device/fence/finite/replay通过。下载gpu-0.f32后validate_native_decoder_split_gpu.py再次全exact，SHA8823598967d37c5c56230e8c6febb7d471be9548711858fdc98b55cc240f725a，报告release/native-rgb512/amd-decoder40-47/validation.json为pass。
