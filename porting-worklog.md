@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版受控双纹理稳态路径证实影响输出
+
+- 原版preblock caller新增DLSS5_PREBLOCK_SLOT8/SLOT10可选独立RGBA32纹理，保留原采样器linear/normalized/clamp，覆盖各自extent/reciprocal字段；禁止scan/非slot0主输入/无captured参数组合。捕获GPU句柄仍清零，绝不重用。
+- 新增probe_native_temporal_inputs.py，8×8受控当前RGB、水平翻转第二RGB、零/0.125两通道图，使用PID3536 frame1标量、固定seed0。原版kernel测试4case完成、session16543 exit0，无FP8 NaN。
+- 2048 main值相对single：slot8-only差0，slot8+slot10零值差1283，slot8+slot10常量0.125差1267。证明额外路径需联合条件，并且slot10数值影响输出；不据此直接命名历史/MV或断言所有门控规则。
+- ignored `release/native-temporal-inputs/sensitivity.json`及原始输出保留。尚未恢复双纹理采样/混合数学、未实现AMD稳态输入，不能称画面移植完成。下一步定位该联合分支的采样与特征组装，再做逐值对照。5090运行状态未改，新神经DLL未部署。
+
+
 ### 2026-09-07：稳态新增槽类型厘清——两张纹理，不是四张
 
 - 对原始preblock CUBIN定向cuobjdump：param基址0x380，slot0→TEX mask7；slot8（LDCU PC10a0）→TEX PC1590 mask7；slot10（LDCU PCbf0）→TEX PC1090 mask3。另slot18→scalar TEX、slot20→mask6 TEX，本次均零。

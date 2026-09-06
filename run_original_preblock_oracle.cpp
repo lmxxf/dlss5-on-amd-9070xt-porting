@@ -169,6 +169,25 @@ int main(int argc, char **argv) {
         }
     }
 
+    // Steady-state candidates: slot +8 is sampled as RGB, +0x10 as RG.
+    // Bind controlled textures, never reuse captured GPU handles.
+    const char*extra_paths[]={std::getenv("DLSS5_PREBLOCK_SLOT8"),std::getenv("DLSS5_PREBLOCK_SLOT10")};
+    CUarray extra_arrays[2]{};CUtexObject extra_textures[2]{};
+    for(unsigned i=0;i<2;i++)if(extra_paths[i]){
+        if(texture_slot!=0||scan||!std::getenv("DLSS5_PREBLOCK_PARAMETER_FILE"))return 2;
+        const auto extra=read_file(extra_paths[i]);
+        if(extra.size()!=input_tile_bytes){std::fprintf(stderr,"extra texture geometry mismatch\n");return 2;}
+        check("extra array",cuArray3DCreate(&extra_arrays[i],&array_desc));
+        auto upload=copy;upload.srcHost=extra.data();upload.dstArray=extra_arrays[i];
+        check("extra upload",cuMemcpy2D(&upload));
+        auto resource=resource_desc;resource.res.array.hArray=extra_arrays[i];
+        check("extra texture",cuTexObjectCreate(&extra_textures[i],&resource,&texture_desc,nullptr));
+        std::memcpy(params+(i==0?0x8:0x10),&extra_textures[i],8);
+        // Each source has its own extent and inverse-extent fields.
+        const float extent[]={float(texture_width),float(texture_height),1.f/texture_width,1.f/texture_height};
+        std::memcpy(params+(i==0?0x30:0x48),extent,sizeof(extent));
+        std::printf("controlled_extra_slot=0x%x dimensions=%dx%d channels=4\n",i==0?8:16,texture_width,texture_height);
+    }
     void *kernel_args[] = {params};
     const size_t main_tile_bytes = size_t(width)*height*32;
     const size_t downsample_tile_bytes = main_tile_bytes/4;
