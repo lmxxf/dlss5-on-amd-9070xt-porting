@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：原始256-token完整block31对照
+
+- 新 runner `run_nvidia_block256.ps1` 从同一 seed=3003 输入依次运行 expand→contract→QKV→attention→projection，残差严格来自对应输入/contract，完整重复两次，所有七份输出逐字节一致。
+- 最终原始 projection SHA256 `1ad576e6bfd90d18752f74a6b3ff8328977c0d77c0bef2a10281043217353552`，不同于先前仅QKV子链的projection，未混用。
+- `check_native_block256.py` 顺序检查七份原始输出，全部 different=0、finite、tail_zero、replay_identical；导出生产 NativeVitBlock 所需原始输入、最终oracle和四份权重，ignored release/native-vit/block256-3003。
+- 原始侧通过文件串联，不是单次CUDA驻留测试；AMD完整NativeVitBlock仍需接入该fixture。未更新游戏DLL。
+
 ### 2026-09-06：AMD 256-token projection 精确通过
 
 - NativeVitLinear 的普通 ViT 线性模式支持64/256 tokens，新增 projection extent 测试入口，残差单独上传并检查。
