@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第48块输入合流布局与量化边界（2026-09-06）：首次候选把0x58200当投影矩阵起点、0x58000当FFN skip，常量main测试65524/65516值不同，skip测试65132值不同；单位skip控制输出全零，明确失败。继续追指令0x5050等处LDG +0x78000后纠正：初段0x58200是矩阵内载入偏移，完整256×512 FP8投影实际区间0x58000..0x78000，FFN skip位于0x78000..0x78200，输入skip系数位于0x78200..0x78400，QKV及后续从0x78400开始，较普通C256对应段平移0x201e0。上轮日志所述“从0x58200做投影”是指令地址证据，不再解读为矩阵区起点。
+
+check_native_upsample48_control.py将三个skip系数区设half1、attention scales设float1，其余零：原输出65536值全部为FP8 0.5，有效区外零。check_native_upsample48_candidates.py直接按恢复字节区重组普通C256参考记录（不拟合权重），初始投影每K32 half累计，与输入skip合流后必须F(H(project+skip*scale))。原main恒0.5/skip零及main零/skip恒0.5两例，保留该FP8边界后各65536值全exact；不量化合流则分别34144/30692值不同。尚未证明空间/通道随机输入及shift边界，AMD第48块未实现，游戏DLL未改。失败数值保留于本日志，候选脚本当前输出为修正后结果。
+
 第48块原生入口恢复与小测试（2026-09-06）：原记录820784 bytes，SHA7e832b24266b5565b4660a32a4789ce3b15d5835e01df4872e0cee52f82dfcb7，不可塞入普通C256的689232-byte解码器。原CUBIN03存在cc_tinlayout_fused_swin_8h_256_8_upsample_fp8；SASS初段权重地址+0x58200进入QMMA，skip系数读+0x78200，后段尾系数读+0xc8420，说明插入输入投影后布局已改变，不采用普通层尾部简单追加假设。
 
 run_original_fused_global.cpp新增mode9：+0x18为skip指针，+0x20/24为输出H/W，+0x28/2c为窗口偏移；输入为半分辨率双通道。仅开放C256/blockY8、8倍数小尺寸，清零输入/skip缓冲后上传，保留旧模式不变。8×8×512→16×16×256三次原版小调用均正常返回：全零输出全零；main恒0.5/skip零时65532值非零；main零/skip恒0.5时65368值非零。有效输出外全零，无NaN。check_native_upsample48_smoke.py检查并保存smoke报告，仅证明入口可调用及两路影响输出，不证明CPU/AMD数值正确。原输出保存在release/native-upsample48。下一步恢复插入投影/融合skip与后续普通C256部分的精确布局和舍入，游戏DLL未改。
