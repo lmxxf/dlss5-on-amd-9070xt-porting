@@ -2,14 +2,14 @@
 from pathlib import Path
 import json,hashlib,argparse
 import numpy as np
-p=argparse.ArgumentParser();p.add_argument('--c256',action='store_true');a=p.parse_args()
-root=Path('release/native-rgb512')/('amd-decoder49-55' if a.c256 else 'amd-decoder40-47');count=262144 if a.c256 else 131072
+p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--c256',action='store_true');g.add_argument('--c128',action='store_true');a=p.parse_args()
+root=Path('release/native-rgb512')/('amd-decoder57-61' if a.c128 else 'amd-decoder49-55' if a.c256 else 'amd-decoder40-47');count=524288 if a.c128 else 262144 if a.c256 else 131072
 got=np.fromfile(root/'gpu-0.f32','<f4');expected=np.fromfile(root/'oracle-0.f32','<f4')
 valid=got.size==expected.size==count and np.isfinite(got).all() and np.isfinite(expected).all()
 different=int(np.count_nonzero(got!=expected)) if valid else None
 report={'status':'pass' if valid and different==0 else 'fail','values':int(got.size),'different':different,
         'max_error':float(np.max(np.abs(got-expected))) if valid else None,
         'sha256':hashlib.sha256((root/'gpu-0.f32').read_bytes()).hexdigest(),
-        'scope':'isolated AMD decoder49..55; not full RGB/game' if a.c256 else 'isolated AMD decoder40..47 with original decoder39 input; not full RGB/game'}
+        'scope':'isolated AMD decoder57..61; not full RGB/game' if a.c128 else 'isolated AMD decoder49..55; not full RGB/game' if a.c256 else 'isolated AMD decoder40..47 with original decoder39 input; not full RGB/game'}
 (root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2));assert report['status']=='pass','AMD decoder split mismatch'
