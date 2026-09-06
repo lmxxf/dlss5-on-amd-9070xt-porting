@@ -2,6 +2,9 @@
 // AFTER motion/transform; generating those coordinates is a separate contract.
 StructuredBuffer<float4> history : register(t0);
 StructuredBuffer<float2> coordinates : register(t1);
+#if TEMPORAL_RECIPROCAL_TABLE
+StructuredBuffer<uint> reciprocal_table : register(t2);
+#endif
 RWStructuredBuffer<float4> reconstructed : register(u0);
 cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inverse_width; float inverse_height; }
 
@@ -73,5 +76,14 @@ void main(uint3 id:SV_DispatchThreadID) {
     result=mad(fetch(float2(px.z,py.y)),right,result);
     precise float total=left+top;total=total+center;total=total+bottom;total=total+right;
     precise float reciprocal=1.0/total;
+#if TEMPORAL_RECIPROCAL_TABLE
+    // Five-tap positive normalization is near one. The table stores generic
+    // rcp.approx mantissas on [1,2), not sampled image/network values.
+    if(total>=.5&&total<2.0) {
+        uint bits=asuint(total);
+        int shift=127-int((bits>>23)&255);
+        reciprocal=asfloat(uint(int(reciprocal_table[bits&0x7fffff])+shift*8388608));
+    }
+#endif
     reconstructed[id.x]=float4(result*reciprocal,1);
 }

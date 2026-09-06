@@ -45,7 +45,8 @@ int wmain(int argc,wchar_t**argv){try{
   auto*h=upload(values);ID3D12Resource*c=nullptr;
   if(motion_path){auto vectors=read(motion_path);if(vectors.size()!=size_t(width)*temporal_height*4)throw std::runtime_error("motion fixture shape");auto*mv=upload(vectors);const float transform[]={0,0,float(width),float(temporal_height),1.f/width,1.f/temporal_height};motion_coordinates.Create(device,mv,width,temporal_height,width,height,width,temporal_height,transform,argv[7],true);mv->Release();c=motion_coordinates.Output();c->AddRef();}
   else{auto xy=read((std::wstring(argv[7])+L"\\temporal-coordinates.f32").c_str());if(xy.size()!=size_t(width)*height*2)throw std::runtime_error("coordinate fixture shape");c=upload(xy);}
-  temporal_sampler.Create(device,h,c,width,temporal_height,width*height,argv[7],motion_path!=nullptr);h->Release();c->Release();temporal_input=temporal_sampler.Output();temporal_input->AddRef();
+  ID3D12Resource*rcp=nullptr;if(const wchar_t*path=_wgetenv(L"DLSS5_TEST_RECIPROCAL_TABLE")){auto values=read(path);if(values.size()!=8388608)throw std::runtime_error("reciprocal table shape");rcp=upload(values);}
+  temporal_sampler.Create(device,h,c,width,temporal_height,width*height,argv[7],motion_path!=nullptr,rcp);if(rcp)rcp->Release();h->Release();c->Release();temporal_input=temporal_sampler.Output();temporal_input->AddRef();
  }
  const bool use_temporal=temporal_input!=nullptr;
  NativePreblockRuntime block;block.Create(device,reflect_input?reflect.Output():input,width,height,fw,aw,argv[7],live,raw_features,noise_path?&noise_table:nullptr,temporal_input);if(temporal_input)temporal_input->Release();

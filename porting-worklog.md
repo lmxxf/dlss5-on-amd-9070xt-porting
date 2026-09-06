@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD只读倒数表接入，valid1080差异降至307/103
+
+- NativeTemporalSample增加可选reciprocal_source及t2 SRV，精确容量32MiB/同设备校验、AddRef生命周期与有无表两套root参数数目。未提供时保持旧路径。测试host通过DLSS5_TEST_RECIPROCAL_TABLE一次上传通用表，无逐帧CPU修正。
+- sampler只在最终total归一化用表，尾数索引+整数指数调整，范围[.5,2)；轴middle倒数暂未改。表不包含图像/特征。MinGW新exe编译成功。
+- session79245 valid1080五帧重放通过，session77733全量回读：main430→307、down109→103。已定位的x94/y78反例消失，新首个x1342/y81。完整数值仍失败，不能称游戏已修复。
+- session97228新exe/查表路径120×72五帧回归main276480/down69120全部exact。证据分别valid1080/rcp和large/rcp；游戏DLL未动。后续需核对轴倒数及剩余误差，并最终做全网络历史生命周期和游戏验证。
+
 ### 2026-09-07：独立MUFU倒数重现，通用尾数表通过百万输入对照
 
 - 新增probe_cuda_reciprocal.cu，显式rcp.approx.ftz.f32、输入输出文件与范围检查；MinGW无关，nvcc sm121编译成功。session4214处理1000032输入，原捕获32lane倒数全bit-exact；相对直接float除法ULP差-1/0/+1计数66086/854783/79163，不能用统一偏置替代。
