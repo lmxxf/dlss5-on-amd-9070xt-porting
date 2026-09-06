@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8 CPU精度候选诊断
+
+- check_block8_accumulation.py在4096值最小窗口上比较原float32 dot与float64内积后half舍入，均重现同3差异，排除单纯提高矩阵内积精度即可解决的假设。
+- 加入float64 rsqrt对照，所有候选结果保存window46-18/accumulation-candidates.json；仅局部替换参考函数并finally恢复，不改生产算法或拟合像素。
+- 未解决block8差异，下一步应获取/隔离中间阶段，未部署游戏DLL。
+
 ### 2026-09-06：block8三值差异缩减到单8×8窗口
 
 - isolate_block8_window.py按shiftY4定位source y44..51/x16..23，独立运行原始普通C64 8×8、shift0，输出与完整shift2大图对应窗口零差异。
