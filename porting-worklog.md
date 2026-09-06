@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：逐步算术回读确认MAD取消误差，局部DFMA通过但整轴试改失败
+
+- 新增native_temporal_arithmetic.hlsl及check_native_temporal_arithmetic.py。独立诊断2160像素，输入UV复用GPU值，只用于算术审计。session59970读回：t_x/t_y相对float32融合参考分别1978/1740差异；center与left/尺寸往返全部一致。pixel593 t_x为0x3f233600，融合参考0x3f233608，符合乘法先舍入再相减的差异。上轮尺寸往返差异在本逐步输出版本未复现，不能笼统归因于尺寸倒数。
+- 仅诊断t改用显式double fma再转float，session59298读回t_x/t_y均0差异。before_floor尚有33/153差异，但此样本floor结果相同；不将输入复用测试冒称完整采样验收。旧/新读回保留gpu-arithmetic-mad与gpu-arithmetic以及各validation.json。
+- 随后尝试整个axis五处mad改为显式double fma helper，session67412五帧完成但真实preblock回归main/down恶化至91159/20123。已完整撤回sampler修改并同步回AMD正常实验目录；失败产物保留fma/gpu-fma-*。仅局部t的微测试有证据，整轴替换不可用，下一步逐项接入并读回定位，不能据此部署游戏DLL。
+
 ### 2026-09-07：排除wide-axis试改，保留DXBC审计证据
 
 - 上轮属于有效进展（已获得实际GPU tap读回）；本轮继续隔离，不操作游戏DLL。
