@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：reflect→preblock GPU测试入口接好待运行
+
+- d3d12_native_preblock_test新增DLSS5_REFLECT_VALID1080模式，输入严格1920×1080/live/global、强制存在原生噪声表，GPU反射输出直接传NativePreblockRuntime，处理1152高。
+- 保留现有五帧seed0/0/0/1/0重放检查及main/down/raw读回，未将不同seed只看相同输出当成功。
+- run_native_reflect_preblock.ps1配置宽度、seed和201326592字节噪声表检查。C++编译通过，尚未运行新路径或逐值对照；噪声默认远程路径部署前需实查。未部署游戏DLL。
+
 ### 2026-09-06：valid1080原始preblock双分支GPU oracle准备
 
 - prepare_native_reflect_preblock_gpu.py解码原始main cell至1152×1920×32 HWC、down global16至576×960×32，长度及FP8 NaN检查，导出原始RGB有效纹理。
