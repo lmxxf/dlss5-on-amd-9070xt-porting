@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD时序五tap采样GPU原版half对照通过
+
+- 新增prepare_native_temporal_gpu.py，四组原版PC1800 holdout组成128个坐标，384个RGB期望值仅作half舍入，alpha=1；同一独立history输入，未用GPU输出生成oracle。
+- 新增d3d12_native_temporal_test.cpp，RX9070XT执行native_temporal_sample.hlsl，实际SRV/UAV绑定、GPU回读、fence三次重放；各512个RGBA half值different=0，session80844 exit0。原版RGB384项与人工alpha128项边界明确。
+- 产物在本地ignored release/native-temporal-holdout/amd及远端D:\DLSSNR-Lab\native-temporal-sample。此验证仅已变换坐标的五tap采样，不含运动图到坐标及preblock组装；不能称稳态整网已完成。
+- 下一步接入生产输入特征13/2/3，保留已验证噪声函数表，核对双纹理preblock主/下采样输出。新神经DLL未部署。
+
+
 ### 2026-09-07：AMD五tap时序采样shader候选编译通过
 
 - 新增native_temporal_sample.hlsl，输入history float4 buffer与已完成motion/transform的像素中心坐标，输出重建float4；按axis32/FMA顺序、fraction8/product8、五tap累加及权重倒数实现。
