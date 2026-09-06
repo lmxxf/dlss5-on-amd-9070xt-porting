@@ -81,6 +81,9 @@ int wmain(int argc,wchar_t**argv){try{
  auto submit=[&](){ck(c->Close());ID3D12CommandList*lists[]={c};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,++fence_value));ck(fence->SetEventOnCompletion(fence_value,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(device->GetDeviceRemovedReason());auto completed=fence->GetCompletedValue();if(completed==UINT64_MAX||completed<fence_value)throw std::runtime_error("invalid fence completion");};
  auto flush=[&](){submit();ck(allocator->Reset());ck(c->Reset(allocator,nullptr));};
  const UINT base_seed=live?(std::getenv("DLSS5_TEST_SEED")?UINT(std::strtoul(std::getenv("DLSS5_TEST_SEED"),nullptr,0)):0):0x3f800000;
+ const bool temporal_reset=_wgetenv(L"DLSS5_TEST_TEMPORAL_RESET")!=nullptr;
+ if(temporal_reset&&(!use_temporal||alternate_path||!live))throw std::runtime_error("temporal reset test contract");
+ std::vector<float>history_baseline[3];
  for(UINT frame=0;frame<5;frame++){
   if(frame){ck(allocator->Reset());ck(c->Reset(allocator,nullptr));}
   if(alternate_path&&(frame==2||frame==3)){
@@ -89,7 +92,7 @@ int wmain(int argc,wchar_t**argv){try{
    ck(input->Map(0,&none,&p));std::memcpy(p,chosen.data(),chosen.size()*4);input->Unmap(0,nullptr);
    ck(post_color->Map(0,&none,&p));for(UINT y=0;y<1152;y++){UINT sy=y<1080?y:2158-y;std::memcpy(static_cast<float*>(p)+size_t(y)*1920*4,chosen.data()+size_t(sy)*1920*4,1920*4*sizeof(float));}post_color->Unmap(0,nullptr);
   }
-  UINT seed=alternate_path?base_seed:live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);if(reflect_input)reflect.Record(c);if(motion_path)motion_coordinates.Record(c);if(history_path)temporal_sampler.Record(c);block.Record(c,seed,!global,use_temporal);if(front4){for(auto&stage:stages)stage.Record(c);ds.Record(c);}if(front8){for(auto&stage:c64)stage.Record(c);ds8.Record(c);}if(front14){for(auto&stage:c128)stage.Record(c);ds14.Record(c);}if(front22){for(auto&stage:c256)stage.Record(c);ds22.Record(c);}
+  UINT seed=(alternate_path||temporal_reset)?base_seed:live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);if(reflect_input)reflect.Record(c);if(motion_path)motion_coordinates.Record(c);if(history_path)temporal_sampler.Record(c);block.Record(c,seed,!global,use_temporal&&(!temporal_reset||frame%2==1));if(front4){for(auto&stage:stages)stage.Record(c);ds.Record(c);}if(front8){for(auto&stage:c64)stage.Record(c);ds8.Record(c);}if(front14){for(auto&stage:c128)stage.Record(c);ds14.Record(c);}if(front22){for(auto&stage:c256)stage.Record(c);ds22.Record(c);}
   if(fronthead){for(auto&stage:split)stage.Record(c);head.Record(c);}
   if(frontvit){bridge.Record(c);flush();for(auto&layer:vit)for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);flush();}}
   if(frontdecoder)for(UINT stage=0;stage<decoder.StageCount();stage++){decoder.RecordStage(c,stage);flush();}
@@ -98,6 +101,10 @@ int wmain(int argc,wchar_t**argv){try{
   submit();
   for(UINT i=0;i<3;i++){D3D12_RANGE range{0,SIZE_T(sizes[i])};ck(readback[i]->Map(0,&range,&m));std::memcpy(data[i].data(),m,sizes[i]);readback[i]->Unmap(0,&none);for(float x:data[i])if(!std::isfinite(x))throw std::runtime_error("nonfinite output");}
   if(frame==0){for(UINT i=0;i<3;i++)baseline[i]=data[i];}
+  else if(temporal_reset){for(UINT i=0;i<3;i++){
+   if(frame==1){if(data[i]==baseline[i])throw std::runtime_error("history has no effect");history_baseline[i]=data[i];std::ofstream f((std::wstring(argv[4+i])+L".temporal").c_str(),std::ios::binary);if(!f.write(reinterpret_cast<const char*>(data[i].data()),sizes[i]))throw std::runtime_error("history output write failed");}
+   else if(data[i]!=(frame%2?history_baseline[i]:baseline[i]))throw std::runtime_error("history reset/re-enable replay mismatch");
+  }}
   else if(alternate_path&&frame==2){for(UINT i=0;i<3;i++){
    size_t different=0;for(size_t j=0;j<data[i].size();j++)different+=data[i][j]!=baseline[i][j];
    if(!different)throw std::runtime_error("alternate RGB failed to change final/head/decoder output");

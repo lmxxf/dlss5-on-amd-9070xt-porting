@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整网络新增时序绑定接口，前端重置/重启历史回归通过
+
+- NativeActualNetwork70::Create可选temporal_rgb，按同设备/1920×1152 float4 buffer容量检查后交preblock持有；Run新增默认false的temporal_enabled，未绑定却请求启用会在提交GPU前拒绝。所有既有调用默认单RGB行为不变。调用者须先在同队列提交时序输入生产者，绑定不等于历史有效。
+- d3d12_native_preblock_test新增DLSS5_TEST_TEMPORAL_RESET，固定seed0按off/on/off/on/off运行；同资源反复启停，分别核对两种基线且要求启用历史确实改变输出。session29200 120×72五帧通过，最终off对原single主/下两路全exact，保存on结果对已验证compensated时序基线亦全部一致。
+- 新测试exe编译成功，完整网络测试原调用经MinGW syntax-only通过（session56516）。这不是完整时序网络运行验收：本轮实跑仅前端开关，完整网络新增接口尚需接sampler生产者并跑最终RGB对照。
+- 游戏DLL未改，原历史来源/写回更新语义仍需核对；不把off/on测试冒称真实多帧历史闭环。
+
 ### 2026-09-07：valid1080时序前端全部exact，补偿乘加消除最后两值
 
 - 新增native_temporal_axis_steps.hlsl隔离Y轴逐步读回，session64467显示t/t²/t³/left/scaled/middle/倒数均与参考一致，但inner为0x3f37d3f7（应f8），other为0x3eccd07a（应78），position为0x43aaedcc（应cb）。原PC1320捕获session1755仍触发CUDA-GDB内部SIGABRT，不继续撞同一点，利用已捕获的上下游和精确算术定位。

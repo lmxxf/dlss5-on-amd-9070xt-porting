@@ -13,7 +13,7 @@ class NativeActualNetwork70 {
  NativeC32Downsample ds4,ds8,ds14,ds22,head;
  NativeSplitWindow split[8];NativeVitGather bridge;NativeVitBlock vit[8];
  NativeActualDecoder69 decoder;NativePost70 post;
- ID3D12Device*device{};bool ready{},failed{};
+ ID3D12Device*device{};bool ready{},failed{},temporal_bound{};
  static std::vector<float>Read(const std::wstring&path){
   std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("network coefficient missing");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("network coefficient size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("network coefficient truncated");return v;
  }
@@ -21,15 +21,16 @@ public:
  NativeActualNetwork70()=default;NativeActualNetwork70(const NativeActualNetwork70&)=delete;
  ~NativeActualNetwork70(){if(device)device->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*rgb_tiles,ID3D12Resource*rgb_hwc,
-             const std::vector<float>&noise,const std::wstring&dir){
+             const std::vector<float>&noise,const std::wstring&dir,ID3D12Resource*temporal_rgb=nullptr){
   if(device||!d||!rgb_tiles||!rgb_hwc||noise.size()!=201326592/4)throw std::runtime_error("network initialization contract");
   if(_wgetenv(L"DLSS5_POST_BASE_ONLY"))throw std::runtime_error("diagnostic post forbidden");
-  for(auto*r:{rgb_tiles,rgb_hwc}){
+  for(auto*r:{rgb_tiles,rgb_hwc,temporal_rgb}){
+   if(!r)continue;
    if(r->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||r->GetDesc().Width<1920ull*1152*16)throw std::runtime_error("network RGB capacity");
    ID3D12Device*owner=nullptr;auto hr=r->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("network RGB device query");bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("network RGB device mismatch");
   }
   device=d;device->AddRef();auto read=[&](const std::wstring&name){return Read(dir+L"\\"+name);};
-  pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise);
+  pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
   const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir);source=c32[i].Output();}
   ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
@@ -47,10 +48,13 @@ public:
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
- void Run(NativeGameSubmission&submit,UINT seed){
+ // This includes temporal_rgb's sampler producer when temporal_enabled is true.
+ // Binding storage does not imply a valid history frame; reset callers pass false.
+ void Run(NativeGameSubmission&submit,UINT seed,bool temporal_enabled=false){
   if(!ready||failed||submit.Device()!=device)throw std::runtime_error("network unavailable/device mismatch");
+  if(temporal_enabled&&!temporal_bound)throw std::runtime_error("network temporal RGB not bound");
   try{
-   submit.Submit([&](ID3D12GraphicsCommandList*c){pre.Record(c,seed,false);for(auto&s:c32)s.Record(c);ds4.Record(c);for(auto&s:c64)s.Record(c);ds8.Record(c);for(auto&s:c128)s.Record(c);ds14.Record(c);for(auto&s:c256)s.Record(c);ds22.Record(c);for(auto&s:split)s.Record(c);head.Record(c);bridge.Record(c);});
+   submit.Submit([&](ID3D12GraphicsCommandList*c){pre.Record(c,seed,false,temporal_enabled);for(auto&s:c32)s.Record(c);ds4.Record(c);for(auto&s:c64)s.Record(c);ds8.Record(c);for(auto&s:c128)s.Record(c);ds14.Record(c);for(auto&s:c256)s.Record(c);ds22.Record(c);for(auto&s:split)s.Record(c);head.Record(c);bridge.Record(c);});
    for(auto&layer:vit)for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);});
    for(UINT stage=0;stage<decoder.StageCount();stage++)submit.Submit([&](ID3D12GraphicsCommandList*c){decoder.RecordStage(c,stage);});
    submit.Submit([&](ID3D12GraphicsCommandList*c){post.Record(c);});
