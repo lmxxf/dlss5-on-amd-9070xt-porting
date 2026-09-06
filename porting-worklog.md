@@ -2841,6 +2841,18 @@ check_native_vit_contract.py直接解码矩阵：output bits[6,3,9,7,8,10..14]�
 
 本轮仅恢复可运行诊断及保存反例，QKV算术尚未闭合，未修改AMD或游戏DLL。下一步核对原指令中各输出和workspace的实际数据来源。AMD已验范围仍RGB256→block30/head，最终游戏画面目标active。
 
+### 2026-09-06 ViT QKV头部偏移更正，V算术及输出坐标闭合
+
+沿SASS权重load的+0x80偏移核查，前次单位系数实验的关键前提错误：block31 QKV矩阵从byte128开始，前128字节为32个可读float32 scale值，不是尾部scale。旧vit-layouts.json及历史runner对尾128字节的解释不能沿用；尾128字节实际仍属于矩阵。先前往尾部写32个float32 1人为污染了V矩阵，解释固定0x57反例，不能据此否定V线性投影。
+
+原runner增加可选prefix-scale和valid-only控制，旧尾部控制保留。正确prefix控制加有效16-token输入时，V相关单位系数输出16个0x38；填满物理padding时前32768字节会出现32个单位响应，说明诊断需保持无效输入零填充。probe_native_vit_qkv_groups.py打印实际record offset并拒绝全空响应。
+
+完整权重候选中，prefix128、Q/K/V每1024字节交错、两组K512分别按K32 half累计再half相加，V排序值集合完全匹配。随后新增DLSS5_VIT_QKV_V_LAYOUT_SCAN和probe_native_vit_v_layout.py，以21个单位系数（compressed V offset0及20个地址bit）及四组源地址编码，逐个恢复输出/输入坐标，不用直方图作为最终证明。
+
+check_native_vit_v.py采用测得V输出token bits[1,0,4,5]、channel bits[6,3,9,7,8,10..14]；物理bit2为当前16-token情况下的空位。完整V矩阵output bits[6,3,9,7,8,10..14]、input bits[0,1,2,4,5,15..19]，实际record地址128+(i//1024)*3072+2048+i%1024。真实编码器/FFN入口及独立seed1901/1907三组，各16384值全部逐值exact，max0。
+
+这一轮只证明V；Q/K的scale应用、归一化和输出坐标还未验收，不能称完整QKV通过。AMD已验连续范围仍RGB256→block30/head，游戏DLL与公开包未更改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -17,17 +17,23 @@ int main(int argc,char**argv){
  ck(cuMemcpyHtoD(src,input.data(),input.size()));ck(cuMemcpyHtoD(w,weights.data(),weights.size()));ck(cuMemsetD32(aux+0x1200,0xffffffffu,0x400/4));
  CUdeviceptr fields[]={src,q[0],q[1],q[2],w,aux+0x1200,work,aux+0xe00,aux+0x1800};alignas(8) unsigned char p[0x50]{};std::memcpy(p,fields,72);std::memcpy(p+72,&height,4);std::memcpy(p+76,&width,4);void*args[]={p};
  CUlaunchAttribute attr{};attr.id=CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION;attr.value.clusterDim={1,1,2};CUlaunchConfig config{};config.gridDimX=gx;config.gridDimY=1;config.gridDimZ=2;config.blockDimX=32;config.blockDimY=4;config.blockDimZ=1;config.attrs=&attr;config.numAttrs=1;
- if(std::getenv("DLSS5_VIT_QKV_UNIT_SCAN")){
+ const bool v_layout=std::getenv("DLSS5_VIT_QKV_V_LAYOUT_SCAN")!=nullptr;
+ if(std::getenv("DLSS5_VIT_QKV_UNIT_SCAN")||v_layout){
   if(width!=4||height!=4||gx!=16)return 2;
-  std::fill(input.begin(),input.end(),0x38);ck(cuMemcpyHtoD(src,input.data(),input.size()));std::fill(weights.begin(),weights.end(),0);
-  const float one=1;for(size_t i=3145728;i<weights.size();i+=4)std::memcpy(weights.data()+i,&one,4);
-  std::vector<unsigned char>scan(23*32768);
-  for(unsigned probe=0;probe<23;probe++){
-   size_t offset=probe?size_t(1)<<(probe-1):0;weights[offset]=0x38;ck(cuMemcpyHtoD(w,weights.data(),weights.size()));weights[offset]=0;
+  std::fill(input.begin(),input.end(),0x38);if(std::getenv("DLSS5_VIT_QKV_SCAN_VALID_ONLY"))std::fill(input.begin()+width*height*1024,input.end(),0);ck(cuMemcpyHtoD(src,input.data(),input.size()));std::fill(weights.begin(),weights.end(),0);
+  const bool prefix=v_layout||std::getenv("DLSS5_VIT_QKV_PREFIX_SCALE")!=nullptr;
+  const float one=1;for(size_t i=0;i<128;i+=4)std::memcpy(weights.data()+(prefix?0:3145728)+i,&one,4);
+  unsigned probes=v_layout?21:23,parts=v_layout?4:1;std::vector<unsigned char>scan(probes*parts*32768);
+  for(unsigned probe=0;probe<probes;probe++){
+   size_t index=probe?size_t(1)<<(probe-1):0;
+   size_t offset=v_layout?128+(index/1024)*3072+2048+index%1024:(prefix?128:0)+index;weights[offset]=0x38;ck(cuMemcpyHtoD(w,weights.data(),weights.size()));weights[offset]=0;
+   for(unsigned part=0;part<parts;part++){
+   if(v_layout){std::fill(input.begin(),input.end(),0);for(size_t i=0;i<width*height*1024;i++)input[i]=0x20+((i>>(4*part))&15);ck(cuMemcpyHtoD(src,input.data(),input.size()));}
    for(auto ptr:{q[0],q[1],q[2],work,aux})ck(cuMemsetD8(ptr,0,capacity));ck(cuMemsetD32(aux+0x1200,0xffffffffu,0x400/4));
-   ck(cuLaunchKernelEx(&config,f,args,nullptr));ck(cuCtxSynchronize());ck(cuMemcpyDtoH(scan.data()+probe*32768,q[2],32768));
+   ck(cuLaunchKernelEx(&config,f,args,nullptr));ck(cuCtxSynchronize());ck(cuMemcpyDtoH(scan.data()+(probe*parts+part)*32768,q[2],32768));
+   }
   }
-  std::ofstream out(std::string(argv[3])+"-unit-scan.fp8",std::ios::binary);if(!out.write((char*)scan.data(),scan.size()))return 2;
+  std::ofstream out(std::string(argv[3])+(v_layout?"-v-layout.fp8":"-unit-scan.fp8"),std::ios::binary);if(!out.write((char*)scan.data(),scan.size()))return 2;
   for(auto ptr:{src,w,q[0],q[1],q[2],work,aux})ck(cuMemFree(ptr));return 0;
  }
  std::fprintf(stderr,"qkv launch counters=-1 extent=%ux%u gridX=%u\n",width,height,gx);ck(cuLaunchKernelEx(&config,f,args,nullptr));ck(cuCtxSynchronize());
