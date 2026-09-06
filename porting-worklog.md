@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：真实1080p捕获前环境核对
+
+- 新增只读 inspect_nvidia_geometry.ps1，避免复杂SSH引号使检查静默失败。当前RTX用户Seth，实际配置路径为 C:\Users\Seth\AppData\Local\SB\Saved\Config\WindowsNoEditor\GameUserSettings.ini。
+- 实查无SB/Stellar游戏进程；配置ResolutionSizeX/Y=3840/2160、FullscreenMode=0、动态分辨率关闭。最新参数捕获仍为 native-kernel-params-24064-11278468 的4K运行，没有新的1080p证据。
+- 本轮没有修改分辨率或启动游戏；下一步备份该实际配置并以1080p运行重新捕获几何。同步更新native-runtime-contract中已过时的“仅64-token”描述，保留真实非正方形/纹理及部署验收缺口。
+
 ### 2026-09-06：AMD256-token八block全GPU串联通过
 
 - extent test 增加 chain31_38，八个生产 NativeVitBlock 依次创建，上一block GPU输出直接作为下一block输入。只上传初始特征和32份权重，不上传中间特征。
