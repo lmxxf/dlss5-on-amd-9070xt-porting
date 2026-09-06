@@ -2919,6 +2919,16 @@ d3d12_native_pool_head_test.cpp增加qkv和qkv_attention模式，旧模式保留
 
 这些是block31 QKV及QKV→attention片段的GPU验证；入口仍是原版contract特征，不是完整GPU FFN或RGB链。本轮算子之间不做CPU读回，但不能称完整ViT已验。下一步串联GPU expand/contract/QKV/attention/projection及八层链。AMD全连续范围仍RGB256→block30/head，游戏DLL/公开ZIP未更新，最终画面目标active。
 
+### 2026-09-06 AMD完整block31与ViT31～38八层链，通过A/A/B/A/A动态回归
+
+新增NativeVitBlock，将常驻expand、contract、QKV两pass、attention、projection按原残差关系直连：contract残差来自层输入，projection残差来自contract输出。所有阶段由同一GPU command list顺序执行、只做资源屏障。宿主新增block31和vit_chain模式；八层各自加载原权重，不复用block31系数冒充后续层。
+
+prepare_native_vit_block_gpu.py从已通过的原CUBIN/CPU链直接解码初始输入及原最终输出，导出单层或八层参数。9070XT完整block31三帧各65536值全exact；继而八层链三帧最终block38各65536值全exact，device/fence、finite与重放检查通过。本GPU测试读回最终结果，逐阶段原/CPU证据仍以前面的56项回归为准，不混称本轮逐阶段GPU审计。
+
+重跑seed2101原八层链，56项全exact并生成pass报告，作为独立B输入；A为seed2107。宿主新增显式DLSS5_VIT_SWITCH_INPUT，run_native_vit_chain.ps1启用A/A/B/A/A五帧：只有等待前一帧fence结束后才更新初始UPLOAD输入，不更新中间激活或权重。五帧最终输出各65536值均与对应原CUBIN oracle全exact；B与A不同、恢复A后与初始baseline一致。下载最终gpu.f32再次比较恢复后的A，全exact。
+
+当前64-token ViT31～38已实现并在AMD独立连续验证，未以CPU修正中间值，也没有跳算来提高显示帧率。但该链的初始输入仍为独立ViT夹具；RGB256编码器输出16-token，尚未与64-token链接成完整RGB路径。下一步建立足够尺寸的RGB连续夹具和重排连接，并继续解码器及最终画面审计。游戏DLL/公开ZIP未更新，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
