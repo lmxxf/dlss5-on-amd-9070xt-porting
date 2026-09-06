@@ -1,0 +1,7 @@
+param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-rgb128',[uint32]$Seed=0)
+$ErrorActionPreference='Stop'
+$env:DLSS5_NOISE_TABLE=Join-Path $Folder 'functions.f32'
+$env:DLSS5_TEST_SEED=$Seed.ToString()
+if ((Get-Item $env:DLSS5_NOISE_TABLE).Length -ne 201326592) { throw 'Noise table size mismatch' }
+& (Join-Path $Folder 'native-preblock-test.exe') (Join-Path $Folder 'block0-ffn.f32') (Join-Path $Folder 'block0-attention.f32') (Join-Path $Folder 'input.rgba32f') (Join-Path $Folder 'lut-main.f32') (Join-Path $Folder 'lut-down.f32') (Join-Path $Folder 'lut-raw.f32') $Folder live global
+if ($LASTEXITCODE -ne 0) { throw "Preblock test failed: $LASTEXITCODE" }

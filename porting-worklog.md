@@ -2705,6 +2705,18 @@ diagnose_native_rgb128_stages.py的mix_cuda_trace控制将直接指令生成的�
 
 由此当前128×128 preblock错误可由随机特征差异解释，正式下一步需在AMD实现相应数学/指令语义，并验证新seed而非硬编码位置修正。原CPU参考在采用原生随机指令序列时主/DS双分支已闭合。游戏DLL、公开包仍未更改，最终游戏画面目标未完成。
 
+### 2026-09-06 AMD通用随机函数表落地；seed0双分支exact，留出seed暴露FFN单点差异
+
+probe_native_noise.cu新增--tables：枚举全部2^24个u=(i+1)/2^24，生成radius/cos/sin三项float32，覆盖任意hash、坐标及seed，不含模型权重或画面激活。表201326592字节（192MiB），SHA256 aa38f7e6c5f20227f90edcb223fb28c258006a9931941df1442494cf5d64ac7f，仅存release及AMD实验目录。validate_native_noise_table.py在seed0、1、0x12345678三份独立指令trace上，重组出的每组49152个float32随机值全exact。
+
+preblock_input_mix.hlsl新增显式NATIVE_NOISE_TABLE路径：GPU计算整数hash与24位索引，从通用函数表取值、相乘并half RNE后继续真实mix/FFN。NativePreblockRuntime新增可选表参数，root SRV t2与常驻UPLOAD资源；旧调用默认不启用，raw_features路径拒绝同时传表。当前UPLOAD读取及192MiB容量是正确性原型，未作性能优化、不据此报告游戏FPS。d3d12_native_preblock_test.cpp支持DLSS5_NOISE_TABLE和DLSS5_TEST_SEED，五帧基准/基准/基准/seed^1/基准，补device/fence有效性检查。run_native_noise_preblock.ps1只运行实验目录，未覆盖游戏DLL。
+
+9070XT seed0实测五帧重放/seed变化通过，validate_native_noise_preblock.py重新调用原CUBIN独立比较：主524288、DS131072全exact，max0，旧7处DS差异消失。随后留出seed0x12345678五帧也正常执行，但原版数值比较失败：main16处/max0.0625，DS3处/max0.125。不得以seed0通过宣称普遍修复，验证器对此返回1。
+
+诊断脚本扩展seed及GPU前缀。留出seed使用独立原生随机trace后，CPU与AMD仍同样有原版main16处、DS3处差异，CPU/AMD raw之间仅3个小舍入差，最大0.0001220703125；因此需继续审原算术而非调整表。原CUBIN分段控制显示mix_cuda_trace的524288值全exact；ffn_cuda_trace仅(y96,x59,c12)一值不同，CPU0.3125、原0.28125，位于后续差异所在8×8窗口。下一步定位该FFN点的prefix/activation/累计舍入，不能把问题笼统归因于attention或用后处理掩盖。
+
+当前仅AMD独立preblock启用了表；RGB→block23整链还未重跑，连续链旧结果仍是失败，最终游戏DLL未更新、画面未验收。已有run_nvidia_ui.ps1无关修改保留，不纳入提交。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -2,6 +2,11 @@
 // for every 8x8 tile. Live texture transforms/global seed contract not yet bound.
 StructuredBuffer<float> weights : register(t0);
 StructuredBuffer<float> input : register(t1);
+#if NATIVE_NOISE_TABLE
+// Universal function values for all 24-bit uniform inputs, not image features.
+StructuredBuffer<float> noise_table : register(t2);
+uint uniform_index(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>30)^(w>>8);}
+#endif
 RWStructuredBuffer<float> output : register(u0);
 #if DYNAMIC_PARAMETERS
 cbuffer RuntimeParameters:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;}
@@ -32,12 +37,21 @@ void main(uint3 id:SV_DispatchThreadID){
  if(!local_oracle){uint tile=p/64;x=(tile%(runtime_width/8))*8+p%8;y=(tile/(runtime_width/8))*8+(p%64)/8;}
 #endif
  uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^(seed*0x9e3779b9u)^0x243f6a88u);
+#if NATIVE_NOISE_TABLE
+ uint ia=uniform_index(h*0xcaa5b80d+0x21dd796b),ib=uniform_index(h*0x2c9277b5+0xac564b05);
+ uint ic=uniform_index(h*0x83232c31+0x3463e0ac),idn=uniform_index(h*0xfa6dc5f9+0x4712a88e);
+ precise float ng0=noise_table[ia*3]*noise_table[ic*3+1];
+ precise float ng1=noise_table[ib*3]*noise_table[idn*3+1];
+ precise float ng2=noise_table[ib*3]*noise_table[idn*3+2];
+ float g0=half_round(ng0),g1=half_round(ng1),g2=half_round(ng2);
+#else
  float a=uniform24(h*0xcaa5b80d+0x21dd796b),b=uniform24(h*0x2c9277b5+0xac564b05);
  float c=uniform24(h*0x83232c31+0x3463e0ac),d=uniform24(h*0xfa6dc5f9+0x4712a88e);
  float r0=sqrt(-2*log(a)),r1=sqrt(-2*log(b));
  float g0=half_round(r0*cos(6.283185482025146*c));
  float g1=half_round(r1*cos(6.283185482025146*d));
  float g2=half_round(r1*sin(6.283185482025146*d));
+#endif
  float rgb_scale=LIVE_PROFILE?.125:2;
  float r=half_round(half_round(half_round(input[p*4])-0.5)*rgb_scale);
  float g=half_round(half_round(half_round(input[p*4+1])-0.5)*rgb_scale);

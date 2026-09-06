@@ -3,17 +3,18 @@
 Disables later matrices in private copies; never changes deployed weights.
 """
 from pathlib import Path
-import os,subprocess,json
+import os,subprocess,json,argparse
 import numpy as np
 from preblock_mix_reference import inputs
 from preblock_noise_reference import fields
 from native_c32_reference import H,F
 from decode_tinlayout_global import e4m3fn
-root=Path('release/native-rgb128');out=root/'stage-audit';out.mkdir(exist_ok=True)
+parser=argparse.ArgumentParser();parser.add_argument('--seed',type=lambda s:int(s,0),default=0);args=parser.parse_args()
+root=Path('release/native-rgb128');out=root/'stage-audit'/f'seed{args.seed}';out.mkdir(parents=True,exist_ok=True)
 original=np.fromfile('/tmp/block0.weights','<f2')
 fw=np.fromfile(root/'amd/block0-ffn.f32','<f4')
 rgb=np.fromfile(root/'input-hwc.rgba32f','<f4').reshape(128,128,4)
-prefix=H(inputs(rgb[...,:3],seed=0,live=True)@fw[:512].reshape(32,16).T)
+prefix=H(inputs(rgb[...,:3],seed=args.seed,live=True)@fw[:512].reshape(32,16).T)
 expanded=H(F(prefix)@fw[512:4608].reshape(128,32).T)
 gate=np.clip(expanded,-4,4)
 poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
@@ -22,18 +23,24 @@ w2=fw[4608:8704].reshape(32,128)
 for k in range(0,128,32):ffn=H(ffn+hidden[...,k:k+32]@w2[:,k:k+32].T)
 pm=np.argmax(np.abs(np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048)),axis=0)
 env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_PREBLOCK_')}
-env.update(DLSS5_PREBLOCK_WIDTH='128',DLSS5_PREBLOCK_HEIGHT='128',DLSS5_PREBLOCK_SEED='0',DLSS5_PREBLOCK_PARAMETER_FILE=str(Path('release/live-preblock-v2/preblock-live-0.bin').resolve()))
+env.update(DLSS5_PREBLOCK_WIDTH='128',DLSS5_PREBLOCK_HEIGHT='128',DLSS5_PREBLOCK_SEED=str(args.seed),DLSS5_PREBLOCK_PARAMETER_FILE=str(Path('release/live-preblock-v2/preblock-live-0.bin').resolve()))
 mix_matrix=fw[:512].reshape(32,16).copy();mix_matrix[:,[0,1,4]]=0
-without_noise=H(inputs(rgb[...,:3],seed=0,live=True)@mix_matrix.T)
-native_features=inputs(rgb[...,:3],seed=0,live=True)
-noise=H(fields(128,128,0,native_steps=True))
+without_noise=H(inputs(rgb[...,:3],seed=args.seed,live=True)@mix_matrix.T)
+native_features=inputs(rgb[...,:3],seed=args.seed,live=True)
+noise=H(fields(128,128,args.seed,native_steps=True))
 native_features[...,[0,1,4]]=noise[...,[1,2,0]]
 native_prefix=H(native_features@fw[:512].reshape(32,16).T)
 cases=[('mix',prefix),('ffn',ffn),('mix_no_noise',without_noise),('mix_native_steps',native_prefix)]
-trace=root/'noise-residual/trace.f32'
+trace=root/f'noise-residual/trace-seed{args.seed}.f32'
 if trace.exists():
  native_features[...,[0,1,4]]=H(np.fromfile(trace,'<f4').reshape(128,128,16)[...,[14,15,13]])
- cases.append(('mix_cuda_trace',H(native_features@fw[:512].reshape(32,16).T)))
+ cuda_prefix=H(native_features@fw[:512].reshape(32,16).T)
+ cases.append(('mix_cuda_trace',cuda_prefix))
+ ex=H(F(cuda_prefix)@fw[512:4608].reshape(128,32).T);gt=np.clip(ex,-4,4)
+ hd=F(H(ex*H(gt*H(np.abs(gt)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))))
+ ff=H(cuda_prefix*fw[8704:])
+ for k in range(0,128,32):ff=H(ff+hd[...,k:k+32]@w2[:,k:k+32].T)
+ cases.append(('ffn_cuda_trace',ff))
 for name,predicted in cases:
  w=original.copy();w[4656:6192]=0;w[10296:10808]=0;w[10808:10840]=1;w.view('<f4')[10288//2]=1
  if name.startswith('mix'):w[:4096]=0;w[4616:4648]=1

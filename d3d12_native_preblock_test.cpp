@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <cmath>
+#include <cstdint>
 #include "native_preblock_runtime.h"
 static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("D3D HRESULT="+std::to_string(unsigned(h)));}
 static std::vector<float> read(const wchar_t*p){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("input file missing");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("input size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("input truncated");return v;}
@@ -19,15 +20,18 @@ int wmain(int argc,wchar_t**argv){try{
  for(UINT i=0;;i++){IDXGIAdapter1*c=nullptr;if(factory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&c))==DXGI_ERROR_NOT_FOUND)break;DXGI_ADAPTER_DESC1 desc{};c->GetDesc1(&desc);if(desc.VendorId==0x1002&&!(desc.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)){adapter=c;std::wprintf(L"adapter=%ls\n",desc.Description);break;}c->Release();}
  if(!adapter)throw std::runtime_error("AMD adapter unavailable");ID3D12Device*device=nullptr;ck(D3D12CreateDevice(adapter,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&device)));
  auto*input=buffer(device,rgb.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*m=nullptr;D3D12_RANGE none{};ck(input->Map(0,&none,&m));std::memcpy(m,rgb.data(),rgb.size()*4);input->Unmap(0,nullptr);
- NativePreblockRuntime block;block.Create(device,input,width,height,fw,aw,argv[7],live,raw_features);
+ std::vector<float>noise_table;const wchar_t*noise_path=_wgetenv(L"DLSS5_NOISE_TABLE");if(noise_path)noise_table=read(noise_path);
+ NativePreblockRuntime block;block.Create(device,input,width,height,fw,aw,argv[7],live,raw_features,noise_path?&noise_table:nullptr);
  D3D12_COMMAND_QUEUE_DESC qd{};ID3D12CommandQueue*q=nullptr;ck(device->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));ID3D12CommandAllocator*allocator=nullptr;ck(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));ID3D12GraphicsCommandList*c=nullptr;ck(device->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,allocator,nullptr,IID_PPV_ARGS(&c)));
  ID3D12Fence*fence=nullptr;ck(device->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));HANDLE event=CreateEventW(nullptr,FALSE,FALSE,nullptr);
  UINT64 sizes[]={UINT64(width)*height*32*4,UINT64(width)*height*8*4,UINT64(width)*height*32*4};ID3D12Resource*outputs[]={block.Main(),block.Downsample(),block.RawTiles()};ID3D12Resource*readback[3]{};std::vector<float>data[3],baseline[3];for(UINT i=0;i<3;i++){readback[i]=buffer(device,sizes[i],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[i].resize(sizes[i]/4);}
+ const UINT base_seed=live?(std::getenv("DLSS5_TEST_SEED")?UINT(std::strtoul(std::getenv("DLSS5_TEST_SEED"),nullptr,0)):0):0x3f800000;
  for(UINT frame=0;frame<5;frame++){
   if(frame){ck(allocator->Reset());ck(c->Reset(allocator,nullptr));}
-  UINT seed=live?(frame==3?1:0):(frame==3?0x12345678:0x3f800000);block.Record(c,seed,!global);
+  UINT seed=live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);block.Record(c,seed,!global);
   for(UINT i=0;i<3;i++){barrier(c,outputs[i],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(readback[i],0,outputs[i],0,sizes[i]);barrier(c,outputs[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
   ck(c->Close());ID3D12CommandList*lists[]={c};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,frame+1));ck(fence->SetEventOnCompletion(frame+1,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");
+  ck(device->GetDeviceRemovedReason());const auto completed=fence->GetCompletedValue();if(completed==UINT64_MAX||completed<frame+1)throw std::runtime_error("invalid fence completion");
   for(UINT i=0;i<3;i++){D3D12_RANGE range{0,SIZE_T(sizes[i])};ck(readback[i]->Map(0,&range,&m));std::memcpy(data[i].data(),m,sizes[i]);readback[i]->Unmap(0,&none);for(float x:data[i])if(!std::isfinite(x))throw std::runtime_error("nonfinite output");}
   if(frame==0){for(UINT i=0;i<3;i++)baseline[i]=data[i];}
   else if(frame==3&&!raw_features){if(data[0]==baseline[0])throw std::runtime_error("seed has no effect");}
