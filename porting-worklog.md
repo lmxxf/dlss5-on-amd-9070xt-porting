@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：同valid1080输入encoder1～4主分支逐值通过
+
+- validate_native_valid1080_c32.py从原始block0-down逻辑global16读取，按shift0/3/1/2逐层计算，四层各17694720主分支值与原kernel零差异、最终finite。
+- block4参考归一化出现half cast overflow警告，但最终输出finite且逐值一致；没有屏蔽警告或替换非有限值。block4下采样仍未验收，不能把主分支通过扩大为完整block4通过。
+- ignored release/native-rgb-valid1080/encoder-c32/main-validation.json及各main.f32用于后续skip；尚未AMD完整前端或游戏部署。
+
 ### 2026-09-06：同valid1080 RGB原始encoder1～4输出生成
 
 - build_native_valid1080_c32.py从已验证block0-down继续1～4，实际960×576、shift0/3/1/2，block1 inpview、block4 downsample，真实提取权重。
