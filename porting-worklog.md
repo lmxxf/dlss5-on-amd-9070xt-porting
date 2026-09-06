@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：无slot18路径的运动坐标参考精确通过8×8中间值
+
+- 原SASS无slot18时跳过深度邻域选择：反射像素中心/有效尺寸→motion offset/extent/reciprocal变换→slot10 RG TEX→以paramA0/A4缩放位移并FMA加当前UV→历史采样。新增native_temporal_coordinates_reference.py，明确只支持该分支及单次反射范围。
+- 原PC10d0读取R46/R19（前一阶段归一化坐标），常量0.125运动64分量与参考exact；新增check_native_temporal_coordinates_random.py，以seed7304空间变化motion[-.75,.75]测试，同warp0 64分量different=0/max_abs=0。原CUBIN未改，报告ignored `release/native-temporal-coordinate-random`。
+- 当前只证实8×8、slot18为空，非幂次实际尺寸MUFU reciprocal、subrect、额外深度分支仍需验证。下一步GPU坐标生成→已验证五tap→preblock直连，并逐步扩实际尺寸。新神经DLL未部署。
+
+
 ### 2026-09-07：GPU五tap采样→preblock直连双支精确通过
 
 - 新增NativeTemporalSample封装GPU history/coordinates/output和重放状态，输出SRV直接交给NativePreblockRuntime t3。主测试host新增DLSS5_TEST_TEMPORAL_HISTORY，与CPU时序RGB模式互斥；重建RGB不经过CPU。
