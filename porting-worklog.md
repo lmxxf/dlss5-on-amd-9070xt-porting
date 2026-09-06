@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：RTX 256-token 随机 attention 首轮精确对照
+
+- 用户允许继续使用两台调试机器；本轮只运行独立 CUDA 探针，未操作游戏或存档。
+- 新增 `prepare_native_vit_attention_random.py`，生成 seed=3001 的独立随机 Q/K/V；扩展 RTX runner 支持 64/128/256 tokens。
+- RTX 5090 两次 256-token 输出 SHA256 均为 `f8d29c3d99f208a37da f4a793b9a3524b7b6c5c520c7c21390ceaf0c478ec02f`（去除其中空格即完整哈希）。原始产物保存在 ignored `release/native-vit/attention-random-256-3001/`。
+- `check_native_vit_random_candidates.py` 对照三种分母求和图：每 64-token 使用已验证的半精度求和，再按块顺序半精度相加，262144 个输出值全部一致，max_abs=0；先跨块合并位置差 630 个值，按 lane 累加 pair 差 711 个值。
+- 这是单个随机样本的候选公式验证，还需额外 seed / 128-token 对照；未修改 AMD attention 或部署新游戏 DLL，不能据此宣称游戏画面修复。
+
 256-token反例定位到当前Spark执行路径（2026-09-06）：对完全相同原attention探针做Compute Sanitizer memcheck，0 errors，但输出与先前普通执行不同；racecheck报2组共享内存读写冲突，写PC0x3570/0x32e0对应UBLKCP.S.G，读PC包括0x1680/0x1c60/0x25e0/0x2c20及0x1090/0x10a0/0x1d90/0x1e60。不能把无越界等同无竞态，也不能直接指责模型数学或AMD移植。
 
 新增最小Windows nvcuda导入定义、原探针可显式选择CUBIN路径及run_nvidia_vit_extent.ps1，将同一CUBIN和同一Q/K/V文件放5090独立实验目录native-vit-extent-256。未启动/关闭/切换游戏。5090两次输出SHA均FFB3BDE38AC214BE12E17CD2E11262B33354D763D76FFE91FBBAD3FF8F0083E8，下载后262144值全部对上量化exp/half累计参考，所有query一致，尾部零。报告validation-rtx-output-1.json为control_pass。
