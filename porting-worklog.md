@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD decoder67～69实际960×576三层GPU链通过
+
+- extent host新增decoder67_69_game，三层NativeC32Stage使用实际shift3/1/2与960×576，GPU资源直接串联。
+- RX9070XT三帧17694720最终值零差异，finite/device/fence通过，回读gpu.f32与原始oracle字节级cmp一致；三层提交等待140.543/141.888/142.663ms，不是游戏FPS。
+- 日志通用tokens字段17280是oracle值数/1024，不代表该C32空间尺寸，实际Create与文件检查明确960×576。ignored release/native-decoder-game-c32/amd-decoder67-69。
+- 尚未post70实际尺寸及真实RGB全链验收，未部署游戏DLL。
+
 ### 2026-09-06：原始decoder67～69实际960×576整链通过
 
 - C32参考新增game extent960×576，从原始block66输出依次运行67/68/69，shift3/1/2。三层各17694720值原始/CPU零差异，tail检查通过。
