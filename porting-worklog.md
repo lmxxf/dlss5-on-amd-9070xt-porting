@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏纹理输入候选shader编译通过，待GPU边界验证
+
+- 检查旧 `initialize_frame_bridge` 确认它双线性缩放到960×544并saturate，这与新受控1920×1080→1920×1152合同不同，不能直接复用旧像素入口。
+- 新增 `native_game_rgb_input.hlsl`：从1920×1080 Texture2D逐像素Load，不缩放、不saturate、不擅自gamma转换；底部72行反射，生成两张GPU buffer：8×8 tile-major RGBA供preblock、HWC RGBA供post。两路来自同一次pixel读值。
+- 新增compile-only工具，MinGW构建后在AMD Windows运行D3DCompile，exit0、1324字节bytecode。未创建GPU设备，未操作游戏；不能据此声称纹理读取、队列状态或颜色空间已验证。
+- 下一步构建纹理上传/双输出回读测试，与已有buffer反射裁判逐值比对，再封装实际游戏device/descriptor/resource-state接入。仍需游戏实际多纹理和post边界证据；游戏DLL未更新。此shader仅候选入口，不替换完整神经网络。
+
+
 ### 2026-09-07：动态RGB0～70整链A/A/B/A/A通过
 
 - session61405/PID18444已exit0，五帧固定seed0；A/A/B/A/A全部replay_check通过，intermediate_CPU_transfers=0。无本轮运行任务遗留。
