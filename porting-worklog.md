@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：融合平方修复后640token八层ViT GPU回归通过
+
+- 更新远端native_vit_qkv.hlsl和native_half_square.hlsli，分块fence整链31～38三帧655360最终值均零差异，device正常。
+- 回读gpu-fused-square.f32与原始oracle字节级cmp一致，旧gpu-chunk-fenced.f32保留。CompileNativeShader对include源码不缓存，未误用旧依赖编译结果。
+- 这仍为既有随机640token fixture，非同RGB完整链或多纹理游戏验收；未部署DLL。
+
 ### 2026-09-07：融合平方修复同步C32/ViT与C32前端GPU回归
 
 - preblock_attention_core.hlsl及native_vit_qkv.hlsl的norm pair使用共用NativeHalfSquarePair，stage脚本允许.hlsli依赖复制。
