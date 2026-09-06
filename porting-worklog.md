@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：时序改动后的首帧preblock GPU回归通过
+
+- 使用同一新exe/shader、清除DLSS5_TEST_TEMPORAL_RGB，在8×8单输入模式运行五帧seed0/0/0/1/0，session40587 exit0，重放通过；独立保存gpu-single-main/down/目标准备，未覆盖时序结果。
+- 新增validate_native_temporal_preblock_gpu.py，正式解码原版FP8 main cell与down global16并比较。single与both_shifted各main2048/down512值different=0，两个报告pass=true，存ignored `native-temporal-inputs-gates/amd-preblock`。
+- 此次single是未绑定temporal资源分支；已绑定但运行时关闭/再次开启的切换仍待直连测试。下一步GPU sampler输出直接进入preblock，避免CPU中间注入；运动坐标与完整稳态游戏仍未完成。新神经DLL未部署。
+
+
 ### 2026-09-07：新增时序特征preblock主/DS双支GPU逐值通过
 
 - preblock host增加DLSS5_TEST_TEMPORAL_RGB隔离验证入口，上传已重建HWC时序RGB并启用新t3/constant路径；新增prepare_native_temporal_preblock_gpu.py生成8×8 fixture，沿用生产noise table和原block0系数。
