@@ -2747,6 +2747,18 @@ prepare_native_rgb128_gpu.py导出block24～29各自原始系数为GPU参数。d
 
 当前AMD连续正确范围扩展至128×128 RGB→block29。下一关block30包含五份记录（前三/四份与split同尺寸，第五份524304字节），原CUBIN存在proj_pool_512_fp8符号；其调用、池化和进入ViT的合同尚待恢复，不能复用历史代理链结论。README顶部同步，游戏DLL与公开ZIP未更新，最终RGB和剑星画面目标仍active。
 
+### 2026-09-06 block30原生投影/池化合同：16×8通过，4×4→2×2仍全零
+
+新增run_original_split_pool.cpp独立调用cc_split_swin_16h_proj_pool_512_fp8。ELF参数元数据确认单个0x50字节参数；结合SASS恢复attn/ffn指针0/8、main/pool输出16/24、权重32、全尺寸H/W64/68及池化H/W72/76。首次错误沿用普通projection的32×8线程，引发CUDA700；Compute Sanitizer定位到共享内存0x2fe0指令越界，线程y5～7非法。改为32×4后执行成功，重新跑memcheck为0 errors。没有修改驱动或游戏状态。
+
+check_native_split_pool.py对16×8独立随机FP8输入，零矩阵+skip1控制：main65536值全exact；pool16384值按4×4 cell排列解码后与half水平两两求和、垂直相加、乘0.25再FP8的结果全exact。通道bank/bank-swap两种错误候选保留作对照；cell不一致会明确失败。
+
+validate_native_split_pool.py提取block30前四份真实记录，从非正方形原版block29输出继续，以shiftY调用plain split。CPU与原CUBIN branch/ffn/attn/main四阶段各65536值全exact；原pool kernel的main65536值及down16384值也全exact。池化使用投影后未量化的half值，而不是先FP8再平均，未拟合系数。
+
+--rgb-small用当前RGB128×128连续链的4×4 block29输出回归：block30四阶段与pool kernel main各8192值全exact，但pool整份4MiB buffer全零，预期2×2×512中2047值非零，验证明确失败。不能靠假设4×4物理padding称2×2已闭合；真实调度的小尺寸限制仍待核对，后续ViT入口需足够尺寸的连续夹具。block30第五份记录（512→1024候选）尚未恢复验证。
+
+本轮为原CUBIN/CPU数值与调用合同验证，未接AMD block30，AMD已验范围保持RGB→block29。游戏DLL、公开ZIP未改，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
