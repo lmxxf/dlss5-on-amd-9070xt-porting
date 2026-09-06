@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏queue上的自有分段提交器初稿
+
+- 新增 `native_game_submission.h`，接收调用方DIRECT queue，从queue取得device，拥有独立allocator/list/fence/event。每段提交并验证device/fence后才允许重置；不Close/Reset游戏列表、不擅自创建另一条游戏推理queue。
+- Submit异常后poison，禁止后续复用；若GPU仍在途，析构不释放自有命令存储，避免把timeout当成取消。调用端仍必须在错误后保留所有GPU引用资源，不可仅依赖此类保护外部网络对象。
+- MinGW独立语法检查exit0，尚未GPU执行或游戏接入。前提是调用时游戏已提交输入producer；此类自身不能证明这个前提，也不替代ReShade immediate提交标志管理。
+- 阅读旧on_present确认queue及immediate flush入口存在，当前未查到AMD游戏进程。下一步在GPU纹理测试上接此提交器做实际依赖验证，再组合整网及ReShade生命周期。游戏DLL未更新，无运行任务遗留。
+
+
 ### 2026-09-07：AMD最终R10纹理复制动态逐像素通过
 
 - 新增 `d3d12_native_game_output_test.cpp`，实际GPU RGB打包→CopyTextureRegion至R10纹理→texture回读。输入为整数/2048，含clamp范围外、量化中点，底部padding设独立哨兵；CPU用整数公式 `(clamp(n)*1023+1024)/2048` 计算期待值，检查全部RGB位与alpha位。
