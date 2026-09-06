@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：原始256-token八block ViT参考链通过
+
+- run_nvidia_block256.ps1 增加 LastBlock=38，分别加载31..38各自权重，上一block projection传入下一block，整链重复两次。
+- check_native_block256.py 增加相同范围的顺序验证：56个阶段全部different=0、finite、tail_zero、replay_identical，原始最终FP8 SHA256 `1547c5b495986625d783832c4c11ca2af51d4dafc3134e2da5c7076deeb18459`。
+- fixture ignored release/native-vit/chain256-3003，根input.f32为初始输入、oracle.f32为block38最终输出；每个block目录包含原始中间输出及对应解码权重。
+- 尚未执行AMD八block全GPU串联，游戏DLL未更新；下一步用此最终oracle验证八个生产NativeVitBlock资源串联。
+
 ### 2026-09-06：AMD完整256-token block31 GPU串联通过
 
 - extent test 新增 block31 模式，直接调用生产 NativeVitBlock，初始输入→expand→contract→QKV→attention→projection，全程GPU资源传递，无中间CPU特征注入。
