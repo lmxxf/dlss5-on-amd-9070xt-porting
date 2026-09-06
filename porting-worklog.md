@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 GPU0～22完成并逐值通过
+
+- 延续session7712/PID31784，CPU时间360→488秒，最终正常exit0，五帧seed0/0/0/1/0重放/seed影响检查通过，未重启。
+- 下载main/down，--front22验证2211840主值（raw转原FP8边界）及1105920下采样值均零差异/max_abs0；same RGB前端0～22已通过此受控fixture。
+- 含include shader绕过缓存且原先无进度输出，native_shader_cache.h补该分支begin/end耗时诊断，另编译二进制通过，未替换正在运行的测试。未改缓存语义。
+- 原session已完成，后续不要再poll/restart7712；下一步split23～30与ViT整链。仍非游戏多纹理/动态RGB验收，未部署DLL。
+
 ### 2026-09-07：同RGB GPU0～22运行中，尚无验收结果
 
 - runner增加-Front22并清理该开关；验证器增加--front22对应raw main2211840值（按FP8边界比较）及down1105920值。

@@ -24,7 +24,13 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
  std::string source((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
  // Includes require dependency tracking: compile uncached rather than risk
  // treating an unchanged top-level file as an unchanged whole program.
- if(source.find("include")!=std::string::npos)return D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);
+ if(source.find("include")!=std::string::npos){
+  const bool progress=_wgetenv(L"DLSS5_SHADER_PROGRESS")!=nullptr;auto started=std::chrono::steady_clock::now();
+  if(progress){std::fprintf(stderr,"shader_compile_begin uncached_include=1 entry=%s path=%ls\n",entry,path.c_str());std::fflush(stderr);}
+  HRESULT hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);
+  if(progress){auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();std::fprintf(stderr,"shader_compile_end uncached_include=1 ms=%lld hr=0x%08x\n",(long long)ms,unsigned(hr));std::fflush(stderr);}
+  return hr;
+ }
  std::string key=source;key.push_back('\0');key+=entry;key.push_back('\0');
  if(macros)for(auto*m=macros;m->Name;m++){key+=m->Name;key.push_back('\0');if(m->Definition)key+=m->Definition;key.push_back('\0');}
  auto&state=NativeShaderCache();std::lock_guard<std::mutex>lock(state.mutex);
