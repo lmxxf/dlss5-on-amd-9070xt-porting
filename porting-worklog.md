@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8 query18分母/倒数敏感性线索
+
+- inspect_block8_query.py保存第二head所有中间参考至query-reference.npz，query18分母.30517578125、half倒数3.27734375（精确倒数3.2768），AV复现9差异。
+- 仅诊断性测试倒数邻近half值：delta -2/-1/0/+1仍9差异，+2（3.28125）恰为0差异。不能据此拟合runtime修正；下一步检查真实分母求和次序及原始倒数实现。
+- 敏感性结果ignored window46-18/reciprocal-sensitivity.json，生产代码未改，未部署DLL。
+
 ### 2026-09-06：block8差异定位到attention第二head单query
 
 - isolate_block8_attention.py在诊断权重副本将projection设identity、最终skip置零，并解码检查矩阵确为单位阵。
