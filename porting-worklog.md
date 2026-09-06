@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：NGX参数MinGW多载虚表ABI差异修正
+
+- 候选probe反汇编原p->Get调用：uint偏移0x58、D3D12Resource偏移0x70。读取LLVM官方 `https://github.com/llvm/llvm-project/blob/main/clang/lib/AST/VTableBuilder.cpp` 的GroupNewVirtualOverloads，Microsoft ABI同名虚方法分组内按声明逆序；结合NVIDIA官方8个Set/8个Get/Reset定义，正确Get resource为slot9/0x48、uint为slot12/0x60。不能直接跨MinGW/MSVC调用该多载接口。
+- 新增 `native_ngx_parameter_access.h` 显式x64转接，probe改用它，重编译反汇编确认0x60/0x48。新增mock测试核对this/key/output与两个slot，Windows运行exit0。mock不是实际NGX对象验收，仍需原版现场确认。
+- 新probe尚未部署；AMD游戏旧base模式不变，原神经DLL未更换。下一步在5090原版Evaluate读取实际输入资源合同。
+
+
 ### 2026-09-07：原版NGX Evaluate参数只读探针候选编译完成
 
 - 本地未找到完整NGX参数SDK；读取NVIDIA官方 `https://github.com/NVIDIA/DLSS/blob/main/include/nvsdk_ngx_params.h` 与nvsdk_ngx.h，下载头文件到临时 `/tmp/dlssnr-ngx-headers`。确认Get资源/标量接口及D3D12 Evaluate签名；原nvngx_dlssnr.dll导出表确有NVSDK_NGX_D3D12_EvaluateFeature。
