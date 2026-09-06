@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：256-token 原始 expand→contract 数值验证
+
+- contract caller 增加 Windows CUBIN 路径；独立 RTX runner 使用 256 tokens / gridX=16 / gridZ=4，计数器仍从 -1 开始。
+- 原始 expand 输出送入原始 contract，残差使用 seed=3003 原始输入，block31 真实权重；两次输出 SHA256 均为 `49f76e9e40bb540193463cd902321e3c7dbdda4501d91f3cacf4c9c5b4a90336`。
+- `check_native_contract_extent.py` 对照原生四分区半精度累加及残差计算，262144 值全部 different=0 / max_abs=0；finite、尾部零、replay 一致。输出与解码系数保存在 ignored release/native-vit/contract-256-3003，供 AMD 验证。
+- 本轮未放宽 AMD contract，也未部署游戏 DLL。下一步使用上述原始 oracle 验证生产 NativeVitLinear contract。
+
 ### 2026-09-06：AMD 256-token expand 三次精确通过
 
 - 生产 NativeVitLinear 仅针对 expand 开放 tokens=256，其他未验证线性模式仍限制原尺寸；HLSL 算术和索引未改。
