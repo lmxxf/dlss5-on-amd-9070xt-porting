@@ -13,11 +13,12 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   [loop]for(uint k=part*(INPUT_CHANNELS/partitions);k<(part+1)*(INPUT_CHANNELS/partitions);k+=32){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[token*INPUT_CHANNELS+k+j]*weights[row*INPUT_CHANNELS+k+j];a=H(a+s);}
   total=part==0?a:H(total+a);
  }
- // Explicit square main extents: 8, 16 (block48), 32 (block56), 64 (block62).
- uint width=tokens==4096?64:tokens==1024?32:tokens==256?16:8;
+ // Explicit square main extents through128 (block66); contracts checked by host.
+ uint width=tokens==16384?128:tokens==4096?64:tokens==1024?32:tokens==256?16:8;
  [unroll]for(uint dy=0;dy<2;dy++)[unroll]for(uint dx=0;dx<2;dx++){
   uint index=((token/width*2+dy)*(width*2)+token%width*2+dx)*OUTPUT_CHANNELS+row;
-  output[index]=F(H(total+F(residual[index])*weights[INPUT_CHANNELS*OUTPUT_CHANNELS+row]));
+  float merged=H(total+F(residual[index])*weights[INPUT_CHANNELS*OUTPUT_CHANNELS+row]);
+  output[index]=OUTPUT_CHANNELS==32?merged:F(merged);
  }
 #elif EXPAND
  float a=0;

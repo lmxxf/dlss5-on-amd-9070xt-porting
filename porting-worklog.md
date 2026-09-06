@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第66块独立通过（2026-09-06）：核对NativeC32Stage的RAW_INPUT路径保留输入half作为FFN残差，只为矩阵输入做q8，故可直接消费第66块half合流。原生线性投影合同增加64→32、64或16384-token；shader仅OUTPUT_CHANNELS==32时输出half merged，其余decoder保持FP8 merged。宿主upsample66以128×128主→256×256输出，接常驻NativeC32Stage与原shift3参数，层间无CPU读回/注入。
+
+prepare_native_upsample66_gpu.py直接导出原seed2707/shift3的input/skip/final oracle，C32 FFN前置512零槽与原解码矩阵/skip、attention矩阵/bias/scale常驻。部署native-upsample66，三帧各2097152值different0/max0，device/fence/finite/replay通过。下载再验证全exact，SHA db0f198506f28f071052ff711bf4810c41eaa0c6bb8a073f5542162ddec586f2，报告release/native-upsample66/amd/validation.json。
+
+同一新exe/shader在native-decoder39回归，三帧131072值仍全exact。已加入-Block66脚本入口；当前测试进程全部退出，游戏DLL未改。第66块尚未接RGB链，AMD63～65仍待独立验证；下一步原block65 outview→66与block4 skip连接，以及67～70。
+
 第66块原生数值参考通过（2026-09-06）：native_c32_reference.py抽出unpack_bytes，路径入口保持兼容。第66块的普通C32主体来自原前0x2000字节、0x2800..2860移至普通0x2000..2060、0x28a0后移至普通0x2060后；初始64→32 FP8投影0x2000..2800，输入skip系数0x2860..28a0。没有拟合或固定帧修正。
 
 check_native_upsample66_candidates.py首次沿multihead输出通道约定导致main常量7932值不同；将投影行从multihead累计通道序转为C32 FFN通道序后，main常量8192值全exact。输入skip使用C32 FFN/attention对应通道序，全exact；multihead skip序失败。关键舍入差别：C32合流后保留half再进主体，不先FP8。提前FP8会让main/skip常量分别4352/2040值不同。这与C64/C128/C256 upsample不同，AMD实现不能无条件复用其FP8合流。
