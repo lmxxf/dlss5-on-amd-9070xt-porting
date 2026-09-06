@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640逻辑桥接正反向GPU独立通过
+
+- bridge640 test使用生产NativeVitGather及原始映射组合，输入655360个互不相同且float精确可表示的位置编号，正反方向分别对照，不以往返抵消错误。
+- RX9070XT正反各三帧零差异，device/fence/finite通过，两份gpu.f32分别cmp各自oracle一致。ignored release/native-vit/repack640/gpu-forward及gpu-inverse。
+- 证明映射在GPU正确执行，尚不代表与实际encoder/ViT/decoder整链衔接完成；未部署游戏DLL。
+
 ### 2026-09-06：实际640token逻辑桥接映射准备
 
 - prepare_native_bridge640.py将原始forward/inverse物理映射与HWC/C512双bank及ViT逻辑位布局组合，655360项双射；独立组合原始inverse与argsort(forward逻辑映射)完全一致。

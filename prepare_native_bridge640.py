@@ -20,3 +20,7 @@ assert np.array_equal(undo,inverse_logical)
 gather.tofile(root/'hwc-to-vit.i32');undo.tofile(root/'vit-to-hwc.i32')
 report={'entries':n,'HWC_shape':[20,32,1024],'forward_inverse_composition_exact':True,'identity_entries':int(np.count_nonzero(gather==np.arange(n))),'scope':'composed original mappings; GPU bridge execution pending'}
 (root/'bridge.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+for name,mapping in [('forward',gather),('inverse',undo)]:
+ out=root/f'gpu-{name}';out.mkdir(exist_ok=True)
+ values=np.arange(n,dtype=np.float32)
+ values.tofile(out/'input.f32');values[mapping].tofile(out/'oracle.f32');mapping.astype('<u4').tofile(out/'indices.i32')
