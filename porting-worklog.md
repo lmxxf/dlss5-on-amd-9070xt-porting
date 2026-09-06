@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原始QK得分直接读值发现key8差异
+
+- debug gdb新增DLSS5_DEBUG_PC可选断点，读取PC5080（首softmax affine之前）32lane寄存器，原始kernel未改。
+- decode_block8_scores.py按bias载入和QMMA C操作数传播坐标，仅比较当时已计算的score寄存器：1536唯一q/key坐标，23差异；已打印样本集中key8，包括q18原始-.338134765625/参考-.3369140625。
+- 保存score-register-comparison.json，下一步读取/核对key8 K向量而非继续改softmax；该映射仍需完整覆盖控制审计，不把局部结果扩大为全score已验证。未部署DLL。
+
 ### 2026-09-07：原始QK边界32lane寄存器捕获
 
 - debug_block8_qk.gdb在PC+5030捕获第二head全32lane、每lane R0～159，成功保存qk-registers-5030.json；原始CUBIN未修改。
