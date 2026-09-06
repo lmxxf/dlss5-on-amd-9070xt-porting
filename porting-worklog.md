@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际block48完整算子三帧通过
+
+- extent host新增upsample48_game，生产NativeVitLinear(60×36主分支)→NativeC64Shift(120×72 C256 shift0)，GPU资源直接传递。
+- RX9070XT三帧2211840值different=0/max_abs=0，finite/device/fence通过；提交等待65.423/54.122/52.776ms仅本算子。回读gpu.f32与原始oracle字节级cmp一致。
+- ignored release/native-upsample48/amd-game。输入仍是独立随机main/skip，不是完整decoder47/encoder22跳接；后续49～70及真实RGB链待继续，未部署游戏DLL。
+
 ### 2026-09-06：AMD block48非方形放大准备
 
 - NativeVitLinear允许decoder模式2160token/512→256，以主宽60、输出120×72计算坐标，实际skip容量按8640×256检查；编译通过，未执行新GPU路径。
