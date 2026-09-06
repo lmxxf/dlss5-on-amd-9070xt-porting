@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：输入→网络→显示整帧GPU组合接口就绪，待游戏挂接
+
+- 新增 `native_game_frame.h`，Create在同queue device创建已测纹理输入、NativeActualNetwork70、R10显示输出；ProcessSubmittedFrame依次提交取图、所有网络段、显示复制，整帧mutex串行，source/target状态由调用方给出并恢复。
+- 单实例绑定稳定source，resize/source替换须先排空再重建；调用方必须证明正确输入/颜色合同及producer已提交。此类不是ReShade回调，不能自行推断这些前提。
+- 失败后整帧poison并保留整个资源图，避免仅保留allocator却释放网络输入输出造成GPU UAF；不关闭/重置游戏命令列表。
+- MinGW独立语法检查exit0，尚未GPU运行组合后的这一接口，更未部署游戏DLL。下一步挂接游戏生命周期，核验实际图像来源及主queue提交时序，并作真实画面ON/OFF与输出因果证据。无运行任务遗留。
+
+
 ### 2026-09-07：抽取後NativeActualNetwork70全RGB回归精确通过
 
 - session15638/PID38016已exit0：NativeActualNetwork70配NativeGameSubmission三帧各6635520个最终RGB值different=0，extracted_network70=exact。
