@@ -2963,6 +2963,16 @@ probe_native_noise_residual.py扩展size512与gain4096。在global(y382,x384)对
 
 保留Width512独立preblock运行支持、全幅main/DS验证器及诊断脚本。下一步需恢复真正的HMMA混合累加/中间舍入过程，不能用单点匹配推广float32末次舍入，也不放宽通过标准。完整RGB512→ViT38仍未通过，游戏DLL/公开包未更新，目标active。
 
+### 2026-09-06 输入混合HMMA规则修复，AMD RGB512→ViT38连续链通过
+
+新增probe_preblock_wmma.cu直接运行half输入/half累加WMMA，并以check_preblock_wmma系列脚本分离输入混合。全幅8388608个混合值量化后与原mix一致；同时倒序和随机打乱成对K项，原half结果不变，排除普通顺序float累加假设。以两操作数frexp指数之和的最大值E为对齐基准，每项按2^(E-27)向零截断、精确求和、最后half RNE，全部8388608个原WMMA half值一致。另换seed2213的新输入与新权重，2097152值一致；留出脚本此前仅打印结果，未写validation.json，不能引用不存在的报告。
+
+native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的NATIVE_NOISE_TABLE分支按相同规则实现整数累计及高低16位精确转换。该规则是当前已测范围的实现，不声称所有Tensor Core模式都通用。修复仅部署AMD native-rgb512实验目录。
+
+修复后512独立preblock的main 8388608值、DS 2097152值全exact；随后连续RGB512→block30/head→GPU gather→ViT31～38三帧执行，DS0/4/8/14/22全部exact，最终65536值different=0、max_error=0。报告release/native-rgb512/amd/validation.json为pass，scope明确不含decoder或游戏画质。层间无CPU读回或中间特征注入；本轮GPU审计覆盖五个DS及最终输出，不冒称每个内部阶段均读回。fence等待1657/1656/1765ms为实验等待时间，不是游戏FPS。
+
+16:27恢复会话后核对报告，未发现所查询的本地实验进程；AMD查询native-preblock-test、native-front-chain-test及游戏进程无输出。用户先前系统异常提示原因未查明，不归因于任何未经证实的服务或GPU故障。下一步恢复第39块原生解码器合同，不能复用旧全FP16代理推断。真实1080p、最终RGB、游戏DLL部署及画面验收尚未完成；游戏DLL、存档与公开包未修改，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

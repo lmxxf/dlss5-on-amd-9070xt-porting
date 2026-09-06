@@ -78,9 +78,22 @@ void main(uint3 id:SV_DispatchThreadID){
 #endif
  [loop]for(uint channel=0;channel<32;channel++){
 #if NATIVE_NOISE_TABLE
-  // Both operands are half values; 16 products fit an exact double sum.
-  double sum=0.0;[unroll]for(uint i=0;i<16;i++)sum+=(double)features[i]*(double)weights[channel*16+i];
-  prefix[channel]=half_round_exact(sum);
+  // Measured HMMA: align by operand exponent sums, truncate to 27 bits,
+  // then add exactly. Sixteen signed terms fit the 32-bit accumulator.
+  float products[16];int maximum_exponent=-1000;
+  [unroll]for(uint i=0;i<16;i++){
+   float a=features[i],b=weights[channel*16+i];products[i]=a*b;
+   if(products[i]!=0){int ea=int((asuint(a)>>23)&255u)-126,eb=int((asuint(b)>>23)&255u)-126;maximum_exponent=max(maximum_exponent,ea+eb);}
+  }
+  if(maximum_exponent==-1000)prefix[channel]=0;
+  else{
+   float scale=asfloat(uint(27-maximum_exponent+127)<<23);int sum=0;
+   [unroll]for(uint i=0;i<16;i++)sum+=(int)(products[i]*scale);
+   // Split the integer conversion so no float32 cast loses accumulator bits.
+   double exact_sum=(double)float(sum>>16)*65536.0+(double)float(asuint(sum)&65535u);
+   float quantum=asfloat(uint(maximum_exponent-27+127)<<23);
+   prefix[channel]=half_round_exact(exact_sum*(double)quantum);
+  }
 #else
   float sum=0;[unroll]for(uint i=0;i<16;i++)sum+=features[i]*weights[channel*16+i];
   prefix[channel]=half_round(sum);
