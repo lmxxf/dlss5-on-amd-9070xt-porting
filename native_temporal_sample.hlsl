@@ -6,8 +6,13 @@ RWStructuredBuffer<float4> reconstructed : register(u0);
 cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inverse_width; float inverse_height; }
 
 void axis(float p,uint extent,out float3 positions,out float3 weights) {
+#if NORMALIZED_COORDINATES
+    precise float center=floor(mad(p,float(extent),-.5))+.5;
+    precise float t=saturate(mad(p,float(extent),-center));
+#else
     precise float center=floor(p-.5)+.5;
     precise float t=saturate(p-center);
+#endif
     precise float t2=t*t,t3=t2*t;
     precise float sum=t+t3;
     precise float left=mad(sum,-.5,t2);
@@ -23,7 +28,11 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     weights=float3(left,middle,right);
 }
 float3 fetch(float2 xy) {
-    precise float2 uv=xy*float2(inverse_width,inverse_height);
+    precise float2 normalized=xy*float2(inverse_width,inverse_height);
+    // Original applies the history subrect transform even for the full-size
+    // zero-offset case. Keep both roundings instead of cancelling dimensions.
+    precise float2 history_pixel=mad(normalized,float2(width,height),float2(0,0));
+    precise float2 uv=history_pixel*float2(inverse_width,inverse_height);
     precise float2 fixed_uv=floor(uv*2097152.0);
     precise float2 pixel=fixed_uv*(float2(width,height)/2097152.0)-.5;
     precise float2 p=clamp(pixel,0,float2(width-1,height-1));

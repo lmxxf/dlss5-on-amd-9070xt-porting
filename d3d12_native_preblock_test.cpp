@@ -42,9 +42,9 @@ int wmain(int argc,wchar_t**argv){try{
   if(temporal_input||!live||raw_features)throw std::runtime_error("ambiguous temporal test input");auto values=read(history_path);if(values.size()!=size_t(width)*height*4)throw std::runtime_error("history fixture shape");
   auto upload=[&](const std::vector<float>&v){for(float x:v)if(!std::isfinite(x))throw std::runtime_error("nonfinite temporal fixture");auto*r=buffer(device,v.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;ck(r->Map(0,&none,&p));std::memcpy(p,v.data(),v.size()*4);r->Unmap(0,nullptr);return r;};
   auto*h=upload(values);ID3D12Resource*c=nullptr;
-  if(motion_path){auto vectors=read(motion_path);if(vectors.size()!=size_t(width)*height*4)throw std::runtime_error("motion fixture shape");auto*mv=upload(vectors);const float transform[]={0,0,float(width),float(height),1.f/width,1.f/height};motion_coordinates.Create(device,mv,width,height,width,height,width,height,transform,argv[7]);mv->Release();c=motion_coordinates.Output();c->AddRef();}
+  if(motion_path){auto vectors=read(motion_path);if(vectors.size()!=size_t(width)*height*4)throw std::runtime_error("motion fixture shape");auto*mv=upload(vectors);const float transform[]={0,0,float(width),float(height),1.f/width,1.f/height};motion_coordinates.Create(device,mv,width,height,width,height,width,height,transform,argv[7],true);mv->Release();c=motion_coordinates.Output();c->AddRef();}
   else{auto xy=read((std::wstring(argv[7])+L"\\temporal-coordinates.f32").c_str());if(xy.size()!=size_t(width)*height*2)throw std::runtime_error("coordinate fixture shape");c=upload(xy);}
-  temporal_sampler.Create(device,h,c,width,height,width*height,argv[7]);h->Release();c->Release();temporal_input=temporal_sampler.Output();temporal_input->AddRef();
+  temporal_sampler.Create(device,h,c,width,height,width*height,argv[7],motion_path!=nullptr);h->Release();c->Release();temporal_input=temporal_sampler.Output();temporal_input->AddRef();
  }
  const bool use_temporal=temporal_input!=nullptr;
  NativePreblockRuntime block;block.Create(device,reflect_input?reflect.Output():input,width,height,fw,aw,argv[7],live,raw_features,noise_path?&noise_table:nullptr,temporal_input);if(temporal_input)temporal_input->Release();

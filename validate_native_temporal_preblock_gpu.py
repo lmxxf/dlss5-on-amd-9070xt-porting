@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,json
 import numpy as np
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');p.add_argument('--variable',action='store_true');g=p.add_mutually_exclusive_group();g.add_argument('--rect',action='store_true');g.add_argument('--large',action='store_true');args=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');p.add_argument('--variable',action='store_true');p.add_argument('--gpu-root',type=Path);p.add_argument('--prefix');g=p.add_mutually_exclusive_group();g.add_argument('--rect',action='store_true');g.add_argument('--large',action='store_true');args=p.parse_args()
 root=Path('release/native-temporal-inputs-gates');gpu=root/('amd-motion' if args.motion else 'amd-direct' if args.direct else 'amd-preblock')
 case='single' if args.single else 'both_shifted'
 if args.variable:root=Path('release/native-temporal-variable');gpu=root;case='original'
@@ -11,6 +11,8 @@ width,height=(120,72) if args.large else (24,16) if args.rect else (8,8)
 if args.rect:root=Path('release/native-temporal-rect');gpu=root;case='single' if args.single else 'original'
 if args.large:root=Path('release/native-temporal-large');gpu=root;case='single' if args.single else 'original'
 prefix='gpu-single-' if args.single else 'gpu-'
+if args.gpu_root:gpu=args.gpu_root
+if args.prefix:prefix=args.prefix
 basis=np.fromfile('release/post-skip-basis/matrix.f32',np.float32).reshape(2048,2048)
 mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()
 main=np.fromfile(root/f'{case}.main.fp8',np.uint8);down=np.fromfile(root/f'{case}.down.fp8',np.uint8)

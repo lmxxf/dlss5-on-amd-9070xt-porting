@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：小GPU回归通过，UV/FMA与历史子矩形顺序实验未消除72/21
+
+- 重新编译独立sampler GPU测试匹配5个root常量，四holdout三次512RGBA half均different=0，session36347 exit0，排除新绑定破坏既有小样本。
+- 坐标/采样组件增加明确可选normalized UV协议；motion直连选择UV，axis用mad(UV,extent,-.5)及mad(UV,extent,-center)保持原FMA路径。120×72五帧session90559通过运行，但main/down仍72/21，与前版main经cmp逐byte相同，提前转pixel不是本样本根因。
+- 再按原指令保留history normalized→full-size subrect→normalized往返，session15412完成，仍72/21。两组失败报告/回读分别保留uv/subrect，不称修复。
+- 下一步对剩余首错窗口block14捕获原TEX坐标/fraction/权重及GPU采样，不能继续只试全局代数变换。新神经DLL未部署。
+
+
 ### 2026-09-07：21bit normalized转换接回GPU，120×72差异降至72/21
 
 - CPU bilinear可选normalized_bits，sample32启用21bit trunc：四个8×8 holdout half仍全通过，原120×72已抓错误窗口half也全部对齐。
