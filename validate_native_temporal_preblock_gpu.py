@@ -3,13 +3,14 @@ from pathlib import Path
 import argparse,json
 import numpy as np
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');p.add_argument('--variable',action='store_true');p.add_argument('--gpu-root',type=Path);p.add_argument('--prefix');g=p.add_mutually_exclusive_group();g.add_argument('--rect',action='store_true');g.add_argument('--large',action='store_true');args=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--single',action='store_true');p.add_argument('--direct',action='store_true');p.add_argument('--motion',action='store_true');p.add_argument('--variable',action='store_true');p.add_argument('--gpu-root',type=Path);p.add_argument('--prefix');g=p.add_mutually_exclusive_group();g.add_argument('--rect',action='store_true');g.add_argument('--large',action='store_true');g.add_argument('--valid1080',action='store_true');args=p.parse_args()
 root=Path('release/native-temporal-inputs-gates');gpu=root/('amd-motion' if args.motion else 'amd-direct' if args.direct else 'amd-preblock')
 case='single' if args.single else 'both_shifted'
 if args.variable:root=Path('release/native-temporal-variable');gpu=root;case='original'
 width,height=(120,72) if args.large else (24,16) if args.rect else (8,8)
 if args.rect:root=Path('release/native-temporal-rect');gpu=root;case='single' if args.single else 'original'
 if args.large:root=Path('release/native-temporal-large');gpu=root;case='single' if args.single else 'original'
+if args.valid1080:root=Path('release/native-temporal-valid1080');gpu=root;case='single' if args.single else 'original';width,height=1920,1152
 prefix='gpu-single-' if args.single else 'gpu-'
 if args.gpu_root:gpu=args.gpu_root
 if args.prefix:prefix=args.prefix
@@ -34,4 +35,5 @@ report={'scope':'single input regression' if args.single else 'GPU motion coordi
 if args.variable:report['scope']='GPU spatially varying motion -> sampler -> preblock; controlled 8x8 no slot18 branch'
 if args.rect:report['scope']='GPU single-input preblock regression; controlled 24x16' if args.single else 'GPU spatially varying motion -> sampler -> preblock; controlled 24x16 no slot18 branch'
 if args.large:report['scope']='GPU single-input preblock regression; controlled 120x72' if args.single else 'GPU spatially varying motion -> sampler -> preblock; controlled 120x72 no slot18 branch'
+if args.valid1080:report['scope']='GPU controlled 1920x1080 history/motion -> 1920x1152 preblock; no slot18; not full temporal network/game acceptance'
 (gpu/f'{case}-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));assert report['pass']

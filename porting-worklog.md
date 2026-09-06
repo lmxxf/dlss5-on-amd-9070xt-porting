@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：真实valid1080时序前端已运行，数值尚有430/109差异
+
+- d3d12_native_preblock_test.cpp区分temporal_height（1080有效纹理）与height（1152处理行）：history/MV容量按有效尺寸检查，motion输出按处理尺寸反射，sampler历史尺寸1080而输出count为1920×1152。旧非反射路径尺寸不变；MinGW编译成功。
+- 新增prepare_native_temporal_valid1080.py，复用既有valid1080 RGB，history为水平翻转、MV为固定seed7308的[-.75,.75]空间随机场。原CUDA前端成功运行，slot8/10均1920×1080。数据仅在ignored release/native-temporal-valid1080。
+- 隔离部署D:\DLSSNR-Lab\native-temporal-valid1080，session79868五帧1920×1152运行结束、replay pass、无中间CPU传输。session39796回读并用新增--valid1080严格验证：main70778880值430处不同，down17694720值109处不同。首个main x94/y78，不能冒称数值通过；GPU运行通过与原版一致是两个门槛。
+- 游戏DLL及存档未改，完整时序网络/游戏验收未完成。后续先检查motion采样仍使用float texel换算的精度边界，并抓1080p首个差异；保留120×72 exact作为回归。
+
 ### 2026-09-07：120×72时序前端全exact，整数小数量化消除最后7/1差异
 
 - capture工具支持--block/--warp，session4084抓block8,row0,warp1及block12,row8,warp0。session67300补当前GPU中间读回，两区域UV全部一致；sampler差异分别lane31和lane26的三个half。用原捕获UV在CPU重建两区域均half exact，表明此次不是CPU规则缺失。
