@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际120×72 decoder49～55原始链对照
+
+- check_native_decoder_c256.py新增--game-extent（当前仅C256），矩形解码/窗口padding均按120×72，旧方形默认保留。
+- 从已验证block48原始输出依次运行49～55，使用实际shift3/1/2/0/3/1/2；各层报告在ignored release/native-decoder-game-c256，成功层输出2211840值零差异。
+- 本轮仅原始/CPU数值链，不是AMD七层GPU串联，也未部署游戏DLL。
+
 ### 2026-09-06：AMD实际block48完整算子三帧通过
 
 - extent host新增upsample48_game，生产NativeVitLinear(60×36主分支)→NativeC64Shift(120×72 C256 shift0)，GPU资源直接传递。
