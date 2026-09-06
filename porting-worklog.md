@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：绕过16b0崩溃点捕获最后区域，确认差异早于下采样
+
+- session98079直接在PC1800断下，成功取得block39,row42,warp1原版RGB，避开反复触发CUDA-GDB内部断言的PC16b0。无需改原kernel或扩大超时。
+- 已保存的positionfma GPU sampler与此窗口比较：lane13（x317,y341）RGB三个half不同，max_abs=0.00285912。CPU用原PC1590 UV/权重重建则half全一致、max float1.19209e-7。该GPU样本早于正值TEX中点修正，仍需读当前tap确认，但当前down同位置残差未消失。
+- 这说明不能因main FP8全一致就推断raw/采样一致：量化可隐藏差异，down传播后才可见。先继续核对该像素的GPU采样点与原版，不盲改2×2池化顺序。
+- 生产代码和游戏DLL未改，数值基线仍main0/down2。目标未完成。
+
 ### 2026-09-07：TEX正值float中点向上修正，valid1080主输出全exact，仅down剩2值
 
 - session27768取得block3,row110,warp1余下四TEX后寄存器。扩展texture_returns工具支持valid1080/指定捕获，发现6个float分量相差1ULP，均为精确插值和落在相邻float正中点，原版向上、CPU取偶数向下；lane24中央tap蓝通道是触发半精度错误的那一项。
