@@ -20,7 +20,7 @@ for lane in range(32):
     rgb=[struct.unpack('<f',struct.pack('<I',raw[str(r)]))[0] for r in (47,64,59)]
     rows.append({'lane':lane,'pc':str(gdb.parse_and_eval('$pc')),'rgb':rgb,'raw':raw})
 filename='sample-registers.json' if offset==0x1800 else 'sample-registers-%x.json'%offset
-with open('release/native-temporal-inputs-gates/'+filename,'w') as f:
+with open(os.environ.get('DLSS5_TEMPORAL_DEBUG_DIR','release/native-temporal-inputs-gates')+'/'+filename,'w') as f:
     json.dump({'scope':'original preblock warp0 register snapshot; PC-specific decoding required','pc_offset':offset,'rows':rows},f,indent=2)
 print('Saved original temporal RGB reconstruction registers')
 end

@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：时序采样独立位移holdout支持8bit乘积量化，剩1个half差异
+
+- gdb脚本支持独立输出目录；新增check_native_temporal_holdout.py，以新seed7303当前/历史图、四组位移(0.37,-0.29)、(-0.63,0.81)、(1/64,31/64)、(0.72,0.23)，抓原版PC1800 warp0。4case运行完成session45448 exit0，证据ignored `release/native-temporal-holdout`。
+- fraction8/product8候选四组half差异为0/1/0/0，float最大误差约1～1.52e-7。第二/四组能区分乘积精度：9/10bit分别有72/63及74/74个half差异，支持8bit乘积量化而非仅凭首样本拟合。
+- 384分量尚有1个half不一致，仍未接受为完整精确采样器；下一步定位临界舍入，恢复原float32/FMA/RCP顺序。脚本报告新增累计差异/精确标志，不把诊断运行exit0等同数值通过。游戏DLL未更新。
+
+
 ### 2026-09-07：中央TEX乘积权重量化候选使五tap最终half对齐
 
 - 原CUBIN gdb PC1730抓中央TEX返回RGB（R54/R55/R58）。仅fraction8候选中央max_abs0.0004774966；再对四个bilinear乘积权重取1/256 nearest后中央max_abs2.98023e-8。
