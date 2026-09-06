@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：五tap坐标已近float32对齐，首个TEX支持8bit fraction候选
+
+- gdb脚本支持DLSS5_TEMPORAL_DEBUG_PC、保存R19～64及实际PC；分别抓1590前五tap坐标/权重因子、16b0首个TEX已等待完成的RGB。仍为原CUBIN、不打补丁，8×8双纹理0.125位移。
+- 新增check_native_temporal_coordinates.py：32线程五tap坐标与数学参考最大差4.23855e-8像素；首个TEX理想bilinear最大差0.00012296，8bit fraction nearest候选仅2.89874e-8。首个TEX不是half输出（half取整差约0.000237）。
+- 整体重建仍未通过：此前最终RGB half仍差42/96，不能将首个TEX接近等同全采样器精确。下一步抓中央二维TEX及各tap返回值，核对二维硬件插值/累加，保持原最终RGB裁判。
+- 未部署新神经DLL；当前报告均ignored `release/native-temporal-inputs-gates`，游戏状态未修改。
+
+
 ### 2026-09-07：原版时序采样中间RGB已抓取，数学参考尚未对齐
 
 - 新增debug_native_temporal_sample.gdb，在原preblock PC1800（五点RGB重建结束、half转换前）抓warp0共32线程R47/R64/R59及PC；使用8×8受控双纹理、slot10常量0.125，CUDA-GDB运行成功，未改原CUBIN。ignored `native-temporal-inputs-gates/sample-registers.json`。
