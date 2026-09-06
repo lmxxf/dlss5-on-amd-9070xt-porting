@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD RGB512→48完整连续通过（2026-09-06）：同一会话32754正常exit0，28个shader编译/177次缓存命中；三帧fence等待2109/1984/2063ms、replay与device/fence/finite通过。下载最终output-rgb512-upsample48.f32后严格验证262144值different0/max0，SHA0ceac820a2ad341f463a771af0b9f5492148003d0062ef024f754d96eea18618，报告amd/upsample48-validation.json。重新下载五个DS文件再比对，DS0/4/8/14/22均全exact。GPU从RGB到48无CPU中间特征注入，不是拼接独立pass；但仍未完成最终RGB/游戏验收。
+
+等待期间已把宿主新增decoder49_55模式：七个NativeC64Shift(C256)、32×32、各自原权重，参数导出脚本严格核对原链输入连续性与pass。编译/部署完成，前一GPU任务退出后才启动新独立回归；当前SSH会话57124，目录native-decoder49-55，已打印ffn编译开始。第49～55块AMD结果pending，不重启同一任务。新增-C256入口与对应验证器选择，旧40～47模式保留。游戏DLL未改，目标active。
+
 原版/CPU decoder49～55连续通过（2026-09-06）：等待AMD全链期间新增check_native_decoder_c256.py，以原RGB衍生block48输出开始，逐块直接读取其各自689232-byte权重，原CUBIN ordinary C256模式执行，再以原生参考核对最终输出。shift给定0/1/3/2/0/1/3，七块各262144值different0/max0；原链每块输入来自前一块原输出，不注入CPU预测。输出有效区外零、无NaN，参数导出ffn/attention及最终oracle供AMD独立链使用。各报告在release/native-rgb512/decoder-block49..55/validation.json，scope不宣称原游戏shift调度已重新捕获。
 
 AMD全链会话32754继续运行，已观察到shader1～15完成、16 projection开始，没有终止或重启。RGB→48验证仍pending，严格AMD连续通过范围仍到39，另有独立40～47和48通过，不能拼成全链通过。游戏DLL未改。
