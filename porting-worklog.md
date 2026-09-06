@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+RGB512原第48块及AMD全链接线（2026-09-06）：prepare_native_rgb512_upsample48.py直接取已验证的原block47 outview与block22 main，给定shift0跑原block48，CPU参考对最终262144值different0/max0。报告release/native-rgb512/upsample48-shift0/validation.json；这是按当前跳接/shift合同搭建的原链，不冒称重新抓取了原游戏参数。
+
+front-chain新增rgb512up48，常驻decoder39→八个NativeSplitWindow40～47→512/256 upsample projection→C256 Swin48，跳接直接来自block22 raw-half，投影shader内FP8量化skip。中间资源全在GPU，无CPU特征注入；输出独立output-rgb512-upsample48.f32。-Chain -Upsample48显式选择，旧39模式保留。导出脚本prepare_native_rgb512_tail_gpu.py及严格验证器validate_native_rgb512_upsample48.py已加入，MinGW编译通过。
+
+已启动一次完整回归：SSH统一会话32754，AMD PID8404，启动17:22:07；查询CPU15.65625秒，shader编译日志1～4已结束。当前仍在初始化，未读回最终数据，RGB→48尚未宣布通过。下一轮继续观察此会话/进程，禁止重复启动同一测试。游戏DLL与公开包未改，目标active。
+
 第48块扩大到32×32及原block47 outview验证（2026-09-06）：空间测试增加--size32，16×16×512主/32×32×256 skip，seed2423/shift0、seed2429/shift3各262144值CPU对原版全exact。NativeVitLinear仅为512→256 decoder模式开放256-token，宽度按已验64/256-token取8/16；ViT与第39块仍限64-token。宿主upsample48wide和-Wide脚本显式选32×32，旧小尺寸模式保留。
 
 AMD独立wide测试部署native-upsample48-wide，三帧各262144值different0/max0；下载复核pass，SHA e0d3cd4d1f829f6ce1684c313c5201d63fe5983aceae2078a587881f17a8e947。报告release/native-upsample48/amd32/validation.json。该结果仍为独立随机输入，不冒称RGB全链已到48。
