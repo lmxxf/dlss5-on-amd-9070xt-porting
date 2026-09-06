@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际640token逻辑桥接映射准备
+
+- prepare_native_bridge640.py将原始forward/inverse物理映射与HWC/C512双bank及ViT逻辑位布局组合，655360项双射；独立组合原始inverse与argsort(forward逻辑映射)完全一致。
+- 仅10240项为恒等映射，不能直接把head HWC指针当ViT逻辑输入。产物ignored release/native-vit/repack640/hwc-to-vit.i32、vit-to-hwc.i32。
+- NativeVitGather允许655360条映射，保留严格双射/源buffer容量检查；完整host编译通过，GPU新桥接执行尚待验证。原完整host仍512尺寸，不能据此宣称已接成实际RGB链，未部署DLL。
+
 ### 2026-09-06：AMD post70实际1920×1152最终RGB三帧通过
 
 - run_native_post70_game.ps1显式清除DLSS5_POST_BASE_ONLY，调用生产NativePost70实际尺寸路径，不是底图直通诊断。
