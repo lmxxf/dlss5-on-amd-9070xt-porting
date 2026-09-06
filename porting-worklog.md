@@ -2863,6 +2863,18 @@ check_native_vit_qk.py先独立比较矩阵与归一化候选，保留为探索�
 
 当前CPU/原CUBIN已闭合ViT31的expand、contract、完整QKV。attention和最终projection尚待恢复，AMD连续范围仍RGB256→block30/head，游戏DLL/公开包未更新，最终画面目标active。
 
+### 2026-09-06 ViT attention：64-token数值闭合，16/32-token调用仍不作裁判
+
+新增run_native_vit_attention_probe.cpp独立调用原cc_vit_1d_attention_fp8，按0x40参数配置Q/K/V、输出及H/W，gridX32、32×4线程，输入显式零padding。16-token调用虽完整输出且memcheck0 errors，但check_native_vit_attention.py的最初候选大幅不符。probe_native_vit_attention_controls.py发现关键反例：Q=K=0、有效V=1时，当前16-token和32-token配置均输出2，64-token输出1；16-token真实Q/K＋常量V输出1～24，不能作为正确attention裁判。此处只记录这些配置的行为，不宣称已证明所有尺寸的官方限制。
+
+64-token进一步以独立随机Q/K＋常量V控制，65536值全部为1。之后使用seed2017/2027/2029三份64×1024随机输入，经已验证CPU QKV公式构造attention输入，按原物理Q/K/V排列直接提交原kernel；这是独立attention测试，不是已闭合原版64-token FFN整链。
+
+SASS恢复的exp公式与Swin不同：score先half，乘half系数0x2dbb，加1.708984375，half后clamp[1.439453125,1.9775390625]；将half bits左移4再加0x4000得到exp half。分子先FP8(exp)×FP8(V)，每K32 half累计；分母使用未FP8的exp，按token bit映射[4,0,1,3,2,5]还原tensor顺序后执行原half归约。最后分子乘half倒数再FP8，而不是先量化归一化概率。旧求和次序留下百余处差异，正确次序三份各65536值全exact，max0。
+
+新增native_vit_attention_reference.py固定已验64-token合同，其他shape明确拒绝；检查脚本只接受canonical64/exp-first规则，不以任意候选“碰巧通过”为门槛。三份均复核可复用函数成功。64-token原kernel再次memcheck0 errors，输出整份文件与普通执行逐byte相同。所有输入/oracle在release/native-vit/attention64-*，未修改权重。
+
+当前attention仅原CUBIN/CPU64-token独立测试通过；现有RGB256编码器入口为16-token，尚不能直接与此段拼成有效完整ViT，后续需更大连续夹具或进一步核对小尺寸调度。最终projection、AMD ViT及解码器仍待完成，游戏DLL/公开包未更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
