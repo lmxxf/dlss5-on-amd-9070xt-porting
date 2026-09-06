@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD实际尺寸RGB0～70整条GPU链精确通过
+
+- 完整静态测试session21947/PID39788已exit0：5帧seed0/0/0/1/0 replay_check全部pass，resident_chain=pass，处理1920×1152、有效输入1920×1080，intermediate_CPU_transfers=0。无运行任务遗留。
+- 下载此次gpu-main/down到 `release/native-rgb-valid1080/amd-full`，运行 `validate_native_valid1080_full_gpu.py` exit0：最终RGB6635520分量different=0/max_abs=0，head655360值different=0/max_abs=0，pass=true。
+- 这是同一RGB从反射输入经encoder、640token ViT、所有decoder跳接直到post70的真正GPU直连数值闭合，不再只是分段。原版/CPU参考由此前同源各段构成，post底图使用反射合同。
+- 仍不可称游戏目标完成：本轮仅A输入及seed变化，尚未跑已编译的A/A/B/A/A动态RGB测试；未证明实际游戏多纹理/post边界及最终呈现。旧游戏DLL与公开zip未更新。
+- 下一步部署动态测试版本（本地 `/tmp/native-frontdynamic-test.exe`，B=`alternate/input.f32`）保留本次静态结果，再将管线接入游戏提交/呈现链。注意冷初始化很慢，需改进重复shader编译的缓存依赖管理或保留初始化实例，不能伪报为每帧速度。
+
+
 ### 2026-09-07：动态B输入及可回查输出准备完成，未运行
 
 - 新增 `prepare_native_valid1080_alternate.py`，从同源A仅对RGB做水平翻转，alpha逐值不变，确认有限值及RGB确实不同；输出ignored `release/native-rgb-valid1080/alternate/input.f32`，provenance记录A/B SHA与变换。此为受控空间变化，不是实际游戏第二帧，尚无B原版oracle。
