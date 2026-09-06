@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：融合平方修复同步C32/ViT与C32前端GPU回归
+
+- preblock_attention_core.hlsl及native_vit_qkv.hlsl的norm pair使用共用NativeHalfSquarePair，stage脚本允许.hlsli依赖复制。
+- 更新远端C32 shader/include后valid1080 reflect→0～4五帧重放/seed变化通过；最终main17694720值、down8847360值仍与原始oracle零差异。
+- ViT QKV同步尚未GPU回归；新include需与shader同时部署，不将部分回归扩大为全网络通过。未部署游戏DLL。
+
 ### 2026-09-07：AMD通用融合平方舍入修复，最小窗口三帧通过
 
 - native_half_square.hlsli利用half平方在float32精确表示及FastTwoSum残差，保留sum丢失小项；仅遇half中点时按残差判方向，覆盖65520溢出边界。无需double或像素特例。

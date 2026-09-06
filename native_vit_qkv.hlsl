@@ -12,11 +12,12 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  output[id.x]=total;
 }
 uint tensor_channel(uint c){return ((c&1)<<1)|((c&2)>>1)|((c&4)<<2)|((c&8)>>1)|((c&16)>>1);}
+#include "native_half_square.hlsli"
 [numthreads(64,1,1)]void normalize(uint3 id:SV_DispatchThreadID){
  if(id.x>=tokens*96)return;uint part=id.x/(tokens*32),token=(id.x/32)%tokens,head=id.x%32,base=(part*tokens+token)*1024+head*32;
  if(part==2){[unroll]for(uint c=0;c<32;c++)output[base+c]=F(input[base+c]);return;}
  float v[32],s[16];[unroll]for(uint c=0;c<32;c++)v[tensor_channel(c)]=input[base+c];
- [unroll]for(uint i=0;i<16;i++)s[i]=H(v[i]*v[i]+H(v[i+16]*v[i+16]));
+ [unroll]for(uint i=0;i<16;i++)s[i]=NativeHalfSquarePair(v[i],v[i+16]);
  [unroll]for(uint i=0;i<8;i++)s[i]=H(s[i*2]+s[i*2+1]);
  [unroll]for(uint width=4;width>0;width/=2){[loop]for(uint i=0;i<width;i++)s[i]=H(s[i]+s[i+width]);}
  float inverse=H(rsqrt(max(s[0],6.198883056640625e-5)));
