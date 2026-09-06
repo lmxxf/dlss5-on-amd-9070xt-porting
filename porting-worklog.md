@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8差异集中单像素，排除DS主分支变体
+
+- 重跑定位3差异均y46/x18，通道11原始.09375/参考.0625、31原始.234375/参考.25、61原始-4.5/参考-5。
+- 同一block7输入、block8权重和shift2，运行原始普通C64 kernel，主输出与原始DS kernel字节级零差异。compare_block8_kernel_variants.py保存variant-comparison.json。
+- 说明该样本不是DS主分支版本差异，下一步定位单窗口参考算术；仍未block8/down完整通过，不拟合像素修正，未部署DLL。
+
 ### 2026-09-06：valid1080 C64主分支5～7精确，8仍有3值差异
 
 - validate_native_valid1080_c64.py按已验证global16低通道位交换解码block4-down，实际480×288依次验证5～8。
