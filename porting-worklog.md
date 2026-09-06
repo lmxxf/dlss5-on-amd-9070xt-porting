@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：运动图→坐标→采样→preblock全GPU直连精确通过
+
+- 主host新增DLSS5_TEST_TEMPORAL_MOTION，必须有history，当前限定valid=processing；读原始motion float4，GPU NativeTemporalCoordinates输出直接接NativeTemporalSample，再接preblock t3。此模式不读取temporal-coordinates文件或CPU重建RGB。
+- 8×8同源history/当前RGB、slot10常量0.125，显式全尺寸identity motion subrect及1/width,height scale，与原版both_shifted一致。五帧seed0/0/0/1/0重放通过，session89551 exit0。
+- 下载独立 `release/native-temporal-inputs-gates/amd-motion`，validator新增--motion：main2048/down512值different=0/pass=true。已闭合该受控无slot18路径的整个GPU前端，不再只是分段。
+- 尚需非恒定motion整体、其它尺寸/实际1080p及有效区padding、history生命期和游戏实景。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：AMD运动坐标GPU原版对照三次精确通过
 
 - 新增NativeTemporalCoordinates封装，显式校验valid/processing/motion尺寸、容量、单次反射范围、同device及有限transform，输出HWC float2可直接接NativeTemporalSample。
