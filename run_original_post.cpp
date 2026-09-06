@@ -28,12 +28,21 @@ static std::vector<unsigned char> read_file(const char *path, size_t bytes) {
     return result;
 }
 
+static std::vector<unsigned char> read_native(const char*path,size_t capacity,size_t valid){
+    std::ifstream f(path,std::ios::binary|std::ios::ate);
+    if(!f)std::exit(2);auto n=f.tellg();
+    if(n<=0||size_t(n)>capacity||size_t(n)<valid)std::exit(2);
+    std::vector<unsigned char>v(capacity,0);f.seekg(0);if(!f.read((char*)v.data(),n))std::exit(2);
+    if(!std::all_of(v.begin()+valid,v.end(),[](unsigned char x){return x==0;}))std::exit(2);
+    return v;
+}
+
 int main(int argc, char **argv) {
     if (argc < 11 || argc > 15) {
         std::fprintf(stderr,
             "usage: %s cubin symbol main skip weights blend color output "
             "width height [texture-mask=1] [rgb-mode=1] [input-scale=0.03125] "
-            "[features]\n",
+            "[features|native]\n",
             argv[0]);
         return 2;
     }
@@ -48,15 +57,17 @@ int main(int argc, char **argv) {
     const float input_scale = argc > 13 ? std::strtof(argv[13], nullptr)
                                         : 0.03125f;
     const bool feature_mode = argc > 14 && !std::strcmp(argv[14], "features");
-    if (argc > 14 && !feature_mode) return 2;
+    const bool native_mode = argc > 14 && !std::strcmp(argv[14], "native");
+    if (argc > 14 && !feature_mode && !native_mode) return 2;
+    if(native_mode&&(width<16||height<16||width>512||height>512||width%16||height%16))return 2;
     if (width <= 0 || height <= 0) {
         std::fprintf(stderr, "invalid dimensions %dx%d\n", width, height);
         return 2;
     }
 
-    constexpr size_t activation_bytes = 320 * 1024 * 1024;
-    auto main_view = read_file(argv[3], activation_bytes);
-    auto skip_view = read_file(argv[4], activation_bytes);
+    const size_t activation_bytes = native_mode?size_t(width)*height*32+65536:320*1024*1024;
+    auto main_view = native_mode?read_native(argv[3],activation_bytes,size_t(width)*height*8):read_file(argv[3], activation_bytes);
+    auto skip_view = native_mode?read_native(argv[4],activation_bytes,size_t(width)*height*32):read_file(argv[4], activation_bytes);
     auto weights = read_file(argv[5], 21808);
     auto blend = read_file(argv[6], 2);
     auto rgba = read_file(argv[7], static_cast<size_t>(width) * height * 16);
@@ -77,6 +88,7 @@ int main(int argc, char **argv) {
     check("alloc skip", cuMemAlloc(&skip_device, skip_view.size()));
     check("alloc weights", cuMemAlloc(&weights_device, weights.size()));
     check("alloc blend", cuMemAlloc(&blend_device, 512));
+    check("clear blend", cuMemsetD8(blend_device,0,512));
     check("copy main", cuMemcpyHtoD(main_device, main_view.data(), main_view.size()));
     check("copy skip", cuMemcpyHtoD(skip_device, skip_view.data(), skip_view.size()));
     check("copy weights", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
@@ -125,8 +137,8 @@ int main(int argc, char **argv) {
         &texture, &texture_resource, &texture_options, nullptr));
 
     alignas(8) unsigned char params[0xb8]{};
-    const CUdeviceptr main_pointer = main_device + 0x2800;
-    const CUdeviceptr skip_pointer = skip_device + 0x2800;
+    const CUdeviceptr main_pointer = main_device + (native_mode?0:0x2800);
+    const CUdeviceptr skip_pointer = skip_device + (native_mode?0:0x2800);
     std::memcpy(params + 0x00, &main_pointer, 8);
     std::memcpy(params + 0x08, &skip_pointer, 8);
     std::memcpy(params + 0x10, &output_surface, 8);
@@ -145,6 +157,13 @@ int main(int argc, char **argv) {
     const unsigned long long live_tail[3] = {
         0x3988888900000000ull, 0x00000f0039f2b9d6ull, 0x870ull};
     std::memcpy(params + 0xa0, live_tail, sizeof(live_tail));
+    if(native_mode){
+        const float transform[]={0,0,float(width),float(height),1.0f/width,1.0f/height};
+        std::memcpy(params+0x40,transform,sizeof(transform));
+        const float inv_width=1.0f/width,inv_height=1.0f/height;
+        std::memcpy(params+0xa4,&inv_width,4);std::memcpy(params+0xa8,&inv_height,4);
+        std::memcpy(params+0xac,&width,4);std::memcpy(params+0xb0,&height,4);
+    }
 
     void *arguments[] = {params};
     std::vector<float> output(static_cast<size_t>(width) * height * 4);

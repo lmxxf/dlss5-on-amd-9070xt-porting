@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD RGB512→69完整连续通过（2026-09-06）：同一会话32104正常exit0；31个shader编译、228次缓存命中，三帧提交至fence等待2390/2329/2390ms，device/fence/finite/replay检查通过。下载最终block69结果后2097152值different0/max0，SHA b9ce77048ae6064b165fd423df82d3072126fe839ab925b46253a6938dbf5d4a；报告amd/tail69-validation.json为pass。五份DS读回重新下载比较，DS0/4/8/14/22也全exact。此前未独立GPU验证的63～65和67～69现在被该连续链最终检查覆盖，但不声称逐块GPU中间读回全做过。
+
+第70块原版小尺寸入口（2026-09-06）：旧post probe要求main/skip各320MiB且硬编码4K纹理坐标、指针+0x2800，不适合新紧凑夹具。新增显式native模式，限制16～512的16倍数尺寸，按尺寸分配buffer，输入有效区外必须零，原数据指针从buffer起点，纹理尺寸/倒数和输出rect按实际尺寸设置；旧features与默认模式仍保留，blend额外空间确定性清零。该模式尚非完整参数合同证明。
+
+check_native_post70_smoke.py直接提取21808-byte原权重（SHA197024afb1f78602dc08cfd5ae87c413385237c5f537dd5dcfeae742be85eca8）及2-byte blend（SHA1ee636d657c0e4bc41b1f1efe5a2007be7a8fbf8b0267bb26298039f6d0c2cfb），16×16恒RGB0.25、零main/skip原post正常返回，全部RGBA有限，RGB逐值等于底图。报告release/native-post70/smoke/validation.json为zero_smoke_pass；只证明零特征下的底图路径，不证明神经输出生效或最终RGB移植。下一步使用非零特征恢复原输出头，游戏DLL未改，目标active。
+
 AMD RGB→69全链接线完成、回归运行中（2026-09-06）：新增NativeDecoderTail69，常驻接49～55(C256)、56投影/主体、57～61(C128)、62投影/主体、63～65(C64)、66 half合流/C32主体、67～69(C32)。输入来自GPU block48，skip分别来自GPU block14、block8、block4，Record不读文件、不注入CPU特征。只支持已建立裁判的RGB512几何与当前给定shift配置。
 
 front-chain增加rgb512tail69及-Tail69入口，原较短模式保留；导出脚本严格检查对应原版/CPU各段pass，严格最终验证器独立写tail69-validation.json。MinGW编译通过，部署实验目录native-rgb512，游戏DLL未改。已启动唯一完整回归：SSH统一会话32104、AMD PID18196，启动18:09:59；查询CPU21.46875秒，shader1～8已完成，尚未最终读回，不能宣称RGB→69通过。下一轮继续观察同一会话/进程，不因无新输出重复启动。第70块及游戏画面验收仍未完成，目标active。
