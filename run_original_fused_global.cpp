@@ -41,7 +41,8 @@ int main(int argc, char **argv) {
     auto weights = read_file(argv[2]), input = read_file(argv[3]);
     int width=std::atoi(argv[7]),height=std::atoi(argv[8]),gx=std::atoi(argv[9]),gy=std::atoi(argv[10]),by=std::atoi(argv[11]),mode=std::atoi(argv[12]),shift=std::atoi(argv[13]);
     const bool game62=mode==9&&width==480&&height==288&&by==2;
-    const size_t arena_size=std::max<size_t>((game62?16:8)*1024*1024,(input.size()+65535)&~65535ull); std::vector<unsigned char> host(arena_size);
+    const bool game66=mode==10&&width==960&&height==576&&by==1;
+    const size_t arena_size=std::max<size_t>((game66?32:game62?16:8)*1024*1024,(input.size()+65535)&~65535ull); std::vector<unsigned char> host(arena_size);
     check("init",cuInit(0)); CUdevice device; check("device",cuDeviceGet(&device,0)); CUcontext context; check("context",cuDevicePrimaryCtxRetain(&context,device)); check("current",cuCtxSetCurrent(context));
     CUmodule module; check("module",cuModuleLoad(&module,argv[1])); CUfunction function; check("function",cuModuleGetFunction(&function,module,argv[6]));
     CUdeviceptr di,doo,dw,aux; check("input alloc",cuMemAlloc(&di,arena_size)); check("output alloc",cuMemAlloc(&doo,arena_size)); check("weight alloc",cuMemAlloc(&dw,(weights.size()+65535)&~65535ull)); check("aux alloc",cuMemAlloc(&aux,arena_size));
@@ -60,7 +61,7 @@ int main(int argc, char **argv) {
     // Native multihead upsample: +0x18 skip pointer, +0x20 output H/W,
     // +0x28 window offsets. Input is half-resolution with twice the channels.
     if(mode==9||mode==10){
-        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||((width>(mode==10?256:128)||height>(mode==10?256:128))&&!game62&&!(mode==9&&width==240&&height==144&&by==4))||(mode==10?by!=1:(by!=2&&by!=4&&by!=8))||shift<0||shift>3)return 2;
+        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||((width>(mode==10?256:128)||height>(mode==10?256:128))&&!game66&&!game62&&!(mode==9&&width==240&&height==144&&by==4))||(mode==10?by!=1:(by!=2&&by!=4&&by!=8))||shift<0||shift>3)return 2;
         auto skip=read_file(argv[14]);if(skip.size()>arena_size)return 2;
         check("clear input",cuMemsetD8(di,0,arena_size));check("input upload",cuMemcpyHtoD(di,input.data(),input.size()));
         check("clear skip",cuMemsetD8(aux,0,arena_size));check("skip upload",cuMemcpyHtoD(aux,skip.data(),skip.size()));
