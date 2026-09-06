@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际decoder63～65三层GPU链通过
+
+- host新增decoder63_65_game，480×288 C64、shift3/1/2，三层生产NativeC64Shift GPU资源直接串联。
+- RX9070XT三帧最终8847360值零差异，finite/device/fence/replay通过，gpu.f32回读cmp原始oracle-0一致。
+- ignored release/native-decoder-game-c64/amd-decoder63-65。后续66～70、真实RGB全链和游戏最终画面尚未验证，未部署DLL。
+
 ### 2026-09-06：原始decoder63～65实际480×288对照通过
 
 - 普通decoder参考支持C64 game extent480×288，从原始block62输出顺序运行63～65，实际shift3/1/2。
