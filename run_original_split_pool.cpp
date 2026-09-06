@@ -15,6 +15,7 @@ int main(int argc,char**argv){
  const size_t capacity=4*1024*1024;auto att=read(argv[1],capacity,false),ffn=read(argv[2],capacity,false),weights=read(argv[3],263168,true);
  ck(cuInit(0));CUdevice device;ck(cuDeviceGet(&device,0));CUcontext context;ck(cuDevicePrimaryCtxRetain(&context,device));ck(cuCtxSetCurrent(context));CUmodule module;ck(cuModuleLoad(&module,"/tmp/dlssnr-cubins/dlssnr-04.cubin"));CUfunction function;ck(cuModuleGetFunction(&function,module,"cc_split_swin_16h_proj_pool_512_fp8"));
  CUdeviceptr buffers[5];for(int i=0;i<5;i++){ck(cuMemAlloc(&buffers[i],capacity));ck(cuMemsetD8(buffers[i],0,capacity));}
+ if(std::getenv("DLSS5_POOL_POISON_OUTPUT"))ck(cuMemsetD8(buffers[3],0x38,capacity));
  ck(cuMemcpyHtoD(buffers[0],att.data(),capacity));ck(cuMemcpyHtoD(buffers[1],ffn.data(),capacity));ck(cuMemcpyHtoD(buffers[4],weights.data(),weights.size()));
  // Metadata: one 0x50-byte parameter. SASS loads views 0/8, stores 16/24,
  // weights at 32, full extent at 64/68 and pooled extent at 72/76.

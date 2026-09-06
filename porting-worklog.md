@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：pool有效区及非零预填边界控制通过
+
+- 新check_native_pool_game_extent.py构造36×60×512非零随机FFN、attention零、identity skip系数，按实际pooled20×32运行原kernel。
+- main有效输出与输入一致；pool前18×30与原生半精度2×2求和均值逐值一致，底部2行/右侧2列均零。
+- 为排除初始清零掩盖未写边缘，caller增加DLSS5_POOL_POISON_OUTPUT=1，将整个pool输出先填FP8 1.0；再次测试仍有效区零差异、边缘全零，证明此控制下kernel实际覆盖补齐区。最后报告poison_output=true。
+- ignored release/native-c512/pool-game-extent，真实projection权重和非零attention尚待测试；不是完整pool/head或AMD验收。未更新游戏DLL。
+
 ### 2026-09-06：pool显式输入输出尺寸合同确认
 
 - launch0055参数0x40四整数为H/W=36/60、pooledH/W=20/32，直接证明原调度器指定补齐后的输出，不是固定h/2,w/2。
