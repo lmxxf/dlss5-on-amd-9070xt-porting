@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD post70实际尺寸入口与fixture准备
+
+- NativePost70允许明确1920×1152，test新增game模式，按实际尺寸检查main/skip/color/oracle长度。dispatch为34560像素组×planes、C32body34560组，低于65535限制。
+- prepare_native_post70_gpu.py --game-extent核对6635520值原始零差异/finite，导出原始输入及直接解码系数到ignored release/native-post70/amd-game。
+- 编译与diff检查通过，尚未执行实际尺寸AMD post70，整数输出头范围在此fixture也尚待GPU验证。未部署游戏DLL。
+
 ### 2026-09-06：post70实际1920×1152最终RGB逐值通过
 
 - check_native_post70_game.py以16行对齐条带调用原生参考，post shift0的8×8窗口不跨条带，降低内存占用而不改变计算；保留每条带结果。

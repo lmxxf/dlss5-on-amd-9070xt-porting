@@ -21,7 +21,7 @@ public:
  NativePost70()=default;NativePost70(const NativePost70&)=delete;
  ~NativePost70(){for(auto*r:{main_input,skip_input,color_input,merged,output,coefficients[0],coefficients[1]})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f){
-  if(main_input||!d||!main||!skip||!color||width<16||height<16||width>512||height>512||width%16||height%16||scales.size()!=64||head.size()!=96)throw std::runtime_error("post70 contract");
+  if(main_input||!d||!main||!skip||!color||width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16||scales.size()!=64||head.size()!=96)throw std::runtime_error("post70 contract");
   UINT64 pixels=UINT64(width)*height;
   if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<pixels*32*4||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
   main_input=main;skip_input=skip;color_input=color;for(auto*r:{main_input,skip_input,color_input})r->AddRef();geometry[0]=width;geometry[1]=height;std::memcpy(&geometry[2],&input_scale,4);
