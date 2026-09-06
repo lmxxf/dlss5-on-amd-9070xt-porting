@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际decoder40～47原始整链对照通过，AMD入口准备
+
+- 继续原始41输出顺序运行42～47，实际shift1/2/0/3/1/2，六层各四阶段全部零差异；连同40/41共32阶段通过，覆盖60×36四种移位。
+- prepare_native_decoder_split_gpu.py --game-extent检查每层输入来源与实际移位，导出最终block47 oracle及八层系数，ignored release/native-decoder-game-split/amd-decoder40-47。
+- AMD host增加decoder40_47_game模式，使用60×36与实际移位表，旧实验默认行为保留；编译通过，尚未运行这个八层GPU链。未更新游戏DLL。
+
 ### 2026-09-06：AMD60×36部分窗口shift0/3三帧通过
 
 - 使用现有d3d12_native_split_window_test.cpp显式60 36 shift入口，无需修改生产NativeSplitWindow。

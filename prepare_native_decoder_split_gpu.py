@@ -1,9 +1,11 @@
 """Export the verified original decoder40..47 chain without model corrections."""
 from pathlib import Path
-import json
-root=Path('release/native-rgb512');out=root/'amd-decoder40-47';out.mkdir(exist_ok=False)
-previous=root/'decoder39-original.output.fp8'
-for block,shift in zip(range(40,48),[0,1,3,2,0,1,3,2]):
+import json,argparse
+p=argparse.ArgumentParser();p.add_argument('--game-extent',action='store_true');a=p.parse_args()
+root=Path('release/native-decoder-game-split' if a.game_extent else 'release/native-rgb512');out=root/'amd-decoder40-47';out.mkdir(exist_ok=False)
+previous=Path('release/native-decoder-game/result.output.fp8') if a.game_extent else root/'decoder39-original.output.fp8'
+shifts=[0,3,1,2,0,3,1,2] if a.game_extent else [0,1,3,2,0,1,3,2]
+for block,shift in zip(range(40,48),shifts):
     source=root/f'decoder-block{block}';report=json.loads((source/'validation.json').read_text())
     assert report['status']=='pass' and report['shift']==shift and Path(report['input'])==previous
     assert len(report['checks'])==4 and all(c['different']==0 for c in report['checks'])
