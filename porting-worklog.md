@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：自有提交器在AMD纹理写回测试实测通过
+
+- `d3d12_native_game_output_test.cpp` 改用NativeGameSubmission，移除原测试自行管理的allocator/list/fence逻辑；每帧先提交R10写入，再单独提交纹理回读，A/A/B/A/A共10次自有命令提交。
+- AMD执行session79963 exit0：五帧各2073600像素different=0，owned_submit=10，证明提交器正常路径的fence完成、allocator重用、跨提交资源状态与结果保持。异常/timeout保留分支未故障注入测试，不称已验收。
+- 构建及diff检查通过。该测试使用实验室DIRECT queue，不证明游戏输入producer提交时序；下一步接入已提交游戏帧的呈现生命周期与完整网络。游戏DLL未更新，无运行任务遗留。
+
+
 ### 2026-09-07：游戏queue上的自有分段提交器初稿
 
 - 新增 `native_game_submission.h`，接收调用方DIRECT queue，从queue取得device，拥有独立allocator/list/fence/event。每段提交并验证device/fence后才允许重置；不Close/Reset游戏列表、不擅自创建另一条游戏推理queue。
