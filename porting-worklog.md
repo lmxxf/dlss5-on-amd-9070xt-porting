@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+真实移位AMD完整RGB512回归通过（2026-09-06）：继续观察原会话36919，正常exit0，PID31832已不存在；33个shader编译/228缓存命中，三帧fence等待2406/2469/2281ms，device/fence/finite/replay通过。下载至native-runtime-rgb512/amd后，对新配置原最终oracle的786432个RGB分量different0/max0，SHA bd52c601b68c4ed27f271cd2c7bcffc8511519f652534f2a0c51ffa9450e6da4；变化大于1e-5的分量786294。新旧配置完整分开，未重启或复用旧pass。
+
+为扩大ViT token合同，新增check_native_vit_extent_control.py，原非chained attention在128-token(16×8)与256-token(16×16)、Q=K=0/V=1控制下，分别131072/262144个有效FP8输出全为1，尾部全零，无NaN。每次调用有15秒进程上限，全部正常返回。仅证明这两个长度的均匀控制，不等于随机attention、非整数窗口长度、整层ViT或AMD扩展已通过。结果在release/native-vit/extent-control-128/256。下一步恢复可变长度attention及原1080p形状；游戏神经DLL未更新，目标active。
+
 真实移位AMD整网回归启动（2026-09-06）：check_native_runtime_shift_consistency.py逐项核对原捕获decoder40～69、C++表与新原/CPU报告，30块全部一致，第70块原final报告pass。验证器支持独立decoder-root并保留encoder-root。新exe编译完成。
 
 stage_native_runtime_rgb512.ps1建立独立AMD实验目录native-runtime-rgb512，只复制输入、系数、shader、索引等必要文件，排除output/audit/gpu/lut及JSON报告；现场查询无oracle文件。原native-rgb512目录和本地旧配置结果保留。唯一回归已启动：统一会话36919，PID31832，20:07:18启动；CPU38.53125秒，shader1～8完成、第9开始。尚未读回最终RGB，不宣布新配置GPU通过。下一轮继续观察同一进程，不重复启动。游戏神经DLL未更新。
