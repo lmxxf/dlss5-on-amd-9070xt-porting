@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD最终R10纹理复制动态逐像素通过
+
+- 新增 `d3d12_native_game_output_test.cpp`，实际GPU RGB打包→CopyTextureRegion至R10纹理→texture回读。输入为整数/2048，含clamp范围外、量化中点，底部padding设独立哨兵；CPU用整数公式 `(clamp(n)*1023+1024)/2048` 计算期待值，检查全部RGB位与alpha位。
+- A/A/B/A/A五次各2073600个packed像素different=0，设备及fence检查通过，session16244已exit0。目标状态COPY_SOURCE在每次Record后恢复、packed重复UAV转换也经过实际重放。
+- 这证明受控R10纹理写入、1080p裁剪和格式量化；不证明游戏颜色空间/主swapchain呈现。代码编译通过，无遗留运行任务，游戏DLL未更新。
+- 下一步必须把已验证的输入/神经网络/输出组件与游戏queue生命周期整合，并对实际游戏取图位置和颜色空间作现场核验；不以此纹理测试代替游戏目标。
+
+
 ### 2026-09-07：最终RGB→R10纹理复制组件完成，待GPU验证
 
 - 新增 `native_game_rgb_output.h`，从1920×1152浮点RGB buffer生成前1080行R10 packed数据，以7680字节footprint CopyTextureRegion至同device的1920×1080 R10G10B10A2_UNORM纹理。
