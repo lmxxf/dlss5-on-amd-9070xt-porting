@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：Q缩放次序候选核对
+
+- 原始SASS 0x4e00/4ea0等显示先乘归一化倒数再乘scale，两个HMUL2；与当前参考的两次half舍入一致。
+- check_block8_qscale_order.py测试先合并scale/inverse及单次舍入，分别导致27/38个attention差异，均劣于基线9；不将更改顺序用作修复。
+- 保存ignored window46-18/qscale-order.json。下一步仍需原始Q/K中间值验证；未改生产公式、未部署DLL。
+
 ### 2026-09-07：参考得分重放定位差异至QK得分生成
 
 - isolate_block8_score_replay.py在identity projection诊断副本仅清零第二head的Q矩阵，将参考half QK+bias得分按原bias布局写入第二head bias，其余FFN/K/V和第一head保持。
