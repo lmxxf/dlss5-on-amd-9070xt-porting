@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际query输入的近似倒数指令控制
+
+- probe_normalize_intrinsics.cu使用PTX rcp.approx.ftz/rsqrt.approx.ftz，对最小窗口参考Q/K平方和及softmax分母运行本地sm121 GPU。
+- check_block8_intrinsics.py比较GPU近似结果转half与CPU参考转half，全部相同，different_half_results0。未证明原kernel中间值相同，但排除在这些已给定输入上近似指令half舍入不同的候选。
+- 结果ignored window46-18/intrinsic-comparison.json；仍需获取原始Q/K或概率中间值，未改生产算法、未部署DLL。
+
 ### 2026-09-06：query0～31原始归约树追踪
 
 - trace_c64_softmax_partials.py --first-half从0x4070～5aa0追踪bias，再按对应partial寄存器和已核对SEL/SHFL构造query0～31树，各query64keys各一次。
