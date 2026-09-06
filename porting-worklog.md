@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：尾段连续来源oracle推进到block61
+
+- block56测试支持--main-hwc/--output-root，用已验证原始block55的oracle.f32作为主输入，不再重置随机main；skip仍固定独立随机seed3014，非真实encoder14跳接。
+- block55→56放大及56→57～61连续原始链逐层零差异，各C128输出4423680值；新产物ignored release/native-decoder-tail-game，不覆盖旧独立fixture。
+- 该连续链目前从原始block48随机fixture起，未接RGB encoder，尚未AMD49～69整段验收或游戏部署。
+
 ### 2026-09-06：decoder49～69整段类接入实际尺寸
 
 - NativeDecoderTail69新增game_extent明确配置：输入120×72 C256，后续240×144 C128、480×288 C64、960×576 C32；默认仍旧RGB512配置。
