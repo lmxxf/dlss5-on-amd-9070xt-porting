@@ -4,6 +4,9 @@
 // Lab setup copies the unmodified production shader to this name first.
 #include "native_temporal_production.hlsl"
 #undef main
+#ifndef TEMPORAL_DIAGNOSTIC_OFFSET
+#define TEMPORAL_DIAGNOSTIC_OFFSET 0
+#endif
 float2 tap_uv(float2 xy) {
     precise float2 normalized=xy*float2(inverse_width,inverse_height);
     precise float2 pixel=float2(
@@ -14,10 +17,11 @@ float2 tap_uv(float2 xy) {
 }
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID) {
-    if(id.x>=count/4)return;
+    if(id.x>=count/4||id.x+TEMPORAL_DIAGNOSTIC_OFFSET>=count)return;
+    uint pixel_index=id.x+TEMPORAL_DIAGNOSTIC_OFFSET;
     float3 px,py,wx,wy;
-    axis(coordinates[id.x].x,width,px,wx);
-    axis(coordinates[id.x].y,height,py,wy);
+    axis(coordinates[pixel_index].x,width,px,wx);
+    axis(coordinates[pixel_index].y,height,py,wy);
     reconstructed[4*id.x]=float4(tap_uv(float2(px.y,py.x)),tap_uv(float2(px.x,py.y)));
     reconstructed[4*id.x+1]=float4(tap_uv(float2(px.y,py.y)),tap_uv(float2(px.y,py.z)));
     reconstructed[4*id.x+2]=float4(tap_uv(float2(px.z,py.y)),wx.x,wx.y);

@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：新窗口坐标/权重全一致，但CPU纹理规则亦失败，定位TEX模型反例
+
+- 新增capture_native_temporal_remaining.py，session19768完成原block(4,6)/warp1的PC10d0、1590、1800三个捕获，保留block4-row6-warp1。AMD已保存的motionfma UV与原64值全一致；accumfma sampler回读仅lane20（x36,y54）的RGB三个half不同，lane29/x37,y55本身采样half相同，后续网络会传播邻域影响。
+- tap诊断支持编译期offset，新增6240偏移wrapper读取y52起区域；session37527读回该窗口512个UV/权重，与原PC1590全部bit-exact。check_native_gpu_temporal_taps.py增加--remaining，默认旧窗口验证保留。
+- check_native_captured_temporal_taps.py增加--remaining：用原捕获UV/权重和现有21bit trunc/8bit插值规则在CPU重建，仍有3个half差异、max_abs=0.00307965。这是当前纹理数值模型的新反例；先前旧窗口全一致不能推广为所有UV区间。下一步应抓五个TEX返回值、独立ramp扫该lane，修正插值/坐标量化模型，不再盲改已对齐的坐标和权重。
+- 本轮不改生产sampler/游戏DLL；完整120×72仍45/14，游戏动态验收未完成。
+
 ### 2026-09-07：原问题窗口tap全512值一致，剩余错误转向y55区域
 
 - 配套当前motion、sampler与tap诊断shader，session48749实际回读block14 warp1的512个UV/权重值与原PC1590全部bit-exact；证据gpu-taps-motionfma.f32/validation.json。此前被反复追踪的lane1/9座标偏差已修复，但仅限该捕获窗口。
