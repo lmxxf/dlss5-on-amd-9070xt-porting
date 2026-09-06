@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第70块首个空间随机数值闭合（2026-09-06）：check_native_post70_spatial.py生成seed2801，8×8×32主特征/16×16×32 skip随机FP8、底图恒RGB0.25，枚举有依据的少量物理布局与合流舍入。正确候选为main global16且不交换低两位（不同于multihead upsample输入），skip cell/preblock两种编码本夹具等价，合流H(H(main*scale_main)+skip*scale_skip)。普通半精度点积末次舍入时，768个RGB分量仅1个不同、max9.5367431640625e-7；仍按失败处理，不放宽标准。
+
+check_native_post70_hmma.py在同一份保存的原输出上，把最后两个K16的half矩阵积改成已测的操作数指数和对齐、27位向零截断乘积、加入前一half accumulator后half RNE。该1处差异消失，768个RGB值different0/max0，报告spatial-2801/hmma-validation.json。没有修正某个输出值或拟合系数；但仅验证当前单夹具，非普遍HMMA accumulator语义证明，仍需独立种子/较大尺寸及动态底图测试。
+
+所有原调用正常退出，数据保存在release/native-post70/spatial-2801，各布局/舍入反例也保留。AMD第70块尚未实现，游戏DLL未改，目标active。
+
 第70块常量输入精确数值候选（2026-09-06）：原SASS显示最终三个分量乘params+0x30，rgb_mode非零时再*8+0.5并clamp；blend读取和第四分量的非线性混合依赖可选纹理分支，当前texture_mask1夹具未启用该分支。不能把这条简化路径等同所有游戏后处理模式。
 
 check_native_post70_candidates.py从原记录直接重组C32主体：前0x2050保留，普通QKV及后段0x2060起来自原0x20d0..0x5130；main/skip系数为0x2050/0x2090处各32个half，按C32 FFN通道序。尾部FP16候选矩阵input bits=[0,1,3,4,8]、output bits=[2,5,6,7]，使用行0/2/4作当前RGB。主体不移位，合流保留half，主体final也raw-half，最后两K16 half累计，再按当前0.03125倍率转RGB。
