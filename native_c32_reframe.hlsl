@@ -11,3 +11,8 @@ cbuffer Geometry:register(b0){uint width;uint height;uint work_width;uint work_h
  uint p=id.x;if(p>=width*height)return;uint x=p%width+shift_x,y=p/width+shift_y;
  [unroll]for(uint c=0;c<32;c++)destination[p*32+c]=source[(y*work_width+x)*32+c];
 }
+[numthreads(64,1,1)]void crop_raw(uint3 id:SV_DispatchThreadID){
+ uint p=id.x;if(p>=width*height)return;uint x=p%width+shift_x,y=p/width+shift_y;
+ uint tile=(y/8)*(work_width/8)+x/8,offset=(tile*64+(y%8)*8+x%8)*32;
+ [unroll]for(uint c=0;c<32;c++)destination[p*32+c]=source[offset+c];
+}

@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第70块原生模块实现待验（2026-09-06）：NativeC32Stage新增默认false的raw_output选项，使用RawTiles加crop_raw转换为HWC，不经过main的FP8量化；旧调用默认保持不变。新增NativePost70，常驻main/skip half合流→raw-half C32主体→FP16 head→RGB浮点合成，Record无CPU读回/文件读取。接口仅接受16～512、16倍数尺寸和像素对齐RGBA底图，限定已恢复的texture_mask1/rgb_mode1，不含可选混合纹理。
+
+native_post70.hlsl按实测27位对齐实现两个K16 half矩阵积，包含accumulator指数+1及double→half精确捨入；RGB编码/加残差/解码保留float32边界。merge/finish用二维Dispatch分摊32/3个输出平面，避免512幅面merge超过65535个X组。C++语法检查（包含完整front-chain）及diff检查通过，HLSL编译和AMD数值运行尚未执行，不能宣布第70块移植通过。下一步建立独立宿主，使用原512随机夹具直接比较最终RGB。游戏DLL未改，目标active。
+
 第70块512×512变化底图参考通过（2026-09-06）：先对seed2819保持同一神经特征，换逐像素RGB渐变底图，768个RGB值全exact。新增native_post70_reference.py，明确仅texture_mask1/rgb_mode1，不含可选混合纹理分支；以固定记录直接解码主体/系数/FP16头，批量处理避免全幅乘积临时数组爆大。新测试64×64/seed2833、随机主/skip及变化底图的12288个RGB值全exact。
 
 首次512×512/seed2843有31/786432值不同、max1.9073486328125e-6，原fail报告保留。离线累加消融发现第二个K16的对齐指数必须同时考虑frexp(accumulator).exponent+1，相当于将accumulator×1也纳入操作数指数和的最大值；只考虑乘积、或只加accumulator指数本身均仍31差。加入+1后原失败夹具全部RGB exact。是否另截断acc在这些输入上无区分，未冒称已证明所有极端范围。
