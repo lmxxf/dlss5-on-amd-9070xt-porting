@@ -2975,6 +2975,8 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第39块恢复审计（2026-09-06）：audit_native_decoder_entry.py直接读取原DLL记录并检查CUBIN非tilesync入口，不运行GPU。实测payload为525312 bytes，SHA256 e7fa32bd2a8fe680eb90cfddbae7492ffedbb87fd7284cc229a2a122dc8c4fb8；262656是容器element_count，不是字节数，恢复摘要中的字节数错误已纠正。SASS矩阵指令为QMMA.16832.F16.E4M3.E4M3，因此旧build_block39_logical.py按整包FP16解释和operation-graph的容量分组推断不能作为原生实现依据。现有run_original_block39_basis.cpp仍是历史调用器，其launch/skip合同未重新验收，不启动大规模basis实验。下一步需从原指令恢复地址与尾部参数，再建立有超时的最小原生输入/skip探针；此静态审计不代表解码器数值通过。
+
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
 - 权重 block 是序列化分组，不直接等于网络层。
 - 工作假设写在本日志；二进制证实后再提升到 `reverse-engineering-notes.md`。
