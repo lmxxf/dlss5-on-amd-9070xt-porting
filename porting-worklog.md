@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第66块C32原版入口恢复（2026-09-06）：核对当前Git仍为c560a2e，未发现遗失的已提交后续成果，保留run_nvidia_ui.ps1既有未提交修改。原block66记录22784 bytes，SHA c4083d8e31bb2820eb1392f6d8b6b7148909ffa129cac7c61780ad1f9c03b916。C32 upsample ABI不同于multihead：+0x18/1c是H/W、+0x20/24为shift、+0x40主指针、+0x48低分辨率H/W、+0x50 skip、+0x58高分辨率H/W。generic runner新增mode10，显式要求blockY1，清零后上传，输出尺寸最多256；旧mode9不变。
+
+check_native_upsample66_smoke.py以紧凑8×8×64主/16×16×32 skip测试三次原kernel，避免过长非零输入掩盖越界读取：全零输出全零，main恒0.5及skip恒0.5各输出8192值非零；三例NaN0、有效区外零，正常返回，报告release/native-upsample66/smoke/validation.json为smoke_pass。仅证明可调用和两路响应，未证明矩阵布局/舍入或AMD正确。SASS可见FFN skip+0x2810、输入skip+0x2860、attention scale+0x54a0、最终skip+0x58b0，下一步用数值控制恢复C32合流与主体。游戏DLL未改，目标active。
+
 原RGB衍生链推进第65块（2026-09-06）：直接执行原C128 block61 outview（64×64、shift0、mode7、32×4），正常返回；validator新增--block61，global16/低两位交换解码与plain输出524288值全exact。prepare_native_rgb512_upsample56.py增加--block62，真实原block61 outview和block8-main跳接接入原第62块，给定shift0最终128×128×64的1048576值CPU/原全exact，报告upsample62-shift0/validation.json。
 
 普通decoder检查器扩展C64 block63～65，使用各自61760-byte记录，测试给定shift0/1/3，连续只消费前一原输出；三块各1048576值different0/max0，有效区外零、无NaN，导出参数及原final oracle。此移位序列目前是待核对的调用配置，不能说已证明原游戏调度同样如此；本轮仅证明所给配置下数值一致，不是最终画质验收。各报告在decoder-block63..65。

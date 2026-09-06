@@ -58,14 +58,18 @@ int main(int argc, char **argv) {
     if(mode==8){p.optional_dims=aux;p.optional4=(unsigned)(height/2)|((unsigned long long)(unsigned)(width/2)<<32);}
     // Native multihead upsample: +0x18 skip pointer, +0x20 output H/W,
     // +0x28 window offsets. Input is half-resolution with twice the channels.
-    if(mode==9){
-        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||width>128||height>128||(by!=2&&by!=4&&by!=8)||shift<0||shift>3)return 2;
+    if(mode==9||mode==10){
+        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||width>(mode==10?256:128)||height>(mode==10?256:128)||(mode==10?by!=1:(by!=2&&by!=4&&by!=8))||shift<0||shift>3)return 2;
         auto skip=read_file(argv[14]);if(skip.size()>arena_size)return 2;
         check("clear input",cuMemsetD8(di,0,arena_size));check("input upload",cuMemcpyHtoD(di,input.data(),input.size()));
         check("clear skip",cuMemsetD8(aux,0,arena_size));check("skip upload",cuMemcpyHtoD(aux,skip.data(),skip.size()));
-        std::memcpy(reinterpret_cast<unsigned char*>(&p)+0x18,&aux,8);
-        p.field_y=height;p.field_x=width;p.optional0=(unsigned)((shift&1)?-4:0)|((unsigned long long)(unsigned)((shift&2)?-4:0)<<32);
-        p.optional4=0;
+        if(mode==9){std::memcpy(reinterpret_cast<unsigned char*>(&p)+0x18,&aux,8);
+            p.field_y=height;p.field_x=width;p.optional0=(unsigned)((shift&1)?-4:0)|((unsigned long long)(unsigned)((shift&2)?-4:0)<<32);p.optional4=0;
+        }else{
+            p.width=height;p.height=width;p.field_y=(shift&1)?-4:0;p.field_x=(shift&2)?-4:0;
+            p.optional3=di;p.optional_dims=(unsigned)(height/2)|((unsigned long long)(unsigned)(width/2)<<32);
+            p.optional4=aux;p.override_width=height;p.override_height=width;
+        }
     }
     if(mode==1){p.field_y=0;p.field_x=0;p.optional2=aux;if(argc>=15&&std::string(argv[14])!="-"){auto optional2=read_file(argv[14]);check("optional2",cuMemcpyHtoD(aux,optional2.data(),std::min(optional2.size(),arena_size)));}}
     if(mode==2){p.optional3=aux;p.optional_dims=dims;p.optional4=0;p.override_width=width/2;p.override_height=height/2;}
