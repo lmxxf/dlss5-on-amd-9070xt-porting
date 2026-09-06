@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD block66实际几何与fixture准备
+
+- NativeVitLinear decoder支持138240token/C64→C32，主宽480、输出960×576，保持half merge而非提前FP8；线性输出按65536元素dispatch分块。
+- C32 reframe/body按64像素组调度，960×576为8640组（shift0），未超过65535组限制。
+- prepare_native_upsample66_gpu.py --game-extent检查原始零差异/finite/tail/输出尺寸并导出系数、原始oracle到ignored release/native-upsample66/amd-game。
+- 编译通过，新AMD完整block66尚未运行；未部署游戏DLL。
+
 ### 2026-09-06：block66实际960×576原始对照通过
 
 - mode10/by1/960×576明确尺寸例外，arena32MiB覆盖17694720字节输出/skip，旧模式保留。
