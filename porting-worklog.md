@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD 同 RGB0～30/head连续链精确通过
+
+- 上述长期初始化任务session44927已exit0，不再运行；5帧seed0/0/0/1/0全部replay_check=pass，resident_chain=pass，处理1920×1152，intermediate_CPU_transfers=0。
+- 进程结束后新下载gpu-main.f32/gpu-down.f32到 `release/native-rgb-valid1080/amd-head`，运行 `validate_native_valid1080_head_gpu.py` 返回0：block30 raw main 1105920值different=0/max_abs=0，padded head655360值different=0/max_abs=0，pass=true。
+- 至此同一有效1080 RGB经反射填充、AMD encoder0～30及pool/head，数值精确对齐原版参考。seed1只验证输出变化，原版数值比对仍仅seed0。不是完整游戏多纹理输入合同，不是0～70整链或游戏DLL验收。
+- 下一步将已生成的同 RGB ViT31～38、decoder39～65对照接入AMD连续链，并完成66～70和实际游戏输出。无需重跑已完成的head测试；游戏DLL仍未更新。
+
+
 ### 2026-09-07：同 RGB 原版62～65连续通过
 
 - block62验证器新增 `--skip-hwc`，本轮main来自同 RGB decoder61，skip来自 `encoder-c64/block8-main.f32`；8847360值different=0/max_abs=0，finite/tail_zero通过。ignored `release/native-rgb-valid1080/upsample62`。
