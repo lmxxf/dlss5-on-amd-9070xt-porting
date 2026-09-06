@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD 256-token contract 精确通过
+
+- NativeVitLinear 允许已对照的 256-token contract（4096→1024），projection 仍未放宽。
+- extent test 新增 contract 模式，检查并上传独立残差，调用生产类。RX 9070 XT 三次各 262144 值全部 different=0 / max_abs=0；finite、device、fence 检查通过。
+- 原始 oracle 来自 RTX expand→contract；下载 AMD gpu.f32 后与 oracle.f32 cmp 一致。产物留在 ignored release/native-vit/contract-256-3003。
+- 此测试上传 expand 中间输出，证明的是独立 contract，不是完整 GPU ViT 串联；游戏 DLL 未替换，最终画面未验收。
+
 ### 2026-09-06：256-token 原始 expand→contract 数值验证
 
 - contract caller 增加 Windows CUBIN 路径；独立 RTX runner 使用 256 tokens / gridX=16 / gridZ=4，计数器仍从 -1 开始。
