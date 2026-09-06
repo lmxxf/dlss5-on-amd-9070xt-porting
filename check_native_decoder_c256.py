@@ -6,8 +6,8 @@ from native_c64_reference import unpack,block
 from decode_tinlayout_global import e4m3fn
 p=argparse.ArgumentParser();p.add_argument('--block',type=int,choices=[*range(49,56),*range(57,62),*range(63,66)],required=True);p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--output-root',type=Path,default=Path('release/native-rgb512'));p.add_argument('--game-extent',action='store_true');a=p.parse_args()
 C,size,cubin=(256,32,'03') if a.block<56 else (128,64,'02') if a.block<62 else (64,128,'01');heads=C//32
-if a.game_extent and C!=256:p.error('game extent currently supports C256 only')
-width,height=(120,72) if a.game_extent else (size,size);count=width*height*C
+if a.game_extent and C==64:p.error('game extent C64 not yet supported')
+width,height=((120,72) if C==256 else (240,144)) if a.game_extent else (size,size);count=width*height*C
 root=a.output_root/f'decoder-block{a.block}';root.mkdir(parents=True,exist_ok=False)
 report={'status':'running','block':a.block,'shift':a.shift,'input':str(a.input),'channels':C,'scope':'original/CPU decoder, not AMD or runtime shift capture'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
