@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD同源ViT31～38精确通过，原版同源链至69
+
+- AMD独立目录 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-vit`，使用同RGB `vit/input.f32` 与 `vit/oracle.f32`，现有chunk-fenced链运行三帧，全部655360值different=0/max_abs=0，device=0。session16040已exit0。
+- 回读 `release/native-rgb-valid1080/vit/gpu.f32` 与oracle.f32经cmp完全相同，SHA256均为 `961a12fc2107c1445eb1f0eb474663e53e3c92911732f3aa1038478221b9d8f9`。这是同源输入的AMD31～38分段链验证；0～30/head与31～38仍是两个独立测试，尚未GPU直接连通，不能称0～38一体化验收。
+- block66新增 `--skip-hwc`，main取同RGB decoder65，skip取encoder4-main；17694720值different=0，finite/tail_zero通过。ignored `release/native-rgb-valid1080/upsample66`。
+- 新增 `check_native_valid1080_decoder67_69.py`，依次移位3/1/2，三层各17694720值different=0/status=pass，session98844已exit0。ignored `release/native-rgb-valid1080/decoder-c32`。
+- 至此原版/CPU同源链到69，尚缺同源post70最终RGB；AMD解码及整链连接仍需验证。无本轮遗留运行任务，未改游戏DLL/存档。下一步完成post70同源对照并连接AMD完整管线，最终必须在游戏中验证实际输出。
+
+
 ### 2026-09-07：AMD 同 RGB0～30/head连续链精确通过
 
 - 上述长期初始化任务session44927已exit0，不再运行；5帧seed0/0/0/1/0全部replay_check=pass，resident_chain=pass，处理1920×1152，intermediate_CPU_transfers=0。
