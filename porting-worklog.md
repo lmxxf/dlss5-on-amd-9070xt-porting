@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD游戏纹理入口float32双路动态精确通过
+
+- 新增 `d3d12_native_game_rgb_test.cpp`，创建真实1920×1080 RGBA32_FLOAT纹理，按GetCopyableFootprints上传，入口Record从COPY_DEST转换读取并恢复，回读tile-major及post-HWC两路。
+- A/A/B/A/A五帧，逐像素位置/通道编码数据含负值与大于1值；CPU采用周期反射定义独立生成期望，不依赖shader输出作oracle。每帧两路各8847360值different=0，设备/fence完成检查通过，session67115已exit0。
+- 这证明当前入口在float32纹理上的映射、无saturate、边界反射和重复状态恢复；RGBA16_FLOAT虽组件允许但尚未测试。实际游戏格式、颜色空间、多纹理合同、队列依赖以及最后呈现仍未验收。
+- 编译与git diff检查通过；没有游戏DLL修改，也无遗留运行任务。下一步把此纹理入口与已经验证的整网GPU组件连接到游戏生命周期，保持同一输入源与明确提交顺序。
+
+
 ### 2026-09-07：游戏RGB纹理入口GPU组件封装完成，待执行验证
 
 - 新增 `native_game_rgb_input.h`：稳定绑定单张1920×1080纹理，创建tile-major及HWC post两个常驻输出，Record由调用方提供原始资源状态并在结束恢复；不提交、关闭或重置游戏command list。重复Record前恢复两个输出UAV状态。
