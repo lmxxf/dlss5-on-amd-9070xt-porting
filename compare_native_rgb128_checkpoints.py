@@ -5,7 +5,7 @@ import numpy as np
 from decode_tinlayout_global import e4m3fn
 parser=argparse.ArgumentParser(description='Report independently decoded DS checkpoints; fail on any mismatch.')
 parser.add_argument('--folder',type=Path,default=Path('release/native-rgb128'))
-parser.add_argument('--size',type=int,choices=[128,256],default=128)
+parser.add_argument('--size',type=int,choices=[128,256,512],default=128)
 args=parser.parse_args()
 root=args.folder
 reports=[]

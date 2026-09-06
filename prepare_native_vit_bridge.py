@@ -23,3 +23,5 @@ job=Path('release/native-vit')/f'chain31-38-input-{sha[:12]}'
 report=json.loads((job/'validation.json').read_text());assert report['status']=='pass' and report['input_sha256']==sha and len(report['stages'])==56 and all(s['different']==0 for s in report['stages'])
 summary={'entries':n,'HWC_extent':[8,8,1024],'tokens':64,'bijective':True,'actual_repack_exact':True,'original_vit_chain':str(job),'original_vit_stage_checks':56,'GPU_bridge_verified':False}
 (root/'bridge.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary))
+out=root/'amd-bridge';out.mkdir(exist_ok=True)
+hwc.tofile(out/'input.f32');target.tofile(out/'oracle.f32');gather.astype('<u4').tofile(out/'indices.i32')

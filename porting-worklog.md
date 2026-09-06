@@ -2941,6 +2941,16 @@ validate_native_vit_block31.py新增--input1d，直接读取该原repack输出�
 
 下一步在GPU应用此桥，并将512尺寸编码器接入已验64-token八层ViT。AMD现有证明仍是RGB256→head与独立ViT链两段，未合并；解码器/真实游戏尺寸和最终画面仍待验证。游戏DLL与公开包未更新，目标active。
 
+### 2026-09-06 GPU桥接通过；完整RGB512→ViT38新夹具失败，首差异回到preblock
+
+新增native_vit_gather.h/hlsl，GPU按65536项数据无关索引做HWC→ViT复制，创建时验证索引为有界完整双射及源buffer容量。宿主bridge模式用原RGB512 head及原repack作独立裁判，9070XT三帧65536值全部exact；下载再次比对通过。该表不包含模型权重或固定画面数值。
+
+d3d12_native_front_chain_test.cpp新增rgb512vit：512尺寸编码器→block30/head→GPU gather→八个NativeVitBlock全部在同一GPU链运行，层间无CPU读回/注入。512参数与索引在prepare_native_rgb128_gpu.py --size512准备，PowerShell -Chain -Vit显式选择；输出独立命名output-rgb512-vit.f32。新增validate_native_rgb512_vit.py核对RGB导出的原ViT38裁判，写明确pass/fail报告。
+
+实际三帧重放与device/fence正常，26次shader编译、125次缓存命中，fence等待1719/1672/1656ms（不是游戏FPS）。但严格数值验证失败：DS0有5/2097152值不同，最大0.03125，位置集中在(y190..191,x192..193)，对应RGB约x384、y376起的8×8窗口；DS4/8/14/22不同值分别830/14945/61226/91501。最终ViT38有45998/65536值不同，最大1.03125。不能把执行/重放通过当移植正确，也不把后续全部差异未经分离就只归因于这5处。
+
+检查远端preblock三份HLSL的SHA，与当前本地文件逐一相同，排除误用旧shader这一候选。下一步以该preblock窗口分离原/CPU/GPU中间结果，检查尚未覆盖的捨入或特殊函数边界。此前256尺寸编码器、独立64-token ViT及桥接的通过范围保留，不外推到512；完整RGB512 GPU链明确未通过。游戏DLL、公开包未部署更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
