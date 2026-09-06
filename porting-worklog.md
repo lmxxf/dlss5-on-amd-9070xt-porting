@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：256-token AMD QKV→attention GPU 串联通过
+
+- extent test 新增 qkv_attention 模式：生产 NativeVitQkv.Output() 直接作为 NativeVitAttention 输入，同一 command list 内执行，无中间 CPU 回读/注入。
+- RTX 原始 QKV 输出继续送入原始 attention，两次最终输出 SHA256 均为 `4dc54e612d1995678cbe51b0564ea0a57c5dc6c9c1a44306729067d6c4327634`。
+- AMD 输入仍是 seed=3003 随机原始特征与真实 block31 权重，不上传 RTX 中间 QKV。三次 replay 的 262144 个最终值全部不同数 0、max_abs 0，device/fence/finite 检查通过；下载 gpu.f32 后与 oracle.f32 cmp 一致。
+- 产物 ignored `release/native-vit/qkv-attention-256-3003/`；打包脚本 `prepare_native_qkv_attention_extent.py` 仅解码原始最终输出。尚未包含 ViT expand/contract/projection，也未替换游戏 DLL，不能据此认定1080p画面完成。
+
 ### 2026-09-06：AMD 256-token QKV 三次逐值通过
 
 - `NativeVitQkv` 放宽到已验证的 64/256 tokens，HLSL 原有索引使用 tokens，无需改变投影和归一化算术；未开放未经测试的任意尺寸。
