@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第48块随机空间反例与分离（2026-09-06）：新增native_upsample48_reference.py候选参考，native_c64_reference.py抽出unpack_bytes（原路径调用保留），避免反复写临时普通权重。check_native_upsample48_spatial.py seed2401、8×8×512主/16×16×256 skip逐位置通道随机，给定shift0原输出finite，但候选不同64446/65536、max1.25，严格fail，未导出AMD参数。
+
+同一随机skip配单位skip权重时65536值全exact，证明此夹具skip输入/输出cell排列及跳接路径正确。再将初始投影按候选地址设为取前256通道的单位矩阵，结果仍64536值不同、max1.4375，故错误可在主投影路径独立重现，不应改动已通过的skip布局。尝试将主输入编码为两个C256 cell bank，实际输出与原C512 cell编码相同且仍失败；保留两个fail目录，不放宽标准。
+
+diagnose_native_upsample48_projection.py读回发现最终输出每个2×2块严格相同，支持nearest空间复制；但输出多重集也不等于输入前256通道（sorted差11284），不能仅称“前256通道的空间排列错位”。下一步对主投影地址做二进制标记定位，区分矩阵列/输出通道与源索引，不能把常量输入通过外推为随机通过。失败报告在release/native-upsample48/spatial-2401-*，游戏DLL未改。
+
 第48块输入合流布局与量化边界（2026-09-06）：首次候选把0x58200当投影矩阵起点、0x58000当FFN skip，常量main测试65524/65516值不同，skip测试65132值不同；单位skip控制输出全零，明确失败。继续追指令0x5050等处LDG +0x78000后纠正：初段0x58200是矩阵内载入偏移，完整256×512 FP8投影实际区间0x58000..0x78000，FFN skip位于0x78000..0x78200，输入skip系数位于0x78200..0x78400，QKV及后续从0x78400开始，较普通C256对应段平移0x201e0。上轮日志所述“从0x58200做投影”是指令地址证据，不再解读为矩阵区起点。
 
 check_native_upsample48_control.py将三个skip系数区设half1、attention scales设float1，其余零：原输出65536值全部为FP8 0.5，有效区外零。check_native_upsample48_candidates.py直接按恢复字节区重组普通C256参考记录（不拟合权重），初始投影每K32 half累计，与输入skip合流后必须F(H(project+skip*scale))。原main恒0.5/skip零及main零/skip恒0.5两例，保留该FP8边界后各65536值全exact；不量化合流则分别34144/30692值不同。尚未证明空间/通道随机输入及shift边界，AMD第48块未实现，游戏DLL未改。失败数值保留于本日志，候选脚本当前输出为修正后结果。
