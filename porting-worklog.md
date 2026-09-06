@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：运动UV融合乘加修正，捕获窗口64值全一致
+
+- 前轮有有效进展，本轮继续针对前级唯一1ULP偏差。native_temporal_coordinates.hlsl的previous_uv显式double fma转float；session39359五帧完成，捕获block14 warp1的64值从1处差异变为全部bit-exact。新增check_native_motion_uv_capture.py，证据large/motionfma/uv-validation.json。
+- 同次120×72 preblock仍45/14差异：修正提高前级忠实度，但未解决剩余最终输出差异，不冒称全链通过。24×16 session96819五帧回归main12288/down3072全exact。
+- 保留该处有原始UV证据支撑的修正，AMD large/rect配套motion shader同步。游戏DLL未改，后续继续后级tap坐标/纹理采样核查。
+
 ### 2026-09-07：历史座标往返显式舍入，120×72进一步降至45/14
 
 - 修正t后的GPU tap读回session40937：block14 warp1与原PC1590差异319→151/512，绝大多数剩余为X UV；六个轴权重只有lane3的Y仍不同，与前级运动UV的1ULP差异一致。证据gpu-taps-tfma.f32/validation.json。

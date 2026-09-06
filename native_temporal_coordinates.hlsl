@@ -37,7 +37,9 @@ void main(uint3 id:SV_DispatchThreadID) {
     precise float2 motion_reciprocal=float2(motion_inverse_width,motion_inverse_height);
     sample_uv=sample_uv*motion_reciprocal;
     float2 vectors=fetch_motion(sample_uv);
-    precise float2 previous_uv=mad(vectors,float2(motion_uv_scale_x,motion_uv_scale_y),uv);
+    precise float2 previous_uv=float2(
+        float(fma(double(vectors.x),double(motion_uv_scale_x),double(uv.x))),
+        float(fma(double(vectors.y),double(motion_uv_scale_y),double(uv.y))));
 #if NORMALIZED_COORDINATES
     coordinates[id.x]=previous_uv;
 #else
