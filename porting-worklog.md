@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：参考得分重放定位差异至QK得分生成
+
+- isolate_block8_score_replay.py在identity projection诊断副本仅清零第二head的Q矩阵，将参考half QK+bias得分按原bias布局写入第二head bias，其余FFN/K/V和第一head保持。
+- 原始kernel处理重放得分后的attention输出与CPU参考4096值零差异，与未修改attention原输出仍9差异。说明此得分输入下原softmax/AV可复现参考，优先定位Q/K投影/normalize/得分生成，而非继续修改分母。
+- 控制仅本地ignored窗口目录，不进入生产；未修复block8或部署游戏DLL。
+
 ### 2026-09-07：AMD生產C64最小窗口重现3值差异
 
 - split-window host新增single64 8×8/shift0模式，prepare_block8_window_gpu.py导出原始block8真实系数及未改模型oracle。
