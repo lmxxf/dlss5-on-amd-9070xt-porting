@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：只修正采样小数DFMA，120×72降至51/15，24×16全一致
+
+- 将normalized axis的t单独改为内联double fma后转float，其余运算不改。session29566五帧完成，120×72 main/down差异72/21→51/15；证据tfma/gpu-tfma-*及validation.json。仍未全通过，不作为游戏画质已修复。
+- 继续单独尝试left权重double fma（session30321），以及反号等价表达（session52375），两者均110813/25166差异，均已撤回，仅保留t修正。失败证据tleft和tleftneg；不能泛化为所有mad都应替换。
+- 24×16首次session21261因实验目录旧motion shader输出pixel而新exe要求normalized UV失配7514/1820，失败读回保留tfma-stale-coordinate-shader。检查实际远端源码后同步当前native_temporal_coordinates.hlsl，session48132重新五帧回归main12288/down3072全部exact。此为测试部署合同错误，非t修正数值回归失败。
+- 当前AMD large/rect实验目录使用t修正sampler；rect配套normalized motion shader已同步。游戏DLL未动。下一步对51/15剩余差异继续定位，并扩展valid1080 temporal合同，最终仍需在游戏验证动态神经输出。
+
 ### 2026-09-07：逐步算术回读确认MAD取消误差，局部DFMA通过但整轴试改失败
 
 - 新增native_temporal_arithmetic.hlsl及check_native_temporal_arithmetic.py。独立诊断2160像素，输入UV复用GPU值，只用于算术审计。session59970读回：t_x/t_y相对float32融合参考分别1978/1740差异；center与left/尺寸往返全部一致。pixel593 t_x为0x3f233600，融合参考0x3f233608，符合乘法先舍入再相减的差异。上轮尺寸往返差异在本逐步输出版本未复现，不能笼统归因于尺寸倒数。

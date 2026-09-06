@@ -8,7 +8,9 @@ cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inv
 void axis(float p,uint extent,out float3 positions,out float3 weights) {
 #if NORMALIZED_COORDINATES
     precise float center=floor(mad(p,float(extent),-.5))+.5;
-    precise float t=saturate(mad(p,float(extent),-center));
+    // Preserve the product bits through cancellation; measured mad rounded
+    // before subtracting center on AMD. Keep this scoped to the fraction.
+    precise float t=saturate(float(fma(double(p),double(extent),-double(center))));
 #else
     precise float center=floor(p-.5)+.5;
     precise float t=saturate(p-center);
