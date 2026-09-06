@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：真实projection系数与非零attention的pool边缘通过
+
+- check_native_pool_game_extent.py增加--real-weights：block30真实projection/skip权重，非零随机attention与非零FFN，实际36×60→20×32尺寸，pool输出预填FP8 1。
+- 原始pool主分支与原生矩阵/残差计算零差异；有效18×30池化与raw半精度求和零差异；底2行/右2列仍主动归零，finite检查通过。
+- 原始输出及raw-projection.f32/pool-oracle.f32保存ignored release/native-c512/pool-game-real，可供后续AMD池化合同测试。注意raw-projection是CPU参考特征，不可作为整链GPU验收输入。
+- 尚未验证生成这些attention/FFN的实际部分窗口链，未更新游戏DLL。
+
 ### 2026-09-06：pool有效区及非零预填边界控制通过
 
 - 新check_native_pool_game_extent.py构造36×60×512非零随机FFN、attention零、identity skip系数，按实际pooled20×32运行原kernel。
