@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：post70实际1920×1152原始输出捕获
+
+- 原始post native模式增加明确1920×1152尺寸，激活容量按像素×32+65536计算，main/skip读取有有效长度检查；编译通过。
+- prepare_native_post70_game.py构造独立非零随机main/skip/RGBA，保留C32主global16和skip cell映射，真实post权重、mask1/mode1/scale.03125运行原始kernel。
+- 输出2211840个RGBA像素全部finite，范围日志0.0842716992..1；ignored release/native-post70/game。仅捕获成功，尚未CPU逐值验证或AMD新尺寸，不能记为post精确通过。未部署游戏DLL。
+
 ### 2026-09-06：AMD decoder67～69实际960×576三层GPU链通过
 
 - extent host新增decoder67_69_game，三层NativeC32Stage使用实际shift3/1/2与960×576，GPU资源直接串联。

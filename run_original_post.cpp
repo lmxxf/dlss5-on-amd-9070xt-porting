@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     const bool feature_mode = argc > 14 && !std::strcmp(argv[14], "features");
     const bool native_mode = argc > 14 && !std::strcmp(argv[14], "native");
     if (argc > 14 && !feature_mode && !native_mode) return 2;
-    if(native_mode&&(width<16||height<16||width>512||height>512||width%16||height%16))return 2;
+    if(native_mode&&(width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16))return 2;
     if (width <= 0 || height <= 0) {
         std::fprintf(stderr, "invalid dimensions %dx%d\n", width, height);
         return 2;
