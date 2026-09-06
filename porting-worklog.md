@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：GPU镜像RGB打包三帧精确通过
+
+- extent host新增rgb_reflect，实际1920×1080 HWC输入→1920×1152 tile-major输出，调用生产NativeRgbReflect。
+- RX9070XT三帧8847360个RGBA值零差异，finite/device/fence通过；提交等待2.639/2.119/1.962ms。回读gpu-tiled.f32与已验证reflect fixture字节级cmp一致。
+- ignored release/native-rgb-reflect1080。此为RGB准备算子，尚未与AMD preblock及完整网络串联验证，不是游戏画面验收，未部署DLL。
+
 ### 2026-09-06：GPU镜像RGB资源封装完成待执行
 
 - 新NativeRgbReflect管理SRV输入/UAV输出、根常量、shader与重放状态转换；有效维度>=2、处理尺寸8整除、上下界及源buffer容量显式检查。
