@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     const auto input = read_file(argv[3]);
     const int width=std::getenv("DLSS5_PREBLOCK_WIDTH")?std::atoi(std::getenv("DLSS5_PREBLOCK_WIDTH")):8;
     const int height=std::getenv("DLSS5_PREBLOCK_HEIGHT")?std::atoi(std::getenv("DLSS5_PREBLOCK_HEIGHT")):8;
-    if(width<=0||height<=0||width%8||height%8||width>512||height>512)return 2;
+    if(width<=0||height<=0||width%8||height%8||((width>512||height>512)&&!(width==1920&&height==1152)))return 2;
     if(scan&&(width!=8||height!=8))return 2;
     const size_t input_tile_bytes = size_t(width)*height*4*sizeof(float);
     const size_t allocation_bytes=std::max<size_t>(1<<20,size_t(width)*height*32*4);

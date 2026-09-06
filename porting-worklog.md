@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际尺寸受控RGB整链起点建立
+
+- 原始preblock caller支持明确1920×1152，容量按像素×32×4分配。
+- prepare_native_rgb_game.py建立独立release/native-rgb-game，复用post随机RGB作为同一编码/合成基底，保存HWC与tile-major两种输入；原始block0权重、实际PID25972标量blob、seed0覆盖，单纹理句柄替换。
+- 原始main70778880字节、down17694720字节长度/FP8 NaN检查通过；只表示捕获成功，尚未新尺寸数值对照。该输入不是实际游戏多纹理合同，不宣称游戏画面验证。
+- 下一步同RGB生成完整encoder及真实skip，未部署游戏DLL。
+
 ### 2026-09-06：AMD49～69连续主分支21阶段GPU链通过
 
 - extent host新增decoder49_69_game，生产NativeDecoderTail69实际尺寸配置，三路skip明确上传且尺寸/finite检查，主分支无中间CPU注入。
