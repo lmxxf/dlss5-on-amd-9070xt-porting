@@ -42,6 +42,14 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     positions=clamp(float3(center-1,position,center+2),.5,float(extent)-.5);
     weights=float3(left,middle,right);
 }
+float texture_round_positive(double v) {
+    float rounded=float(v);
+    if(v>0.0 && double(rounded)<v) {
+        float next=asfloat(asuint(rounded)+1);
+        if(v==(double(rounded)+double(next))*.5)return next;
+    }
+    return rounded;
+}
 float3 fetch(float2 xy) {
     precise float2 normalized=xy*float2(inverse_width,inverse_height);
     // Original applies the history subrect transform even for the full-size
@@ -72,7 +80,7 @@ float3 fetch(float2 xy) {
     v+=double3(history[lo.y*width+hi.x].xyz)*double(w.y);
     v+=double3(history[hi.y*width+lo.x].xyz)*double(w.z);
     v+=double3(history[hi.y*width+hi.x].xyz)*double(w.w);
-    return float3(v);
+    return float3(texture_round_positive(v.x),texture_round_positive(v.y),texture_round_positive(v.z));
 }
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID) {

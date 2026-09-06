@@ -58,6 +58,14 @@ def sample(image,x,y):
 def fma32(a,b,c):
     return (np.asarray(a,np.float32).astype(np.float64)*np.asarray(b,np.float32).astype(np.float64)+np.asarray(c,np.float32).astype(np.float64)).astype(np.float32)
 
+def texture_float32(value):
+    """Measured positive TEX midpoint rounding; negative tie behavior unaudited."""
+    exact=np.asarray(value,np.float64)
+    rounded=exact.astype(np.float32)
+    upper=np.nextafter(rounded,np.float32(np.inf))
+    tie=(exact>0)&(exact>rounded)&(exact==(rounded.astype(np.float64)+upper.astype(np.float64))*.5)
+    return np.where(tie,upper,rounded)
+
 def axis32(position,extent):
     p=np.asarray(position,np.float32)
     center=(np.floor(p-np.float32(.5))+np.float32(.5)).astype(np.float32)
@@ -75,7 +83,7 @@ def sample32(image,x,y):
     h,w,_=image.shape;px,wx=axis32(x,w);py,wy=axis32(y,h)
     xy=np.stack([np.stack([px[...,i],py[...,j]],-1) for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-2)
     weights=np.stack([wx[...,i]*wy[...,j] for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-1)
-    pixels=bilinear(image,xy,8,8,21).astype(np.float32)
+    pixels=texture_float32(bilinear(image,xy,8,8,21))
     total=pixels[...,0,:]*weights[...,0,None]
     for i in range(1,5):total=fma32(pixels[...,i,:],weights[...,i,None],total)
     denominator=weights[...,1]+weights[...,0]

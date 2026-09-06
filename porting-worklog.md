@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：TEX正值float中点向上修正，valid1080主输出全exact，仅down剩2值
+
+- session27768取得block3,row110,warp1余下四TEX后寄存器。扩展texture_returns工具支持valid1080/指定捕获，发现6个float分量相差1ULP，均为精确插值和落在相邻float正中点，原版向上、CPU取偶数向下；lane24中央tap蓝通道是触发半精度错误的那一项。
+- sampler新增texture_round_positive，将正值中点向上；负值行为尚未审计，保持原float转换。CPU新增texture_float32，捕获TEX返回值现在480个分量全float32 exact；该窗口最终half归零，四组holdout共384值也从仅half exact提升为全部float32 exact。
+- session78292 full valid1080五帧完成，session19030回读main70778880值全部exact，down17694720只剩x158/y170的channel20/28两值（0/2）。证据valid1080/textureround。不能称前端全部通过，剩余在另一个除错器曾崩溃的区域。
+- session22861同版120×72五帧回归main276480/down69120全exact。游戏DLL未改；下一步核查最后down两值及其前置计算，之后仍需全网络历史生命周期/游戏动态验收。
+
 ### 2026-09-07：缩小诊断网格解开后段捕获，另一区域触发CUDA-GDB内部崩溃
 
 - NVIDIA CUDA-GDB官方文档说明条件断点每次都会命中并判条件，可能看似挂起：https://docs.nvidia.com/cuda/cuda-gdb/index.html#conditional-breakpoints 。原preblock SASS检查到CTAID读，无常规gridDim读取，提出只缩小启动网格、保留纹理/参数尺寸的诊断前缀。
