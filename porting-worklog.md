@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：24×16时序前端精确闭合，乘积半格向上规则修复
+
+- 定位剩余主误差(y15,x19,c23)窗口block(2,1),warp1；PC1800发现lane2/18历史采样half不同，PC10d0/1590坐标近一致。PC1730中央TEX在corner*256=18.5及52.5两处，round-even错误0.0032585/0.0006557，half-up匹配至1.64e-8/2.26e-8。
+- 将CPU/GPU乘积左上角量化改为floor(q+.5)，其余三权重仍由边际推导；没有像素位置特判。四个既有采样holdout384half仍全通过。
+- 24×16同源空间motion全GPU前端五帧session49070 exit0；新halfup独立回读与原版解码比较：main12288/down3072全部different=0。之前7/3及1/2失败证据保留。
+- 这是24×16无slot18分支精确闭合；更大非幂次尺寸、1080有效区padding、实际history来源/时序生命周期仍未验收。下一步扩大尺寸并接整网稳态，最终仍须游戏DLL和画面验证。新神经DLL未部署。
+
+
 ### 2026-09-07：原版双线性量化临界权重保持行列和，24×16差异缩至1/2
 
 - GDB支持指定blockXY/threadY条件断点，定位原主差异像素(y6,x12)于block1 warp1 lane20。PC1800该像素三RGB half偏差，PC10d0坐标一致至float；PC1590采样位置近一致，中央点分数量化为153/256与128/256。
