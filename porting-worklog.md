@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第56块独立通过（2026-09-06）：显式decoder投影合同新增256→128，允许已验证64/1024-token，主宽度8/32；原ViT及第39块维持各自限制。宿主upsample56选择32×32主/64×64 skip，GPU投影→nearest/FP8合流→C128 NativeC64Shift直接串接。参数导出/运行/验证脚本复用现有文件并加Block56选择，不改原第48块模式。
+
+原seed2507/shift3夹具部署native-upsample56，三帧各524288值different0/max0，device/fence/finite/replay检查通过；下载gpu.f32再验证全exact，SHA5fffdd82ed9456782b611b2b2697e0abfb95c16665968b86d06b7c09b3a37c78。报告release/native-upsample56/amd/validation.json，明确独立算子而非RGB全链。shader编译main34ms、FFN5669ms、attention2290ms、projection793ms。测试进程已正常退出，无待观察GPU任务。
+
+同一新exe/shader在native-decoder39执行回归，三帧各131072值仍全exact。下一步原block55 outview→56与block14 skip连接，再推进57～70及合并AMD全链。当前AMD严格RGB连续范围到48，49～55及56分别独立通过，游戏DLL未改。
+
 AMD decoder49～55獨立链通过（2026-09-06）：会话57124正常exit0，七个常驻NativeC64Shift三帧最终各262144值different0/max0，device/fence/finite/replay通过。下载gpu-0.f32后--c256验证器再次全exact，SHA eb7bf99bf25e96b58741d48d6d1058732717560a6760a362eae98c508f9a49ed。报告release/native-rgb512/amd-decoder49-55/validation.json。输入仍为原block48夹具；AMD已验RGB连续范围仍到48，未拼称全链到55。
 
 第56块原生参考恢复（2026-09-06）：原记录230176 bytes，SHA f73035bd13f1ce40ec2768b49eee02564e1ef5f7a4860375e7b1901c8e41ae83。SASS支持输入投影0x18000..0x20000、FFN skip0x20000、合流skip0x20100、QKV起0x20200、attention scale0x34200、最终skip0x38210。native_upsample48_reference.py按记录尺寸支持C128，普通C128尾段平移0x80e0，继续复用直接字节解码与已验数学；原mode9开放blockY4，不改旧C256调用。
