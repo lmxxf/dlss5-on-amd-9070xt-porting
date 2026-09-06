@@ -10,7 +10,10 @@ H=lambda x:np.asarray(x,np.float16).astype(np.float32)
 F=lambda x:e4m3fn(quantize(x))
 
 def unpack(path):
- raw=np.fromfile(path,np.uint8);assert raw.size in (20672,22720)
+ return unpack_bytes(np.fromfile(path,np.uint8))
+
+def unpack_bytes(raw):
+ assert raw.dtype==np.uint8 and raw.size in (20672,22720)
  raw=raw[:20672]  # DS projection starts at 20656, replacing ordinary tail padding.
  ffn=np.load('release/preblock-ffn-byte-layout/layout.npz')
  att=np.load('release/preblock-attention-layout/matrix-layout.npz')

@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第66块原生数值参考通过（2026-09-06）：native_c32_reference.py抽出unpack_bytes，路径入口保持兼容。第66块的普通C32主体来自原前0x2000字节、0x2800..2860移至普通0x2000..2060、0x28a0后移至普通0x2060后；初始64→32 FP8投影0x2000..2800，输入skip系数0x2860..28a0。没有拟合或固定帧修正。
+
+check_native_upsample66_candidates.py首次沿multihead输出通道约定导致main常量7932值不同；将投影行从multihead累计通道序转为C32 FFN通道序后，main常量8192值全exact。输入skip使用C32 FFN/attention对应通道序，全exact；multihead skip序失败。关键舍入差别：C32合流后保留half再进主体，不先FP8。提前FP8会让main/skip常量分别4352/2040值不同。这与C64/C128/C256 upsample不同，AMD实现不能无条件复用其FP8合流。
+
+新增native_upsample66_reference.py和空间测试：原global16/低两位交换主、C32 cell skip，16×16/seed2701/shift0的8192值全exact；RGB512需要的256×256/seed2707/shift3的2097152值全exact，含移位边界。报告release/native-upsample66/spatial-16-2701-0和spatial-256-2707-3/validation.json。第66块尚未AMD实现，游戏DLL未改，下一步以half输出投影接C32主体。
+
 第66块C32原版入口恢复（2026-09-06）：核对当前Git仍为c560a2e，未发现遗失的已提交后续成果，保留run_nvidia_ui.ps1既有未提交修改。原block66记录22784 bytes，SHA c4083d8e31bb2820eb1392f6d8b6b7148909ffa129cac7c61780ad1f9c03b916。C32 upsample ABI不同于multihead：+0x18/1c是H/W、+0x20/24为shift、+0x40主指针、+0x48低分辨率H/W、+0x50 skip、+0x58高分辨率H/W。generic runner新增mode10，显式要求blockY1，清零后上传，输出尺寸最多256；旧mode9不变。
 
 check_native_upsample66_smoke.py以紧凑8×8×64主/16×16×32 skip测试三次原kernel，避免过长非零输入掩盖越界读取：全零输出全零，main恒0.5及skip恒0.5各输出8192值非零；三例NaN0、有效区外零，正常返回，报告release/native-upsample66/smoke/validation.json为smoke_pass。仅证明可调用和两路响应，未证明矩阵布局/舍入或AMD正确。SASS可见FFN skip+0x2810、输入skip+0x2860、attention scale+0x54a0、最终skip+0x58b0，下一步用数值控制恢复C32合流与主体。游戏DLL未改，目标active。
