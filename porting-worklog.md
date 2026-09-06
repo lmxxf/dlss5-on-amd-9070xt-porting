@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB block30→pool/head逐值通过
+
+- validate_native_valid1080_pool_head.py使用连续block30原始FFN/attention中间输出，原始pool参数60×36→32×20，再接原始head。
+- raw投影主输出、有效18×30池化及零补齐、最终655360值head均与参考精确一致、finite；导出head HWC与block30 raw供后续桥接/skip对照。
+- ignored encoder-split/pool-head。原始受控RGB已连续到ViT入口，尚未AMD0～head整体或完整游戏多纹理验收，未部署DLL。
+
 ### 2026-09-07：同valid1080 RGB原始split23～30连续对照通过
 
 - check_native_decoder_split.py支持encoder23～30；23使用原始inpview及global16低通道位交换输入，24～30沿原始cell输出连续运行，实际60×36及shift0/3/1/2/0/3/1/2。
