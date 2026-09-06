@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：原始decoder67～69实际960×576整链通过
+
+- C32参考新增game extent960×576，从原始block66输出依次运行67/68/69，shift3/1/2。三层各17694720值原始/CPU零差异，tail检查通过。
+- prepare_native_decoder_c32_game_gpu.py检查来源、值数与移位，导出原始最终oracle与三层系数到ignored release/native-decoder-game-c32/amd-decoder67-69。
+- 尚未执行AMD三层链，未完成post70实际尺寸或RGB全链，未部署游戏DLL。
+
 ### 2026-09-06：AMD block66实际960×576三帧精确通过
 
 - extent host新增upsample66_game，NativeVitLinear half融合结果直接送NativeC32Stage(960×576 shift0)，无中间CPU传输。
