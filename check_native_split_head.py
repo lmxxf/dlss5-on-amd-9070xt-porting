@@ -7,10 +7,11 @@ from native_c64_reference import multiply
 from native_c32_reference import F
 from decode_tinlayout_global import e4m3fn
 from encode_tinlayout_global import quantize
-parser=argparse.ArgumentParser();parser.add_argument('--random-input',action='store_true');args=parser.parse_args()
-root=Path('release/native-rgb256')
+parser=argparse.ArgumentParser();parser.add_argument('--random-input',action='store_true');parser.add_argument('--rgb-size',type=int,choices=[256,512],default=256);args=parser.parse_args()
+if args.random_input and args.rgb_size!=256:parser.error('rgb-size does not apply to random input')
+root=Path(f'release/native-rgb{args.rgb_size}')
 inverse=np.argsort(np.load('release/native-c512/split-view/mapping.npz')['cell_output_to_hwc'])
-width,height=4,4;input_path=root/'block30-pool.fp8'
+width=height=args.rgb_size//64;input_path=root/'block30-pool.fp8'
 if args.random_input:
  width,height=16,8;root=Path('release/native-c512/head-check');root.mkdir(exist_ok=True)
  values=F(np.random.default_rng(1801).normal(0,.25,(height,width,512)).astype(np.float32))

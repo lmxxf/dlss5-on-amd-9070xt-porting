@@ -5,8 +5,8 @@ This does not resolve the original dispatcher's logical/physical-size policy.
 from pathlib import Path
 import os,json,subprocess,argparse
 import numpy as np
-parser=argparse.ArgumentParser();parser.add_argument('--size',type=int,choices=[128,256],default=128);parser.add_argument('--through-pool',action='store_true');args=parser.parse_args()
-if args.through_pool and args.size!=256:parser.error('Pool continuation requires size 256; 2x2 output is unverified')
+parser=argparse.ArgumentParser();parser.add_argument('--size',type=int,choices=[128,256,512],default=128);parser.add_argument('--through-pool',action='store_true');args=parser.parse_args()
+if args.through_pool and args.size<256:parser.error('Pool continuation requires size >=256; 2x2 output is unverified')
 size=args.size
 folder=Path(f'release/native-rgb{size}');folder.mkdir(parents=True,exist_ok=True)
 if size==128:tiles=np.fromfile('release/preblock-branch-audit/input.rgba32f','<f4').reshape(256,8,8,4)

@@ -18,14 +18,14 @@ static void check(const char *name, CUresult result) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 3 && argc != 5) {
-    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height]\n",
+  if (argc != 3 && argc != 5 && argc != 7) {
+    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height [input.fp8 output.fp8]]\n",
                  argv[0]);
     return 2;
   }
   constexpr size_t arenaBytes = 4 * 1024 * 1024;
-  const int width = argc == 5 ? std::atoi(argv[3]) : 8;
-  const int height = argc == 5 ? std::atoi(argv[4]) : 8;
+  const int width = argc >= 5 ? std::atoi(argv[3]) : 8;
+  const int height = argc >= 5 ? std::atoi(argv[4]) : 8;
   if(width<=0||height<=0||width%4||height%4||size_t(width)*size_t(height)>arenaBytes/1024)return 2;
   const size_t outputBytes = static_cast<size_t>(width) * height * 1024;
   constexpr unsigned addressBits = 22;
@@ -114,6 +114,13 @@ int main(int argc, char **argv) {
       std::fprintf(stderr,"held-out repack mismatch seed=%u offset=%zu\n",seed,i);return 6;
     }
   }
+  if(argc==7){
+    std::fill(input.begin(),input.end(),0);std::ifstream actual(argv[5],std::ios::binary|std::ios::ate);if(!actual)return 7;auto bytes=actual.tellg();if(bytes<=0||size_t(bytes)>arenaBytes)return 7;actual.seekg(0);if(!actual.read((char*)input.data(),bytes))return 7;
+    for(size_t i=outputBytes;i<arenaBytes;i++)if(input[i])return 7;
+    launch();for(size_t i=0;i<outputBytes;i++)if(output[i]!=input[outputToInput[i]])return 8;
+    for(size_t i=outputBytes;i<arenaBytes;i++)if(output[i])return 8;
+    std::ofstream result(argv[6],std::ios::binary);if(!result.write((char*)output.data(),outputBytes))return 9;
+  }
   std::ofstream(argv[1], std::ios::binary).write(
       reinterpret_cast<const char *>(outputToInput.data()),
       outputToInput.size() * sizeof(uint32_t));
@@ -123,7 +130,8 @@ int main(int argc, char **argv) {
            << "  \"shape\": [" << (width * height) << ", 1024],\n"
            << "  \"entries\": " << outputToInput.size() << ",\n"
            << "  \"source_arena_bytes\": " << arenaBytes << ",\n"
-           << "  \"launches\": " << (addressBits + 3) << ",\n"
+           << "  \"launches\": " << (addressBits + 3+(argc==7?1:0)) << ",\n"
+           << "  \"actual_input_verified\": " << (argc==7?"true":"false") << ",\n"
            << "  \"held_out_random_inputs\": 2,\n"
            << "  \"bijective_over_selected_offsets\": true\n"
            << "}\n";

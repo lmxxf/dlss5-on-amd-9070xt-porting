@@ -2929,6 +2929,18 @@ prepare_native_vit_block_gpu.py从已通过的原CUBIN/CPU链直接解码初始�
 
 当前64-token ViT31～38已实现并在AMD独立连续验证，未以CPU修正中间值，也没有跳算来提高显示帧率。但该链的初始输入仍为独立ViT夹具；RGB256编码器输出16-token，尚未与64-token链接成完整RGB路径。下一步建立足够尺寸的RGB连续夹具和重排连接，并继续解码器及最终画面审计。游戏DLL/公开ZIP未更新，目标active。
 
+### 2026-09-06 RGB512原版链贯通ViT38，建立HWC/ViT桥接索引
+
+build_native_rgb128_oracle.py增加size512，连续原CUBIN RGB→block30 pool生成有效8×8×512池化结果；check_native_split_head.py --rgb-size512验证8×8×1024 head全部65536值与原矩阵运算exact。旧128/256夹具保留，不把16-token attention限制绕成通过。
+
+run_original_vit_repack_permutation.cpp扩展可选真实输入/输出参数：8×8下恢复65536-entry重排双射，通过两份随机留出输入，再实际运行原kernel重排RGB512的head。真实输出逐byte等于映射预测，有效区域外全零。得到release/native-rgb512/vit-input.fp8，不是用CPU拟合替代原kernel。
+
+validate_native_vit_block31.py新增--input1d，直接读取该原repack输出，按输入SHA区分任务目录，导入输入时seed标null且不重新量化源文件。原版ViT31～38连跑及CPU逐阶段56项全部exact，报告在release/native-vit/chain31-38-input-b38e14db0110/validation.json。该路径覆盖原版RGB512编码器到ViT38；512编码器本身尚未在AMD验证，不将原版运行当GPU移植通过。
+
+新增prepare_native_vit_bridge.py，复合原head的4×4 cell/双C512 bank排列、实测1d重排和ViT逻辑轴，得到65536项HWC→ViT gather索引及逆映射。两者为完整双射，实际head数值经过该映射与原repack输出的逻辑视图全exact。索引是数据无关地址变换，不含模型权重或固定画面值；导出hwc-to-vit.i32、vit-to-hwc.i32及bridge.json，GPU_bridge_verified明确false。
+
+下一步在GPU应用此桥，并将512尺寸编码器接入已验64-token八层ViT。AMD现有证明仍是RGB256→head与独立ViT链两段，未合并；解码器/真实游戏尺寸和最终画面仍待验证。游戏DLL与公开包未更新，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
