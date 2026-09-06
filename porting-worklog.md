@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080纹理/processing1152原始preblock已运行
+
+- caller增加DLSS5_PREBLOCK_GAME_TEXTURE，仅允许1920×1152处理且需参数blob，实际CUDA纹理1920×1080，输入长度/上传pitch/有效标量按纹理尺寸，处理/下采样尺寸保持1152。
+- prepare_native_rgb_valid1080.py截取同一随机RGB前1080行，seed0和捕获标量一致，输出长度及FP8 NaN检查通过。主分支与旧完整1152纹理实验3945111字节不同，下采样938692不同。
+- ignored release/native-rgb-valid1080，尚未定位差异空间范围/验证AMD采样，单纹理控制不代表完整游戏多纹理输入。未部署DLL。
+
 ### 2026-09-06：preblock有效纹理范围与网络补齐范围不同
 
 - audit_preblock_scalar_profiles.py对比旧4K与新PID25972非资源字段0x48..0xd7，仅0x90/94/98/9c/a0/a4/d0/d4不同，其他所查标量一致。

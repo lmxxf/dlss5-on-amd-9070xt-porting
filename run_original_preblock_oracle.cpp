@@ -59,7 +59,10 @@ int main(int argc, char **argv) {
     const int height=std::getenv("DLSS5_PREBLOCK_HEIGHT")?std::atoi(std::getenv("DLSS5_PREBLOCK_HEIGHT")):8;
     if(width<=0||height<=0||width%8||height%8||((width>512||height>512)&&!(width==1920&&height==1152)))return 2;
     if(scan&&(width!=8||height!=8))return 2;
-    const size_t input_tile_bytes = size_t(width)*height*4*sizeof(float);
+    const bool game_texture=std::getenv("DLSS5_PREBLOCK_GAME_TEXTURE")!=nullptr;
+    if(game_texture&&(width!=1920||height!=1152||scan||!std::getenv("DLSS5_PREBLOCK_PARAMETER_FILE")))return 2;
+    const int texture_width=width,texture_height=game_texture?1080:height;
+    const size_t input_tile_bytes = size_t(texture_width)*texture_height*4*sizeof(float);
     const size_t allocation_bytes=std::max<size_t>(1<<20,size_t(width)*height*32*4);
     if (weights.size() != 21696 || input.empty() || input.size() % input_tile_bytes) return 2;
     if(scan&&input.size()!=input_tile_bytes)return 2;
@@ -87,8 +90,8 @@ int main(int argc, char **argv) {
     check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, allocation_bytes));
 
     CUDA_ARRAY3D_DESCRIPTOR array_desc{};
-    array_desc.Width = width;
-    array_desc.Height = height;
+    array_desc.Width = texture_width;
+    array_desc.Height = texture_height;
     array_desc.Format = CU_AD_FORMAT_FLOAT;
     array_desc.NumChannels = 4;
     CUarray array;
@@ -96,11 +99,11 @@ int main(int argc, char **argv) {
     CUDA_MEMCPY2D copy{};
     copy.srcMemoryType = CU_MEMORYTYPE_HOST;
     copy.srcHost = input.data();
-    copy.srcPitch = width * 4 * sizeof(float);
+    copy.srcPitch = texture_width * 4 * sizeof(float);
     copy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
     copy.dstArray = array;
     copy.WidthInBytes = copy.srcPitch;
-    copy.Height = height;
+    copy.Height = texture_height;
     check("cuMemcpy2D", cuMemcpy2D(&copy));
 
     CUDA_RESOURCE_DESC resource_desc{};
@@ -152,12 +155,12 @@ int main(int argc, char **argv) {
         // Replace all captured texture/resource handles; retain scalar behavior.
         std::memset(params,0,0x48);
         std::memcpy(params+texture_offsets[texture_slot],&texture,8);
-        const float fw=float(width),fh=float(height),iw=1.0f/width,ih=1.0f/height;
+        const float fw=float(texture_width),fh=float(texture_height),iw=1.0f/texture_width,ih=1.0f/texture_height;
         const uint64_t down_dims=uint64_t(height/2)|(uint64_t(width/2)<<32);
         std::memcpy(params+0x90,&fw,4);std::memcpy(params+0x94,&fh,4);
         for(int offset:{0x98,0xa0})std::memcpy(params+offset,&iw,4);
         for(int offset:{0x9c,0xa4})std::memcpy(params+offset,&ih,4);
-        std::memcpy(params+0xd0,&height,4);std::memcpy(params+0xd4,&width,4);
+        std::memcpy(params+0xd0,&texture_height,4);std::memcpy(params+0xd4,&texture_width,4);
         std::memcpy(params+0xd8,&main_output,8);std::memcpy(params+0xe0,&device_weights,8);
         std::memset(params+0xe8,0,8);std::memcpy(params+0xf0,&dimensions,8);
         std::memcpy(params+0xf8,&downsample_output,8);std::memcpy(params+0x100,&down_dims,8);
