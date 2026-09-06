@@ -46,7 +46,9 @@ int wmain(int argc,wchar_t**argv){try{
  if(fronthead){outputs[0]=split[7].Output();outputs[1]=head.Output();sizes[0]=UINT64(60)*36*512*4;sizes[1]=UINT64(32)*20*1024*4;for(UINT i=0;i<2;i++){readback[i]->Release();readback[i]=buffer(device,sizes[i],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[i].resize(sizes[i]/4);}}
  NativeVitGather bridge;NativeVitBlock vit[8];
  if(frontvit){auto packed=read((std::wstring(argv[7])+L"\\hwc-to-vit.i32").c_str());std::vector<UINT>map(packed.size());std::memcpy(map.data(),packed.data(),packed.size()*4);bridge.Create(device,head.Output(),map,argv[7]);auto*source=bridge.Output();for(UINT i=0;i<8;i++){auto prefix=std::wstring(argv[7])+L"\\block"+std::to_wstring(31+i)+L"-";vit[i].Create(device,source,640,read((prefix+L"expand.f32").c_str()),read((prefix+L"contract.f32").c_str()),read((prefix+L"qkv.f32").c_str()),read((prefix+L"projection.f32").c_str()),argv[7]);source=vit[i].Output();}outputs[0]=source;sizes[0]=655360ull*4;readback[0]->Release();readback[0]=buffer(device,sizes[0],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[0].resize(sizes[0]/4);}
- NativeActualDecoder69 decoder;NativePost70 final_post;
+ NativeActualDecoder69 decoder;NativePost70 final_post;ID3D12Resource*post_color=nullptr;
+ const wchar_t*alternate_path=_wgetenv(L"DLSS5_ALTERNATE_RGB");std::vector<float>alternate;
+ if(alternate_path){if(!frontfinal)throw std::runtime_error("alternate RGB requires full final chain");alternate=read(alternate_path);if(alternate.size()!=rgb.size()||alternate==rgb)throw std::runtime_error("alternate RGB must differ with same geometry");for(float v:alternate)if(!std::isfinite(v))throw std::runtime_error("nonfinite alternate RGB");}
  if(frontdecoder){decoder.Create(device,vit[7].Output(),split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),stages[3].Output(),argv[7]);outputs[0]=decoder.Output();sizes[0]=960ull*576*32*4;}
  if(frontfinal){
   if(_wgetenv(L"DLSS5_POST_BASE_ONLY"))throw std::runtime_error("diagnostic post cannot validate final chain");
@@ -54,16 +56,23 @@ int wmain(int argc,wchar_t**argv){try{
   std::vector<float>color(1920ull*1152*4);for(UINT y=0;y<1152;y++){UINT sy=y<1080?y:2158-y;std::memcpy(color.data()+size_t(y)*1920*4,rgb.data()+size_t(sy)*1920*4,1920*4*sizeof(float));}
   auto*base=buffer(device,color.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;ck(base->Map(0,&none,&p));std::memcpy(p,color.data(),color.size()*4);base->Unmap(0,nullptr);
   auto coeff=[&](const wchar_t*name){return read((std::wstring(argv[7])+L"\\post70-"+name+L".f32").c_str());};
-  final_post.Create(device,decoder.Output(),block.Main(),base,1920,1152,coeff(L"scales"),coeff(L"ffn"),coeff(L"attention"),coeff(L"head"),argv[7]);base->Release();outputs[0]=final_post.Output();sizes[0]=1920ull*1152*3*4;
+  final_post.Create(device,decoder.Output(),block.Main(),base,1920,1152,coeff(L"scales"),coeff(L"ffn"),coeff(L"attention"),coeff(L"head"),argv[7]);post_color=base;base->Release();outputs[0]=final_post.Output();sizes[0]=1920ull*1152*3*4;
  }
  if(frontdecoder){readback[0]->Release();readback[0]=buffer(device,sizes[0],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[0].resize(sizes[0]/4);}
+ if(alternate_path){outputs[2]=decoder.Output();sizes[2]=960ull*576*32*4;readback[2]->Release();readback[2]=buffer(device,sizes[2],D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);data[2].resize(sizes[2]/4);}
  UINT64 fence_value=0;
  auto submit=[&](){ck(c->Close());ID3D12CommandList*lists[]={c};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,++fence_value));ck(fence->SetEventOnCompletion(fence_value,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(device->GetDeviceRemovedReason());auto completed=fence->GetCompletedValue();if(completed==UINT64_MAX||completed<fence_value)throw std::runtime_error("invalid fence completion");};
  auto flush=[&](){submit();ck(allocator->Reset());ck(c->Reset(allocator,nullptr));};
  const UINT base_seed=live?(std::getenv("DLSS5_TEST_SEED")?UINT(std::strtoul(std::getenv("DLSS5_TEST_SEED"),nullptr,0)):0):0x3f800000;
  for(UINT frame=0;frame<5;frame++){
   if(frame){ck(allocator->Reset());ck(c->Reset(allocator,nullptr));}
-  UINT seed=live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);if(reflect_input)reflect.Record(c);block.Record(c,seed,!global);if(front4){for(auto&stage:stages)stage.Record(c);ds.Record(c);}if(front8){for(auto&stage:c64)stage.Record(c);ds8.Record(c);}if(front14){for(auto&stage:c128)stage.Record(c);ds14.Record(c);}if(front22){for(auto&stage:c256)stage.Record(c);ds22.Record(c);}
+  if(alternate_path&&(frame==2||frame==3)){
+   const auto&chosen=frame==2?alternate:rgb;void*p=nullptr;
+   // Previous frame has completed its final fence before either upload changes.
+   ck(input->Map(0,&none,&p));std::memcpy(p,chosen.data(),chosen.size()*4);input->Unmap(0,nullptr);
+   ck(post_color->Map(0,&none,&p));for(UINT y=0;y<1152;y++){UINT sy=y<1080?y:2158-y;std::memcpy(static_cast<float*>(p)+size_t(y)*1920*4,chosen.data()+size_t(sy)*1920*4,1920*4*sizeof(float));}post_color->Unmap(0,nullptr);
+  }
+  UINT seed=alternate_path?base_seed:live?(base_seed^(frame==3?1u:0u)):(frame==3?0x12345678:base_seed);if(reflect_input)reflect.Record(c);block.Record(c,seed,!global);if(front4){for(auto&stage:stages)stage.Record(c);ds.Record(c);}if(front8){for(auto&stage:c64)stage.Record(c);ds8.Record(c);}if(front14){for(auto&stage:c128)stage.Record(c);ds14.Record(c);}if(front22){for(auto&stage:c256)stage.Record(c);ds22.Record(c);}
   if(fronthead){for(auto&stage:split)stage.Record(c);head.Record(c);}
   if(frontvit){bridge.Record(c);flush();for(auto&layer:vit)for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);flush();}}
   if(frontdecoder)for(UINT stage=0;stage<decoder.StageCount();stage++){decoder.RecordStage(c,stage);flush();}
@@ -72,9 +81,11 @@ int wmain(int argc,wchar_t**argv){try{
   submit();
   for(UINT i=0;i<3;i++){D3D12_RANGE range{0,SIZE_T(sizes[i])};ck(readback[i]->Map(0,&range,&m));std::memcpy(data[i].data(),m,sizes[i]);readback[i]->Unmap(0,&none);for(float x:data[i])if(!std::isfinite(x))throw std::runtime_error("nonfinite output");}
   if(frame==0){for(UINT i=0;i<3;i++)baseline[i]=data[i];}
-  else if(frame==3&&!raw_features){if(data[0]==baseline[0])throw std::runtime_error("seed has no effect");}
+  else if(alternate_path&&frame==2){for(UINT i=0;i<3;i++)if(data[i]==baseline[i])throw std::runtime_error("alternate RGB failed to change final/head/decoder output");}
+  else if(!alternate_path&&frame==3&&!raw_features){if(data[0]==baseline[0])throw std::runtime_error("seed has no effect");}
   else for(UINT i=0;i<3;i++)if(data[i]!=baseline[i])throw std::runtime_error("persistent-resource replay changed output");
   std::printf("frame=%u seed=%08x replay_check=pass\n",frame,seed);
+  if(alternate_path)std::printf("dynamic_rgb frame=%u input=%c checked=final,head,decoder69\n",frame,frame==2?'B':'A');
  }
  for(UINT i=0;i<3;i++){std::ofstream f(argv[4+i],std::ios::binary);if(!f.write(reinterpret_cast<const char*>(data[i].data()),sizes[i]))throw std::runtime_error("output write failed");}
  std::printf("resident_chain=pass width=%u height=%u frames=5 intermediate_CPU_transfers=0\n",width,height);return 0;

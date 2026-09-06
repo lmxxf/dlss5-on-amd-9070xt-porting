@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：补充真实RGB切换验收代码（未运行）
+
+- 主host新增可选DLSS5_ALTERNATE_RGB，限定FRONTFINAL，要求B输入同尺寸、有限且与A不同。五帧序列改为A/A/B/A/A，seed保持不变；在上一帧fence完成后才更新RGB upload及由它生成的post反射底图。
+- 动态模式第三路回读改为decoder69而非preblock raw；B必须使final/head/decoder69三路均变化，恢复A后每路都必须与基线完全一致。避免仅post底图变化就把神经网络视为生效。未用B原版oracle做数值校准，因此未来此模式通过也只是因果/重放证据，不能替代B数值与游戏验证。
+- 编译 `/tmp/native-frontdynamic-test.exe` exit0，运行器新增可选-AlternateRgb并清理未选择时的残留env。仅本地修改，未覆盖正在运行的full版本。当前full测试仍session21947/PID39788，持续编译成功日志，尚未最终回读。
+- 下一步先收现有full结果，再用新动态版本和独立B图验证，之后游戏接入。游戏DLL未更新。
+
+
 ### 2026-09-07：游戏接入点审计，明确提交顺序迁移要求
 
 - 当前游戏端源文件为 `dlss5_1080p_runtime.cpp`。`hook_ffx_dispatch` 在调用原FFX前record_frame_bridge、调用后将旧0～70计算写入unwrapped游戏command list；它不拥有该列表的提交时机。`on_present` 可取得主swapchain和原生queue，并已有显示审计与GPU profile fence逻辑。

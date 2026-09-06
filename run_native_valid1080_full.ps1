@@ -1,9 +1,14 @@
 param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-valid1080-full',
-      [string]$Noise='D:\DLSSNR-Lab\matrix-probe\native-runtime-rgb512\functions.f32')
+      [string]$Noise='D:\DLSSNR-Lab\matrix-probe\native-runtime-rgb512\functions.f32',
+      [string]$AlternateRgb='')
 $ErrorActionPreference='Stop'
 if(Get-Process native-preblock-test -ErrorAction SilentlyContinue){throw 'An encoder test is already running; do not restart it'}
 if((Get-Item $Noise).Length -ne 201326592){throw 'Noise table size mismatch'}
 Remove-Item Env:DLSS5_POST_BASE_ONLY -ErrorAction SilentlyContinue
+if($AlternateRgb){
+ if((Get-Item $AlternateRgb).Length -ne 33177600){throw 'Alternate RGB must be 1920x1080 float4'}
+ $env:DLSS5_ALTERNATE_RGB=$AlternateRgb
+}else{Remove-Item Env:DLSS5_ALTERNATE_RGB -ErrorAction SilentlyContinue}
 $env:DLSS5_FRONTFINAL='1'
 $env:DLSS5_REFLECT_VALID1080='1'
 $env:DLSS5_TEST_WIDTH='1920'
