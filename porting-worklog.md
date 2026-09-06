@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：C64 softmax原始归约指令定位
+
+- cuobjdump确认C64原kernel在0x7fa0～0x8600执行packed half局部和，0x8690后warp shuffle，0x8750/8760/8770顺序合并四部分，0x8780合并half两侧，0x87d0/87e0 MUFU.RCP。
+- extract_c64_softmax_trace.py保存0x7a00～8900指令与CUBIN hash到最小窗口目录，便于下一步将bias坐标符号传播到求和树。
+- 现有denominator来自C32追踪，尚未证明与C64同序；仅指令定位，不宣称发现/修复根因，不改生产分母或倒数。未部署DLL。
+
 ### 2026-09-06：block8 query18分母/倒数敏感性线索
 
 - inspect_block8_query.py保存第二head所有中间参考至query-reference.npz，query18分母.30517578125、half倒数3.27734375（精确倒数3.2768），AV复现9差异。
