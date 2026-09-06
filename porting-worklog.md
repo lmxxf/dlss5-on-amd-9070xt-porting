@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB GPU0～14双分支通过
+
+- runner支持-Front14，GPU镜像→preblock→C32/C64/C128直到14/DS连续五帧seed0/0/0/1/0，重放/seed变化检查通过；初始化PID1776活跃，未重复启动。
+- 主分支raw按原FP8边界比较4423680值零差异，down2211840值零差异，finite/device/fence通过。报告amd-front14/validation.json。
+- seed1未原始逐值验证，仍受控单纹理RGB，不是完整游戏输入合同；下一步15以后的完整前端，未部署DLL。
+
 ### 2026-09-07：同RGB GPU0～14整链准备
 
 - prepare_native_valid1080_front14_gpu.py核对原始9～14 main/down14精确结果，直接解码六层权重，继承0～8系数/同RGB输入，导出block14 raw边界对应FP8 main及down oracle。
