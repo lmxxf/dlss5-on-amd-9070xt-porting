@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640block分块独立提交首次三帧精确通过
+
+- NativeVitLinear增加ChunkCount/RecordChunk，按65536输出元素分块：首块处理重放转UAV，末块转SRV；中间块写互不重叠区间。NativeVitBlock提供StageChunks/RecordStageChunk。
+- staged测试每个线性chunk提交后等待独立fence，再继续下一块，保持GPU资源和每值算术不变；QKV/attention仍各单独提交。
+- RX9070XT完整640block三帧全部原始oracle零差异，exit0，无device错误；回读gpu-chunk-fenced.f32与oracle字节级cmp一致。先前失败首帧gpu-first-frame.f32保留。
+- 小块观测毫秒级，但未测完整游戏FPS，不从局部耗时推断性能。此次结果只证明该提交路径三次通过；常规Record同提交路径仍有已记录TDR风险。下一步将此路径扩展到八block并验证输入切换、最终实际图像路径，未部署游戏DLL。
+
 ### 2026-09-06：同提交内拆dispatch未解决TDR
 
 - NativeVitLinear增加output_base常量，将输出范围按65536元素拆成多次dispatch；shader用全局输出索引，不改每值求和。根常量由1扩到2，必须同步更新host/shader。

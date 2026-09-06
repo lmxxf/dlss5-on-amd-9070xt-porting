@@ -20,4 +20,12 @@ D3D12_ROOT_PARAMETER params[5]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D
  }
  void Record(ID3D12GraphicsCommandList*c){if(recorded)barrier(c,true);c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,input->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,residual->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,output->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,1,&count,0);for(UINT base=0;base<count*outputs;base+=65536){c->SetComputeRoot32BitConstants(4,1,&base,1);UINT size=std::min(UINT(65536),count*outputs-base);c->Dispatch((size+63)/64,1,1);}barrier(c,false);recorded=true;}
  ID3D12Resource* Output()const{return output;}
+ UINT ChunkCount()const{return (count*outputs+65535)/65536;}
+ void RecordChunk(ID3D12GraphicsCommandList*c,UINT chunk){
+  if(chunk>=ChunkCount())throw std::runtime_error("linear chunk range");
+  if(chunk==0&&recorded)barrier(c,true);
+  c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,input->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,residual->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,output->GetGPUVirtualAddress());
+  UINT base=chunk*65536,constants[]={count,base};c->SetComputeRoot32BitConstants(4,2,constants,0);c->Dispatch((std::min(UINT(65536),count*outputs-base)+63)/64,1,1);
+  if(chunk+1==ChunkCount()){barrier(c,false);recorded=true;}
+ }
 };

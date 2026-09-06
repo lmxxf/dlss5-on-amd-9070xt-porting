@@ -54,7 +54,7 @@ int wmain(int argc,wchar_t**argv){try{
  };
  for(UINT frame=0;frame<3;frame++){
   std::printf("begin frame=%u device=0x%08x\n",frame,unsigned(d->GetDeviceRemovedReason()));std::fflush(stdout);
-  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++){if(staged){for(UINT s=0;s<5;s++){blocks[i].RecordStage(cmd,s);submit_stage(frame,i,s);}}else blocks[i].Record(cmd);}}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
+  if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++){if(staged){for(UINT s=0;s<5;s++){for(UINT chunk=0;chunk<blocks[i].StageChunks(s);chunk++){blocks[i].RecordStageChunk(cmd,s,chunk);submit_stage(frame,i,s);}}}else blocks[i].Record(cmd);}}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
   D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={output,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
   cmd->ResourceBarrier(1,&b);cmd->CopyBufferRegion(rb,0,output,0,bytes);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);cmd->ResourceBarrier(1,&b);ck(cmd->Close());
   LARGE_INTEGER start,stop,frequency;QueryPerformanceFrequency(&frequency);QueryPerformanceCounter(&start);
