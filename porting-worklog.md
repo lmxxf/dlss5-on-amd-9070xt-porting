@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版参数探针已部署5090，Steam云状态阻止启动
+
+- 确认5090游戏未运行，新增 `D:\SteamLibrary\steamapps\common\StellarBlade\SB\Binaries\Win64\native-ngx-input-contract.addon64`（已修NGX ABI版本），未替换原版DLL。启动任务DLSSNR-Launch-StellarBlade执行0但没有Shipping新进程，旧gameprocess日志无新启动。
+- 使用已核对DLSSNR-UI截图任务；首次立即下载拿到旧黑图，核对任务完成与文件时间后重新下载，看到Steam“云过期”：另一台PC今日3:53仍在运行，云中尚无该存档，按钮为仍然进行游戏/取消。未点击强制继续，不冒充游戏已经启动或probe已经加载。
+- 为避免双机冲突，尝试AMD Shipping正常CloseMainWindow，返回False，不能声称退出。AMD仍主菜单旧base模式。下一步经UI正常退出AMD并等待Steam同步，再取消/重新触发5090启动；不得选择覆盖存档或强行继续。
+- 参数探针仍待现场日志，目标未完成；原神经DLL未更新。
+
+
 ### 2026-09-07：NGX参数MinGW多载虚表ABI差异修正
 
 - 候选probe反汇编原p->Get调用：uint偏移0x58、D3D12Resource偏移0x70。读取LLVM官方 `https://github.com/llvm/llvm-project/blob/main/clang/lib/AST/VTableBuilder.cpp` 的GroupNewVirtualOverloads，Microsoft ABI同名虚方法分组内按声明逆序；结合NVIDIA官方8个Set/8个Get/Reset定义，正确Get resource为slot9/0x48、uint为slot12/0x60。不能直接跨MinGW/MSVC调用该多载接口。
