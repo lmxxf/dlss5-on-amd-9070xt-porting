@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：5090旧提示已消失，Steam启动请求仍未建立游戏进程
+
+- 查看最新截图仍有旧云过期提示后执行取消操作，未点强制继续。初次依据历史3840报告误用双倍点击坐标，随后按实际1920×1080截图坐标纠正；后续截图显示桌面，未出现存档覆盖选择。以后以截图实际像素尺寸为准，不用旧显示驱动报告换算。
+- 再次启动DLSSNR-Launch-StellarBlade任务结果0，但gameprocess日志没有新Shipping，NGX探针日志未生成。任务与UI任务均为Seth/Interactive、Steam进程20816在Session1，不能把任务0当启动成功。
+- 新增show_steam_contract_ui.ps1用于只读聚焦/截图；实际AppActivate Steam PID返回False，截图只见桌面（临时PowerShell窗口），Steam进程仍在。未强杀Steam或自动处理云端选择。下步需检查/正常重启Steam客户端以恢复可见启动，再查原版参数，勿反复重复同一无效启动。
+- AMD已退出且同步完成；5090尚未取到原版参数，目标未完成。新增临时任务DLSSNR-CancelCloudPrompt、DLSSNR-SteamContractUI均已结束，可后续清理。
+
+
 ### 2026-09-07：AMD退出与Steam云同步完成
 
 - 实时截图确认AMD仍主菜单base模式，MainWindowHandle=0。修正focus_game_key：按PID查UnrealWindow，核对前台PID才发键；增加Alt修饰并finally释放按键。发送Alt+F4任务返回0，但进程未退出、截图停住，未把发送成功当退出成功。
