@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：连续decoder主分支推进到65
+
+- block62脚本新增--main-hwc/--output-root，用连续block61原始oracle替换随机main，skip保持seed3015独立随机。原始62及随后63/64/65逐层零差异，C64各8847360值。
+- ignored release/native-decoder-tail-game保存新连续来源结果，旧独立fixture保留。62报告本次进程读取的是新增main_source字段之前脚本版本，来源由本次命令与input.f32记录，不据缺失字段假定随机main。
+- 连续链仍未接encoder真实skip，未执行AMD49～69整段或部署游戏DLL。
+
 ### 2026-09-06：尾段连续来源oracle推进到block61
 
 - block56测试支持--main-hwc/--output-root，用已验证原始block55的oracle.f32作为主输入，不再重置随机main；skip仍固定独立随机seed3014，非真实encoder14跳接。
