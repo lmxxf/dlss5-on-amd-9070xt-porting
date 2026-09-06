@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第70块首次实测失败、底图路径分离（2026-09-06）：新增独立宿主/参数导出/读回验证器，使用原512/seed2851变化底图夹具，实际shader编译与执行完成。首次最终786432值全零，max0.6320953369，明确fail；本地amd/gpu.f32及validation.json保留该失败。新增POST_BASE_ONLY诊断1直接底图回写三帧全exact，说明这条资源/输出接线可用，不计入神经验收。
+
+诊断2跳过head计算但保留RGB编码/解码，使用double表达式时也全零；改为逐步precise float，诊断2三帧全exact。这是可重现代码路径差异，未未经证据归因驱动或硬件。保留原SASS的float32运算顺序，无公式代数折叠。随后恢复正常神经计算，输出已非零，但786237/786432值不同、max0.016986846923828125，仍fail；读回另存gpu-after-rgb-fix.f32，SHA b30050f7afbbf00379216011873b1d26e8a40569b9bf0327f0efdfd75f6f2aaf，对应validation-after-rgb-fix.json，不覆盖初始失败。
+
+诊断输出写gpu-base.f32，日志显式NOT_neural_acceptance；脚本默认清除诊断变量，只显式-Diagnostic1/2才启用。所有测试进程已退出，无正在运行任务。下一步读回merge及C32 raw-half，区分主体与head首差异，不能因底图或非零响应而称移植成功。游戏DLL未改，目标active。
+
 AMD第70块原生模块实现待验（2026-09-06）：NativeC32Stage新增默认false的raw_output选项，使用RawTiles加crop_raw转换为HWC，不经过main的FP8量化；旧调用默认保持不变。新增NativePost70，常驻main/skip half合流→raw-half C32主体→FP16 head→RGB浮点合成，Record无CPU读回/文件读取。接口仅接受16～512、16倍数尺寸和像素对齐RGBA底图，限定已恢复的texture_mask1/rgb_mode1，不含可选混合纹理。
 
 native_post70.hlsl按实测27位对齐实现两个K16 half矩阵积，包含accumulator指数+1及double→half精确捨入；RGB编码/加残差/解码保留float32边界。merge/finish用二维Dispatch分摊32/3个输出平面，避免512幅面merge超过65535个X组。C++语法检查（包含完整front-chain）及diff检查通过，HLSL编译和AMD数值运行尚未执行，不能宣布第70块移植通过。下一步建立独立宿主，使用原512随机夹具直接比较最终RGB。游戏DLL未改，目标active。

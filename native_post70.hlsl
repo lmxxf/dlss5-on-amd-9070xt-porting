@@ -16,6 +16,10 @@ float exact_half(double value){
 }
 [numthreads(64,1,1)]void finish(uint3 id:SV_DispatchThreadID){
  uint i=id.x+id.y*width*height,p=i/3,row=i%3;if(p>=width*height)return;float acc=0;
+#if POST_BASE_ONLY == 1
+ output[i]=skip_or_color[p*4+row];return;
+#endif
+#if POST_BASE_ONLY != 2
  [unroll]for(uint part=0;part<2;part++){
   float products[16];int e=acc==0?-1000:int((asuint(acc)>>23)&255u)-125;
   [unroll]for(uint j=0;j<16;j++){float a=input[p*32+part*16+j],b=weights[row*32+part*16+j];products[j]=a*b;if(products[j]!=0)e=max(e,int((asuint(a)>>23)&255u)+int((asuint(b)>>23)&255u)-252);}
@@ -25,8 +29,10 @@ float exact_half(double value){
    acc=exact_half(exact_sum*(double)quantum+(double)acc);
   }
  }
+#endif
  // Explicit float32 boundaries, matching the original encode/add/decode order.
- float base=(float)((double)skip_or_color[p*4+row]*0.125-0.0625);
- float encoded=(float)((double)acc*(double)input_scale+(double)base);
- output[i]=clamp((float)((double)encoded*8.0+0.5),0.0,1.0);
+ precise float base=skip_or_color[p*4+row]*0.125-0.0625;
+ precise float encoded=acc*input_scale+base;
+ precise float rgb=encoded*8.0+0.5;
+ output[i]=clamp(rgb,0.0,1.0);
 }
