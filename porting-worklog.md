@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：稳态新增槽类型厘清——两张纹理，不是四张
+
+- 对原始preblock CUBIN定向cuobjdump：param基址0x380，slot0→TEX mask7；slot8（LDCU PC10a0）→TEX PC1590 mask7；slot10（LDCU PCbf0）→TEX PC1090 mask3。另slot18→scalar TEX、slot20→mask6 TEX，本次均零。
+- 原帧1的0x30=float2(1920,1080)、0x38=float2(1/1920,1/1080)，被UR16～19的FFMA/FMUL用于坐标，不是纹理指针。更新审计脚本及pointer-free报告，保留原始非零槽证据并增加typed字段。
+- 实际首帧纹理仅slot0；帧1～7为slot0/8/10。slot8三通道、slot10两通道与历史RGB/运动信息相符，但尚未确认语义，不把候选当事实。稳态输入混合仍未移植，单RGB验证不能覆盖。
+- 下一步结合原端资源创建/绑定或受控双纹理试验定位两张纹理及采样/混合规则。5090仍原版运行，未部署新神经DLL。
+
+
 ### 2026-09-07：关键稳态合同缺口——首帧单槽，后续启用额外输入
 
 - 从当前5090 PID3536下载preblock-live0～7及首次post blob，日志确认本PID/seed0..7/处理1152×1920。ignored `release/native-game-present/temporal-3536` 保存原始证据。
