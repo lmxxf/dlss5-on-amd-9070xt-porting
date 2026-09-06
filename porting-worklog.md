@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block4下采样参考遗漏修正后精确通过
+
+- 对照check_native_c32_ds.py发现新验证器漏池化后FP8量化及既有coded projection输出行顺序；从ds-coded-aux.fp8恢复已验证64通道排列，检查所有空间位置编码一致及排列双射。
+- 补齐两项后valid1080 block4 down8847360值different0/max_abs0/finite通过。保留旧失败down-validation.json，新结果down-validation-corrected.json，导出block4-down.f32为原始global16物理通道顺序，非默认矩阵行序。
+- 没有拟合校正，也未改原生产算术；这是新参考程序遗漏既有合同的修复。下一步AMD同RGB前端整链验证，未部署游戏DLL。
+
 ### 2026-09-06：valid1080 block4下采样参考首轮失败
 
 - validate_native_valid1080_ds4.py从已验证block3主输出重算block4 raw half，水平pair半精度池化，再用既有block4-ds矩阵投影。
