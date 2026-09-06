@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：同valid1080 RGB原始encoder5～8捕获
+
+- build_native_valid1080_c64.py从block4-down继续5～8，实际480×288 C64、shift0/3/1/2，5为inpview、8为ds，真实提取权重。
+- 原始主分支长度/FP8 NaN检查及block8 down长度检查通过，来源/hash保存ignored release/native-rgb-valid1080/encoder-c64/capture.json。
+- 仅捕获成功，尚未逐值参考/AMD同RGB5～8链验收；下一步核对物理通道与下采样，未部署游戏DLL。
+
 ### 2026-09-06：同valid1080 RGB GPU0～4整链双分支通过
 
 - runner新增-Front4并显式设置/清除环境开关，GPU镜像→preblock→1～4→DS连续运行五帧seed0/0/0/1/0，重放与seed变化检查通过。
