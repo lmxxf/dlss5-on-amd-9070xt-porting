@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第70块常量输入精确数值候选（2026-09-06）：原SASS显示最终三个分量乘params+0x30，rgb_mode非零时再*8+0.5并clamp；blend读取和第四分量的非线性混合依赖可选纹理分支，当前texture_mask1夹具未启用该分支。不能把这条简化路径等同所有游戏后处理模式。
+
+check_native_post70_candidates.py从原记录直接重组C32主体：前0x2050保留，普通QKV及后段0x2060起来自原0x20d0..0x5130；main/skip系数为0x2050/0x2090处各32个half，按C32 FFN通道序。尾部FP16候选矩阵input bits=[0,1,3,4,8]、output bits=[2,5,6,7]，使用行0/2/4作当前RGB。主体不移位，合流保留half，主体final也raw-half，最后两K16 half累计，再按当前0.03125倍率转RGB。
+
+主恒0.5/skip零及主零/skip恒0.5两例各768个RGB值逐值全exact，未拟合任何系数或色彩修正。提前FP8合流、FP8主体输出或强制移位候选均不能达到这两例全exact；完整候选报告release/native-post70/candidates.json保留全部误差，不只保存最佳项。仍只验证常量特征与恒底图，空间布局、动态纹理、HMMA随机边界及实际游戏参数未验，AMD第70块尚未实现，游戏DLL未改。
+
 第70块原版神经分支因果响应（2026-09-06）：扩展smoke脚本，保持16×16底图RGB0.25及全部标量参数不变，单独main恒FP8 0.5或skip恒0.5。两例原kernel均正常返回、RGBA全finite，768个RGB分量全部改变；相对底图max差分别0.001178741455078125和0.00431060791015625。报告smoke-main/smoke-skip，输出SHA分别617b4b433e9485cc924ec8b5dcd7e1500eaa303fff42a6977cfd7f039650b724、6df8c6b78ade7fa2cb6a446687d4380f10b1b25d103d1ef106876c9ceeb77554。
 
 进一步只将权重0x5130后的1024字节清零，其他输入/主体权重/参数保持不变，两个非零输入例的RGB都逐值恢复底图0.25。记录effective_weights SHA，区分原提取记录和控制记录。此消融证明在该原版夹具中，main/skip造成的RGB变化依赖最后权重区，不是单纯底图采样差异；不代表AMD第70块已经移植。
