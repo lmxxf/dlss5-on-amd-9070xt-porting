@@ -2979,7 +2979,7 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 - 用户允许继续使用两台调试机器；本轮只运行独立 CUDA 探针，未操作游戏或存档。
 - 新增 `prepare_native_vit_attention_random.py`，生成 seed=3001 的独立随机 Q/K/V；扩展 RTX runner 支持 64/128/256 tokens。
-- RTX 5090 两次 256-token 输出 SHA256 均为 `f8d29c3d99f208a37da f4a793b9a3524b7b6c5c520c7c21390ceaf0c478ec02f`（去除其中空格即完整哈希）。原始产物保存在 ignored `release/native-vit/attention-random-256-3001/`。
+- RTX 5090 两次 256-token 输出 SHA256 均为 `f8d29c3d99f208a37daf4a793b9a3524b7b6c5c520c7c21390ceaf0c478ec02f`。原始产物保存在 ignored `release/native-vit/attention-random-256-3001/`。
 - `check_native_vit_random_candidates.py` 对照三种分母求和图：每 64-token 使用已验证的半精度求和，再按块顺序半精度相加，262144 个输出值全部一致，max_abs=0；先跨块合并位置差 630 个值，按 lane 累加 pair 差 711 个值。
 - 这是单个随机样本的候选公式验证，还需额外 seed / 128-token 对照；未修改 AMD attention 或部署新游戏 DLL，不能据此宣称游戏画面修复。
 
