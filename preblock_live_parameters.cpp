@@ -15,6 +15,7 @@ using GetKernel=void*(*)(void*,const char*,uint32_t,uint32_t,uint32_t,uint64_t);
 GetKernel original_get=nullptr;SRWLOCK names_lock=SRWLOCK_INIT;
 std::vector<std::pair<void*,std::string>> names;std::atomic<unsigned> launches{0};
 constexpr wchar_t Log[]=LR"(D:\DLSSNR-Lab\logs\preblock-live-parameters.txt)";
+wchar_t parameter_directory[MAX_PATH]{};
 void* get_hook(void*self,const char*name,uint32_t x,uint32_t y,uint32_t z,uint64_t shared){
  void*result=original_get(self,name,x,y,z,shared);
  if(result&&name){if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"kernel_create name=%s args_xyz=%u,%u,%u shared_arg=%llu\n",name,x,y,z,shared);fclose(f);}}
@@ -23,7 +24,16 @@ void* get_hook(void*self,const char*name,uint32_t x,uint32_t y,uint32_t z,uint64
 int64_t hook(void*self,void*context,uint32_t x,uint32_t y,uint32_t z,void*blob,uint64_t bytes,uint8_t flag){
  unsigned seq=launches.fetch_add(1);
  if(seq<200){std::string name="unknown";AcquireSRWLockShared(&names_lock);for(const auto&item:names)if(item.first==context){name=item.second;break;}ReleaseSRWLockShared(&names_lock);
-  if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"launch=%u kernel=%s grid=%u,%u,%u bytes=%llu\n",seq,name.c_str(),x,y,z,bytes);fclose(f);}}
+  if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"launch=%u kernel=%s grid=%u,%u,%u bytes=%llu\n",seq,name.c_str(),x,y,z,bytes);fclose(f);}
+  // Read CPU argument blobs only, never dereference captured GPU resources.
+  if(parameter_directory[0]&&blob&&bytes>0&&bytes<=0x200){
+   void*parameters=nullptr;SIZE_T got=0;unsigned char data[0x200]{};
+   if(ReadProcessMemory(GetCurrentProcess(),blob,&parameters,sizeof(parameters),&got)&&got==sizeof(parameters)&&parameters&&ReadProcessMemory(GetCurrentProcess(),parameters,data,SIZE_T(bytes),&got)&&got==bytes){
+    wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,L"%ls\\launch-%04u.bin",parameter_directory,seq);
+    if(FILE*f=_wfopen(path,L"wb")){size_t written=fwrite(data,1,SIZE_T(bytes),f);fclose(f);if(written==bytes)if(FILE*log=_wfopen(Log,L"ab")){fprintf(log,"parameter_capture launch=%u bytes=%llu path=%ls\n",seq,bytes,path);fclose(log);}}
+   }
+  }
+ }
  if(bytes==0x108&&blob){unsigned n=count.fetch_add(1);if(n<8){
   unsigned char data[0x108]{};SIZE_T got=0;void*parameters=nullptr;
   // Backend +449a0 loads [argument_array] before forwarding the by-value blob.
@@ -45,6 +55,8 @@ DWORD WINAPI worker(void*){
  auto*getter=reinterpret_cast<unsigned char*>(module)+0x44830;
  const unsigned char get_expected[]={0x40,0x53,0x57,0x48,0x81,0xec,0x58,1,0,0};
  if(memcmp(getter,get_expected,sizeof(get_expected)))return 4;
+ swprintf(parameter_directory,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\native-kernel-params-%lu-%llu)",GetCurrentProcessId(),GetTickCount64());
+ if(!CreateDirectoryW(parameter_directory,nullptr))parameter_directory[0]=0;
  const auto init=MH_Initialize();const auto create=MH_CreateHook(target,reinterpret_cast<void*>(&hook),reinterpret_cast<void**>(&original));
  const auto create_get=MH_CreateHook(getter,reinterpret_cast<void*>(&get_hook),reinterpret_cast<void**>(&original_get));
  if(FILE*f=_wfopen(Log,L"wb")){fprintf(f,"format=indirect-v3 init=%d create=%d create_get=%d pid=%lu\n",int(init),int(create),int(create_get),GetCurrentProcessId());fclose(f);}

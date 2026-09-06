@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原游戏移位合同发现实质差异（2026-09-06）：只读检查5090，未见游戏进程；现有preblock日志仍为04:38旧捕获，未启动游戏或切换窗口。下载保存到release/live-preblock-v2/launches.txt，包含完整第一帧launch0～154。新增audit_native_live_shifts.py按原preblock H/W2176/3840及8×8窗口、每轴0/-4假设枚举可兼容grid的mask，输出native-live-shift-audit.json并保留日志SHA。
+
+48～69可唯一推导：48=0；49～55=3/1/2/0/3/1/2；56=1；57～61=2/0/3/1/2；62=0；63～65=3/1/2；66=0；67～69=3/1/2。与当前512控制配置多处不同，不能把此前原kernel/AMD按给定参数的exact提升为原游戏配置exact。40～47输入H68时Y0/-4均得到gridY9，日志只能确定X，不能擅自猜Y。原ViT attention grid32×9、expand544等也表明64-token不是原游戏规模；具体H/W/padding仍需blob，未从grid直接宣布token数。
+
+preblock_live_parameters.cpp已扩展为只读捕获前200次launch的CPU参数blob（最大0x200字节），按PID+tick独立目录保存，不解引用GPU资源、不改游戏帧；原preblock八次捕获保留。MinGW语法检查通过，尚未重新链接/部署该新版探针，原游戏未启动。下一步补足这些原参数证据，再生成正确配置的新回归，避免在错误shift上继续优化。新神经游戏DLL/公开包均未更新，目标active。
+
 AMD完整RGB512→RGB通过（2026-09-06）：同一会话21197正常exit0，33个shader编译/228次缓存命中，三帧fence等待2469/2406/2390ms及device/fence/finite/replay通过。下载output-rgb512-final.f32后严格最终比较786432值different0/max0，SHA66a3d99a2e0a2111c87373731ca58c0331c2d96ff28086e13cbed96810fa181a；final-validation.json为pass，相对原RGB有786293分量变化大于1e-5。此为完整GPU初始RGB→神经网络→最终RGB，不是独立段拼接。五个DS文件重新下载核对也全exact。
 
 等待期间核对真实尺寸线索：原preblock参数0xf0/0xf4为2176/3840，原caller证明顺序H/W；1080p候选应核对1920×1088输入，旧表960×544不能混当preblock输入。检查当前源代码，ViT仍64-token限定，post≤512，decoder tail固定尺寸，且原游戏移位/多纹理合同未重新验证。因此不部署512实验冒充1080p。新增native-runtime-contract.md集中列明真实运行前的剩余条件，防止历史README成功宣称与当前范围混淆。当前无待观察测试进程，游戏DLL未改，目标active。

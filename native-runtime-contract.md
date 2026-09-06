@@ -6,6 +6,8 @@
 
 ## 进入1080p前必须解决
 
+已发现具体原配置差异：`native-live-shift-audit.json`从保存的4K原启动grid推导出48～69的唯一候选移位，其中49、56等与512测试配置不同。40～47的Y轴无法仅凭grid消歧，必须补参数blob。原先数值通过仅适用于给定测试配置，不能声称原游戏配置已对齐。
+
 - **输入尺寸不能混淆。** 原`live-preblock-v2/preblock-live-0.bin`的0xf0/0xf4是H/W=2176/3840（`run_original_preblock_oracle.cpp`明确按H/W打包）。1920×1088是半尺寸候选，尚未新抓取1080p原运行确认。旧geometry表的960×544对应下采样分支，不能直接当新preblock的RGB输入尺寸。
 - **不是只解除assert。** ViT QKV/attention/linear目前只验证64-token；真实非正方形尺寸需要原kernel的有效token、padding/mask与物理地址验证。不能把512推理再拉伸当1080p数值移植。
 - **部分窗口及跳接。** 当前decoder tail写死512夹具尺寸。需要逐阶段正确处理非4/8倍数边缘、池化/head重排及跳接；不能沿用旧proxy表就声称已证实。
