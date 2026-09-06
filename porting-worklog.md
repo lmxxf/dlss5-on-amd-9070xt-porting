@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：block8平方FMA二次舍入机制定位
+
+- 捕获PC3a40相关32lane操作数，key8全32个分量都可在参考K向量找到；按实际HMUL/HFMA/HADD/shuffle用float32重放仍383.25。
+- 关键一项下半平方(-12.75)^2=162.5625恰为half中点，加上上半小平方舍入项会略超中点；float32中间相加可能先抹掉小项。原始HFMA2一次half舍入不应抹掉。
+- 诊断precise_norm改为float64保留融合平方+已half舍入上项，最小原模型窗口3处差异全部消失。尚未生产CPU/AMD通用实现及回归，不能宣布移植完成；未部署DLL。
+
 ### 2026-09-07：key8原始平方和383.5，参考383.25
 
 - inspect_key8_norm_sum.py确认参考inverse .05108642578125与原始.051055908203125不同，分别产生已观察的两种half归一化值。
