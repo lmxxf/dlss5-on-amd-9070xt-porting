@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD block66实际960×576三帧精确通过
+
+- extent host新增upsample66_game，NativeVitLinear half融合结果直接送NativeC32Stage(960×576 shift0)，无中间CPU传输。
+- RX9070XT三帧17694720值different=0/max_abs=0，finite/device/fence通过；提交等待53.827/55.473/58.230ms仅本算子，gpu.f32回读cmp原始oracle一致。
+- ignored release/native-upsample66/amd-game。仍是独立随机输入算子，不是真实encoder跳接或RGB全链；后续67～70和游戏画面验收未完成，未部署DLL。
+
 ### 2026-09-06：AMD block66实际几何与fixture准备
 
 - NativeVitLinear decoder支持138240token/C64→C32，主宽480、输出960×576，保持half merge而非提前FP8；线性输出按65536元素dispatch分块。
