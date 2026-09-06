@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+ViT更长序列的非均匀V控制（2026-09-06）：新增check_native_vit_uniform_qk.py，Q/K零而V逐token/通道取不同二进制可表示值。最初将输出当普通均值，64-token也失败（3776差）；这是裁判遗漏F(exp)与未量化exp分母之差，不是已有64-token实现失效。改为原量化exp×V、每K32 half累计及half倒数归一化，读取同一原输出重新比较，64/128-token分别65536/131072值全exact。原均值失败报告保留，修正裁判报告另写validation-exp.json；期间修复F工具不接受scalar的测试代码错误，未改原输出。
+
+256-token仍77824/262144值不同、max0.05078125；Q/K相同却不同query输出不相同，按每32条query的差异为30912/30912/0/0/8000/8000/0/0。这提示布局/读取或调用合同问题，不能放宽容差或直接解除64-token限制。重新查原kernel_create日志，attention普通/chained均为32×4×1，未猜测改线程数。所有小测试已退出，下一步核对256-token原QKV生成的V物理输出及attention读取范围。游戏神经DLL未改。
+
 真实移位AMD完整RGB512回归通过（2026-09-06）：继续观察原会话36919，正常exit0，PID31832已不存在；33个shader编译/228缓存命中，三帧fence等待2406/2469/2281ms，device/fence/finite/replay通过。下载至native-runtime-rgb512/amd后，对新配置原最终oracle的786432个RGB分量different0/max0，SHA bd52c601b68c4ed27f271cd2c7bcffc8511519f652534f2a0c51ffa9450e6da4；变化大于1e-5的分量786294。新旧配置完整分开，未重启或复用旧pass。
 
 为扩大ViT token合同，新增check_native_vit_extent_control.py，原非chained attention在128-token(16×8)与256-token(16×16)、Q=K=0/V=1控制下，分别131072/262144个有效FP8输出全为1，尾部全零，无NaN。每次调用有15秒进程上限，全部正常返回。仅证明这两个长度的均匀控制，不等于随机attention、非整数窗口长度、整层ViT或AMD扩展已通过。结果在release/native-vit/extent-control-128/256。下一步恢复可变长度attention及原1080p形状；游戏神经DLL未更新，目标active。
