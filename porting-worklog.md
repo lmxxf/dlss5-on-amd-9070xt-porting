@@ -2975,6 +2975,8 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+真实移位新配置40～47回归（2026-09-06）：split检查器增加--output-root，新结果独立保存在release/native-runtime-rgb512，旧控制配置不覆盖。按直接捕获的0/3/1/2/0/3/1/2，从原decoder39输出连续执行原40～47；八块四阶段共32检查点全部different0/max0。原权重各自抽取，原链只用上一原输出，没有CPU修正注入。下一步推进新配置48～70并重新验证AMD全链；本轮不继承旧配置后段pass。游戏补丁未更新。
+
 只读探针部署与直接参数解码（2026-09-06，跨用户中断恢复）：新v4探针SHA d7887caeb9ccf8713ba63079ffb8de95877b008f2a0d09487610c3fd99e36c38已编译并部署5090，旧探针SHA c256f1a5...备份为preblock-live-parameters.addon64.backup-20260906-113147-633。部署脚本改为游戏运行则拒绝、先备份验证，再安装；启动需显式-Launch，不自动杀游戏。使用核对过的Steam -applaunch3489700任务，实际游戏PID24064、19:32:34启动，v4日志和200份参数blob已下载至release/native-kernel-params-24064-11278468。期间曾尝试CloseMainWindow返回False，不能声称已退出；用户随后允许继续使用两台机器。未改AMD神经DLL或存档。
 
 用户在5090实际游戏中用F6观察到角色变暗，确认该开关有可见影响；这是用户现场观察，不冒称同帧GPU输出审计。ReShade日志的EvaluateFeature_C入口错误后仍有普通EvaluateFeature挂钩及feature18多次evaluate成功，本轮参数捕获也完整；已向用户区分“执行”和“最终回写”证据。
