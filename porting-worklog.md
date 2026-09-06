@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：剩余窗口捕获TEX重建全half一致，倒数精化无效已撤回
+
+- 抓原120×72 block14 warp1 PC10d0/1590/1800，软件自生成坐标仍有lane1/9 half偏差；改用原捕获五tap normalized UV与权重、21bit trunc及边际保持量化重建，则96half全一致，max float1.19e-7。新增check_native_captured_temporal_taps.py保存该隔离证据，不把使用原中间值的重建当完整验收。
+- 原采样器尺寸倒数R28/R33位模式与host rounded float(1/120,1/72)一致。高UV独立ramp扫测也符合21bit trunc候选，暂未找到该规则反证。
+- 试验GPU采样动态倒数Newton精化，session26696五帧结束，最终仍72/21。已撤回refined_reciprocal代码并将正常shader同步回实验目录，无效修改不保留；失败回读保留refined。
+- 下一步直接抓GPU TEX前UV/权重，与原PC1590逐一比较，定位第一个生成差异；不继续盲改全局代数。新神经DLL未部署。
+
+
 ### 2026-09-07：小GPU回归通过，UV/FMA与历史子矩形顺序实验未消除72/21
 
 - 重新编译独立sampler GPU测试匹配5个root常量，四holdout三次512RGBA half均different=0，session36347 exit0，排除新绑定破坏既有小样本。
