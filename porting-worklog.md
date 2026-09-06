@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整0～70同源GPU夹具及运行/验收脚本就绪
+
+- `prepare_native_valid1080_full_gpu.py` 已生成ignored `release/native-rgb-valid1080/amd-full`：0～70系数、正逆640映射、唯一RGB输入、最终RGB与head比较对照。decoder40～69主输入连续性及四处upsample的同源encoder跳接均按文件内容检查通过；不把skip或预制特征作为运行输入打包。
+- 新增 `run_native_valid1080_full.ps1` 设置FINAL/valid1080/seed0/noise，禁止在另一个native-preblock-test运行时启动；新增 `validate_native_valid1080_full_gpu.py` 检查最终6635520 RGB值与655360 head值，数值非零差异即失败。
+- 当前完整夹具仅在本地准备，未部署/启动完整测试。旧0～38直连仍是session34710/PID39212，轮询有持续成功编译输出，禁止重启。下一步等旧任务完成后核对其输出，部署full包与当前exe/shader再跑整链。游戏DLL未更新。
+
+
 ### 2026-09-07：主host接入实际0～70直连，编译通过待整链验收
 
 - `d3d12_native_preblock_test.cpp` 新增 `DLSS5_FRONTDECODER`（含FRONTVIT）与 `DLSS5_FRONTFINAL`（含decoder），将实际decoder39～69接入ViT输出，encoder30/22/14/8/4跳接直接使用GPU资源。decoder13阶段各提交/fence，不回读特征。
