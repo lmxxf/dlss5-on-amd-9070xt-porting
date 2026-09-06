@@ -2779,6 +2779,16 @@ validate_native_split_pool.py新增互斥--rgb256，直接采用这条原版连�
 
 至此block30第五记录在该原kernel下确认为512→1024矩阵运算，真实256×256原版链有可用的4×4×1024入口输出。尚未恢复ViT内部算术或接AMD block30/head；不能把原版/CPU对照称为AMD整链验收。AMD连续范围仍RGB128×128→block29，游戏DLL和公开包未更新，最终画面目标active。
 
+### 2026-09-06 AMD独立block30→池化→512/1024入口验证通过
+
+NativeSplit/NativeSplitWindow新增默认关闭的raw_output参数，仅最终projection编译RAW_OUTPUT=1，FFWD/attention保持原FP8语义。crop保留未量化half值，供后续池化；普通调用默认仍为FP8输出。NativeC32Downsample复用既有raw池化+矩阵shader并扩展CHANNELS=512：水平half加、垂直half加、乘0.25、FP8后做1024×512投影，每K32 half累计。此512分支暂拒绝小于8或非8对齐输入，避免将未闭合2×2池化当成支持。
+
+prepare_native_pool_head_gpu.py以原版256夹具的block29输出作为独立测试入口，导出block30真实四份参数及已验证head矩阵；裁判仅取原CUBIN最终head，不采用拟合/CPU预测作为oracle。d3d12_native_pool_head_test.cpp在9070XT连续执行8×8 block30 shiftY→4×4 pool/head，内部不读回或注入中间值。三帧各16384值全exact、max0，device/fence与重放检查通过；下载gpu.f32后再次核对oracle全exact。
+
+为验证默认路径未被raw开关改变，重新构建d3d12_native_split_window_test.cpp，读取现场夹具大小确认12×8后执行shiftXY，三帧每帧49152值全exact、max0。较长RGB链宿主亦编译通过，但本轮未重跑该整链。
+
+范围严格为AMD独立block30→pool→head，入口是原版block29特征，不是AMD从RGB生成；AMD全连续范围仍RGB128×128→block29。下一步参数化256尺寸并把本段接回连续链，然后继续ViT。游戏DLL、网盘包未更新，最终RGB/剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
