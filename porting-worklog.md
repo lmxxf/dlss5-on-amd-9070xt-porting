@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：稳态RGB输入特征落位精确对齐
+
+- gdb PC1bd0捕获共享存储前R4～7/R48～51，脚本扩展保存R0～64。物理16half与已有mix矩阵特征顺序映射为[0,1,4,5,8,9,12,13,2,3,6,7,10,11,14,15]。
+- 当前RGB保留8/9/12；时序重建RGB经half中心化及0.125缩放写入13/2/3。修改preblock_mix_reference.inputs增加可选temporal_rgb，默认首帧行为不变，不把整个当前RGB替换成历史图。
+- check_native_temporal_features.py比较原warp0，除噪声0/1/4三通道外，全部416个half特征different=0。噪声排除原因明确：此旧helper的近似高斯与生产函数表不同；不称全16通道或完整preblock已验收。
+- 下一步把五tap采样与此特征落位加入AMD生产输入混合，沿用已验证noise table，再与原版双纹理preblock main/down逐值比较。新神经DLL未部署。
+
+
 ### 2026-09-07：原顺序float32/FMA消除最后half差异，四holdout全half精确
 
 - 参考新增axis32/sample32，按原SASS单轴多项式舍入顺序、五tap乘积权重、top→left→center→bottom→right FMA及未归一化权重和/倒数顺序执行。使用fraction8/product8纹理候选，不再用float64最终平均替代原顺序。

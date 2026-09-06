@@ -11,7 +11,7 @@ def unpack_mix(weight):
  matrix=np.zeros((32,16),np.float32);matrix[channel,feature]=weight[4104:4616]
  return matrix
 
-def inputs(rgb,seed=0x3f800000,live=False):
+def inputs(rgb,seed=0x3f800000,live=False,temporal_rgb=None):
  rgb=rgb.astype(np.float16);rgb=((rgb-np.float16(.5))*np.float16(.125 if live else 2)).astype(np.float32)
  g=fields(rgb.shape[1],rgb.shape[0],seed).astype(np.float16).astype(np.float32)
  x=np.zeros((*rgb.shape[:2],16),np.float32)
@@ -20,6 +20,11 @@ def inputs(rgb,seed=0x3f800000,live=False):
  x[:,:,5]=1;x[:,:,7]=1
  if live:
   x[:,:,6]=.0078125;x[:,:,10]=1;x[:,:,11]=1;x[:,:,14]=1
+ if temporal_rgb is not None:
+  if not live or temporal_rgb.shape!=rgb.shape:raise ValueError('temporal RGB requires matching live RGB shape')
+  history=temporal_rgb.astype(np.float16)
+  history=((history-np.float16(.5))*np.float16(.125)).astype(np.float32)
+  for target,source in [(13,0),(2,1),(3,2)]:x[:,:,target]=history[:,:,source]
  return x
 
 if __name__=='__main__':

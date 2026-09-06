@@ -16,7 +16,7 @@ import gdb,json,struct
 rows=[]
 for lane in range(32):
     gdb.execute("cuda thread (%d,0,0)"%lane,to_string=True)
-    raw={str(r):int(gdb.parse_and_eval("$R%d"%r))&0xffffffff for r in range(19,65)}
+    raw={str(r):int(gdb.parse_and_eval("$R%d"%r))&0xffffffff for r in range(65)}
     rgb=[struct.unpack('<f',struct.pack('<I',raw[str(r)]))[0] for r in (47,64,59)]
     rows.append({'lane':lane,'pc':str(gdb.parse_and_eval('$pc')),'rgb':rgb,'raw':raw})
 filename='sample-registers.json' if offset==0x1800 else 'sample-registers-%x.json'%offset
