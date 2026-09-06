@@ -26,6 +26,7 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  }
 }
 groupshared float queries[2048],keys[2048],values[2048];
+#include "native_half_square.hlsli"
 [numthreads(64,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
  uint p=((gid.x/(width/8))*8+t/8)*width+(gid.x%(width/8))*8+t%8;
@@ -38,7 +39,7 @@ groupshared float queries[2048],keys[2048],values[2048];
   }
   q[c]=a;k[c]=b;values[t*32+c]=F(z);
  }
- [unroll]for(uint i=0;i<16;i++){qs[i]=H(q[i]*q[i]+H(q[i+16]*q[i+16]));ks[i]=H(k[i]*k[i]+H(k[i+16]*k[i+16]));}
+ [unroll]for(uint i=0;i<16;i++){qs[i]=NativeHalfSquarePair(q[i],q[i+16]);ks[i]=NativeHalfSquarePair(k[i],k[i+16]);}
  [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));

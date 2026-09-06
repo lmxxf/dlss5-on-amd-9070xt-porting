@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD通用融合平方舍入修复，最小窗口三帧通过
+
+- native_half_square.hlsli利用half平方在float32精确表示及FastTwoSum残差，保留sum丢失小项；仅遇half中点时按残差判方向，覆盖65520溢出边界。无需double或像素特例。
+- native_c64.hlsl的Q/K平方pair改用该函数，AMD原block8最小窗口三帧4096值零差异，device正常，回读cmp原始oracle一致。
+- test_half_square_residual.py随机100万组有限half操作数，float32残差算法全部等于float64承载的一次half舍入。GPU仅最小模型窗口通过，仍需更大回归、其他normalize shader同步及新增include部署脚本覆盖；未部署游戏DLL。
+
 ### 2026-09-07：生产CPU参考融合平方修复及大图回归通过
 
 - native_c32_normalize.py使用float64承载下半平方+已half舍入上半平方，最后一次half舍入，避免float32中间吞掉中点旁的小项；不改归约次序/倒数，不加像素特例。
