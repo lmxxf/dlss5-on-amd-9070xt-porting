@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：独立CUDA纹理扫描支持normalized小数21bit截断
+
+- 新增probe_cuda_texture_fraction.cu，真实float4纹理R=x/G=y ramp，单纯tex2D normalized/linear/clamp，无神经运算。围绕原错误UV邻近257个float32值扫描，重现38处软件float32乘尺寸nearest与TEX不符。
+- 新增check_cuda_texture_fraction_sweeps.py，4组位置/尺寸（120×72两位置、24×16、1920×1080），共1028测试点。候选floor(u*2^21)/2^21再乘尺寸/8bit fraction对全部点一致；20bit nearest在其它三组差15/15/18，排除该候选。session88709 exit0，原始CSV及报告ignored release/native-texture-fraction。
+- 这是硬件坐标转换的受控证据，不是所有坐标/格式/负边界的全域证明。下一步把normalized固定小数转换接回GPU motion/history采样，保留float32坐标变换顺序，再验证120×72原版主/DS。尚未修改生产采样shader，新神经DLL未部署。
+
+
 ### 2026-09-07：120×72首个时序偏差定位到TEX横向fraction临界
 
 - 诊断GPU回读完成session57101 exit0，坐标/采样文件保存在native-temporal-large。原block(1,0) warp0抓PC10d0/1590/1730/1800；32像素仅lane19(y2,x11)三RGB half不同，最大RGB差0.001032，坐标仅5/64分量差且max1.19e-7。
