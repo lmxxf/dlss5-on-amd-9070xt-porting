@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD decoder40～47八块独立连续链通过（2026-09-06）：d3d12_native_split_window_test.cpp新增decoder40_47模式，以16×16×512原decoder39输入开始，八个NativeSplitWindow分别加载自己的参数，shift按0/1/3/2/0/1/3/2，GPU层间直接传递，无CPU读回/修正。prepare_native_decoder_split_gpu.py先核对八份pass/32检查点及原输入路径连续性，再导出原block47最终oracle。部署独立目录D:\DLSSNR-Lab\matrix-probe\native-decoder40-47。
+
+六个shader编译日志已生效：ffwd2833ms、ffwd_projection1127ms、attention5702ms、projection30881ms、pack16ms、crop8ms；这明确展示至少本轮大段等待位于shader编译，非GPU逐帧执行时间。三帧最终131072值全部different0/max0，device/fence/finite/replay通过。下载gpu-0.f32后validate_native_decoder_split_gpu.py再次全exact，SHA8823598967d37c5c56230e8c6febb7d471be9548711858fdc98b55cc240f725a，报告release/native-rgb512/amd-decoder40-47/validation.json为pass。
+
+独立链初始输入仍来自原decoder39夹具，不能将本轮与先前RGB→39的两个通过简单拼称已验RGB→47。下一步接入全连续链，并处理第48块降通道/上采样及后续层。shift的实际原游戏调度证据仍待复核；游戏DLL和公开包未改，目标active。
+
 原版/CPU decoder40～47连续验证通过（2026-09-06）：新增check_native_decoder_split.py，每块独立抽取自己的四份原记录、原CUBIN native-plain执行后读branch/ffn/attention/final四阶段，再用native_split_weights与已验原生参考核对。输入从RGB512衍生的原decoder39最终输出开始，后续只消费前一块原输出，不把CPU结果注入原链。八块共32个检查点均131072值different0/max0，所有输出finite且有效区外零；每个小测试均一秒内返回，未做长时间basis扫描。
 
 当前采用shift序列0/1/3/2/0/1/3/2，来自历史decoder脚本的配置；本轮证明这些给定参数下算子数值正确，不等同新核对过游戏层对象实际shift参数。各块validation.json明确该边界，失败先写fail，不用旧pass兜底。解码后的ffwd/ffwd-projection/attention和原最终oracle已导出至release/native-rgb512/decoder-block40..47，权重/激活不入Git。
