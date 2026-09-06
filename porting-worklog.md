@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第39块空间随机输入闭合（2026-09-06）：smoke脚本新增spatial及seed参数，8×8×1024主特征、16×16×512 skip均逐像素/通道随机FP8；分别按双C512 cell bank和单C512 cell编码。seed2301原输出在smoke-o620n1od，seed2307留出在smoke-8qclb2i4，两个原kernel正常返回、counter全3、NaN0。新增native_decoder_entry_reference.py直接解码矩阵/尾系数，四K256分区累计后以最近邻重复2×2，最后H(main+skip*scale)并FP8；两份各131072值与原最终输出全exact，包括该16×16输出边界。双线性align_corners=false候选无论先X/先Y、是否中间half均失败，约122296～122360值不同。
+
+check_native_decoder_spatial.py严格比较并分别写spatial-validation.json，scope明确仅CPU/original block39的8×8输入，不含AMD/游戏。该结果恢复了这一尺寸下矩阵、输入/输出cell排列、nearest上采样及融合skip运算，无拟合校正。其他尺寸、原ViT1D输出到本层输入的重排、原block30 skip来源及AMD实现仍需闭合，不能把独立随机fixture冒充RGB连续链。游戏DLL未改，下一步实现AMD第39块并做独立GPU比较。
+
 第39块矩阵/skip候选数值核对（2026-09-06）：新增check_native_decoder_entry_candidates.py，直接解码原权重，使用已有C512 cell排列读取最终16×16×512输出。512×1024矩阵物理output bits=[3,6,7,8,9,10,11,12,13]、input bits=[1,0,4,5,2,14,15,16,17,18]；四个K256分区内每K32 half累加，分区间依序half相加。main恒0.5、skip零时131072值全exact。尾区按split projection的order=(c//16)*16+(c%8)*2+(c%16//8)恢复，main零/skip恒0.5时全exact；线性读取尾区则101376值不同。
 
 新增seed2301逐通道随机、空间常量的双路输入（smoke-h9cyqj1o），主1024通道按两个C512 cell bank编码，skip512按C512 cell编码。单次原kernel正常返回、counter全3、NaN0。上述矩阵候选加最终H(main_sum+skip_input*tail_scale)再FP8，全部131072值exact；若先单独H(skip*scale)再相加则256值不同、max0.001953125，因此本夹具明确区分了最终half fused乘加与提前舍入。没有拟合矩阵或修正值。空间上仍为常量，尚不能证明2倍上采样/边界/ViT实际重排；下一步用空间变化输入恢复插值合同。当前仍无AMD第39块实现或最终游戏画面验收。

@@ -8,11 +8,12 @@ import tempfile
 import struct
 
 p = argparse.ArgumentParser(description=__doc__)
-p.add_argument('--case', choices=['zero', 'main', 'skip', 'channels'], default='zero')
+p.add_argument('--case', choices=['zero', 'main', 'skip', 'channels', 'spatial'], default='zero')
+p.add_argument('--seed', type=int, default=2301)
 a = p.parse_args()
 base = Path(__file__).resolve().parent
 root = Path(tempfile.mkdtemp(prefix='smoke-', dir=base / 'release'))
-report = {'status': 'running', 'scope': 'original kernel smoke only', 'case': a.case,
+report = {'status': 'running', 'scope': 'original kernel smoke only', 'case': a.case, 'seed': a.seed,
           'directory': str(root), 'width': 8, 'height': 8}
 def save():
     (root / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -20,11 +21,11 @@ save()
 try:
     (root / 'main.fp8').write_bytes(bytes([0x30 if a.case == 'main' else 0]) * (8 * 8 * 1024))
     (root / 'skip.fp8').write_bytes(bytes([0x30 if a.case == 'skip' else 0]) * (16 * 16 * 512))
-    if a.case == 'channels':
+    if a.case in ('channels', 'spatial'):
         import numpy as np
         from native_c32_reference import F
         from encode_tinlayout_global import quantize
-        rng=np.random.default_rng(2301)
+        rng=np.random.default_rng(a.seed)
         main=F(rng.normal(0,.25,1024).astype(np.float32))
         skip=F(rng.normal(0,.25,512).astype(np.float32))
         main.tofile(root/'main-channels.f32'); skip.tofile(root/'skip-channels.f32')
@@ -35,6 +36,14 @@ try:
         cells=np.broadcast_to(quantize(skip),(16,512)).reshape(1,8192)
         packed=np.empty_like(cells); packed[:,inverse]=cells
         np.tile(packed.ravel(),16).tofile(root/'skip.fp8')
+        if a.case == 'spatial':
+            main=F(rng.normal(0,.25,(8,8,1024)).astype(np.float32))
+            skip=F(rng.normal(0,.25,(16,16,512)).astype(np.float32))
+            main.tofile(root/'main-hwc.f32'); skip.tofile(root/'skip-hwc.f32')
+            cells=quantize(main).reshape(2,4,2,4,2,512).transpose(0,2,4,1,3,5).reshape(-1,8192)
+            packed=np.empty_like(cells); packed[:,inverse]=cells; packed.tofile(root/'main.fp8')
+            cells=quantize(skip).reshape(4,4,4,4,512).transpose(0,2,1,3,4).reshape(-1,8192)
+            packed=np.empty_like(cells); packed[:,inverse]=cells; packed.tofile(root/'skip.fp8')
     subprocess.run(['python3', str(base / 'extract_native_weight_record.py'),
                     '/home/lmxxf/work/tmp-test/nvngx_dlssnr.dll',
                     'block39.layer0.layer', str(root / 'weights.bin')], check=True, timeout=5)
