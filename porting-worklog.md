@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原版/CPU decoder40～47连续验证通过（2026-09-06）：新增check_native_decoder_split.py，每块独立抽取自己的四份原记录、原CUBIN native-plain执行后读branch/ffn/attention/final四阶段，再用native_split_weights与已验原生参考核对。输入从RGB512衍生的原decoder39最终输出开始，后续只消费前一块原输出，不把CPU结果注入原链。八块共32个检查点均131072值different0/max0，所有输出finite且有效区外零；每个小测试均一秒内返回，未做长时间basis扫描。
+
+当前采用shift序列0/1/3/2/0/1/3/2，来自历史decoder脚本的配置；本轮证明这些给定参数下算子数值正确，不等同新核对过游戏层对象实际shift参数。各块validation.json明确该边界，失败先写fail，不用旧pass兜底。解码后的ffwd/ffwd-projection/attention和原最终oracle已导出至release/native-rgb512/decoder-block40..47，权重/激活不入Git。
+
+下一步在AMD串联这八块并验证原最终block47，避免重跑完整RGB链的长shader初始化作为每个小修改的反馈环。最终仍需再做RGB全连续回归；目前AMD严格连续范围到39，游戏DLL未改。
+
 AMD RGB512→第39块连续验证通过（2026-09-06）：继续读取同一SSH会话93511，进程正常exit0；27个shader编译、126次缓存命中，三帧提交至fence等待1718/1610/1656ms，重放与device/fence/finite检查通过。AMD PID28652已不存在，没有重启测试。下载output-rgb512-decoder39.f32后validate_native_rgb512_decoder.py严格通过：131072值different0/max0，SHA565979c464e6fda2cb065c029dec652129736ae8737963b39a31c325f19d6c71。报告release/native-rgb512/amd/decoder39-validation.json。
 
 本次重新下载五份DS读回并比较原检查点，DS0/4/8/14/22全部exact。由此首次把AMD连续范围从ViT38推进到decoder39，包含GPU重排和block30跳接FP8量化，无中间CPU值注入。实验启动阶段耗时较长，但没有证据把用户此前系统异常归因于该原因；以上毫秒数是提交后的fence等待，不是游戏FPS。下一版已加编译进度日志，本次成功exe未包含该日志改动。
