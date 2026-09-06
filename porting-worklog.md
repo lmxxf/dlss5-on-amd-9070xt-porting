@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：最终RGB→R10纹理复制组件完成，待GPU验证
+
+- 新增 `native_game_rgb_output.h`，从1920×1152浮点RGB buffer生成前1080行R10 packed数据，以7680字节footprint CopyTextureRegion至同device的1920×1080 R10G10B10A2_UNORM纹理。
+- Record恢复目标纹理原始状态，重复调用恢复packed buffer的UAV状态；不提交/关闭游戏列表。目标格式/尺寸/device显式检查，颜色空间仍须调用端验证，不把R10格式等同于SDR合同。
+- MinGW独立语法检查exit0，尚未GPU执行或与真实swapchain连接。下一步用纹理回读核对量化、裁剪、行距及重放，再接游戏提交与呈现。游戏DLL未更新，无运行任务遗留。
+
+
 ### 2026-09-07：明确显示输出裁剪/格式候选，尚未GPU或游戏验收
 
 - 检查现有probe与游戏接入历史：原版CPU参数探针只能给kernel参数，不能证明实际RGB取自哪个渲染阶段；历史swapchain为R10G10B10A2，而旧FFX输入是低分辨率RGBA16。必须重新在实际游戏确认取图和颜色空间，不能把二者混同。
