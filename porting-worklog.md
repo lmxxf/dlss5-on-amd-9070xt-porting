@@ -2819,6 +2819,18 @@ check_native_vit_expand.py直接按该bit规则解码完整原block31.layer0记�
 
 还核对了原1d重排与head canonical坐标：14个物理地址bit对应mask[2,1,8192,16,4,8,1024,2048,4096,32,64,128,256,512]，说明进入ViT不能直接把旧HWC通道序当相同坐标。当前通过的是原CUBIN/CPU expansion，不是AMD ViT或完整block31；收缩层、QKV、attention、projection仍待恢复，AMD已验范围仍RGB256→block30/head。游戏DLL/公开包未改，最终画面目标active。
 
+### 2026-09-06 ViT31 contraction数值闭合，并修复诊断调用的同步计数器竞态
+
+新增独立run_native_vit_contract_probe.cpp，保留旧run_original_vit_contract.cpp不动。按原0x48参数及四个cluster-Z分组调用cc_vit_1d_ffn_contract_fp8，输入按32-token物理空间补零，权重4196352字节独立分配，真实record SHA256 143e90b9d5e8359ad8e20bb4f780765014136a838efbadb91c95329b525942f0。
+
+初版沿用旧诊断把同步计数器清零：memcheck下能结束且0 errors，但普通执行超过85秒仍不返回。核对同一PID/CPU后，主动SIGTERM终止本轮自建实验进程1636501；未杀游戏、未重启GPU/Steam，也没有把观察超时当进程已结束后重复启动。SASS 0x3ef0..0x3f60显示Zk等待counter>=k-1，Z0最后发布0；初始0会让Z1提前通过并被Z0后到的写入覆盖，导致后续等待。将aux+0xa00的计数器区初始化为-1后普通运行立即完成。首次清零计数器的“memcheck可结束”不作数值裁判。
+
+check_native_vit_contract.py直接解码矩阵：output bits[6,3,9,7,8,10..14]，input bits[0,1,2,4,5,15..21]；skip按已有ViT输出轴低位排列。计算为四个1024输入维度分区，每区K32 half累计，残差H(input*skip)只作为Z0初值，再按Z0/Z1/Z2/Z3顺序half相加，最后FP8。完整K4096串行half累计在三组输入分别有449/444/492处不同，明确拒绝；正确分区规则各16384值全exact，max0。
+
+验证输入为真实RGB256编码器入口经原expand，以及独立seed1901/1907对应expand。真实入口普通执行三次输出整份文件一致；其余两组也逐值exact。修正计数器后再次memcheck为0 errors。该同步修复仅针对原版诊断runner，AMD未来可用确定顺序直接实现同一算术，不需复制跨CTA忙等。
+
+当前原CUBIN/CPU已闭合ViT31 expand+contract；QKV、attention和最后projection仍待恢复，AMD连续范围保持RGB256→block30/head。游戏DLL/公开包未改，最终游戏画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
