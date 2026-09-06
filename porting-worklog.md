@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：剩余区域捕获受30秒上限影响，AMD中间输出已保存
+
+- session4495重新运行当前positionfma valid1080五帧并开启中间读回，全部重放通过；UV与sampler文件本轮重新保存于positionfma目录，传输session29340已完成。
+- 原版block3,row110,warp1首次30秒超时；block39,row42,warp1取得PC10d0/1590后，PC16b0亦超时。后者64个运动UV与当前GPU全部一致，尚无该区域完整RGB对照。session2020已终止。
+- capture工具新增--timeout，默认仍30秒；重跑block3,row110使用120秒，session87097最终也TimeoutExpired，已终止，不能继续等旧handle。需要检查残留进程、保留超时日志并改进捕获方式，不能只继续加长上限。
+- 本轮生产shader、游戏DLL未改，严格结果仍8/4。下一步取得这两个窗口的原版返回值后继续定位。
+
 ### 2026-09-07：中央tap位置融合乘加，valid1080缩至8/4
 
 - session4614捕获block83,row41,warp0（x671/y328首误差）的PC10d0/1590/16b0/1800；CPU原UV重建half exact。session40402补同版rcpaccum GPU中间回读：64个UV全一致，但lane7三个sampler half不同，max RGB差0.00157565，错误在采样而非后续矩阵层。
