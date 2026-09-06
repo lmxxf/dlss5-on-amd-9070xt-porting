@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际decoder57～61五层GPU链通过
+
+- host增加decoder57_61_game，240×144 C128、实际shift2/0/3/1/2，生产NativeC64Shift五层GPU直接串联。
+- RX9070XT三帧最终4423680值零差异，finite/device/fence/replay通过；回读gpu.f32与原始oracle-0.f32字节级cmp一致。
+- ignored release/native-decoder-game-c128/amd-decoder57-61。仍为独立链，后续62～70及RGB全链和游戏输出验收未完成，未部署DLL。
+
 ### 2026-09-06：原始decoder57～61实际240×144对照通过
 
 - C128 game extent扩展到240×144，从原始block56输出顺序运行57～61，实际shift2/0/3/1/2。
