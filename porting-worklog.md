@@ -2831,6 +2831,16 @@ check_native_vit_contract.py直接解码矩阵：output bits[6,3,9,7,8,10..14]�
 
 当前原CUBIN/CPU已闭合ViT31 expand+contract；QKV、attention和最后projection仍待恢复，AMD连续范围保持RGB256→block30/head。游戏DLL/公开包未改，最终游戏画面目标active。
 
+### 2026-09-06 ViT31 QKV原生诊断调用及第三输出反例（未数值闭合）
+
+新增run_native_vit_qkv_probe.cpp，不改旧runner。0x50参数采用input0、三个输出8/16/24、weights32、同步/工作区40/48、H/W72/76；SASS先将H/W相乘，故这里不能误当单个token数。使用真实block31.layer2记录3145856字节，SHA256 8317de7004196a2fbb6d87603b9083f71ef3dddfbe3a1dcc618edd65b6eb9cd9；输入物理空间暂按128-token对齐分配，尚未证明这是最小需求。4×4、gridX16、clusterZ2、32×4线程，候选同步计数区初始化-1。
+
+原CUBIN memcheck0 errors，普通运行也正常返回。前两个输出非零范围至16383；第三输出至32763，每8字节前4字节有数据、后4字节全零，实际非零16383个。这只描述物理读回，不能据此完全确认Q/K/V语义。check_native_vit_qkv.py试验第三矩阵按整矩阵/32768/2048/1024字节分组、K1024串行或双512分区等候选，排序比较亦不一致，验收明确失败。
+
+进一步DLSS5_VIT_QKV_UNIT_SCAN及probe_native_vit_qkv_groups.py使用单位系数offset0与22个地址bit、输入物理区全1、尾部候选scale全1，试图定位V权重区。所有所试offset在第三buffer前32768字节均出现128个0x57，而非预期16个0x38；因此“第三输出等于独立V线性投影”的当前控制合同不成立，不能从该扫描推出矩阵排列。完整输入padding也填1，后续需区分无效token影响、buffer语义、scale格式及工作区依赖；不预先选定其中任何解释。脚本打印失败数据并返回非零，不当作通过。
+
+本轮仅恢复可运行诊断及保存反例，QKV算术尚未闭合，未修改AMD或游戏DLL。下一步核对原指令中各输出和workspace的实际数据来源。AMD已验范围仍RGB256→block30/head，最终游戏画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
