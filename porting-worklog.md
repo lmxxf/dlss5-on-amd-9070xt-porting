@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB block22下采样通过
+
+- validate_native_valid1080_ds22.py从已验证block21主输出，计算shift2 raw half、原生池化/FP8及C256→512矩阵投影，按global16低位交换解码原始down。
+- 1105920值different0/max_abs0/finite通过，保存encoder-c256/down-validation.json与逻辑down/矩阵。此输入对应后续60×36 split阶段。
+- 仍需AMD同RGB0～22整链及完整网络验收，未部署游戏DLL。
+
 ### 2026-09-07：同valid1080 RGB原始encoder15～22主分支通过
 
 - capture/main参考脚本增加互斥--c256，从block14-down继续120×72 C256八层，shift0/3/1/2/0/3/1/2，22下采样同时捕获。
