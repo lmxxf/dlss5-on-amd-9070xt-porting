@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：修复后同valid1080 RGB GPU0～8双分支通过
+
+- runner支持-Front8并清理未选环境开关。生产reflect→preblock→C32四层/DS→C64四层/DS五帧seed0/0/0/1/0重放及seed影响检查通过。
+- validate_native_valid1080_front8_gpu.py将raw block8 main仅按原边界FP8量化后比较：8847360主值零差异，4423680下采样值零差异。finite/设备/fence检查通过。
+- ignored amd-front8/validation.json，block8三值问题在同RGB大图GPU链已消失。seed1只验证变化非原始逐值；完整9～70及游戏输入/输出验收仍缺，未部署DLL。
+
 ### 2026-09-07：同RGB GPU0～8整链准备
 
 - prepare_native_valid1080_front8_gpu.py检查修复后5～8 main/down8通过，导出原始系数及主/下采样oracle至amd-front8。
