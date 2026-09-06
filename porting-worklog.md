@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：中央TEX乘积权重量化候选使五tap最终half对齐
+
+- 原CUBIN gdb PC1730抓中央TEX返回RGB（R54/R55/R58）。仅fraction8候选中央max_abs0.0004774966；再对四个bilinear乘积权重取1/256 nearest后中央max_abs2.98023e-8。
+- bilinear参考新增独立product_bits选项，默认不变；带回五tap合成后96分量float32仍差44、max_abs1.01492e-7，但half舍入后different=0（原理想参考57，fraction-only42）。原pixel-center/constant数学不变量回归通过。
+- 此为单个受控位移0.125/warp0证据。乘积8/9/10bit在本样本上等价，不能唯一识别硬件精度；尚需其它分数位移、边界及全warp对照。未宣称完整采样器或AMD稳态通过，未部署新神经DLL。
+- 原始寄存器及comparison报告仍在ignored `release/native-temporal-inputs-gates`。下一步用可区分乘积精度的位移做holdout并恢复实际FP32运算顺序。
+
+
 ### 2026-09-07：五tap坐标已近float32对齐，首个TEX支持8bit fraction候选
 
 - gdb脚本支持DLSS5_TEMPORAL_DEBUG_PC、保存R19～64及实际PC；分别抓1590前五tap坐标/权重因子、16b0首个TEX已等待完成的RGB。仍为原CUBIN、不打补丁，8×8双纹理0.125位移。
