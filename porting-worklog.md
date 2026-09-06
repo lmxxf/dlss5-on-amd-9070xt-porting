@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版NGX Evaluate参数只读探针候选编译完成
+
+- 本地未找到完整NGX参数SDK；读取NVIDIA官方 `https://github.com/NVIDIA/DLSS/blob/main/include/nvsdk_ngx_params.h` 与nvsdk_ngx.h，下载头文件到临时 `/tmp/dlssnr-ngx-headers`。确认Get资源/标量接口及D3D12 Evaluate签名；原nvngx_dlssnr.dll导出表确有NVSDK_NGX_D3D12_EvaluateFeature。
+- 新增 `native_ngx_input_contract.cpp`，等待原版DLL加载后hook其Evaluate导出，记录Color/Output/Depth/MotionVectors/Exposure资源描述及尺寸标量，原调用原样转发，不提交GPU命令或改参数。仅初始3次及每600次记录，模块pin防后台线程卸载。
+- MinGW候选编译成功 `/tmp/native-ngx-input-contract.addon64`，使用既有MinHook对象。尚未部署/调用，参数对象ABI及原版DLL兼容性需先核验，不能以编译通过宣称采样成功。
+- 该探针应在5090原版调用端采样，而不是AMD旧代理或feeder旁证。下一步核对ABI/部署条件后获取实际模型输入资源；AMD游戏仍为旧base模式，原神经DLL未替换。
+
+
 ### 2026-09-07：AMD主菜单旧补丁ON/base现场对照，网格来自旧输出路径
 
 - PID34376仍Responding，主swapchain探针累计3600帧1080p/R10/sRGB。通过已核对DLSS5Capture任务抓桌面，图像为剑星主菜单，旧neural模式有全幅细密周期网格。
