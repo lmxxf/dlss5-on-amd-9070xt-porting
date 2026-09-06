@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8三值差异缩减到单8×8窗口
+
+- isolate_block8_window.py按shiftY4定位source y44..51/x16..23，独立运行原始普通C64 8×8、shift0，输出与完整shift2大图对应窗口零差异。
+- CPU参考在窗口内y2/x2通道11/31/61重现相同3差异，排除大尺寸调度、边缘窗口及截取错误。
+- ignored encoder-c64/window46-18保存4096值原始oracle和输入，便于后续逐阶段算术定位；尚未修正block8，未部署DLL。
+
 ### 2026-09-06：block8差异集中单像素，排除DS主分支变体
 
 - 重跑定位3差异均y46/x18，通道11原始.09375/参考.0625、31原始.234375/参考.25、61原始-4.5/参考-5。
