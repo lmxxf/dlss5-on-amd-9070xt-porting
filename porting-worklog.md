@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏接入点审计，明确提交顺序迁移要求
+
+- 当前游戏端源文件为 `dlss5_1080p_runtime.cpp`。`hook_ffx_dispatch` 在调用原FFX前record_frame_bridge、调用后将旧0～70计算写入unwrapped游戏command list；它不拥有该列表的提交时机。`on_present` 可取得主swapchain和原生queue，并已有显示审计与GPU profile fence逻辑。
+- 新实验室管线的chunk-fenced ViT不能原样塞进上述hook并同步等待：游戏list可能尚未提交，等待其输入完成可能形成错误依赖/停顿。移植必须明确“游戏输入拷贝已提交→推理队列执行→结果完成→当前帧合成”的实际提交与资源状态；不能擅自Close/Reset游戏拥有的list。
+- 旧运行时仍硬编码960×544/1920×1088等旧几何（block0_ready与record_block70），必须由已验证1920×1152内部、1920×1080有效输出合同取代；仅换权重不能修复。
+- 本轮只读游戏源代码，未修改或部署游戏DLL。完整测试session21947/PID39788仍有成功编译日志，未结束；继续沿用该handle，完成后先下载最终输出验收。此接入审计不是游戏验证成功。
+
+
 ### 2026-09-07：AMD0～38直连精确通过，完整0～70测试启动
 
 - 旧session34710已exit0：5帧seed0/0/0/1/0 replay_check全部pass，resident_chain=pass，处理中间无CPU特征传输。反射有效1080 RGB经encoder/head、GPU gather直接进入640token ViT，不使用预制中间特征输入。
