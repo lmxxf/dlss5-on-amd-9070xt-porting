@@ -15,8 +15,9 @@ constexpr auto logpath=LR"(D:\DLSSNR-Lab\logs\native-ngx-input-contract.txt)";
 NVSDK_NGX_Result NVSDK_CONV evaluate(ID3D12GraphicsCommandList*c,const NVSDK_NGX_Handle*h,const NVSDK_NGX_Parameter*p,PFN_NVSDK_NGX_ProgressCallback callback){
  unsigned n=++calls;if(p&&(n<=3||n%600==0))if(FILE*f=_wfopen(logpath,L"ab")){
   std::fprintf(f,"pid=%lu evaluate=%u list=%p handle=%p\n",GetCurrentProcessId(),n,c,h);
-  for(const char*key:{"Width","Height","OutWidth","OutHeight","DLSS.Render.Subrect.Dimensions.Width","DLSS.Render.Subrect.Dimensions.Height"}){unsigned value=0;auto result=NativeNgxGetUInt(p,key,&value);std::fprintf(f,"scalar=%s status=%08x value=%u\n",key,unsigned(result),value);}
-  for(const char*key:{"Color","Output","Depth","MotionVectors","Exposure"}){
+  for(const char*key:{"Width","Height","OutWidth","OutHeight","DLSSNR.ColorSubrectBaseX","DLSSNR.ColorSubrectBaseY","DLSSNR.ColorSubrectWidth","DLSSNR.ColorSubrectHeight","DLSSNR.OutputSubrectWidth","DLSSNR.OutputSubrectHeight"}){unsigned value=0;auto result=NativeNgxGetUInt(p,key,&value);std::fprintf(f,"scalar=%s status=%08x value=%u\n",key,unsigned(result),value);}
+  // Names verified in the original DLSSNR binary, not inferred from DLSS SR.
+  for(const char*key:{"DLSSNR.Color","DLSSNR.Output","DLSSNR.Depth","DLSSNR.MVec","DLSSNR.ControlMask","DLSSNR.UI","DLSSNR.UIAlpha","DLSSNR.Backbuffer"}){
    ID3D12Resource*r=nullptr;auto result=NativeNgxGetResource(p,key,&r);std::fprintf(f,"resource=%s status=%08x pointer=%p",key,unsigned(result),r);
    if(result==NVSDK_NGX_Result_Success&&r){auto d=r->GetDesc();std::fprintf(f," dimension=%u size=%llux%u format=%u flags=%u",unsigned(d.Dimension),static_cast<unsigned long long>(d.Width),d.Height,unsigned(d.Format),unsigned(d.Flags));}
    std::fputc('\n',f);

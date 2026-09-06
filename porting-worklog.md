@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：5090原版Evaluate现场采样成功，发现DLSSNR专用资源键
+
+- 确认5090无游戏后，通过互动任务DLSSNR-SteamRecovery运行Steam -shutdown，bootstrap日志04:26:12 Shutdown且旧PID20816消失；正常重启Steam并-applaunch，产生Shipping PID7528，Responding=true。没有强杀Steam或覆盖存档。
+- 原版probe hook成功，Evaluate1/2/3/600取得Width/Height/OutWidth/OutHeight=1920/1080/1920/1080，GetUInt status1；标准Color/Output等GetResource返回bad00010，不能解读成无输入或据此判定资源ABI错误。日志保存ignored `release/native-game-present/ngx-input-contract-first.txt`。
+- 检查实际nvngx_dlssnr.dll字符串确认资源键为DLSSNR.Color/Output/Depth/MVec/ControlMask/UI/UIAlpha/Backbuffer及各自Subrect字段，区别于普通SR参数。探针已改查这些实有键并编译成功，但尚未覆盖运行中的旧probe；下一次正常退出5090后部署并取样。
+- 当前5090游戏运行PID7528，AMD已退出；原神经DLL均未替换，新网络尚未挂入游戏，目标未完成。
+
+
 ### 2026-09-07：5090旧提示已消失，Steam启动请求仍未建立游戏进程
 
 - 查看最新截图仍有旧云过期提示后执行取消操作，未点强制继续。初次依据历史3840报告误用双倍点击坐标，随后按实际1920×1080截图坐标纠正；后续截图显示桌面，未出现存档覆盖选择。以后以截图实际像素尺寸为准，不用旧显示驱动报告换算。
