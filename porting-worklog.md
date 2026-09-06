@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：GPU运动坐标生成shader候选编译通过
+
+- 新增native_temporal_coordinates.hlsl，当前分支限定无slot18邻域选择；接收明确valid/processing/motion尺寸、motion subrect offset/extent、motion UV scale，按已恢复顺序反射→UV→运动纹理插值→位移FMA→像素坐标。
+- shader不硬猜运动正负号或游戏scale，需由捕获合同提供；插值沿用fraction8/product8候选。Host仍需检查非零尺寸、容量、单次反射范围和资源状态，实际非幂次尺寸MUFU精度未证明。
+- Windows D3DCompile exit0，bytecode3880字节；尚未GPU执行或接入sampler。下一步用原版空间motion坐标捕获逐值验证并接通运动→采样→preblock。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：无slot18路径的运动坐标参考精确通过8×8中间值
 
 - 原SASS无slot18时跳过深度邻域选择：反射像素中心/有效尺寸→motion offset/extent/reciprocal变换→slot10 RG TEX→以paramA0/A4缩放位移并FMA加当前UV→历史采样。新增native_temporal_coordinates_reference.py，明确只支持该分支及单次反射范围。
