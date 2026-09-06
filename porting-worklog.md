@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8得分对齐/平方舍入候选排除
+
+- check_block8_score_alignment.py按已知27bit乘积对齐模型测试QK+bias，得分与现参考无变化，仍9个attention差异；不是此候选能解决的问题。
+- check_block8_norm_candidates.py对照两侧平方各舍入与上下侧融合互换，分别25/31个差异，比原9个更多，query18仍不同。均为参考诊断，不修改生产公式。
+- 结果ignored最小窗口目录，下一步仍需原始中间值或更直接控制定位，不用拟合输出修正，未部署DLL。
+
 ### 2026-09-06：block8清零Q/K诊断均精确
 
 - isolate_block8_qk.py分别在identity-projection诊断权重副本清零Q或K，保持FFN、V、bias及其余参数，原始kernel各4096值与参考零差异/finite。
