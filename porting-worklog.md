@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：120×72时序扩展未通过，单图控制全精确
+
+- fixture/validator新增--large（120×72，独立seed7306，RGB/history/spatial motion），保持原版HWC与AMD tile-major输入区分。部署已修half-up/边际保持shader和16常量坐标exe，远端native-temporal-large。
+- 时序全GPU链五帧session29435 exit0/重放通过，但原版比较main276480差319、down69120差91，pass=false；失败证据保留ignored release/native-temporal-large。
+- 同尺寸单图控制重新跑原版及AMD，session3416 exit0，main/down共345600值全部different=0。偏差继续限定在时序前段，而不是扩大尺寸破坏一般preblock。
+- 下一步抓120×72最早时序坐标/采样差异，重点验证非幂次UV往返与MUFU/FMA，不凭误差比例放宽标准。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：24×16时序前端精确闭合，乘积半格向上规则修复
 
 - 定位剩余主误差(y15,x19,c23)窗口block(2,1),warp1；PC1800发现lane2/18历史采样half不同，PC10d0/1590坐标近一致。PC1730中央TEX在corner*256=18.5及52.5两处，round-even错误0.0032585/0.0006557，half-up匹配至1.64e-8/2.26e-8。
