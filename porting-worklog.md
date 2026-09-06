@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：GPU五tap采样→preblock直连双支精确通过
+
+- 新增NativeTemporalSample封装GPU history/coordinates/output和重放状态，输出SRV直接交给NativePreblockRuntime t3。主测试host新增DLSS5_TEST_TEMPORAL_HISTORY，与CPU时序RGB模式互斥；重建RGB不经过CPU。
+- fixture/validator增加--direct，独立 `release/native-temporal-inputs-gates/amd-direct`，原版对照仍both_shifted双纹理。坐标目前外部提供全8×8像素中心+.125，不冒充运动坐标生成已完成。
+- RX9070XT独立目录native-temporal-direct执行五帧seed0/0/0/1/0，session60392 exit0；下载输出正式验证main2048/down512值different=0/pass=true。GPU sampler→输入特征→FFN/attention/DS直连闭合。
+- 尚缺已绑定资源时的时序开关切换、其它位移/实际尺寸验证以及运动前段坐标和真实历史资源来源。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：时序改动后的首帧preblock GPU回归通过
 
 - 使用同一新exe/shader、清除DLSS5_TEST_TEMPORAL_RGB，在8×8单输入模式运行五帧seed0/0/0/1/0，session40587 exit0，重放通过；独立保存gpu-single-main/down/目标准备，未覆盖时序结果。
