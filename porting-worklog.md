@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：5090原版DLSSNR实际资源合同采样成功
+
+- Alt+F4使旧PID7528正常退出，Steam记录exit0。备份旧probe为`.before-nr-keys`后部署NR键版。初次重启失败原因已定位：DLSSNR-Launch-StellarBlade上次拉起Steam后任务仍Running，MultipleInstances=IgnoreNew导致2147946720；不是本次游戏崩溃。新增独立DLSSNR-GameRequest任务发送-applaunch，原Steam无需重启。
+- 新Shipping PID3536 Responding，probe读取至Evaluate1200：Width/Height及Color/Output subrect=1920×1080，Color baseXY=0。所有成功Get返回1，证明本次实际参数ABI/resource getter可用。
+- DLSSNR.Color与Output：1920×1080 DXGI10=RGBA16_FLOAT，flags4=ALLOW_UNORDERED_ACCESS；Depth：1920×1080 format19=R32G8X24_TYPELESS flags2；MVec：1920×1080 format34=RG16_FLOAT flags4。ControlMask/UI/UIAlpha/Backbuffer未提供（bad00010）。日志ignored `release/native-game-present/ngx-input-contract-nr-keys.txt`。
+- 这证明实际模型输入是完整浮点纹理且存在Depth/MVec，不是低分辨率FSR Color或最终R10显示表面；颜色传递函数、对应渲染阶段、Depth/MVec如何进入实际网络参数仍需核对。不能把受控单RGB实验直接冒充完整游戏多纹理合同。
+- 当前5090仍运行PID3536，AMD已退出，原神经DLL未替换。下一步建立与此合同一致的AMD取图/指南输入及提交顺序，再部署新网络并做实际画面验收。
+
+
 ### 2026-09-07：5090原版Evaluate现场采样成功，发现DLSSNR专用资源键
 
 - 确认5090无游戏后，通过互动任务DLSSNR-SteamRecovery运行Steam -shutdown，bootstrap日志04:26:12 Shutdown且旧PID20816消失；正常重启Steam并-applaunch，产生Shipping PID7528，Responding=true。没有强杀Steam或覆盖存档。
