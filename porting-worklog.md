@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD0～38直连测试已启动，等待同一进程
+
+- 部署 `/tmp/native-frontvit-test.exe` 至 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-frontvit\native-preblock-test.exe`；使用 `amd-frontvit` 全部系数和唯一RGB输入，以及当前ViT shader/half-square依赖。不是旧独立ViT exe。
+- 运行 `DLSS5_FRONTVIT=1`、`DLSS5_SHADER_PROGRESS=1` 加反射preblock运行器 `-FrontHead`。unified exec session34710，远端PID39212，启动时间2026-09-07 01:37:06（远端显示）；已确认进程存活、CPU12.8125秒、工作集528699392字节，反射shader编译成功。当前仍在初始化，没有验收结果。下轮先轮询同一handle，勿重启。
+- 新增 `validate_native_valid1080_frontvit_gpu.py`：结束后核对gpu-main与oracle-vit、gpu-down与oracle-head，各655360值，finite和逐值检查；语法及git diff检查通过，尚无输出可验收。
+- 接线检查补充：`native_vit_linear.hlsl` 的DECODER_ENTRY路径现已对 `residual[index]` 调用F，再乘skip权重。因此后续raw encoder跳接可直接交给此路径，由已有shader实现所需FP8量化，不必新增重复量化pass。此前“raw不得直接不经量化使用”的边界仍成立，但现实现已经覆盖这一点。
+- 游戏DLL未更新。后续先收本轮直连数值证据，再将逆bridge、decoder39～69及post70接入同一管线，不能跳过实际游戏最终输出验证。
+
+
 ### 2026-09-07：实现实际RGB0～38 GPU直连入口，编译通过待运行
 
 - `d3d12_native_preblock_test.cpp` 新增 `DLSS5_FRONTVIT`，隐含FRONTHEAD：head.Output直接接640映射NativeVitGather，再直接接8层NativeVitBlock；不读取预制head/ViT特征作为输入。
