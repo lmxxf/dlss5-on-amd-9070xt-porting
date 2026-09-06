@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：独立MUFU倒数重现，通用尾数表通过百万输入对照
+
+- 新增probe_cuda_reciprocal.cu，显式rcp.approx.ftz.f32、输入输出文件与范围检查；MinGW无关，nvcc sm121编译成功。session4214处理1000032输入，原捕获32lane倒数全bit-exact；相对直接float除法ULP差-1/0/+1计数66086/854783/79163，不能用统一偏置替代。
+- check_native_reciprocal_probe.py生成独立随机[.9,1.2]百万样本并校验原捕获。prepare_native_reciprocal_table.py穷举[1,2)的8388608个float尾数，输出32MiB通用数学倒数表；按指数缩放重建上述1000032值，全部bit-exact。
+- 表位于ignored release/native-reciprocal/normalized-output.f32，不含神经特征/游戏图像/逐帧捕获值，源代码提交而表不入git。当前仅NVIDIA指令与CPU索引验证，尚未实现AMD GPU查表，更不代表1080p回归通过。
+- 下一步为sampler增加可选只读倒数表绑定，GPU内按正正规浮点尾数索引和指数缩放，先核验归一化再做全1080p回归。游戏DLL未动，目标未完成。
+
 ### 2026-09-07：1080p首个反例定位到原MUFU倒数舍入
 
 - motion采样尝试同样整数小数量化，session49542五帧完成，回读session80464仍430/109差异；无改善修改已撤回，远端valid1080坐标shader恢复。产物保留motioninteger目录。
