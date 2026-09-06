@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：确认head输入已补齐，32×20原始head通过
+
+- launch0056参数0x20实际HW=20/32，补齐在final head之前，不是ViT repack才扩尺寸；几何summary新增此直接证据。
+- check_native_split_head.py新增--random-input --game-extent，32×20×512随机输入跑原始CUBIN head（本地Spark，独立单次），原生矩阵/双cell bank输出655360值cell_banks_different=0/max_error=0；另一错误矩阵候选仍645308值不同。
+- fixture ignored release/native-c512/head-check640。不是36×60 pool→head联合验证，也不是AMD head新尺寸验收；下一步验证pool边缘填充值及源布局。未部署游戏DLL。
+
 ### 2026-09-06：32×20原始repack双向恒等验证
 
 - 原始repack caller支持无需实际输入文件的--inverse地址映射探针。RTX正反两个方向各655360条映射唯一、两组随机输入通过。
