@@ -50,7 +50,7 @@ for odd in (0, 1):
     parity.append(total)
 candidates['accumulate_lane_pairs'] = H(parity[0] + parity[1])[..., None]
 raw = np.fromfile(a.folder / 'rtx-output-1.fp8', np.uint8)
-t = bits(n*1024, [2,6,7,8,14,15] + list(range(16,10+n.bit_length()-1)))
+t = bits(n*1024, [2,6,7,8,14,15] + list(range(16,10+(n-1).bit_length())))
 c = bits(n*1024, [0,1,3,4,5,9,10,11,12,13])
 actual = np.empty((n,1024), np.float32)
 actual[t,c] = e4m3fn(raw[:n*1024])
@@ -59,7 +59,7 @@ for name, den in candidates.items():
     expected = F(H(num * H(1/den))).transpose(1,0,2).reshape(n,1024)
     delta = np.abs(expected-actual)
     report['candidates'][name] = {'different': int(np.count_nonzero(delta)), 'max_abs': float(delta.max())}
-reference = attention(data['q'], data['k'], data['v'])
+reference = attention(data['q'], data['k'], data['v'],experimental_640=n==640)
 report['reference_different'] = int(np.count_nonzero(reference != actual))
 report['reference_finite'] = bool(np.isfinite(reference).all() and np.isfinite(actual).all())
 report['replay_identical'] = (a.folder / 'rtx-output-1.fp8').read_bytes() == (a.folder / 'rtx-output-2.fp8').read_bytes()

@@ -5,10 +5,10 @@ import numpy as np
 from native_c32_reference import F
 from native_split_reference import bits
 from encode_tinlayout_global import quantize
-p=argparse.ArgumentParser();p.add_argument('--tokens',type=int,choices=[64,128,256],required=True);p.add_argument('--seed',type=int,default=3001);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--tokens',type=int,choices=[64,128,256,640],required=True);p.add_argument('--seed',type=int,default=3001);a=p.parse_args()
 n=a.tokens;root=Path('release/native-vit')/f'attention-random-{n}-{a.seed}';root.mkdir(exist_ok=False)
 rng=np.random.default_rng(a.seed);values=[F(rng.normal(0,s,(n,1024)).astype(np.float32)) for s in (.5,.25,.5)]
-high=list(range(16,10+n.bit_length()-1))
+high=list(range(16,10+(n-1).bit_length()))
 for part,(name,value) in enumerate(zip(('q','k','v'),values)):
     tb=([1,0,4,5,2,15] if part==2 else [3 if part==1 else 2,6,7,8,14,15])+high
     cb=[6,3,9,7,8,10,11,12,13,14] if part==2 else [0,1,2 if part==1 else 3,4,5,9,10,11,12,13]

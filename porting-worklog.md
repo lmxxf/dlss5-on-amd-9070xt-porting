@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640-token原始attention首次逐值通过
+
+- caller支持实际32×20、grid32×3，保持4MiB输出/工作区；随机fixture打包修正高token地址位为ceil(log2(N))，旧公式在640导致非双射并被assert阻止，seed3005未运行GPU。保留失败目录，使用seed3006重新生成。
+- RTX原始attention两次SHA256均为3328d7c3c595c38ae11cfa063ff344fbece3fd29f7878816903070005d39dc46。655360值与按64token块分母求和的参考全部一致，finite/replay/tail通过；另外两种候选仍有1857/2123值不同。
+- 参考640入口暂标experimental_640，AMD attention尚未扩展到640，未部署游戏DLL。产物ignored release/native-vit/attention-random-640-3006。未操作正在运行的游戏界面。
+
 ### 2026-09-06：用户进入1080p无边框后，真实640-token几何已捕获
 
 - 用户手动设置桌面1080p、游戏无边框并停留主菜单；只读检查PID25972运行，未重启/改配置/操作存档。

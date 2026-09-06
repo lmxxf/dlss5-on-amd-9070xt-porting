@@ -1,7 +1,7 @@
-param([string]$Folder='D:\DLSSNR-Lab\native-vit-extent-256',[ValidateSet(64,128,256)][int]$Tokens=256)
+param([string]$Folder='D:\DLSSNR-Lab\native-vit-extent-256',[ValidateSet(64,128,256,640)][int]$Tokens=256)
 $ErrorActionPreference='Stop'
 $env:DLSS5_VIT_CUBIN=Join-Path $Folder 'dlssnr-05.cubin'
-$Width=if($Tokens -eq 64){8}else{16}
+$Width=if($Tokens -eq 640){32}elseif($Tokens -eq 64){8}else{16}
 $Height=$Tokens/$Width
 foreach($Trial in 1..2){
  & (Join-Path $Folder 'native-vit-attention-oracle.exe') (Join-Path $Folder 'q.fp8') (Join-Path $Folder 'k.fp8') (Join-Path $Folder 'v.fp8') (Join-Path $Folder "rtx-output-$Trial.fp8") $Width $Height 32

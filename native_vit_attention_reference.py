@@ -3,8 +3,9 @@ import numpy as np
 from native_c32_reference import H,F
 from native_c32_softmax_sum import denominator
 
-def attention(q,k,v):
- if q.shape not in ((64,1024),(128,1024),(256,1024)) or k.shape!=q.shape or v.shape!=q.shape:
+def attention(q,k,v,*,experimental_640=False):
+ shapes=((64,1024),(128,1024),(256,1024))+(((640,1024),) if experimental_640 else ())
+ if q.shape not in shapes or k.shape!=q.shape or v.shape!=q.shape:
   raise ValueError('only 64/128/256-token attention contracts are verified')
  n=q.shape[0]
  q,k,v=[a.reshape(n,32,32).transpose(1,0,2) for a in (q,k,v)]
