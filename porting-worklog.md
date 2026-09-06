@@ -2695,6 +2695,16 @@ AMD执行三帧，device/fence及重放检查通过，18次shader编译、42次�
 
 该候选mix对原CUBIN差异从4降至1，仅剩(y116,x7,c29)，CPU0.0078125 vs原0.009765625，最大0.001953125。仍未全通过，不能直接替换GPU；下一步查剩余MUFU近似/舍入，并以更多seed和尺寸复核。此轮未修改运行HLSL、AMD游戏DLL或公开包，最终游戏画面未验收。
 
+### 2026-09-06 原生随机特征隔离闭合：CPU preblock主/DS均exact
+
+probe_native_noise_residual.py以原CUBIN mix系数做64倍差分抵消，读回四个问题像素的3个随机特征；只报告FP8读回兼容的附近half候选，不直接把量化值当精确逆。11个候选与native_steps一致，(y116,x7,g1)独立读回兼容half唯一为0.11749267578125，候选为0.1175537109375，确有一half刻度差异。所有控制权重留release，不替换真实权重。
+
+新增probe_native_noise.cu直接生成16项随机中间值：整数hash/uniform、LG2、半径、角度、三角函数及3个最终随机数。初版__fsqrt_rn编译成RSQ加修正，反汇编不符原MUFU.SQRT，因此改为显式sqrt.approx.ftz.f32；复查生成代码含LG2/SQRT/COS/SIN及角度FMUL.RZ。compare_native_noise_trace.py对完整128×128发现数学候选与原生指令序列有53/49152个half随机值不同，不能因为mix只剩1处就称随机函数全对。
+
+diagnose_native_rgb128_stages.py的mix_cuda_trace控制将直接指令生成的随机特征输入CPU mix，524288值全部对上独立原CUBIN。diagnose_native_rgb128_preblock.py --cuda-noise进一步沿原CPU FFN/attention/池化计算，main524288、DS131072值均与原CUBIN全exact，MAE/max0。这是在CPU诊断中替换随机特征来源用于隔离因果，不是GPU移植通过；AMD当前DS仍有7处差异，未把该trace馈入任何AMD整链或游戏。
+
+由此当前128×128 preblock错误可由随机特征差异解释，正式下一步需在AMD实现相应数学/指令语义，并验证新seed而非硬编码位置修正。原CPU参考在采用原生随机指令序列时主/DS双分支已闭合。游戏DLL、公开包仍未更改，最终游戏画面目标未完成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -29,7 +29,12 @@ native_features=inputs(rgb[...,:3],seed=0,live=True)
 noise=H(fields(128,128,0,native_steps=True))
 native_features[...,[0,1,4]]=noise[...,[1,2,0]]
 native_prefix=H(native_features@fw[:512].reshape(32,16).T)
-for name,predicted in [('mix',prefix),('ffn',ffn),('mix_no_noise',without_noise),('mix_native_steps',native_prefix)]:
+cases=[('mix',prefix),('ffn',ffn),('mix_no_noise',without_noise),('mix_native_steps',native_prefix)]
+trace=root/'noise-residual/trace.f32'
+if trace.exists():
+ native_features[...,[0,1,4]]=H(np.fromfile(trace,'<f4').reshape(128,128,16)[...,[14,15,13]])
+ cases.append(('mix_cuda_trace',H(native_features@fw[:512].reshape(32,16).T)))
+for name,predicted in cases:
  w=original.copy();w[4656:6192]=0;w[10296:10808]=0;w[10808:10840]=1;w.view('<f4')[10288//2]=1
  if name.startswith('mix'):w[:4096]=0;w[4616:4648]=1
  if name=='mix_no_noise':
