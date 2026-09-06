@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：接回同 RGB GPU0～30/head 验证入口（尚未 GPU 验收）
+
+- 用户已将桌面改为 1080p、游戏改为无边框窗口，5090 停在主菜单；本轮未操作游戏或修改存档。
+- `prepare_native_valid1080_head_gpu.py` 已准备同一有效 1080p RGB 的连续输入、23～30 层系数、原版 head 及经原版中间结果验证的 raw block30 对照；不是拼接独立随机特征。
+- `d3d12_native_preblock_test.cpp` 新增 `DLSS5_FRONTHEAD`，自动接通已有 0～22 层，再运行 60×36 的 split23～30，保留 block30 raw half，池化投影至 32×20×1024（有效池化 30×18）。运行器新增 `-FrontHead`。
+- 新增 `validate_native_valid1080_head_gpu.py`，分别检查 raw block30 和 padded head，禁止只看有限值或运行成功就判定正确。
+- MinGW 交叉编译成功（`/tmp/native-preblock-head-test.exe`）；本次新增连续链尚未在 AMD 上运行、未生成 GPU 验收报告，未部署游戏 DLL。下一步运行该链并核对两个输出，随后继续同 RGB ViT/decoder/post 全链。
+
+
 ### 2026-09-07：同valid1080 RGB block30→pool/head逐值通过
 
 - validate_native_valid1080_pool_head.py使用连续block30原始FFN/attention中间输出，原始pool参数60×36→32×20，再接原始head。

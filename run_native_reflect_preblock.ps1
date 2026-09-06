@@ -1,5 +1,6 @@
-param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-reflect-preblock',[string]$Noise='D:\DLSSNR-Lab\matrix-probe\native-runtime-rgb512\functions.f32',[switch]$Front4,[switch]$Front8,[switch]$Front14,[switch]$Front22)
+param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-reflect-preblock',[string]$Noise='D:\DLSSNR-Lab\matrix-probe\native-runtime-rgb512\functions.f32',[switch]$Front4,[switch]$Front8,[switch]$Front14,[switch]$Front22,[switch]$FrontHead)
 $ErrorActionPreference='Stop'
+if($FrontHead){$env:DLSS5_FRONTHEAD='1'}else{Remove-Item Env:DLSS5_FRONTHEAD -ErrorAction SilentlyContinue}
 if((Get-Item $Noise).Length -ne 201326592){throw 'Noise table size mismatch'}
 $env:DLSS5_NOISE_TABLE=$Noise
 $env:DLSS5_TEST_WIDTH='1920';$env:DLSS5_TEST_SEED='0';$env:DLSS5_REFLECT_VALID1080='1'
