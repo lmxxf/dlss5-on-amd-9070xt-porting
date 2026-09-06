@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：生产CPU参考融合平方修复及大图回归通过
+
+- native_c32_normalize.py使用float64承载下半平方+已half舍入上半平方，最后一次half舍入，避免float32中间吞掉中点旁的小项；不改归约次序/倒数，不加像素特例。
+- valid1080 encoder5～8四层主输出全部零差异，block8原3差异消失；C32 encoder1～4主输出回归全部零差异。test_half_square_fma.py验证直接原始key8归一化值及完整4096值窗口均精确。
+- AMD shader仍使用旧平方表达式，尚未修复/回归，不能称GPU问题已解决。下一步实现无需不可靠double的等价half-FMA舍入，未部署DLL。
+
 ### 2026-09-07：block8平方FMA二次舍入机制定位
 
 - 捕获PC3a40相关32lane操作数，key8全32个分量都可在参考K向量找到；按实际HMUL/HFMA/HADD/shuffle用float32重放仍383.25。
