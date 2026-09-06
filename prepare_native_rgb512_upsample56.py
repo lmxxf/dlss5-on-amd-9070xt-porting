@@ -4,17 +4,17 @@ import argparse,json,subprocess
 import numpy as np
 from native_upsample48_reference import unpack,upsample
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--block62',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--block62',action='store_true');p.add_argument('--decoder-root',type=Path,default=Path('release/native-rgb512'));p.add_argument('--encoder-root',type=Path,default=Path('release/native-rgb512'));a=p.parse_args()
 index,C,size,skip_block,cubin=(62,64,128,8,'01') if a.block62 else (56,128,64,14,'02')
 count=size*size*C;main_count=count//2;low=size//2;heads=C//32
-base=Path('release/native-rgb512');root=base/f'upsample{index}-shift{a.shift}';root.mkdir(exist_ok=False)
+base=a.decoder_root;root=base/f'upsample{index}-shift{a.shift}';root.mkdir(parents=True,exist_ok=False)
 assert json.loads((base/f'block{index-1}-outview-validation.json').read_text())['status']=='pass'
 report={'status':'running','shift':a.shift,'output_extent':[size,size,C],
         'scope':f'RGB-derived original/CPU block{index}; runtime shift/skip identity not newly captured'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
 try:
-    main=np.fromfile(base/f'block{index-1}-outview.fp8',np.uint8);skip=np.fromfile(base/f'block{skip_block}-main.fp8',np.uint8)
+    main=np.fromfile(base/f'block{index-1}-outview.fp8',np.uint8);skip=np.fromfile(a.encoder_root/f'block{skip_block}-main.fp8',np.uint8)
     assert not np.any(main[main_count:]) and not np.any(skip[count:])
     main[:main_count].tofile(root/'input.fp8');skip[:count].tofile(root/'skip.fp8')
     c=np.arange(2*C);perm=(c&~3)|((c&1)<<1)|((c&2)>>1)

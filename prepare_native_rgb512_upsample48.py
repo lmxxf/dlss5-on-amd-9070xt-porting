@@ -4,15 +4,15 @@ import argparse,json,subprocess
 import numpy as np
 from native_upsample48_reference import unpack,upsample
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);a=p.parse_args()
-base=Path('release/native-rgb512');root=base/f'upsample48-shift{a.shift}';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--decoder-root',type=Path,default=Path('release/native-rgb512'));p.add_argument('--encoder-root',type=Path,default=Path('release/native-rgb512'));a=p.parse_args()
+base=a.decoder_root;root=base/f'upsample48-shift{a.shift}';root.mkdir(parents=True,exist_ok=False)
 assert json.loads((base/'block47-outview-validation.json').read_text())['status']=='pass'
 report={'status':'running','shift':a.shift,'scope':'RGB-derived original/CPU block48; runtime shift/skip identity not newly captured',
         'main_global':'swap','skip_control':False,'projection_control':False,'output_extent':[32,32,256]}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
 try:
-    main=np.fromfile(base/'block47-outview.fp8',np.uint8);skip=np.fromfile(base/'block22-main.fp8',np.uint8)
+    main=np.fromfile(base/'block47-outview.fp8',np.uint8);skip=np.fromfile(a.encoder_root/'block22-main.fp8',np.uint8)
     assert not np.any(main[131072:]) and not np.any(skip[262144:])
     main[:131072].tofile(root/'input.fp8');skip[:262144].tofile(root/'skip.fp8')
     c=np.arange(512);perm=(c&~3)|((c&1)<<1)|((c&2)>>1)

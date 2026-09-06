@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+真实移位新配置推进第62块（2026-09-06）：outview验证器增加--root，48与56/62桥接脚本分开decoder-root和encoder-root，普通C256/C128/C64检查器增加output-root。新结果全部留release/native-runtime-rgb512，编码器复用已与捕获移位一致的原数据，不覆盖旧配置。
+
+新block47 outview对plain全exact；48 shift0及49～55按捕获3/1/2/0/3/1/2，各262144值原版/CPU全exact。新block55 outview校验通过后，56以真实X移位mask1接block14 skip，524288值全exact；57～61按2/0/3/1/2各524288值全exact。新61 outview与62 shift0接block8 skip也通过，62最终1048576值全exact。所有调用正常退出、无CPU中间修正注入；AMD新配置全链仍待重跑，下一步63～70。游戏补丁未更新。
+
 真实移位新配置40～47回归（2026-09-06）：split检查器增加--output-root，新结果独立保存在release/native-runtime-rgb512，旧控制配置不覆盖。按直接捕获的0/3/1/2/0/3/1/2，从原decoder39输出连续执行原40～47；八块四阶段共32检查点全部different0/max0。原权重各自抽取，原链只用上一原输出，没有CPU修正注入。下一步推进新配置48～70并重新验证AMD全链；本轮不继承旧配置后段pass。游戏补丁未更新。
 
 只读探针部署与直接参数解码（2026-09-06，跨用户中断恢复）：新v4探针SHA d7887caeb9ccf8713ba63079ffb8de95877b008f2a0d09487610c3fd99e36c38已编译并部署5090，旧探针SHA c256f1a5...备份为preblock-live-parameters.addon64.backup-20260906-113147-633。部署脚本改为游戏运行则拒绝、先备份验证，再安装；启动需显式-Launch，不自动杀游戏。使用核对过的Steam -applaunch3489700任务，实际游戏PID24064、19:32:34启动，v4日志和200份参数blob已下载至release/native-kernel-params-24064-11278468。期间曾尝试CloseMainWindow返回False，不能声称已退出；用户随后允许继续使用两台机器。未改AMD神经DLL或存档。
