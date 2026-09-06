@@ -9,7 +9,7 @@ static void ck(CUresult r){if(r){const char*s=nullptr;cuGetErrorString(r,&s);std
 static std::vector<unsigned char> read(const char*p,size_t size,bool exact){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)std::exit(2);auto n=f.tellg();if(n<=0||size_t(n)>8*1024*1024||(exact&&size_t(n)!=size))std::exit(2);std::vector<unsigned char>b(size_t(n),0);f.seekg(0);if(!f.read((char*)b.data(),n))std::exit(2);for(size_t i=size;i<b.size();i++)if(b[i])std::exit(2);b.resize(size,0);return b;}
 int main(int argc,char**argv){
  if(argc!=7){std::fprintf(stderr,"usage: %s input weights output-prefix width height gridX\n",argv[0]);return 2;}
- unsigned width=std::strtoul(argv[4],nullptr,0),height=std::strtoul(argv[5],nullptr,0),gx=std::strtoul(argv[6],nullptr,0);if(!width||!height||width>16||height>16||!gx||gx>128)return 2;
+ unsigned width=std::strtoul(argv[4],nullptr,0),height=std::strtoul(argv[5],nullptr,0),gx=std::strtoul(argv[6],nullptr,0);if(!width||!height||((width>16||height>16)&&!(width==32&&height==20))||!gx||gx>128)return 2;
  size_t capacity=4*1024*1024,padded=(width*height+127)/128*128;
  auto input=read(argv[1],padded*1024,false),weights=read(argv[2],3145856,true);
  ck(cuInit(0));CUdevice d;ck(cuDeviceGet(&d,0));CUcontext context;ck(cuDevicePrimaryCtxRetain(&context,d));ck(cuCtxSetCurrent(context));CUmodule module;const char*cubin=std::getenv("DLSS5_VIT_CUBIN");ck(cuModuleLoad(&module,cubin?cubin:"/tmp/dlssnr-cubins/dlssnr-05.cubin"));CUfunction f;ck(cuModuleGetFunction(&f,module,"cc_vit_1d_qkv_fp8"));

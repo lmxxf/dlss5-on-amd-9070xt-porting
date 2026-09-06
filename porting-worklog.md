@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：原始640-token block31两次运行完成，待算术验证
+
+- expand/contract/QKV原始caller支持32×20，expand grid160、contract/projection40、QKV80，attention32×3。4MiB输出容量覆盖expand的2621440字节，其他输出655360字节。
+- runner加入Tokens=640，从seed3006初始输入按完整block31依次运行，两次七份输出hash均一致，报告NaN为0。最终projection SHA256 `08e442449cd040e624faf657a79b9d16097c6df6c20fa5b4fcda0af7b499eb77`。
+- 产物下载到ignored release/native-vit/block640-3006。这里只证明重复运行稳定，尚未将全部阶段与CPU数学参考逐值对照，不能记为精确通过；AMD640完整block也未验证。游戏DLL未更新。
+
 ### 2026-09-06：AMD640-token attention精确通过
 
 - NativeVitAttention开放640tokens，HLSL暂存扩至640；GPU夹具打包使用ceil(log2(N)) token位，避免非2次方长度别名。
