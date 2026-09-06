@@ -2607,6 +2607,14 @@ GPU DS host允许已crop raw输入为偶数尺寸、支持256通道，shader增�
 
 当前AMD正确特征前缀推进到block0..22 DS，尚未恢复C512 split/ViT及后续解码器，第0层旁路2个差异仍待查。游戏DLL和公开ZIP未更新，最终剑星RGB/角色面部效果验收目标active。
 
+### 2026-09-06 C512 split原版调用审计，尚未建立有效整层裁判
+
+原live序列显示block23为ffwd_inpview（grid Z2）、ffwd_proj_inpview、qkv（grid Z4）、proj四阶段，参数分别56/72/56/72bytes。提取四个原记录，尺寸524288/263168/917568/263168bytes；旧split_swin512_reference.py按全FP16、256宽hidden及16维head解释，不再当正确参考。SASS可见QMMA.E4M3，混合矩阵/标量解释仍需独立恢复。
+
+run_original_split_global.cpp增加独立native-inpview诊断模式，选择前两段inpview kernel，尝试H/W顺序及投影ceil(W/4)网格、QKV独立shift-mask网格，并增加branch/ffn/attn读回。以上参数仍在验证，不宣称已修正全部ABI。真实4×2输入得到全零，probe_native_split_input.py进一步全常量输入：4×2仍四段全零；8×8/16×8前3段分别约32768/65536bytes非零，最后proj仅约16384/32768bytes，范围少一半。当前block=(32,4,1)等线程配置仍需与实际创建参数核对，不能把“非零”当正确裁判。
+
+reader对权重严格要求原记录尺寸，仅输入可补零；native模式全零现在返回4并明确拒绝验收，旧模式保留。preblock_live_parameters.cpp新增kernel_create原始args_xyz/shared_arg只读日志，为下一轮核对真实线程配置准备；未构建部署该新增日志，不把源码变化说成已采集数据。AMD正确范围仍block0..22 DS，未修改游戏DLL/公开包，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

@@ -17,6 +17,7 @@ std::vector<std::pair<void*,std::string>> names;std::atomic<unsigned> launches{0
 constexpr wchar_t Log[]=LR"(D:\DLSSNR-Lab\logs\preblock-live-parameters.txt)";
 void* get_hook(void*self,const char*name,uint32_t x,uint32_t y,uint32_t z,uint64_t shared){
  void*result=original_get(self,name,x,y,z,shared);
+ if(result&&name){if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"kernel_create name=%s args_xyz=%u,%u,%u shared_arg=%llu\n",name,x,y,z,shared);fclose(f);}}
  if(result&&name){AcquireSRWLockExclusive(&names_lock);names.emplace_back(result,name);ReleaseSRWLockExclusive(&names_lock);}return result;
 }
 int64_t hook(void*self,void*context,uint32_t x,uint32_t y,uint32_t z,void*blob,uint64_t bytes,uint8_t flag){
