@@ -8,7 +8,7 @@ root=Path('release/native-temporal-inputs-gates');gpu=root/('amd-motion' if args
 case='single' if args.single else 'both_shifted'
 if args.variable:root=Path('release/native-temporal-variable');gpu=root;case='original'
 width,height=(24,16) if args.rect else (8,8)
-if args.rect:root=Path('release/native-temporal-rect');gpu=root;case='original'
+if args.rect:root=Path('release/native-temporal-rect');gpu=root;case='single' if args.single else 'original'
 prefix='gpu-single-' if args.single else 'gpu-'
 basis=np.fromfile('release/post-skip-basis/matrix.f32',np.float32).reshape(2048,2048)
 mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()
@@ -24,5 +24,5 @@ for name,expected in [('main',main),('down',down)]:
 report={'scope':'single input regression' if args.single else 'GPU motion coordinates -> sampler -> preblock; controlled 8x8 no slot18 branch' if args.motion else 'GPU sampler directly into preblock; supplied transformed coordinates, not full motion path' if args.direct else 'CPU-supplied temporal RGB into production GPU preblock; sampler not directly connected',
         'checks':checks,'pass':all(c['different']==0 for c in checks)}
 if args.variable:report['scope']='GPU spatially varying motion -> sampler -> preblock; controlled 8x8 no slot18 branch'
-if args.rect:report['scope']='GPU spatially varying motion -> sampler -> preblock; controlled 24x16 no slot18 branch'
+if args.rect:report['scope']='GPU single-input preblock regression; controlled 24x16' if args.single else 'GPU spatially varying motion -> sampler -> preblock; controlled 24x16 no slot18 branch'
 (gpu/f'{case}-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));assert report['pass']

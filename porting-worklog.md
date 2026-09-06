@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：24×16偏差定位到时序坐标前段候选，single全exact
+
+- 原版同尺寸单RGB控制及AMD新root单图五帧完成session2501 exit0，validator --rect --single：main12288/down3072全different=0，排除该样本基本preblock路径。
+- host增加可选DLSS5_TEST_TEMPORAL_DUMP，在运算完成后独立回读坐标与采样RGB，不向运行注入特征。诊断exe五帧完成session86752 exit0，原先失败输出未覆盖（gpu-diagnostic-*独立文件）。
+- 24×16 GPU坐标对当前CPU参考有323/768分量不同，max3.8146973e-6；把GPU实际坐标输入CPU sample32后，采样RGB全部half一致（float max1.788e-7）。因此优先检查坐标倒数/运算顺序，尚不能直接认定CPU参考就是原版真值。
+- 下一步抓24×16原版motion阶段寄存器，与两端坐标三方比较，修复最早差异。失败报告仍有效，新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：24×16时序GPU前端发现精度差异，未通过
 
 - prepare_native_temporal_variable_gpu.py新增--rect，seed7305独立RGB/history/spatial motion，原版输入HWC、AMD输入明确转换8×8 tile-major，history/motion保留HWC。有效/处理尺寸均24×16，非二次幂宽度。

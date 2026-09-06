@@ -107,6 +107,11 @@ int wmain(int argc,wchar_t**argv){try{
   std::printf("frame=%u seed=%08x replay_check=pass\n",frame,seed);
   if(alternate_path)std::printf("dynamic_rgb frame=%u input=%c checked=final,head,decoder69\n",frame,frame==2?'B':'A');
  }
+ if(history_path&&_wgetenv(L"DLSS5_TEST_TEMPORAL_DUMP")){
+  auto dump=[&](ID3D12Resource*r,UINT64 bytes,const wchar_t*name){auto*rb=buffer(device,bytes,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);ck(allocator->Reset());ck(c->Reset(allocator,nullptr));barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(rb,0,r,0,bytes);barrier(c,r,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);submit();void*p=nullptr;D3D12_RANGE range{0,SIZE_T(bytes)};ck(rb->Map(0,&range,&p));std::ofstream f((std::wstring(argv[7])+L"\\"+name).c_str(),std::ios::binary);if(!f.write(reinterpret_cast<const char*>(p),bytes))throw std::runtime_error("temporal diagnostic write failed");rb->Unmap(0,&none);rb->Release();};
+  if(motion_path)dump(motion_coordinates.Output(),UINT64(width)*height*8,L"gpu-temporal-coordinates.f32");
+  dump(temporal_sampler.Output(),UINT64(width)*height*16,L"gpu-temporal-sampled.f32");
+ }
  for(UINT i=0;i<3;i++){std::ofstream f(argv[4+i],std::ios::binary);if(!f.write(reinterpret_cast<const char*>(data[i].data()),sizes[i]))throw std::runtime_error("output write failed");}
  std::printf("resident_chain=pass width=%u height=%u frames=5 intermediate_CPU_transfers=0\n",width,height);return 0;
 }catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());return 1;}}
