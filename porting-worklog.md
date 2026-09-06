@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：C64完整shuffle求和树覆盖检查
+
+- 核对P3/P2/P1/P0来自lane位1/2/8/16；shuffle索引由(lane%8)*4+lane/8并xor0/1/2/3形成。追踪0x8610～8780后每lane树均同一query、64keys各一次。
+- 当前bias载入段对应query32～63，保存c64-full-trees.json；把树的key顺序应用最小query18指数行，打印与旧分母对比以继续定位。
+- 尚未全模型数值回归或生产修改，不能把符号覆盖正确等同修复完成；未部署DLL。
+
 ### 2026-09-06：C64局部softmax求和符号追踪
 
 - trace_c64_softmax_partials.py从0x7510 bias载入经QMMA C操作数、HFMA/clamp/指数位变换与HADD传播坐标到0x8600，四个partial寄存器8/11/56/57各64个half来源均非空。
