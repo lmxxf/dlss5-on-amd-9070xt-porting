@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整GPU测试包已部署到独立目录，尚未启动
+
+- 完成向 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-full` 传输完整系数、输入、oracle、映射、shader依赖及运行脚本；传输session80263已exit0。目录210文件，oracle-final.f32为26542080字节。
+- 部署exe的远端SHA256与本地 `/tmp/native-frontfinal-test.exe` 一致：`8581e32b0a75ce96e60ba43199a23289301eef18a907cdfc03ac7b6f22daa53c`。没有覆盖frontvit目录或游戏DLL。
+- 0～38原测试仍在工作：session34710/PID39212，最近确认CPU481.828125秒、工作集1206468608字节，持续编译成功。完整测试未启动，避免并发干扰。后续先收该session结果、运行frontvit验证器，再通过 `run_native_valid1080_full.ps1` 启动已部署完整测试。
+- 本轮是部署进展及可核验等待，不是整链数值验收。实际游戏DLL仍未更新。
+
+
 ### 2026-09-07：完整0～70同源GPU夹具及运行/验收脚本就绪
 
 - `prepare_native_valid1080_full_gpu.py` 已生成ignored `release/native-rgb-valid1080/amd-full`：0～70系数、正逆640映射、唯一RGB输入、最终RGB与head比较对照。decoder40～69主输入连续性及四处upsample的同源encoder跳接均按文件内容检查通过；不把skip或预制特征作为运行输入打包。
