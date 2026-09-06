@@ -38,7 +38,13 @@ float3 fetch(float2 xy) {
         float(fma(double(normalized.y),double(height),0.0)));
     precise float2 uv=history_pixel*float2(inverse_width,inverse_height);
     precise float2 fixed_uv=floor(uv*2097152.0);
-    precise float2 pixel=fixed_uv*(float2(width,height)/2097152.0)-.5;
+    // Quantize directly from 21-bit UV to 8-bit texel fractions. Converting
+    // the product to float first can round across a half-grid boundary.
+    // Split at 13 bits so every product fits uint32 even at extent 16384.
+    uint2 fixed_bits=uint2(clamp(fixed_uv,0,2097152.0));
+    uint2 scaled=(fixed_bits>>13)*uint2(width,height)
+        +(((fixed_bits&8191)*uint2(width,height)+4096)>>13);
+    precise float2 pixel=float2(max(scaled,128)-128)/256.0;
     precise float2 p=clamp(pixel,0,float2(width-1,height-1));
     uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(width-1,height-1));
     precise float2 f=floor((p-float2(lo))*256.0+.5)/256.0;

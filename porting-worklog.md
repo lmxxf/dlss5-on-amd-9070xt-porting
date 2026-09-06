@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：120×72时序前端全exact，整数小数量化消除最后7/1差异
+
+- capture工具支持--block/--warp，session4084抓block8,row0,warp1及block12,row8,warp0。session67300补当前GPU中间读回，两区域UV全部一致；sampler差异分别lane31和lane26的三个half。用原捕获UV在CPU重建两区域均half exact，表明此次不是CPU规则缺失。
+- sampler不再先把21bit UV乘extent变成float texel再量化，而是按整数拆乘直接得到8bit texel坐标：(u>>13)*extent+(((u&8191)*extent+4096)>>13)，再减128并夹边。避免float中间值提前跨越半格；check_native_texture_integer_fraction.py对八种尺寸（含1920/1080/16384）的随机及边界样本与uint64直接乘法比较全一致。
+- session39764五帧运行完成：120×72 GPU motion→history sampler→preblock，main276480/down69120所有值与原版exact，7/1→0/0。证据large/integerfraction/original-validation.json。session33872的24×16五帧回归main12288/down3072亦全exact。
+- 此里程碑只证明受控120×72无slot18时序前端，不等价于valid1080时序、全网络动态闭环或游戏验收。游戏DLL未改；下一步扩展1920×1152处理/1920×1080有效纹理与历史帧生命周期，并接回全网络及DLL。
+
 ### 2026-09-07：纹理小数半格取整修正，120×72差异45/14→7/1
 
 - capture脚本增加--pcs，session80588抓五个TEX后寄存器。新增check_native_temporal_texture_returns.py：仅lane20的top/center/bottom大误差，公共u位模式0x3e9de003；并非Y方向问题。21bit截断后fraction*256恰为128.5。

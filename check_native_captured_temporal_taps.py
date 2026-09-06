@@ -3,8 +3,8 @@ from pathlib import Path
 import json,struct,argparse
 import numpy as np
 from native_temporal_sampling_reference import bilinear,fma32
-parser=argparse.ArgumentParser();parser.add_argument('--remaining',action='store_true');args=parser.parse_args()
-root=Path('release/native-temporal-large');capture=root/('block4-row6-warp1' if args.remaining else 'block14-warp1')
+parser=argparse.ArgumentParser();parser.add_argument('--remaining',action='store_true');parser.add_argument('--capture');args=parser.parse_args()
+root=Path('release/native-temporal-large');capture=root/(args.capture or ('block4-row6-warp1' if args.remaining else 'block14-warp1'))
 rows=json.loads((capture/'sample-registers-1590.json').read_text())['rows']
 value=lambda row,k:struct.unpack('<f',struct.pack('<I',row['raw'][str(k)]))[0]
 uv=np.array([[[value(r,x),value(r,y)] for x,y in [(48,49),(44,45),(54,45),(60,61),(56,45)]] for r in rows],np.float32)
