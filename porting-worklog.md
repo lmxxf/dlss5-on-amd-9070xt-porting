@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际C256七层整链入口准备
+
+- prepare_native_decoder_c256_gpu.py --game-extent核对49～55原始零差异、2211840值、逐层来源及实际shift3/1/2/0/3/1/2，导出七层系数与最终oracle。
+- d3d12_native_split_window_test.cpp增加decoder49_55_game模式，120×72 C256、实际移位序列；旧实验入口保留。编译与diff检查通过，尚未执行新的七层GPU测试。
+- fixture ignored release/native-decoder-game-c256/amd-decoder49-55。下一步部署到独立实验目录测试，未替换游戏DLL。
+
 ### 2026-09-06：实际120×72 decoder49～55原始链对照
 
 - check_native_decoder_c256.py新增--game-extent（当前仅C256），矩形解码/窗口padding均按120×72，旧方形默认保留。
