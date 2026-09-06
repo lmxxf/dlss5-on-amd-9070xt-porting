@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：双纹理门控与同图零位移基线闭合
+
+- 原SASS PC03e0/0450建立P1=(slot10==0 OR slot8==0)，PC0bb0为真跳至1880，绕过双纹理路径。slot10 TEX→坐标FFMA→floor/fraction及三次多项式→slot8五次RGB TEX(1590/15c0/15d0/15e0/15f0)→权重和RCP归一化→half中心化/缩放，不是两图简单加权混合。
+- 扩展受控脚本增加slot10-only与both_same，并支持独立output-root。六case原版执行成功，session75639 exit0：slot8-only、slot10-only、同RGB+零slot10均与single的2048main值exact；不同RGB+零位移差1283、不同RGB+0.125位移差1267。证据ignored `release/native-temporal-inputs-gates`。
+- 这确认额外输入门控与同图零位移退化基线，尚未恢复五采样数学/纹理硬件舍入/输入特征落位，不称AMD稳态支持完成。下一步先独立恢复采样器再接入输入特征，继续保留原始kernel作裁判。游戏DLL未更新。
+
+
 ### 2026-09-07：原版受控双纹理稳态路径证实影响输出
 
 - 原版preblock caller新增DLSS5_PREBLOCK_SLOT8/SLOT10可选独立RGBA32纹理，保留原采样器linear/normalized/clamp，覆盖各自extent/reciprocal字段；禁止scan/非slot0主输入/无captured参数组合。捕获GPU句柄仍清零，绝不重用。

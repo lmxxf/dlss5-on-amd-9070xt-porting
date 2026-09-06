@@ -1,8 +1,9 @@
 """Controlled original preblock extra-texture sensitivity, not an AMD oracle."""
 from pathlib import Path
-import os,subprocess,json
+import os,subprocess,json,argparse
 import numpy as np
-root=Path('release/native-temporal-inputs');root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--output-root',type=Path,default=Path('release/native-temporal-inputs'));args=p.parse_args()
+root=args.output_root;root.mkdir(exist_ok=False)
 rng=np.random.default_rng(7301)
 rgb=rng.uniform(.1,.9,(8,8,4)).astype('<f4');rgb[:,:,3]=1
 history=rgb[:,::-1].copy();motion=np.zeros_like(rgb)
@@ -11,7 +12,7 @@ shifted=motion.copy();shifted[:,:,:2]=.125;shifted.tofile(root/'shifted.f32')
 env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_PREBLOCK_')}
 env.update(DLSS5_PREBLOCK_PARAMETER_FILE='release/native-game-present/temporal-3536/preblock-live-1.bin',DLSS5_PREBLOCK_SEED='0')
 rows=[];baseline=None
-for name,extra in [('single',{}),('slot8',{'DLSS5_PREBLOCK_SLOT8':'history.f32'}),('both_zero',{'DLSS5_PREBLOCK_SLOT8':'history.f32','DLSS5_PREBLOCK_SLOT10':'motion.f32'}),('both_shifted',{'DLSS5_PREBLOCK_SLOT8':'history.f32','DLSS5_PREBLOCK_SLOT10':'shifted.f32'})]:
+for name,extra in [('single',{}),('slot8',{'DLSS5_PREBLOCK_SLOT8':'history.f32'}),('slot10',{'DLSS5_PREBLOCK_SLOT10':'motion.f32'}),('both_same',{'DLSS5_PREBLOCK_SLOT8':'rgb.f32','DLSS5_PREBLOCK_SLOT10':'motion.f32'}),('both_zero',{'DLSS5_PREBLOCK_SLOT8':'history.f32','DLSS5_PREBLOCK_SLOT10':'motion.f32'}),('both_shifted',{'DLSS5_PREBLOCK_SLOT8':'history.f32','DLSS5_PREBLOCK_SLOT10':'shifted.f32'})]:
     trial=dict(env,**{k:str(root/v) for k,v in extra.items()})
     prefix=root/name
     subprocess.run(['/tmp/native-preblock-temporal-oracle','/tmp/dlssnr-cubins/dlssnr-00.cubin','release/native-rgb-game/block0.weights',str(root/'rgb.f32'),str(prefix)+'.main.fp8',str(prefix)+'.down.fp8','0'],env=trial,check=True,timeout=20)
