@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     // Native multihead upsample: +0x18 skip pointer, +0x20 output H/W,
     // +0x28 window offsets. Input is half-resolution with twice the channels.
     if(mode==9){
-        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||width>64||height>64||(by!=4&&by!=8)||shift<0||shift>3)return 2;
+        if(argc<15||std::string(argv[14])=="-"||width<=0||height<=0||width%8||height%8||width>128||height>128||(by!=2&&by!=4&&by!=8)||shift<0||shift>3)return 2;
         auto skip=read_file(argv[14]);if(skip.size()>arena_size)return 2;
         check("clear input",cuMemsetD8(di,0,arena_size));check("input upload",cuMemcpyHtoD(di,input.data(),input.size()));
         check("clear skip",cuMemsetD8(aux,0,arena_size));check("skip upload",cuMemcpyHtoD(aux,skip.data(),skip.size()));

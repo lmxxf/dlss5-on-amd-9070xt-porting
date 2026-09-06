@@ -12,6 +12,7 @@ def unpack(path):
     raw=np.fromfile(path,np.uint8)
     if raw.size==820784:C,n,begin,ffskip,qkv_old=256,689232,0x58000,0x78000,0x58220
     elif raw.size==230176:C,n,begin,ffskip,qkv_old=128,197184,0x18000,0x20000,0x18120
+    elif raw.size==70048:C,n,begin,ffskip,qkv_old=64,61760,0x7000,0x9000,0x70a0
     else:raise ValueError('native upsample record size')
     ordinary=np.zeros(n,np.uint8)
     ordinary[:begin]=raw[:begin]
@@ -25,7 +26,7 @@ def unpack(path):
     return matrix,scale,unpack_bytes(ordinary)
 def upsample(x,skip,params,shift=0):
     matrix,scale,body=params;h,w,c=skip.shape
-    if c not in (128,256) or x.shape!=(h//2,w//2,2*c) or h%8 or w%8 or shift not in range(4):raise ValueError('native upsample geometry')
+    if c not in (64,128,256) or x.shape!=(h//2,w//2,2*c) or h%8 or w%8 or shift not in range(4):raise ValueError('native upsample geometry')
     low=multiply(x,matrix)
     merged=F(H(np.repeat(np.repeat(low,2,0),2,1)+skip*scale))
     px=4 if shift&1 else 0;py=4 if shift&2 else 0;ww=(w+px+7)//8*8;hh=(h+py+7)//8*8

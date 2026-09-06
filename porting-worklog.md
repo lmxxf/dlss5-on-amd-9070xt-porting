@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第62块原生参考通过（2026-09-06）：原记录70048 bytes，SHA eaaa79ba63a53cbd0c23521593379284af29ab50a718ddf37e06b93b339ccadd。直接布局为C64 FFN前缀0..0x7000、128→64 FP8投影0x7000..0x9000、FFN skip0x9000、输入skip0x9080、QKV0x9100，普通C64后段平移0x2060。共享上采样参考新增该记录尺寸，mode9允许blockY2及128输出范围，旧C128/C256路径保留。
+
+check_native_upsample56_spatial.py加--block62，所有通道/尺寸/物理global16及cell编码按配置生成，不复用C128夹具。原CUBIN01小测试16×16/seed2601/shift0共16384值全exact；实际RGB512需要的128×128/seed2607/shift3共1048576值全exact，包含移位边界。报告release/native-upsample62/spatial-16-2601-0及spatial-128-2607-3/validation.json。第62块尚未实现AMD，RGB完整GPU连续仍到48，游戏DLL未改。
+
 AMD decoder57～61独立链通过（2026-09-06）：宿主新增decoder57_61，五个NativeC64Shift(C128)在64×64常驻串联，输入为原block56夹具，shift给定0/1/3/2/0。导出/运行/验证脚本增加互斥C128选项并保留C256与split模式。部署native-decoder57-61，三帧最终各524288值different0/max0，device/fence/finite/replay全部通过；下载再验证全exact，SHAadf50e8cfca05446dc6ba5b352d0a6c46e0622719be64a15e412173bd07a97f7，报告release/native-rgb512/amd-decoder57-61/validation.json。进程已退出，无待观察GPU任务。
 
 初查第62块：原记录70048 bytes，CUBIN01为2h64 upsample；SASS输入投影载入+0x7200、FFN skip+0x9000、输入skip+0x9080、attention scale+0x10100、最终skip+0x11110，与前两种upsample布局同族，但尚未数值验证。下一轮建立C64投影与128×128输出测试。AMD严格RGB连续范围仍到48，后段分别独立通过，游戏DLL未改。
