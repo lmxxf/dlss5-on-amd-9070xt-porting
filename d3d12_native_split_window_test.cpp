@@ -1,0 +1,29 @@
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <dxgi1_6.h>
+#include <fstream>
+#include <cstdio>
+#include <cmath>
+#include <cstdint>
+#include <cwchar>
+#include "native_split_window.h"
+static ID3D12Device*device=nullptr;
+static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("D3D HRESULT="+std::to_string(unsigned(h)));}
+static std::vector<float> read(const std::wstring&p){std::ifstream f(p.c_str(),std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("missing input");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("bad file size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("short read");return v;}
+static ID3D12Resource* buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){D3D12_HEAP_PROPERTIES hp{};hp.Type=type;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;ID3D12Resource*r=nullptr;ck(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,state,nullptr,IID_PPV_ARGS(&r)));return r;}
+static void barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,bool copy){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,copy?D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE:D3D12_RESOURCE_STATE_COPY_SOURCE,copy?D3D12_RESOURCE_STATE_COPY_SOURCE:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);}
+int wmain(int argc,wchar_t**argv){try{
+ if(argc!=2&&argc!=5)return 2;UINT width=argc==5?wcstoul(argv[2],nullptr,10):4,height=argc==5?wcstoul(argv[3],nullptr,10):4,shift=argc==5?wcstoul(argv[4],nullptr,10):3;std::wstring dir=argv[1];auto file=[&](const wchar_t*n){return dir+L"\\"+n;};auto values=read(file(L"input.f32"));const UINT64 bytes=UINT64(width)*height*512*4;if(values.size()*4!=bytes)throw std::runtime_error("fixture extent");
+ IDXGIFactory6*factory=nullptr;ck(CreateDXGIFactory2(0,IID_PPV_ARGS(&factory)));IDXGIAdapter1*adapter=nullptr;
+ for(UINT i=0;;i++){IDXGIAdapter1*a=nullptr;if(factory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&a))==DXGI_ERROR_NOT_FOUND)break;DXGI_ADAPTER_DESC1 desc{};a->GetDesc1(&desc);if(desc.VendorId==0x1002&&!(desc.Flags&DXGI_ADAPTER_FLAG_SOFTWARE)){adapter=a;std::wprintf(L"adapter=%ls\n",desc.Description);break;}a->Release();}if(!adapter)throw std::runtime_error("AMD adapter missing");ck(D3D12CreateDevice(adapter,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&device)));
+ auto*input=buffer(bytes,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*m=nullptr;D3D12_RANGE none{};ck(input->Map(0,&none,&m));std::memcpy(m,values.data(),bytes);input->Unmap(0,nullptr);
+ NativeSplitWindow split;split.Create(device,input,width,height,shift,read(file(L"ffwd.f32")),read(file(L"ffwd-projection.f32")),read(file(L"attention.f32")),dir);
+ ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(device->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));ID3D12CommandAllocator*allocator=nullptr;ck(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));ID3D12GraphicsCommandList*cmd=nullptr;ck(device->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,allocator,nullptr,IID_PPV_ARGS(&cmd)));ID3D12Fence*fence=nullptr;ck(device->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));HANDLE event=CreateEventW(nullptr,FALSE,FALSE,nullptr);
+ ID3D12Resource*rb[1]{};std::vector<float>oracle[1],baseline[1];rb[0]=buffer(bytes,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);oracle[0]=read(file(L"oracle-0.f32"));if(oracle[0].size()!=values.size())throw std::runtime_error("oracle extent");
+ for(UINT frame=0;frame<3;frame++){
+  if(frame){ck(allocator->Reset());ck(cmd->Reset(allocator,nullptr));}split.Record(cmd);
+  for(UINT i=0;i<1;i++){barrier(cmd,split.Output(),true);cmd->CopyBufferRegion(rb[i],0,split.Output(),0,bytes);barrier(cmd,split.Output(),false);}ck(cmd->Close());ID3D12CommandList*lists[]={cmd};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,frame+1));ck(fence->SetEventOnCompletion(frame+1,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(device->GetDeviceRemovedReason());auto completed=fence->GetCompletedValue();if(completed==UINT64_MAX||completed<frame+1)throw std::runtime_error("fence incomplete");
+  for(UINT i=0;i<1;i++){D3D12_RANGE all{0,bytes};ck(rb[i]->Map(0,&all,&m));std::vector<float>result(values.size());std::memcpy(result.data(),m,bytes);rb[i]->Unmap(0,&none);const auto&expected=oracle[i];size_t different=0;float max_error=0;for(size_t j=0;j<result.size();j++){if(!std::isfinite(result[j])||!std::isfinite(expected[j]))throw std::runtime_error("nonfinite");different+=result[j]!=expected[j];max_error=std::max(max_error,std::abs(result[j]-expected[j]));}std::printf("frame=%u stage=%u different=%zu max_error=%.9g\n",frame,i,different,max_error);std::fflush(stdout);if(different)throw std::runtime_error("original stage mismatch");if(frame==0)baseline[i]=result;else if(result!=baseline[i])throw std::runtime_error("replay changed");std::ofstream out(file((L"gpu-"+std::to_wstring(i)+L".f32").c_str()).c_str(),std::ios::binary);if(!out.write(reinterpret_cast<const char*>(result.data()),bytes))throw std::runtime_error("output write");}
+ }
+ std::printf("split_window=%ux%u shift=%u final=exact frames=3 intermediate_CPU_transfers=0\n",width,height,shift);return 0;
+}catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());if(device)std::fprintf(stderr,"device_removed_reason=0x%08x\n",unsigned(device->GetDeviceRemovedReason()));return 1;}}

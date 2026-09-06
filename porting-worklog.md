@@ -2667,6 +2667,14 @@ check_native_split_small.py分别比较4×4、8×4、4×8、8×12、12×8五种�
 
 这一轮未改变AMD代码或游戏DLL：GPU连续RGB前缀仍block0..22 DS，C512独立GPU仍为16×8五帧验证。接回整链还要解决前缀4×2与C512物理尺寸合同，不能把本次4×4以上通过说成4×2已修复。最终游戏画面目标active。
 
+### 2026-09-06 C512 GPU窗口包装验证：4×4重复与12×8补零
+
+新增NativeSplitWindow及native_split_window.hlsl，GPU完成pack/原生四阶段/crop。有效轴恰为4则模4重复，较大轴越界补零，使用明确分支避免root SRV非法读取；支持已验证的至少4、4对齐尺寸，仍拒绝4×2。前后非attention阶段均为逐像素通道计算，窗口变换可放在整层入口，最终再crop。
+
+prepare_native_split_window_gpu.py直接导出此前保存的原CUBIN小窗口fixture；d3d12_native_split_window_test.cpp在9070XT验证4×4 shiftXY，8192最终值全部exact、三帧重放/device/fence检查通过。随后12×8 shiftXY验证49152最终值全部exact，证明较大轴没有被错做循环重复；下载GPU输出再次与原oracle比较通过。这个包装测试只验最终crop输出，内部四阶段的独立数值与输入切换验证仍以前一检查点为准。
+
+本轮未把C512接到RGB前缀，4×2逻辑尺寸与C512物理尺寸的銜接仍待核对；不能把4×4以上GPU通过称为4×2已解决。AMD连续RGB正确范围仍block0..22 DS，游戏DLL/公开包未更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
