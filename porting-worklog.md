@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同 RGB 原版post70最终RGB精确通过（反射底图合同）
+
+- `prepare_native_post70_game.py --valid1080` 使用同RGB decoder69的逻辑FP8输出、同RGB block0原版main跳接、1080高原输入向底部反射填充72行，生成原版post70输出。维持mask1/rgb1/scale0.03125。主输入重排为C32 global16且不交换低位，skip保留cell布局。
+- `check_native_post70_game.py --valid1080` 按16行独立窗口比对全1152×1920，6635520个RGB分量different=0/max_abs=0，finite=true，session99651已exit0。ignored `release/native-rgb-valid1080/post70/validation.json`。至此受控单RGB同源原版/CPU分段链到最终RGB闭合。
+- 重要边界：post底图的反射填充是本次受控合同，未证明实际游戏post纹理边界；未完成多纹理输入及游戏最终表面写回，不得称游戏移植完成。
+- `prepare_native_post70_gpu.py --valid1080` 已导出对应AMD夹具至 `post70/amd`，尚未运行AMD本轮post测试。下一步AMD同源post、解码链及0～70GPU直连，之后部署并在游戏实际场景核对。未改游戏DLL/存档，无本轮运行任务遗留。
+
+
 ### 2026-09-07：AMD同源ViT31～38精确通过，原版同源链至69
 
 - AMD独立目录 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-vit`，使用同RGB `vit/input.f32` 与 `vit/oracle.f32`，现有chunk-fenced链运行三帧，全部655360值different=0/max_abs=0，device=0。session16040已exit0。
