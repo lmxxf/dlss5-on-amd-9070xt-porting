@@ -4,8 +4,8 @@ import argparse,json,subprocess
 import numpy as np
 from native_c32_reference import unpack,block
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--block',type=int,choices=[67,68,69],required=True);p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--input',type=Path,required=True);a=p.parse_args()
-root=Path('release/native-rgb512')/f'decoder-block{a.block}';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--block',type=int,choices=[67,68,69],required=True);p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--output-root',type=Path,default=Path('release/native-rgb512'));a=p.parse_args()
+root=a.output_root/f'decoder-block{a.block}';root.mkdir(parents=True,exist_ok=False)
 report={'status':'running','block':a.block,'shift':a.shift,'input':str(a.input),'scope':'original/CPU C32, not AMD or runtime shift capture'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()

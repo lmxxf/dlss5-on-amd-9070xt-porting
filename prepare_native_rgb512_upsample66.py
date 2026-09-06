@@ -4,15 +4,15 @@ import argparse,json,subprocess
 import numpy as np
 from native_upsample66_reference import unpack,upsample
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);a=p.parse_args()
-base=Path('release/native-rgb512');root=base/f'upsample66-shift{a.shift}';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--shift',type=int,choices=range(4),required=True);p.add_argument('--decoder-root',type=Path,default=Path('release/native-rgb512'));p.add_argument('--encoder-root',type=Path,default=Path('release/native-rgb512'));a=p.parse_args()
+base=a.decoder_root;root=base/f'upsample66-shift{a.shift}';root.mkdir(parents=True,exist_ok=False)
 assert json.loads((base/'block65-outview-validation.json').read_text())['status']=='pass'
 report={'status':'running','shift':a.shift,'output_extent':[256,256,32],
         'scope':'RGB-derived original/CPU block66; runtime shift/skip identity not newly captured'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
 try:
-    main=np.fromfile(base/'block65-outview.fp8',np.uint8);skip=np.fromfile(base/'block4-main.fp8',np.uint8)
+    main=np.fromfile(base/'block65-outview.fp8',np.uint8);skip=np.fromfile(a.encoder_root/'block4-main.fp8',np.uint8)
     assert not np.any(main[1048576:]) and not np.any(skip[2097152:])
     main[:1048576].tofile(root/'input.fp8');skip[:2097152].tofile(root/'skip.fp8')
     c=np.arange(64);perm=(c&~3)|((c&1)<<1)|((c&2)>>1)

@@ -1,22 +1,23 @@
 """Original RGB512-derived block69 + preblock skip + base -> final RGB."""
 from pathlib import Path
-import json,subprocess
+import json,subprocess,argparse
 import numpy as np
 from native_post70_reference import unpack,post
 from decode_tinlayout_global import e4m3fn
-base=Path('release/native-rgb512');root=base/'post70';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--decoder-root',type=Path,default=Path('release/native-rgb512'));p.add_argument('--encoder-root',type=Path,default=Path('release/native-rgb512'));a=p.parse_args()
+base=a.decoder_root;root=base/'post70';root.mkdir(parents=True,exist_ok=False)
 assert json.loads((base/'block69-outview-validation.json').read_text())['status']=='pass'
 report={'status':'running','scope':'original/CPU RGB512-derived final RGB, mask1 mode1; not game contract acceptance'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
 try:
-    main=np.fromfile(base/'block69-outview.fp8',np.uint8);skip=np.fromfile(base/'block0-main.fp8',np.uint8)
+    main=np.fromfile(base/'block69-outview.fp8',np.uint8);skip=np.fromfile(a.encoder_root/'block0-main.fp8',np.uint8)
     assert not np.any(main[2097152:]) and skip.size==8388608
     main[:2097152].tofile(root/'main.fp8');skip.tofile(root/'skip.fp8')
     x=e4m3fn(main[:2097152]).reshape(2,256,256,16).transpose(1,2,0,3).reshape(256,256,32)
     basis=np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048);mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()
     skip=e4m3fn(skip.reshape(-1,512)[:,mapping]).reshape(128,128,4,4,32).transpose(0,2,1,3,4).reshape(512,512,32)
-    color=np.fromfile(base/'input-hwc.rgba32f','<f4').reshape(512,512,4)
+    color=np.fromfile(a.encoder_root/'input-hwc.rgba32f','<f4').reshape(512,512,4)
     x.tofile(root/'main.f32');skip.tofile(root/'skip.f32');color.tofile(root/'color.f32')
     weights=Path('release/native-post70/smoke')
     subprocess.run(['timeout','--kill-after=2s','15s','/tmp/native-post70-oracle','/tmp/dlssnr-cubins/dlssnr-00.cubin',

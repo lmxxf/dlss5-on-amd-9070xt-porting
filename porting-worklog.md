@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+真实移位新配置最终RGB参考通过（2026-09-06）：新目录native-runtime-rgb512继续63～65按3/1/2各1048576值原/CPU全exact，原65 outview验证通过；66 shift0及67～69按3/1/2各2097152值全exact。原69 outview验证通过后，接同一编码器preblock skip与初始RGB，新配置最终post70共786432个RGB分量different0/max0。完整新报告在native-runtime-rgb512/post70/validation.json；旧native-rgb512控制配置未覆盖。
+
+66/C32/post70脚本增加独立decoder/output root与encoder root，避免拷贝旧后段或混淆输入来源。所有原调用已正常退出，当前未运行AMD新配置全链。下一步以本新裁判重跑已修正移位的AMD全链，再进入1080p，游戏补丁未更新。
+
 真实移位新配置推进第62块（2026-09-06）：outview验证器增加--root，48与56/62桥接脚本分开decoder-root和encoder-root，普通C256/C128/C64检查器增加output-root。新结果全部留release/native-runtime-rgb512，编码器复用已与捕获移位一致的原数据，不覆盖旧配置。
 
 新block47 outview对plain全exact；48 shift0及49～55按捕获3/1/2/0/3/1/2，各262144值原版/CPU全exact。新block55 outview校验通过后，56以真实X移位mask1接block14 skip，524288值全exact；57～61按2/0/3/1/2各524288值全exact。新61 outview与62 shift0接block8 skip也通过，62最终1048576值全exact。所有调用正常退出、无CPU中间修正注入；AMD新配置全链仍待重跑，下一步63～70。游戏补丁未更新。
