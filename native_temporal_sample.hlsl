@@ -38,7 +38,7 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     precise float other=1-left;other=other-inner;other=other-right;
     precise float middle=inner+other;
     precise float reciprocal=temporal_reciprocal(middle);
-    precise float position=mad(other,reciprocal,center);
+    precise float position=float(fma(double(other),double(reciprocal),double(center)));
     positions=clamp(float3(center-1,position,center+2),.5,float(extent)-.5);
     weights=float3(left,middle,right);
 }

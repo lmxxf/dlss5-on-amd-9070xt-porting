@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：中央tap位置融合乘加，valid1080缩至8/4
+
+- session4614捕获block83,row41,warp0（x671/y328首误差）的PC10d0/1590/16b0/1800；CPU原UV重建half exact。session40402补同版rcpaccum GPU中间回读：64个UV全一致，但lane7三个sampler half不同，max RGB差0.00157565，错误在采样而非后续矩阵层。
+- 将axis中央position的mad改显式double fma转float，其余保持。session24755五帧结束，session51852回读valid1080 main24→8/down8→4。新的main全位于x24..28/y884..887；down另有x158/y170两通道差异。之前小尺寸position试改无收益不代表1080p无收益。
+- session47005同版120×72五帧回归main276480/down69120全exact，证据large/fullposition。valid1080证据positionfma。保留修正；游戏DLL未改，完整前端尚未全过，更未完成全网络时序和游戏验证。
+
 ### 2026-09-07：轴倒数与五tap融合累加修正，valid1080降至24/8
 
 - 通用temporal_reciprocal同时用于轴middle及最终total，在提供表时按相同原MUFU规则重建。session32793五帧结束，axisrcp回读307/103→288/99；未提供表时仍直接除法。
