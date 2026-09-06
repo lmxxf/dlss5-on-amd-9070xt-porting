@@ -2769,6 +2769,16 @@ validate_native_split_pool.py新增互斥--rgb256，直接采用这条原版连�
 
 本轮未接AMD256夹具或block30 GPU，AMD已验范围仍128×128 RGB→block29；新256夹具是原版oracle与block30 CPU参考证据。下一步恢复/验证512→1024入口，并扩展AMD尺寸与池化路径。游戏DLL和公开包未更新，最终RGB/游戏画面仍未完成。
 
+### 2026-09-06 block30第五记录与512→1024入口矩阵数值闭合
+
+新增run_original_split_head.cpp调用CUBIN04的cc_split_swin_16h_final_head_512_fp8，使用元数据确认的0x28参数：输入/输出/权重指针0/8/16，H/W32/36。权重严格524304字节，独立分配不以大零buffer掩盖读越界；记录SHA256 3ab0bf4b8e4b55cd4f60a8473d9cb0100896c1fd8328179188db43e427a50a4c，末尾16字节全零。
+
+4×4原版block30池化输入、gridX1只写4096值，扩为gridX4后完整16384值（4×4×1024），memcheck0 errors。check_native_split_head.py比较两种地址候选：正确矩阵输出bits[3,6..14]，输入bits[1,0,4,5,2,15..18]，按K32 half累加并FP8；把输出额外bit附在末尾的错误候选不匹配。输出每个4×4 cell包含两个原C512 cell bank，独立排列解码后16384值全exact，不只是直方图一致。
+
+再以seed1801/σ0.25独立16×8×512随机输入验证。首次gridX=4*ceil(W/4)多写到147455字节，被逻辑范围断言拒绝；修正为4*ceil(W/8)，gridY=ceil(H/8)、gridZ1、threads32×8后输出范围恰131072字节，所有131072值逐值exact，max0。再次memcheck0 errors。4×4真实连续夹具回归仍全exact，正确矩阵仅导出release下head-matrix.f32，未提交系数数据。
+
+至此block30第五记录在该原kernel下确认为512→1024矩阵运算，真实256×256原版链有可用的4×4×1024入口输出。尚未恢复ViT内部算术或接AMD block30/head；不能把原版/CPU对照称为AMD整链验收。AMD连续范围仍RGB128×128→block29，游戏DLL和公开包未更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
