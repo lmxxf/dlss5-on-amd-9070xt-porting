@@ -44,11 +44,15 @@ int wmain(int argc,wchar_t**argv){try{
  ID3D12Fence*fence=nullptr;ck(d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));HANDLE event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("event");
  UINT64 bytes=oracle.size()*4;auto*rb=buffer(d,bytes,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);std::vector<float> result(oracle.size());
  for(UINT frame=0;frame<3;frame++){
+  std::printf("begin frame=%u device=0x%08x\n",frame,unsigned(d->GetDeviceRemovedReason()));std::fflush(stdout);
   if(frame){ck(alloc->Reset());ck(cmd->Reset(alloc,nullptr));}if(block_mode){for(UINT i=0;i<block_count;i++)blocks[i].Record(cmd);}if(expand_mode||contract_mode)linear.Record(cmd);if(qkv_mode||chain_mode)qkv.Record(cmd);if(!qkv_mode&&!expand_mode&&!contract_mode&&!block_mode)attention.Record(cmd);
   D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={output,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
   cmd->ResourceBarrier(1,&b);cmd->CopyBufferRegion(rb,0,output,0,bytes);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);cmd->ResourceBarrier(1,&b);ck(cmd->Close());
-  ID3D12CommandList*lists[]={cmd};q->ExecuteCommandLists(1,lists);ck(q->Signal(fence,frame+1));ck(fence->SetEventOnCompletion(frame+1,event));
-  if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(d->GetDeviceRemovedReason());auto done=fence->GetCompletedValue();if(done==UINT64_MAX||done<frame+1)throw std::runtime_error("fence");
+  LARGE_INTEGER start,stop,frequency;QueryPerformanceFrequency(&frequency);QueryPerformanceCounter(&start);
+  ID3D12CommandList*lists[]={cmd};q->ExecuteCommandLists(1,lists);auto signal=q->Signal(fence,frame+1);if(FAILED(signal)){std::printf("signal frame=%u hr=0x%08x device=0x%08x\n",frame,unsigned(signal),unsigned(d->GetDeviceRemovedReason()));std::fflush(stdout);}ck(signal);ck(fence->SetEventOnCompletion(frame+1,event));
+  auto wait=WaitForSingleObject(event,30000);QueryPerformanceCounter(&stop);auto reason=d->GetDeviceRemovedReason();auto done=fence->GetCompletedValue();
+  std::printf("submission frame=%u elapsed_ms=%.3f wait=%lu device=0x%08x fence=%llu\n",frame,1000.0*(stop.QuadPart-start.QuadPart)/frequency.QuadPart,wait,unsigned(reason),(unsigned long long)done);std::fflush(stdout);
+  if(wait!=WAIT_OBJECT_0)throw std::runtime_error("GPU timeout");ck(reason);if(done==UINT64_MAX||done<frame+1)throw std::runtime_error("fence");
   D3D12_RANGE range{0,SIZE_T(bytes)};ck(rb->Map(0,&range,&m));std::memcpy(result.data(),m,bytes);rb->Unmap(0,&empty);
   size_t diff=0;float maximum=0;for(size_t i=0;i<result.size();i++){if(!std::isfinite(result[i])||!std::isfinite(oracle[i]))throw std::runtime_error("nonfinite");diff+=result[i]!=oracle[i];maximum=std::max(maximum,std::abs(result[i]-oracle[i]));}
   std::printf("tokens=%u frame=%u values=%zu different=%zu max_abs=%.9g\n",tokens,frame,result.size(),diff,maximum);std::fflush(stdout);

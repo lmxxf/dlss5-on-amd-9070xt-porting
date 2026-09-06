@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640block重放错误确认伴随AMD watchdog
+
+- 只读inspect_amd_gpu_failure.ps1查得21:26:35/59两条WER1001，LiveKernelEvent141，bucket LKD_0x141_Tdr:6_IMAGE_amdkmdag.sys，关联同一WATCHDOG-20260906-2126.dmp。不将两条报告误当两次独立GPU故障。
+- 暂无运行中的native-attention/SB-Win64进程输出；未重跑GPU负载、未改驱动/TDR。证据支持watchdog事件，但不单独证明具体算子或提交粒度就是根因。
+- extent host增加每帧device状态、Signal错误位置、submission elapsed/wait/fence诊断；本轮仅编译检查，不宣称新稳定性测试通过。下一步隔离阶段提交并保持原算术及最终oracle。
+
 ### 2026-09-06：640-token参考全通过，AMD首帧精确但重放设备错误
 
 - check_native_block256.py支持Tokens640及ceil(log2(N))布局，原始block31七阶段全部different=0/finite/tail/replay通过，导出初始输入与原始最终oracle。
