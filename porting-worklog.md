@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：1080p首个反例定位到原MUFU倒数舍入
+
+- motion采样尝试同样整数小数量化，session49542五帧完成，回读session80464仍430/109差异；无改善修改已撤回，远端valid1080坐标shader恢复。产物保留motioninteger目录。
+- capture脚本新增--valid1080，session50632捕获首个错误所在block11,row9,warp1的PC10d0/1590/1800，session26419补PC16b0。使用原UV/权重的CPU重建只差1个half，max_float=1.19209e-7，属于half边界而非大幅采样偏移。
+- 原PC16b0的R64是总权重MUFU.RCP结果，与CPU float32直接1/total在32lane中有3处不同。仅将该捕获倒数代入CPU重建，half差异1→0。check_native_captured_temporal_taps.py增加valid1080尺寸及可用时的倒数隔离报告，严格主结果仍失败，不把捕获值替代当实现。
+- 下一步独立探测原MUFU.RCP规则/误差，不能把捕获倒数硬编码进运行时。完整GPU仍430/109，游戏DLL未改，目标active。
+
 ### 2026-09-07：真实valid1080时序前端已运行，数值尚有430/109差异
 
 - d3d12_native_preblock_test.cpp区分temporal_height（1080有效纹理）与height（1152处理行）：history/MV容量按有效尺寸检查，motion输出按处理尺寸反射，sampler历史尺寸1080而输出count为1920×1152。旧非反射路径尺寸不变；MinGW编译成功。
