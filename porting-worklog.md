@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：block8最小窗口FFN特征控制零差异
+
+- isolate_block8_ffn.py仅在诊断副本将attention projection置零、最终skip置1，保持FFN与原输入，原kernel输出暴露量化FFN residual。
+- 4096值与现有FFN参考完全一致，ffn-control.json记录different0。差异定位进一步缩至attention/其projection，不能把修改权重控制当原模型验收。
+- 所有控制产物在ignored window46-18，原始权重未改；未部署游戏DLL。
+
 ### 2026-09-06：block8 CPU精度候选诊断
 
 - check_block8_accumulation.py在4096值最小窗口上比较原float32 dot与float64内积后half舍入，均重现同3差异，排除单纯提高矩阵内积精度即可解决的假设。
