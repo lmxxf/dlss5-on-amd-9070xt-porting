@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD 256-token projection 精确通过
+
+- NativeVitLinear 的普通 ViT 线性模式支持64/256 tokens，新增 projection extent 测试入口，残差单独上传并检查。
+- RX 9070 XT 三次各262144个值均与原始 RTX projection 输出完全一致，finite/device/fence 检查通过；下载 gpu.f32 后与 oracle.f32 cmp 一致。数据 ignored release/native-vit/projection-256-3003。
+- 至此256-token的 expand/contract/QKV/attention/projection 各独立测试通过，QKV→attention也已串联；尚需整个 ViT block、真实1080p尺寸与最终游戏画面验证。没有替换游戏 DLL。
+
 ### 2026-09-06：原始 256-token projection 精确通过
 
 - projection caller 的输入容量从固定 128 tokens 改为向上按128取整，允许64/256；RTX runner 使用 gridX=16、gridZ=4、计数器 -1。

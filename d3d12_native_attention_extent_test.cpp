@@ -19,10 +19,10 @@ static ID3D12Resource* buffer(ID3D12Device*d,UINT64 bytes,D3D12_HEAP_TYPE type,D
  ID3D12Resource*r=nullptr;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&desc,state,nullptr,IID_PPV_ARGS(&r)));return r;
 }
 int wmain(int argc,wchar_t**argv){try{
- if(argc!=2&&argc!=3)return 2;bool qkv_mode=argc==3&&!wcscmp(argv[2],L"qkv"),chain_mode=argc==3&&!wcscmp(argv[2],L"qkv_attention"),expand_mode=argc==3&&!wcscmp(argv[2],L"expand"),contract_mode=argc==3&&!wcscmp(argv[2],L"contract");if(argc==3&&!qkv_mode&&!chain_mode&&!expand_mode&&!contract_mode)return 2;
+ if(argc!=2&&argc!=3)return 2;bool projection_mode=argc==3&&!wcscmp(argv[2],L"projection");bool qkv_mode=argc==3&&!wcscmp(argv[2],L"qkv"),chain_mode=argc==3&&!wcscmp(argv[2],L"qkv_attention"),expand_mode=argc==3&&!wcscmp(argv[2],L"expand"),contract_mode=projection_mode||(argc==3&&!wcscmp(argv[2],L"contract"));if(argc==3&&!qkv_mode&&!chain_mode&&!expand_mode&&!contract_mode)return 2;
  std::wstring dir=argv[1];auto values=read(dir+L"\\input.f32"),oracle=read(dir+L"\\oracle.f32");
  UINT tokens=UINT(((qkv_mode||expand_mode)?values.size():oracle.size())/1024);
- if(contract_mode?(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*4):(expand_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*4):(chain_mode?values.size()!=oracle.size():(qkv_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*3):(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*3)))))throw std::runtime_error("geometry");
+ if(contract_mode?(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*(projection_mode?1:4)):(expand_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*4):(chain_mode?values.size()!=oracle.size():(qkv_mode?(values.size()!=size_t(tokens)*1024||oracle.size()!=values.size()*3):(oracle.size()!=size_t(tokens)*1024||values.size()!=oracle.size()*3)))))throw std::runtime_error("geometry");
  for(float v:values)if(!std::isfinite(v))throw std::runtime_error("nonfinite input");
  IDXGIFactory6*factory=nullptr;ck(CreateDXGIFactory2(0,IID_PPV_ARGS(&factory)));IDXGIAdapter1*adapter=nullptr;
  for(UINT i=0;;i++){IDXGIAdapter1*a=nullptr;if(factory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,IID_PPV_ARGS(&a))==DXGI_ERROR_NOT_FOUND)break;
@@ -31,7 +31,7 @@ int wmain(int argc,wchar_t**argv){try{
  auto*input=buffer(d,values.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*m=nullptr;D3D12_RANGE empty{};
  ck(input->Map(0,&empty,&m));std::memcpy(m,values.data(),values.size()*4);input->Unmap(0,nullptr);
  NativeVitAttention attention;NativeVitQkv qkv;NativeVitLinear linear;
- if(contract_mode){auto data=read(dir+L"\\residual.f32");if(data.size()!=oracle.size())throw std::runtime_error("residual geometry");for(float v:data)if(!std::isfinite(v))throw std::runtime_error("nonfinite residual");auto*skip=buffer(d,data.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);ck(skip->Map(0,&empty,&m));std::memcpy(m,data.data(),data.size()*4);skip->Unmap(0,nullptr);linear.Create(d,input,skip,tokens,4096,1024,false,read(dir+L"\\weights.f32"),dir);skip->Release();}
+ if(contract_mode){auto data=read(dir+L"\\residual.f32");if(data.size()!=oracle.size())throw std::runtime_error("residual geometry");for(float v:data)if(!std::isfinite(v))throw std::runtime_error("nonfinite residual");auto*skip=buffer(d,data.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);ck(skip->Map(0,&empty,&m));std::memcpy(m,data.data(),data.size()*4);skip->Unmap(0,nullptr);linear.Create(d,input,skip,tokens,projection_mode?1024:4096,1024,false,read(dir+L"\\weights.f32"),dir);skip->Release();}
  if(expand_mode)linear.Create(d,input,nullptr,tokens,1024,4096,true,read(dir+L"\\weights.f32"),dir);
  if(qkv_mode||chain_mode)qkv.Create(d,input,tokens,read(dir+L"\\weights.f32"),dir);
  if(!qkv_mode&&!expand_mode&&!contract_mode)attention.Create(d,chain_mode?qkv.Output():input,tokens,dir);
