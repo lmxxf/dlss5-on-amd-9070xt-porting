@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD完整256-token block31 GPU串联通过
+
+- extent test 新增 block31 模式，直接调用生产 NativeVitBlock，初始输入→expand→contract→QKV→attention→projection，全程GPU资源传递，无中间CPU特征注入。
+- 上传的oracle仅CPU比对使用；GPU只接收初始随机输入及四份原始解码系数。RX 9070 XT三次各262144个最终值全部different=0/max_abs=0，finite/device/fence检查通过。
+- 下载 ignored release/native-vit/block256-3003/gpu.f32 后与原始最终oracle字节级cmp一致。
+- 这是单block31、256-token固定输入重复验证；不是八block完整ViT，不是真实1080p纹理输入，更不是游戏DLL验收。后续继续实际几何/全链路，未更新游戏DLL。
+
 ### 2026-09-06：原始256-token完整block31对照
 
 - 新 runner `run_nvidia_block256.ps1` 从同一 seed=3003 输入依次运行 expand→contract→QKV→attention→projection，残差严格来自对应输入/contract，完整重复两次，所有七份输出逐字节一致。
