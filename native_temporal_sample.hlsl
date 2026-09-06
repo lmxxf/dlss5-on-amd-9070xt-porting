@@ -7,6 +7,16 @@ StructuredBuffer<uint> reciprocal_table : register(t2);
 #endif
 RWStructuredBuffer<float4> reconstructed : register(u0);
 cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inverse_width; float inverse_height; }
+float temporal_reciprocal(float x) {
+#if TEMPORAL_RECIPROCAL_TABLE
+    if(x>=.5&&x<2.0) {
+        uint bits=asuint(x);
+        int shift=127-int((bits>>23)&255);
+        return asfloat(uint(int(reciprocal_table[bits&0x7fffff])+shift*8388608));
+    }
+#endif
+    return 1.0/x;
+}
 
 void axis(float p,uint extent,out float3 positions,out float3 weights) {
 #if NORMALIZED_COORDINATES
@@ -27,7 +37,7 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     precise float right=(t3-t2)*.5;
     precise float other=1-left;other=other-inner;other=other-right;
     precise float middle=inner+other;
-    precise float reciprocal=1.0/middle;
+    precise float reciprocal=temporal_reciprocal(middle);
     precise float position=mad(other,reciprocal,center);
     positions=clamp(float3(center-1,position,center+2),.5,float(extent)-.5);
     weights=float3(left,middle,right);
@@ -70,20 +80,11 @@ void main(uint3 id:SV_DispatchThreadID) {
     float3 px,py,wx,wy;axis(coordinates[id.x].x,width,px,wx);axis(coordinates[id.x].y,height,py,wy);
     precise float top=wx.y*wy.x,left=wx.x*wy.y,center=wx.y*wy.y,bottom=wx.y*wy.z,right=wx.z*wy.y;
     precise float3 result=fetch(float2(px.y,py.x))*top;
-    result=mad(fetch(float2(px.x,py.y)),left,result);
-    result=mad(fetch(float2(px.y,py.y)),center,result);
-    result=mad(fetch(float2(px.y,py.z)),bottom,result);
-    result=mad(fetch(float2(px.z,py.y)),right,result);
+    result=float3(fma(double3(fetch(float2(px.x,py.y))),double3(left,left,left),double3(result)));
+    result=float3(fma(double3(fetch(float2(px.y,py.y))),double3(center,center,center),double3(result)));
+    result=float3(fma(double3(fetch(float2(px.y,py.z))),double3(bottom,bottom,bottom),double3(result)));
+    result=float3(fma(double3(fetch(float2(px.z,py.y))),double3(right,right,right),double3(result)));
     precise float total=left+top;total=total+center;total=total+bottom;total=total+right;
-    precise float reciprocal=1.0/total;
-#if TEMPORAL_RECIPROCAL_TABLE
-    // Five-tap positive normalization is near one. The table stores generic
-    // rcp.approx mantissas on [1,2), not sampled image/network values.
-    if(total>=.5&&total<2.0) {
-        uint bits=asuint(total);
-        int shift=127-int((bits>>23)&255);
-        reciprocal=asfloat(uint(int(reciprocal_table[bits&0x7fffff])+shift*8388608));
-    }
-#endif
+    precise float reciprocal=temporal_reciprocal(total);
     reconstructed[id.x]=float4(result*reciprocal,1);
 }

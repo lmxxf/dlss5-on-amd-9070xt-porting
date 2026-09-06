@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：轴倒数与五tap融合累加修正，valid1080降至24/8
+
+- 通用temporal_reciprocal同时用于轴middle及最终total，在提供表时按相同原MUFU规则重建。session32793五帧结束，axisrcp回读307/103→288/99；未提供表时仍直接除法。
+- session88352捕获block167,row10,warp0（旧首个x1342/y81），CPU原UV重建half exact，倒数隔离亦exact；新方向转向GPU累加捨入。
+- 四处五tap累加显式double3 fma后转float。session5500五帧结束，session34497回读valid1080 main288→24/down99→8，证据rcpaccum。此改动先前120×72无改善曾撤回，现在有完整尺寸证据才保留，不把小样本无变化当普遍无用。
+- session82658同版120×72五帧回归main276480/down69120全部exact。新的main首个x671/y328，down首个x158/y170；后续继续捕获小范围残差。游戏DLL未改，valid1080尚未全通过，更未完成全网络动态及游戏验收。
+
 ### 2026-09-07：AMD只读倒数表接入，valid1080差异降至307/103
 
 - NativeTemporalSample增加可选reciprocal_source及t2 SRV，精确容量32MiB/同设备校验、AddRef生命周期与有无表两套root参数数目。未提供时保持旧路径。测试host通过DLSS5_TEST_RECIPROCAL_TABLE一次上传通用表，无逐帧CPU修正。
