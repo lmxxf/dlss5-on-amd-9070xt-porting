@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原版/CPU decoder49～55连续通过（2026-09-06）：等待AMD全链期间新增check_native_decoder_c256.py，以原RGB衍生block48输出开始，逐块直接读取其各自689232-byte权重，原CUBIN ordinary C256模式执行，再以原生参考核对最终输出。shift给定0/1/3/2/0/1/3，七块各262144值different0/max0；原链每块输入来自前一块原输出，不注入CPU预测。输出有效区外零、无NaN，参数导出ffn/attention及最终oracle供AMD独立链使用。各报告在release/native-rgb512/decoder-block49..55/validation.json，scope不宣称原游戏shift调度已重新捕获。
+
+AMD全链会话32754继续运行，已观察到shader1～15完成、16 projection开始，没有终止或重启。RGB→48验证仍pending，严格AMD连续通过范围仍到39，另有独立40～47和48通过，不能拼成全链通过。游戏DLL未改。
+
 RGB512原第48块及AMD全链接线（2026-09-06）：prepare_native_rgb512_upsample48.py直接取已验证的原block47 outview与block22 main，给定shift0跑原block48，CPU参考对最终262144值different0/max0。报告release/native-rgb512/upsample48-shift0/validation.json；这是按当前跳接/shift合同搭建的原链，不冒称重新抓取了原游戏参数。
 
 front-chain新增rgb512up48，常驻decoder39→八个NativeSplitWindow40～47→512/256 upsample projection→C256 Swin48，跳接直接来自block22 raw-half，投影shader内FP8量化skip。中间资源全在GPU，无CPU特征注入；输出独立output-rgb512-upsample48.f32。-Chain -Upsample48显式选择，旧39模式保留。导出脚本prepare_native_rgb512_tail_gpu.py及严格验证器validate_native_rgb512_upsample48.py已加入，MinGW编译通过。
