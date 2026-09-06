@@ -2633,6 +2633,16 @@ recover_native_split_view.py在非方形16×8×512上以16组位置编码恢复6
 
 本轮AMD游戏DLL/公开包未改，实际AMD正确前缀仍block0..22 DS。5090仅新增CPU日志探针，未变更原神经权重或游戏画面。下一步按三段串联恢复C512 ffwd，并在桌面恢复可操作后补真实kernel参数。最终画面目标active。
 
+### 2026-09-06 C512 split ffwd与FFN投影真实权重逐值闭合
+
+check_native_split_activation.py对三系数路径做8组正负/幅度控制，全部符合前两段乘积后激活、第三段线性，而非gate/up并联乘法。probe_native_split_pre_bits.py测出第一矩阵9个输入地址bit及逻辑输入坐标；probe_native_split_expand_bits.py确认分组扩展的输入高bit为13，不是直接复用C64 W1时的12。为探针新增原runner的DLSS5_SPLIT_FFWD_ONLY路径，只在8对齐native模式读首段紧凑输出，允许断开连接的全零控制，不把它作为完整四调用验收。
+
+据指令/探针恢复record0三段：0..0x40000为512→512混合；0x40000..0x60000为8组64→256扩展；0x60000..0x80000为8组256→64收缩。混合后FP8，扩展后原half多项式激活再FP8，收缩每K32 half累计再FP8。最初直接套C64扩展位排列只有2.77% exact，测出bit13并修正后，validate_native_split_ffwd.py用真实record0及seed601/σ0.25、seed607/σ1.0的16×8×512输入，两个branch各65536值全部exact，MAE/max0，且按已测4×4 cell坐标逐值比对，不仅直方图相同。
+
+validate_native_split_projection.py进一步使用真实record0和record1（512×512 FP8矩阵＋512个FP16 skip），分支先投影、残差作为half初始累加值。seed631/σ0.25与seed641/σ1.0两组FFN输出各65536值全部exact。前两次split调用至此具有真实原系数数值对照，旧“两个256×512 FP16 gate/up”的解释作废。参数与激活仅存release/native-c512。
+
+当前仍为本地CUDA原版对CPU参考，未接AMD C512；QKV/attention、最后投影和4×2小尺寸合同仍待解决。5090新live数据仍未取得，AMD游戏DLL/公开包未改，已验证GPU范围仍block0..22 DS，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
