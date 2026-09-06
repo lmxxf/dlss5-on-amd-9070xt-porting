@@ -15,6 +15,6 @@ assert len(matches)==1, len(matches)
 order,address=matches[0];checks=[]
 for group in groups:
  p=values(group['register_base']);ref=k[group['keys']].ravel()[address];idx=np.flatnonzero(p!=ref)
- checks.append({'register_base':group['register_base'],'different':len(idx),'mismatches':[{'key':group['keys'][int(address[i])//32],'channel':int(address[i])%32,'original':float(p[i]),'reference':float(ref[i])} for i in idx]})
+ checks.append({'register_base':group['register_base'],'different':len(idx),'mismatches':[{'lane':int(i)//8,'register':group['register_base']+(int(i)%8)//4,'byte':int(i)%4,'key':group['keys'][int(address[i])//32],'channel':int(address[i])%32,'original':float(p[i]),'reference':float(ref[i])} for i in idx]})
 r={'scope':'data-inferred diagnostic mapping, corroborated across clean fragments; needs instruction provenance','physical_bits_for_logical':list(order),'checks':checks}
 (root/'k-bitlayout.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r,indent=2))

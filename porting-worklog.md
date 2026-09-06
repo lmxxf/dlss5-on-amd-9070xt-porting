@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：key8候选字节定位及量化前断点
+
+- K位布局诊断定位差异在lane16/R12/byte3；新增记录lane/register/byte字段。
+- 原始PC46d0前捕获32lane（F2FP merge写R12），inspect_key8_prequant.py显示R11两half并非候选K8/ch3归一化值，说明不能直接假定byte3来自本指令R11高half，需追前次merge或其他来源。
+- 参考该K原始值-.478271484375，归一化half-.0244293212890625，接近E4M3相邻值中点；保存key8-prequant.json，不将未确定映射当数值证据。未部署DLL。
+
 ### 2026-09-07：原始K片段交叉解码定位单值差异
 
 - inspect_block8_key_groups.py发现K按[0,1,2,3,8,9,10,11]等非连续8key分组，八组中七组直方图完全一致，含key8组仅1值不同。
