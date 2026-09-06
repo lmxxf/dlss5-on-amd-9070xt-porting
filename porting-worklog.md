@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：120×72首个时序偏差定位到TEX横向fraction临界
+
+- 诊断GPU回读完成session57101 exit0，坐标/采样文件保存在native-temporal-large。原block(1,0) warp0抓PC10d0/1590/1730/1800；32像素仅lane19(y2,x11)三RGB half不同，最大RGB差0.001032，坐标仅5/64分量差且max1.19e-7。
+- 原中央采样坐标约(11.02151155,2.85815200)，参考约(11.02151037,2.85815201)。按当前软件fraction nearest得到(134,92)/256，但原TEX返回值由(133,92)/256、corner79及边际保持重建至2.07e-8；软件(134,92,corner78)差0.000881。
+- 该点极接近横向量化阈值，说明normalized坐标到硬件fraction的转换尚未完全恢复。未据此硬编码epsilon或像素修正；下一步独立texture取样精度扫测/原指令检查，区分硬件坐标转换与前段误差，保持120×72失败报告。
+- 24×16通过不等于通用采样器完成，新神经DLL未部署。
+
+
 ### 2026-09-07：120×72时序扩展未通过，单图控制全精确
 
 - fixture/validator新增--large（120×72，独立seed7306，RGB/history/spatial motion），保持原版HWC与AMD tile-major输入区分。部署已修half-up/边际保持shader和16常量坐标exe，远端native-temporal-large。
