@@ -2975,6 +2975,10 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD RGB→69全链接线完成、回归运行中（2026-09-06）：新增NativeDecoderTail69，常驻接49～55(C256)、56投影/主体、57～61(C128)、62投影/主体、63～65(C64)、66 half合流/C32主体、67～69(C32)。输入来自GPU block48，skip分别来自GPU block14、block8、block4，Record不读文件、不注入CPU特征。只支持已建立裁判的RGB512几何与当前给定shift配置。
+
+front-chain增加rgb512tail69及-Tail69入口，原较短模式保留；导出脚本严格检查对应原版/CPU各段pass，严格最终验证器独立写tail69-validation.json。MinGW编译通过，部署实验目录native-rgb512，游戏DLL未改。已启动唯一完整回归：SSH统一会话32104、AMD PID18196，启动18:09:59；查询CPU21.46875秒，shader1～8已完成，尚未最终读回，不能宣称RGB→69通过。下一轮继续观察同一会话/进程，不因无新输出重复启动。第70块及游戏画面验收仍未完成，目标active。
+
 原RGB衍生链推进第69块（2026-09-06）：原C64 block65 outview（128×128、shift3、32×2）正常执行，global16/低两位交换解码后与plain输出1048576值全exact，validator新增--block65。prepare_native_rgb512_upsample66.py使用真实原block65 outview与block4-main跳接，给定shift0原第66块最终2097152值CPU/原全exact，报告upsample66-shift0/validation.json。
 
 check_native_decoder_c32.py随后使用各自20672-byte原权重，给定shift0/1/3连续执行67～69，输入只取上一块原输出；三块各2097152值different0/max0，有效区外零、无NaN，导出FFN/attention及原final oracle。普通C32参考保持raw residual与精确half累计，未注入修正特征。报告位于decoder-block67..69。上述移位/跳接仍为当前待核对运行合同，不能把算子数值通过等同原游戏配置已捕获。
