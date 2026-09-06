@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：动态RGB整链测试启动，固定seed A/A/B/A/A
+
+- 保留静态full目录，在独立 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-dynamic` 部署新动态exe、B输入与运行器，未改游戏DLL。exe本地/远端SHA均为 `27414c57d98c6c89f75e535abf2bf71e786c1fc383b3c44b109bb102aff6a1f6`。
+- `run_native_valid1080_full.ps1 -Folder ...native-valid1080-dynamic -AlternateRgb ...alternate-input.f32` 已启动，unified exec session61405，PID18444，检查CPU29.359375秒，反射shader编译成功。当前初始化中，未有验收结果，下轮先轮询同一handle，勿重启。
+- 新增 `validate_native_valid1080_dynamic_gpu.py`，未来将三路A恢复输出与原版A比较，并核对B对final/head/decoder69三路均有影响，尺寸/有限值严格检查。注意gpu-raw在动态模式实际上是decoder69，不是preblock raw。需要新下载3份标准及3份.alternate文件到本地 `release/native-rgb-valid1080/amd-dynamic` 后运行。
+- 独立目录初始复制包含旧静态输出，不能在本轮进程exit0前当新动态结果收取；A恢复还应结合host的A/A/B/A/A重放日志。B没有原版数值oracle，因果通过不能冒称B数值精确或游戏验收完成。
+
+
 ### 2026-09-07：AMD实际尺寸RGB0～70整条GPU链精确通过
 
 - 完整静态测试session21947/PID39788已exit0：5帧seed0/0/0/1/0 replay_check全部pass，resident_chain=pass，处理1920×1152、有效输入1920×1080，intermediate_CPU_transfers=0。无运行任务遗留。
