@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD 256-token QKV 三次逐值通过
+
+- `NativeVitQkv` 放宽到已验证的 64/256 tokens，HLSL 原有索引使用 tokens，无需改变投影和归一化算术；未开放未经测试的任意尺寸。
+- 独立 extent test 增加 qkv 模式，直接调用生产类；`check_native_qkv_extent.py` 将原始 RTX Q/K/V 解码后导出 oracle，而不是使用 CPU 预测当标准答案。
+- RX 9070 XT 使用 seed=3003 随机输入、block31 原始系数，三次各 786432 个值全部 different=0 / max_abs=0，finite/device/fence 检查通过。下载 GPU 输出后 `cmp gpu.f32 oracle.f32` 也完全一致。
+- 产物在 ignored `release/native-vit/qkv-extent-256-3003/`。只部署到独立 matrix-probe/native-qkv-extent 实验目录，未替换游戏 DLL；QKV→attention 串联及其余线性层/真实尺寸仍待继续验证。
+
 ### 2026-09-06：256-token 原始 QKV 完整数值对照通过
 
 - 将原始 QKV CUDA caller 接入 Windows RTX 独立实验；通过 `DLSS5_VIT_CUBIN` 指定 CUBIN，增加 cluster launch / D32 memset import，未操作游戏。
