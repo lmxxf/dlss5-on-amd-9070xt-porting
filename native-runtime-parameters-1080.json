@@ -1,0 +1,1389 @@
+{
+  "source": "release/native-kernel-params-25972-17399312",
+  "capture_scope": "PID25972 startup after user set desktop1080p and borderless; main-menu geometry capture",
+  "pointer_values_omitted": true,
+  "encoder": [
+    {
+      "block": 1,
+      "launch": 2,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_inpview_tilesync_fp8",
+      "grid": [
+        120,
+        72,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "ac19182b25e0f5bc16811e3680ce40ec78072a1baed448208a60e1a3cea8aeb9"
+    },
+    {
+      "block": 2,
+      "launch": 3,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_chained_fp8",
+      "grid": [
+        121,
+        73,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "1796e7cddd82f2149e8eda57e41bf08d2dcb86f92e83744ecd097576696dcb4e"
+    },
+    {
+      "block": 3,
+      "launch": 4,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_chained_fp8",
+      "grid": [
+        121,
+        72,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "04ca9b3fce8a41ab13472b2bd1ff70d53a33b8407493981bba77320fe9bccd7a"
+    },
+    {
+      "block": 4,
+      "launch": 5,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_ds_wait_fp8",
+      "grid": [
+        120,
+        73,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "dd030989865d0cd106e26a937d818f18db9ad6b8dda7e24f84bd35ea8ef8f174"
+    },
+    {
+      "block": 5,
+      "launch": 6,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_inpview_tilesync_fp8",
+      "grid": [
+        60,
+        36,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "0010dfdda8cc6f5a03eacb96ee33e4c92e0dc543222b7a6a04d14890c82bfec6"
+    },
+    {
+      "block": 6,
+      "launch": 7,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_chained_fp8",
+      "grid": [
+        61,
+        37,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "0c82099397c75b7d68227c3cc8bac9934f8c35fe5b1f5923c6155de6df2f3b24"
+    },
+    {
+      "block": 7,
+      "launch": 8,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_chained_fp8",
+      "grid": [
+        61,
+        36,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "1977f5af7cc1a14100fb63133f6f6edb5a2f89c9aca21b301744f0ba72fe9ada"
+    },
+    {
+      "block": 8,
+      "launch": 9,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_ds_wait_fp8",
+      "grid": [
+        60,
+        37,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "8255704d929d5f1c25e6621d19844ea4ba10ba204357ee42893c792daa567c93"
+    },
+    {
+      "block": 9,
+      "launch": 10,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_inpview_tilesync_fp8",
+      "grid": [
+        30,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "4cd4afe22aa016d8454c213bc5e08a98479fba7eed1a0bf630be848173417806"
+    },
+    {
+      "block": 10,
+      "launch": 11,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        31,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "6329153740a043f587f9219fe9f9a269c253495c20e20887951c37a9053aaec3"
+    },
+    {
+      "block": 11,
+      "launch": 12,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        31,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "f1128b47f3dca849d74c6a915e892409ab8e7785abc9c90151020de86959a2ee"
+    },
+    {
+      "block": 12,
+      "launch": 13,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        30,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "6558d01f01261620f8373df0515c58dd5fee6d51705e2c59e5b2672a7b9c4a64"
+    },
+    {
+      "block": 13,
+      "launch": 14,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        30,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "d697abb6d97d6984ff4cbb0e9f2ba921c9fc1164774e72e6e94c7c8afc44c5c8"
+    },
+    {
+      "block": 14,
+      "launch": 15,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_ds_wait_fp8",
+      "grid": [
+        31,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "457d8b206b21ce0b7c58f0d2fa23daf9addbb42ec3d36a31eb686da9be295080"
+    },
+    {
+      "block": 15,
+      "launch": 16,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_inpview_tilesync_fp8",
+      "grid": [
+        15,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "e9798f49a987642f51857196ccce6adb6104bae892b25c2887a405a8a23dbd5b"
+    },
+    {
+      "block": 16,
+      "launch": 17,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "63ba444fd9feaf2a02faba7cb4364859259b9c2ba6a12e950f5f34b7ab72a752"
+    },
+    {
+      "block": 17,
+      "launch": 18,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "d76472857c190dc5d9dd02a9db972a40d81a97ed6d055b38d5e0b51b657e0fe7"
+    },
+    {
+      "block": 18,
+      "launch": 19,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        15,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "70691d201806c13baed426141e25ece2afe91f5d2a11bd8fdcd6740723407d30"
+    },
+    {
+      "block": 19,
+      "launch": 20,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        15,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "9d95ffe41754ddbd2030ab1539fc06284603e62e3757aab84986fab7bb972721"
+    },
+    {
+      "block": 20,
+      "launch": 21,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "87b009288dcc4657b25234f4554c350ea6532b71f57c68814600e8585daaea16"
+    },
+    {
+      "block": 21,
+      "launch": 22,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "a8da158cee10be1e1151fc260c2e7e35649f858721fd57dbb54aae694d73d0c8"
+    },
+    {
+      "block": 22,
+      "launch": 23,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_ds_wait_fp8",
+      "grid": [
+        15,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "4b7ca2a082ed8a368d48e09f6b23d84da97eafa9254163f6f2c3910b60fc83bc"
+    },
+    {
+      "block": 23,
+      "launch": 26,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "cf154b6975a2e09617d698eb2910dd44b19e0716bf2a6b0fba478e4d75a39f05"
+    },
+    {
+      "block": 24,
+      "launch": 30,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "8acc1687289227108e2a368f9a215d7b2298fc140697b587b719c2944b636e3e"
+    },
+    {
+      "block": 25,
+      "launch": 34,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "b6009f0bb00a776769934ff9dbfef2ba8f75e047d6b9a3d285b0c6fd9f9172e1"
+    },
+    {
+      "block": 26,
+      "launch": 38,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "deb52bb7cb6cc48ff539e98c8db5da2c195dacc6bf8592aefb7059ae10bd6e28"
+    },
+    {
+      "block": 27,
+      "launch": 42,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "2e2c4d6185ebbf5ceb7c948e8971bea16776f727e7c10e1ada2d5e5b5d496ed9"
+    },
+    {
+      "block": 28,
+      "launch": 46,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "7a62349d07508e1dc25a9eeac18fe25776ba413ecf01167becc8c9c30e2f3af8"
+    },
+    {
+      "block": 29,
+      "launch": 50,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "f2da3b353cd70c8cf4e39e48b78e25ab99ea12ffa50b9986ce52f037dfb1c6ec"
+    },
+    {
+      "block": 30,
+      "launch": 54,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "8bc45e570c8bda8bd3fd1127afc9bebdcc9d9be625b3e55e0639dd75f9dde635"
+    }
+  ],
+  "decoder": [
+    {
+      "block": 40,
+      "launch": 102,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "dc941c27a102a7dfbdcc374455e6b69f0e47b22af976f01131b1d71540012b43"
+    },
+    {
+      "block": 41,
+      "launch": 106,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "fedf9175a0150d0252fff1078d6cb49aa534896538d4f3681ddb037de62ced39"
+    },
+    {
+      "block": 42,
+      "launch": 110,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "c16c4ee170e5daf1b76d4ea79083105b1cd24f5ab290aa7a35ebff01bd3444c6"
+    },
+    {
+      "block": 43,
+      "launch": 114,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "01edf38b0dd156bb9c69cb811ddcc4d56d0357a9d83350641d5bff358b707bcb"
+    },
+    {
+      "block": 44,
+      "launch": 118,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "abd3217e614f33a49888e1ef8fd68f119bdb3effab140155ceb1ee2ee7200ca7"
+    },
+    {
+      "block": 45,
+      "launch": 122,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "efd2e485c05f3124779ed41786e3cb2d34abc895b17220091da2751402973d89"
+    },
+    {
+      "block": 46,
+      "launch": 126,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "ee677b968119d1a21665c79a185ca0a4ca9c7d340cad07751f4d0e2380e9fa98"
+    },
+    {
+      "block": 47,
+      "launch": 130,
+      "kernel": "cc_split_swin_16h_qkv_512_chained_fp8",
+      "grid": [
+        8,
+        5,
+        4
+      ],
+      "bytes": 56,
+      "HW": [
+        36,
+        60
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "42e4ec54e963412ac8513eff6005bcb060a13de5548c494678c5f99f24f52f70"
+    },
+    {
+      "block": 48,
+      "launch": 132,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_upsample_tilesync_fp8",
+      "grid": [
+        15,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "fb88d66c5208ebe4ffb7c0bb4a7e7b77f34d60496903b4c6309bed52c2f36401"
+    },
+    {
+      "block": 49,
+      "launch": 133,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "980340674137e4fee96e8bd1a6d3b40a9d092d2e58fa1cac5a30d6e87d53db25"
+    },
+    {
+      "block": 50,
+      "launch": 134,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "bb26470dabe7b5b3c5a09a9376b6e7b9eae377299d57ebe66876424418fa4959"
+    },
+    {
+      "block": 51,
+      "launch": 135,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        15,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "a661fc0f4550ef4f7b1c4b9dea793e0b33aa80321b34d488e11e9c05d346440d"
+    },
+    {
+      "block": 52,
+      "launch": 136,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        15,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "9d3af8f56b5b91cafc268142da18388cd2de2bdba793db7570548930e338ff76"
+    },
+    {
+      "block": 53,
+      "launch": 137,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "4ad3fc080464dd6ef682194b08294e79229a5ee4086c31c599aeb847bd4affc2"
+    },
+    {
+      "block": 54,
+      "launch": 138,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_chained_fp8",
+      "grid": [
+        16,
+        9,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "aa78a1750299d18f81c98164611c0e6ab89099a4bffb392e5186b69e3911a35b"
+    },
+    {
+      "block": 55,
+      "launch": 139,
+      "kernel": "cc_tinlayout_fused_swin_8h_256_8_outview_wait_fp8",
+      "grid": [
+        15,
+        10,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        72,
+        120
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "76280cdf98f2abc9bb14fdd3363356e05f51bce043c25eae469a1ed7f89b7022"
+    },
+    {
+      "block": 56,
+      "launch": 140,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_upsample_tilesync_fp8",
+      "grid": [
+        31,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "19635e014d26dc67db3ad201a026f60fb3f712abc3b88eb7e2da324a5de1a468"
+    },
+    {
+      "block": 57,
+      "launch": 141,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        30,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "79cc74bd6977bf67643ed197ac1d66d983aa0ecdae24574046b9cb462404f3a9"
+    },
+    {
+      "block": 58,
+      "launch": 142,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        30,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "913d9e9e0b59c5dcb63272ffc01a460d3fd3e4684aa0c24271b7e986ba26a4ee"
+    },
+    {
+      "block": 59,
+      "launch": 143,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        31,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "5839c21892d71928fc282a0a12a345704f6b69f7ec1c9d767e0ef8df1c664251"
+    },
+    {
+      "block": 60,
+      "launch": 144,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_chained_fp8",
+      "grid": [
+        31,
+        18,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "5db451a912baff198cd4ea4b9cf3ab6a850245efc7df505bbd3e9d8838e1b2b6"
+    },
+    {
+      "block": 61,
+      "launch": 145,
+      "kernel": "cc_tinlayout_fused_swin_4h_128_4_outview_wait_fp8",
+      "grid": [
+        30,
+        19,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        144,
+        240
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "81effa98b3e096037828418ef5481c0a6de5a9d95111a4aad3603b68647272d6"
+    },
+    {
+      "block": 62,
+      "launch": 146,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_upsample_tilesync_fp8",
+      "grid": [
+        60,
+        36,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "e2d48ed02a8fa8b56956fc8c5087404d647843248f4fb3c1be3dd470af796e46"
+    },
+    {
+      "block": 63,
+      "launch": 147,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_chained_fp8",
+      "grid": [
+        61,
+        37,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "d847cb89bac5025ea287f0ce0c12dbe3b2d3e9c6297d9f2cbc3da5482b056cf4"
+    },
+    {
+      "block": 64,
+      "launch": 148,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_chained_fp8",
+      "grid": [
+        61,
+        36,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "52f657e95b406be53eaf4dbc46f574f23428aa5f4f8aa2082572fcc15e4b6d52"
+    },
+    {
+      "block": 65,
+      "launch": 149,
+      "kernel": "cc_tinlayout_fused_swin_2h_64_2_outview_wait_fp8",
+      "grid": [
+        60,
+        37,
+        1
+      ],
+      "bytes": 88,
+      "HW": [
+        288,
+        480
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "05b481bf9ff3eb6ce234c755b9c63cc12cfe680744b9207e4043b1392906bec5"
+    },
+    {
+      "block": 66,
+      "launch": 150,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_upsample_tilesync_fp8",
+      "grid": [
+        120,
+        72,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        0,
+        0
+      ],
+      "shift_mask": 0,
+      "blob_sha256": "d9f71b7ac088ee47068f3f20d8db34bd0f1aa45512b8fdde1c707df355be1ecd"
+    },
+    {
+      "block": 67,
+      "launch": 151,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_chained_fp8",
+      "grid": [
+        121,
+        73,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        -4,
+        -4
+      ],
+      "shift_mask": 3,
+      "blob_sha256": "35dda0e3286b0f238708a8bd5f267a23751943d46e83e78060a434c7ab673ac3"
+    },
+    {
+      "block": 68,
+      "launch": 152,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_chained_fp8",
+      "grid": [
+        121,
+        72,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        -4,
+        0
+      ],
+      "shift_mask": 1,
+      "blob_sha256": "ba8629b2bfed337311a428ad012061c2ed234d7627856a192b1c6afbf0ef71c0"
+    },
+    {
+      "block": 69,
+      "launch": 153,
+      "kernel": "cc_tinlayout_fused_swin_1h_32_1_outview_wait_fp8",
+      "grid": [
+        120,
+        73,
+        1
+      ],
+      "bytes": 96,
+      "HW": [
+        576,
+        960
+      ],
+      "offset_XY": [
+        0,
+        -4
+      ],
+      "shift_mask": 2,
+      "blob_sha256": "d865d24d75c8fcaee68b114d1dbed1d1255b795a55270bc1ba029c20e580f336"
+    }
+  ],
+  "vit": [
+    {
+      "launch": 57,
+      "kernel": "cc_vit_1d_repack_2d_to_1d_fp8",
+      "grid": [
+        640,
+        1,
+        1
+      ],
+      "bytes": 24,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 16
+    },
+    {
+      "launch": 58,
+      "kernel": "cc_vit_1d_ffn_expand_publish_fp8",
+      "grid": [
+        160,
+        1,
+        1
+      ],
+      "bytes": 72,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 64
+    },
+    {
+      "launch": 59,
+      "kernel": "cc_vit_1d_ffn_contract_chained_fp8",
+      "grid": [
+        40,
+        1,
+        4
+      ],
+      "bytes": 72,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 64
+    },
+    {
+      "launch": 60,
+      "kernel": "cc_vit_1d_qkv_chained_fp8",
+      "grid": [
+        80,
+        1,
+        2
+      ],
+      "bytes": 80,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 72
+    },
+    {
+      "launch": 61,
+      "kernel": "cc_vit_1d_attention_chained_fp8",
+      "grid": [
+        32,
+        3,
+        1
+      ],
+      "bytes": 64,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 56
+    },
+    {
+      "launch": 62,
+      "kernel": "cc_vit_1d_projection_chained_fp8",
+      "grid": [
+        40,
+        1,
+        4
+      ],
+      "bytes": 72,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 64
+    },
+    {
+      "launch": 98,
+      "kernel": "cc_vit_1d_repack_1d_to_2d_fp8",
+      "grid": [
+        640,
+        1,
+        1
+      ],
+      "bytes": 24,
+      "HW_pair": [
+        20,
+        32
+      ],
+      "field_offset": 16
+    }
+  ],
+  "post": {
+    "HW": [
+      1152,
+      1920
+    ],
+    "input_scale": 0.03125,
+    "rgb_mode": 1,
+    "texture_presence": {
+      "0x38": true,
+      "0x58": false,
+      "0x60": false
+    }
+  }
+}

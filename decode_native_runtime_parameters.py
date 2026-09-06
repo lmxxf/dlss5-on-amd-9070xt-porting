@@ -1,7 +1,8 @@
 """Decode pointer-free geometry/mode evidence from original CPU parameter blobs."""
 from pathlib import Path
-import json,re,struct,hashlib
-root=Path('release/native-kernel-params-24064-11278468');log=(root/'launches.txt').read_text()
+import json,re,struct,hashlib,argparse
+p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path('release/native-kernel-params-24064-11278468'));p.add_argument('--output',type=Path,default=Path('native-runtime-parameters.json'));p.add_argument('--scope',default='original startup at4K; no new1080p/equipment frame claim');args=p.parse_args()
+root=args.root;log=(root/'launches.txt').read_text()
 assert 'format=indirect-v4' in log
 launches={int(s):{'kernel':k,'grid':[int(x),int(y),int(z)],'bytes':int(n)} for s,k,x,y,z,n in re.findall(r'launch=(\d+) kernel=(\S+) grid=(\d+),(\d+),(\d+) bytes=(\d+)',log)}
 def blob(seq):
@@ -20,6 +21,6 @@ for seq,offset in [(57,16),(58,64),(59,64),(60,72),(61,56),(62,64),(98,16)]:
 r=blob(154)
 post={'HW':list(struct.unpack_from('<ii',r,32)),'input_scale':struct.unpack_from('<f',r,48)[0],'rgb_mode':struct.unpack_from('<I',r,52)[0],
       'texture_presence':{hex(off):bool(struct.unpack_from('<Q',r,off)[0]) for off in (0x38,0x58,0x60)}}
-report={'source':str(root),'capture_scope':'original startup at4K; no new1080p/equipment frame claim','pointer_values_omitted':True,'encoder':[r for r in rows if r['block']<=30],'decoder':[r for r in rows if r['block']>=40],'vit':vit,'post':post}
-Path('native-runtime-parameters.json').write_text(json.dumps(report,indent=2)+'\n')
+report={'source':str(root),'capture_scope':args.scope,'pointer_values_omitted':True,'encoder':[r for r in rows if r['block']<=30],'decoder':[r for r in rows if r['block']>=40],'vit':vit,'post':post}
+args.output.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps({'encoder_shifts':{r['block']:r['shift_mask'] for r in report['encoder']},'decoder_shifts':{r['block']:r['shift_mask'] for r in report['decoder']},'vit':vit,'post':post},indent=2))

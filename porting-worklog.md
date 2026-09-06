@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：用户进入1080p无边框后，真实640-token几何已捕获
+
+- 用户手动设置桌面1080p、游戏无边框并停留主菜单；只读检查PID25972运行，未重启/改配置/操作存档。
+- 下载native-kernel-params-25972-17399312全部参数blob及独立preblock-live-parameters.txt（另存launches.txt）。decoder新增root/output/scope参数，保留旧4K报告；新指针脱敏报告native-runtime-parameters-1080.json。
+- 实际ViT HW=20/32=640 tokens；expand grid160、contract/projection40、QKV80、attention32×3。post HW=1152/1920，scale=.03125、rgb_mode=1，额外纹理58/60缺省。移位序列与当前修正表一致。
+- 这些是本进程启动期捕获，不宣称装备场景或最终像素验证。此前1920×1088、30×18候选不能当真实合同；下一步按640token、非正方形、attention gridY=3验证，并核对各层padding与最终裁剪。游戏DLL未替换。
+
 ### 2026-09-06：1080p配置已备份，首次启动未产生游戏进程
 
 - capture_nvidia_1080_geometry.ps1 检查无游戏进程、实际配置键唯一、启动排程目标Steam/app3489700；备份后仅改ResolutionSizeX/Y=1920/1080、FullscreenMode/PreferredFullscreenMode=2。
