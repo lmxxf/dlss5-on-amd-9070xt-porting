@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：256-token 原始 QKV 完整数值对照通过
+
+- 将原始 QKV CUDA caller 接入 Windows RTX 独立实验；通过 `DLSS5_VIT_CUBIN` 指定 CUBIN，增加 cluster launch / D32 memset import，未操作游戏。
+- 小尺寸 gridX=16 直接套到 256 tokens 会只计算约一半输出。错误样本保存在 `release/native-vit/qkv-extent-256-3003/grid16/`，不可作为参考。真实运行捕获 2160 tokens 的 gridX=272 支持按 128-token 块、每块 16 组的启动方式；本次 256-token gridX=32 实测确认。
+- 使用独立随机 seed=3003 输入和原始 block31 QKV 权重，RTX 两次 Q/K/V 完全一致；`check_native_qkv_extent.py` 与 native_vit_qkv_reference 的全部 786432 个值逐值一致，输出有限、尾部零、replay 相同。
+- 新 runner `run_nvidia_qkv_extent.ps1` 按 token 数计算 gridX。AMD QKV 仍未放宽尺寸或验证，下一步需要用这组原始输出验证生产 GPU QKV，随后串接 attention。
+
 ### 2026-09-06：AMD 可变长度 attention 首次 GPU 精确通过
 
 - `native_vit_attention.h/.hlsl` 扩展到 64/128/256 tokens；每 64-token 分母使用原生求和图，再顺序半精度相加，分子继续每 32 keys 半精度累计。尚不支持任意游戏尺寸。
