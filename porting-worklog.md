@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD同源post70最终RGB三次精确通过
+
+- 新独立目录 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-post` 使用同RGB `post70/amd` 的全部输入、对照和系数；部署当前 `native_half_square.hlsli` 与 `preblock_attention_core.hlsl`，没有沿用旧半精度归一化着色器。
+- 原生post测试session76936已exit0：frame0/1/2各6635520分量different=0/max_error=0，post70=exact，intermediate_CPU_transfers=0。
+- 新下载 `release/native-rgb-valid1080/post70/amd/gpu.f32`，与oracle.f32经cmp完全一致，SHA256 `c1d6ab580e4d3bfb46acb90646d1a65d609cbcf6dbdcdde12d1bef18703afbe3`。
+- 边界未变：这是输入为同源特征的AMD post独立段，底图使用反射填充；不是AMD0～70GPU直连、不是实际游戏post纹理合同，更不是游戏最终画面验证。游戏DLL未修改，本轮无运行任务遗留。
+- 后续优先实际整合：现有 `d3d12_native_preblock_test.cpp` 已实现实际0～30/head，`NativeVitGather`640映射、chunk-fenced ViT、实际decoder39及 `NativeDecoderTail69(game_extent=true)` 可复用。不能直接把旧512全链改个输入尺寸：它的ViT长度、bridge、head尺寸和早期encoder短高布局有硬编码，需要逐一接入已验证的1080实现。decoder跳接需要FP8值，encoder为池化保留的raw half不得直接不经量化传入。完成整链数值对照后才部署DLL做实际游戏验证。
+
+
 ### 2026-09-07：同 RGB 原版post70最终RGB精确通过（反射底图合同）
 
 - `prepare_native_post70_game.py --valid1080` 使用同RGB decoder69的逻辑FP8输出、同RGB block0原版main跳接、1080高原输入向底部反射填充72行，生成原版post70输出。维持mask1/rgb1/scale0.03125。主输入重排为C32 global16且不交换低位，skip保留cell布局。
