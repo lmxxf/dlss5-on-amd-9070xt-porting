@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：纹理小数半格取整修正，120×72差异45/14→7/1
+
+- capture脚本增加--pcs，session80588抓五个TEX后寄存器。新增check_native_temporal_texture_returns.py：仅lane20的top/center/bottom大误差，公共u位模式0x3e9de003；并非Y方向问题。21bit截断后fraction*256恰为128.5。
+- 独立CUDA ramp扫该u±128ULP共257点，当前取偶数候选17点不符，half-up候选全部吻合；原中心tex_x=36.50390625。CSV保留release/native-texture-fraction/sweep-remaining-u.csv。这是该扫描范围证据，不声称所有坐标已证明。
+- history/motion shader及CPU bilinear的小数8bit量化改floor(f*256+.5)/256。捕获反例CPU重建3half差异→0，max float1.19209e-7。session12576五帧120×72最终main/down45/14→7/1，剩余main位于x70..71/y4..7和x98/y67；完整目标尚未通过。
+- session65236的24×16五帧回归main12288/down3072全部一致；四组原版holdout共384half仍全一致。保留fractionhalfup产物，large/rect实验目录已同步；游戏DLL未改，继续检查新剩余位置。
+
 ### 2026-09-07：新窗口坐标/权重全一致，但CPU纹理规则亦失败，定位TEX模型反例
 
 - 新增capture_native_temporal_remaining.py，session19768完成原block(4,6)/warp1的PC10d0、1590、1800三个捕获，保留block4-row6-warp1。AMD已保存的motionfma UV与原64值全一致；accumfma sampler回读仅lane20（x36,y54）的RGB三个half不同，lane29/x37,y55本身采样half相同，后续网络会传播邻域影响。

@@ -42,7 +42,7 @@ def bilinear(image,xy,fraction_bits=None,product_bits=None,normalized_bits=None)
     a=(x-x0)[...,None];b=(y-y0)[...,None]
     if fraction_bits is not None:
         scale=2**fraction_bits
-        a=np.rint(a*scale)/scale;b=np.rint(b*scale)/scale
+        a=np.floor(a*scale+.5)/scale;b=np.floor(b*scale+.5)/scale
     if product_bits is not None:
         corner=np.floor((1-a)*(1-b)*2**product_bits+.5)/2**product_bits
         adjacent_x=(1-b)-corner;adjacent_y=(1-a)-corner

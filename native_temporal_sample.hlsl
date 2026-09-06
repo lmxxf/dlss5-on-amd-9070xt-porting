@@ -41,7 +41,7 @@ float3 fetch(float2 xy) {
     precise float2 pixel=fixed_uv*(float2(width,height)/2097152.0)-.5;
     precise float2 p=clamp(pixel,0,float2(width-1,height-1));
     uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(width-1,height-1));
-    precise float2 f=round((p-float2(lo))*256.0)/256.0;
+    precise float2 f=floor((p-float2(lo))*256.0+.5)/256.0;
     precise float corner=floor(((1-f.x)*(1-f.y))*256.0+.5)/256.0;
     precise float adjacent_x=(1-f.y)-corner;
     precise float adjacent_y=(1-f.x)-corner;
