@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第39块独立实现通过（2026-09-06）：NativeVitLinear增加显式decoder参数（默认false保持原ViT路径），仅允许已验64-token的8×8主1024/16×16 skip512合同。DECODER_ENTRY shader每个低分辨率token/channel做四K256分区、K32 half累计；随后为对应2×2输出各读取自己的skip，最终一次H(main+skip*scale)再FP8。输入/skip/解码权重与输出常驻，Record间无CPU传输，三帧重放按原屏障恢复输出状态。
+
+d3d12_native_pool_head_test.cpp新增decoder39模式，prepare_native_decoder_gpu.py从seed2307原CUBIN最终输出解码oracle，不用CPU预测替代裁判。MinGW编译通过，实验部署D:\DLSSNR-Lab\matrix-probe\native-decoder39，9070XT三帧各131072值different0/max0，finite/device/fence/replay检查全部通过。读回gpu.f32下载后validate_native_decoder_gpu.py再次逐值全exact，报告release/native-decoder-amd/validation.json为pass。宿主末尾沿用类名native_vit_linear日志标签，本次明确以decoder39参数运行，不能将该标签误读成ViT新回归。
+
+这是独立AMD第39块验证，入口为空间随机原夹具，不是RGB→ViT→decoder连续链。尚需实际ViT重排、block30 skip来源连接，后续40～70原生解码器及1080p/游戏最终画面验收。游戏DLL与公开包未更换，目标active。
+
 第39块空间随机输入闭合（2026-09-06）：smoke脚本新增spatial及seed参数，8×8×1024主特征、16×16×512 skip均逐像素/通道随机FP8；分别按双C512 cell bank和单C512 cell编码。seed2301原输出在smoke-o620n1od，seed2307留出在smoke-8qclb2i4，两个原kernel正常返回、counter全3、NaN0。新增native_decoder_entry_reference.py直接解码矩阵/尾系数，四K256分区累计后以最近邻重复2×2，最后H(main+skip*scale)并FP8；两份各131072值与原最终输出全exact，包括该16×16输出边界。双线性align_corners=false候选无论先X/先Y、是否中间half均失败，约122296～122360值不同。
 
 check_native_decoder_spatial.py严格比较并分别写spatial-validation.json，scope明确仅CPU/original block39的8×8输入，不含AMD/游戏。该结果恢复了这一尺寸下矩阵、输入/输出cell排列、nearest上采样及融合skip运算，无拟合校正。其他尺寸、原ViT1D输出到本层输入的重排、原block30 skip来源及AMD实现仍需闭合，不能把独立随机fixture冒充RGB连续链。游戏DLL未改，下一步实现AMD第39块并做独立GPU比较。
