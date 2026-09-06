@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：动态B输入及可回查输出准备完成，未运行
+
+- 新增 `prepare_native_valid1080_alternate.py`，从同源A仅对RGB做水平翻转，alpha逐值不变，确认有限值及RGB确实不同；输出ignored `release/native-rgb-valid1080/alternate/input.f32`，provenance记录A/B SHA与变换。此为受控空间变化，不是实际游戏第二帧，尚无B原版oracle。
+- 主host动态frame2记录final/head/decoder69各自不同元素数，并保存三份 `.alternate` 回读文件，供以后与原版B核对；A恢复结果仍写标准输出文件。补充后 `/tmp/native-frontdynamic-test.exe` 再编译exit0、diff检查通过。
+- 未部署动态exe，避免覆盖正在运行的完整静态测试。session21947/PID39788继续有成功编译输出，未结束；下一步先收完整静态结果，再决定动态验证与游戏接入。游戏DLL未更新。
+
+
 ### 2026-09-07：补充真实RGB切换验收代码（未运行）
 
 - 主host新增可选DLSS5_ALTERNATE_RGB，限定FRONTFINAL，要求B输入同尺寸、有限且与A不同。五帧序列改为A/A/B/A/A，seed保持不变；在上一帧fence完成后才更新RGB upload及由它生成的post反射底图。

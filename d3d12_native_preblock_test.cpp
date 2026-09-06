@@ -81,7 +81,12 @@ int wmain(int argc,wchar_t**argv){try{
   submit();
   for(UINT i=0;i<3;i++){D3D12_RANGE range{0,SIZE_T(sizes[i])};ck(readback[i]->Map(0,&range,&m));std::memcpy(data[i].data(),m,sizes[i]);readback[i]->Unmap(0,&none);for(float x:data[i])if(!std::isfinite(x))throw std::runtime_error("nonfinite output");}
   if(frame==0){for(UINT i=0;i<3;i++)baseline[i]=data[i];}
-  else if(alternate_path&&frame==2){for(UINT i=0;i<3;i++)if(data[i]==baseline[i])throw std::runtime_error("alternate RGB failed to change final/head/decoder output");}
+  else if(alternate_path&&frame==2){for(UINT i=0;i<3;i++){
+   size_t different=0;for(size_t j=0;j<data[i].size();j++)different+=data[i][j]!=baseline[i][j];
+   if(!different)throw std::runtime_error("alternate RGB failed to change final/head/decoder output");
+   std::printf("dynamic_delta output=%u values=%zu different=%zu\n",i,data[i].size(),different);
+   std::ofstream f((std::wstring(argv[4+i])+L".alternate").c_str(),std::ios::binary);if(!f.write(reinterpret_cast<const char*>(data[i].data()),sizes[i]))throw std::runtime_error("alternate output write failed");
+  }}
   else if(!alternate_path&&frame==3&&!raw_features){if(data[0]==baseline[0])throw std::runtime_error("seed has no effect");}
   else for(UINT i=0;i<3;i++)if(data[i]!=baseline[i])throw std::runtime_error("persistent-resource replay changed output");
   std::printf("frame=%u seed=%08x replay_check=pass\n",frame,seed);
