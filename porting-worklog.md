@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：GPU镜像RGB资源封装完成待执行
+
+- 新NativeRgbReflect管理SRV输入/UAV输出、根常量、shader与重放状态转换；有效维度>=2、处理尺寸8整除、上下界及源buffer容量显式检查。
+- Record仅GPU调度反射与tile-major输出，不传输CPU神经特征；1920×1080→1920×1152使用240×144 dispatch。
+- C++交叉编译通过（直接编译header仅pragma once警告），HLSL仍需D3D运行时编译及数值/重放验证。未部署游戏DLL。
+
 ### 2026-09-06：GPU镜像输入shader与tile布局公式准备
 
 - native_rgb_reflect.hlsl直接从有效HWC float4读取镜像坐标，输出8×8 tile-major float4；不需要逐像素CPU索引表。坐标函数支持周期反射，调用方需确保有效尺寸>=2、处理尺寸8整除。
