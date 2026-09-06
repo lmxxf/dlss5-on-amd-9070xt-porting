@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：最后窗口GPU仅中央Y UV差1ULP，inner FMA试改失败撤回
+
+- 新增valid1080 tap诊断wrapper偏移652800，隔离目录native-temporal-valid1080-taps；session11418五帧完成，session79422回读512值与原PC1590比较仅3个不同：lane13三处共用中央Y UV，GPU 0x3ea210e0、原0x3ea210df，其余UV/权重全部一致。诊断输出不是RGB，不用于神经验收。
+- session16424捕获原PC1340/1420/1500。原中央Y pixel=341.8577575683594（0x43aaedcb），正规化及history往返应得0x3ea210df；原轴倒数/权重已保存。下一步应直接观察GPU position/inner中间值，而非推定某处已错。
+- 尝试inner的mad改显式double fma，session20405五帧完成但session45952回归main23739509/down5658431大幅失配，已撤回并同步正常valid1080 sampler。失败证据innerfma目录保留。此前left类似试改也失败，不能继续笼统替换；需要独立算术及编译指令检查。
+- 可用基线仍main0/down2，游戏DLL未改。check_native_gpu_temporal_taps.py支持--valid1080以复现最后窗口对照。
+
 ### 2026-09-07：绕过16b0崩溃点捕获最后区域，确认差异早于下采样
 
 - session98079直接在PC1800断下，成功取得block39,row42,warp1原版RGB，避开反复触发CUDA-GDB内部断言的PC16b0。无需改原kernel或扩大超时。
