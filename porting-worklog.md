@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD49～69连续主分支21阶段GPU链通过
+
+- extent host新增decoder49_69_game，生产NativeDecoderTail69实际尺寸配置，三路skip明确上传且尺寸/finite检查，主分支无中间CPU注入。
+- RX9070XT三帧17694720最终值零差异，device/fence/finite通过；整段提交等待1026.241/1019.269/1016.162ms，不是游戏FPS。gpu.f32回读cmp原始连续oracle一致。
+- ignored release/native-decoder-tail-game/amd，三路skip仍独立随机，输入来自block48随机fixture，未证明真实encoder跳接或完整RGB链。游戏DLL未部署。
+
 ### 2026-09-06：连续49～69整段GPU fixture打包完成
 
 - prepare_native_decoder_tail_game_gpu.py遍历21阶段，普通层检查原始pass/零差异/上游来源，放大层逐字节核对input.f32等于上一原始oracle，导出真实系数和最终block69 oracle。
