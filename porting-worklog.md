@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD block62实际480×288三帧通过
+
+- extent host新增upsample62_game，NativeVitLinear主240×144/C128→C64与NativeC64Shift输出480×288/shift0直接GPU串联。
+- RX9070XT三帧8847360值different=0/max_abs=0，finite/device/fence通过；提交等待52.897/55.325/54.734ms仅本算子。gpu.f32回读cmp原始oracle一致。
+- ignored release/native-upsample62/amd-game。独立随机输入，不证明真实跳接链，后续63～70及RGB全链待完成，未部署游戏DLL。
+
 ### 2026-09-06：AMD block62实际投影几何准备
 
 - NativeVitLinear decoder支持34560token/128→64，主240×144、输出480×288索引；容量检查按实际输出元素，旧尺寸行为保留。
