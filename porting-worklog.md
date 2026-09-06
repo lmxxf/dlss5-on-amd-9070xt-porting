@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同 RGB 原版48～55连续通过
+
+- `check_native_upsample48_game.py --valid1080` 使用同 RGB decoder47输出和encoder22的FP8 main跳接，实际120×72输出2211840值different=0/max_abs=0，finite/tail_zero通过。旧独立随机测试模式保留。
+- 新增 `check_native_valid1080_decoder49_55.py`，连续运行49～55，移位3/1/2/0/3/1/2；7层各2211840值全部different=0/status=pass。ignored产物分别在 `release/native-rgb-valid1080/upsample48` 和 `decoder-c256`。
+- 这是同 RGB 原版/CPU 对照延伸到55，不是AMD整链验收。AMD head 测试PID28224/session44927仍活跃，最近检查CPU570.296875秒、工作集1833156608字节；已经进入split512编译，每个attention约8秒、projection约32秒，尚未输出frame验收。保持同一进程，不重启。
+- 下一步继续收取AMD head结果，原版同源链再接56及encoder14跳接。游戏DLL未更新，目标未完成。
+
+
 ### 2026-09-07：同 RGB 原版解码器39～47连续对齐
 
 - `check_native_valid1080_decoder39.py` 从同 RGB ViT38 原版输出经过实际逆 repack 接入 decoder39，并独立与逻辑逆 gather 比对；skip 来自同 RGB encoder30 的原版 FP8 main（不是 raw half，也不是独立随机 skip）。32×20 投影后 nearest2×，左上裁剪至60×36。
