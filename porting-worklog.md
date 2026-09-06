@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：K片段标准连续key布局候选排除
+
+- decode_block8_k_fragments.py对PC5030全lane寄存器两两组合，测试标准8key×32channel B片段与连续8key参考块，无接近逐值匹配的候选。
+- 排列无关直方图最佳仍118值不同，因此不能仅靠调整同一连续key块的channel排列解码；需追踪原始加载/重排及非连续key分组。
+- histogram仅诊断排序，未当验收或拟合映射。结果ignored最小窗口目录，生产算法未改、未部署DLL。
+
 ### 2026-09-07：原始QK得分直接读值发现key8差异
 
 - debug gdb新增DLSS5_DEBUG_PC可选断点，读取PC5080（首softmax affine之前）32lane寄存器，原始kernel未改。
