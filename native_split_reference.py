@@ -60,11 +60,13 @@ if __name__=='__main__':
   tiles=feature.reshape(1,8,2,8,512).transpose(0,2,1,3,4).reshape(2,64,512)
   attended=attention(tiles,qkv,bias,scales).reshape(1,2,8,8,512).transpose(0,2,1,3,4).reshape(x.shape)
   result=F(multiply(attended,projection,H(feature*skip)))
-  reports={}
+  reports={};fixture={'input':x}
   for suffix,predicted in [('.branch',branch),('.ffn',feature),('.attn',attended),('',result)]:
    original=np.fromfile(str(output)+suffix,np.uint8);assert not np.any(original[65536:]) and not np.any((original[:65536]&127)==127)
    target=e4m3fn(original[:65536].reshape(8,8192)[:,inverse]).reshape(2,4,4,4,512).transpose(0,2,1,3,4).reshape(x.shape)
+   fixture['oracle_'+str(len(reports))]=target
    error=np.abs(predicted-target);reports[suffix or 'final']={'exact_fraction':float(np.mean(predicted==target)),'mae':float(error.mean()),'max_error':float(error.max())}
   print(json.dumps({'seed':seed,'scale':scale,'stages':reports},indent=2),flush=True)
   assert all(v['exact_fraction']==1. for v in reports.values()), 'split stage arithmetic differs'
+  np.savez(folder/f'fixture-{seed}.npz',**fixture)
  np.savez(folder/'attention-matrices.npz',Q=qkv[0],K=qkv[1],V=qkv[2],bias=bias,scales=scales,P=projection,skip=skip)

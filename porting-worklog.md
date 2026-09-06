@@ -2651,6 +2651,14 @@ seed661/σ0.25、seed673/σ1.0两组输入，各自branch、ffn、attn、final�
 
 当前C512仍未接AMD，实际GPU正确前缀保持block0..22 DS。下一步实现split GPU阶段，并核对进入C512时的物理padding/有效尺寸合同（4×2现仍全零，不擅自视为已解决）；游戏DLL、公开ZIP未改，最终剑星画面目标active。
 
+### 2026-09-06 C512 split独立AMD四阶段及切换输入验证通过
+
+新增native_split.h/hlsl：ffwd实现512混合＋8组64→256→64，独立FFN投影接原skip；attention与最终投影复用已验证的参数化native_c64.hlsl，以CHANNELS=512、16 heads编译。四阶段资源常驻，显式UAV/SRV屏障，权重和原输入分别绑定，层间不做CPU读回或注入中间激活。prepare_native_split_gpu.py导出真实系数及独立原CUBIN的逐段oracle。
+
+d3d12_native_split_test.cpp在9070XT、16×8×512独立输入上逐段检查branch/ffn/attn/final各65536值。首次三帧全部exact；随后扩为五帧A/A/B/A/A，A=seed673、B=seed661，两套oracle直接保存自原CUBIN读回。切换前等待fence，更新输入UPLOAD资源，确认B最终输出不同于A，恢复A后各阶段与首次结果相同；五帧四阶段均different0/max0，device/fence成功。GPU输出下载后再次与原oracle逐值比较，四段全exact。
+
+这证明C512独立层GPU正确与资源重用，不等于RGB→block23整链已闭合：当前前端小夹具到block22仅4×2有效尺寸，原split的4×2调用仍全零，需要核对物理padding/尺寸合同或建立符合原调度的大夹具。实际连续RGB前缀仍block0..22 DS，独立C512仅16×8测试通过；游戏DLL、公开ZIP未更新，后续split/ViT/解码器及最终剑星画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
