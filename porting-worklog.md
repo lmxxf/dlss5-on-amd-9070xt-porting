@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：decoder49～69整段类接入实际尺寸
+
+- NativeDecoderTail69新增game_extent明确配置：输入120×72 C256，后续240×144 C128、480×288 C64、960×576 C32；默认仍旧RGB512配置。
+- 三个放大投影token数分别8640/34560/138240，对应已独立验证生产路径，移位继续用NativeDecoderShift；增加输入及三个skip buffer类型/容量检查。
+- 完整host编译通过，尚未运行此49～69整体资源链；不能把各独立段通过当整段通过。下一步构造连续来源的原始整段oracle并验证，未部署游戏DLL。
+
 ### 2026-09-06：640逻辑桥接正反向GPU独立通过
 
 - bridge640 test使用生产NativeVitGather及原始映射组合，输入655360个互不相同且float精确可表示的位置编号，正反方向分别对照，不以往返抵消错误。
