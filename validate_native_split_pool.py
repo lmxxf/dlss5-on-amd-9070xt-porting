@@ -7,9 +7,9 @@ from native_split_reference import ffwd,attention_window
 from native_c64_reference import multiply
 from native_c32_reference import H,F
 from decode_tinlayout_global import e4m3fn
-parser=argparse.ArgumentParser();parser.add_argument('--rgb-small',action='store_true');args=parser.parse_args()
-root=Path('release/native-c512');folder=root/('pool-rgb-small' if args.rgb_small else 'pool-real');folder.mkdir(exist_ok=True)
-width,height=(4,4) if args.rgb_small else (16,8)
+parser=argparse.ArgumentParser();group=parser.add_mutually_exclusive_group();group.add_argument('--rgb-small',action='store_true');group.add_argument('--rgb256',action='store_true');args=parser.parse_args()
+root=Path('release/native-c512');folder=root/('pool-rgb256' if args.rgb256 else 'pool-rgb-small' if args.rgb_small else 'pool-real');folder.mkdir(exist_ok=True)
+width,height=(8,8) if args.rgb256 else (4,4) if args.rgb_small else (16,8)
 inverse=np.argsort(np.load(root/'split-view/mapping.npz')['cell_output_to_hwc'])
 def decode(path,width,height):
  physical_w,physical_h=max(4,width),max(4,height)
@@ -20,7 +20,7 @@ def decode(path,width,height):
  return result[:height,:width]
 for i in range(4):
  subprocess.run(['python3','extract_native_weight_record.py','/home/lmxxf/work/tmp-test/nvngx_dlssnr.dll',f'block30.layer{i}.layer',str(root/f'block30-{i}.weights')],check=True,capture_output=True)
-source=Path('release/native-rgb128/block29-main.fp8') if args.rgb_small else root/'plain-continuation/block29-main.fp8';x=decode(source,width,height)
+source=Path('release/native-rgb256/block29-main.fp8') if args.rgb256 else Path('release/native-rgb128/block29-main.fp8') if args.rgb_small else root/'plain-continuation/block29-main.fp8';x=decode(source,width,height)
 env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_SPLIT_')}
 out=folder/'body.fp8'
 subprocess.run(['/tmp/native-split-global-oracle',str(source),str(out),*[str(root/f'block30-{i}.weights') for i in range(4)],str(width),str(height),'2','native-plain'],env=env,check=True,capture_output=True)

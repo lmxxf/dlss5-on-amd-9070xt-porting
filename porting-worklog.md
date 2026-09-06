@@ -2759,6 +2759,16 @@ validate_native_split_pool.py提取block30前四份真实记录，从非正方�
 
 本轮为原CUBIN/CPU数值与调用合同验证，未接AMD block30，AMD已验范围保持RGB→block29。游戏DLL、公开ZIP未改，最终画面目标active。
 
+### 2026-09-06 扩大原版连续夹具至256×256，block30池化获得有效4×4输出
+
+build_native_rgb128_oracle.py新增--size 256 --through-pool，旧默认128夹具不变，新夹具存release/native-rgb256。使用seed29701新生成1024个RGB tiles（不是简单复制旧图），preblock随机seed仍0、live scalar参数不变。原CUBIN从RGB连续运行block0～30：C512阶段8×8，block30池化输出4×4×512。全部已检查输出有限/非零与写入范围；pool kernel main与普通projection的整份4MiB输出逐byte一致，pool有效8192字节非零且无越界填充。
+
+validate_native_split_pool.py新增互斥--rgb256，直接采用这条原版连续链的block29输入。CPU/原CUBIN block30 branch/ffn/attn/main各32768值全exact；pool kernel main32768值、down8192值均全exact，MAE/max0。256夹具成功提供非零4×4池化结果，不代表128夹具的2×2合同已解决。
+
+为定位第五份记录的执行点，检查了各CUBIN入口符号；CUBIN04的cc_split_swin_16h_final_head_512_fp8为候选，元数据显示0x28参数，SASS含FP8 QMMA及FP8输出，但尚未验证其调用网格、矩阵排列与block30第五记录的对应关系。不能因kernel名称就宣称ViT入口已恢复。
+
+本轮未接AMD256夹具或block30 GPU，AMD已验范围仍128×128 RGB→block29；新256夹具是原版oracle与block30 CPU参考证据。下一步恢复/验证512→1024入口，并扩展AMD尺寸与池化路径。游戏DLL和公开包未更新，最终RGB/游戏画面仍未完成。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
