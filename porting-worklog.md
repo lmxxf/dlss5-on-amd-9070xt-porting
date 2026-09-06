@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080原始preblock双分支GPU oracle准备
+
+- prepare_native_reflect_preblock_gpu.py解码原始main cell至1152×1920×32 HWC、down global16至576×960×32，长度及FP8 NaN检查，导出原始RGB有效纹理。
+- ignored release/native-rgb-valid1080/amd-preblock生成两个oracle及input。脚本随后补block0系数复制逻辑，当前已生成目录未重新执行该复制，部署前需确认系数存在。
+- 移除本轮生成的重复main-cellgrid.f32（仅可再生测试产物），保留main-oracle.f32。尚未运行reflect→preblock GPU链，未部署游戏DLL。
+
 ### 2026-09-06：GPU镜像RGB打包三帧精确通过
 
 - extent host新增rgb_reflect，实际1920×1080 HWC输入→1920×1152 tile-major输出，调用生产NativeRgbReflect。
