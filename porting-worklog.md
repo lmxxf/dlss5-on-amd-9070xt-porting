@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD五tap时序采样shader候选编译通过
+
+- 新增native_temporal_sample.hlsl，输入history float4 buffer与已完成motion/transform的像素中心坐标，输出重建float4；按axis32/FMA顺序、fraction8/product8、五tap累加及权重倒数实现。
+- 纹理边界用四角加权宽中间精度后转float模拟当前参考；这是待GPU验证的候选，不宣称硬件所有输入均等价，也不作为性能优化版。没有使用预制神经输出或像素补丁。
+- Windows D3DCompile exit0，bytecode10700字节，session44478已完成；尚未GPU执行。下一步用已保存原版holdout坐标/样本作GPU半精度输出验收，再接入生产preblock的13/2/3特征槽。MotionVectors前段坐标合同仍需补齐，游戏DLL未部署。
+
+
 ### 2026-09-07：稳态RGB输入特征落位精确对齐
 
 - gdb PC1bd0捕获共享存储前R4～7/R48～51，脚本扩展保存R0～64。物理16half与已有mix矩阵特征顺序映射为[0,1,4,5,8,9,12,13,2,3,6,7,10,11,14,15]。

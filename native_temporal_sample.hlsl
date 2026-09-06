@@ -1,0 +1,52 @@
+// Controlled temporal reconstruction. Coordinates are supplied pixel centers
+// AFTER motion/transform; generating those coordinates is a separate contract.
+StructuredBuffer<float4> history : register(t0);
+StructuredBuffer<float2> coordinates : register(t1);
+RWStructuredBuffer<float4> reconstructed : register(u0);
+cbuffer Geometry : register(b0) { uint width; uint height; uint count; }
+
+void axis(float p,uint extent,out float3 positions,out float3 weights) {
+    precise float center=floor(p-.5)+.5;
+    precise float t=saturate(p-center);
+    precise float t2=t*t,t3=t2*t;
+    precise float sum=t+t3;
+    precise float left=mad(sum,-.5,t2);
+    precise float scaled=t2*2.5;
+    precise float inner=mad(t3,1.5,-scaled);
+    inner=inner+1;
+    precise float right=(t3-t2)*.5;
+    precise float other=1-left;other=other-inner;other=other-right;
+    precise float middle=inner+other;
+    precise float reciprocal=1.0/middle;
+    precise float position=mad(other,reciprocal,center);
+    positions=clamp(float3(center-1,position,center+2),.5,float(extent)-.5);
+    weights=float3(left,middle,right);
+}
+float3 fetch(float2 xy) {
+    precise float2 p=clamp(xy-.5,0,float2(width-1,height-1));
+    uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(width-1,height-1));
+    precise float2 f=round((p-float2(lo))*256.0)/256.0;
+    precise float4 w=float4((1-f.x)*(1-f.y),f.x*(1-f.y),(1-f.x)*f.y,f.x*f.y);
+    w=round(w*256.0)/256.0;
+    // Products on binary /256 weights are accumulated in a wider intermediate
+    // to match the reference's single float rounding at the texture boundary.
+    double3 v=double3(history[lo.y*width+lo.x].xyz)*double(w.x);
+    v+=double3(history[lo.y*width+hi.x].xyz)*double(w.y);
+    v+=double3(history[hi.y*width+lo.x].xyz)*double(w.z);
+    v+=double3(history[hi.y*width+hi.x].xyz)*double(w.w);
+    return float3(v);
+}
+[numthreads(64,1,1)]
+void main(uint3 id:SV_DispatchThreadID) {
+    if(id.x>=count)return;
+    float3 px,py,wx,wy;axis(coordinates[id.x].x,width,px,wx);axis(coordinates[id.x].y,height,py,wy);
+    precise float top=wx.y*wy.x,left=wx.x*wy.y,center=wx.y*wy.y,bottom=wx.y*wy.z,right=wx.z*wy.y;
+    precise float3 result=fetch(float2(px.y,py.x))*top;
+    result=mad(fetch(float2(px.x,py.y)),left,result);
+    result=mad(fetch(float2(px.y,py.y)),center,result);
+    result=mad(fetch(float2(px.y,py.z)),bottom,result);
+    result=mad(fetch(float2(px.z,py.y)),right,result);
+    precise float total=left+top;total=total+center;total=total+bottom;total=total+right;
+    precise float reciprocal=1.0/total;
+    reconstructed[id.x]=float4(result*reciprocal,1);
+}
