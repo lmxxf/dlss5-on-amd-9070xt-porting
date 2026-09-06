@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640-token参考全通过，AMD首帧精确但重放设备错误
+
+- check_native_block256.py支持Tokens640及ceil(log2(N))布局，原始block31七阶段全部different=0/finite/tail/replay通过，导出初始输入与原始最终oracle。
+- NativeVitQkv/Linear允许640，生产NativeVitBlock在RX9070XT首帧655360值different=0/max_abs=0；第二次提交报HRESULT=2289696774（0x887A0006），进程exit1。不能记作AMD稳定通过。
+- 首帧回读保存ignored release/native-vit/block640-3006/gpu-first-frame.f32，cmp原始oracle一致。未立即重试、未修改TDR或驱动；下一步调查GPU耗时/提交粒度与设备错误原因。游戏DLL未部署。
+
 ### 2026-09-06：原始640-token block31两次运行完成，待算术验证
 
 - expand/contract/QKV原始caller支持32×20，expand grid160、contract/projection40、QKV80，attention32×3。4MiB输出容量覆盖expand的2621440字节，其他输出655360字节。
