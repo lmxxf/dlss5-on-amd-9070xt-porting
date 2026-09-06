@@ -2887,6 +2887,18 @@ run_native_vit_contract_probe.cpp增加独立projection模式，使用原cc_vit_
 
 仍待ViT32～38、AMD ViT接入、解码器/最终RGB及真实剑星画面验证。AMD已验连续范围保持RGB256→block30/head；16/32-token attention的异常未因本轮FFN ABI修正而宣称解决。游戏DLL与网盘包未更改，最终画面目标active。
 
+### 2026-09-06 ViT31～38完整原生连续链双输入验证通过
+
+validate_native_vit_block31.py新增--last-block 31..38，逐层提取各自expand/contract/QKV/projection真实记录。每层原CUBIN直接读取上一层原projection文件作为输入，CPU参考独立沿同一链计算，并对expand、contract、Q、K、V、attention、projection七个检查点逐值验收；任一失败即停止，不把CPU结果写回原版链。
+
+首次进入block32时，expand诊断reader拒绝前层4MiB固定输出文件，即使有效64KiB之外全零也报size错误。将reader改为先严格检查超过物理输入范围的字节全零，再缩到实际分配尺寸；权重记录仍要求精确长度。中间一次编译出现vexing-parse错误，旧binary重复报读入错误，两次都未计通过；修正构造并以编译成功为执行门槛后完整运行。
+
+seed2101、2107两组64-token链均从block31连续到block38，各56个检查点全部different0、max0；每层expand262144值，其余六个检查点各65536值。此处没有放宽阈值或拟合修正，使用此前冻结的原生舍入、分组累加、QKV头部偏移及attention归约规则。
+
+新增每次任务启动先写status=running、全部通过后才写status=pass的validation.json，防止旧pass文件被误认作新测试；seed2107报告已现场核对status=pass、56项、last_block38。源夹具、权重和完整原输出均留release/native-vit/chain31-38-64-*，不入Git。
+
+至此64-token原CUBIN/CPU ViT八层连续链已闭合，但AMD ViT尚未实现/验证，RGB256编码器输出仍为16-token，不能和这条64-token链冒充完整GPU路径。下一步实现AMD ViT并建立足够尺寸的RGB连续夹具，再继续解码器与最终游戏画面。游戏DLL/公开包未更改，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

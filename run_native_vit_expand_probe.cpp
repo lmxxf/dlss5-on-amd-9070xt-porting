@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 static void ck(CUresult r){if(r){const char*s=nullptr;cuGetErrorString(r,&s);std::fprintf(stderr,"CUDA %d %s\n",r,s?s:"");std::exit(1);}}
-static std::vector<unsigned char> read(const char*p,size_t size,bool exact){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)std::exit(2);auto n=f.tellg();if(n<=0||size_t(n)>size||(exact&&size_t(n)!=size))std::exit(2);std::vector<unsigned char>b(size);f.seekg(0);if(!f.read((char*)b.data(),n))std::exit(2);return b;}
+static std::vector<unsigned char> read(const char*p,size_t size,bool exact){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f)std::exit(2);auto n=f.tellg();if(n<=0||size_t(n)>8*1024*1024||(exact&&size_t(n)!=size))std::exit(2);std::vector<unsigned char>b(size_t(n),0);f.seekg(0);if(!f.read((char*)b.data(),n))std::exit(2);for(size_t i=size;i<b.size();i++)if(b[i])std::exit(2);b.resize(size,0);return b;}
 int main(int argc,char**argv){
  if(argc!=6){std::fprintf(stderr,"usage: %s input output weights tokens gridX\n",argv[0]);return 2;}
  uint64_t tokens=std::strtoull(argv[4],nullptr,0);unsigned gx=std::strtoul(argv[5],nullptr,0);if(!tokens||tokens>256||!gx||gx>128)return 2;
