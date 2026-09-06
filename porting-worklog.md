@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080 RGB0～4整链GPU fixture准备
+
+- prepare_native_valid1080_front_gpu.py检查四主分支与down参考通过，直接解码原始1～4系数及block4 DS矩阵。
+- 依据独立coded projection64通道顺序，把原始down物理通道转回生产DS矩阵行顺序，导出oracle-down和oracle-main4；输入仅有效1920×1080 RGB。
+- ignored release/native-rgb-valid1080/amd-front4，打包与diff检查通过，尚未执行GPU0～4整链，未部署游戏DLL。
+
 ### 2026-09-06：block4下采样参考遗漏修正后精确通过
 
 - 对照check_native_c32_ds.py发现新验证器漏池化后FP8量化及既有coded projection输出行顺序；从ds-coded-aux.fp8恢复已验证64通道排列，检查所有空间位置编码一致及排列双射。
