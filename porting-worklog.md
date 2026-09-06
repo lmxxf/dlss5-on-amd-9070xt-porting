@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：只读呈现合同探针部署AMD，待启动现场采样
+
+- 新增 `native_game_present_contract.cpp`，只在SB-Win64-Shipping加载，注册ReShade present，记录每300帧尺寸/format/get_color_space/主queue device LUID及buffer index；不录GPU命令、不改像素、不初始化网络。
+- 使用本地ReShade6.8头文件编译成功，Linux大小写Windows.h问题通过 `/tmp/dlssnr-win-case` 临时include链接处理，未改SDK源码。部署后SHA `56e86508a1d215736faf64b2d4add4e58015e0af676f4f0ce27b87463d517ba3`。
+- 确认AMD游戏未运行、目标探针文件不存在后，新增游戏Win64目录 `native-present-contract.addon64`；原神经DLL未改。日志位置 `D:\DLSSNR-Lab\logs\native-present-contract.txt`，追加且带PID。AMD未找到名称含Stellar的scheduled task，尚未启动游戏；不能宣称探针已加载或合同已采到。
+- 下一步通过已核对的交互会话启动Steam游戏，检查探针加载及实际颜色/尺寸，再挂接完整GPU帧接口。探针不是修复DLL，游戏画面目标尚未完成。
+
+
 ### 2026-09-07：输入→网络→显示整帧GPU组合接口就绪，待游戏挂接
 
 - 新增 `native_game_frame.h`，Create在同queue device创建已测纹理输入、NativeActualNetwork70、R10显示输出；ProcessSubmittedFrame依次提交取图、所有网络段、显示复制，整帧mutex串行，source/target状态由调用方给出并恢复。
