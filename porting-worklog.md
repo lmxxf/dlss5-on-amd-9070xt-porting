@@ -2729,6 +2729,14 @@ d3d12_native_front_chain_test.cpp接入可选DLSS5_NOISE_TABLE，run_native_nois
 
 README顶部更新为当前范围，旧“整网已完成”等历史结论仍不作证明。尚未完成block24之后的真实数值链、真实游戏尺寸合同与最终RGB输出验证；游戏DLL、公开包未部署更新，目标继续active。
 
+### 2026-09-06 block24～29原始plain split四阶段闭合，纠正FFWD线程数
+
+新增native_split_weights.py，按此前逐值验证过的地址位规则解码各层四份原始记录（524288/263168/917568/263168字节），不沿用block23数值系数。validate_native_split_continuation.py分别以已闭合RGB链block23的4×4输出，以及独立seed1703/σ0.5的16×8×512随机输入，连续执行block24～29；沿用port既有shift3/1/2/0/3/1序列，此测试不是新游戏live调度捕获。
+
+原runner新增native-plain，选择ffwd/ffwd_proj的普通输入符号，同时采用已修正的H/W、指针顺序、projection网格及线程约定。最初错误沿用inpview的FFWD32×4线程：4×4全部四阶段通过，但16×8 block24的branch下4行全漏算（32711值不同），FFN/attention/final随之错误。尝试加倍grid Y无效，已撤回；SASS中TID.Y右移2参与索引，改为plain FFWD32×8后恢复下4行，inpview仍保持32×4。禁止以4×4小尺寸通过推断一般调度正确。
+
+修正后，独立16×8连续block24～29每层branch/ffn/attn/final各65536值全部exact，MAE/max0；重新回归4×4 RGB续链各阶段8192值也全exact。原始输出及系数留release/native-c512、release/native-rgb128，不提交权重数据。这一轮是原CUBIN对CPU参考的续链验证，尚未将24～29接进AMD连续链；AMD已验范围仍RGB→block23。游戏DLL/公开包未更新，最终游戏画面未验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
