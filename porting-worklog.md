@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB原始encoder15～22主分支通过
+
+- capture/main参考脚本增加互斥--c256，从block14-down继续120×72 C256八层，shift0/3/1/2/0/3/1/2，22下采样同时捕获。
+- 八层主分支各2211840值与原kernel零差异/finite通过，encoder-c256/main-validation.json保存结果。down22仅长度/FP8 NaN检查，尚未算术验收。
+- 下一步down22及AMD同RGB前端扩展，未部署游戏DLL。
+
 ### 2026-09-07：同valid1080 RGB GPU0～14双分支通过
 
 - runner支持-Front14，GPU镜像→preblock→C32/C64/C128直到14/DS连续五帧seed0/0/0/1/0，重放/seed变化检查通过；初始化PID1776活跃，未重复启动。
