@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原RGB衍生链推进第69块（2026-09-06）：原C64 block65 outview（128×128、shift3、32×2）正常执行，global16/低两位交换解码后与plain输出1048576值全exact，validator新增--block65。prepare_native_rgb512_upsample66.py使用真实原block65 outview与block4-main跳接，给定shift0原第66块最终2097152值CPU/原全exact，报告upsample66-shift0/validation.json。
+
+check_native_decoder_c32.py随后使用各自20672-byte原权重，给定shift0/1/3连续执行67～69，输入只取上一块原输出；三块各2097152值different0/max0，有效区外零、无NaN，导出FFN/attention及原final oracle。普通C32参考保持raw residual与精确half累计，未注入修正特征。报告位于decoder-block67..69。上述移位/跳接仍为当前待核对运行合同，不能把算子数值通过等同原游戏配置已捕获。
+
+目前原版/CPU衍生链已到69，核心最后输出头70仍待原生恢复；AMD全RGB连续仍到48，63～65和67～69尚未独立/全链GPU验证。下一步合并AMD后段回归并处理70最终RGB，不把“只剩输出头”说成游戏移植即将完成。游戏DLL未改，目标active。
+
 AMD第66块独立通过（2026-09-06）：核对NativeC32Stage的RAW_INPUT路径保留输入half作为FFN残差，只为矩阵输入做q8，故可直接消费第66块half合流。原生线性投影合同增加64→32、64或16384-token；shader仅OUTPUT_CHANNELS==32时输出half merged，其余decoder保持FP8 merged。宿主upsample66以128×128主→256×256输出，接常驻NativeC32Stage与原shift3参数，层间无CPU读回/注入。
 
 prepare_native_upsample66_gpu.py直接导出原seed2707/shift3的input/skip/final oracle，C32 FFN前置512零槽与原解码矩阵/skip、attention矩阵/bias/scale常驻。部署native-upsample66，三帧各2097152值different0/max0，device/fence/finite/replay通过。下载再验证全exact，SHA db0f198506f28f071052ff711bf4810c41eaa0c6bb8a073f5542162ddec586f2，报告release/native-upsample66/amd/validation.json。
