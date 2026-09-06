@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD主菜单旧补丁ON/base现场对照，网格来自旧输出路径
+
+- PID34376仍Responding，主swapchain探针累计3600帧1080p/R10/sRGB。通过已核对DLSS5Capture任务抓桌面，图像为剑星主菜单，旧neural模式有全幅细密周期网格。
+- 核对旧运行时F6循环0=neural/1=base/2=split，发送一次F6；日志display_residual generation2160 mode=1。再次截图纯底图网格消失，人物菜单动画姿态不同，不能作同帧像素差分。
+- 截图保存ignored `release/native-game-present/old-neural-menu.png` 与 `old-base-menu.png`，均已视觉检查。这是旧补丁的现场反证，不是新网络生效或画质验收；可见周期网格与旧输出模式相关。
+- 游戏仍运行于主菜单、旧补丁base模式，未加载/更改存档，未替换原神经DLL。下一步新接入须避免把旧神经合成结果再次送入新网络，保持干净输入及明确ON/OFF验证。
+
+
 ### 2026-09-07：修正SDK误判，主swapchain只读合同现场采样成功
 
 - 核对 `/tmp/reshade680.MNSVvW` 为干净v6.8.0，tag源码明确RESHADE_API_VERSION20；游戏日志版本6.8.0.2155。撤回前条“本地不是6.8/API20不符”的推断，API20不是已证实故障。
