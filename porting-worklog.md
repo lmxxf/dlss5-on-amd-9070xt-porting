@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原RGB衍生链推进第61块（2026-09-06）：以原C256 outview kernel重新执行block55（32×32、shift3、mode7、32×8线程），正常返回；将global16/低两位交换布局解码后，与原plain block55最终262144值全部一致。validate_native_block47_outview.py增加--block55并保存block55-outview-validation.json，旧47验证保留。
+
+prepare_native_rgb512_upsample56.py使用真实原block55 outview及block14-main作为skip，给定shift0调用原block56，最终64×64×128共524288值CPU/原全exact。输入/skip/原输出和验证报告保存在upsample56-shift0；此连接仍为当前合同下的原版链，不冒称新抓取原游戏skip指针/shift参数。
+
+随后扩展check_native_decoder_c256.py支持C128 block57～61，按0/1/3/2/0给定shift依次只消费前一原输出，五块各524288值different0/max0，有效区外零且无NaN。导出各自ffn/attention、原final oracle，全部通过后才写pass，范围为原版/CPU连续链。AMD第57～61块尚未运行，严格RGB GPU全链仍到48；49～55与56已独立验证。游戏DLL未改，目标active。
+
 AMD第56块独立通过（2026-09-06）：显式decoder投影合同新增256→128，允许已验证64/1024-token，主宽度8/32；原ViT及第39块维持各自限制。宿主upsample56选择32×32主/64×64 skip，GPU投影→nearest/FP8合流→C128 NativeC64Shift直接串接。参数导出/运行/验证脚本复用现有文件并加Block56选择，不改原第48块模式。
 
 原seed2507/shift3夹具部署native-upsample56，三帧各524288值different0/max0，device/fence/finite/replay检查通过；下载gpu.f32再验证全exact，SHA5fffdd82ed9456782b611b2b2697e0abfb95c16665968b86d06b7c09b3a37c78。报告release/native-upsample56/amd/validation.json，明确独立算子而非RGB全链。shader编译main34ms、FFN5669ms、attention2290ms、projection793ms。测试进程已正常退出，无待观察GPU任务。
