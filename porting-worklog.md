@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：实际补齐pool→head原始最终oracle准备完成
+
+- prepare_native_padded_pool_head.py将真实projection系数、非零attention控制的原始pool输出送入原始head，使用32×20及grid16×3。
+- head655360个值与原生矩阵参考完全一致，额外底2行/右2列通过head后仍为零，finite检查通过。
+- ignored release/native-c512/pool-game-real/head-oracle.f32和head-weights.f32已生成；后续AMD独立测试将以raw-projection.f32作池化输入，该输入是CPU参考，不可称完整encoder GPU验收。未部署游戏DLL。
+
 ### 2026-09-06：AMD pool/head补齐路径实现，待GPU验收
 
 - NativeC32Downsample对明确60×36 C512 raw输入设置32×20输出、30×18有效池化区域；输出buffer按实际geometry分配。旧整除8尺寸路径保持原几何。
