@@ -204,8 +204,14 @@ int main(int argc, char **argv) {
         check("cuMemcpy2D(tile)", cuMemcpy2D(&copy));
         check("cuMemsetD8(main)", cuMemsetD8(main_output, 0, allocation_bytes));
         check("cuMemsetD8(downsample)", cuMemsetD8(downsample_output, 0, allocation_bytes));
+        unsigned grid_x=width/8,grid_y=height/8;
+        if(const char*s=std::getenv("DLSS5_PREBLOCK_DEBUG_GRID_X"))grid_x=std::strtoul(s,nullptr,10);
+        if(const char*s=std::getenv("DLSS5_PREBLOCK_DEBUG_GRID_Y"))grid_y=std::strtoul(s,nullptr,10);
+        if(!grid_x||!grid_y||grid_x>unsigned(width/8)||grid_y>unsigned(height/8))return 2;
+        // Diagnostic prefix only: preserve all parameter/texture dimensions.
+        // Output outside launched blocks remains zero, never a full oracle.
         check("cuLaunchKernel", cuLaunchKernel(
-            function, width/8, height/8, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
+            function, grid_x, grid_y, 1, 32, 2, 1, 0, nullptr, kernel_args, nullptr));
         check("cuCtxSynchronize", cuCtxSynchronize());
         check("cuMemcpyDtoH(main)", cuMemcpyDtoH(
             main_bytes.data() + tile * main_tile_bytes, main_output, main_tile_bytes));

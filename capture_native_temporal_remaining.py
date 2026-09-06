@@ -7,6 +7,7 @@ parser.add_argument('--block',nargs=2,type=int,default=[4,6])
 parser.add_argument('--warp',type=int,default=1)
 parser.add_argument('--valid1080',action='store_true')
 parser.add_argument('--timeout',type=float,default=30)
+parser.add_argument('--prefix-grid',action='store_true')
 args=parser.parse_args()
 root=Path('release/native-temporal-valid1080' if args.valid1080 else 'release/native-temporal-large')
 bx,by=args.block
@@ -19,6 +20,7 @@ env.update(DLSS5_PREBLOCK_PARAMETER_FILE='release/native-game-present/temporal-3
            DLSS5_TEMPORAL_DEBUG_DIR=str(out),DLSS5_TEMPORAL_DEBUG_BLOCK_X=str(bx),
            DLSS5_TEMPORAL_DEBUG_BLOCK_Y=str(by),DLSS5_TEMPORAL_DEBUG_THREAD_Y=str(args.warp))
 if args.valid1080:env.update(DLSS5_PREBLOCK_WIDTH='1920',DLSS5_PREBLOCK_HEIGHT='1152',DLSS5_PREBLOCK_GAME_TEXTURE='1')
+if args.prefix_grid:env.update(DLSS5_PREBLOCK_DEBUG_GRID_X=str(bx+1),DLSS5_PREBLOCK_DEBUG_GRID_Y=str(by+1))
 for pc in args.pcs:
     env['DLSS5_TEMPORAL_DEBUG_PC']=pc
     result=subprocess.run(['/usr/local/cuda/bin/cuda-gdb','-batch','-x','debug_native_temporal_sample.gdb',

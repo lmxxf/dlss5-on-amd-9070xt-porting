@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：缩小诊断网格解开后段捕获，另一区域触发CUDA-GDB内部崩溃
+
+- NVIDIA CUDA-GDB官方文档说明条件断点每次都会命中并判条件，可能看似挂起：https://docs.nvidia.com/cuda/cuda-gdb/index.html#conditional-breakpoints 。原preblock SASS检查到CTAID读，无常规gridDim读取，提出只缩小启动网格、保留纹理/参数尺寸的诊断前缀。
+- oracle新增DEBUG_GRID_X/Y环境变量，范围不超过原grid，默认不变；capture新增--prefix-grid。check_native_prefix_grid.py验证4×111及40×43启动区域相对原完整输出：main909312/3522560字节、down227328/880640字节全部exact。未启动区域为零，明确不能当完整oracle。
+- session78845成功取得block3,row110,warp1四个PC捕获，解决原120秒超时。当前GPU运动UV64值全一致，sampler仅lane24蓝通道half不同，float最大1.19209e-7；CPU原UV重建也1half不同，即使使用原倒数仍不同。下一步抓该lane的TEX返回值与累加细节。
+- block39,row42的后续PC捕获session36379触发CUDA-GDB内部SIGABRT，日志明确“This is a bug”。确认无残留后session52464重试仍同样SIGABRT；失败日志保留0x16b0-debugger-abort.log及0x16b0.log。先沿已成功取得的第一反例推进，不连续重试此条件。
+- 生产shader、游戏DLL未变，数值基线仍8/4。诊断grid只用于实验，未缩小运行目标或游戏分辨率。
+
 ### 2026-09-07：剩余区域捕获受30秒上限影响，AMD中间输出已保存
 
 - session4495重新运行当前positionfma valid1080五帧并开启中间读回，全部重放通过；UV与sampler文件本轮重新保存于positionfma目录，传输session29340已完成。
