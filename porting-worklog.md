@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：历史座标往返显式舍入，120×72进一步降至45/14
+
+- 修正t后的GPU tap读回session40937：block14 warp1与原PC1590差异319→151/512，绝大多数剩余为X UV；六个轴权重只有lane3的Y仍不同，与前级运动UV的1ULP差异一致。证据gpu-taps-tfma.f32/validation.json。
+- history normalized→pixel步骤用显式double fma再转float，保留中间舍入（sampler及诊断tap_uv同步）。session1072五帧完成，120×72 main/down差异51/15→45/14，结果保留pixelfma目录。仍不是全通过。
+- 额外尝试central position显式double fma，session87801仍45/14，无收益，已撤回该处。失败/无改善回读保留positionfma目录。
+- 24×16配套shader回归session8753五帧完成，main12288/down3072值全部一致，证据rect/pixelfma。保留history_pixel修改并同步AMD large/rect实验目录，游戏DLL未改。后续优先核查前级运动UV融合乘加及剩余tap归一化，不再盲改已一致的权重。
+
 ### 2026-09-07：只修正采样小数DFMA，120×72降至51/15，24×16全一致
 
 - 将normalized axis的t单独改为内联double fma后转float，其余运算不改。session29566五帧完成，120×72 main/down差异72/21→51/15；证据tfma/gpu-tfma-*及validation.json。仍未全通过，不作为游戏画质已修复。

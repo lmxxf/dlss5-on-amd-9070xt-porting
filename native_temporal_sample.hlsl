@@ -33,7 +33,9 @@ float3 fetch(float2 xy) {
     precise float2 normalized=xy*float2(inverse_width,inverse_height);
     // Original applies the history subrect transform even for the full-size
     // zero-offset case. Keep both roundings instead of cancelling dimensions.
-    precise float2 history_pixel=mad(normalized,float2(width,height),float2(0,0));
+    precise float2 history_pixel=float2(
+        float(fma(double(normalized.x),double(width),0.0)),
+        float(fma(double(normalized.y),double(height),0.0)));
     precise float2 uv=history_pixel*float2(inverse_width,inverse_height);
     precise float2 fixed_uv=floor(uv*2097152.0);
     precise float2 pixel=fixed_uv*(float2(width,height)/2097152.0)-.5;

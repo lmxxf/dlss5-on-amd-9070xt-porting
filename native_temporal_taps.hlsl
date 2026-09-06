@@ -6,7 +6,9 @@
 #undef main
 float2 tap_uv(float2 xy) {
     precise float2 normalized=xy*float2(inverse_width,inverse_height);
-    precise float2 pixel=mad(normalized,float2(width,height),float2(0,0));
+    precise float2 pixel=float2(
+        float(fma(double(normalized.x),double(width),0.0)),
+        float(fma(double(normalized.y),double(height),0.0)));
     precise float2 uv=pixel*float2(inverse_width,inverse_height);
     return uv;
 }
