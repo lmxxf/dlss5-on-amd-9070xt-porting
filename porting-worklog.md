@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD现场探针启动失败，已可恢复停用
+
+- 找到并核对互动任务DLSS5Launch（lmxxf，Steam -applaunch3489700）；启动后Steam记录SB PID40496、Shipping PID21296，随后查询只剩crs-handler PID19092，无present合同输出。游戏未成功进入可验收状态，不反复重启。
+- ReShade日志显示新探针注册API20；核查 `/tmp/reshade680.MNSVvW/include/reshade.hpp` 及tmp-test另一个repo均定义API20，目录名字不能证明6.8接口。此前记录“使用6.8头文件”的说法不成立。API/虚表兼容性是明确待核对项，尚不能仅据此断言唯一崩溃根因。
+- 已确认Shipping退出后，将新探针改名为 `native-present-contract.addon64.disabled-api-audit`，SHA不变，可恢复；原神经DLL未动、未改存档。新增inspect/disable脚本保存操作，未杀crs-handler。
+- 下一步定位真正匹配已安装ReShade的SDK/版本与回调ABI，检查启动期swapchain调用边界，修正探针后再现场采样。目标未完成。
+
+
 ### 2026-09-07：只读呈现合同探针部署AMD，待启动现场采样
 
 - 新增 `native_game_present_contract.cpp`，只在SB-Win64-Shipping加载，注册ReShade present，记录每300帧尺寸/format/get_color_space/主queue device LUID及buffer index；不录GPU命令、不改像素、不初始化网络。
