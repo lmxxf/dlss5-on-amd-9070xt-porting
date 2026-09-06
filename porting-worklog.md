@@ -2909,6 +2909,16 @@ d3d12_native_pool_head_test.cpp增加三个显式linear模式，原双参数pool
 
 下一步实现AMD QKV与attention并连接线性算子，再做完整block31及八层GPU链验证。AMD全连续范围仍RGB256→block30/head，游戏DLL/公开包未更改，最终画面目标active。
 
+### 2026-09-06 AMD QKV及QKV→attention直连验证通过
+
+新增native_vit_qkv.h/hlsl，两pass实现三矩阵投影和Q/K归一化、V量化。投影保留两个K512分区及K32 half累计；归一化按已测tensor通道序，Q依次half乘5.65625及head scale，K不加该scale，V直接FP8。GPU参数使用解码后的三份row-major float矩阵＋32个scale，不能与原记录前128字节scale的物理布局混淆。输入/中间/输出常驻，pass间只有GPU屏障。
+
+新增native_vit_attention.h/hlsl，限定已验证64-token；复现原exp位操作、先FP8(exp)×V再归一化、canonical token顺序half归约及K32半精度累计。输出为逻辑64×1024，不依赖NVIDIA中间数据、拟合修正或CPU求和。
+
+d3d12_native_pool_head_test.cpp增加qkv和qkv_attention模式，旧模式保留。prepare_native_vit_qkv_gpu.py从seed2107已通过的八层原版链导出block31 contract作为独立入口，并分别以原Q/K/V及原attention输出作裁判。9070XT独立QKV每帧196608值、QKV→attention直接GPU串联每帧65536值，各三帧均different0、max0，finite/device/fence与重放检查通过。两个GPU读回文件下载后再次逐值比较，全exact。
+
+这些是block31 QKV及QKV→attention片段的GPU验证；入口仍是原版contract特征，不是完整GPU FFN或RGB链。本轮算子之间不做CPU读回，但不能称完整ViT已验。下一步串联GPU expand/contract/QKV/attention/projection及八层链。AMD全连续范围仍RGB256→block30/head，游戏DLL/公开ZIP未更新，最终画面目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
