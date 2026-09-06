@@ -1,4 +1,4 @@
-param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-rgb128',[uint32]$Seed=0,[switch]$Chain,[switch]$Tail,[switch]$Head,[switch]$Vit)
+param([string]$Folder='D:\DLSSNR-Lab\matrix-probe\native-rgb128',[uint32]$Seed=0,[switch]$Chain,[switch]$Tail,[switch]$Head,[switch]$Vit,[ValidateSet(128,256,512)][int]$Width=128)
 $ErrorActionPreference='Stop'
 if ($Tail -and -not $Chain) { throw '-Tail requires -Chain' }
 if ($Head -and -not $Chain) { throw '-Head requires -Chain' }
@@ -6,6 +6,7 @@ if ($Vit -and -not $Chain) { throw '-Vit requires -Chain' }
 if ($Vit -and $Head) { throw 'Choose -Vit or -Head, not both' }
 $env:DLSS5_NOISE_TABLE=Join-Path $Folder 'functions.f32'
 $env:DLSS5_TEST_SEED=$Seed.ToString()
+$env:DLSS5_TEST_WIDTH=$Width.ToString()
 if ((Get-Item $env:DLSS5_NOISE_TABLE).Length -ne 201326592) { throw 'Noise table size mismatch' }
 if ($Chain) {
  if ($Tail) { $env:DLSS5_SPLIT_TAIL='1' } else { Remove-Item Env:DLSS5_SPLIT_TAIL -ErrorAction SilentlyContinue }

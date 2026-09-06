@@ -2951,6 +2951,18 @@ d3d12_native_front_chain_test.cpp新增rgb512vit：512尺寸编码器→block30/
 
 检查远端preblock三份HLSL的SHA，与当前本地文件逐一相同，排除误用旧shader这一候选。下一步以该preblock窗口分离原/CPU/GPU中间结果，检查尚未覆盖的捨入或特殊函数边界。此前256尺寸编码器、独立64-token ViT及桥接的通过范围保留，不外推到512；完整RGB512 GPU链明确未通过。游戏DLL、公开包未部署更新，最终画面目标active。
 
+### 2026-09-06 RGB512首差异定位到mix；float32末次捨入候选全幅失败并撤回
+
+新增diagnose_native_rgb512_tile.py，仅计算global(x384,y376)的8×8窗口，使用独立原生随机指令trace、精确输入混合及原CPU FFN/attention。CPU main对原有21处不同，DS有5处不同；CPU DS与此前AMD DS全部相同，说明当前反例可在共同参考里重现，不是仅AMD执行故障。新增diagnose_native_rgb512_stages.py做原kernel消融：mix只在局部(y6,x0,c0)一处不同，FFN有同一像素的8个通道不同。
+
+probe_native_noise_residual.py扩展size512与gain4096。在global(y382,x384)对三项随机half值做差分抵消，三个读回均仅兼容候选本身；gain64时第三项分辨率不够，不能先前零残差就说完全一致，4096倍后才唯一确认。因此当前点的随机half值一致。
+
+该mix点精确和为-0.2108764603290183，距half边界-0.21087646484375约4.5e-9。试验“精确double求和→float32→half”能让问题窗口CPU main/DS全部对上，也保留旧128/seed0x12345678的FFN通过。然而此局部候选不是全局规则：部署至独立512 preblock后，主分支有337/8388608处差异，DS有91/2097152处差异（max0.0625），比原DS5处更多，严格判失败。
+
+已恢复本地及AMD实验目录的原preblock_input_mix.hlsl，不保留这个负向修改。失败shader及lut-main/down/raw文件归档release/native-rgb512/round32-candidate；远端读回文件也移到对应round32-candidate，避免误当恢复后shader的输出。未删除实验数据，可继续复核。当前tile-diagnostic恢复记录原基线，新增rounding标志避免混淆。
+
+保留Width512独立preblock运行支持、全幅main/DS验证器及诊断脚本。下一步需恢复真正的HMMA混合累加/中间舍入过程，不能用单点匹配推广float32末次舍入，也不放宽通过标准。完整RGB512→ViT38仍未通过，游戏DLL/公开包未更新，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

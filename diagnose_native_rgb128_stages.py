@@ -53,6 +53,12 @@ if trace.exists():
  ff64=H(prefix64*fw[8704:])
  for k in range(0,128,32):ff64=H(ff64+hd64[...,k:k+32]@w2[:,k:k+32].T)
  cases.append(('ffn_cuda_prefix64',ff64))
+ prefix32=H((native_features.astype(np.float64)@fw[:512].reshape(32,16).astype(np.float64).T).astype(np.float32))
+ ex32=H(F(prefix32)@fw[512:4608].reshape(128,32).T);gt32=np.clip(ex32,-4,4)
+ hd32=F(H(ex32*H(gt32*H(np.abs(gt32)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))))
+ ff32=H(prefix32*fw[8704:])
+ for k in range(0,128,32):ff32=H(ff32+hd32[...,k:k+32]@w2[:,k:k+32].T)
+ cases.append(('ffn_cuda_prefix64_to32',ff32))
  print(json.dumps({'prefix_half_changed_by_float64':int(np.count_nonzero(prefix64!=cuda_prefix))}),flush=True)
  accum=H(cuda_prefix*fw[8704:]);cases.append(('ffn_skip_only',accum.copy()))
  for group in range(4):
