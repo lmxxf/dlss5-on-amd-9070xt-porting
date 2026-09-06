@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD生產C64最小窗口重现3值差异
+
+- split-window host新增single64 8×8/shift0模式，prepare_block8_window_gpu.py导出原始block8真实系数及未改模型oracle。
+- RX9070XT生产NativeC64Shift首帧different3/max_error0.5，exit1、device_removed_reason0；与CPU参考同数量同最大差异，明确GPU移植路径也未通过。
+- ignored window46-18/amd与远端block8-window为可重复诊断入口，未使用修改权重控制作为验收，不部署游戏DLL。
+
 ### 2026-09-06：block8得分对齐/平方舍入候选排除
 
 - check_block8_score_alignment.py按已知27bit乘积对齐模型测试QK+bias，得分与现参考无变化，仍9个attention差异；不是此候选能解决的问题。
