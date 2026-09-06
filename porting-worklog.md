@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：GPU镜像输入shader与tile布局公式准备
+
+- native_rgb_reflect.hlsl直接从有效HWC float4读取镜像坐标，输出8×8 tile-major float4；不需要逐像素CPU索引表。坐标函数支持周期反射，调用方需确保有效尺寸>=2、处理尺寸8整除。
+- check_rgb_reflect_layout.py以原始输出已验证的numpy reflect fixture核对索引公式，2211840像素零差异，最后一行映射到有效源1007行，dispatch240×144。
+- 输出input-tiled.rgba32f供后续preblock，尚未创建D3D资源封装/执行shader，不宣称GPU通过；未部署游戏DLL。
+
 ### 2026-09-06：SASS引导的镜像RGB补齐精确通过
 
 - 原始preblock SASS 0x02d0/02e0/0320/0370显示越界坐标选择2*extent-coordinate-2（有效宽来自cb0x454，即参数0xd4）；据此测试reflect而非继续猜常量。
