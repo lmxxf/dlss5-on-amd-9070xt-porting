@@ -11,7 +11,8 @@ public:
  ~NativeVitLinear(){for(auto*r:{input,residual,weights,output})if(r)r->Release();if(root)root->Release();if(pso)pso->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*src,ID3D12Resource*skip,UINT tokens,UINT inputs,UINT out,bool expand,const std::vector<float>&coefficients,const std::wstring&dir,bool decoder=false){
   const bool game_decoder=decoder&&inputs==1024&&out==512&&tokens==640;
-  const bool decoder_shape=game_decoder||(inputs==1024&&out==512&&tokens==64)||(inputs==512&&out==256&&(tokens==64||tokens==256))||(inputs==256&&out==128&&(tokens==64||tokens==1024))||(inputs==128&&out==64&&(tokens==64||tokens==4096))||(inputs==64&&out==32&&(tokens==64||tokens==16384));
+  const bool game_up48=decoder&&inputs==512&&out==256&&tokens==2160;
+  const bool decoder_shape=game_decoder||game_up48||(inputs==1024&&out==512&&tokens==64)||(inputs==512&&out==256&&(tokens==64||tokens==256))||(inputs==256&&out==128&&(tokens==64||tokens==1024))||(inputs==128&&out==64&&(tokens==64||tokens==4096))||(inputs==64&&out==32&&(tokens==64||tokens==16384));
   if(input||!d||!src||(!decoder&&tokens!=64&&tokens!=256&&tokens!=640)||(!expand&&!skip)||(decoder?(expand||!decoder_shape):(expand?(inputs!=1024||out!=4096):(out!=1024||(inputs!=1024&&inputs!=4096))))||coefficients.size()!=size_t(inputs)*out+(expand?0:out))throw std::runtime_error("ViT/decoder linear contract");
   UINT64 output_values=game_decoder?UINT64(60)*36*out:UINT64(tokens)*out*(decoder?4:1);
   if(decoder&&(src->GetDesc().Width<UINT64(tokens)*inputs*4||skip->GetDesc().Width<output_values*4))throw std::runtime_error("decoder buffer capacity");

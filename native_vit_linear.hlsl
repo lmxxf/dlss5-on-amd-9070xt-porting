@@ -15,8 +15,8 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   total=part==0?a:H(total+a);
  }
  // Explicit square main extents through128 (block66); contracts checked by host.
- uint width=tokens==640?32:tokens==16384?128:tokens==4096?64:tokens==1024?32:tokens==256?16:8;
- uint output_width=tokens==640?60:width*2,output_height=tokens==640?36:width*2;
+ uint width=tokens==2160?60:tokens==640?32:tokens==16384?128:tokens==4096?64:tokens==1024?32:tokens==256?16:8;
+ uint output_width=tokens==640?60:width*2,output_height=tokens==2160?72:tokens==640?36:width*2;
  [unroll]for(uint dy=0;dy<2;dy++)[unroll]for(uint dx=0;dx<2;dx++){
   uint x=token%width*2+dx,y=token/width*2+dy;
   if(x>=output_width||y>=output_height)continue;

@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD block48非方形放大准备
+
+- NativeVitLinear允许decoder模式2160token/512→256，以主宽60、输出120×72计算坐标，实际skip容量按8640×256检查；编译通过，未执行新GPU路径。
+- prepare_native_upsample48_gpu.py增加--game48，检查原始finite/tail/零差异及输入输出文件尺寸，导出真实系数和原始最终oracle到ignored release/native-upsample48/amd-game。
+- 下一步接NativeC64Shift(120,72,shift0,C256)并执行原始oracle对照；本轮未部署游戏DLL。
+
 ### 2026-09-06：block48真实120×72原始随机对照通过
 
 - check_native_upsample48_game.py构造独立36×60×512 main(global16低通道位交换)及72×120×256 skip(cell)，block48真实权重，shift0/grid15×9运行原始kernel。
