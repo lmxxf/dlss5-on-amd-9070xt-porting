@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：动态RGB0～70整链A/A/B/A/A通过
+
+- session61405/PID18444已exit0，五帧固定seed0；A/A/B/A/A全部replay_check通过，intermediate_CPU_transfers=0。无本轮运行任务遗留。
+- B相对A：最终RGB6635520/6635520分量不同，head444407/655360不同，decoder6916834118/17694720不同，证明差异不仅来自post底图。frame3/4恢复A后，三路与基线全部一致。
+- 下载6份此次标准及.alternate输出至ignored `release/native-rgb-valid1080/amd-dynamic`，运行 `validate_native_valid1080_dynamic_gpu.py` exit0：恢复A的final/head/decoder69与原版A均different=0，B差异数量与运行日志一致，pass=true。
+- 这是受控输入的动态因果及恢复验证，不是B原版数值验收，也不是游戏呈现；B为A的RGB水平翻转且alpha不变。当前已同时具备实际尺寸静态整链精确对照与动态输入穿过神经网的证据。
+- 下一阶段应推进游戏接入：抽取已验证管线的GPU资源/分段提交接口，处理游戏输入提交后再推理、结果完成后写回的队列依赖，不可在旧FFX未提交list中阻塞等待。旧游戏DLL及公开包仍未更新，目标尚未完成。
+
+
 ### 2026-09-07：动态RGB整链测试启动，固定seed A/A/B/A/A
 
 - 保留静态full目录，在独立 `D:\DLSSNR-Lab\matrix-probe\native-valid1080-dynamic` 部署新动态exe、B输入与运行器，未改游戏DLL。exe本地/远端SHA均为 `27414c57d98c6c89f75e535abf2bf71e786c1fc383b3c44b109bb102aff6a1f6`。
