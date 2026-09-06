@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原始C64 kernel寄存器直接读取成功
+
+- 本地cuda-gdb可在原始CUBIN符号断点停住，动态取entry PC再于+0x5030断点，避免硬编码加载地址。
+- debug_block8_qk.gdb切换thread(0,1,0)第二head，成功读取量化后R8..11及R80/81/84/85。该次为除错停止后退出，不产生新的最终oracle。
+- 下一步采集32lane并按QMMA A/B布局解码Q/K，直接对照query-reference。未改原始CUBIN、生产权重或游戏DLL。
+
 ### 2026-09-07：Q缩放次序候选核对
 
 - 原始SASS 0x4e00/4ea0等显示先乘归一化倒数再乘scale，两个HMUL2；与当前参考的两次half舍入一致。
