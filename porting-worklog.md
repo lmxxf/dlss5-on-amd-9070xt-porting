@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：24×16时序GPU前端发现精度差异，未通过
+
+- prepare_native_temporal_variable_gpu.py新增--rect，seed7305独立RGB/history/spatial motion，原版输入HWC、AMD输入明确转换8×8 tile-major，history/motion保留HWC。有效/处理尺寸均24×16，非二次幂宽度。
+- AMD五帧seed0/0/0/1/0重放通过session91006 exit0，但正式validator --rect：main12288值差7、down3072值差3，pass=false并exit1。ignored release/native-temporal-rect保留原版/GPU输出和失败报告，未放宽标准。
+- 该反证说明8×8精确不能外推。尚未定位是motion/采样坐标倒数、半精度临界或preblock其它项；下一步做同尺寸single路径控制和采样中间值分段比较，找首个差异，不能直接假定根因为MUFU。
+- 新神经DLL未部署，目标未完成，无运行任务遗留。
+
+
 ### 2026-09-07：空间变化motion的完整GPU前端精确通过
 
 - 新增prepare_native_temporal_variable_gpu.py，使用同一当前RGB/独立history与seed7304空间motion[-.75,.75]，原版caller重新执行双纹理生成main/down；无预制采样RGB/坐标参与AMD输入。
