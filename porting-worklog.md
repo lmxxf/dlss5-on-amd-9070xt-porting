@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+原RGB512最终RGB对齐、AMD整网回归启动（2026-09-06）：原C32 block69 outview实际执行后，global16不交换通道低两位的解码与plain输出2097152值全exact。prepare_native_rgb512_post70.py取真实原block69 outview、原preblock主分支及同一张RGB输入，mask1/mode1运行原post70，CPU最终786432个RGB分量different0/max0。报告release/native-rgb512/post70/validation.json，范围仍为当前控制配置，不是原游戏所有输入/移位模式。
+
+front-chain增加rgb512final，把NativePost70接到GPU69和pre.Main。底图独立UPLOAD但逐像素核对其与编码器tile输入为同一RGB，仅初始输入布局不同，不是中间特征注入。拒绝DLSS5_POST_BASE_ONLY诊断变量，FinalRGB入口清除该变量。输出独立output-rgb512-final.f32；导出及严格验证器已加入，MinGW编译通过。整网仅在实验目录部署，游戏DLL未改。
+
+完整GPU回归唯一进程运行中：统一SSH会话21197、AMD PID31080，启动19:12:55；查询CPU15.359375秒，shader1～4已结束，第5开始。尚未最终读回，不能宣布AMD整网RGB已通过。下一轮继续观察同一任务，不重复启动。真实1080p与游戏画面验收仍未完成，目标active。
+
 AMD第70块首差异定位并独立通过（2026-09-06）：宿主在数值失败后（已等原提交fence）额外读回merge及raw-half主体，不注入CPU数据。diagnose_native_post70_gpu.py核对两份各8388608值：merge对CPU全exact，主体对GPU merge的CPU计算全exact，确认错误位于最后head/合成，不修改已通过前段。
 
 原double head结果接近second-only但不完全相等；禁止double合并未改变失败。dump_native_shader.cpp导出DXBC，能看到第二段确有ftod/dadd累加，并含enable11_1DoubleExtensions，因此没有证据断言“编译器漏加了acc”，也不直接归因某条驱动指令。改为等价整数实现：27位乘积对齐累计、signed magnitude合并half accumulator、整数位舍入到half。若scaled accumulator不是整数或越出该实现界限，显式输出NaN触发测试失败，不静默近似。此范围限制仍需未来真实输入验证。
