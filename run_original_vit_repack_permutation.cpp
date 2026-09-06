@@ -18,11 +18,13 @@ static void check(const char *name, CUresult result) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 3 && argc != 5 && argc != 7) {
-    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height [input.fp8 output.fp8]]\n",
+  if (argc != 3 && argc != 5 && argc != 7 && argc != 8) {
+    std::fprintf(stderr, "usage: %s output-to-input.i32 metadata.json [width height [input.fp8 output.fp8 [--inverse]]]\n",
                  argv[0]);
     return 2;
   }
+  const bool inverse=argc==8 && !std::strcmp(argv[7],"--inverse");
+  if(argc==8&&!inverse)return 2;
   constexpr size_t arenaBytes = 4 * 1024 * 1024;
   const int width = argc >= 5 ? std::atoi(argv[3]) : 8;
   const int height = argc >= 5 ? std::atoi(argv[4]) : 8;
@@ -42,7 +44,7 @@ int main(int argc, char **argv) {
         cuModuleLoad(&module, "/tmp/dlssnr-cubins/dlssnr-05.cubin"));
   CUfunction repack;
   check("function", cuModuleGetFunction(
-                        &repack, module, "cc_vit_1d_repack_2d_to_1d_fp8"));
+                        &repack, module, inverse?"cc_vit_1d_repack_1d_to_2d_fp8":"cc_vit_1d_repack_2d_to_1d_fp8"));
 
   CUdeviceptr source, destination;
   check("source", cuMemAlloc(&source, arenaBytes));
@@ -60,7 +62,7 @@ int main(int argc, char **argv) {
   auto launch = [&]() {
     check("upload", cuMemcpyHtoD(source, input.data(), arenaBytes));
     check("clear", cuMemsetD8(destination, 0, arenaBytes));
-    check("launch", cuLaunchKernel(repack, width * height + 16, 1, 1, 32, 4, 1, 0,
+    check("launch", cuLaunchKernel(repack, inverse?unsigned((outputBytes/4+255)/256):width * height + 16, 1, 1, inverse?256:32, inverse?1:4, 1, 0,
                                     nullptr, arguments, nullptr));
     check("sync", cuCtxSynchronize());
     check("download", cuMemcpyDtoH(output.data(), destination, arenaBytes));
@@ -114,7 +116,7 @@ int main(int argc, char **argv) {
       std::fprintf(stderr,"held-out repack mismatch seed=%u offset=%zu\n",seed,i);return 6;
     }
   }
-  if(argc==7){
+  if(argc>=7){
     std::fill(input.begin(),input.end(),0);std::ifstream actual(argv[5],std::ios::binary|std::ios::ate);if(!actual)return 7;auto bytes=actual.tellg();if(bytes<=0||size_t(bytes)>arenaBytes)return 7;actual.seekg(0);if(!actual.read((char*)input.data(),bytes))return 7;
     for(size_t i=outputBytes;i<arenaBytes;i++)if(input[i])return 7;
     launch();for(size_t i=0;i<outputBytes;i++)if(output[i]!=input[outputToInput[i]])return 8;
@@ -126,12 +128,12 @@ int main(int argc, char **argv) {
       outputToInput.size() * sizeof(uint32_t));
   std::ofstream metadata(argv[2]);
   metadata << "{\n"
-           << "  \"semantics\": \"1d physical byte offset -> 2d physical byte offset\",\n"
+           << "  \"semantics\": \"" << (inverse?"2d physical byte offset -> 1d physical byte offset":"1d physical byte offset -> 2d physical byte offset") << "\",\n"
            << "  \"shape\": [" << (width * height) << ", 1024],\n"
            << "  \"entries\": " << outputToInput.size() << ",\n"
            << "  \"source_arena_bytes\": " << arenaBytes << ",\n"
-           << "  \"launches\": " << (addressBits + 3+(argc==7?1:0)) << ",\n"
-           << "  \"actual_input_verified\": " << (argc==7?"true":"false") << ",\n"
+           << "  \"launches\": " << (addressBits + 3+(argc>=7?1:0)) << ",\n"
+           << "  \"actual_input_verified\": " << (argc>=7?"true":"false") << ",\n"
            << "  \"held_out_random_inputs\": 2,\n"
            << "  \"bijective_over_selected_offsets\": true\n"
            << "}\n";

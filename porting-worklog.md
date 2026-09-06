@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+RGB512原版链延伸第39块（2026-09-06）：run_original_vit_repack_permutation.cpp新增显式--inverse，直接运行cc_vit_1d_repack_1d_to_2d_fp8；此方向按每线程4字节、block256×1调用，不沿用反方向32×4的grid。恢复65536地址双射、两份随机留出与实际block38 projection全部通过；映射逐项等于已验2d→1d映射的逆。输出block38-2d.fp8由原kernel生成，不由CPU映射代替。
+
+prepare_native_rgb512_decoder.py将实际原RGB512→ViT38→原repack接入原decoder39，以原block30-pool-main.fp8的有效16×16×512区作为skip（该文件与block30 main全byte一致，见生成器检查）。首次预检因该skip文件带4MiB零尾超过探针2MiB上限退出2，尚未启动GPU；确认有效区外全零后另导出131072-byte紧凑skip，重跑正常返回。CPU原生参考与最终131072值全exact，报告decoder39-validation.json为pass。此处是按当前block30 main跳接合同搭建的原版链，未新抓取原游戏层对象的skip指针；不能把该连接推断写成新的运行时指针证据。
+
+同时生成vit-to-decoder.i32（逻辑ViT→HWC完整双射）、decoder39-weights.f32和原输出decoder39-oracle.f32，供下一轮AMD连续链使用。AMD block30当前为池化保留raw-half输出，接decoder skip时必须先FP8量化才能匹配本原skip，不能直接乘raw-half。当前AMD连续范围仍到ViT38，第39块仅独立验证；游戏DLL未更换。
+
 AMD第39块独立实现通过（2026-09-06）：NativeVitLinear增加显式decoder参数（默认false保持原ViT路径），仅允许已验64-token的8×8主1024/16×16 skip512合同。DECODER_ENTRY shader每个低分辨率token/channel做四K256分区、K32 half累计；随后为对应2×2输出各读取自己的skip，最终一次H(main+skip*scale)再FP8。输入/skip/解码权重与输出常驻，Record间无CPU传输，三帧重放按原屏障恢复输出状态。
 
 d3d12_native_pool_head_test.cpp新增decoder39模式，prepare_native_decoder_gpu.py从seed2307原CUBIN最终输出解码oracle，不用CPU预测替代裁判。MinGW编译通过，实验部署D:\DLSSNR-Lab\matrix-probe\native-decoder39，9070XT三帧各131072值different0/max0，finite/device/fence/replay检查全部通过。读回gpu.f32下载后validate_native_decoder_gpu.py再次逐值全exact，报告release/native-decoder-amd/validation.json为pass。宿主末尾沿用类名native_vit_linear日志标签，本次明确以decoder39参数运行，不能将该标签误读成ViT新回归。
