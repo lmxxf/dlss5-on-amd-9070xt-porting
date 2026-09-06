@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：valid1080差异仅在补齐区，RGB边缘复制候选失败
+
+- audit_preblock_valid_region.py按逻辑像素解码：main前1080行零差异，变化仅1080～1151；down前540行零差异，变化仅540～575。结果release/native-rgb-valid1080/spatial-difference.json。
+- check_preblock_clamped_padding.py把RGB最后一行复制到1152高，使用旧等尺寸采样合同运行原kernel；与valid1080原始输出仍main3957299/down969269值不同。不能简单用最后一行RGB填充来替代原版有效区域处理。
+- 失败候选独立保存在release/native-rgb-clamp1080；未改AMD采样，下一步检查kernel有效区域分支/噪声坐标及补齐特征生成。未部署游戏DLL。
+
 ### 2026-09-06：valid1080纹理/processing1152原始preblock已运行
 
 - caller增加DLSS5_PREBLOCK_GAME_TEXTURE，仅允许1920×1152处理且需参数blob，实际CUDA纹理1920×1080，输入长度/上传pitch/有效标量按纹理尺寸，处理/下采样尺寸保持1152。
