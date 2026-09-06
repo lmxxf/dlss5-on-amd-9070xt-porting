@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：同valid1080 RGB GPU0～4整链双分支通过
+
+- runner新增-Front4并显式设置/清除环境开关，GPU镜像→preblock→1～4→DS连续运行五帧seed0/0/0/1/0，重放与seed变化检查通过。
+- 回读seed0最终block4 main17694720值、down8847360值与原始oracle均different0/max_abs0/finite通过，无中间CPU特征注入。
+- ignored release/native-rgb-valid1080/amd-front4/validation.json。seed1仅检查变化、未原始逐值对照；仍单纹理受控RGB，不代表完整游戏多纹理输入。下一步encoder5以后及全图链，未部署DLL。
+
 ### 2026-09-06：valid1080 GPU0～4整链host接入待测
 
 - preblock test新增DLSS5_FRONT4，强制reflect valid1080模式，GPU reflect→preblock→四层C32→DS直接串联，尺寸960×576/480×288，shift0/3/1/2。
