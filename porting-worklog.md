@@ -2789,6 +2789,16 @@ prepare_native_pool_head_gpu.py以原版256夹具的block29输出作为独立测
 
 范围严格为AMD独立block30→pool→head，入口是原版block29特征，不是AMD从RGB生成；AMD全连续范围仍RGB128×128→block29。下一步参数化256尺寸并把本段接回连续链，然后继续ViT。游戏DLL、网盘包未更新，最终RGB/剑星画面目标active。
 
+### 2026-09-06 AMD连续256×256 RGB→block30/head全exact
+
+d3d12_native_front_chain_test.cpp新增rgb256head模式，前端各阶段宽/高从输入尺寸派生，C512为8×8，六个尾层后接block30 raw、池化及head；原128模式保持原尺寸。输出独立命名output-rgb256-head.f32，避免与block29/23混淆；五个检查点读回长度也按256输入更新。prepare_native_rgb128_gpu.py --size 256导出block30及head参数；PowerShell -Chain -Head显式选择新模式，使用独立native-rgb256实验目录。源RGB只在初始化上传，神经层之间没有CPU传输或原版特征注入。
+
+9070XT实际三帧重放、finite、device/fence全部通过；19次shader编译、83次缓存命中，fence等待734/703/688ms，仅为实验时长，不是游戏FPS。下载后compare_native_rgb128_checkpoints.py --folder release/native-rgb256 --size 256核对DS0/4/8/14/22分别524288/262144/131072/65536/32768值全exact；validate_native_rgb256_head.py最终4×4×1024共16384值全exact，MAE/max0。此前独立block30入口已由AMD真实前缀取代，连续GPU范围扩展到编码器head。
+
+等待GPU初始化期间复核ViT重排：run_original_vit_repack_permutation.cpp新增输入尺寸范围检查、两份随机FP8留出输入对照，4×4情况下16384-entry映射为双射，source0..16383，bit-plane恢复及两份held-out数据全部通过。映射与metadata在release/native-rgb256；这只是原CUBIN地址重排验证，还未执行ViT算术或把repack接AMD。
+
+README顶部同步当前范围。仍待ViT31～38、解码器/最终RGB和真实游戏尺寸、画面验证；游戏DLL、公开包未更新。不能把实验编码器全部exact称为剑星DLSS5画面已修复，目标active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

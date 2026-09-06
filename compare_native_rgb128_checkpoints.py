@@ -5,10 +5,12 @@ import numpy as np
 from decode_tinlayout_global import e4m3fn
 parser=argparse.ArgumentParser(description='Report independently decoded DS checkpoints; fail on any mismatch.')
 parser.add_argument('--folder',type=Path,default=Path('release/native-rgb128'))
+parser.add_argument('--size',type=int,choices=[128,256],default=128)
 args=parser.parse_args()
 root=args.folder
 reports=[]
 for layer,w,h,C in [(0,64,64,32),(4,32,32,64),(8,16,16,128),(14,8,8,256),(22,4,4,512)]:
+ w*=args.size//128;h*=args.size//128
  raw=np.fromfile(root/f'block{layer}-ds.fp8',np.uint8);n=w*h*C
  assert not np.any(raw[n:]) and not np.any((raw[:n]&127)==127)
  expected=e4m3fn(raw[:n]).reshape(C//16,h,w,16).transpose(1,2,0,3).reshape(h,w,C)

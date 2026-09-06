@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
   constexpr size_t arenaBytes = 4 * 1024 * 1024;
   const int width = argc == 5 ? std::atoi(argv[3]) : 8;
   const int height = argc == 5 ? std::atoi(argv[4]) : 8;
+  if(width<=0||height<=0||width%4||height%4||size_t(width)*size_t(height)>arenaBytes/1024)return 2;
   const size_t outputBytes = static_cast<size_t>(width) * height * 1024;
   constexpr unsigned addressBits = 22;
   constexpr unsigned char one = 0x38; // E4M3 1.0
@@ -105,6 +106,14 @@ int main(int argc, char **argv) {
     }
     seen[sourceOffset] = 1;
   }
+  for(uint32_t seed : {1709u,1721u}) {
+    uint32_t state=seed;
+    for(auto& value:input){state^=state<<13;state^=state>>17;state^=state<<5;value=static_cast<unsigned char>((state%126+1)|((state>>31)<<7));}
+    launch();
+    for(size_t i=0;i<outputBytes;i++)if(output[i]!=input[outputToInput[i]]){
+      std::fprintf(stderr,"held-out repack mismatch seed=%u offset=%zu\n",seed,i);return 6;
+    }
+  }
   std::ofstream(argv[1], std::ios::binary).write(
       reinterpret_cast<const char *>(outputToInput.data()),
       outputToInput.size() * sizeof(uint32_t));
@@ -114,7 +123,8 @@ int main(int argc, char **argv) {
            << "  \"shape\": [" << (width * height) << ", 1024],\n"
            << "  \"entries\": " << outputToInput.size() << ",\n"
            << "  \"source_arena_bytes\": " << arenaBytes << ",\n"
-           << "  \"launches\": " << (addressBits + 1) << ",\n"
+           << "  \"launches\": " << (addressBits + 3) << ",\n"
+           << "  \"held_out_random_inputs\": 2,\n"
            << "  \"bijective_over_selected_offsets\": true\n"
            << "}\n";
   std::printf("entries=%zu unique_sources=%zu source_min=%u source_max=%u\n",
