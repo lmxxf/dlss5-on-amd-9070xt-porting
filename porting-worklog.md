@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同valid1080 RGB原始split23～30连续对照通过
+
+- check_native_decoder_split.py支持encoder23～30；23使用原始inpview及global16低通道位交换输入，24～30沿原始cell输出连续运行，实际60×36及shift0/3/1/2/0/3/1/2。
+- 八层各branch/ffn/attention/final共32阶段零差异；ignored encoder-split/decoder-block23..30保留原始输出、系数和validation。
+- 此处block30仅主输出，pool/head尚未接入同RGB，AMD0～30亦待验收；未部署DLL。
+
 ### 2026-09-07：同valid1080 GPU0～22完成并逐值通过
 
 - 延续session7712/PID31784，CPU时间360→488秒，最终正常exit0，五帧seed0/0/0/1/0重放/seed影响检查通过，未重启。

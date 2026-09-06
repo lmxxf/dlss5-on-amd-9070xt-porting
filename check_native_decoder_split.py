@@ -8,7 +8,7 @@ from native_c64_reference import multiply
 from native_c32_reference import H,F
 from decode_tinlayout_global import e4m3fn
 p=argparse.ArgumentParser(description=__doc__)
-p.add_argument('--block',type=int,choices=range(40,48),required=True)
+p.add_argument('--block',type=int,choices=[*range(23,31),*range(40,48)],required=True)
 p.add_argument('--shift',type=int,choices=range(4),required=True)
 p.add_argument('--input',type=Path,required=True)
 p.add_argument('--output-root',type=Path,default=Path('release/native-rgb512'))
@@ -26,7 +26,7 @@ try:
     env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_SPLIT_')}
     output=root/'output.fp8'
     subprocess.run(['timeout','--kill-after=2s','15s','/tmp/native-split-global-oracle',str(a.input),str(output),
-                    *[str(root/f'block{a.block}-{i}.weights') for i in range(4)],str(width),str(height),str(a.shift),'native-plain'],
+                    *[str(root/f'block{a.block}-{i}.weights') for i in range(4)],str(width),str(height),str(a.shift),'native-inpview' if a.block==23 else 'native-plain'],
                    env=env,check=True,timeout=20)
     inverse=np.argsort(np.load('release/native-c512/split-view/mapping.npz')['cell_output_to_hwc'])
     def decode(path):
@@ -34,7 +34,13 @@ try:
         count=width*height*512
         assert v.size>=count and not np.any(v[count:]) and not np.any((v[:count]&127)==127)
         return e4m3fn(v[:count].reshape(-1,8192)[:,inverse]).reshape(height//4,width//4,4,4,512).transpose(0,2,1,3,4).reshape(height,width,512)
-    x=decode(a.input);fw,fp,qkv,bias,scales,projection=unpack(root,a.block)
+    if a.block==23:
+        v=np.fromfile(a.input,np.uint8);count=width*height*512
+        assert not v[count:].any() and not np.any((v[:count]&127)==127)
+        c=np.arange(512);perm=(c&~3)|((c&1)<<1)|((c&2)>>1)
+        x=e4m3fn(v[:count]).reshape(32,height,width,16).transpose(1,2,0,3).reshape(height,width,512)[...,perm]
+    else:x=decode(a.input)
+    fw,fp,qkv,bias,scales,projection=unpack(root,a.block)
     branch=ffwd(x,fw);feature=F(multiply(branch,fp['matrix'],H(x*fp['skip'])))
     attended=attention_window(feature,qkv,bias,scales,a.shift)
     final=F(multiply(attended,projection['matrix'],H(feature*projection['skip'])))
