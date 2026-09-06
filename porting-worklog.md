@@ -2737,6 +2737,16 @@ README顶部更新为当前范围，旧“整网已完成”等历史结论仍�
 
 修正后，独立16×8连续block24～29每层branch/ffn/attn/final各65536值全部exact，MAE/max0；重新回归4×4 RGB续链各阶段8192值也全exact。原始输出及系数留release/native-c512、release/native-rgb128，不提交权重数据。这一轮是原CUBIN对CPU参考的续链验证，尚未将24～29接进AMD连续链；AMD已验范围仍RGB→block23。游戏DLL/公开包未更新，最终游戏画面未验收。
 
+### 2026-09-06 AMD连续RGB→block29验证通过
+
+prepare_native_rgb128_gpu.py导出block24～29各自原始系数为GPU参数。d3d12_native_front_chain_test.cpp通过显式DLSS5_SPLIT_TAIL开启六层NativeSplitWindow，GPU source直接接block23输出，移位3/1/2/0/3/1，所有权重和资源常驻，同一个command list依次执行。run_native_noise_preblock.ps1 -Chain -Tail仅在seed0原型下启用，-Tail单独使用报错。输出另存output-rgb128-block29.f32，不覆盖旧block23输出或误标层号。
+
+9070XT实际执行三帧：device/fence、finite及重放一致性通过；18次shader编译、78次缓存命中，fence等待672/625/641ms。这些是实验链提交到fence的时长，不是游戏FPS。层间没有CPU传输、NVIDIA特征注入或每帧文件读取，192MiB通用函数表仍为初始化时上传的正确性原型。
+
+下载GPU输出后，validate_native_rgb128_gpu.py --last-block 29对独立原CUBIN连续链最终8192值全exact，MAE/max0。DS0/4/8/14/22五个原有检查点分别131072/65536/32768/16384/8192值也全exact。此GPU测试对24～29仅读最终block29，逐层四阶段CPU/原CUBIN证据仍以前一条为准，不混称本次逐阶段GPU审计。
+
+当前AMD连续正确范围扩展至128×128 RGB→block29。下一关block30包含五份记录（前三/四份与split同尺寸，第五份524304字节），原CUBIN存在proj_pool_512_fp8符号；其调用、池化和进入ViT的合同尚待恢复，不能复用历史代理链结论。README顶部同步，游戏DLL与公开ZIP未更新，最终RGB和剑星画面目标仍active。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。
