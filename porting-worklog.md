@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：随机 attention 跨 seed / token 长度复验
+
+- 新增 128-token seed=3002、256-token seed=3003 原始 RTX 对照，各运行两次输出一致；SHA256 分别为 `56e457e3982873823130e861b7063da4ce2013e347dac2e414f4376cfc91acfe`、`e69dd199ca06f8ddbef2f6a9d23326025c863d3de2d82f949678430bd94c6f28`。
+- 两组都确认“每 64-token 分母求和后顺序半精度相加”逐值精确；另外两种候选求和图仍有数百个值不同。
+- `native_vit_attention_reference.py` 正式支持 64/128/256 三种已检查的尺寸；将诊断脚本接入此实际参考函数，并强制检查有限值、两次 replay 一致、输出尾部为零、参考输出逐值一致。三个随机 fixture 全部通过。
+- 原始 CUDA 探针没有操作游戏；AMD HLSL 仍限制 64 tokens，下一步应扩展 GPU 实作并做相同独立对照。这不是 1080p 全链路或游戏 DLL 验收。
+
 ### 2026-09-06：RTX 256-token 随机 attention 首轮精确对照
 
 - 用户允许继续使用两台调试机器；本轮只运行独立 CUDA 探针，未操作游戏或存档。

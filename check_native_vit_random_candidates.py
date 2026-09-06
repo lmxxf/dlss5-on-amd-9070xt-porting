@@ -6,6 +6,7 @@ from native_c32_reference import H, F
 from native_c32_softmax_sum import denominator
 from native_split_reference import bits
 from decode_tinlayout_global import e4m3fn
+from native_vit_attention_reference import attention
 
 p = argparse.ArgumentParser()
 p.add_argument('folder', type=Path)
@@ -59,4 +60,11 @@ for name, den in candidates.items():
     delta = np.abs(expected-actual)
     report['candidates'][name] = {'different': int(np.count_nonzero(delta)), 'max_abs': float(delta.max())}
 print(json.dumps(report, indent=2))
+reference = attention(data['q'], data['k'], data['v'])
+report['reference_different'] = int(np.count_nonzero(reference != actual))
+report['reference_finite'] = bool(np.isfinite(reference).all() and np.isfinite(actual).all())
+report['replay_identical'] = (a.folder / 'rtx-output-1.fp8').read_bytes() == (a.folder / 'rtx-output-2.fp8').read_bytes()
+report['tail_zero'] = not bool(np.any(raw[n*1024:]))
 (a.folder / 'candidate-validation.json').write_text(json.dumps(report, indent=2)+'\n')
+assert report['reference_finite'] and report['replay_identical'] and report['tail_zero']
+assert report['reference_different'] == 0, report
