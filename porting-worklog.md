@@ -2687,6 +2687,14 @@ AMD执行三帧，device/fence及重放检查通过，18次shader编译、42次�
 
 当前此前RGB128×64的block0..22 DS结论限于旧夹具，不外推到新尺寸；新128×128整链明确失败，最终剑星画面尚未修复/验收。脚本与检查点主机代码提交，所有原权重/激活留release，不提交二进制数据。
 
+### 2026-09-06 preblock差异进一步隔离到随机特征计算
+
+新增diagnose_native_rgb128_stages.py，以私有原权重副本清零后续矩阵、skip=1，分别调用原CUBIN的mix-only与FFN-only控制，保持128×128输入、live scalars、seed0。CPU mix对原版有4/524288处不同，坐标(y1,x64)、(y22,x72)、(y67,x66)、(y116,x7)；FFN-only有12处不同，仍集中在这四个像素。将mix中随机特征0/1/4的系数同时在原版及CPU清零后，524288值全exact。不是将此清零作为运行方案，而是定位用负对照。
+
+反汇编原cc_tinlayout_fused_pre_block_swin_1h_32_1_ds_fp8的0x960..0xae0：随机半径先MUFU.LG2再乘float32 ln2和-2，随后MUFU.SQRT；角度先RN乘6.283185482025146，再RZ乘0.15915493667125702，随后MUFU.COS/SIN。旧CPU/HLSL直接log与sin/cos弧度表达式没有完整保留这些步骤。preblock_noise_reference.fields新增显式native_steps候选（默认仍旧行为），通过float64精确乘积及nextafter模拟正数乘法RZ，数学sin/cos仍不声称模拟MUFU。
+
+该候选mix对原CUBIN差异从4降至1，仅剩(y116,x7,c29)，CPU0.0078125 vs原0.009765625，最大0.001953125。仍未全通过，不能直接替换GPU；下一步查剩余MUFU近似/舍入，并以更多seed和尺寸复核。此轮未修改运行HLSL、AMD游戏DLL或公开包，最终游戏画面未验收。
+
 ## 工作纪律
 
 - kernel 存在只证明运行时编译了该实现，不证明当前 preset 调用它。

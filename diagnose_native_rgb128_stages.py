@@ -1,0 +1,49 @@
+"""Original-CUBIN controlled preblock ablations, with CPU comparisons.
+
+Disables later matrices in private copies; never changes deployed weights.
+"""
+from pathlib import Path
+import os,subprocess,json
+import numpy as np
+from preblock_mix_reference import inputs
+from preblock_noise_reference import fields
+from native_c32_reference import H,F
+from decode_tinlayout_global import e4m3fn
+root=Path('release/native-rgb128');out=root/'stage-audit';out.mkdir(exist_ok=True)
+original=np.fromfile('/tmp/block0.weights','<f2')
+fw=np.fromfile(root/'amd/block0-ffn.f32','<f4')
+rgb=np.fromfile(root/'input-hwc.rgba32f','<f4').reshape(128,128,4)
+prefix=H(inputs(rgb[...,:3],seed=0,live=True)@fw[:512].reshape(32,16).T)
+expanded=H(F(prefix)@fw[512:4608].reshape(128,32).T)
+gate=np.clip(expanded,-4,4)
+poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
+hidden=F(H(expanded*poly));ffn=H(prefix*fw[8704:])
+w2=fw[4608:8704].reshape(32,128)
+for k in range(0,128,32):ffn=H(ffn+hidden[...,k:k+32]@w2[:,k:k+32].T)
+pm=np.argmax(np.abs(np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048)),axis=0)
+env={k:v for k,v in os.environ.items() if not k.startswith('DLSS5_PREBLOCK_')}
+env.update(DLSS5_PREBLOCK_WIDTH='128',DLSS5_PREBLOCK_HEIGHT='128',DLSS5_PREBLOCK_SEED='0',DLSS5_PREBLOCK_PARAMETER_FILE=str(Path('release/live-preblock-v2/preblock-live-0.bin').resolve()))
+mix_matrix=fw[:512].reshape(32,16).copy();mix_matrix[:,[0,1,4]]=0
+without_noise=H(inputs(rgb[...,:3],seed=0,live=True)@mix_matrix.T)
+native_features=inputs(rgb[...,:3],seed=0,live=True)
+noise=H(fields(128,128,0,native_steps=True))
+native_features[...,[0,1,4]]=noise[...,[1,2,0]]
+native_prefix=H(native_features@fw[:512].reshape(32,16).T)
+for name,predicted in [('mix',prefix),('ffn',ffn),('mix_no_noise',without_noise),('mix_native_steps',native_prefix)]:
+ w=original.copy();w[4656:6192]=0;w[10296:10808]=0;w[10808:10840]=1;w.view('<f4')[10288//2]=1
+ if name.startswith('mix'):w[:4096]=0;w[4616:4648]=1
+ if name=='mix_no_noise':
+  slots=np.arange(512);features=(slots//8%4)*4+slots%4
+  w[4104+slots[np.isin(features,[0,1,4])]]=0
+ path=out/f'{name}.weights';w.tofile(path)
+ main=out/f'{name}-main.fp8';ds=out/f'{name}-ds.fp8'
+ subprocess.run(['/tmp/preblock-branch-oracle','/tmp/dlssnr-cubins/dlssnr-00.cubin',str(path),str(root/'input-hwc.rgba32f'),str(main),str(ds),'0','0'],env=env,check=True,capture_output=True)
+ raw=np.fromfile(main,np.uint8);assert raw.size==128*128*32
+ target=np.empty((128,128,32),np.float32)
+ for ty in range(16):
+  for tx in range(16):
+   base=ty*16*2048+tx*1024
+   record=np.concatenate([raw[base:base+1024],raw[base+16*1024:base+17*1024]])
+   target[ty*8:ty*8+8,tx*8:tx*8+8]=e4m3fn(record[pm]).reshape(8,8,32)
+ got=F(predicted);err=np.abs(got-target);where=np.argwhere(err!=0)
+ print(json.dumps({'stage':name,'different':len(where),'values':got.size,'max_error':float(err.max()),'first_mismatches':[{'y':int(y),'x':int(x),'c':int(c),'cpu':float(got[y,x,c]),'original':float(target[y,x,c])} for y,x,c in where[:16]]}),flush=True)

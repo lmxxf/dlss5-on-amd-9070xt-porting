@@ -3,7 +3,7 @@ Not a replacement for the live parameter contract; validate seeds and coordinate
 """
 import numpy as np
 
-def fields(width,height,seed):
+def fields(width,height,seed,native_steps=False):
  y,x=np.indices((height,width),dtype=np.uint64)
  mask=np.uint64(0xffffffff)
  def mix(v):
@@ -17,6 +17,19 @@ def fields(width,height,seed):
   v=((v^(v>>((v>>np.uint64(28))+np.uint64(4))))*np.uint64(0x108ef2d9))&mask
   v=(v>>np.uint64(30))^(v>>np.uint64(8))
   u.append((v+1).astype(np.float32)*np.float32(2**-24))
+ if native_steps:
+  # Original SASS 0x960..0xae0: LG2, multiply ln(2), SQRT;
+  # angle multiply 2*pi RN, then multiply 1/(2*pi) RZ before MUFU.
+  # Mathematical sin/cos below are still candidates, not a MUFU emulation.
+  radius0=np.sqrt(np.float32(-2)*np.float32(np.log2(u[0])*np.float32(.6931471824645996)))
+  radius1=np.sqrt(np.float32(-2)*np.float32(np.log2(u[1])*np.float32(.6931471824645996)))
+  def angle(v):
+   product=np.float32(v*np.float32(6.283185482025146)).astype(np.float64)*np.float64(np.float32(.15915493667125702))
+   rounded=product.astype(np.float32)
+   turns=np.where(rounded.astype(np.float64)>product,np.nextafter(rounded,np.float32(0)),rounded)
+   return turns.astype(np.float64)*(2*np.pi)
+  t0,t1=angle(u[2]),angle(u[3])
+  return np.stack([radius0*np.cos(t0).astype(np.float32),radius1*np.cos(t1).astype(np.float32),radius1*np.sin(t1).astype(np.float32)],-1)
  radius0=np.sqrt(-2*np.log(u[0]));radius1=np.sqrt(-2*np.log(u[1]))
  return np.stack([radius0*np.cos(np.float32(2*np.pi)*u[2]),radius1*np.cos(np.float32(2*np.pi)*u[3]),radius1*np.sin(np.float32(2*np.pi)*u[3])],-1)
 
