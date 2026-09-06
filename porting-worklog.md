@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：同提交内拆dispatch未解决TDR
+
+- NativeVitLinear增加output_base常量，将输出范围按65536元素拆成多次dispatch；shader用全局输出索引，不改每值求和。根常量由1扩到2，必须同步更新host/shader。
+- 编译成功，但AMD640 staged首个expand仍在2214.080ms报0x887A0006，exit1，未产生新的通过结果。同一command list内分小dispatch不足以稳定此负载；本修改仍属未通过实验，不是发布修复。
+- 下一步应实现chunk级独立提交/fence或优化线性shader；不继续重复同样负载，不放宽TDR，不部署游戏DLL。
+
 ### 2026-09-06：分阶段提交将640-token TDR定位到expand
 
 - NativeVitBlock新增RecordStage；extent host可用DLSS5_VIT_STAGED分五阶段独立提交/fence，资源全留GPU、算法不改，独立stage fence避免与帧fence计数冲突。
