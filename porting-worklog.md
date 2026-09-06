@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：SASS引导的镜像RGB补齐精确通过
+
+- 原始preblock SASS 0x02d0/02e0/0320/0370显示越界坐标选择2*extent-coordinate-2（有效宽来自cb0x454，即参数0xd4）；据此测试reflect而非继续猜常量。
+- check_preblock_clamped_padding.py --reflect将1080高RGB镜像补到1152，仍使用等尺寸纹理原kernel；与valid1080纹理原输出main70778880字节、down17694720字节均different=0。
+- 结果ignored release/native-rgb-reflect1080/validation.json。该实测确认本单纹理/seed0合同的底部镜像等价性；未证明所有额外纹理分支或动态seed。下一步将镜像预处理接到AMD输入路径，未部署DLL。
+
 ### 2026-09-06：preblock简单补齐候选继续排除
 
 - 空间审计新增padding非零统计：valid1080原始main补齐区4415795个非零值、down1104059，排除直接输出全零。
