@@ -6,8 +6,9 @@ from native_upsample48_reference import unpack,upsample
 from native_c32_reference import F
 from encode_tinlayout_global import quantize
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2401);p.add_argument('--shift',type=int,choices=range(4),default=0);p.add_argument('--main-banks',action='store_true');controls=p.add_mutually_exclusive_group();controls.add_argument('--skip-control',action='store_true');controls.add_argument('--projection-control',action='store_true');a=p.parse_args()
-base=Path('release/native-upsample48');root=base/f'spatial-{a.seed}-{a.shift}{"-skip-control" if a.skip_control else "-projection-control" if a.projection_control else ""}{"-banks" if a.main_banks else ""}';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--seed',type=int,default=2401);p.add_argument('--shift',type=int,choices=range(4),default=0);p.add_argument('--main-banks',action='store_true');p.add_argument('--main-global',choices=['plain','swap']);controls=p.add_mutually_exclusive_group();controls.add_argument('--skip-control',action='store_true');controls.add_argument('--projection-control',action='store_true');a=p.parse_args()
+if a.main_banks and a.main_global:p.error('choose bank or global layout')
+base=Path('release/native-upsample48');root=base/f'spatial-{a.seed}-{a.shift}{"-skip-control" if a.skip_control else "-projection-control" if a.projection_control else ""}{"-banks" if a.main_banks else ""}{"-global-"+a.main_global if a.main_global else ""}';root.mkdir(exist_ok=False)
 report={'status':'running','seed':a.seed,'shift':a.shift,'skip_control':a.skip_control,'projection_control':a.projection_control,'scope':'original/CPU block48 spatial 16x16 output only'}
 def save():(root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 save()
@@ -19,6 +20,10 @@ try:
         packed=np.empty_like(cells);packed[:,mapping(c)]=cells;packed.tofile(path)
     encode(x,root/'input.fp8');encode(skip,root/'skip.fp8');x.tofile(root/'input.f32');skip.tofile(root/'skip.f32')
     report['main_banks']=a.main_banks
+    report['main_global']=a.main_global
+    if a.main_global:
+        c=np.arange(512);order=((c&~3)|((c&1)<<1)|((c&2)>>1)) if a.main_global=='swap' else c
+        quantize(x[...,order]).reshape(8,8,32,16).transpose(2,0,1,3).copy().tofile(root/'input.fp8')
     if a.main_banks:
         cells=quantize(x).reshape(2,4,2,4,2,256).transpose(0,2,4,1,3,5).reshape(-1,4096)
         packed=np.empty_like(cells);packed[:,mapping(256)]=cells;packed.tofile(root/'input.fp8')

@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+第48块随机反例修复：主输入是global16而非cell（2026-09-06）。原SASS初始输入地址随K增量跨全幅，且CUBIN04存在split projection outview版本；据此测试global16主输入排列。plain global16单位投影仍32296值不同，而在全域16通道分组内交换逻辑通道索引最低两位后，单位投影65536值全exact。编码为quantize(x[...,perm]).reshape(H,W,32,16).transpose(2,0,1,3)，perm=(c&~3)|((c&1)<<1)|((c&2)>>1)。此前C512 cell和两个C256 cell候选失败，问题实际在原主输入物理布局，不是已恢复矩阵系数。
+
+随后使用原block48权重，seed2401/shift0以及独立seed2411/shift3两次随机主/skip测试各65536值different0/max0，包括双轴移位的零填充边界。native_upsample48_reference.py的逻辑HWC算法无需改变：投影→nearest2倍→half融合skip→FP8→C256 Swin。通过报告为release/native-upsample48/spatial-2401-0-global-swap及spatial-2411-3-global-swap/validation.json。失败目录完整保留；新脚本--main-global swap显式选正确原版编码，其他布局选项仍作诊断。
+
+这也说明后续连接原block47→48时不能直接拿plain projection cell输出当输入；必须运行原outview或验证对应重排。AMD内部HWC不需要复刻物理格式，但仍要以正确原输出作裁判。第48块尚未接AMD或RGB链，游戏DLL未改。
+
 第48块随机空间反例与分离（2026-09-06）：新增native_upsample48_reference.py候选参考，native_c64_reference.py抽出unpack_bytes（原路径调用保留），避免反复写临时普通权重。check_native_upsample48_spatial.py seed2401、8×8×512主/16×16×256 skip逐位置通道随机，给定shift0原输出finite，但候选不同64446/65536、max1.25，严格fail，未导出AMD参数。
 
 同一随机skip配单位skip权重时65536值全exact，证明此夹具skip输入/输出cell排列及跳接路径正确。再将初始投影按候选地址设为取前256通道的单位矩阵，结果仍64536值不同、max1.4375，故错误可在主投影路径独立重现，不应改动已通过的skip布局。尝试将主输入编码为两个C256 cell bank，实际输出与原C512 cell编码相同且仍失败；保留两个fail目录，不放宽标准。

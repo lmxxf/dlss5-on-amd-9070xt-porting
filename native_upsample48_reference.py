@@ -1,4 +1,8 @@
-"""Block48 candidate native projection/merge and C256 Swin reference."""
+"""Block48 native projection/merge and C256 Swin reference.
+
+CPU/original exact on 16x16 random output fixtures, shifts 0 and 3.
+Logical HWC inputs here; original main uses global16 with low channel bits swapped.
+"""
 import numpy as np
 from native_split_reference import bits
 from native_c64_reference import unpack_bytes,multiply,block
