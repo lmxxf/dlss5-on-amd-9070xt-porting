@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD运动坐标GPU原版对照三次精确通过
+
+- 新增NativeTemporalCoordinates封装，显式校验valid/processing/motion尺寸、容量、单次反射范围、同device及有限transform，输出HWC float2可直接接NativeTemporalSample。
+- prepare_native_motion_gpu.py从原版空间motion PC10d0寄存器生成64分量oracle；d3d12_native_motion_test.cpp在9070XT执行8×8运动坐标shader，三次各64原版warp0值different=0，其余输出也检查有限。session18418 exit0。
+- GPU回读保存ignored `release/native-temporal-coordinate-random/amd/gpu.f32`。远端测试复用native-temporal-sample目录，gpu.f32现为坐标输出而非前次采样RGB，不可混用。
+- 只证明该8×8无slot18分支；下一步运动→采样→preblock全GPU直连，再扩实际1920×1152/1080有效尺寸与时序资源。新神经DLL未部署，无运行任务遗留。
+
+
 ### 2026-09-07：GPU运动坐标生成shader候选编译通过
 
 - 新增native_temporal_coordinates.hlsl，当前分支限定无slot18邻域选择；接收明确valid/processing/motion尺寸、motion subrect offset/extent、motion UV scale，按已恢复顺序反射→UV→运动纹理插值→位移FMA→像素坐标。
