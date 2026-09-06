@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD block62实际投影几何准备
+
+- NativeVitLinear decoder支持34560token/128→64，主240×144、输出480×288索引；容量检查按实际输出元素，旧尺寸行为保留。
+- prepare_native_up56_game_gpu.py --block62校验原始零差异/finite/tail和文件大小，导出完整block62原始oracle与系数到ignored release/native-upsample62/amd-game。
+- 编译与diff检查通过，尚未运行AMD block62完整算子；下一步接480×288 C64 body、shift0测试，未部署游戏DLL。
+
 ### 2026-09-06：block62实际480×288原始对照通过
 
 - 原始fused探针对mode9/by2/480×288使用16MiB arena，输出8847360字节超过旧8MiB，明确扩容后运行。
