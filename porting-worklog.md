@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：640-token八block原始与AMD分块整链通过
+
+- 原始31～38八block整链两次运行完成；check_native_block256.py --tokens640 --last-block38 共56阶段全部逐值通过。原始最终FP8 SHA256 96529fff888be2138ce032d1885627034c9f919408da13ba5fbe2d25cec93895。
+- run_native_staged_block.ps1支持chain31_38；AMD八个生产block使用chunk级fence提交，仅上传初始输入及各层系数。三帧完整整链测试exit0，每帧655360最终值零差异，device/fence/finite通过；gpu-chunk-fenced.f32下载后cmp原始oracle一致。
+- fixture ignored release/native-vit/chain640-3006。固定随机输入整链不是动态输入验证，也不是完整RGB网络或游戏画面。下一步继续输入切换及真实encoder/decoder几何，不将实验室提交等待时间称游戏FPS；未部署DLL。
+
 ### 2026-09-06：640block分块独立提交首次三帧精确通过
 
 - NativeVitLinear增加ChunkCount/RecordChunk，按65536输出元素分块：首块处理重放转UAV，末块转SRV；中间块写互不重叠区间。NativeVitBlock提供StageChunks/RecordStageChunk。
