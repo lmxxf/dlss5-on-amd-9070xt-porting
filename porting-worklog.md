@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+AMD第62块独立通过（2026-09-06）：原生投影合同新增128→64、64或4096-token（主宽度8/64），宿主upsample62显式使用64×64主→128×128输出/skip，投影合流后直接接C64 NativeC64Shift。导出/运行/验证脚本增加互斥Block62选择，使用原seed2607/shift3夹具及其实际原输出。
+
+部署native-upsample62，三帧各1048576值different0/max0，device/fence/finite/replay通过。下载gpu.f32再核对全exact，SHA13bb952fbdb7a0e658532502aeccd2ac802a09de2366adb05354e129328300f1；报告release/native-upsample62/amd/validation.json明确独立上采样，不是RGB链。main/FFN/attention/projection编译分别34/2038/1909/157ms，非游戏帧时间。测试已正常退出。
+
+同一新exe及shader在native-decoder39做回归，三帧131072值仍全exact。下一步原block61 outview与block8 skip接第62块，再验证63～65及66上采样；全网最终RGB尚未完成，严格AMD RGB连续范围仍48，游戏DLL未改。
+
 第62块原生参考通过（2026-09-06）：原记录70048 bytes，SHA eaaa79ba63a53cbd0c23521593379284af29ab50a718ddf37e06b93b339ccadd。直接布局为C64 FFN前缀0..0x7000、128→64 FP8投影0x7000..0x9000、FFN skip0x9000、输入skip0x9080、QKV0x9100，普通C64后段平移0x2060。共享上采样参考新增该记录尺寸，mode9允许blockY2及128输出范围，旧C128/C256路径保留。
 
 check_native_upsample56_spatial.py加--block62，所有通道/尺寸/物理global16及cell编码按配置生成，不复用C128夹具。原CUBIN01小测试16×16/seed2601/shift0共16384值全exact；实际RGB512需要的128×128/seed2607/shift3共1048576值全exact，包含移位边界。报告release/native-upsample62/spatial-16-2601-0及spatial-128-2607-3/validation.json。第62块尚未实现AMD，RGB完整GPU连续仍到48，游戏DLL未改。
