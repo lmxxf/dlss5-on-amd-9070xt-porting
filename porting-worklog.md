@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原始K片段交叉解码定位单值差异
+
+- inspect_block8_key_groups.py发现K按[0,1,2,3,8,9,10,11]等非连续8key分组，八组中七组直方图完全一致，含key8组仅1值不同。
+- decode_block8_k_bitlayout.py在干净R4/5片段穷举唯一bit排列[1,0,3,4,2,5,6,7]，同排列交叉核对其余七组：全部K仅key8/channel3不同，原始-.0234375、参考-.025390625。
+- 属数据推断诊断布局，尚需指令来源佐证，不作生产映射拟合；下一步量化前K值/正規化跟踪。未改模型公式或部署DLL。
+
 ### 2026-09-07：K片段标准连续key布局候选排除
 
 - decode_block8_k_fragments.py对PC5030全lane寄存器两两组合，测试标准8key×32channel B片段与连续8key参考块，无接近逐值匹配的候选。
