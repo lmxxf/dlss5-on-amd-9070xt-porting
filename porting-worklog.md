@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：抽取网络组件全RGB回归已启动
+
+- 新增 `d3d12_native_network70_test.cpp`，使用同源valid1080输入、GPU反射、NativeActualNetwork70::Create/Run与NativeGameSubmission，三帧最终RGB逐值比较原版oracle。输出独立 `gpu-network70.f32`，不覆盖旧gpu-main精确结果。
+- MinGW构建并部署 `D:\DLSSNR-Lab\native-network70-test.exe`，使用已有native-valid1080-full系数和functions.f32。启动session15638，反射shader编译成功，目前初始化中、尚无验收结果；下轮先轮询同一handle，勿重启。
+- 测试发生GPU错误时不析构网络及反射资源，避免timeout后释放仍在用资源；成功完成所有fence才销毁。fixture oracle有限值检查、输出非有限/任一不等即失败。
+- 本轮仍非游戏接入，游戏DLL未更新。回归完成后再将同一个组件连接纹理输入和呈现生命周期，不能把编译/启动当成通过。
+
+
 ### 2026-09-07：实际0～70网络抽成游戏可调用GPU组件，待回归
 
 - 新增 `native_actual_network70.h`，从已验证完整host提取实际尺寸encoder0～30/head、640 gather/ViT、decoder39～69、post70创建与提交；输入是外部GPU tile-major RGB和HWC post base，唯一CPU数据为系数/映射/函数表，不读oracle或预制特征。
