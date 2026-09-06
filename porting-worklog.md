@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD实际decoder40～47八层GPU串联通过
+
+- decoder40_47_game模式60×36，实际移位0/3/1/2/0/3/1/2，八层GPU资源直接串联，无中间CPU传输。
+- RX9070XT三帧最终1105920值零差异，device/fence/finite/replay通过；回读gpu.f32与原始block47 oracle-0.f32字节级cmp一致。
+- 初始化期间只读确认PID12428仍活跃，未误重启。结果ignored release/native-decoder-game-split/amd-decoder40-47。
+- 验证范围仍为独立decoder40～47，不包含39及后续48～70、真实RGB输入或游戏提交；未部署DLL。
+
 ### 2026-09-06：实际decoder40～47原始整链对照通过，AMD入口准备
 
 - 继续原始41输出顺序运行42～47，实际shift1/2/0/3/1/2，六层各四阶段全部零差异；连同40/41共32阶段通过，覆盖60×36四种移位。
