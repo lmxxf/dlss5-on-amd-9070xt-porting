@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：AMD60×36部分窗口shift0/3三帧通过
+
+- 使用现有d3d12_native_split_window_test.cpp显式60 36 shift入口，无需修改生产NativeSplitWindow。
+- block40 shift0与block41 shift3分别三帧最终零差异，device/fence/finite/replay通过；各1105920值回读gpu.f32与原始oracle-0.f32字节级cmp一致。
+- ignored release/native-decoder-game-split/decoder-block40及41；这是两个独立层测试（输入分别来自原始上一层），不是AMD40→41串联。游戏DLL未更新。
+
 ### 2026-09-06：60×36部分窗口原始decoder40/41对照
 
 - check_native_decoder_split.py新增--game-extent，按实际60×36解码cell并执行原kernel，保留旧16×16默认。
