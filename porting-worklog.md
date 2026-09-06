@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：同valid1080 RGB原始encoder1～4输出生成
+
+- build_native_valid1080_c32.py从已验证block0-down继续1～4，实际960×576、shift0/3/1/2，block1 inpview、block4 downsample，真实提取权重。
+- 原始主分支长度/FP8 NaN检查、block4 down长度检查通过，输入来源及hash存ignored release/native-rgb-valid1080/encoder-c32/capture.json。
+- 此轮为原始输出捕获，未逐值对照CPU或AMD；不会将finite当作数值验收。下一步核对C32前端及block4实际skip/down链，未部署DLL。
+
 ### 2026-09-06：valid1080 GPU镜像→preblock双分支精确通过
 
 - 远端原生functions.f32实际存在且201326592字节。运行NativeRgbReflect→NativePreblockRuntime，五帧seed0/0/0/1/0通过重放与seed影响检查，所有中间数据在GPU。
