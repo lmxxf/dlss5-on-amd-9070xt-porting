@@ -3,7 +3,7 @@
 StructuredBuffer<float4> history : register(t0);
 StructuredBuffer<float2> coordinates : register(t1);
 RWStructuredBuffer<float4> reconstructed : register(u0);
-cbuffer Geometry : register(b0) { uint width; uint height; uint count; }
+cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inverse_width; float inverse_height; }
 
 void axis(float p,uint extent,out float3 positions,out float3 weights) {
     precise float center=floor(p-.5)+.5;
@@ -23,7 +23,10 @@ void axis(float p,uint extent,out float3 positions,out float3 weights) {
     weights=float3(left,middle,right);
 }
 float3 fetch(float2 xy) {
-    precise float2 p=clamp(xy-.5,0,float2(width-1,height-1));
+    precise float2 uv=xy*float2(inverse_width,inverse_height);
+    precise float2 fixed_uv=floor(uv*2097152.0);
+    precise float2 pixel=fixed_uv*(float2(width,height)/2097152.0)-.5;
+    precise float2 p=clamp(pixel,0,float2(width-1,height-1));
     uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(width-1,height-1));
     precise float2 f=round((p-float2(lo))*256.0)/256.0;
     precise float corner=floor(((1-f.x)*(1-f.y))*256.0+.5)/256.0;

@@ -31,8 +31,11 @@ def geometry(x,y,width,height):
                       wx[...,1]*wy[...,1],wx[...,1]*wy[...,2],wx[...,2]*wy[...,1]],-1)
     return xy,weights/weights.sum(axis=-1,keepdims=True)
 
-def bilinear(image,xy,fraction_bits=None,product_bits=None):
+def bilinear(image,xy,fraction_bits=None,product_bits=None,normalized_bits=None):
     image=np.asarray(image,dtype=np.float64);h,w,_=image.shape
+    if normalized_bits is not None:
+        uv=np.asarray(xy,np.float32)*np.asarray([1/w,1/h],np.float32)
+        xy=np.floor(uv.astype(np.float64)*2**normalized_bits)/2**normalized_bits*np.asarray([w,h])
     x=np.clip(xy[...,0]-.5,0,w-1);y=np.clip(xy[...,1]-.5,0,h-1)
     x0=np.floor(x).astype(int);y0=np.floor(y).astype(int)
     x1=np.minimum(x0+1,w-1);y1=np.minimum(y0+1,h-1)
@@ -72,7 +75,7 @@ def sample32(image,x,y):
     h,w,_=image.shape;px,wx=axis32(x,w);py,wy=axis32(y,h)
     xy=np.stack([np.stack([px[...,i],py[...,j]],-1) for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-2)
     weights=np.stack([wx[...,i]*wy[...,j] for i,j in ((1,0),(0,1),(1,1),(1,2),(2,1))],-1)
-    pixels=bilinear(image,xy,8,8).astype(np.float32)
+    pixels=bilinear(image,xy,8,8,21).astype(np.float32)
     total=pixels[...,0,:]*weights[...,0,None]
     for i in range(1,5):total=fma32(pixels[...,i,:],weights[...,i,None],total)
     denominator=weights[...,1]+weights[...,0]

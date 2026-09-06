@@ -8,8 +8,10 @@ cbuffer Geometry : register(b0) {
     float motion_extent_x; float motion_extent_y; float motion_uv_scale_x; float motion_uv_scale_y;
     float valid_inverse_width; float valid_inverse_height; float motion_inverse_width; float motion_inverse_height;
 }
-float2 fetch_motion(float2 pixel) {
-    precise float2 p=clamp(pixel-.5,0,float2(motion_width-1,motion_height-1));
+float2 fetch_motion(float2 uv) {
+    precise float2 fixed_uv=floor(uv*2097152.0);
+    precise float2 pixel=fixed_uv*(float2(motion_width,motion_height)/2097152.0)-.5;
+    precise float2 p=clamp(pixel,0,float2(motion_width-1,motion_height-1));
     uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(motion_width-1,motion_height-1));
     precise float2 f=round((p-float2(lo))*256.0)/256.0;
     precise float corner=floor(((1-f.x)*(1-f.y))*256.0+.5)/256.0;
@@ -34,8 +36,7 @@ void main(uint3 id:SV_DispatchThreadID) {
     precise float2 sample_uv=mad(uv,float2(motion_extent_x,motion_extent_y),float2(motion_offset_x,motion_offset_y));
     precise float2 motion_reciprocal=float2(motion_inverse_width,motion_inverse_height);
     sample_uv=sample_uv*motion_reciprocal;
-    precise float2 sample_pixel=sample_uv*float2(motion_width,motion_height);
-    float2 vectors=fetch_motion(sample_pixel);
+    float2 vectors=fetch_motion(sample_uv);
     precise float2 previous_uv=mad(vectors,float2(motion_uv_scale_x,motion_uv_scale_y),uv);
     coordinates[id.x]=previous_uv*float2(valid_width,valid_height);
 }

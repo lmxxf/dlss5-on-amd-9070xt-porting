@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：21bit normalized转换接回GPU，120×72差异降至72/21
+
+- CPU bilinear可选normalized_bits，sample32启用21bit trunc：四个8×8 holdout half仍全通过，原120×72已抓错误窗口half也全部对齐。
+- GPU历史采样新增倒数metadata（root3→5），motion直接使用变换后的normalized UV，先floor(uv*2^21)再缩放至pixel。独立sampler测试host同步更新root常量，但尚未重新GPU运行该小测试。
+- 初版double2坐标缩放GPU结果严重错误（main163887/down38176），已撤换为明确float32缩放，失败回读保留fixed21目录，不臆断具体编译器根因。
+- float32版session96024五帧重放完成，120×72原版比较main276480差72、down69120差21（此前319/91），仍未通过。回读独立fixed21-float保存，不能把误差减少当精确闭合。
+- 下一步核对原UV→历史texture变换往返及量化前FP32舍入，定位剩余差异；新root布局需要既有小尺寸GPU回归。新神经DLL未部署。
+
+
 ### 2026-09-07：独立CUDA纹理扫描支持normalized小数21bit截断
 
 - 新增probe_cuda_texture_fraction.cu，真实float4纹理R=x/G=y ramp，单纯tex2D normalized/linear/clamp，无神经运算。围绕原错误UV邻近257个float32值扫描，重现38处软件float32乘尺寸nearest与TEX不符。
