@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原始QK边界32lane寄存器捕获
+
+- debug_block8_qk.gdb在PC+5030捕获第二head全32lane、每lane R0～159，成功保存qk-registers-5030.json；原始CUBIN未修改。
+- decode_block8_q_fragment.py试标准16×32 A fragment两个寄存器位顺序候选，均未与任一连续16query块吻合，不能把原始packed寄存器直接当标准布局。结果q-fragment-candidates.json用于后续真实布局追踪。
+- 尚未Q/K数值解码完成或修复block8；未部署游戏DLL。
+
 ### 2026-09-07：原始C64 kernel寄存器直接读取成功
 
 - 本地cuda-gdb可在原始CUBIN符号断点停住，动态取entry PC再于+0x5030断点，避免硬编码加载地址。
