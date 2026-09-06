@@ -2975,6 +2975,15 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：修正SDK误判，主swapchain只读合同现场采样成功
+
+- 核对 `/tmp/reshade680.MNSVvW` 为干净v6.8.0，tag源码明确RESHADE_API_VERSION20；游戏日志版本6.8.0.2155。撤回前条“本地不是6.8/API20不符”的推断，API20不是已证实故障。
+- 探针改为只追踪init_swapchain(resize=true)并在destroy清除，使用已验证的native GetBuffer路径，取buffer/颜色空间前后写step日志。首次失败更可能与启动期swapchain访问有关，但无崩溃栈不宣称唯一根因。
+- 修正版部署后Steam一度未重新启动游戏，因旧crs-handler PID19092仍被跟踪。确认进程名后仅结束该残留程序，再启动DLSS5Launch，Steam建立新Shipping PID34376（launcher40500、当前正常crs-handler7844）。未终止新游戏或Steam，未改存档。
+- 新探针现场frame1/300/600：1920×1080，DXGI format24=R10G10B10A2_UNORM，ReShade colorspace1=srgb（对应已读6.8头文件枚举），queue GetDevice S_OK，LUID00000000:45371b56；PID34376 Responding=true。日志D:\DLSSNR-Lab\logs\native-present-contract.txt。
+- 当前游戏仍运行、新只读探针已加载，原神经DLL未替换；新完整网络未接入。后续需核对原版神经输入的渲染阶段及颜色合同，接入输出并做实际场景ON/OFF。勿把这次显示合同成功当作修复完成。
+
+
 ### 2026-09-07：AMD现场探针启动失败，已可恢复停用
 
 - 找到并核对互动任务DLSS5Launch（lmxxf，Steam -applaunch3489700）；启动后Steam记录SB PID40496、Shipping PID21296，随后查询只剩crs-handler PID19092，无present合同输出。游戏未成功进入可验收状态，不反复重启。
