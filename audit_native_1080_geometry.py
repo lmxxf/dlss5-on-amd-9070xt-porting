@@ -8,6 +8,7 @@ summary={'source':report['source'],'preblock_HW_at_f0':list(struct.unpack_from('
  'encoder':[{'block':r['block'],'HW':r['HW']} for r in report['encoder'] if r['block'] in (1,5,9,15,23,30)],
  'vit_HW':report['vit'][0]['HW_pair'],
  'final_head_HW_at_20':list(struct.unpack_from('<ii',(root/'launch-0056.bin').read_bytes(),0x20)),
+ 'pool_full_and_output_HW_at_40':list(struct.unpack_from('<iiii',(root/'launch-0055.bin').read_bytes(),0x40)),
  'decoder':[{'block':r['block'],'HW':r['HW']} for r in report['decoder'] if r['block'] in (40,48,56,62,66,69)],
  'post_HW':report['post']['HW'],
  'scope':'captured parameter geometry, not inferred valid texel region or game pixel acceptance'}

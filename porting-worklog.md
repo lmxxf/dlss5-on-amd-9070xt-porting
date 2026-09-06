@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-06：pool显式输入输出尺寸合同确认
+
+- launch0055参数0x40四整数为H/W=36/60、pooledH/W=20/32，直接证明原调度器指定补齐后的输出，不是固定h/2,w/2。
+- run_original_split_pool.cpp增加可选poolWidth/poolHeight，保留旧默认行为并限制容量；现可传60 36 32 20重现捕获参数。编译通过，但尚未运行非零边缘验证，不能假定补齐区域为零。
+- 下一步独立构造边缘输入验证原始pool主分支与补齐区域；未更新AMD池化实现或游戏DLL。
+
 ### 2026-09-06：确认head输入已补齐，32×20原始head通过
 
 - launch0056参数0x20实际HW=20/32，补齐在final head之前，不是ViT repack才扩尺寸；几何summary新增此直接证据。
