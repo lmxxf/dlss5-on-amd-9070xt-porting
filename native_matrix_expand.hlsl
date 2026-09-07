@@ -1,5 +1,9 @@
 #include <dx/linalg.h>
+#if PACKED_INPUT
+ByteAddressBuffer input:register(t0);
+#else
 StructuredBuffer<float> input:register(t0);
+#endif
 ByteAddressBuffer weights:register(t1);
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;}
@@ -11,7 +15,13 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  vector<float,32>a=0;
  [loop]for(uint g=0;g<8;g++){
   Mat m=Mat::Load<dx::linalg::MatrixLayout::RowMajor>(weights,(id.y*8+g)*2048,64);
-  vector<float16_t,32>x;[unroll]for(uint j=0;j<32;j++)x[j]=float16_t(input[p*256+g*32+j]);
+  vector<float16_t,32>x;[unroll]for(uint j=0;j<32;j++){
+#if PACKED_INPUT
+   uint pos=(p*256+g*32+j)*2,bits=input.Load(pos&~3u);x[j]=float16_t(f16tof32((bits>>((pos&2)*8))&65535u));
+#else
+   x[j]=float16_t(input[p*256+g*32+j]);
+#endif
+  }
   vector<float,32>y=dx::linalg::Multiply<float>(m,x);
   [unroll]for(uint r=0;r<32;r++)a[r]=H(a[r]+y[r]);
  }

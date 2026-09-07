@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：GPU一次打包输入，矩阵展开含打包快于旧分块
+
+- native_matrix_pack每线程打包两个原FP8格点float到uint half对，无损（当前C256输入合同），输出DEFAULT raw buffer；每帧重用前SRV→UAV，打包后UAV→SRV，矩阵读取ByteAddress half不再重复转完整FP32。
+- NativeC64新增显式pack_input依赖use_matrix，专用pack PSO/resource，矩阵展开其余层不动。计时单列input_pack。packed展开CSO单独命名，避免同目录误把packed输入shader用于直接float路径。
+- session88625 exit0，五轮block52最终2211840值baseline/oracle/candidate全不同0。暖轮input_pack0.19383、matrix_expand1.10214ms，合计1.29597；旧tiled_expand2.32118ms。完整核心13.88444→12.74870ms，约8.2%下降。日志release/matrix-c256-packed/result.log。
+- 分离CSO名后重编译并重跑session16857 exit0，五轮对照再次通过，named-cso.log保留。游戏/整网尚未启用，10fps未达到；下一步优先同类矩阵QKV大项，而非夸大单个展开收益。
+
 ### 2026-09-07：矩阵展开接完整C256核心，数值通过但直接FP32输入慢
 
 - native_matrix_expand.hlsl采用t0 FP32特征、t1打包half原权重、u0展开float输出，width/height参数；权重初始化一次CPU无损打包K32块，每float→half检查表示范围/尾位，默认不启用。NativeC64最后可选use_matrix仅允许split C256，CSO缺失拒绝。
