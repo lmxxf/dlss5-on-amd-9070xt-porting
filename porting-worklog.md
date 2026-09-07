@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：post70单值差异稳定，16×16裁切完整复现
+
+- 原版post70同输入重放到post70/replay.f32，与output.f32逐byte一致；排除本次原版输出随机变化，但未泛化其他环境。
+- 新增check_native_temporal_post_crop.py，从x224/y448对齐16×16区域取main、skip、底色，重新按原布局编码并执行原post70。裁切输出与完整1920×1152同区域768个RGB值全部一致，CPU仍在局部x8/y6绿色通道差同一个值：原0.14323392510414124、参考0.14320340752601624。
+- 这提供更小的可复现样本，不替代完整尺寸验收。差异不是仅完整纹理尺寸才触发，后续可在四个block的原post kernel中抓merge/body/head中间值，定位局部数值规则。
+- post70/crop保留输入/输出及validation，当前最终RGB严格对照仍1值失败；AMD全网尚未启动，游戏DLL未改。
+
 ### 2026-09-07：时序decoder66..69全exact，最终post70参考剩1值差异
 
 - session63565验证encoder1..4主输出全exact并导出同源block4 skip；中间half转换出现overflow warning，但报告最终finite且different0，不隐藏此警告。upsample66及decoder67..69各17694720值与原版全exact。
