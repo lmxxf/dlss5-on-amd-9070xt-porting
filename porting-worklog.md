@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C64快速量化隔离核心回归启动
+
+- 审核native_c64.hlsl各F调用：输入由H量化累加/乘积产生；新增NATIVE_FAST_FP8可选分支，有限输入用候选，非有限保留LegacyF。NativeC64::Create追加fast_fp8参数默认false，不修改已有调用默认行为，未部署生产快速模式。
+- 新增d3d12_c64_quantizer_bench，使用已验证decoder block52 shift0的120×72×256输入/权重/独立oracle；创建legacy/fast两实例，五轮交替顺序，记录同一list内两核心的时间戳，并逐值比较各自oracle及彼此float位元。此范围不代表完整网络性能。
+- MinGW构建成功，AMD独立c64-quantizer-bench目录启动session2560，已打印legacy initialized，候选编译仍在运行。当前快取对新fp8 include未知会回退不缓存，保持安全；没有改正在使用的游戏shader目录。下一步等待数值及时间结果，不能预告收益。
+
 ### 2026-09-07：FP8位元量化候选在有限half域GPU全exact
 
 - 新增native_fp8_fast.hlsli候选，将正常E4M3FN量化的log2/exp2/floor换为float位元RNE截位与448饱和，保留小数值分支与旧负零语义；当前验证域仅有限half，不宣称所有float32/NaN输入等价。
