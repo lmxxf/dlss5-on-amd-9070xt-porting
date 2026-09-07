@@ -66,6 +66,10 @@ public:
  // This batches the same stages as Run; single-list GPU safety is not implied
  // by the separately submitted/chunked tests and must be verified separately.
  void RecordUnsubmitted(ID3D12GraphicsCommandList*c,UINT seed,bool temporal_enabled=false){
+  // Whole-network batching produced DXGI_ERROR_DEVICE_HUNG on9070XT.
+  // Keep only as an explicit diagnostic; never silently enable in game code.
+  const wchar_t*permit=_wgetenv(L"DLSS5_TEST_SINGLE_LIST");
+  if(!permit||wcscmp(permit,L"1"))throw std::runtime_error("single-list network is diagnostic-only: observed device hang");
   if(!c)throw std::runtime_error("network null command list");
   ID3D12Device*owner=nullptr;auto hr=c->GetDevice(IID_PPV_ARGS(&owner));
   if(FAILED(hr))throw std::runtime_error("network command list device query");

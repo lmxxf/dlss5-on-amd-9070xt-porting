@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：单list全网络触发DEVICE_HUNG，禁止生产使用
+
+- PID408自然结束，session40586 exit1。所有shader初始化完成后，首帧尚未产生计时/像素结果即报game submission HRESULT2289696774=0x887a0006 DXGI_ERROR_DEVICE_HUNG；不能验收或反复重试同策略。日志/run保存release/native-single-list-failed。
+- 查询近期System Display/4101未得到事件，不能额外断言具体TDR来源；已知事实是单list失败、此前分段相同网络通过。AMD小型RGB纹理桥后续A/B/A三帧不同0，确认新D3D12工作仍能正常执行，无需用户重启。
+- RecordUnsubmitted新增严格DLSS5_TEST_SINGLE_LIST=1诊断门，避免游戏代码无意使用已观察到挂起的路径。语法检查通过，未改分段Run。
+- 此测试证明游戏插入不能简单复用单list批量记录；后续必须建立有序的分段提交边界，或先将执行时间降至安全范围。没有改TDR注册表、没有把失败实现部署到游戏。真实history及游戏验证仍未完成。
+
 ### 2026-09-07：单command-list原网络回归启动
 
 - d3d12_native_network70_test增加严格DLSS5_TEST_SINGLE_LIST=1路径，输入生产者/时序采样/RecordUnsubmitted全部记录到同一个测试自有list，统一提交等待；保留原分段模式。每帧记录submit_wait_ms（CPU记录+提交等待墙钟，不冒充纯GPU计时），结果仍逐值比较独立原版参考。
