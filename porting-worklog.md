@@ -2975,6 +2975,11 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整链下载结果核验器就绪，测试仍运行
+
+- 新增validate_native_color_frame.py，要求独立expected固定SHA、部署source hash、三帧history0/different0记录及完成标记，并将下载actual-frame.f16与原版逐byte比较、检查有限性与alpha。不以日志单独宣称通过，报告固定game_verified=false。
+- 语法及--help检查通过；当前没有实际整链输出，未运行验收或生成pass报告。AMD同PID24536 CPU913秒且Responding，编译日志前进；继续session66185，不重复启动。
+
 ### 2026-09-07：nearby compute覆盖核验，确认观测入口盲区
 
 - 下载PID18528 bounded小shader及codec shader到nearby目录。新增audit_native_nearby_compute.py：256条nearby dispatch共22个pipeline，全部在捕获文件集合有对应文件；虽256小shader上限耗尽，这22项没有缺文件。
