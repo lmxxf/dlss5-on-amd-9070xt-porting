@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07 20:10：用户确认观感，整理并封存现场
+
+- 用户确认连续展示“这个是对的，虽然只有2fps”，随后要求整理提交、省额度。未退出或改动正在运行的游戏，最后检查21632仍持续完成处理。
+- 新CURRENT-STATE.md集中记录当前能力/未完成项、安装路径与SHA、自动开关、回退方式、证据与构建恢复流程；README顶部明确旧记录失效边界。
+- 唯一未提交run_nvidia_ui.ps1实验原样复制到release/checkpoints/2026-09-07-correct-game-preview/run_nvidia_ui.uncommitted.ps1并核对SHA，随后通过补丁恢复根目录HEAD版本。不是删除实验，也未冒认该实验为已验证修复。
+- 当前展示DLL、手动版DLL、已验证整网exe由/tmp复制到同封存目录，散列记录在CURRENT-STATE.md。大数据/截图/原版证据原位保留，release/已有gitignore规则，无需重复添加。无权重或二进制入Git。
+
 ### 2026-09-07 20:07：慢速游戏展示连续30次处理完成
 
 - 现进程21632初始化耗时约195.266秒，随后自动连续render_begin/render_complete。下载日志截至tick602211578，统计该PID完成30次、render_failed=0，相邻处理约4秒。不是回退普通游戏后只声称生效。
