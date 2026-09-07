@@ -23,6 +23,9 @@ report=dict(scope='isolated original attention32 vs CPU; not accepted',different
  values=[dict(token=int(t),channel=int(c),original=float(actual[t,c]),cpu=float(expected[t,c])) for t,c in indices])
 (root/'attention-mismatch.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
+gpu=root/'amd-isolated';gpu.mkdir(exist_ok=True)
+np.concatenate([q,k,v]).astype(np.float32).tofile(gpu/'input.f32')
+actual.tofile(gpu/'oracle.f32') # Original output, never the CPU candidate.
 from native_c32_reference import H,F
 from native_c32_softmax_sum import denominator
 for t,ch in indices:

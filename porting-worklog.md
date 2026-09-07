@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：attention32 AMD无须修改，参考推进至decoder47
+
+- check_native_color_attention32导出原版QKV及原版attention输出到amd-isolated；AMD独立执行现有native_vit_attention.hlsl，session30372三帧各655360值different0/max0、exit0。虽然shader也用float累加，实际求和次序/编译路径未重现CPU BLAS问题，不应未经证据把CPU修正照搬GPU。
+- session97838自然完成exit0：修正后ViT56阶段原版/CPU/replay检查通过，decoder39及40..47原版/CPU子阶段全部通过。原版参考未换成候选结果。
+- 已启动同源block48及49..55参考/CPU检查任务，尚待结果。完整color-frame expected.f16及实际游戏验收仍未完成。
+
 ### 2026-09-07：新输入暴露attention32 CPU累加双舍入，局部修正
 
 - session3800结束exit1，在block32 attention仅1值不一致，原版两次replay一致；条件串联的decoder39/40..47没有执行。
