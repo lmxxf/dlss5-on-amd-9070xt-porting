@@ -99,7 +99,12 @@ void tiled_project(uint3 gid,uint t,uint matrix_offset,uint skip_offset,bool raw
  [unroll]for(uint g=0;g<HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*CHANNELS+g*32+j]*weights[8*MATRIX+row*CHANNELS+g*32+j];a=H(a+s);}
  output[n]=F(a);
 }
-groupshared float queries[2048],keys[2048],values[2048];
+#if NATIVE_PAD_MULTIHEAD_LDS
+#define ATTN_STRIDE 33
+#else
+#define ATTN_STRIDE 32
+#endif
+groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_STRIDE];
 #include "native_half_square.hlsli"
 [numthreads(64,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
@@ -111,16 +116,16 @@ groupshared float queries[2048],keys[2048],values[2048];
    float sa=0,sb=0,sz=0;[loop]for(uint j=0;j<32;j++){float v=input[p*CHANNELS+g*32+j];sa+=v*weights[row*CHANNELS+g*32+j];sb+=v*weights[MATRIX+row*CHANNELS+g*32+j];sz+=v*weights[2*MATRIX+row*CHANNELS+g*32+j];}
    a=H(a+sa);b=H(b+sb);z=H(z+sz);
   }
-  q[c]=a;k[c]=b;values[t*32+c]=F(z);
+  q[c]=a;k[c]=b;values[t*ATTN_STRIDE+c]=F(z);
  }
  [unroll]for(uint i=0;i<16;i++){qs[i]=NativeHalfSquarePair(q[i],q[i+16]);ks[i]=NativeHalfSquarePair(k[i],k[i+16]);}
  [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
- [loop]for(uint c=0;c<32;c++){queries[t*32+c]=F(H(H(q[c]*qi)*H(weights[SCALE_OFFSET+head])));keys[t*32+c]=F(H(k[c]*ki));}
+ [loop]for(uint c=0;c<32;c++){queries[t*ATTN_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[SCALE_OFFSET+head])));keys[t*ATTN_STRIDE+c]=F(H(k[c]*ki));}
  GroupMemoryBarrierWithGroupSync();float ex[64],prob[64];
  [loop]for(uint key=0;key<64;key++){
-  float s=0;[loop]for(uint c=0;c<32;c++)s+=queries[t*32+c]*keys[key*32+c];
+  float s=0;[loop]for(uint c=0;c<32;c++)s+=queries[t*ATTN_STRIDE+c]*keys[key*ATTN_STRIDE+c];
   float score=H(s+weights[4*MATRIX+head*4096+t*64+key]);uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));ex[key]=f16tof32(((bits<<5)+0x8000u)&65535u);
  }
  float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
@@ -130,7 +135,7 @@ groupshared float queries[2048],keys[2048],values[2048];
   }parity[odd]=total;
  }
  float inv=H(1/H(parity[0]+parity[1]));[loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
- [loop]for(uint c=0;c<32;c++){float a=0;[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[g*32+key]*values[(g*32+key)*32+c];a=H(a+s);}output[p*CHANNELS+head*32+c]=F(a);}
+ [loop]for(uint c=0;c<32;c++){float a=0;[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[g*32+key]*values[(g*32+key)*ATTN_STRIDE+c];a=H(a+s);}output[p*CHANNELS+head*32+c]=F(a);}
 }
 [numthreads(64,1,1)]void projection(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=width*height)return;

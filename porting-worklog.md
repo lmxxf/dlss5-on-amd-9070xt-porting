@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：多通道注意力共享padding，整网1.470秒
+
+- native_c64.hlsl仅queries/keys/values行跨度32→33，保留(g*32+key)的分组长度。NativeC64与NativeSplit共同以严格DLSS5_TEST_PAD_MULTIHEAD_LDS=0/1宏控制，RAW_OUTPUT仍在macros[0]，默认旧布局。
+- 独立native-network70-pad-multi，session44248/PID43824 exit0，五轮off/on/reset最终下载后逐字节原版一致。shader编译与git diff检查通过。
+- 暖轮1512.6764325→1469.7617425ms，约2.8%；encoder15_22=110.52391、encoder9_14=69.4005、tail49_55=98.40648ms。10fps尚未达到，不能以小百分比改善替代100ms目标。
+- 证据release/native-network70-pad-multi/profile-validation.json。游戏与测试均退出，安装版不变；后续应继续找矩阵计算/提交成本的大项。
+
 ### 2026-09-07：C32共享存储padding，整网1.513秒
 
 - 核对C64注意力已无重复F输入量化，未实施冗余删除。改测C32 queries/keys/values每行32→33，三数组按64×stride分配，所有共享索引同步调整；严格DLSS5_TEST_PAD_C32_LDS=0/1宏控制，默认32。
