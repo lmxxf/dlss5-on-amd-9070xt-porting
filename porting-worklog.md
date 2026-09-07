@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原生barrier观察器实机部署并取得转换记录
+
+- 确认工作树仍在d07c135、仅用户run_nvidia_ui.ps1脏；正常退出17584，备份.before-native-barrier后部署已构建观察器。新PID32428 Responding，native_barrier_hook status0/native_list24f3b930，日志保存order-32428.txt。
+- 实机原生transition包含输出1091b7f20/e9e72a70在list2e3b9d30上的4→192、192→4及首次0→4，subresource0/flags0。这是后续游戏使用的实际native转换；尚未形成FFX提交返回瞬间状态的完整证明，不能直接推断插入前为4或192。
+- 核对AMD官方SDK Types文档确认当前FfxResourceStates UAV枚举为1<<1，与原生D3D12 UAV数值不同；旧FSR2版本枚举又不同，因此还需以所载DLL版本/实际轨迹为准，不能跨版本硬套。来源https://gpuopen.com/manuals/fidelityfx_sdk/reference_documentation/sdk/host/sdk_types/s_d_k_types/
+- 当前只读观察正常，未部署神经渲染。下一步补齐FFX内部UAV/转换与提交返回的关联，确定插入状态再执行。
+
 ### 2026-09-07：原生输出barrier只读观察器构建
 
 - 顺序探针从FFX列表通过已验证unwrap接口获取native list，安装一次SDK slot26 ResourceBarrier观察器；原函数按原count/数组先执行，再只记录当前输出resource的transition before/after/subresource/flags，不发任何barrier或额外GPU操作。
