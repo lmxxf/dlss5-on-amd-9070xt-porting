@@ -6081,3 +6081,11 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - MinGW/DXC构建通过，远程PID9652正常退出0；15帧history off/on/reset最终输出逐字节一致，下载两份输出对独立原版参考也byte-exact。当前回归覆盖1080p/640 tokens；其他允许token尺寸仅静态布局检查，不宣称GPU实测覆盖。
 - 暖均649.227125ms、末5帧652.626334ms；此前coalesced基线661.67148ms。八层vit*_stage3从7.54～7.83ms下降至3.68～4.58ms，其他区间有波动，不能把局部节省直接相加当整网收益。
 - 证据release/native-network70-wave-vit-attention/，准备脚本release/prepare-wave-vit-attention.ps1均忽略；可重复入口run_wave_vit_attention_network.ps1。游戏DLL未更新，实际游戏10fps仍未实现。
+# 2026-09-08：矩阵优化后重新测量提交/GPU比例
+
+- 在649ms有效配置上仅加DLSS5_TEST_SUBMISSION_TIMING=1，独立目录native-network70-current-submit-profile，PID1840正常退出0；15帧最终及下载的两份结果仍对原版byte-exact。
+- 新分析脚本analyze_submission_profile.py依赖整网验证报告，按network70外层submit_wait标记划分帧，过滤初始化其它队列，并在正确性标记处丢弃验证用读回。每帧512次执行提交；旧513计数包含额外读回，范围不同，不是减少了一次网络操作。
+- 暖GPU区间642.6092286ms；各Submit内部wall合计699.2036429ms；外层wall760.6372143ms；外层减GPU为118.0279857ms。GPU含访存/barrier，wall差含录制/调度/等待/打印，不叫纯CPU时间。
+- 诊断每次增加timestamp查询、读取和fflush，约61.43ms发生在Submit内部wall取样之后及外层其它工作；不能用这个有观察开销的760.6ms直接否定无诊断649ms基线，也不能宣称全部118ms可省。
+- 当前643ms GPU区间仍远超100ms，后续优先512 FFWD分阶段并行等GPU工作。此轮无算子提速、不修改游戏DLL、不改变提交策略；历史整网/整阶段合并的DEVICE_HUNG禁重试边界保持。
+- 证据release/native-network70-current-submit-profile/{profile-validation,submission-validation}.json及日志/输出（ignored）；运行入口run_current_submit_profile.ps1；准备脚本release/prepare-current-submit-profile.ps1。

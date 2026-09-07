@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新基线逐提交诊断完成：15帧exact，每帧512次（reflect/temporal＋网络，不含验证读回；连读回计513），暖GPU区间642.60923ms、外层wall760.63721ms、差118.02799ms，其中逐Submit内部wall合计699.20364ms。额外timestamp/readback/fflush造成观察开销，不把此wall与无诊断649ms直接比较；GPU区间含访存/barrier，非纯计算。证据release/native-network70-current-submit-profile；analyze_submission_profile.py排除初始化队列及验证读回。仍需重点改GPU算子，下一候选512 FFWD分阶段并行；不重试已DEVICE_HUNG的整网/整阶段合并。生产路径未改。
+
 最新ViT Wave注意力15帧exact，暖649.227125ms、末5帧652.626334ms。WAVE_VIT_ATTENTION显式开启，16查询/组，QK和AV用Wave矩阵；原exp位映射、denominator树及K32 H/F顺序不变，输入F8→half无损。八层stage3由约7.54～7.83ms变为3.68～4.58ms；其他阶段有波动，整网仅由661.67降到649.23ms。21,568字节组共享区，无新增全图缓冲/无提交合并。证据release/native-network70-wave-vit-attention，运行run_wave_vit_attention_network.ps1继承C32 coalesced配置。游戏DLL未改，10fps未达到。
 
 最新C32收尾按通道合并访存：COALESCED_FINISH显式开启，保留旧入口默认路径、H/F和池化求和顺序。15帧最终exact，暖661.67148ms、末5帧662.32926ms；preblock_detail_stage2由9.30013到1.14322ms，首个c32_probe_stage2由2.69509到0.24597ms。其他阶段存在波动，不把全部整网差额归因此改。无新增GPU缓冲，2D dispatch覆盖回归通过。证据release/native-network70-coalesced-finish；run_coalesced_finish_network.ps1继承上一有效配置。游戏DLL未改，10fps未达到。
