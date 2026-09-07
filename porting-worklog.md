@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：硬件矩阵全尺寸展开0.802ms，实际输出逐字节一致
+
+- prepare_matrix_real_probe.py --full打包完整block52 W1与全部8640像素，4947968字节；矩阵按输出32行/K32块布局，原f32到half逐值无损。shader FULL_EXTENT=1对应8640像素/1024行，dispatch270×32，每线程一像素一32行块。
+- runner full模式严格文件大小、输出8847360float，路径1矩阵、路径2标量独立运行，10次dispatch/UAV barrier单列表计时。session94683 exit0：0.801680ms vs2.170559ms，finite。
+- 下载matrix_full1/2.f32，cmp逐字节一致。证据release/matrix-real-probe/timing-full.txt与实际输出。
+- 边界：计时不含预先CPU打包、gate/收缩，也不是与主线最优tiled FFN（含gate）的公平端到端对照。下一步构建GPU输入/激活完整算子；目前仅线性核心实测可行，游戏DLL/裁判链未改，10fps未达到。
+
 ### 2026-09-07：真数据矩阵与标量拆开执行，首次独立计时
 
 - matrix_real_probe增加MATRIX_PATH=1矩阵单路、=2标量单路、默认双路比较，单路输出实际数值。runner新增可选输出文件，raw模式只检查finite（原mismatches打印字段此模式实为invalid），实际两路一致性由下载后cmp另验，不以exit0代替比较。
