@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏挂接顺序审计与只记录网络接口
+
+- 现有hook_ffx_dispatch在原ffxDispatch之前读取dispatch.color并降到960×544，之后记录旧网络；这不等于原版NR使用升频后完整1080p的路径。新挂接应验证dispatch.output（升频后）及其真实资源状态，不能原封沿用旧输入桥。
+- FFX回调内game command list尚未提交，因此不能直接调用NativeGameFrame::ProcessSubmittedFrame的自提交/等待接口，否则会在生产者提交前执行消费者。需要在同一记录序列插入或建立明确提交边界，不能盲目Wait。
+- NativeActualNetwork70将Run的提交器参数模板化，新增RecordUnsubmitted，复用完全相同stage序列，仅记录到给定同设备list，不Close/Reset/Execute/Wait；原分段提交路径行为保留。MinGW语法检查通过，未GPU验证此单list批量路径，TDR风险必须独立测试后才允许游戏使用。
+- 没有启动AMD游戏、没有替换游戏DLL。下一步验证记录路径、资源状态与GPU执行时间；真实history来源仍未完成。
+
 ### 2026-09-07：NativeGameFrame完整颜色链三帧全部通过
 
 - PID16108自然完成，session61892 exit0。下载actual-frame.f16、frame日志/run元数据到release/native-color-frame/amd-samegpu-accepted；validate_native_color_frame --amd-original-codec正式通过。

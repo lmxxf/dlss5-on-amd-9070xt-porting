@@ -51,7 +51,7 @@ public:
  // Input producer MUST already have been submitted to the same queue.
  // This includes temporal_rgb's sampler producer when temporal_enabled is true.
  // Binding storage does not imply a valid history frame; reset callers pass false.
- void Run(NativeGameSubmission&submit,UINT seed,bool temporal_enabled=false){
+ template<class Submission> void Run(Submission&submit,UINT seed,bool temporal_enabled=false){
   if(!ready||failed||submit.Device()!=device)throw std::runtime_error("network unavailable/device mismatch");
   if(temporal_enabled&&!temporal_bound)throw std::runtime_error("network temporal RGB not bound");
   try{
@@ -61,7 +61,24 @@ public:
    submit.Submit([&](ID3D12GraphicsCommandList*c){post.Record(c);});
   }catch(...){failed=true;throw;}
  }
+ // For an already-recording external command list only. Does not close/reset,
+ // submit, or wait. Caller owns ordering, GPU lifetime and TDR budgeting.
+ // This batches the same stages as Run; single-list GPU safety is not implied
+ // by the separately submitted/chunked tests and must be verified separately.
+ void RecordUnsubmitted(ID3D12GraphicsCommandList*c,UINT seed,bool temporal_enabled=false){
+  if(!c)throw std::runtime_error("network null command list");
+  ID3D12Device*owner=nullptr;auto hr=c->GetDevice(IID_PPV_ARGS(&owner));
+  if(FAILED(hr))throw std::runtime_error("network command list device query");
+  bool same=owner==device;owner->Release();if(!same)throw std::runtime_error("network command list device mismatch");
+  InlineRecorder recorder{device,c};Run(recorder,seed,temporal_enabled);
+ }
  ID3D12Resource*Output()const{return post.Output();}
  ID3D12Resource*Head()const{return head.Output();}
  ID3D12Resource*Decoder69()const{return decoder.Output();}
+private:
+ struct InlineRecorder {
+  ID3D12Device*device;ID3D12GraphicsCommandList*commands;
+  ID3D12Device*Device()const{return device;}
+  template<class F>void Submit(F&&record){record(commands);}
+ };
 };
