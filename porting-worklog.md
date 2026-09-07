@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机场景前后可视化与独立原版参考启动
+
+- audit_live_neural_frame.py按固定同一soft-shoulder/sRGB映射生成诊断预览（不是最终swapchain截图），确认before/after为同一角色/洞穴场景，未见明显大块网格；不据预览宣称数值或时序通过。
+- 请求1 before SHA3c17d04f07696fb682a32f022e0b88017f2d050dbe841bfbf36d065565b82a3e，after SHA ff760f3cc93b751c4e05a57fee71fc7ea134471bc8595e8b536c568375c5ec40。RGB不同6214706/6220800，alpha不同0，max_abs10.65625/mean_abs0.00812561；范围before0.0024776..20.484375、after0.00245285..9.828125。报告independent_verified=false。
+- 复制真实before到reference-request-1/source.f16。AMD捕获原版encode三scale对候选均different0/invalid0，导出原版scale1编码输入；原版block0已生成。启动session70189原版encoder1..22生成，沿新base，禁止混入合成夹具参考。后续仍须ViT/decoder/post/原版decode及最终逐值比较。
+
 ### 2026-09-07：可控场景请求1完成，前后数据待独立核验
 
 - PID34096初始化ready tick593942515；未重启，聚焦游戏后写入PID34096/request1。日志request_armed594020031、render_begin594020078、render_complete594025265，游戏Responding，单次包含记录/等待约5187ms，不是实时帧率达标证据。
