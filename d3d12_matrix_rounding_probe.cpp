@@ -23,7 +23,7 @@ int wmain(int argc,wchar_t **argv){
     if(argc<2||argc>5)return 2;
     const bool full=argc==5,wave=full&&!wcscmp(argv[4],L"wave");if(full&&!wave&&wcscmp(argv[4],L"full"))return 2;
     const UINT pixels=full?8640:256,rows=full?1024:32,fixture_bytes=full?4947968:147456;
-    std::vector<char> fixture;if(argc>=3){std::ifstream f(argv[2],std::ios::binary|std::ios::ate);if(!f||f.tellg()!=fixture_bytes)return 2;fixture.resize(fixture_bytes);f.seekg(0);if(!f.read(fixture.data(),fixture.size()))return 2;}
+    std::vector<char> fixture;if(argc>=3&&wcscmp(argv[2],L"-")){std::ifstream f(argv[2],std::ios::binary|std::ios::ate);if(!f||f.tellg()!=fixture_bytes)return 2;fixture.resize(fixture_bytes);f.seekg(0);if(!f.read(fixture.data(),fixture.size()))return 2;}
     const UINT weight_bytes=fixture.empty()?2048:UINT(fixture.size());
     const IID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};
     check("experimental",D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr));

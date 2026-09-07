@@ -6163,3 +6163,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 首帧submit_wait564.910ms包含冷启动且没有后续暖帧，不报告有效性能收益；也不因用户允许硬件算术误差就直接部署该误差水平。尚未做画面/连续帧验收，不是已获接受的快速版。
 - 原因未定位，不能直接归因RTZ/驱动或移除补偿；若继续该路线，先独立标量舍入探针区分intrinsic行为及表达式重排。
 - 证据release/native-network70-c32-hardware-half/（日志与失败输出，ignored）；准备/manifest脚本在release/。入口run_c32_hardware_half_network.ps1。有效基线仍约586ms，游戏未改，10fps未完成。
+# 2026-09-08：独立half舍入探针定位
+
+- 新增half_conversion_probe.hlsl，8192个分布在half相邻值中点及前后float32邻点的带符号有限样本，intrinsic对软件H有6144处不同；无需网络即可复现。
+- PROBE_VALUES=1导出2048条input/software/hardware/half-index记录。NumPy验证软件全部符合RNE；intrinsic和PROBE_NATIVE_CAST=1的float16_t cast各1536处不等RNE，全部等于朝零截断结果。结论仅限当前AMD预览驱动/DXC/样本，不把它包装成通用HLSL规范。
+- 保留原d3d12_matrix_rounding_probe.cpp功能，仅增加fixture参数“-”跳过文件读取，供无输入shader导出输出。构建half-rounding-probe.exe到/tmp并上传独立名，不覆盖已有probe。现有矩阵CSO/游戏未动。
+- 编译：DXC cs_6_10/main/HV2021/O3；cast加-enable-16bit-types；导出模式加-D PROBE_VALUES=1。远程matrix-probe目录执行half-rounding-probe.exe half_conversion_values.cso - half-conversion-values.f32及cast对应文件。两次均退出0（这里只代表finite），实际正确性由analyze_half_conversion_probe.py检查。
+- 证据release/half-conversion-probe/{half-conversion-values.f32,half-conversion-cast.f32,validation.json}（ignored）。这解释了硬件H直接替换为何产生系统偏移；下一步必须补RNE修正或另测可控舍入接口，未取得新的整网提速，10fps仍未达到。
