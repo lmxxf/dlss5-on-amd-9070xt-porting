@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：真实block52展开矩阵接口对标量全通道取样一致
+
+- prepare_matrix_real_probe.py取原block52 W1全部1024×256权重、原input以索引(i*31)%8640选256像素；每32输出行打包一份，完整K256按8块K32布局，转F16前断言roundtrip无损，SHA/索引记入ignored JSON，不改权重。
+- matrix_real_probe.hlsl每K32调用LinAlg F16矩阵/F16输入、F32输出，然后显式H累计；同shader标量点积/H参考比较，保留完整K256顺序。runner可读严格147456字节fixture，旧随机模式不变。
+- row0单次session38946 exit0；32组全通道session49318 exit0，每组8192输出different0，总262144。CPU有限性复查所有阶段finite，最终范围-22.515625..12.2890625，避免把共同溢出当通过。日志release/matrix-real-probe/result.log。
+- 限定：此处比较GPU标量参考，不是重新执行原CUDA；原层来源沿用已验证数据。仅抽样256像素的线性展开，不含gate/收缩/其余层，且探针同时计算两路，不是性能基准。下一步实现独立可计时矩阵算子，裁判链/安装游戏DLL均未改。
+
 ### 2026-09-07 22:24：真人批准预览驱动，首个矩阵舍入探针exact
 
 - 用户22:21明确批准：保留exact裁判，允许快速版有界硬件算术误差但不改权重/网络/输入依赖，先测硬件矩阵能否exact，不自动重启。

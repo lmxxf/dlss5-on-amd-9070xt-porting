@@ -5,6 +5,9 @@
 #include <d3dcompiler.h>
 #include <cstdio>
 #include <cstdint>
+#include <fstream>
+#include <vector>
+#include <cstring>
 extern "C" {
 __declspec(dllexport) extern const UINT D3D12SDKVersion=721;
 __declspec(dllexport) const char *D3D12SDKPath=".\\D3D12\\";
@@ -16,7 +19,9 @@ ID3D12Resource *buffer(ID3D12Device*d,UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RE
     ID3D12Resource*r=nullptr;check("buffer",d->CreateCommittedResource(&heap,D3D12_HEAP_FLAG_NONE,&desc,state,nullptr,IID_PPV_ARGS(&r)));return r;
 }
 int wmain(int argc,wchar_t **argv){
-    if(argc!=2)return 2;
+    if(argc!=2&&argc!=3)return 2;
+    std::vector<char> fixture;if(argc==3){std::ifstream f(argv[2],std::ios::binary|std::ios::ate);if(!f||f.tellg()!=147456)return 2;fixture.resize(147456);f.seekg(0);if(!f.read(fixture.data(),fixture.size()))return 2;}
+    const UINT weight_bytes=fixture.empty()?2048:UINT(fixture.size());
     const IID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};
     check("experimental",D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr));
     IDXGIFactory6*factory=nullptr;check("factory",CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
@@ -31,13 +36,13 @@ int wmain(int argc,wchar_t **argv){
     ID3DBlob*signature=nullptr,*error=nullptr;check("signature",D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&signature,&error));
     ID3D12RootSignature*root=nullptr;check("root",d->CreateRootSignature(0,signature->GetBufferPointer(),signature->GetBufferSize(),IID_PPV_ARGS(&root)));
     D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={shader->GetBufferPointer(),shader->GetBufferSize()};ID3D12PipelineState*pso=nullptr;check("pso",d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));
-    auto*w=buffer(d,2048,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto*w=buffer(d,weight_bytes,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);
     constexpr UINT bytes=256*32*4;
     auto*out=buffer(d,bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
     auto*readback=buffer(d,bytes,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
-    void*m=nullptr;D3D12_RANGE none{0,0};check("map weights",w->Map(0,&none,&m));for(UINT i=0;i<1024;i++){uint32_t h=i*747796405u+2891336453u;h=((h>>((h>>28)+4))^h)*277803737u;static_cast<uint16_t*>(m)[i]=uint16_t(((h>>16)&0x8000)|((9+h%10)<<10)|(((h>>8)&7)<<7));}w->Unmap(0,nullptr);
+    void*m=nullptr;D3D12_RANGE none{0,0};check("map weights",w->Map(0,&none,&m));for(UINT i=0;i<1024;i++){uint32_t h=i*747796405u+2891336453u;h=((h>>((h>>28)+4))^h)*277803737u;static_cast<uint16_t*>(m)[i]=uint16_t(((h>>16)&0x8000)|((9+h%10)<<10)|(((h>>8)&7)<<7));}if(!fixture.empty())std::memcpy(m,fixture.data(),fixture.size());w->Unmap(0,nullptr);
     D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,2,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};ID3D12DescriptorHeap*heap=nullptr;check("heap",d->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap)));
-    auto cpu=heap->GetCPUDescriptorHandleForHeapStart();D3D12_SHADER_RESOURCE_VIEW_DESC srv{};srv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;srv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;srv.Format=DXGI_FORMAT_R32_TYPELESS;srv.Buffer.NumElements=512;srv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;d->CreateShaderResourceView(w,&srv,cpu);
+    auto cpu=heap->GetCPUDescriptorHandleForHeapStart();D3D12_SHADER_RESOURCE_VIEW_DESC srv{};srv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;srv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;srv.Format=DXGI_FORMAT_R32_TYPELESS;srv.Buffer.NumElements=weight_bytes/4;srv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;d->CreateShaderResourceView(w,&srv,cpu);
     cpu.ptr+=d->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);D3D12_UNORDERED_ACCESS_VIEW_DESC uv{};uv.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uv.Buffer.NumElements=256*32;uv.Buffer.StructureByteStride=4;d->CreateUnorderedAccessView(out,nullptr,&uv,cpu);
     D3D12_COMMAND_QUEUE_DESC qd{};ID3D12CommandQueue*q=nullptr;check("queue",d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));
     ID3D12CommandAllocator*allocator=nullptr;check("allocator",d->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));
