@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机神经单帧完成但输入全黑，不能验收画面
+
+- PID43088后台线程结束，日志ready tick591635250、render_begin591635312、render_complete591639546，分段渲染调用约4234ms（含记录/等待，非纯GPU计时），游戏仍Responding。
+- 下载before/after及日志到release/native-live-neural-43088。严格像素检查发现before RGB范围0..0，after范围-0..0.0003349781，RGB不同3013215、alpha不同0，两者全部有限。它只证明网络处理了黑输入，不证明有效游戏画面增强；不能用pixels_changed标记当成功。
+- F12截图20260907171337_1.jpg显示当前在有角色背景的主菜单，保存menu-after-test.jpg。截图不是触发瞬间的同帧图，不能据此确定黑输入原因；需区分主菜单路径、后台/前台行为、所选资源与提交时序。尚未进入有效场景做对照。
+- 此单帧机会已消耗，当前phase done不继续改画面。下一步添加非黑输入检查及可控再触发/场景验证，防止再次把空输入算作有效验收。目标未完成，不应发布现有诊断DLL为成品。
+
 ### 2026-09-07：单帧神经诊断DLL实际部署，后台初始化中
 
 - AMD native-color-frame-samegpu目录23个shader hash全部校验通过；正常退出43204，观察器备份native-submission-order.addon64.before-neural-oneshot，部署真实NATIVE_ORDER_NEURAL构建。安装文件SHA 7C33272069A7EDB471C12A6A13F00CB3568037A906ACA7F2C6177AA4A632748C，旧渲染及所有观察器备份保留。
