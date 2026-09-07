@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新C256 Wave展开/收缩/QK评分已接整网15帧exact：DLSS5_TEST_WAVE_C256=1需MATRIX_C256，C128矩阵/共享workspace保持，C64旧分块。暖均1311.13692ms、末5帧1304.05339ms，tail49_55=24.51406ms。local14.469GB低于15.381GB预算。证据release/native-network70-wave-c256/profile-validation.json。游戏安装尚未更新，10fps未达到。
+
 最新Wave Q×K评分接C256核心：归一化后的FP8格点Q/K用half共享，wave合作16×32乘32×16写scores，后续softmax近似/归约/V加权原样。五轮最终字节一致，attention2.71318→0.96467ms，完整核心5.17005→3.42863ms。证据release/matrix-c256-wave-scores/result.log。仅显式wave_scores/C256，默认关闭，未接整网/游戏。
 
 最新Wave收缩接C256核心：每组16像素×16输出，K1024按K32加载组内half小块，保留每步H与最终F；无新增全尺寸输入打包。对照上一版Wave展开/旧收缩，五轮最终字节一致，contract1.70686→0.65209ms，完整核心5.89964→4.88883ms。证据release/matrix-c256-wave-contract/result.log。use_wave_contract显式开启、依赖Wave展开，默认关闭；未接整网/游戏，下一大项attention约2.44ms。

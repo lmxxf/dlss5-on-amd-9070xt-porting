@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：C256 Wave完整网络15帧exact/1.311秒
+
+- NativeC64Shift新增严格WAVE_C256=0/1显式开关，依赖matrix路径，统一开启已验证Wave展开/收缩/QK评分；其它通道保持原设置。
+- 独立native-network70-wave-c256，session74975/PID35516 exit0，15帧history交替，实际GPU两输出下载后逐字节独立原版一致。跨多层权重/移位/raw输出全部经过完整链，不再只是block52。
+- 四舍五入暖均1311.1369221ms、末5帧1304.05339ms；tail49_55=24.514057ms。对照共享矩阵旧轮1354.1084021/1344.924816ms，收益延伸至整网但其它阶段仍占主要耗时。
+- local usage14468567040/budget15380881408，nonlocal828366848，显存预算内。证据release/native-network70-wave-c256/profile-validation.json。编译/diff检查通过，未更新游戏安装，10fps未达到。
+
 ### 2026-09-08：Wave QK评分，C256核心3.43ms
 
 - native_c64 attention可选NATIVE_WAVE_SCORES：Q/K共享half（均为FP8格点可无损表示），V仍float；scores4096float，合计32KiB共享存储，Wave分支行stride32，不叠加旧33-padding超预算。64线程两wave分别覆盖四个query16块与四个key16块，乘积写共享scores，再全组同步。
