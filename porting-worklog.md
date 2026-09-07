@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：静态定位原版内部CopyResource封装，模块身份与实机一致
+
+- 使用x86_64-w64-mingw32-objdump分析PE（本机默认objdump不识别该格式）。发现RVA0x5c070函数：保存RDX为命令列表、R8为目的资源、R9为来源资源，先调用0x46100处理资源记录，再于0x5c0c1取列表vtable+0x88并经CFG dispatch调用；返回int0或-5。不能把所有vtable+0x88引用都当CopyResource，此处参数布置支持这一识别。
+- 函数指针出现于file offset0xb5cf8/RVA0xb6af8，提供继续追后端调用表的入口。新增inspect_native_copy_helper.py，保存prologue32、反汇编、PE定位与hash到release/native-copy-static。
+- 本地DLL SHA e16bcf15e16e13f527491cdf7845b2fe6521a738d8f7c9c721866a8496e1fc8e，与PID3084实际加载的游戏目录nvngx_dlssnr.dll一致。静态参数识别尚非live调用或历史来源证明。
+- 本轮未重启游戏、未安装新hook。下一步可对该特定后端封装做版本/prologue保护的只读调用记录，或继续追调用者，避免再次泛化拦截NGX入口/命令列表方法。AMD实际游戏接入仍未完成。
+
 ### 2026-09-07：被动资源复制通知兼容，但尚未覆盖NR历史目标
 
 - 事件addon增加copy_resource/copy_texture_region和destroy_resource。只跟踪已见format10/34资源，销毁时移除；记录子资源/源目的box，不调用设备虚拟方法、始终返回false。离线测试确认不抑制、不改payload及生命周期过滤。
