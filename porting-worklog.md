@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C32共享存储padding，整网1.513秒
+
+- 核对C64注意力已无重复F输入量化，未实施冗余删除。改测C32 queries/keys/values每行32→33，三数组按64×stride分配，所有共享索引同步调整；严格DLSS5_TEST_PAD_C32_LDS=0/1宏控制，默认32。
+- 首轮机械替换误将(group*32+key)中的分组长度也替成stride，编译器以越界拒绝，session10919/PID39344 exit1，无GPU错误核执行。停止命令到达时进程已结束。修正为(group*32+key)*stride后重跑，失败日志远端indexing-error.*.log保留。
+- session60219/PID41960 exit0，五轮off/on/reset输出下载后逐字节原版一致。暖轮1590.0457→1512.6764325ms，约4.9%；preblock106.34406、encoder1_4=87.62789、post70=87.01505、tail67_69=64.47889ms。
+- 证据release/native-network70-pad-c32/profile-validation.json；该运行包含尾段细分时间戳，比较decoder尾段须求tail*合计。安装版未改，10fps未达到。下一步可测其它通道的同类共享布局。
+
 ### 2026-09-07：解码尾段细分完成，排除上采样投影瓶颈
 
 - NativeDecoderTail69::Record/NativeActualDecoder69::RecordStage可选timestamp，profile下分十段；network额外tail_begin隔离跨提交间隙，默认无数学改动。

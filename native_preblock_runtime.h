@@ -61,7 +61,8 @@ public:
   const wchar_t* names[]={L"preblock_input_mix.hlsl",L"preblock_attention_core.hlsl",L"preblock_finish.hlsl"};
   auto count=std::to_string(UINT64(w)*h*32);
   const wchar_t*cache_flag=_wgetenv(L"DLSS5_TEST_CACHE_C32_INPUT");if(cache_flag&&wcscmp(cache_flag,L"0")&&wcscmp(cache_flag,L"1"))throw std::runtime_error("invalid cached C32 input flag");
-  D3D_SHADER_MACRO macros[]={{"TOTAL_OUTPUTS",count.c_str()},{"FULL_FFN","1"},{"RAW_OUTPUT","1"},{"RAW_INPUT",raw_features?"1":"0"},{"DEBUG_FEATURES","0"},{"DYNAMIC_PARAMETERS","1"},{"LIVE_PROFILE",live_profile?"1":"0"},{"NOISE_SEED","0"},{"NATIVE_NOISE_TABLE",noise?"1":"0"},{"NATIVE_TEMPORAL_RGB",temporal?"1":"0"},{"NATIVE_CACHE_C32_INPUT",cache_flag&&!wcscmp(cache_flag,L"1")?"1":"0"},{nullptr,nullptr}};
+  const wchar_t*pad_flag=_wgetenv(L"DLSS5_TEST_PAD_C32_LDS");if(pad_flag&&wcscmp(pad_flag,L"0")&&wcscmp(pad_flag,L"1"))throw std::runtime_error("invalid C32 LDS padding flag");
+  D3D_SHADER_MACRO macros[]={{"TOTAL_OUTPUTS",count.c_str()},{"FULL_FFN","1"},{"RAW_OUTPUT","1"},{"RAW_INPUT",raw_features?"1":"0"},{"DEBUG_FEATURES","0"},{"DYNAMIC_PARAMETERS","1"},{"LIVE_PROFILE",live_profile?"1":"0"},{"NOISE_SEED","0"},{"NATIVE_NOISE_TABLE",noise?"1":"0"},{"NATIVE_TEMPORAL_RGB",temporal?"1":"0"},{"NATIVE_PAD_C32_LDS",pad_flag&&!wcscmp(pad_flag,L"1")?"1":"0"},{"NATIVE_CACHE_C32_INPUT",cache_flag&&!wcscmp(cache_flag,L"1")?"1":"0"},{nullptr,nullptr}};
   for(UINT i=0;i<3;i++){
    ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
    if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"compile failed";if(error)error->Release();throw std::runtime_error(message);}
