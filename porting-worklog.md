@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：C32 AV及projection Wave通过，整网746ms
+
+- WAVE_C32_AV依赖Wave QKV/scores；exp/prob使用Q/K已闲置half区按key-major存储，无每线程ex/prob数组；原softmax归约顺序不变。QK评分后同步、概率准备后同步，AV两K32矩阵结果每段H，再F。
+- 初版从F32 MatrixUse::B Cast到F16：session72642/PID18452初始化exit=-1073741819（存取违例），无测试帧；独立matrix_smoke通过，GPU可用。未定位确切驱动内部原因，不等同DEVICE_HUNG。日志cast-failure.*保留。
+- 改为QKV阶段将已F量化V直接写half，使用GetCoordinate散布；F32 B Cast路径移除。session57272/PID34256 exit0，15帧最终GPU两输出逐字节原版一致，暖752.19737ms、末5帧751.081916ms。
+- WAVE_C32_PROJECTION再复用Q/K区存AV/原投影权重，Wave投影后保留原残差H与half_add_preserving_midpoint。新增权重half无损检查覆盖前4096项。session76440/PID3856 exit0，15帧输出逐字节原版一致，暖745.959355ms、末5帧744.382106ms；首C32 attention6.04041→5.87988ms，收益小不夸大。
+- 证据release/native-network70-wave-c32-av与-c32-full-attn。默认各开关关闭，编译/diff通过，安装游戏未改，10fps未达到。
+
 ### 2026-09-08：C32 Wave FFN本地打包权重，整网763ms
 
 - 初版native_wave_c32_ffn在约14KiB共享区载入原float系数并转half，保留32→128 gate→32和残差/四K32 H；session11046/PID27872 exit0，15帧exact但暖867.3734593ms不优于862.2546129ms，未采用为快路径。
