@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：noise表驻留GPU，整网1.679秒
+
+- 新NativeResidentTable初始化时由UPLOAD复制到DEFAULT缓冲并完成COPY_DEST→NON_PIXEL_SHADER_RESOURCE转换；专用DIRECT提交及fence完成后释放上传引用，超时/失败保留资源避免未完成GPU引用悬空。仅NativePreblockRuntime的192MiB noise表通过严格DLSS5_TEST_RESIDENT_NOISE=1启用，默认原路径，未改数值。
+- 独立native-network70-resident-noise实验session45400/PID42400 exit0，沿用前五个优化开关，只新增resident noise。五轮history off/on/reset最终6635520值全exact，下载两个GPU输出并由profile分析器逐字节原版核验通过。
+- 四暖轮1720.227495→1678.7057975ms；preblock193.22972→144.14321ms。其它阶段基本接近，不把全网小幅差异夸为跨越式收益。距离10fps仍大。
+- 编译及diff检查通过。证据release/native-network70-resident-noise/profile-validation.json。GPU游戏与测试均未运行，安装版未改。
+
 ### 2026-09-07：普通C32共享前馈整网1.720秒
 
 - preblock_input_mix新增RAW_INPUT限定raw_ffn_shared：8像素一组，shared prefix256/hidden1024，64线程分工，两次同步，保留q8、half残差及四K32舍入。尾组按组拒绝，实际所有路径像素数整除8；2D dispatch按65535组展平。
