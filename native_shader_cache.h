@@ -18,13 +18,30 @@ struct NativeShaderCacheState {
  size_t hits{},compiles{};
 };
 inline NativeShaderCacheState& NativeShaderCache(){static NativeShaderCacheState state;return state;}
+// Snapshot the one flat dependency used by production neural shaders. Unknown
+// includes are compiled through the old uncached path, never cached speculatively.
+struct NativeHalfInclude final:ID3DInclude {
+ std::string bytes;bool unknown{};
+ HRESULT STDMETHODCALLTYPE Open(D3D_INCLUDE_TYPE type,const char*name,const void*,const void**data,UINT*size)override{
+  if(type!=D3D_INCLUDE_LOCAL||!name||std::strcmp(name,"native_half_square.hlsli")){unknown=true;return E_FAIL;}
+  *data=bytes.data();*size=UINT(bytes.size());return S_OK;
+ }
+ HRESULT STDMETHODCALLTYPE Close(const void*)override{return S_OK;}
+};
 inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACRO*macros,const char*entry,ID3DBlob**code,ID3DBlob**errors){
  if(!code||!entry)return E_INVALIDARG;*code=nullptr;if(errors)*errors=nullptr;
  std::ifstream file(path.c_str(),std::ios::binary);if(!file)return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
  std::string source((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
- // Includes require dependency tracking: compile uncached rather than risk
- // treating an unchanged top-level file as an unchanged whole program.
- if(source.find("include")!=std::string::npos){
+ const bool has_include=source.find("include")!=std::string::npos;
+ NativeHalfInclude dependency;bool snapshot=false;std::string source_name;
+ if(has_include){
+  auto slash=path.find_last_of(L"/\\");auto header=(slash==std::wstring::npos?L"":path.substr(0,slash+1))+L"native_half_square.hlsli";
+  std::ifstream include_file(header.c_str(),std::ios::binary);
+  if(include_file){dependency.bytes.assign(std::istreambuf_iterator<char>(include_file),{});snapshot=!dependency.bytes.empty()&&dependency.bytes.size()<1024*1024&&dependency.bytes.find("include")==std::string::npos;}
+  int n=WideCharToMultiByte(CP_UTF8,0,path.data(),int(path.size()),nullptr,0,nullptr,nullptr);
+  if(n>0){source_name.resize(n);WideCharToMultiByte(CP_UTF8,0,path.data(),int(path.size()),source_name.data(),n,nullptr,nullptr);}else snapshot=false;
+ }
+ if(has_include&&!snapshot){
   const bool progress=_wgetenv(L"DLSS5_SHADER_PROGRESS")!=nullptr;auto started=std::chrono::steady_clock::now();
   if(progress){std::fprintf(stderr,"shader_compile_begin uncached_include=1 entry=%s path=%ls\n",entry,path.c_str());std::fflush(stderr);}
   HRESULT hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);
@@ -32,6 +49,7 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
   return hr;
  }
  std::string key=source;key.push_back('\0');key+=entry;key.push_back('\0');
+ if(snapshot){key+=source_name;key.push_back('\0');key+=dependency.bytes;key.push_back('\0');}
  if(macros)for(auto*m=macros;m->Name;m++){key+=m->Name;key.push_back('\0');if(m->Definition)key+=m->Definition;key.push_back('\0');}
  auto&state=NativeShaderCache();std::lock_guard<std::mutex>lock(state.mutex);
  auto found=state.entries.find(key);if(found!=state.entries.end()){
@@ -41,7 +59,11 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
  const bool progress=_wgetenv(L"DLSS5_SHADER_PROGRESS")!=nullptr;
  auto started=std::chrono::steady_clock::now();
  if(progress){std::fprintf(stderr,"shader_compile_begin index=%zu entry=%s path=%ls\n",state.compiles+1,entry,path.c_str());std::fflush(stderr);}
- HRESULT hr=D3DCompile(source.data(),source.size(),"native-standalone",macros,nullptr,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);state.compiles++;
+ HRESULT hr=D3DCompile(source.data(),source.size(),snapshot?source_name.c_str():"native-standalone",macros,snapshot?&dependency:nullptr,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);state.compiles++;
+ if(dependency.unknown){
+  if(*code){(*code)->Release();*code=nullptr;}if(errors&&*errors){(*errors)->Release();*errors=nullptr;}
+  return D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);
+ }
  if(progress){auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();std::fprintf(stderr,"shader_compile_end index=%zu ms=%lld hr=0x%08x\n",state.compiles,(long long)ms,unsigned(hr));std::fflush(stderr);}
  if(SUCCEEDED(hr)){auto*begin=static_cast<const unsigned char*>((*code)->GetBufferPointer());state.entries.emplace(std::move(key),std::vector<unsigned char>(begin,begin+(*code)->GetBufferSize()));}
  return hr;

@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：修复核心include重复编译，位元码对照通过
+
+- native_shader_cache原实现凡出现include即不缓存，导致各层重复编译native_c64等。新增已知flat本地native_half_square.hlsli内容快照：key含源/入口/宏/源路径/依赖字节，编译使用同一快照避免读取时序不一致；未知/system/nested依赖保留原不缓存路径，不推测完整依赖图。
+- Windows小型合同测试验证baseline bytecode一致、重复命中、依赖内容变更失效、宏变更失效、未知include回退且不缓存、system include拒绝快照，全部通过。
+- session57881实际native_c64.hlsl的CHANNELS64/128/256、ffn/attention/projection、RAW_OUTPUT0共9组合与旧D3DCompileFromFile字节相同，第二次命中缓存，exit0。已有FXC loop-shadow/潜在未初始化及X4714临时寄存器过多警告如实保留；后者是待测性能线索，不是已量测结论。
+- 此修改仅编译路径，未改HLSL数学/权重，也未替换正在游戏里的控制DLL。尚未量测整网初始化缩短比例，不宣称推论FPS提升。下一步用更快初始化开展分段GPU性能测量，同时保留已验证实机数值输出。
+
 ### 2026-09-07：真实游戏帧端到端独立原版对照逐位一致
 
 - 实机请求1同源参考48..61任务43619及62..69/post任务58039均exit0，原版/CPU分段检查全部通过。post使用origin-4/valid1080/HALF原版surface，展开float再存half经逐值无损检查后上传AMD原版decode执行器。
