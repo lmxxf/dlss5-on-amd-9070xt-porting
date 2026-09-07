@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：性能回归五帧exact，定位主要耗时区间
+
+- PID24236自然结束/session99945 exit0，五帧off/on/off/on/off各6635520 RGB不同0。下载两种输出逐byte等于独立shift3原版参考，新增analyze_native_network_profile.py复核输出hash、有限性、五帧/区间完整性及各区间和等于total。
+- 网络时间戳total依次4010.716/4018.418/3986.656/3967.068/3936.848ms，明确包含跨提交空档，不是纯算子耗时。暖帧1..4（混合history开关）均值主要项：decoder_stage12=1011.853ms（tail49..69，不是单一末层）、encoder23_head396.568、encoder15_22360.039、encoder9_14352.081、preblock198.722、post70177.692、encoder1_4169.784、encoder5_8165.648。
+- 量测没有改变结果；当前网络约4秒，不能宣称达到10/30fps。下一步在这些已定位区间细分并优化，尤其矩阵/FFN线程布局与寄存器压力；未改游戏DLL或降低正确性门槛。原始及profile-validation.json保存在release/native-network70-profile。
+
 ### 2026-09-07：可选网络时间戳量测启动，游戏正常退出
 
 - 新增native_network_timestamps.h，profile模式分配128 timestamp query与readback，标记preblock、encoder分组、各ViT阶段、decoder13阶段及post；最后提交Resolve并完成fence后读取，检查单调时钟。报告明确includes_inter_submission_gaps=1，跨list区间包含CPU提交空档，不冒充纯算子GPU时间。
