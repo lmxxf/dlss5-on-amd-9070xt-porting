@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完成帧后的源纹理重绑接口
+
+- NativeGameCodec增加RebindInputAfterCompletion，校验同设备/1080p FP16/单mip单采样/非别名，更新对应SRV并先AddRef新资源再Release旧资源。明确调用方必须已完成所有GPU使用，不能在运行中覆写shader-visible描述符。
+- NativeGameFrame增加RebindSourceAfterCompletion，与ProcessSubmittedFrame共享mutex（后者持锁直到各次GPU等待完成），同时重绑encode原图与decode原图，不重建网络/中间缓冲。失败/超时帧禁止重绑；部分更新异常将frame标记failed，不能继续渲染半更新状态。
+- MinGW语法及diff检查通过；重绑不同像素资源的GPU A/B/A测试尚未执行，接口尚未部署游戏。下一步验证重绑实际输出后再进入游戏提交路径。
+
 ### 2026-09-07：AMD实机输出资源轮换与状态观察
 
 - 正常退出29060后旧顺序addon备份.before-state，再部署新版状态观察器，Steam正常启动PID17196 Responding。旧神经渲染仍停用，无存档覆盖操作。

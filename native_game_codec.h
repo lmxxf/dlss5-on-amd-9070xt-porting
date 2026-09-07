@@ -37,6 +37,21 @@ public:
   hr=CompileNativeShader(dir+(count==3?L"\\native_codec_decode.hlsl":L"\\native_codec_encode.hlsl"),nullptr,"main",&b,&err);if(err)err->Release();check(hr);
   D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={b->GetBufferPointer(),b->GetBufferSize()};hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso));b->Release();check(hr);
  }
+ // Caller must have completed every GPU use of this stage before rebinding.
+ void RebindInputAfterCompletion(UINT index,ID3D12Resource*replacement){
+  if(!pso||index>=count||!replacement)throw std::runtime_error("codec rebind contract");
+  if(replacement==source[index])return;
+  auto desc=replacement->GetDesc();
+  if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||desc.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT||(desc.Flags&D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE))throw std::runtime_error("codec rebind geometry/format");
+  if(replacement==output)throw std::runtime_error("codec rebind output alias");
+  for(UINT i=0;i<count;i++)if(i!=index&&source[i]==replacement)throw std::runtime_error("codec rebind input alias");
+  ID3D12Device*d=nullptr,*owner=nullptr;check(heap->GetDevice(IID_PPV_ARGS(&d)));
+  auto hr=replacement->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr)){d->Release();check(hr);}
+  bool same=owner==d;owner->Release();if(!same){d->Release();throw std::runtime_error("codec rebind device mismatch");}
+  D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.Format=desc.Format;sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Texture2D.MipLevels=1;
+  auto cpu=heap->GetCPUDescriptorHandleForHeapStart();cpu.ptr+=SIZE_T(index)*d->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+  replacement->AddRef();d->CreateShaderResourceView(replacement,&sv,cpu);d->Release();source[index]->Release();source[index]=replacement;
+ }
  void Record(ID3D12GraphicsCommandList*c,const std::vector<D3D12_RESOURCE_STATES>&before,float paper_white=1.f){
   if(!c||!pso||before.size()!=count||(paper_white!=1.f&&paper_white!=.5f&&paper_white!=2.f))throw std::runtime_error("codec unverified record contract");
   if(recorded)transition(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);

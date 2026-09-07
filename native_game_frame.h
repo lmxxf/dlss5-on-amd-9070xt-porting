@@ -5,7 +5,7 @@
 
 // Integration boundary, not a ReShade callback. The caller must establish the
 // correct source/color contract and submit all input producers before Process.
-// One stable source texture per instance; recreate after draining on resize.
+// Rebind rotating same-size source only after completed frames; recreate on resize.
 class NativeGameFrame {
  struct Resources {
   ID3D12Resource*original{}; // Kept alive by encode/decode resource references.
@@ -39,6 +39,15 @@ public:
    resources->neural.Create(d,resources->network.Output(),directory);
    resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);ready=true;
   }catch(...){failed=true;throw;}
+ }
+ void RebindSourceAfterCompletion(ID3D12Resource*source){
+  // ProcessSubmittedFrame holds this mutex through all completion waits. Failed
+  // frames are never eligible: timeout does not mean GPU work has completed.
+  std::lock_guard<std::mutex>guard(mutex);
+  if(!ready||failed||!source)throw std::runtime_error("frame rebind unavailable");
+  if(source==resources->original)return;
+  try{resources->encode.RebindInputAfterCompletion(0,source);resources->decode.RebindInputAfterCompletion(2,source);resources->original=source;}
+  catch(...){failed=true;throw;}
  }
  // Synchronizes encode -> network -> FP16 bridge -> decode -> FP16 copy on the
  // supplied queue. Both source and destination return to their original states.
