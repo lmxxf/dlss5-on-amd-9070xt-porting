@@ -26,24 +26,22 @@ uint window_pixel(uint window,uint token){return ((window/(width/8))*8+token/8)*
 
 #if DIRECT_NORMALIZE
 RWByteAddressBuffer packed:register(u0);
-[numthreads(64,1,1)]void normalize(uint3 id:SV_DispatchThreadID){
- uint n=id.x+id.y*65535u*64u;if(n>=width*height*HEADS)return;
- uint window=n/(64*HEADS),rest=n%(64*HEADS),token=rest/HEADS,head=rest%HEADS,p=window_pixel(window,token);
- float q[32],k[32],qs[16],ks[16];
- [unroll]for(uint c=0;c<32;c++){uint row=head*32+c;q[c]=feature[p*STRIDE+row];k[c]=feature[p*STRIDE+CHANNELS+row];}
- [unroll]for(uint i=0;i<16;i++){qs[i]=NativeHalfSquarePair(q[i],q[i+16]);ks[i]=NativeHalfSquarePair(k[i],k[i+16]);}
- [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
- [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
- float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5))),scale=H(weights[SCALE_OFFSET+head]);
- uint base=(window*64+token)*STRIDE+head*32;
- [unroll]for(uint c=0;c<32;c+=2){
-  float q0=F(H(H(q[c]*qi)*scale)),q1=F(H(H(q[c+1]*qi)*scale));
-  float k0=F(H(k[c]*ki)),k1=F(H(k[c+1]*ki));
-  float v0=F(feature[p*STRIDE+2*CHANNELS+head*32+c]),v1=F(feature[p*STRIDE+2*CHANNELS+head*32+c+1]);
-  packed.Store((base+c)*2,f32tof16(q0)|(f32tof16(q1)<<16));
-  packed.Store((base+CHANNELS+c)*2,f32tof16(k0)|(f32tof16(k1)<<16));
-  packed.Store((base+2*CHANNELS+c)*2,f32tof16(v0)|(f32tof16(v1)<<16));
- }
+// One wave per (token, head): lane c owns channel c. The square-sum tree is the
+// original 16-pair / 8 / 4 / 2 / 1 sequence, evaluated with wave lane reads.
+[WaveSize(32)]
+[numthreads(32,1,1)]void normalize(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint n=gid.x+gid.y*65535u;if(n>=width*height*HEADS)return;
+ uint window=n/(64*HEADS),rest=n%(64*HEADS),token=rest/HEADS,head=rest%HEADS,p=window_pixel(window,token),c=tid.x;
+ float q=feature[p*STRIDE+head*32+c],k=feature[p*STRIDE+CHANNELS+head*32+c],v=feature[p*STRIDE+2*CHANNELS+head*32+c];
+ float qs=NativeHalfSquarePair(q,WaveReadLaneAt(q,c+16)),ks=NativeHalfSquarePair(k,WaveReadLaneAt(k,c+16));
+ {float a=WaveReadLaneAt(qs,c*2),b=WaveReadLaneAt(qs,c*2+1);float ka=WaveReadLaneAt(ks,c*2),kb=WaveReadLaneAt(ks,c*2+1);qs=H(a+b);ks=H(ka+kb);}
+ [unroll]for(uint step=4;step>0;step/=2){float a=WaveReadLaneAt(qs,c+step),b=WaveReadLaneAt(ks,c+step);qs=H(qs+a);ks=H(ks+b);}
+ float q0=WaveReadLaneAt(qs,0),k0=WaveReadLaneAt(ks,0);
+ float qi=H(rsqrt(max(q0,6.198883056640625e-5))),ki=H(rsqrt(max(k0,6.198883056640625e-5))),scale=H(weights[SCALE_OFFSET+head]);
+ uint base=(window*64+token)*STRIDE+head*32+c;
+ packed.Store<float16_t>(base*2,float16_t(F(H(H(q*qi)*scale))));
+ packed.Store<float16_t>((base+CHANNELS)*2,float16_t(F(H(k*ki))));
+ packed.Store<float16_t>((base+2*CHANNELS)*2,float16_t(F(v)));
 }
 #else
 RWStructuredBuffer<float> output:register(u0);
