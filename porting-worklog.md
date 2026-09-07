@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD实机原生提交返回入口确认
+
+- 正常退出17196后备份观察器.before-return，部署原生ExecuteCommandLists返回观察器，Steam正常启动PID5508 Responding。下载order-5508.txt；execute_hook_status0，无额外GPU工作。
+- 首个FFX list24cba540返回后close API24cba548/native24ddb1a0；原生queue2f235700提交batch2，items248dce10和24ddb1a0，随后出现execute_native_return，游戏后续dispatch/draw才继续记录。明确观察到原调用返回，不再把ReShade before事件当提交完成。
+- return仍不代表GPU完成；同queue后续神经分段命令可依赖有序提交，但需确认原生queue类型、source原生DXGI描述及插入点状态，再实现实际工作。当前仅只读探针，旧渲染addon停用保留，新渲染DLL未部署。
+
 ### 2026-09-07：原生ExecuteCommandLists返回只读观察器构建
 
 - 顺序探针在首个FFX之后的ReShade before-execute事件获取native queue，经SDK vtable slot10安装一次ExecuteCommandLists观察hook；记录begin、batch中至多64个list及原调用return，不修改列表、不插入GPU命令或fence、不重试冲突。
