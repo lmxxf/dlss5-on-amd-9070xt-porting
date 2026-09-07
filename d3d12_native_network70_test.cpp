@@ -4,8 +4,14 @@
 #include "native_actual_network70.h"
 #include "native_temporal_coordinates.h"
 #include "native_temporal_sample.h"
+#ifdef MATRIX_BENCH
+extern "C" {__declspec(dllexport) extern const UINT D3D12SDKVersion=721;__declspec(dllexport) const char*D3D12SDKPath=".\\D3D12\\";}
+#endif
 
 int wmain(int argc,wchar_t**argv){try{
+#ifdef MATRIX_BENCH
+ const IID experimental={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};ck(D3D12EnableExperimentalFeatures(1,&experimental,nullptr,nullptr));
+#endif
  if(argc!=3)return 2;std::wstring dir=argv[1];
  const wchar_t*single_setting=_wgetenv(L"DLSS5_TEST_SINGLE_LIST");
  if(single_setting&&wcscmp(single_setting,L"1"))throw std::runtime_error("invalid single-list test flag");

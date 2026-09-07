@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：硬件矩阵C256接整网，五帧exact/1.348秒
+
+- NativeC64Shift新增严格DLSS5_TEST_MATRIX_C256=0/1，只在channels256且tiled已有开启时调用matrix expand/pack/QKV；其它通道原路径。d3d12_native_network70_test MATRIX_BENCH构建导出Agility721且设备创建前启用实验shader。
+- 独立native-network70-matrix-c256目录保留旧输入/权重，仅更新native_c64 shader与三矩阵CSO、私有runtime。session62285/PID7664 exit0，五帧history0/1/0/1/0，6635520值different0；下载实际GPU两输出并由分析器逐字节独立原版验证通过。
+- 暖轮1347.77308ms；encoder15_22=57.23774ms，encoder23_head109.78807、preblock103.65787、post70=97.090735ms。虽比旧1.470秒快，但runtime/驱动已变，完整差额不单独归因矩阵实现；后续以同环境baseline比较。
+- 已覆盖多层权重、移位、raw输出下采样及整网，不只是block52样本。证据release/native-network70-matrix-c256/profile-validation.json。游戏安装不变，10fps未达到。下一步扩其它通道并保留预览环境基线。
+
 ### 2026-09-07：C256矩阵QKV接通，核心耗时约减47%
 
 - native_matrix_qkv将打包half特征×原QKV权重按K32矩阵/F32输出/H累加，写pixel-major三路C256 raw；权重只初始化一次无损打包。NativeC64显式use_matrix_qkv依赖pack_input，重新打包FFN结果后计算QKV，新增原始QKV缓存由根SRV t2传入旧attention。
