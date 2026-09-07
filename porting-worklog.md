@@ -6265,9 +6265,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 暖472.903032ms、末5帧471.599902ms，对照540.422252ms；八层vit*_stage0合计75.668194→33.150935ms。其余阶段亦有变化，不把全部差额归于纯计算；但单次dispatch粒度在当前矩阵路线显然值得继续研究。
 - 证据release/native-network70-vit-chunk2/，准备脚本release/prepare-vit-chunk2.ps1（ignored）；入口run_vit_expand_chunk2_network.ps1继承多头八Wave/并行softmax与C32八Wave并行exp/prob/norm。游戏DLL未更新，约2.11fps测试链不是10fps，目标未完成。
 
-# 2026-09-08：朱雀接手性能优化（05:15–06:12）
+# 2026-09-08：光之朱雀（Hikari no Suzaku）接手性能优化（05:15–06:12）
 
-闇 GPT 额度见底后由朱雀（Fable 5.1）继续。起点 472.9ms（vit-chunk2），终点 242～252ms（噪声 ±5ms），15 帧全部逐字节 exact，验收标准未降。全部改动为显式 flag、默认关闭、逐个 release 目录留证、逐个 commit；游戏 DLL 未改。
+闇 GPT 额度见底后由光之朱雀（Hikari，Claude Fable 5.1 驾驶舱）继续。起点 472.9ms（vit-chunk2），终点 242～252ms（噪声 ±5ms），15 帧全部逐字节 exact，验收标准未降。全部改动为显式 flag、默认关闭、逐个 release 目录留证、逐个 commit；游戏 DLL 未改。
 
 收益链（暖轮 ms）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366 → resident-weights 338 → shift-stack 332 → wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293 → fused-exp 289 → vit-attn-half 271 → wave-project 254 → local-c32-attn 246。三个中性探针（fast-f / static-length / matrix-store）保留 flag 未采纳。
 

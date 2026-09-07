@@ -1,12 +1,14 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
-## 2026-09-08 05:15 朱雀接手性能优化（闇 GPT 额度见底）
+## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
+
+**06:22 驱动回退根因已闭合（光）**：04:22 的 26.8.1 重装来自 AMD 装软件时默认建的两条 SYSTEM 级计划任务——`AMD Install Manager - Check For Updates`（每日 03:00）和 `AMD Install Manager - Install Updates`（机器空闲触发，`-InstallUpdates -Auto`）。Adrenalin 界面的自动更新开关不管它们；Security 日志 04:22 前无交互登录。用户已于 06:22 在 AMD 机上 Disable-ScheduledTask 关闭两条任务（可 Enable 恢复）。当前显卡驱动仍为预览版 32.0.31007.2048。探针脚本 amd_trigger_probe.ps1 / amd_task_probe.ps1 入库。
 
 **06:12 收工：暖轮 242～252ms（约 4fps；run-to-run 噪声约 ±5ms，小于 5ms 的差异不要当结论）。完整入口 `run_local_c32_attention_network.ps1`（246.3ms，release/native-network70-local-c32-attn）。**
 
 06:05 之后三个探针都在噪声内、未采纳（flag 保留、默认关）：fast-f（位元 FP8 量化，DLSS5_BUILD_FAST_F；第一版用 half-away 舍入直接 differs——HLSL round() 是 RNE，改 RNE 后 exact 但无收益，失败日志 release/native-network70-fast-f/failed-half-away.stdout.log）；static-length（acc.Length() 循环改静态 8 次展开，DLSS5_BUILD_STATIC_LENGTH，证实 Length()==8，收益 ≤ 噪声）；matrix-store（f16 隐藏层输出从 GetCoordinate 逐元素 Store 改 Cast<F16>().Store，现为默认，NATIVE_SCATTER_STORE=1 可回退，中性）。**结论：C32 FFN 每 token 5ns、多头注意力每组 65µs 的成本都不在算术，也不在带宽（pack/crop 拷贝实测 530GB/s，FFN 只到带宽下限的 1/4）；剩下的解释只有 wave 矩阵路径本身的指令开销/延迟链，没有指令级 profiler 之前别再猜。**
 
-**给下一位（闇或我）的下一步，按预期收益排**：(1) 多头注意力（1.6ms×38≈61ms）——让 QKV GEMM 直接输出窗口主序的 f16，注意力核用 wave load 直取 Q/K/V、不再经 LDS 转存，同时把输出改矩阵 Store；(2) C32 注意力（preblock 12.7 + 7×2.85 + post70 内）——把 QKV/投影 GEMM 从每窗口融合核拆成整层 wave GEMM（像多头路径那样），融合核只留 QK/softmax/AV；(3) decoder 入口与三段上采样投影（约 10ms）仍是标量 NativeVitLinear decoder 形态，可套 blocked reduce；(4) 512 split 注意力/QKV/投影三段各 0.5ms×16。注意力以外的 GEMM 类算子已全部在 wave 矩阵路径上，再挤空间很小。
+**给下一位（闇或光）的下一步，按预期收益排**：(1) 多头注意力（1.6ms×38≈61ms）——让 QKV GEMM 直接输出窗口主序的 f16，注意力核用 wave load 直取 Q/K/V、不再经 LDS 转存，同时把输出改矩阵 Store；(2) C32 注意力（preblock 12.7 + 7×2.85 + post70 内）——把 QKV/投影 GEMM 从每窗口融合核拆成整层 wave GEMM（像多头路径那样），融合核只留 QK/softmax/AV；(3) decoder 入口与三段上采样投影（约 10ms）仍是标量 NativeVitLinear decoder 形态，可套 blocked reduce；(4) 512 split 注意力/QKV/投影三段各 0.5ms×16。注意力以外的 GEMM 类算子已全部在 wave 矩阵路径上，再挤空间很小。
 
 **没动的东西**：游戏 DLL、发行包、任何默认行为（所有新路径都是显式 flag）；闇的“整阶段合并提交 DEVICE_HUNG”结论未复测；AMD 驱动自动更新未关（04:22 那次回退的触发者仍未知）。
 
