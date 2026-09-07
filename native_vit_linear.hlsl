@@ -3,6 +3,21 @@ RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint tokens;uint output_base;}
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#if EXPAND
+groupshared float tile_input[8*33],tile_weight[32*33];
+[numthreads(64,1,1)]void expand_tiled(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint t=tid.x,first=output_base/OUTPUT_CHANNELS+gid.y*8,token=first+t/8,row=gid.x*32+(t%8)*4;
+ if(first>=tokens)return;float4 a=0;
+ [loop]for(uint k=0;k<INPUT_CHANNELS;k+=32){
+  for(uint i=t;i<256;i+=64)tile_input[(i/32)*33+i%32]=input[(first+i/32)*INPUT_CHANNELS+k+i%32];
+  for(uint i=t;i<1024;i+=64)tile_weight[(i%32)*33+i/32]=weights[(gid.x*32+i/32)*INPUT_CHANNELS+k+i%32];
+  GroupMemoryBarrierWithGroupSync();float4 s=0;
+  [loop]for(uint j=0;j<32;j++){uint w=j*33+(t%8)*4;float v=tile_input[(t/8)*33+j];s+=v*float4(tile_weight[w],tile_weight[w+1],tile_weight[w+2],tile_weight[w+3]);}
+  a=float4(H(a.x+s.x),H(a.y+s.y),H(a.z+s.z),H(a.w+s.w));GroupMemoryBarrierWithGroupSync();
+ }
+ [unroll]for(uint r=0;r<4;r++){float g=clamp(a[r],-4.0,4.0),poly=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);output[token*OUTPUT_CHANNELS+row+r]=F(H(a[r]*poly));}
+}
+#endif
 [numthreads(64,1,1)]void main(uint3 id:SV_DispatchThreadID){
  uint index_out=output_base+id.x;
  uint token=index_out/OUTPUT_CHANNELS,row=index_out%OUTPUT_CHANNELS;if(token>=tokens)return;

@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：ViT expand分块无整网收益，默认关闭
+
+- 新expand_tiled使用8token×32行、每线程4输出共享输入/权重，保留每K32 H、gate/F及output_base；host仅EXPAND且显式DLSS5_TEST_TILED_VIT_EXPAND=1启用。Record/RecordChunk均保持原65536输出块和原逐块提交，不合并阶段。
+- 独立native-network70-tiled-expand实验session88765/PID36544 exit0。五轮off/on/reset最终输出下载后逐字节原版一致，无设备挂起。
+- 暖轮1482.349745ms，相比1469.7617425ms无收益；ViT stage0约21.64～26.88ms，未明显下降。不宣传加速、不推广游戏。证据release/native-network70-tiled-expand/profile-validation.json。
+- 编译与diff检查通过。下一方向需要拆分GPU dispatch本身与CPU/fence提交间隙，再决定方案；游戏安装不变、当前无测试运行。
+
 ### 2026-09-07 21:30：阶段合并提交失败并撤回，GPU恢复确认
 
 - 用户中断等待后查原session43310/PID41232，确认已exit1而非仍运行。stderr game submission HRESULT=2289696774（0x887a0006 DXGI_ERROR_DEVICE_HUNG），stdout无完整测试帧。
