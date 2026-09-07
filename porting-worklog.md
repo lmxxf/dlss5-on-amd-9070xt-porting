@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：分块核心扩展至C128/C64，原版五轮逐位通过
+
+- bench支持可选geometry.txt（width height channels raw），严格检查字段和输入尺寸，默认保持旧120×72×256。RAW_OUTPUT测试入口已开放，但本轮没有验证raw=true。
+- C128选原始零移位decoder58，不误用带移位的oracle。session28112 exit0，240×144×128，每轮4423680值，五轮baseline/候选对原版oracle不同0、彼此位差0。暖轮完整核心104.01142→12.56976ms。日志 release/c64-tiled-c128/result.log。
+- 新prepare_native_c64_encoder5_bench.py从已验证原版encoder5导出C64夹具：解码原block4-down输入布局、原block5输出布局、原权重，记录源SHA，不运行候选生成答案。session23170/PID40740已exit0，480×288×64，每轮8847360值，五轮三项不同均0。暖轮完整核心53.08858→17.28032ms；attention单段9.22399→11.28933ms，局部有回退，但整核心仍有收益。日志 release/c64-tiled-c64/result.log。
+- 编译和git diff --check通过。生产默认仍关闭；真实整网encoder组末层使用raw=true，不能跳过该路径回归就启用。下一步raw输出、移位包装与整网验证，随后再更新游戏DLL。未宣称1080p实时或动态画面验收完成。
+
 ### 2026-09-07：分块展开、收缩与双投影五轮逐位通过
 
 - 上轮 session49139 已 exit0：block52 每轮2211840值，五轮 baseline/候选对原版oracle不同0、彼此位差0；暖轮原核心143.32169ms，展开+收缩分块候选21.66677ms。日志 release/c64-tiled-expand-contract/result.log。
