@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机原生FP16/DIRECT确认，同时发现device包装差异
+
+- 观察器增加前8帧output GetDesc/GetDevice与前8批native queue GetDesc/GetDevice，均只读。构建及Windows mock转发测试通过。正常退出5508、备份.before-desc后部署，新PID27000 Responding，日志order-27000.txt已保存。
+- 输出原生desc：dimension3(Texture2D)、DXGI10(RGBA16_FLOAT)、1920×1080、samples1/mips1、flags5；资源轮换ea516630/11e4dad10。原生提交queue2f195ce0 type0(DIRECT)、flags0，满足分段提交队列类型要求。
+- resource GetDevice返回1446eaf0，native queue GetDevice返回24c04170，两者都成功但指针不等。可能是ReShade/其它包装层，尚未证明；不能仅按同Adapter LUID忽略差异，也不能直接使用离线指针相等合同。下一步核对unwrapped接口与COM身份，避免混用不同真实device。
+- 游戏仍只有观察器，实际神经渲染未部署。
+
 ### 2026-09-07：AMD实机原生提交返回入口确认
 
 - 正常退出17196后备份观察器.before-return，部署原生ExecuteCommandLists返回观察器，Steam正常启动PID5508 Responding。下载order-5508.txt；execute_hook_status0，无额外GPU工作。

@@ -18,6 +18,7 @@ static SRWLOCK lock=SRWLOCK_INIT;
 using ExecuteLists=void(STDMETHODCALLTYPE*)(ID3D12CommandQueue*,UINT,ID3D12CommandList*const*);
 static ExecuteLists original_execute{};
 static std::atomic<bool>execute_install_attempted{};
+static std::atomic<unsigned>native_batches{};
 static void log(const char*kind,void*list,void*queue,unsigned value=0){
  if(!frames.load()||events.fetch_add(1)>=8192)return;
  AcquireSRWLockExclusive(&lock);
@@ -36,6 +37,13 @@ static uint32_t dispatch(void**context,const Header*h){
  SIZE_T output_bytes=0;
  if(ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+312,&output,sizeof(output),&output_bytes)&&output_bytes==sizeof(output)){
   tracked_output.store(reinterpret_cast<uint64_t>(output.resource));
+  if(n<=8&&output.resource){
+   auto*r=static_cast<ID3D12Resource*>(output.resource);auto desc=r->GetDesc();ID3D12Device*device=nullptr;auto hr=r->GetDevice(IID_PPV_ARGS(&device));
+   AcquireSRWLockExclusive(&lock);
+   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
+    fprintf(f,"pid=%lu kind=native_output_desc frame=%u resource=%p dimension=%u dxgi=%u size=%llux%u samples=%u mips=%u flags=%u device=%p device_hr=%08x\n",GetCurrentProcessId(),n,r,unsigned(desc.Dimension),unsigned(desc.Format),(unsigned long long)desc.Width,desc.Height,desc.SampleDesc.Count,desc.MipLevels,unsigned(desc.Flags),device,unsigned(hr));fclose(f);
+   }ReleaseSRWLockExclusive(&lock);if(device)device->Release();
+  }
   if(n<=8){AcquireSRWLockExclusive(&lock);
    if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
     fprintf(f,"pid=%lu thread=%lu tick=%llu kind=ffx_output frame=%u list=%p resource=%p format=%u size=%ux%u declared_state=%u payload_only=1\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),n,list,output.resource,output.format,output.width,output.height,output.state);fclose(f);
@@ -45,6 +53,14 @@ static uint32_t dispatch(void**context,const Header*h){
  auto result=original(context,h);log("ffx_end",list,nullptr,result);return result;
 }
 static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3D12CommandList*const*lists){
+ const unsigned batch=++native_batches;
+ if(q&&batch<=8){
+  auto desc=q->GetDesc();ID3D12Device*device=nullptr;auto hr=q->GetDevice(IID_PPV_ARGS(&device));
+  AcquireSRWLockExclusive(&lock);
+  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
+   fprintf(f,"pid=%lu kind=native_queue_desc batch=%u queue=%p type=%u flags=%u device=%p device_hr=%08x\n",GetCurrentProcessId(),batch,q,unsigned(desc.Type),unsigned(desc.Flags),device,unsigned(hr));fclose(f);
+  }ReleaseSRWLockExclusive(&lock);if(device)device->Release();
+ }
  log("execute_native_begin",nullptr,q,count);
  if(lists&&count<=64)for(UINT i=0;i<count;i++)log("execute_native_item",lists[i],q,i);
  original_execute(q,count,lists);
