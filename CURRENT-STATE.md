@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+Wave C32 attention位元FP8复测失败（性能）：NATIVE_FAST_C32_FP8=1专门重编完整attention CSO，15帧exact但暖608.875417ms、末5帧609.813532ms，post70_body37.79873ms（原33.60917）、preblock attention28.99365ms、首C32 attention6.93963ms。未采纳，默认旧F。证据release/native-network70-wave-c32-fast-fp8，runner run_wave_c32_fast_fp8_network.ps1。不是早期FXC标量复测，同样结论；游戏未改，10fps未达到。
+
 C32 Wave score行padding候选15帧exact：SCORE_ROW32→33、SCORE_WIDE64→65，score容量4096→4224 float（+512B），矩阵/标量索引同步改。暖585.284452ms、末5帧586.848162ms，post70_body32.85373ms（旧33.60917），首C32 attention5.64669ms。整网差异很小，仍显式候选、默认关闭，不宣称稳定整体提速。证据release/native-network70-padded-c32-scores；runner run_padded_c32_scores_network.ps1。游戏未改，10fps未达到。
 
 矩阵版C32权重驻留复测15帧exact但未采纳：RESIDENT_C32_WEIGHTS=1，暖587.328718ms、末5帧591.87154ms；post70_body33.63794ms对旧33.60917ms几乎无变化，preblock attention23.91003ms、首C32 attention5.74253ms。仍不启用该flag；证据release/native-network70-resident-c32-matrix，runner run_resident_c32_matrix_network.ps1。权重复制发生初始化，不改数值，游戏未改，10fps未达到。

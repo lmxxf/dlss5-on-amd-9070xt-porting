@@ -6150,3 +6150,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC通过，PID43940退出0；15帧最终different0，下载两份结果与独立原版参考byte-exact。暖585.2844521ms、末5帧586.848162ms；post70_body32.853729ms对旧33.609171ms，preblock attention23.59904ms，首C32 attention5.646686ms。
 - 局部小幅改善但整网相对586.27370ms基线差异不足以确认稳定收益，保留显式候选而不推广默认。不是已经测到硬件bank冲突计数，当前只有布局与计时证据。
 - 证据release/native-network70-padded-c32-scores/，准备/manifest脚本在release/（ignored）；入口run_padded_c32_scores_network.ps1。游戏未改，10fps未达到。
+# 2026-09-08：Wave C32注意力位元FP8复测，性能倒退
+
+- 既有NativeFastFp8此前只在更早标量路径测试；本次单独编译当前完整Wave C32 attention的NATIVE_FAST_C32_FP8=1，其余CSO/配置不变，未开启padding/驻留/共享概率等候选。
+- DXC通过，PID34864退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact。暖608.875417ms、末5帧609.813532ms。
+- post70_body37.798734ms对旧33.609171ms，preblock_detail_stage1 28.993649ms，首c32_probe_stage1 6.939626ms，相关C32区间均倒退；不能凭减少log2/exp2断言更快。
+- 不采纳，不改默认F，不宣称实测寄存器/指令原因。证据release/native-network70-wave-c32-fast-fp8/和准备脚本release/prepare-wave-c32-fast-fp8.ps1（ignored）；显式复现入口run_wave_c32_fast_fp8_network.ps1。有效基线仍约586ms，游戏DLL未改，10fps未完成。
