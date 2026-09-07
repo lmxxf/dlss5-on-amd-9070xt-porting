@@ -1,8 +1,9 @@
 """Generate original encoder1..4 from the verified valid1080 preblock output."""
 from pathlib import Path
-import subprocess,os,json,hashlib
+import subprocess,os,json,hashlib,argparse
 import numpy as np
-base=Path('release/native-rgb-valid1080');out=base/'encoder-c32';out.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base=args.base;out=base/'encoder-c32';out.mkdir(exist_ok=False)
 source=base/'block0-down.fp8';w,h=960,576;reports=[]
 env={k:v for k,v in os.environ.items() if not k.startswith(('DLSS5_PREBLOCK_','DLSS5_NATIVE_SCAN_','DLSS5_SPLIT_'))}
 for b,shift in ((1,0),(2,3),(3,1),(4,2)):

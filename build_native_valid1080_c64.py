@@ -2,8 +2,8 @@
 from pathlib import Path
 import subprocess,json,os,hashlib,argparse
 import numpy as np
-p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--c128',action='store_true');g.add_argument('--c256',action='store_true');args=p.parse_args()
-base=Path('release/native-rgb-valid1080');root=base/('encoder-c256' if args.c256 else 'encoder-c128' if args.c128 else 'encoder-c64');root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));g=p.add_mutually_exclusive_group();g.add_argument('--c128',action='store_true');g.add_argument('--c256',action='store_true');args=p.parse_args()
+base=args.base;root=base/('encoder-c256' if args.c256 else 'encoder-c128' if args.c128 else 'encoder-c64');root.mkdir(exist_ok=False)
 source=base/('encoder-c128/block14-down.fp8' if args.c256 else 'encoder-c64/block8-down.fp8' if args.c128 else 'encoder-c32/block4-down.fp8');w,h,C=(120,72,256) if args.c256 else (240,144,128) if args.c128 else (480,288,64);reports=[]
 sequence=((15,0),(16,3),(17,1),(18,2),(19,0),(20,3),(21,1),(22,2)) if args.c256 else ((9,0),(10,3),(11,1),(12,2),(13,0),(14,3)) if args.c128 else ((5,0),(6,3),(7,1),(8,2))
 first,last=sequence[0][0],sequence[-1][0];heads=C//32

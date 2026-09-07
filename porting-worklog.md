@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整时序网络测试接线完成，原版对照推进到encoder22
+
+- d3d12_native_network70_test.cpp支持history/MV/reciprocal/独立temporal-final-oracle四项配套输入，缺任何一项提前拒绝。GPU motion→sampler在同队列先提交，再Run(...,enabled)；五帧off/on/off/on/off分别比较旧首帧与独立时序最终RGB。默认旧三帧单RGB不变，超时失败仍保留整个heap资源图，不在GPU未完成时析构。
+- 新exe /tmp/native-network70-temporal.exe经MinGW完整编译成功（session5425）；尚未启动全网测试，因为时序最终oracle仍在生成。不使用单帧oracle替代时序oracle。
+- build_native_valid1080_c32.py/c64.py增加--base，默认目录不变。以已验证original.down.fp8作为时序block0-down，session54616生成encoder1..8，session20502生成encoder9..22。结果在release/native-temporal-valid1080各encoder目录，记录哈希、尺寸/有限值检查；这是原版对照生成，不是AMD全网通过。
+- 下一步继续encoder23..30/head/ViT/decoder/post的同源时序oracle，再运行完整GPU测试。历史输入当前是受控fixture，不等于游戏历史资源生命周期已完成；游戏DLL未改。
+
 ### 2026-09-07：完整网络新增时序绑定接口，前端重置/重启历史回归通过
 
 - NativeActualNetwork70::Create可选temporal_rgb，按同设备/1920×1152 float4 buffer容量检查后交preblock持有；Run新增默认false的temporal_enabled，未绑定却请求启用会在提交GPU前拒绝。所有既有调用默认单RGB行为不变。调用者须先在同队列提交时序输入生产者，绑定不等于历史有效。
