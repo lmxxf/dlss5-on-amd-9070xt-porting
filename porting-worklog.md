@@ -6073,3 +6073,11 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - MinGW MATRIX_BENCH编译通过；远程测试PID4780正常退出0。15帧history off/on/reset最终6635520值逐字节一致，两份下载输出也与独立原版参考完全一致。
 - 暖均661.6714807ms、末5帧662.329258ms；上一raw downsample暖688.0306321ms。preblock_detail_stage2 9.300134→1.143223ms，c32_probe_stage2 2.695094→0.245969ms。其余阶段波动，整网差值不全算作此算子收益。
 - 证据release/native-network70-coalesced-finish/（忽略版本控制）；准备/manifest更新脚本在release/。测试入口run_coalesced_finish_network.ps1，所有权重、网络结构、输入依赖未改，无新增GPU缓冲。游戏安装DLL未更新；约1.51fps测试链不等于游戏10fps，目标仍未完成。
+# 2026-09-08：ViT注意力Wave矩阵路径
+
+- 新增native_wave_vit_attention.hlsl：每组16查询/32线程，逐16键QK矩阵，保留原score H、affine clamp和exp位映射。21,568字节LDS容纳640×16个half exp、512 half暂存和16个float倒数。
+- 分母保持旧key_index树和逐chunk H，计算后才将exp量化F；AV按K32矩阵乘、每段软件H，最后乘half倒数并H/F。输入来自原normalized QKV的F8格点，half存储无损；权重与网络不改。
+- NativeVitAttention仅DLSS5_TEST_WAVE_VIT_ATTENTION=1加载新CSO，原路径默认保留。维持原输出缓冲、资源barrier和提交边界；没有整图额外scratch。
+- MinGW/DXC构建通过，远程PID9652正常退出0；15帧history off/on/reset最终输出逐字节一致，下载两份输出对独立原版参考也byte-exact。当前回归覆盖1080p/640 tokens；其他允许token尺寸仅静态布局检查，不宣称GPU实测覆盖。
+- 暖均649.227125ms、末5帧652.626334ms；此前coalesced基线661.67148ms。八层vit*_stage3从7.54～7.83ms下降至3.68～4.58ms，其他区间有波动，不能把局部节省直接相加当整网收益。
+- 证据release/native-network70-wave-vit-attention/，准备脚本release/prepare-wave-vit-attention.ps1均忽略；可重复入口run_wave_vit_attention_network.ps1。游戏DLL未更新，实际游戏10fps仍未实现。
