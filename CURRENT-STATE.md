@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**06:45 累计（光）：暖轮 225.0ms（约 4.4fps），15帧exact。完整入口 `run_wave_split_project_network.ps1`，证据 release/native-network70-split-project/。** 新增两项：wave-decoder 237.7（decoder39 入口与四段 2× 上采样投影换 wave 矩阵，native_wave_decoder_entry.hlsl，DLSS5_TEST_WAVE_DECODER_LINEAR；decoder_stage1 4.51→0.31、stage10 2.63→0.19、tail56/62/66 project 1.75/1.17/0.78→0.19/0.49/0.64）→ split-project 225.0（512 分裂块的 FFWD/注意力投影复用 native_wave_project.hlsl C512 版，DLSS5_TEST_WAVE_SPLIT_PROJECT；每段 0.47→0.11ms，encoder23_30_body 17.0→11.7）。至此网络里除注意力核和 C32 FFN 外的所有 GEMM 都在 wave 矩阵路径上。剩余大项：多头注意力 ≈61、C32 注意力 ≈45、C32 FFN ≈21、pack/crop ≈15、split 注意力 0.47×16。
+
 **06:22 驱动回退根因已闭合（光）**：04:22 的 26.8.1 重装来自 AMD 装软件时默认建的两条 SYSTEM 级计划任务——`AMD Install Manager - Check For Updates`（每日 03:00）和 `AMD Install Manager - Install Updates`（机器空闲触发，`-InstallUpdates -Auto`）。Adrenalin 界面的自动更新开关不管它们；Security 日志 04:22 前无交互登录。用户已于 06:22 在 AMD 机上 Disable-ScheduledTask 关闭两条任务（可 Enable 恢复）。当前显卡驱动仍为预览版 32.0.31007.2048。探针脚本 amd_trigger_probe.ps1 / amd_task_probe.ps1 入库。
 
 **06:12 收工：暖轮 242～252ms（约 4fps；run-to-run 噪声约 ±5ms，小于 5ms 的差异不要当结论）。完整入口 `run_local_c32_attention_network.ps1`（246.3ms，release/native-network70-local-c32-attn）。**
