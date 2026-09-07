@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：拒绝黑输入并改为显式PID请求诊断帧
+
+- NativeGameOneShot ready后不再自动渲染，250ms节流读取D:\DLSSNR-Lab\neural-frame-request.txt中的PID/单调request-id；仅当前PID、较新正编号且<=1000000接受，旧进程/重复/倒退/非法编号忽略。完成后可由新请求再触发，不重新初始化网络；GPU错误仍phase failed禁止重试。
+- CheckNativeFrameInput检查完整1080p FP16尺寸/全通道有限性/RGB非全零，非零alpha和负零不绕过黑输入拒绝。拒绝时只保存before，不执行网络或写回，回到等待新请求。非黑只是必要条件，不当作场景或画质通过。
+- 输出文件改为neural-PID-request-ID-before/after.f16，保留每次证据；首次旧自动渲染黑图失败文件不动。原生单元测试覆盖黑/负零/alpha/非有限/尺寸及PID请求规则并通过，神经DLL构建通过；最后请求规则调整后重编译仍需收取session结果。
+- 当前游戏仍运行旧phase done版，尚未部署此控制版。下一步正常换版、进入实际游戏场景后请求，核验真正场景输入与神经输出，不能宣告完成。
+
 ### 2026-09-07：实机神经单帧完成但输入全黑，不能验收画面
 
 - PID43088后台线程结束，日志ready tick591635250、render_begin591635312、render_complete591639546，分段渲染调用约4234ms（含记录/等待，非纯GPU计时），游戏仍Responding。
