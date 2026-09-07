@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机后端表确认，同时发现post70运行标量与受控默认不同
+
+- 正常退出PID11188并同步，备份旧参数探针为.before-backend-snapshot，部署e82bcd7d版。新PID26572 NR count1/60成功。backend快照确认vtable RVA0xb6988，slot168→5c0f0、slot170→5c070，确为此前候选表，不能再以“可能选错后端”解释零命中。
+- 当前post SASS两处SUST均从参数+0x10加载同一输出surface，未找到单独历史surface存储；这仍不排除别处复制/别名/交换，不能直接认定历史机制。
+- 下载同PID post launch154到backend/post70.bin。新增audit_live_post_contract.py：processing HW均1152×1920，但live origin=(-4,-4)、texture extent=(1920,1080)、word70=1；受控oracle默认分别(0,0)、(1920,1152)、0。
+- 原点参与SASS像素索引，这些差异必须核对实际作用。现有受控全网exact不证明这些运行标量等价，不能跳过post合同直接宣称游戏完成；word70含义尚未确认。
+- 本轮更新的仅既有只读参数探针，原渲染DLL未替换。下一步优先验证live post原点/有效尺寸及标量行为，同时继续历史生命周期调查。
+
 ### 2026-09-07：准备从已验证launch hook读取实际后端函数表
 
 - 静态核对RVA449a0：self+8为后端对象，self+0x10为命令列表，后续从后端vtable调用0x150/0xd8等槽。不能用未命中的D3D12候选表直接代表实际运行后端。
