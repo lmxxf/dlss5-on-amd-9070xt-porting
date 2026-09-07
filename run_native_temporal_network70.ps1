@@ -3,6 +3,9 @@ $ErrorActionPreference='Stop'
 if($SingleList -and $GpuProfile){throw 'Timestamp reporting requires completed segmented submissions'}
 if($GpuProfile){$env:DLSS5_NETWORK_GPU_PROFILE='1'}else{Remove-Item Env:DLSS5_NETWORK_GPU_PROFILE -ErrorAction SilentlyContinue}
 $Exe=Join-Path $Folder 'native-network70-temporal.exe'
+foreach($Map in 'hwc-to-vit.i32','vit-to-hwc.i32'){
+ if(!(Test-Path (Join-Path $Folder $Map) -PathType Leaf)){throw "Missing layout map: $Map"}
+}
 if(Get-Process native-network70-temporal -ErrorAction SilentlyContinue){throw 'Existing full-network test; inspect it instead of restarting'}
 $Manifest=Get-Content (Join-Path $Folder 'shader-manifest.json') -Raw | ConvertFrom-Json
 if($Manifest.Count -ne 19){throw 'Incomplete shader manifest'}

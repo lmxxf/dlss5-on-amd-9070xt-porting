@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整网初始化缺失布局文件已修正，重跑中
+
+- session26421/PID35820最终exit1，stderr明确network coefficient missing，尚未执行任何完整帧。查明独立目录复制过滤漏掉hwc-to-vit.i32与vit-to-hwc.i32，并非数值失败。失败stdout/stderr重命名init-missing-map.*.log保留。
+- 补齐两份i32，并逐份SHA核对基线全部194份f32＋2份i32，一致。runner增加布局文件启动前存在性检查，避免编译数分钟才发现缺失。确认旧进程终止后重跑，session5329/PID11048已启动，继续检查该句柄，尚无整网通过结论。
+- 新build_native_game_verification.sh从MinHook源码与ReShade头重建单帧验证DLL，自动处理Linux大小写Windows.h。bash -n与实际MinGW链接通过；/tmp/native-game-neural-tiled-candidate.addon64 SHA bdb4f8998a2b65f03337a432701236141e15dfe9e581a506aee701b4b2195bf7。候选未部署，仍为受控reset-history诊断，不是连续时序渲染器。
+
 ### 2026-09-07：完整分块网络off/on/reset实验已启动
 
 - 独立D:\DLSSNR-Lab\native-network70-tiled目录从已验证profile基线复制f32与shader输入，未覆盖旧目录。仅替换native_c64.hlsl及新测试exe，更新该shader的manifest散列；设DLSS5_TEST_TILED_C64=1，PostShift=3，GpuProfile开启，SingleList关闭。
