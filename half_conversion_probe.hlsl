@@ -1,6 +1,9 @@
 RWStructuredBuffer<float> output:register(u0);
+#include "native_half_corrected.hlsli"
 float Hardware(float v){
-#if PROBE_NATIVE_CAST
+#if PROBE_CORRECTED
+ return NativeCorrectedHalf(v);
+#elif PROBE_NATIVE_CAST
  return float(float16_t(v));
 #else
  return f16tof32(f32tof16(v));

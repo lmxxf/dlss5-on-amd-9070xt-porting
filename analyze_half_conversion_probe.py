@@ -18,6 +18,13 @@ for name in ['values','cast']:
     report[name]=dict(samples=len(v),software_rne_differences=0,
                       hardware_rne_differences=int(np.count_nonzero(hardware!=soft)),
                       hardware_toward_zero_differences=0)
+corrected=root/'half-conversion-corrected.f32'
+if corrected.exists():
+    a=np.fromfile(corrected,np.float32).reshape(-1,4)
+    assert a.shape==(2048,4) and np.isfinite(a).all()
+    assert np.array_equal(a[:,1].view(np.uint32),a[:,2].view(np.uint32))
+    assert np.array_equal(a[:,1],a[:,0].astype(np.float16).astype(np.float32))
+    report['corrected']=dict(samples=2048,software_bit_differences=0,rne_differences=0)
 report['scope']='Selected finite half midpoints/neighbors, current AMD preview driver and DXC; not a universal API rounding claim.'
 (root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

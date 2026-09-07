@@ -36,7 +36,10 @@ void WriteAux(uint k,uint t,float v){if(k<32)queries[k*64+t]=float16_t(v);else k
 #else
 #define EX(k) ex[k]
 #endif
-#if NATIVE_C32_HARDWARE_HALF
+#if NATIVE_C32_CORRECTED_HALF
+#include "native_half_corrected.hlsli"
+float H(float v){return NativeCorrectedHalf(v);}
+#elif NATIVE_C32_HARDWARE_HALF
 float H(float v){return f16tof32(f32tof16(v));}
 #else
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}

@@ -6170,3 +6170,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 保留原d3d12_matrix_rounding_probe.cpp功能，仅增加fixture参数“-”跳过文件读取，供无输入shader导出输出。构建half-rounding-probe.exe到/tmp并上传独立名，不覆盖已有probe。现有矩阵CSO/游戏未动。
 - 编译：DXC cs_6_10/main/HV2021/O3；cast加-enable-16bit-types；导出模式加-D PROBE_VALUES=1。远程matrix-probe目录执行half-rounding-probe.exe half_conversion_values.cso - half-conversion-values.f32及cast对应文件。两次均退出0（这里只代表finite），实际正确性由analyze_half_conversion_probe.py检查。
 - 证据release/half-conversion-probe/{half-conversion-values.f32,half-conversion-cast.f32,validation.json}（ignored）。这解释了硬件H直接替换为何产生系统偏移；下一步必须补RNE修正或另测可控舍入接口，未取得新的整网提速，10fps仍未达到。
+# 2026-09-08：硬件half中点修正，数值闭环但性能倒退
+
+- 新增native_half_corrected.hlsli：依已测RTZ结果找相邻half、中点比较和奇偶位修正，处理符号、溢出与非有限值；不适用于未经探针确认的其他转换模式。
+- 独立PROBE_CORRECTED=1导出2048样本，修正结果与软件H逐位一致并匹配NumPy RNE；analyze_half_conversion_probe.py现验证该证据。
+- NATIVE_C32_CORRECTED_HALF=1仅C32 attention替换H，保留原中点补偿及网络。PID14616退出0，15帧最终different0，两份下载输出与独立原版参考byte-exact，修正可解释上一直接硬件H的整网偏差。
+- 暖616.247572ms、末5帧611.408438ms；post70_body39.046643ms，preblock attention29.693434ms，首C32 attention7.2757ms。比约586ms软件H基线慢，明确不采用、默认关闭。不是数值不可能对齐，而是本修正无性能优势。
+- 证据release/half-conversion-probe/half-conversion-corrected.f32及release/native-network70-c32-corrected-half/；准备/manifest脚本在release/（ignored）。显式入口run_c32_corrected_half_network.ps1。游戏未改，10fps未完成。

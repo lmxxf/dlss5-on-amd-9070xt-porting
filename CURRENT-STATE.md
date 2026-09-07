@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+硬件half补偿实验数值恢复但更慢：NativeCorrectedHalf对RTZ相邻half中点做RNE修正，2048探针对软件bit0，C32整网15帧exact。暖616.247572ms、末5帧611.408438ms，post70_body39.04664ms，未优于586ms软件H，默认关闭。证据release/half-conversion-probe及release/native-network70-c32-corrected-half；runner run_c32_corrected_half_network.ps1。该舍入差异已形成探针→修正→整网验证闭环，不继续将直接cast当免费RNE。游戏未改，10fps未达到。
+
 half差异已独立重现：8192边界样本intrinsic对软件6144不同；读回2048样本软件全部匹配NumPy RNE，f32tof16/f16tof32与float16_t cast均1536不同且全部匹配朝零截断。仅当前驱动/DXC实测，不宣称通用API规则。证据release/half-conversion-probe/validation.json，源码half_conversion_probe.hlsl，通用probe增加“-”跳过fixture读取以导出数据。下一步硬件转换需RNE修正或寻找可指定舍入接口，不能直接换H。有效基线不变，10fps未达到。
 
 C32硬件half转换候选未通过exact：NATIVE_C32_HARDWARE_HALF=1用f16tof32(f32tof16(v))替代H，保持中点补偿/网络结构。PID35852首帧6627936/6635520值不同，RGB finite、MAE0.00615155、max0.05422974、RMSE0.00785048，非可忽略位差；测试exit1，未暖测，未采用。证据release/native-network70-c32-hardware-half。原因尚未独立定位，不预设硬件RTZ/驱动bug；下一步需舍入探针。默认软件H，游戏未改，10fps未达到。
