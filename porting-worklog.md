@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：NativeGameFrame接入完整mode1颜色链（待整链GPU验证）
+
+- NativeGameFrame已由原始RGB→网络→10bit直接打包改为encode→FP16 proxy→RGB unpack→shift3全网络→FP16 neural→decode→FP16 target CopyResource。真正网络输出送入decode，未混用参考图、CPU中间像素或base-only路径。
+- 接入边界明确要求1920×1080 RGBA16_FLOAT线性mode1源/目标，保留原alpha，目标不再是swapchain；写回前检查设备/尺寸/格式，恢复源/目标及内部输出资源状态，源目标同对象时拒绝互相矛盾的状态。
+- Create可接可选GPU temporal_rgb，Process显式传temporal_enabled；这只是连接已验证采样结果的接口，调用方仍必须先提交采样生产者、建立正确历史来源与reset逻辑，不能凭接口存在声称历史反馈完成。
+- MinGW NativeGameFrame语法及diff检查通过，各独立阶段已有GPU验证，但本次组合未执行整链GPU测试、也未编译部署游戏DLL。下一步构建实际调用此边界的测试与对应参考，随后游戏挂接。
+
 ### 2026-09-07：原版HALF surface证实截断，RGB纹理桥通过
 
 - run_original_post.cpp新增native-only DLSS5_POST_TEST_HALF_SURFACE，以CU_AD_FORMAT_HALF创建输出surface，按8byte/pixel下载后精确展开half到float；输入/权重/实机尺寸、origin-4、word70=1保持不变。输出live-half-surface.f32。
