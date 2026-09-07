@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整尺寸post shift3原版/CPU/AMD全exact
+
+- 原post70在同源时序main/skip/color夹具上使用origin(-4,-4)生成origin-minus4-full.f32，默认零原点文件保留。
+- 新增check_native_post_shift_full.py，16行输出条带配上下各8行邻域，保持8×8平移窗口依赖，首尾以零特征边界处理。session13456全6635520个RGB值different0/max0/finite，生成shift-full-oracle.f32。
+- 独立AMD native-post-origin-full，post_config1920×1152 shift3，session68920三帧各6635520值different0/max0，无中间CPU传输。下载shift-full-gpu.f32后cmp原oracle逐byte一致。
+- 此次底色纹理仍是反射后的1920×1152夹具，不能冒称live有效1080纹理/word70已经等价；完整网络默认及游戏DLL均未更改。下一步继续隔离有效纹理尺寸和实机剩余标量。
+
 ### 2026-09-07：post原点GPU小区块回归通过
 
 - d3d12_native_post70_test增加crop模式（16×16）及严格0..3的DLSS5_TEST_POST_SHIFT，打印实际配置；旧512/game默认shift0保持不变。prepare_native_post_origin_gpu.py生成分开的origin0/origin3夹具，各自使用原版输出，防止混用oracle。
