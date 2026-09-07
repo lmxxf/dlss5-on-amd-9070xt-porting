@@ -1,5 +1,11 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+## 2026-09-08 05:30 朱雀接手性能优化（闇 GPT 额度见底）
+
+寄存器分块FFN＋f16隐藏层15帧exact，暖426.5ms（基线456.2ms，vit-chunk2的472.9ms）。DLSS5_TEST_BLOCKED_FFN=1：native_wave_ffn_blocked.hlsl 每wave算16 token×64输出，A tile一次装载复用4份权重tile；expand把隐藏层以f16存（F()输出是FP8格点，转换无损），contract直接A::Load f16、不再经LDS转存。每个输出元素的K32乘加顺序与H()次数不变。首C64 FFN contract 1.982→0.334ms、expand 0.931→0.495ms；encoder5_8 22.9→16.5、tail63_65 22.9→16.4。证据release/native-network70-blocked-ffn/profile-validation.json，入口run_blocked_ffn_network.ps1（叠在async-submit之上）。游戏DLL未改，10fps未达到。
+
+延迟提交（DLSS5_TEST_ASYNC_SUBMIT=1）15帧exact，暖472.9→456.2ms。native_game_submission.h 增加8槽allocator/list环，Submit不再逐条等fence，只在复用槽位时等待；Flush()供读回前调用。队列顺序不变、命令不变。首次运行在NativeResidentTable初始化时DEVICE_REMOVED——该helper在Submit后立刻释放上传缓冲，已加Flush修复（native_submitted_readback同样补上）；失败日志留release/native-network70-async-submit/failed-resident-table.*。注意：延迟模式下各stage时间戳会前移（ViT各段显得变快、decoder_stage1多出9ms是上游未完成的工作），只能信整帧total_ms。游戏DLL默认仍同步模式。
+
 ViT展开单dispatch块16→32 tokens有明显收益：VIT_EXPAND_CHUNK2=1仅Wave expand的chunk_values65536→131072，每块仍单独Submit/fence等待，未合并整阶段command list。15帧exact，暖472.903032ms、末5帧471.599902ms，八层stage0合计75.66819→33.15094ms；旧整网540.422252ms。无新buffer或舍入变化，无DEVICE_HUNG。证据release/native-network70-vit-chunk2，入口run_vit_expand_chunk2_network.ps1；游戏未改，10fps未达到。
 
 多头归一化并行候选未采纳：-ParallelNorm新增512B共享倒数，raw Q/K用half暂存后全组逐元素缩放，15帧exact但暖546.822146ms、末5帧545.92308ms，首C64 attention2.44709ms无改善；encoder15_22和tail49_55升到34.10/35.60ms。保持上一八Wave并行softmax约540ms，不加ParallelNorm。证据release/native-network70-multihead-norm，游戏未改，10fps未达到。

@@ -26,6 +26,7 @@ inline std::vector<unsigned char> NativeReadSubmittedFrame(ID3D12CommandQueue*q,
   D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=source;src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=readback;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);
   std::swap(b.Transition.StateBefore,b.Transition.StateAfter);if(before!=D3D12_RESOURCE_STATE_COPY_SOURCE)c->ResourceBarrier(1,&b);
  });
+ submit->Flush();
  std::vector<unsigned char>result(1920ull*1080*8);void*p=nullptr;D3D12_RANGE range{0,SIZE_T(bytes)};check(readback->Map(0,&range,&p));
  for(UINT y=0;y<1080;y++)std::memcpy(result.data()+size_t(y)*1920*8,static_cast<unsigned char*>(p)+fp.Offset+size_t(y)*fp.Footprint.RowPitch,1920*8);
  D3D12_RANGE none{};readback->Unmap(0,&none);delete submit;readback->Release();source->Release();return result;

@@ -6,7 +6,7 @@
 class NativeC64 {
  NativeMatrixWorkspace*workspace{};
  ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{},wave_scores{};
- ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{};
+ ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{};
  ID3D12Resource*input{};ID3D12Resource*weights[2]{};ID3D12Resource*result[3]{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[3]{};UINT geometry[2]{},channel_count{64};bool recorded{};
  ID3D12Resource*scratch[2]{};ID3D12PipelineState*split_pso[3]{};bool split_ffn{},tiled_contract{},tiled_expand{},tiled_projection{};
@@ -22,6 +22,8 @@ public:
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,UINT channels=64,bool fast_fp8=false,bool split=false,bool tile_contract=false,bool tile_expand=false,bool tile_projection=false,bool use_matrix=false,bool pack_input=false,bool use_matrix_qkv=false,NativeMatrixWorkspace*shared=nullptr,bool use_wave=false,bool use_wave_contract=false,bool use_wave_scores=false){
   if(use_wave_scores&&(!use_matrix_qkv||(channels!=64&&channels!=128&&channels!=256)))throw std::runtime_error("wave scores require matrix QKV C64/C128/C256");wave_scores=use_wave_scores;
   if(use_wave_contract&&!use_wave)throw std::runtime_error("wave contract requires wave expand");wave_contract=use_wave_contract;
+  // Register-blocked FFN with f16 hidden storage: same K32/H sequence per output, less traffic.
+  if(const wchar_t*bf=_wgetenv(L"DLSS5_TEST_BLOCKED_FFN")){if(wcscmp(bf,L"0")&&wcscmp(bf,L"1"))throw std::runtime_error("invalid blocked FFN flag");blocked_ffn=!wcscmp(bf,L"1")&&wave_contract;}
   if(use_wave&&(!pack_input||(channels!=64&&channels!=128&&channels!=256)))throw std::runtime_error("wave expand requires packed C64/C128/C256");wave_expand=use_wave;
   if(shared&&use_matrix_qkv){shared->Validate(d,UINT64(width)*height*channels);workspace=shared;}
   if(use_matrix_qkv&&!pack_input)throw std::runtime_error("matrix QKV requires packed matrix mode");matrix_qkv=use_matrix_qkv;
@@ -68,7 +70,7 @@ public:
   if(split_ffn){
    scratch[0]=Buffer(d,UINT64(width)*height*channels*16);scratch[1]=Buffer(d,UINT64(width)*height*channels*4);
    const char*names[]={tiled_expand?"tiled_ffn_expand":"split_ffn_expand",tiled_contract?"tiled_ffn_contract":"split_ffn_contract",tiled_projection?"tiled_ffn_project":"split_ffn_project"};macros[0].Definition="0";
-   for(UINT i=0;i<3;i++){blob=nullptr;error=nullptr;auto hr=(i==1&&wave_contract)?D3DReadFileToBlob(matrix_file(L"native_wave_contract").c_str(),&blob):(i==0&&matrix_expand)?D3DReadFileToBlob(matrix_file(wave_expand?L"native_wave_expand":pack_matrix?L"native_matrix_expand_packed":L"native_matrix_expand").c_str(),&blob):CompileNativeShader(path,macros,names[i],&blob,&error);if(error)error->Release();Check(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&split_pso[i]));blob->Release();Check(hr);}
+   for(UINT i=0;i<3;i++){blob=nullptr;error=nullptr;auto hr=(i==1&&wave_contract)?D3DReadFileToBlob(matrix_file(blocked_ffn?L"native_wave_ffn_contract_blocked":L"native_wave_contract").c_str(),&blob):(i==0&&matrix_expand)?D3DReadFileToBlob(matrix_file(wave_expand?(blocked_ffn?L"native_wave_ffn_expand_blocked":L"native_wave_expand"):pack_matrix?L"native_matrix_expand_packed":L"native_matrix_expand").c_str(),&blob):CompileNativeShader(path,macros,names[i],&blob,&error);if(error)error->Release();Check(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&split_pso[i]));blob->Release();Check(hr);}
   }
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr,const char*label="core"){
@@ -81,7 +83,7 @@ public:
     UINT n=geometry[0]*geometry[1]*channel_count/128;c->Dispatch(std::min(n,65535u),(n+65534)/65535,1);Barrier(c,matrix_input,false);if(workspace)workspace->packed_readable=true;
     if(timer)timer->Mark(c,std::string(label)+"_input_pack");
    }
-   for(UINT i=0;i<3;i++){auto*src=i?scratch[i-1]:(pack_matrix?matrix_input:input);auto*dst=i==2?result[0]:scratch[i];c->SetComputeRootSignature(root);c->SetPipelineState(split_pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,((i==0&&matrix_expand)||(i==1&&wave_contract)?matrix_weights:weights[0])->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);UINT64 groups=(UINT64(geometry[0])*geometry[1]*channel_count*(i==0?4:1)+63)/64;if(i==1&&wave_contract)c->Dispatch(geometry[0]*geometry[1]/16,channel_count/16,1);else if(i==0&&wave_expand)c->Dispatch(geometry[0]*geometry[1]/16,4*channel_count/16,1);else if(i==0&&matrix_expand)c->Dispatch((geometry[0]*geometry[1]+31)/32,4*channel_count/32,1);else if(i==0&&tiled_expand)c->Dispatch(channel_count*4/32,geometry[0]*geometry[1]/8,1);else if((i==1&&tiled_contract)||(i==2&&tiled_projection))c->Dispatch(channel_count/32,geometry[0]*geometry[1]/8,1);else c->Dispatch(UINT(std::min<UINT64>(groups,65535)),UINT((groups+65534)/65535),1);Barrier(c,dst,false);if(timer)timer->Mark(c,std::string(label)+"_ffn_part"+std::to_string(i));}
+   for(UINT i=0;i<3;i++){auto*src=i?scratch[i-1]:(pack_matrix?matrix_input:input);auto*dst=i==2?result[0]:scratch[i];c->SetComputeRootSignature(root);c->SetPipelineState(split_pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,((i==0&&matrix_expand)||(i==1&&wave_contract)?matrix_weights:weights[0])->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);UINT64 groups=(UINT64(geometry[0])*geometry[1]*channel_count*(i==0?4:1)+63)/64;if(i==1&&wave_contract)c->Dispatch(geometry[0]*geometry[1]/16,channel_count/(blocked_ffn?64:16),1);else if(i==0&&wave_expand)c->Dispatch(geometry[0]*geometry[1]/16,4*channel_count/(blocked_ffn?64:16),1);else if(i==0&&matrix_expand)c->Dispatch((geometry[0]*geometry[1]+31)/32,4*channel_count/32,1);else if(i==0&&tiled_expand)c->Dispatch(channel_count*4/32,geometry[0]*geometry[1]/8,1);else if((i==1&&tiled_contract)||(i==2&&tiled_projection))c->Dispatch(channel_count/32,geometry[0]*geometry[1]/8,1);else c->Dispatch(UINT(std::min<UINT64>(groups,65535)),UINT((groups+65534)/65535),1);Barrier(c,dst,false);if(timer)timer->Mark(c,std::string(label)+"_ffn_part"+std::to_string(i));}
   }
   if(matrix_qkv){
    Barrier(c,matrix_input,true);if(workspace?workspace->qkv_readable:recorded)Barrier(c,qkv_raw,true);

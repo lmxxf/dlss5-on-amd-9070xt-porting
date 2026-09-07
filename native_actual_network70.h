@@ -73,7 +73,7 @@ public:
    for(UINT b=0;b<8;b++){auto&layer=vit[b];for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));});}
    for(UINT stage=0;stage<decoder.StageCount();stage++)submit.Submit([&](ID3D12GraphicsCommandList*c){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));});
    submit.Submit([&](ID3D12GraphicsCommandList*c){post.Record(c,profile?&timestamps:nullptr);timestamps.Mark(c,"post70");timestamps.Resolve(c);});
-   if(profile)timestamps.Report(submit.TimestampFrequency());
+   if(profile){submit.Flush();timestamps.Report(submit.TimestampFrequency());}
   }catch(...){failed=true;throw;}
  }
  // For an already-recording external command list only. Does not close/reset,
@@ -99,6 +99,7 @@ private:
   ID3D12Device*device;ID3D12GraphicsCommandList*commands;
   ID3D12Device*Device()const{return device;}
   UINT64 TimestampFrequency()const{throw std::runtime_error("inline recorder cannot report completed timestamps");}
+  void Flush(){}
   template<class F>void Submit(F&&record){record(commands);}
  };
 };

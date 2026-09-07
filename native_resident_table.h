@@ -17,5 +17,5 @@ inline ID3D12Resource* NativeResidentTable(ID3D12Device*d,ID3D12Resource*upload)
   D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
   b.Transition={resident,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);
  });
- delete submission;q->Release();upload->Release();return resident;
+ submission->Flush();delete submission;q->Release();upload->Release();return resident;
 }

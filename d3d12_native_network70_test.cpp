@@ -71,8 +71,11 @@ int wmain(int argc,wchar_t**argv){try{
   const auto started=std::chrono::steady_clock::now();
   submit.Submit([&](ID3D12GraphicsCommandList*c){reflect->Record(c);if(enabled){coordinates->Record(c);sampler->Record(c);}if(single_list)network->RecordUnsubmitted(c,0,enabled);});
   if(!single_list)network->Run(submit,0,enabled);
-  std::printf("network70 frame=%u single_list=%u submit_wait_ms=%.3f\n",frame,single_list,std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-started).count());std::fflush(stdout);
+  const double recorded_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-started).count();
+  submit.Flush();
+  std::printf("network70 frame=%u single_list=%u deferred=%u submit_wait_ms=%.3f flushed_ms=%.3f\n",frame,single_list,submit.Deferred(),recorded_ms,std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-started).count());std::fflush(stdout);
   submit.Submit([&](ID3D12GraphicsCommandList*c){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={network->Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};c->ResourceBarrier(1,&b);c->CopyBufferRegion(rb,0,network->Output(),0,oracle.size()*4);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);});
+  submit.Flush();
   void*p=nullptr;D3D12_RANGE range{0,oracle.size()*4},none{};ck(rb->Map(0,&range,&p));auto*actual=static_cast<const float*>(p);size_t different=0;
   for(size_t i=0;i<oracle.size();i++)different+=!std::isfinite(actual[i])||actual[i]!=expected[i];
   std::ofstream out((dir+(enabled?L"\\gpu-network70-temporal.f32":L"\\gpu-network70.f32")).c_str(),std::ios::binary);if(!out.write(reinterpret_cast<const char*>(p),oracle.size()*4))throw std::runtime_error("readback save failed");rb->Unmap(0,&none);
