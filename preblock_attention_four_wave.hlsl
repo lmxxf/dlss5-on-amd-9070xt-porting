@@ -162,7 +162,15 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
+#if NATIVE_PARALLEL_C32_EXP
+ for(uint i=t;i<4096;i+=C32_THREADS){
+  uint query=i/64,key=i%64;
+  WriteAux(key,query,fast_exp(H(scores[query*SCORE_WIDE+key]+weights[4096+i])));
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
  if(t<64){
+#if !NATIVE_PARALLEL_C32_EXP
 #if !NATIVE_WAVE_C32_AV
  float ex[64],prob[64];
 #endif
@@ -178,6 +186,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   ex[key]=fast_exp(H(dot+weights[4096+t*64+key]));
 #endif
  }
+#endif
  float parity[2];
  [unroll]for(uint odd=0;odd<2;odd++){
   float total=0;

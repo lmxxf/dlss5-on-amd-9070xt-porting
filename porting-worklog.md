@@ -6205,3 +6205,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 保存旧八Wave日志为pre-driver-*，确认上次终止后才重跑。八WavePID21052退出0，15帧最终/下载结果对独立原版byte-exact，暖582.260006ms、末5帧585.337214ms。
 - 补同一恢复后环境四Wave对照PID30596，15帧byte-exact，暖594.28691ms、末5帧594.138682ms。八Wavepost70_body27.965003对四Wave30.524977ms、preblock attention18.303491对20.812323ms，当前环境八Wave优。恢复前四Wave569ms仍是历史证据，不做跨环境同轮比较。
 - 证据release/native-network70-c32-eight-wave、-c32-four-wave-restored及resume-eight-wave/recheck-four-wave准备脚本（ignored）。下一优化以恢复后环境和能力门禁为准；八Wave可显式-EightWaves，不修改游戏DLL，10fps未完成。
+# 2026-09-08：C32八Wave并行指数阶段
+
+- NATIVE_PARALLEL_C32_EXP将64线程各处理一查询×64键，改成全C32_THREADS线程分配4096 score/bias/exp元素；写回原ReadAux布局后全组同步，分母求和树和概率归一化仍由原64查询线程计算，顺序未改。
+- 不增共享区或全图buffer，保持软件H/F、全部权重/输入依赖。test_c32_wave_ownership.py补充128/256线程指数元素覆盖测试。
+- DXC及运行前SM6.10/tier0x10检查通过；PID25980退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。
+- 暖574.629421ms、末5帧575.382012ms；同恢复后环境八Wave582.260006ms。preblock attention16.284466ms（旧18.303491），首C32 attention4.196606ms（旧4.578469），post70_body26.136314ms（旧27.965003），保留。
+- 证据release/native-network70-c32-parallel-exp/，准备脚本release/prepare-c32-parallel-exp.ps1（ignored）；run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp。普通参数仍默认四Wave，优化测试需显式参数。未更新游戏DLL，10fps未完成。

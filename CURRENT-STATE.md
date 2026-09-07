@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32八Wave并行exp通过15帧exact：-EightWaves -ParallelExp，4096 score+bias/exp由全256线程按元素处理，增加一次全组同步，再执行原64查询分母树/概率步骤。无新增共享/全图buffer，暖574.629421ms、末5帧575.382012ms；恢复后八Wave基线582.260006ms。preblock attention16.28447ms、首C32 attention4.19661ms、post70_body26.13631ms。证据release/native-network70-c32-parallel-exp；启动能力SM6.10/tier0x10正常。游戏未改，10fps未达到。
+
 重要更正/驱动恢复：八Wave最初PSO失败来自驱动回退，不是该shader不支持。当前检查发现AMD32.0.31041.1004、SM6.9/tier0，已知四Wave也PSO失败；SetupAPI显示09/08 04:22 AMD26.8.1安装器活动（触发者未知）。按既有授权恢复32.0.31007.2048，PID21368退出0，无重启，Intel不变；SM6.10/tier0x10恢复，四/八Wave均PSO成功。一次性任务完成后移除，更新设置未改。
 
 恢复后同环境两轮各15帧exact：八WavePID21052暖582.260006ms、末5帧585.337214ms；四WavePID30596暖594.28691ms、末5帧594.138682ms。八Wavepost70_body27.96500ms vs四Wave30.52498，preblock attention18.30349 vs20.81232。八Wave在当前环境有收益，可显式-EightWaves使用；旧569ms是恢复前历史测量，不用作跨环境直接比较。证据release/native-network70-c32-eight-wave与-c32-four-wave-restored，旧失败日志pre-driver-*保留；驱动证据release/driver-install-20260908-restore。新增启动前SM6.10/LinAlg能力门禁，避免再次误判代码；游戏未改，10fps未达到。

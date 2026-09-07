@@ -11,4 +11,7 @@ for waves in [4,8]:
                     coords.extend((query*16+r,col*16+c) for r in range(16) for c in range(16))
         assert len(coords)==64*columns and len(set(coords))==len(coords)
         assert set(coords)=={(r,c) for r in range(64) for c in range(columns)}
-print('four/eight-wave matrices cover all query/channel cells exactly once')
+for threads in [128,256]:
+    cells=[(i//64,i%64) for t in range(threads) for i in range(t,4096,threads)]
+    assert len(cells)==4096 and set(cells)=={(q,k) for q in range(64) for k in range(64)}
+print('matrix and parallel exponent ownership cover all cells exactly once')
