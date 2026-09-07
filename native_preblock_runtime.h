@@ -53,6 +53,8 @@ public:
   if(noise_table){noise=Buffer(noise_table->size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(noise->Map(0,&none,&p));std::memcpy(p,noise_table->data(),noise_table->size()*4);noise->Unmap(0,nullptr);}
   const wchar_t*resident_flag=_wgetenv(L"DLSS5_TEST_RESIDENT_NOISE");if(resident_flag&&wcscmp(resident_flag,L"0")&&wcscmp(resident_flag,L"1"))throw std::runtime_error("invalid resident noise flag");
   if(noise&&resident_flag&&!wcscmp(resident_flag,L"1")){auto*local=NativeResidentTable(device,noise);noise->Release();noise=local;}
+  const wchar_t*weight_flag=_wgetenv(L"DLSS5_TEST_RESIDENT_C32_WEIGHTS");if(weight_flag&&wcscmp(weight_flag,L"0")&&wcscmp(weight_flag,L"1"))throw std::runtime_error("invalid resident C32 weights flag");
+  if(weight_flag&&!wcscmp(weight_flag,L"1"))for(auto*&w:weights){auto*local=NativeResidentTable(device,w);w->Release();w=local;}
   root=Root(2,1,noise!=nullptr,temporal!=nullptr);finish_root=Root(1,2);
   Heap(0,weights[0],fw.size()*4,input,UINT64(w)*h*(raw_features?128:16),ffn,bytes,false);Heap(1,weights[1],aw.size()*4,ffn,bytes,raw,bytes,false);Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");

@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C32系数驻留回归通过，但收益未确认
+
+- NativePreblockRuntime新增严格DLSS5_TEST_RESIDENT_C32_WEIGHTS=1实验开关，创建descriptor前将两个只读系数缓冲拷贝到DEFAULT，无shader改动，默认关闭。
+- 独立native-network70-resident-c32实验session48380/PID10360 exit0，继承resident-noise及其前五项开关，五轮off/on/reset输出全exact。下载GPU输出并逐字节原版核对通过。
+- 暖轮1678.7057975→1665.2109175ms，不足1%；preblock144.14321→134.44511，其它主要阶段基本不变。单轮实验不足以排除频率/运行波动，不宣称确定收益、不推广游戏，后续优先算子瓶颈而非小系数搬运。
+- 证据release/native-network70-resident-c32/profile-validation.json；编译及diff检查通过。游戏与测试均退出，安装版未改。
+
 ### 2026-09-07：noise表驻留GPU，整网1.679秒
 
 - 新NativeResidentTable初始化时由UPLOAD复制到DEFAULT缓冲并完成COPY_DEST→NON_PIXEL_SHADER_RESOURCE转换；专用DIRECT提交及fence完成后释放上传引用，超时/失败保留资源避免未完成GPU引用悬空。仅NativePreblockRuntime的192MiB noise表通过严格DLSS5_TEST_RESIDENT_NOISE=1启用，默认原路径，未改数值。
