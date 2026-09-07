@@ -2,6 +2,9 @@
 #ifndef NATIVE_PREFIX_ONLY
 #define NATIVE_PREFIX_ONLY 0
 #endif
+#if NATIVE_PREFIX_ONLY
+#include "native_scaled_integer_half.hlsli"
+#endif
 // for every 8x8 tile. Live texture transforms/global seed contract not yet bound.
 StructuredBuffer<float> weights : register(t0);
 StructuredBuffer<float> input : register(t1);
@@ -133,7 +136,11 @@ void main(uint3 id:SV_DispatchThreadID){
    // Split the integer conversion so no float32 cast loses accumulator bits.
    double exact_sum=(double)float(sum>>16)*65536.0+(double)float(asuint(sum)&65535u);
    float quantum=asfloat(uint(maximum_exponent-27+127)<<23);
+#if NATIVE_PREFIX_ONLY
+   prefix[channel]=NativeScaledIntegerHalf(sum,maximum_exponent-27);
+#else
    prefix[channel]=half_round_exact(exact_sum*(double)quantum);
+#endif
   }
 #else
   float sum=0;[unroll]for(uint i=0;i<16;i++)sum+=features[i]*weights[channel*16+i];

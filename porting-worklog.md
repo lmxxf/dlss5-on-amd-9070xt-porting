@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：定位prefix转换回退，等价整数舍入修复/706ms
+
+- d3d12_preblock_split_debug只跑64×64双路，读取FFN/Main及prefix样本；初版Win32 SetEnvironmentVariable不更新CRT getenv缓存，改_wputenv_s后真正切换两路。修复前FFN131072值全不同，prefix全微小正数，首值6.16312e-5；WaveFFN只是消费了错误prefix。
+- native_scaled_integer_half直接对signed int32×2^exponent进行binary16 RNE，处理符号/INT_MIN/次正规/中点/溢出，不经double。仅PREFIX_ONLY路径改用它，保留原指数对齐、27位截断与整数sum。CPU test_scaled_integer_half.py 202905随机/边界案例比float64精确尺度参考bit0。
+- 替换后GPU小探针两轮FFN/Main不同0，prefix首值-0.0568237。支持转换表达式/编译上下文导致回退的判断，但没有定位具体驱动编译器机制，不将猜测写成定论。旧debug-prefix/stages与-fixed文件均保留。
+- 独立split-preblock-fixed整网session91318/PID13344 exit0，15帧GPU实际两最终输出逐字节原版一致。暖706.43771、末5帧706.459902ms；prefix7.692946、FFN15.185869、attention23.592057、finish9.221466ms。preblock标签现分拆，需合计detail区间。
+- local14711271424/budget15403425792，预算内。编译/diff通过，证据release/native-network70-split-preblock-fixed。游戏未部署、10fps未达到。
+
 ### 2026-09-08：F16累加和首层拆分实验未通过采用标准
 
 - matrix_half_accumulate使用F16 accumulator MultiplyAccumulate代替每K32软件H。session24540 exit0，全8847360值finite，但438687不同、max2/MAE0.00118217093/RMSE0.0163191，0.697196ms相对0.732240ms收益小，不采纳。

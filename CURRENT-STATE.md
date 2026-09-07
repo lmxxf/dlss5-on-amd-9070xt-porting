@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+首層拆分已修复并通过15帧exact，暖706.43771ms、末5帧706.45990ms。小型双路探针定位混合prefix已错误（全为微小正数），将signed-int32×2^exponent直接RNE到half的等价整数公式代替拆分路径double转换后恢复；202905 CPU随机/边界案例bit0，GPU小探针前馈/最终两轮bit0，整网15帧bit0。确切编译器内部机制未定位，不宣称已证明驱动bug。证据release/native-network70-split-preblock[-fixed]；SPLIT_PREBLOCK_FFN显式开启、无新全图缓冲，游戏未改，10fps未达到。
+
 最新两个实验未采纳：直接F16矩阵累加0.697196ms但438687/8847360值不同（max2），收益小，保留exact方案。首层prefix→Wave FFN拆分（SPLIT_PREBLOCK_FFN）首帧6635518/6635520最终值不同，输出范围0.1..0.9、接近原输入，MAE0.03134，不能当硬件小误差。默认关闭，数据release/native-network70-split-preblock/；下一步单独核对prefix与FFN接点，当前有效基线仍约746ms，游戏安装未改。
 
 最新C32完整Wave注意力（QKV/QK/AV/projection）15帧exact，暖745.959355ms、末5帧744.382106ms。AV模式先将exp/prob转置存入已闲置Q/K half区（不改softmax求和），V存FP8格点half，后续两K32 H；投影仍保留最后half_add_preserving_midpoint。AV单独约752.19737ms，额外投影收益小。初版F32 B矩阵Cast到F16在初始化存取违例，已移除；直接half V方案恢复，故障证据保留。见release/native-network70-wave-c32-av和-c32-full-attn。游戏未改，10fps未达到。
