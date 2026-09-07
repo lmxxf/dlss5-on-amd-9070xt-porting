@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：首轮全网失败来自漏同步input shader，补部署清单后重新验收
+
+- PID24280最终结束；原session86169收尾。frame0 history0的6635520值全exact，frame1 history1有6631403差异后停止。两帧GPU文件SHA均c1d6ab580e4d3bfb46acb90646d1a65d609cbcf6dbdcdde12d1bef18703afbe3，说明历史分支未产生不同输出。
+- 实查部署preblock_input_mix.hlsl无NATIVE_TEMPORAL内容，SHA0ed888fc...；当前源码SHA93783296...。是本代理复制旧完整目录时漏同步该文件，不是神经网络数值失败，责任不推给环境。补入当前shader后19文件清单全一致。
+- 新增prepare_native_network_shader_manifest.py；runner启动前逐一校验19个shader/include SHA、检查时序宏存在，缺失/不符即拒绝。首轮失败产物远端failed-stale-inputmix及本地release/native-temporal-network70-failed-stale日志保留，不覆盖证据。
+- runner原Process.ExitCode空值曾导致外层显示exit0，增加Handle缓存与空退出码拒绝，不凭外层exit0宣称通过；逐帧日志始终为必要验收证据。
+- 新有效运行exec session9405、Windows PID43244，17.15625 CPU秒、Responding=True，初始化中暂无frame。算法未改，只修部署；后续续查此PID，不再等旧24280。游戏DLL未改，目标仍未完成。
+
 ### 2026-09-07：描述符资源创建探针准备完成，全网同PID继续编译
 
 - PID24280 CPU698.4375→919.171875秒、Responding=True；编译日志持续出现完成项，stdout仍无frame。原exec session86169保留，不重启。RTX只读查询仍见SB-Win64-Shipping PID3536存活，本轮未退出或重启游戏。
