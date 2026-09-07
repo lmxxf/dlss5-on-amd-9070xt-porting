@@ -6225,3 +6225,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC及能力门禁通过，PID9176退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。
 - 暖568.236776ms、末5帧566.920302ms，不优于567.012028ms基线；post70_body25.59524ms、preblock attention16.140806ms、首C32 attention4.105394ms，均没有局部改善。明确不采用-ParallelOutput。
 - 证据release/native-network70-c32-parallel-output/，准备脚本release/prepare-c32-parallel-output.ps1（ignored）；显式复现run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb -ParallelOutput。有效配置保持不加最后参数，游戏DLL未更新，10fps未完成。
+# 2026-09-08：C32逐通道Q/K归一化全组并行
+
+- NATIVE_PARALLEL_C32_NORM保留每查询原平方和树、NativeHalfSquarePair补偿和rsqrt/H，存Q/K两组64 float倒数（512B共享）。全组同步后按2048元素从尚未覆写的raw Q/K scores缩放、量化并写queries/keys，原每次H/F顺序与scale系数H保持不变；V仍按原F格点处理。
+- 不增整图buffer，依赖和权重不变；原工作分配默认保留。DXC、布局/元素覆盖回归及SM6.10/tier0x10能力门禁通过。
+- PID33724退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。暖555.090092ms、末5帧554.68984ms，对照上版567.012028ms，有收益。
+- post70_body21.957709ms、preblock attention12.477671ms、首C32 attention3.014434ms，对照上版24.759466/15.376906/3.731706ms，保留。
+- 证据release/native-network70-c32-parallel-norm/，准备脚本release/prepare-c32-parallel-norm.ps1（ignored）；入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb -ParallelNorm。无收益ParallelOutput仍关闭，游戏DLL未更新，10fps未完成。

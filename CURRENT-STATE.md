@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32逐通道Q/K归一化并行15帧exact，暖555.090092ms、末5帧554.68984ms。-EightWaves -ParallelExp -ParallelProb -ParallelNorm，原平方和/rsqrt由64查询线程计算，新增128 float共享倒数；全组从原raw Q/K scores按元素缩放/量化，保留每次H/F和V量化。post70_body21.95771ms、preblock attention12.47767ms、首C32 attention3.01443ms；上版567.012028ms。证据release/native-network70-c32-parallel-norm；ParallelOutput仍关闭，游戏未改，10fps未达到。
+
 C32最终残差/写回并行候选未采纳：-ParallelOutput，2048元素全组分工，原half_add_preserving_midpoint及H/F不变；15帧exact但暖568.236776ms、末5帧566.920302ms，post70_body25.59524ms较基线24.75947ms慢。保持ParallelOutput关闭，有效-EightWaves -ParallelExp -ParallelProb约567ms。证据release/native-network70-c32-parallel-output；游戏未改，10fps未达到。
 
 C32概率量化全组并行15帧exact，暖567.012028ms、末5帧566.189546ms。-EightWaves -ParallelExp -ParallelProb：原64查询分母树输出倒数至新增256B共享区，同步后全组按原key-major布局执行F(H(exp*inv))，再同步进入AV。post70_body24.75947ms、preblock attention15.37691ms、首C32 attention3.73171ms；上版574.62942ms。证据release/native-network70-c32-parallel-prob。权重/结构/舍入不变，游戏未改，10fps未达到。

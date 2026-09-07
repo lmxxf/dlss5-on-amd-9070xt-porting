@@ -32,6 +32,9 @@ cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint r
 StructuredBuffer<float> weights:register(t0);
 StructuredBuffer<float> input:register(t1);
 RWStructuredBuffer<float> output:register(u0);
+#if NATIVE_PARALLEL_C32_NORM
+groupshared float norm_inverse[128];
+#endif
 #if NATIVE_PARALLEL_C32_PROB
 groupshared float query_inverse[64];
 #endif
@@ -150,9 +153,22 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
+#if NATIVE_PARALLEL_C32_NORM
+ norm_inverse[t]=qi;norm_inverse[64+t]=ki;
+#else
  [loop]for(uint c=0;c<32;c++){queries[t*LDS_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[8192])));keys[t*LDS_STRIDE+c]=F(H(k[c]*ki));values[t*LDS_STRIDE+c]=v[c];}
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_PARALLEL_C32_NORM
+ for(uint i=t;i<2048;i+=C32_THREADS){
+  uint query=i/32,c=i%32;
+  queries[i]=float16_t(F(H(H(scores[query*SCORE_ROW+c]*norm_inverse[query])*H(weights[8192]))));
+  keys[i]=float16_t(F(H(scores[64*SCORE_ROW+query*SCORE_ROW+c]*norm_inverse[64+query])));
+  values[i]=float16_t(F(values[i]));
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
 #if NATIVE_WAVE_C32_SCORES
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
