@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD NativeGameFrame完整颜色链测试正式启动
+
+- 重新编译实际NativeGameFrame测试exe；新目录D:\DLSSNR-Lab\native-color-frame-test从已验证网络目录复制顶层系数/着色器，再部署4个颜色路径shader、源图及独立expected。旧目录保留不动。
+- prepare_native_network_shader_manifest --color-frame生成23源文件hash；run_native_color_frame.ps1运行前核验全部shader、expected固定SHA及两幅FP16尺寸，记录exe/source hash和PID，拒绝重复进程，保留真实ExitCode。
+- runner通过部署校验后启动PID24536，SSH session66185。该任务执行线性输入→encode→全网络shift3→FP16桥→decode→FP16目标，三帧与原版expected对比。当前处于重型初始化/编译，尚无最终结果，必须轮询此PID/session，不重启。
+- 这是固定首帧完整颜色链，不是真实历史反馈或游戏内验收。游戏DLL仍未替换。
+
 ### 2026-09-07：独立完整颜色链expected.f16生成完成
 
 - session80600自然结束exit0，62..69所有原版/CPU检查different0。prepare_native_post70_game新增--live-half，清除继承的测试环境并显式设置origin-4/word70=1/valid1080/HALF surface，保留默认模式；新颜色输入post参考成功。
