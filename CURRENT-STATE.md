@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C128矩阵路径整网五帧exact，但本轮暖均1515.8034ms，未优于C256-only的1347.77308ms。主要额外耗时发生在未改ViT attention（各+14～22ms），帧总时间1561→1553→1533→1502→1476ms仍下降，因此需查显存预算/暖机稳定性，不能直接判定C128算法慢了168ms。DLSS5_TEST_MATRIX_C128默认关闭，不部署；证据release/native-network70-matrix-c128/profile-validation.json。
+
 最新硬件矩阵C256整网五帧已通过：DLSS5_TEST_MATRIX_C256=1经NativeC64Shift启用打包展开/QKV，含各层移位、raw输出、history off/on/reset，GPU实际最终结果与原版逐字节一致。暖轮1347.77308ms，encoder15_22=57.23774ms。证据release/native-network70-matrix-c256/profile-validation.json。此运行使用Agility721/experimental与预览驱动；旧1.470秒环境不同，不能将全部差额归给算子。游戏安装未改，10fps未达到，后续扩通道需沿该运行环境对照。
 
 最新C256矩阵QKV核心：显式use_matrix_qkv依赖packed matrix expand，FFN结果在GPU再打包一次、LinAlg计算原Q/K/V后送回原normalize/attention/projection。block52五轮最终原版/旧核逐字节一致，完整核心13.80241→7.33708ms；QKV pack0.01224、matrix0.34057、剩余attention2.51536ms，对照旧attention8.86283ms。证据release/matrix-c256-qkv/result.log。尚未整网/游戏推广，下一步完整C256各层回归。

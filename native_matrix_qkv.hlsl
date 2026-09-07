@@ -1,3 +1,6 @@
+#ifndef MATRIX_CHANNELS
+#define MATRIX_CHANNELS 256
+#endif
 #include <dx/linalg.h>
 ByteAddressBuffer input:register(t0),weights:register(t1);
 RWStructuredBuffer<float> output:register(u0);
@@ -7,10 +10,10 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
  uint p=id.x;if(p>=width*height)return;
  using Mat=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Thread>;
  vector<float,32>a=0;
- [loop]for(uint g=0;g<8;g++){
-  Mat m=Mat::Load<dx::linalg::MatrixLayout::RowMajor>(weights,((id.z*8+id.y)*8+g)*2048,64);
-  vector<float16_t,32>x;[unroll]for(uint j=0;j<32;j++){uint pos=(p*256+g*32+j)*2,b=input.Load(pos&~3u);x[j]=float16_t(f16tof32((b>>((pos&2)*8))&65535u));}
+ [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
+  Mat m=Mat::Load<dx::linalg::MatrixLayout::RowMajor>(weights,((id.z*(MATRIX_CHANNELS/32)+id.y)*(MATRIX_CHANNELS/32)+g)*2048,64);
+  vector<float16_t,32>x;[unroll]for(uint j=0;j<32;j++){uint pos=(p*MATRIX_CHANNELS+g*32+j)*2,b=input.Load(pos&~3u);x[j]=float16_t(f16tof32((b>>((pos&2)*8))&65535u));}
   vector<float,32>y=dx::linalg::Multiply<float>(m,x);[unroll]for(uint r=0;r<32;r++)a[r]=H(a[r]+y[r]);
  }
- [unroll]for(uint r=0;r<32;r++)output[(p*3+id.z)*256+id.y*32+r]=a[r];
+ [unroll]for(uint r=0;r<32;r++)output[(p*3+id.z)*MATRIX_CHANNELS+id.y*32+r]=a[r];
 }

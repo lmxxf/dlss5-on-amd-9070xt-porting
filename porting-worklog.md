@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：矩阵C128整网数值通过，性能存在非局部回退
+
+- 三matrix shader以MATRIX_CHANNELS参数化（默认256），host权重块数/K块数/输入步长/dispatch随channels变；128 CSO加_c128后缀，256旧命名保持。仅128/256可启用，64仍拒绝；NativeC64Shift新增严格MATRIX_C128开关，默认关闭。
+- run_matrix_c128_network.ps1编译3个128 CSO并继承既有有效开关；session92845/PID14568 exit0，完整五帧off/on/reset实际两GPU输出下载后逐字节原版一致。
+- 本轮暖均1515.8034ms，C256-only旧轮1347.77308ms；C128 encoder9_14仅68.21856→71.92095、tail57_61仅55.63836→59.04131ms，主要增量在未改的ViT stage3每层+14～22ms。五帧总1560.99003/1552.56991/1532.57348/1502.49556/1475.57465ms仍下降，未形成稳定平台，不将全部差额归因C128算子。
+- 下一步检查显存预算、资源驻留和更长暖机，矩阵QKV原始缓存会增加常驻内存但目前没有证据证明已发生显存溢出。C128暂不推广，游戏安装不变。证据release/native-network70-matrix-c128；编译/diff检查通过。
+
 ### 2026-09-07：硬件矩阵C256接整网，五帧exact/1.348秒
 
 - NativeC64Shift新增严格DLSS5_TEST_MATRIX_C256=0/1，只在channels256且tiled已有开启时调用matrix expand/pack/QKV；其它通道原路径。d3d12_native_network70_test MATRIX_BENCH构建导出Agility721且设备创建前启用实验shader。
