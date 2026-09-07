@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：Wave收缩净收益，C256核心4.89ms
+
+- 新native_wave_contract：16像素×16输出wave，每K32将512个FP8格点float转组内half，barrier后Mat16×32/32×16乘法，H累计32次，最后F。权重初始化时在Wave展开权重后追加W2的row-major half并逐值检查无损；无新增全尺寸scratch。
+- NativeC64显式use_wave_contract依赖use_wave，stage1独立CSO/dispatch，默认原路径。bench wave_contract baseline保持Wave展开但旧收缩，candidate仅换收缩。
+- session76941 exit0，五轮最终2211840值baseline_diff/fast_diff/bit_diff全0。暖轮contract1.70686→0.65209ms，完整核心5.89964→4.88883ms，约17.1%下降。candidate attention2.44303仍最大，FFNprojection0.46328、projection0.43758ms。
+- 证据release/matrix-c256-wave-contract/result.log；编译/diff检查通过。尚未整网/游戏启用，10fps未达到。
+
 ### 2026-09-08：Wave展开接GPU核心，净收益验证
 
 - native_wave_expand从t0 GPU打包half特征、t1原权重、u0 raw输出，16像素×16输出/32线程wave，保留K32 H和原gate/F。NativeC64显式use_wave依赖pack_input/C256，W1仅该模式改row-major half，QKV权重打包不变，独立native_wave_expand.cso。
