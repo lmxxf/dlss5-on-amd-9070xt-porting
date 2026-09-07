@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：ReShade虚拟描述符机制查明，准备被动更新/复制链记录
+
+- 阅读本机ReShade6.8源：device_impl::convert_to_original_cpu_descriptor_handle从heap index及offset还原原生CPU句柄；CreateUAV先保存virtual table（0xF000...|虚拟CPU句柄），转换后发init_resource_view原生view，随后update_descriptor_tables同时带table和view。这解释两套数值不同，不能直接比较或猜地址。
+- CopyDescriptorsSimple也通过copy_descriptor_tables通知给出source/dest virtual table。新增两种被动回调，逐项记录元数据，不调用device虚拟查询、不改参数，始终返回false，日志有上限。
+- Windows离线测试验证更新/复制回调返回false且payload保持不变；构建成功。此为新待部署版本，本轮没有重启游戏或替换正在使用的865b9e payload-only addon，尚无新回调live验收。
+- 下一步受控部署并按PID/时间顺序建立view→resource、virtual table→view及copy链，再和NVAPI surface句柄对齐。AMD游戏接入目标仍未完成。
+
 ### 2026-09-07：ReShade被动视图事件可用，避免初始化期虚拟资源查询
 
 - 新增native_resource_view_events.cpp使用API20 init_resource_view通知，无NGX/device方法替换。首版调用get_resource_desc的d77225d1 addon导致PID19072启动访问异常（Steam exit -1073741819），未得到有效日志；已移为.failed-resource-query，截图确认崩溃报告并选Don't Report关闭，未上传。
