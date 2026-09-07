@@ -6130,3 +6130,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - test_coalesced_shift_dispatch.py通过C64/C128/C256、多shift及短高度几何覆盖/边界检查。MinGW编译通过，PID43372退出0；完整15帧最终different0，下载两份结果对独立原版参考byte-exact。
 - 首C64 pack0.142977ms、crop0.097509ms（原约0.37/0.35ms），局部收益明确。整网暖583.589209ms、末5帧587.675586ms，较586.273701ms基线仅小幅差异，未做重复配对测量，暂不宣称稳定整体提速；候选显式开启，默认仍旧路径。
 - 证据release/native-network70-coalesced-shift/，准备/manifest更新脚本在release/（ignored）；运行run_coalesced_shift_network.ps1。不启用共享概率/收缩预载实验，无新增buffer、无游戏DLL更新，10fps未达到。
+# 2026-09-08：post70耗时分解
+
+- NativePost70::Record加入可选timer，仅profile开启时标记begin/merge/body/rgb；原算子、提交、资源不改，查询容量检查108以内（128上限）。
+- PID22232退出0；15帧最终different0，下载两份输出对独立原版参考byte-exact。全网暖591.256927ms，新增观测不宣称提速。
+- post70_body33.609171ms，merge1.100363ms，RGB0.846251ms，begin含跨提交间隔0.338404ms。故约36ms绝大多数是最后C32网络，不是末端RGB的整数精确舍入。下一步优先C32核心而非RGB投影。
+- post70标签现在是最后微小间隔，需加post70_*才是原范围；禁止拿接近零的旧标签当提速。
+- 证据release/native-network70-post-detail/，准备脚本release/prepare-post-detail.ps1（ignored）；运行multihead-av有效基线，没有开启最近三个未确认/无收益候选。游戏DLL未改，10fps未达到。

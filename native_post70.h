@@ -37,10 +37,10 @@ public:
   D3D_SHADER_MACRO macros[]={{"POST_BASE_ONLY",diagnostic?diagnostic:"0"},{nullptr,nullptr}};
   for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=CompileNativeShader(dir+L"\\native_post70.hlsl",macros,entries[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string((char*)error->GetBufferPointer(),error->GetBufferSize()):"post70 compile";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
- void Record(ID3D12GraphicsCommandList*c){
+ void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(!output||!c)throw std::runtime_error("post70 not created");if(recorded){barrier(c,merged,true);barrier(c,output,true);}
   auto pass=[&](UINT i,ID3D12Resource*src,ID3D12Resource*extra,ID3D12Resource*dst,UINT planes){c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,coefficients[i]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,extra->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,3,geometry,0);c->Dispatch(geometry[0]*geometry[1]/64,planes,1);};
-  pass(0,main_input,skip_input,merged,32);barrier(c,merged,false);body.Record(c);pass(1,body.Output(),color_input,output,3);barrier(c,output,false);recorded=true;
+  if(timer)timer->Mark(c,"post70_begin");pass(0,main_input,skip_input,merged,32);barrier(c,merged,false);if(timer)timer->Mark(c,"post70_merge");body.Record(c);if(timer)timer->Mark(c,"post70_body");pass(1,body.Output(),color_input,output,3);barrier(c,output,false);if(timer)timer->Mark(c,"post70_rgb");recorded=true;
  }
  ID3D12Resource*Output()const{return output;}
  ID3D12Resource*Merged()const{return merged;}

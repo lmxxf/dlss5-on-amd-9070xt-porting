@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+post70细分15帧exact：body33.60917ms、merge1.10036ms、RGB0.84625ms，begin队列间隔0.33840ms。暖全网591.25693ms，纯观测无提速。大头是末层C32，不是RGB精确投影；下一步定位C32共享注意力/FFN。旧post70标签现在仅最后间隔，完整比较必须加post70_*，不能宣称post降为零。证据release/native-network70-post-detail；有效无诊断基线仍约586ms，游戏未改，10fps未达到。
+
 多头shift合并访存候选15帧exact：COALESCED_MULTIHEAD_SHIFT=1使用元素级二维dispatch，原零填充/短高度循环/crop索引保持；首C64 pack/crop0.14298/0.09751ms（此前约0.37/0.35）。整网暖583.589209ms、末5帧587.675586ms，较586.27370ms有效基线差异小，尚不宣称稳定整网提升，默认仍旧路径。证据release/native-network70-coalesced-shift，runner run_coalesced_shift_network.ps1。无新buffer，游戏未改，10fps未达到。
 
 C64收缩全tile预载实验未采纳：PRELOAD_C64_CONTRACT=1一次载入16×256 half到8KiB LDS（旧1KiB逐K32），保留K32 H/F，15帧exact。暖589.420234ms、末5帧589.916056ms，首收缩1.94924ms，局部改善极小，未优于586.27370ms有效基线。默认关闭，证据release/native-network70-preload-contract，runner run_preload_contract_network.ps1。没有新增全图buffer，游戏未改，10fps未达到。
