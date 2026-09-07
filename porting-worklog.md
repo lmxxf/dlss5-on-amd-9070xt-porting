@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整shift3网络最终验收通过，新增RGB→FP16资源阶段
+
+- PID18872自然结束，session28959返回exit0。五帧history0/1/0/1/0各6635520 RGB different0；下载两份GPU结果、stdout及run.json到release/native-temporal-network70-shift3-accepted，validate_native_temporal_network70.py --shift3复核与独立原版shift参考逐byte一致且finite。
+- 首帧SHA82b01ef638b74e79adbacb0e8eceb5d8c94141cdff3e8900f32bb3dfad51abaf；时序SHA5fbef833d68c14a75252ede43870ade986310264ed3fc1189c332d3a75719f96。报告post_shift3、game_verified=false。这是控制历史输入，不是真实反馈生命周期或游戏显示验收。当前无该完整网络测试进程。
+- 新增native_rgb_texture.h/.hlsl：将网络1920×1152连续float RGB前1080行写入RGBA16_FLOAT纹理，alpha1；不加颜色转换/归一化。资源封装校验设备和buffer容量、拥有UAV/PSO、维护重复帧输出状态，供decode的Neural纹理使用。MinGW语法与Windows HLSL编译通过，尚未GPU执行此封装。
+- 原完整网络/codec测试均保留，游戏DLL未替换。下一步验证RGB纹理桥，之后连接encode→network→bridge→decode。
+
 ### 2026-09-07：NativeGameCodec封装在AMD输入/输出GPU对照通过
 
 - d3d12_native_codec_test增加DLSS5_TEST_CODEC_STAGE_DIR，要求game几何。启用后第二路实际调用NativeGameCodec::Create/Record及其Output，不再用测试程序自己的候选PSO输出；第一路仍独立执行捕获原版DXBC。消费封装输出后恢复NON_PIXEL_SHADER_RESOURCE以允许下一次Record。
