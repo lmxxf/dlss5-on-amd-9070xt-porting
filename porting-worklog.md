@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：post70差异前移到投影输入的单个half特征
+
+- 新增debug_native_post_head.gdb/capture_native_post_head.py，session53088取得裁切post kernel block1,row0,warp1的PCc0a0/c100/c130/c140寄存器。仅观察原kernel，不改权重/计算。
+- check_native_post_head_features.py将两组HMMA的两个K16输入合并1024个half，与CPU body对应4×8×32区域做数值多重集合比较（尚未假定lane布局）。只差一项：原版-9.0390625（0xc885），CPU-9.03125（0xc884），CPU该值唯一位置为局部y2/x0/channel12，即crop y6/x8/channel12，对应全图y454/x232。
+- 该结果将调查前移到body特征生成/merge，而不是直接改最终head的对齐累加规则。多重集合不是完整lane布局验证，不能据此声称其余特征位置逐位全部一致。
+- 原post完整RGB重放稳定，严格CPU对照仍1值失败；游戏DLL未改，AMD全网未启动。
+
 ### 2026-09-07：post70单值差异稳定，16×16裁切完整复现
 
 - 原版post70同输入重放到post70/replay.f32，与output.f32逐byte一致；排除本次原版输出随机变化，但未泛化其他环境。
