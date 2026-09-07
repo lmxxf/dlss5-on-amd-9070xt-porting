@@ -11,6 +11,9 @@ int wmain(int argc,wchar_t**argv){try{
  const UINT inputs=decode?3:1;
  const wchar_t*stage_dir=_wgetenv(L"DLSS5_TEST_CODEC_STAGE_DIR");
  if(stage_dir&&!game)throw std::runtime_error("codec stage requires game geometry");
+ const wchar_t*rebind_flag=_wgetenv(L"DLSS5_TEST_CODEC_REBIND");
+ if(rebind_flag&&(!stage_dir||wcscmp(rebind_flag,L"1")))throw std::runtime_error("rebind test requires stage and flag1");
+ const bool rebind=rebind_flag!=nullptr;
  const wchar_t*fixture_dir=_wgetenv(L"DLSS5_CODEC_FIXTURE_DIR");
  if(fixture_dir&&(!game||stage_dir))throw std::runtime_error("fixture export requires original game test");
  UINT vendor=wcstoul(argv[3],nullptr,16);
@@ -52,7 +55,14 @@ int wmain(int argc,wchar_t**argv){try{
  ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));NativeGameSubmission submit;submit.Create(q);
  auto transition=[](ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER v{};v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;v.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&v);};
  submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT j=0;j<inputs;j++){D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=upload;src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint=fp;src.PlacedFootprint.Offset+=bytes*j;dst.pResource=input[j];dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);transition(c,input[j],D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}});
+ ID3D12Resource*alternate=nullptr;
+ if(rebind){
+  ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&td,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&alternate)));
+  auto*zero=buf(d,bytes,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);ck(zero->Map(0,&none,&m));std::memset(m,0,bytes);zero->Unmap(0,nullptr);
+  submit.Submit([&](ID3D12GraphicsCommandList*c){D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=zero;src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint=fp;dst.pResource=alternate;dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);transition(c,alternate,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});zero->Release();
+ }
  for(UINT test=0;test<3;test++){
+  if(rebind){UINT index=decode?2:0;auto*replacement=test==1?alternate:input[index];stage->RebindInputAfterCompletion(index,replacement);auto descriptor=heap->GetCPUDescriptorHandleForHeapStart();descriptor.ptr+=index*stride;d->CreateShaderResourceView(replacement,&sv,descriptor);std::printf("codec rebind_frame=%u source=%c\n",test,test==1?'B':'A');}
   uint32_t words[16]={W,H,W,H,0,0,W,H,0x3f800000,0x3f800000,0x3f800000,1};float scale=test==0?1.f:test==1?.5f:2.f;std::memcpy(words+8,&scale,4);
   submit.Submit([&](ID3D12GraphicsCommandList*c){c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(root);auto gpu=heap->GetGPUDescriptorHandleForHeapStart();c->SetComputeRootDescriptorTable(0,gpu);c->SetComputeRoot32BitConstants(2,16,words,0);
    for(UINT i=0;i<2;i++){if(i==1&&stage){
@@ -62,6 +72,6 @@ int wmain(int argc,wchar_t**argv){try{
     transition(c,stage->Output(),D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);continue;
    }if(test)transition(c,out[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);auto u=gpu;u.ptr+=(i+inputs)*stride;c->SetComputeRootDescriptorTable(1,u);c->SetPipelineState(pso[i]);c->Dispatch((W+15)/16,(H+15)/16,1);transition(c,out[i],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=out[i];src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=rb;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;dst.PlacedFootprint.Offset+=bytes*i;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
   });
-  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0,invalid=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++){different+=a[i]!=a[bytes/2+i];for(UINT side=0;side<2;side++){auto v=a[side*bytes/2+i];invalid+=(i%4==3)?v!=(decode?(fixture_dir?fixture_alpha[i/4]:sample(UINT(i/4),3,2)):0x3c00):((v&0x7c00)==0x7c00||(!decode&&v>0x3c00));}}if(fixture_dir&&test==0&&!different&&!invalid){std::ofstream file((std::wstring(fixture_dir)+(decode?L"\\expected.f16":L"\\oracle-encode.f16")).c_str(),std::ios::binary);if(!file.write(static_cast<char*>(m),bytes))throw std::runtime_error("encode export failed");}rb->Unmap(0,&none);printf("codec vendor=%x size=%ux%u scale=%g half_values=%llu different=%zu invalid=%zu\n",vendor,W,H,scale,(unsigned long long)bytes/2,different,invalid);fflush(stdout);if(different||invalid)throw std::runtime_error("codec differs or invalid coverage");
+  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0,invalid=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++){different+=a[i]!=a[bytes/2+i];for(UINT side=0;side<2;side++){auto v=a[side*bytes/2+i];invalid+=(i%4==3)?v!=(decode?(rebind&&test==1?0:fixture_dir?fixture_alpha[i/4]:sample(UINT(i/4),3,2)):0x3c00):((v&0x7c00)==0x7c00||(!decode&&v>0x3c00));}}if(fixture_dir&&test==0&&!different&&!invalid){std::ofstream file((std::wstring(fixture_dir)+(decode?L"\\expected.f16":L"\\oracle-encode.f16")).c_str(),std::ios::binary);if(!file.write(static_cast<char*>(m),bytes))throw std::runtime_error("encode export failed");}rb->Unmap(0,&none);printf("codec vendor=%x size=%ux%u scale=%g half_values=%llu different=%zu invalid=%zu\n",vendor,W,H,scale,(unsigned long long)bytes/2,different,invalid);fflush(stdout);if(different||invalid)throw std::runtime_error("codec differs or invalid coverage");
  }if(stage)delete stage;return 0;
 }catch(const std::exception&e){fprintf(stderr,"%s\n",e.what());return 1;}}

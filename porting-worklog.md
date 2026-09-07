@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：codec源重绑GPU A/B/A验证通过
+
+- codec测试增加严格DLSS5_TEST_CODEC_REBIND=1，仅stage模式可用。创建另一张独立全零FP16纹理B，完成上传后按A/B/A重绑encode slot0或decode slot2，同时独立原版PSO的SRV指向同一对应输入，保持逐值对照；B的原图alpha为0，decode专门按真实B alpha检查。
+- AMD decode session83512及encode测试均exit0，1080p三个阶段各8294400 half different0/invalid0。scale仍为1/.5/2，不将两个A输出声称相等，而是各自和对应scale原版比较。候选使用真实RebindInputAfterCompletion，上一GPU提交已等待完成。
+- 证明codec描述符轮换及引用处理可以工作；未运行完整NativeGameFrame的轮换回归，也未证明游戏提交后插入点的资源状态。下一步继续原生提交返回及状态验证，不因局部重绑通过宣称游戏完成。
+
 ### 2026-09-07：完成帧后的源纹理重绑接口
 
 - NativeGameCodec增加RebindInputAfterCompletion，校验同设备/1080p FP16/单mip单采样/非别名，更新对应SRV并先AddRef新资源再Release旧资源。明确调用方必须已完成所有GPU使用，不能在运行中覆写shader-visible描述符。
