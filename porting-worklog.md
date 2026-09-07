@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整分块网络off/on/reset实验已启动
+
+- 独立D:\DLSSNR-Lab\native-network70-tiled目录从已验证profile基线复制f32与shader输入，未覆盖旧目录。仅替换native_c64.hlsl及新测试exe，更新该shader的manifest散列；设DLSS5_TEST_TILED_C64=1，PostShift=3，GpuProfile开启，SingleList关闭。
+- 首次调用被PowerShell执行策略拒绝，未启动测试；以进程级ExecutionPolicy Bypass正常启动。session26421/PID35820，run.json记录实际进程；已实查进程存活、CPU增长，stdout确认single_list=0、post_shift=3，stderr显示shader编译成功。当前仍初始化，无整网正确性或性能结论。继续查看同一PID/session，不能重复启动。
+- analyze_native_network_profile.py新增--root，便于审核独立候选目录而不改旧证据。对旧profile运行回归通过五帧逐字节原版结果；候选待完成后复制日志与两个GPU输出再运行。游戏DLL及发布包未动。
+
 ### 2026-09-07：raw输出三通道回归通过，准备整网分块测试
 
 - prepare_native_c64_raw_bench.py生成8×8、C64/C128/C256有符号非均匀输入，使用原权重与独立CPU block(raw_output=True)生成参考；明确不是直接CUDA raw oracle。保存的旧HLSL与候选各对CPU参考、彼此位元同时比较。

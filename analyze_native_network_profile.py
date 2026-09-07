@@ -1,8 +1,9 @@
 """Audit profiling run correctness and rank intervals (including queue gaps)."""
 from pathlib import Path
-import json,re,hashlib
+import json,re,hashlib,argparse
 import numpy as np
-root=Path('release/native-network70-profile');log=(root/'network.stdout.log').read_text()
+p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path('release/native-network70-profile'));args=p.parse_args()
+root=args.root;log=(root/'network.stdout.log').read_text()
 rows=[tuple(map(int,m)) for m in re.findall(r'network70 frame=(\d+) history=(\d+) values=(\d+) different=(\d+)',log)]
 assert rows==[(i,i%2,6635520,0) for i in range(5)] and 'extracted_network70=exact frames=5;' in log
 outputs={}
