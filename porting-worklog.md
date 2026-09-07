@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：mode1输出合成候选实现完成，尚待GPU对照
+
+- 新增native_codec_decode.hlsl，按捕获输出DXBC与嵌入函数常数还原mode1：Proxy/Neural sRGB解码、Original按PaperWhiteScale归一化、亮度比例及OkLab色相修正/AP1非负处理、TransferStrength和ColorStrength混合、亮度比例0..4限幅、恢复PaperWhiteScale并保留source alpha。
+- 非法模式/非正scale仍要求host拒绝。此候选尚未接入游戏；必须以三张独立纹理验证，不能把输入codec测试的单纹理别名当输出合成验收。
+- Windows cs_5_1/O3编译成功。首次早返回触发FXC X4000警告，改为初始化result再分支赋值、单出口后无警告；并不据此声明数值正确。下一步扩展GPU runner的t1/t2/t3资源及alpha/亮度边界测试。
+- AMD完整网络PID18872仍Responding，最后检查CPU1132秒；没有重复启动或替换游戏DLL。
+
 ### 2026-09-07：输入codec完整1080p两卡对照通过
 
 - d3d12_native_codec_test增加game模式1920×1080，dispatch向上取整120×68，覆盖底部不足16行的边界；保留256模式。增加两个输出的RGB有限/[0,1]与alpha精确half1检查，避免相同未写区域误判exact。
