@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：ViT Wave收缩/投影，整网965ms
+
+- native_wave_vit_reduce输出1024，支持K4096/K1024，两独立CSO；每wave16token×16输出，四K分区，首分区以原FP32 skip系数乘残差后H初始化，其余0，K32矩阵结果每步H，分区依次H合并，最终F。仍按65536输出分块提交。
+- NativeVitLinear显式WAVE_VIT_REDUCE仅非expand/非decoder启用，矩阵无损half row-major、尾skip原FP32复制，初始化后DEFAULT驻留。未改decoder及权重数值。
+- session38562/PID23768 exit0，15帧最终实际GPU两输出下载后逐字节原版一致；暖均965.4765336ms、末5帧964.39536ms，对照1042.8636021ms。ViT stage1约4.58～5.56ms，stage4约2.14～2.35ms。
+- local14685884416/budget15386648576，nonlocal528605184，预算内。证据release/native-network70-wave-vit-reduce/profile-validation.json。编译/diff通过，游戏未部署，10fps未达到。
+
 ### 2026-09-08：ViT Wave展开和half权重驻留，整网1.043秒
 
 - native_wave_vit_expand处理16token×16输出，K1024每32项H、原gate/F，组内half小块直接读FP32特征；NativeVitLinear仅expand下显式WAVE_VIT_EXPAND启用，权重初始化无损half row-major。Record/RecordChunk保持原65536输出边界，未合并提交；与旧tiled_expand冲突拒绝。
