@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：共享记忆体分块收缩通过，正在核对原始shader基线
+
+- session10117细分五轮均数值exact。暖轮均值baseline FFN132.127ms、attention8.862、projection4.221；拆分候选expand23.211、contract76.004、FFN project4.354，确立收缩乘法是拆分路径主耗时。
+- 新增默认关闭tiled_ffn_contract：每组8像素×32输出通道、64线程各算4值，以带33跨度的共享存储加载32项输入/权重块，维持每32项sum→H及最终F，组内两次同步防覆盖。主机仅contract pass改dispatch，额外几何限制，未改fast量化或其它pass。
+- session39567 five rounds block52(120×72×256) baseline/候选对原版oracle及彼此位元全部不同0。新收缩均值2.46965ms；该轮候选其余均值expand23.37031、FFN project4.05557、attention9.34049、projection6.59035。只代表此隔离样本，不代表整个网络或游戏帧率。
+- 为排除实验源码影响基线，bench增加DLSS5_BENCH_LEGACY_SHADER_DIR，session85694正在用保存的native-network70-profile原始shader作legacy、分块新shader作候选，独立archived-baseline.log。当前不推广生产，仍需原始基线、多通道及整网回归。
+
 ### 2026-09-07：三段FFN数值通过，继续细分核心耗时
 
 - native_c64新增默认关闭split_ffn：expand/contract/project三个GPU pass，按输出通道分工，保留每32项sum→H的顺序、gate多项式与原F量化；隐藏/中间量放GPU float buffer，无CPU中间传输。2D dispatch处理超过65535组的展开，索引范围检查，fast_fp8与split同时开启拒绝。

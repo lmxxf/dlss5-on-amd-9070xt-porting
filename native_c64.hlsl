@@ -46,6 +46,24 @@ float F(float v){return LegacyF(v);}
  [loop]for(uint g=0;g<4*HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*4*CHANNELS+g*32+j]*weights[4*MATRIX+row*4*CHANNELS+g*32+j];a=H(a+s);}
  output[n]=F(a);
 }
+groupshared float ffn_tile_input[8*33],ffn_tile_weight[32*33];
+[numthreads(64,1,1)]void tiled_ffn_contract(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ if(gid.x*32>=CHANNELS||gid.y*8>=width*height)return;
+ uint t=tid.x,local_pixel=t/8,local_row=(t%8)*4;
+ uint p=gid.y*8+local_pixel,row=gid.x*32+local_row;float4 a=0;
+ [loop]for(uint g=0;g<4*HEADS;g++){
+  [loop]for(uint i=t;i<8*32;i+=64)ffn_tile_input[(i/32)*33+i%32]=input[(gid.y*8+i/32)*4*CHANNELS+g*32+i%32];
+  [loop]for(uint i=t;i<32*32;i+=64)ffn_tile_weight[(i%32)*33+i/32]=weights[4*MATRIX+(gid.x*32+i/32)*4*CHANNELS+g*32+i%32];
+  GroupMemoryBarrierWithGroupSync();float4 s=0;
+  [loop]for(uint j=0;j<32;j++){
+   float v=ffn_tile_input[local_pixel*33+j];uint w=j*33+local_row;
+   s+=v*float4(ffn_tile_weight[w],ffn_tile_weight[w+1],ffn_tile_weight[w+2],ffn_tile_weight[w+3]);
+  }
+  a=float4(H(a.x+s.x),H(a.y+s.y),H(a.z+s.z),H(a.w+s.w));
+  GroupMemoryBarrierWithGroupSync();
+ }
+ [unroll]for(uint r=0;r<4;r++)output[p*CHANNELS+row+r]=F(a[r]);
+}
 [numthreads(64,1,1)]void split_ffn_project(uint3 id:SV_DispatchThreadID){
  uint n=id.x+id.y*4194240u;if(n>=width*height*CHANNELS)return;
  uint p=n/CHANNELS,row=n%CHANNELS;float a=H(feature[n]*weights[9*MATRIX+row]);
