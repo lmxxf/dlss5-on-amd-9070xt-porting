@@ -27,3 +27,23 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   output[p*512+row]=F(a);
  }
 }
+// One pixel per workgroup; distribute channels instead of keeping thousands
+// of per-pixel temporaries in every individual thread.
+groupshared float shared_mixed[512],shared_hidden[2048];
+[numthreads(64,1,1)]void ffwd_shared(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint p=gid.x;if(p>=width*height)return;
+ for(uint row=tid.x;row<512;row+=64){
+  float a=0;[loop]for(uint k=0;k<16;k++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*512+k*32+j]*weights[row*512+k*32+j];a=H(a+s);}shared_mixed[row]=F(a);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ for(uint index=tid.x;index<2048;index+=64){
+  uint group=index/256,row=index%256;float a=0;
+  [unroll]for(uint k=0;k<2;k++){float s=0;[loop]for(uint j=0;j<32;j++)s+=shared_mixed[group*64+k*32+j]*weights[262144+group*16384+row*64+k*32+j];a=H(a+s);}
+  float gate=clamp(a,-4.0,4.0),poly=H(gate*H(abs(gate)*(-.055908203125)+.447265625)+.89453125);shared_hidden[index]=F(H(a*poly));
+ }
+ GroupMemoryBarrierWithGroupSync();
+ for(uint index=tid.x;index<512;index+=64){
+  uint group=index/64,row=index%64;float a=0;
+  [unroll]for(uint k=0;k<8;k++){float s=0;[loop]for(uint j=0;j<32;j++)s+=shared_hidden[group*256+k*32+j]*weights[393216+group*16384+row*256+k*32+j];a=H(a+s);}output[p*512+index]=F(a);
+ }
+}

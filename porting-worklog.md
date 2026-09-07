@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：目标提高到10fps，共享FFWD隔离实验通过
+
+- NativeSplit::Record新增可选四阶段timestamp，默认无计时。d3d12_native_split_test五轮测试同时输出各段GPU时间，不包含读回与CPU比较。
+- 确认投影优化后首段FFWD支配小夹具成本，新增ffwd_shared：64线程一组处理一个像素，shared_mixed512/shared_hidden2048，共10KiB共享存储；混合→门控展开→收缩之间两次组同步，沿用每32项H及F。显式DLSS5_TEST_SPLIT_FFWD=1启用，限制pixels<=65535，默认不影响旧路径。
+- 首次部署命令因Windows尾反斜杠引用解析失败，未启动GPU测试；修正命令后session38114 exit0，五轮四阶段、输入切换及恢复全部different0。原profile session2907 exit0亦通过。
+- 暖轮split_stage0/1/2/3：旧34.16767/0.27016/1.47757/0.15809ms，新0.65429/0.24187/3.12796/0.24735ms，合计36.07349→4.27147ms。注意力反而慢，不能掩盖；仅16×8样本，需整网验证。日志release/split-shared-ffwd/result.log与release/split-projection-tiled/profile.log。
+- 编译与diff检查通过，游戏仍退出、安装版不变；下一步完整尺寸/整网计时，不把局部约8倍收益当作10fps完成。
+
 ### 2026-09-07：用户恢复优化，C512双投影分块整网约10%收益
 
 - 新增native_c64.hlsl tiled_split_project，复用共享分块，权重偏移0、skip偏移MATRIX；NativeSplit显式DLSS5_TEST_SPLIT_PROJECTION=1时两投影采用16×(pixels/8) dispatch，默认原路径。未改权重、量化或FFWD/attention算法，无额外大scratch。
