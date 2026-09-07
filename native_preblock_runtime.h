@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
@@ -48,6 +48,7 @@ public:
   if(noise_table&&(raw_features||noise_table->size()!=size_t(3)*(1<<24)))throw std::runtime_error("invalid universal noise table");
   if(device||!d||!input||!w||!h||w%8||h%8||UINT64(w)*h/64>65535||fw.size()!=8736||aw.size()!=8225)throw std::runtime_error("invalid native preblock contract");
   if(temporal_input){if(!noise_table||raw_features||!live_profile||temporal_input->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||temporal_input->GetDesc().Width<UINT64(w)*h*16)throw std::runtime_error("temporal preblock contract");temporal=temporal_input;temporal->AddRef();}
+  const wchar_t*finish_flag=_wgetenv(L"DLSS5_TEST_COALESCED_FINISH");if(finish_flag&&wcscmp(finish_flag,L"0")&&wcscmp(finish_flag,L"1"))throw std::runtime_error("invalid coalesced finish flag");coalesced_finish=finish_flag&&!wcscmp(finish_flag,L"1");
   const wchar_t*prefix_flag=_wgetenv(L"DLSS5_TEST_SPLIT_PREBLOCK_FFN");if(prefix_flag&&wcscmp(prefix_flag,L"0")&&wcscmp(prefix_flag,L"1"))throw std::runtime_error("invalid split preblock flag");prefix_wave=!raw_features&&noise_table&&prefix_flag&&!wcscmp(prefix_flag,L"1");
   const wchar_t*ffn_flag=_wgetenv(L"DLSS5_TEST_WAVE_C32_FFN");if(ffn_flag&&wcscmp(ffn_flag,L"0")&&wcscmp(ffn_flag,L"1"))throw std::runtime_error("invalid wave C32 FFN flag");wave_ffn=raw_features&&ffn_flag&&!wcscmp(ffn_flag,L"1");
   if(wave_ffn||prefix_wave)for(size_t i=512;i<8704;i++){uint32_t b;std::memcpy(&b,&fw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 FFN weight not exact half");}
@@ -86,7 +87,7 @@ public:
   if(wave_qkv)for(size_t i=0;i<(wave_projection?4096:3072);i++){uint32_t b;std::memcpy(&b,&aw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 QKV weights not exact normal half");}
   if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+L"\\native_wave_c32_ffn_local.cso").c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
   for(UINT i=0;i<3;i++){
-   ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?L"\\native_wave_c32_ffn_local.cso":L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
+   ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?L"\\native_wave_c32_ffn_local.cso":L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==2&&coalesced_finish)?"finish_coalesced":(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
    if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"compile failed";if(error)error->Release();throw std::runtime_error(message);}
    if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[i])));code->Release();
   }
@@ -97,7 +98,7 @@ public:
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
-   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
+   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    if(stage==0&&prefix_wave){
     Barrier(c,raw,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,std::string(label)+"_prefix");
     if(test_prefix_readback){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(test_prefix_readback,0,raw,0,4096);Barrier(c,raw,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}

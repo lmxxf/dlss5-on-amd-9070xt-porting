@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新C32收尾按通道合并访存：COALESCED_FINISH显式开启，保留旧入口默认路径、H/F和池化求和顺序。15帧最终exact，暖661.67148ms、末5帧662.32926ms；preblock_detail_stage2由9.30013到1.14322ms，首个c32_probe_stage2由2.69509到0.24597ms。其他阶段存在波动，不把全部整网差额归因此改。无新增GPU缓冲，2D dispatch覆盖回归通过。证据release/native-network70-coalesced-finish；run_coalesced_finish_network.ps1继承上一有效配置。游戏DLL未改，10fps未达到。
+
 最新raw下采样池化＋Wave投影15帧exact，暖688.03063ms、末5帧685.43865ms。WAVE_HEAD先把ViT入口head16.74132→0.04410ms（含池化）；WAVE_DOWNSAMPLE再覆盖C64/128/256 raw路径，非raw的ds4保持旧实现。矩阵无损half本地驻留、池化借共享packed区；valid矩形补零不变。证据release/native-network70-wave-head与-wave-downsample。参数化初版误改FP8常数已修正并加静态回归，失败日志保留；游戏未改，10fps未达到。
 
 512融合Wave FFWD候选15帧exact但暖708.75353ms，不优于706.43771ms，保持WAVE_SPLIT_FFWD=0。新增首Split分段计时确认FFWD3.48644ms、QKV0.23348/attention0.45686ms；ViT入口head单独16.74132ms，下一步优先下采样投影。证据release/native-network70-wave-split-ffwd与-split-profile。encoder23_head现在只剩bridge间隔，需加encoder_head/encoder23_30_body和首层split*，不能误报标签变小为提速。

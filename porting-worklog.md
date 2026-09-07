@@ -6066,3 +6066,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 工作假设写在本日志；二进制证实后再提升到 `reverse-engineering-notes.md`。
 - AMD 第一版统一把权重解成 FP16，不被原始 FP8 执行路径绑住。
 - 先让固定输入离线出图，再装 Windows AMD 工具链；不在结构未知时提前优化。
+# 2026-09-08：C32收尾合并访存
+
+- 将每线程串行32通道改为相邻线程处理相邻通道，原tile→HWC索引、main输出F、down输出逐步H/F池化保持不变。原入口保留；仅DLSS5_TEST_COALESCED_FINISH=1选择新入口。
+- host dispatch增加32倍线程并展开为二维；shader按65535组行跨度还原索引，越界线程返回。test_coalesced_finish_dispatch.py覆盖小图、真实C32几何及1920×1152，验证主输出和下采样写入一一覆盖。
+- MinGW MATRIX_BENCH编译通过；远程测试PID4780正常退出0。15帧history off/on/reset最终6635520值逐字节一致，两份下载输出也与独立原版参考完全一致。
+- 暖均661.6714807ms、末5帧662.329258ms；上一raw downsample暖688.0306321ms。preblock_detail_stage2 9.300134→1.143223ms，c32_probe_stage2 2.695094→0.245969ms。其余阶段波动，整网差值不全算作此算子收益。
+- 证据release/native-network70-coalesced-finish/（忽略版本控制）；准备/manifest更新脚本在release/。测试入口run_coalesced_finish_network.ps1，所有权重、网络结构、输入依赖未改，无新增GPU缓冲。游戏安装DLL未更新；约1.51fps测试链不等于游戏10fps，目标仍未完成。

@@ -11,3 +11,14 @@ uint index(uint x,uint y,uint c){uint tile=(y/8)*(width/8)+x/8;return (tile*64+(
   if((x%2)==0&&(y%2)==0){float top=H(raw[index(x,y,c)]+raw[index(x+1,y,c)]),bottom=H(raw[index(x,y+1,c)]+raw[index(x+1,y+1,c)]);down_output[((y/2)*(width/2)+x/2)*32+c]=F(H(H(top+bottom)*.25));}
  }
 }
+[numthreads(64,1,1)]void finish_coalesced(uint3 group:SV_GroupID,uint t:SV_GroupIndex){
+ uint n=(group.y*65535+group.x)*64+t;
+ if(n>=width*height*32)return;
+ uint p=n/32,c=n%32,x=p%width,y=p/width;
+ main_output[n]=F(raw[index(x,y,c)]);
+ if((x%2)==0&&(y%2)==0){
+  float top=H(raw[index(x,y,c)]+raw[index(x+1,y,c)]);
+  float bottom=H(raw[index(x,y+1,c)]+raw[index(x+1,y+1,c)]);
+  down_output[((y/2)*(width/2)+x/2)*32+c]=F(H(H(top+bottom)*.25));
+ }
+}
