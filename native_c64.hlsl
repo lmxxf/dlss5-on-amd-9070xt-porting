@@ -92,6 +92,7 @@ void tiled_project(uint3 gid,uint t,uint matrix_offset,uint skip_offset,bool raw
 }
 [numthreads(64,1,1)]void tiled_ffn_project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){tiled_project(gid,tid.x,8*MATRIX,9*MATRIX,false);}
 [numthreads(64,1,1)]void tiled_attention_project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){tiled_project(gid,tid.x,3*MATRIX,SCALE_OFFSET+HEADS,RAW_OUTPUT!=0);}
+[numthreads(64,1,1)]void tiled_split_project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){tiled_project(gid,tid.x,0,MATRIX,false);}
 [numthreads(64,1,1)]void split_ffn_project(uint3 id:SV_DispatchThreadID){
  uint n=id.x+id.y*4194240u;if(n>=width*height*CHANNELS)return;
  uint p=n/CHANNELS,row=n%CHANNELS;float a=H(feature[n]*weights[9*MATRIX+row]);

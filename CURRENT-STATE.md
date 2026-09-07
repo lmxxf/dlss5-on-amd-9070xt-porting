@@ -1,6 +1,12 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
-本页优先于 README 中旧里程碑。速度优化按用户要求暂停；不宣称完整移植目标已经完成。
+本页优先于 README 中旧里程碑。不宣称完整移植目标已经完成。
+
+## 20:14之后：用户恢复性能工作
+
+用户要求暂以现有正确性为基线，继续优化。首个候选将NativeSplit的两段C512投影切成共享分块，默认关闭，仅DLSS5_TEST_SPLIT_PROJECTION=1启用。现成四阶段输入切换五轮通过，完整off/on/reset五轮最终字节也一致；暖轮2.710→2.439秒，约10%收益，证据release/native-network70-split-projection/profile-validation.json。代码已保留，尚未推广到游戏DLL。
+
+为避免GPU计时争用，21632已正常Alt+F4退出，完整测试PID21952已exit0；当前游戏不在运行，已安装DLL与开关文件不变。下文“最后检查PID21632”描述封存时历史状态，不是现时进程。继续优化时以此段及worklog最新条目为准。
 
 ## 当前能做到什么
 
@@ -46,7 +52,7 @@
 ## 恢复工作
 
 1. 先看本页与porting-worklog最新段，再查Git状态、实际游戏PID和当前DLL散列，不重启仍存活的测试。
-2. 首要事项是核验当前新帧/持续显示与历史反馈；速度留到下周。不要继续优化算子来替代正确画面目标。
+2. 用户20:14重新授权性能优化，暂沿用现有正确性基线；仍保留回归，不以牺牲神经输出换FPS。新帧独立核验与历史反馈未完成项保留，不改写为已完成。
 3. 构建当前展示版：`bash build_native_game_verification.sh /home/lmxxf/work/tmp-test/minhook.KmbJvO/repo /tmp/reshade680.MNSVvW/include OUTPUT.addon64 --tiled`。先确认外部MinHook/ReShade路径仍存在；DLL已封存，不依赖临时二进制存活。
 4. `deploy_native_tiled_verification.ps1`是旧手动版的一次性部署脚本，硬编码旧SHA且拒绝覆盖备份；不要拿它重装当前展示版。当前展示版SHA/回退方法以本页为准。
 5. 不推送/发布旧网盘包作为完成版。完整目标保持未完成。

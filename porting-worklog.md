@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：用户恢复优化，C512双投影分块整网约10%收益
+
+- 新增native_c64.hlsl tiled_split_project，复用共享分块，权重偏移0、skip偏移MATRIX；NativeSplit显式DLSS5_TEST_SPLIT_PROJECTION=1时两投影采用16×(pixels/8) dispatch，默认原路径。未改权重、量化或FFWD/attention算法，无额外大scratch。
+- session99382 exit0，原native-c512/amd现成四阶段夹具，五帧包括输入切换/还原均different0。日志release/split-projection-tiled/result.log。
+- 正常退出游戏21632后，独立native-network70-split-projection完整实验session95012/PID21952 exit0；PostShift3、TILED_C64=1、SPLIT_PROJECTION=1、分段profile。下载两份实际GPU输出与独立原版逐字节核验，五轮history off/on/reset均exact。
+- 暖轮2709.6836475→2439.2734975ms（约9.98%下降）；encoder23_head400.65385→251.35409ms，decoder_stage12本轮401.389905ms。不是实时FPS。证据release/native-network70-split-projection/profile-validation.json。
+- 游戏已退出以免计时争用，安装DLL和开关文件未改；新候选尚未部署。用户暂假设正确性允许优化，不代表撤销未完成的时序/新帧验证边界。
+
 ### 2026-09-07 20:10：用户确认观感，整理并封存现场
 
 - 用户确认连续展示“这个是对的，虽然只有2fps”，随后要求整理提交、省额度。未退出或改动正在运行的游戏，最后检查21632仍持续完成处理。
