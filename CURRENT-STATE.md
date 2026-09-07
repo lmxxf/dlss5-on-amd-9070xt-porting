@@ -1,5 +1,9 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+重要更正/驱动恢复：八Wave最初PSO失败来自驱动回退，不是该shader不支持。当前检查发现AMD32.0.31041.1004、SM6.9/tier0，已知四Wave也PSO失败；SetupAPI显示09/08 04:22 AMD26.8.1安装器活动（触发者未知）。按既有授权恢复32.0.31007.2048，PID21368退出0，无重启，Intel不变；SM6.10/tier0x10恢复，四/八Wave均PSO成功。一次性任务完成后移除，更新设置未改。
+
+恢复后同环境两轮各15帧exact：八WavePID21052暖582.260006ms、末5帧585.337214ms；四WavePID30596暖594.28691ms、末5帧594.138682ms。八Wavepost70_body27.96500ms vs四Wave30.52498，preblock attention18.30349 vs20.81232。八Wave在当前环境有收益，可显式-EightWaves使用；旧569ms是恢复前历史测量，不用作跨环境直接比较。证据release/native-network70-c32-eight-wave与-c32-four-wave-restored，旧失败日志pre-driver-*保留；驱动证据release/driver-install-20260908-restore。新增启动前SM6.10/LinAlg能力门禁，避免再次误判代码；游戏未改，10fps未达到。
+
 C32八Wave候选PSO创建被拒绝：256线程按查询/输出列分工，DXC通过但PID14572初始化native preblock HRESULT2147942487(E_INVALIDARG)，exit1，无完整帧/性能数据，无DEVICE_HUNG。原因尚未定位，不宣称硬件普遍不支持256线程。-EightWaves显式开启，默认仍四Wave569ms。证据release/native-network70-c32-eight-wave，test_c32_wave_ownership.py仅验证索引覆盖；游戏未改，10fps未达到。
 
 C32四Wave融合核15帧exact，暖569.132636ms、末5帧572.907292ms。独立preblock_attention_four_wave.hlsl每窗口128线程，四个Wave各负责16查询矩阵工作；标量段仅t<64，barrier保持全组；输入/投影暂存协同连续搬运，不增LDS/全图buffer。preblock attention20.79282ms，首C32 attention5.13972ms，post70_body30.78596ms（旧33.60917）。证据release/native-network70-c32-four-wave；runner run_c32_four_wave_network.ps1，其他无收益候选均关闭。游戏未改，10fps未达到。

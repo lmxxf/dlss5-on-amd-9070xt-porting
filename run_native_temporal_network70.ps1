@@ -7,6 +7,16 @@ foreach($Map in 'hwc-to-vit.i32','vit-to-hwc.i32'){
  if(!(Test-Path (Join-Path $Folder $Map) -PathType Leaf)){throw "Missing layout map: $Map"}
 }
 if(Get-Process native-network70-temporal -ErrorAction SilentlyContinue){throw 'Existing full-network test; inspect it instead of restarting'}
+if($env:DLSS5_TEST_MATRIX_C256 -eq '1' -or $env:DLSS5_TEST_MATRIX_C128 -eq '1' -or $env:DLSS5_TEST_MATRIX_C64 -eq '1'){
+ $Probe='D:\DLSSNR-Lab\matrix-probe\matrix_probe.exe'
+ $Capability=& $Probe --experimental 2>&1
+ $ProbeExit=$LASTEXITCODE
+ $Capability | Write-Output
+ $Tier=[regex]::Match(($Capability -join "`n"),'tier=(?:0x)?([0-9a-fA-F]+)')
+ if($ProbeExit -ne 0 -or !($Capability -match 'returned=6a') -or !$Tier.Success -or [Convert]::ToInt32($Tier.Groups[1].Value,16) -eq 0){
+  throw 'Matrix capability unavailable; inspect current driver before treating this as a shader regression'
+ }
+}
 $Manifest=Get-Content (Join-Path $Folder 'shader-manifest.json') -Raw | ConvertFrom-Json
 if($Manifest.Count -ne 19){throw 'Incomplete shader manifest'}
 foreach($Entry in $Manifest){

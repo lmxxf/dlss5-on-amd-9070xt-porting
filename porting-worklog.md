@@ -6196,3 +6196,12 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - test_c32_wave_ownership.py检查32/64输出列的两种分工覆盖集合相同且无重复。DXC通过；PID14572在初始化native preblock管线时报HRESULT2147942487=E_INVALIDARG，exit1，无完整帧、无计时/数值结论，也不是DEVICE_HUNG。
 - 不自动重跑、不修改游戏安装；保留四Wave默认及其569ms已验证基线。该错误原因未定位，不能从单个复杂shader拒绝推出GPU普遍不支持256线程。
 - 证据release/native-network70-c32-eight-wave/日志，准备脚本release/prepare-c32-eight-wave.ps1（ignored）。复现入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves；默认不加该参数。10fps仍未达到。
+# 2026-09-08：驱动再次回退、恢复与八Wave重判
+
+- 新d3d12_c32_pipeline_probe.cpp只建立相同root/PSO、不提交GPU工作。首先已知四Wave和八Wave均E_INVALIDARG；debug接口887a002d、InfoQueue80004002，调试层不可用。能力探针--experimental最高6.9、LinAlg tier0，WMI确认AMD已变32.0.31041.1004。
+- SetupAPI尾部记录09/08 04:22 AMDSoftwareInstaller_AMDInstallManager/26.8.1安装活动；不能确定自动/手动触发，也未证明Windows Update所为。更正上一轮八Wave拒绝结论，不能归因shader资源限制。
+- 依据已有用户授权恢复预览驱动。start_amd_preview_install.ps1加入独立RunTag，复用现有签名/回退INF/空闲进程检查；20260908-restore任务PID21368退出0，04:29完成。AMD32.0.31007.2048、Intel32.0.101.8331，无自动重启；一次性任务Ready/LastTaskResult0后删除。没有修改更新策略。安装证据release/driver-install-20260908-restore。
+- 恢复后--experimental返回SM6.10/tier0x10，独立四/八Wave PSO都成功。run_native_temporal_network70.ps1新增矩阵配置启动前能力门禁，失败时要求检查驱动，不再把E_INVALIDARG直接当shader回归。
+- 保存旧八Wave日志为pre-driver-*，确认上次终止后才重跑。八WavePID21052退出0，15帧最终/下载结果对独立原版byte-exact，暖582.260006ms、末5帧585.337214ms。
+- 补同一恢复后环境四Wave对照PID30596，15帧byte-exact，暖594.28691ms、末5帧594.138682ms。八Wavepost70_body27.965003对四Wave30.524977ms、preblock attention18.303491对20.812323ms，当前环境八Wave优。恢复前四Wave569ms仍是历史证据，不做跨环境同轮比较。
+- 证据release/native-network70-c32-eight-wave、-c32-four-wave-restored及resume-eight-wave/recheck-four-wave准备脚本（ignored）。下一优化以恢复后环境和能力门禁为准；八Wave可显式-EightWaves，不修改游戏DLL，10fps未完成。
