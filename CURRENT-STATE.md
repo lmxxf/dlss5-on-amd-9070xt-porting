@@ -2,6 +2,14 @@
 
 ## 2026-09-08 05:30 朱雀接手性能优化（闇 GPT 额度见底）
 
+**07:05 累计：暖轮 293.2ms（闇最后基线 472.9ms，−38%），15帧全部exact。** 叠加顺序（每步一个release/native-network70-*目录、一个run_*.ps1 入口，每个入口链式调用上一个）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366（噪声内）→ resident-weights 338 → shift-stack 332（重评闇的COALESCED_MULTIHEAD_SHIFT，现在有效）→ wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293。当前完整入口：`run_blocked_c32_ffn_network.ps1`。
+
+**共同规律**：所有收益来自数据搬运，不是算术——(1) 每wave一份A tile复用4个权重tile（寄存器分块）；(2) 中间层用f16存（F()输出都在FP8格点，转换无损）；(3) 权重全部驻留VRAM；(4) 取消LDS→temp→LDS的转存和多余barrier，用GetCoordinate直接写；(5) 取消分chunk小dispatch。每个输出元素的K32乘加序列和H()调用次数完全不变，所以逐字节exact是构造性保证，不是靠运气。
+
+新增文件：native_wave_ffn_blocked.hlsl（Swin C64/128/256 FFN）、native_wave_vit_blocked.hlsl（ViT expand/reduce，含K=1024投影版）、native_wave_vit_qkv.hlsl（ViT QKV，1.53→0.39ms/层）、native_wave_c32_ffn_blocked.hlsl（C32 FFN，preblock stage0 13.3→10.0ms）、native_wave_split_ffwd_parallel.hlsl 加 NATIVE_SPLIT_FFWD_BLOCKED（1.18→0.65ms/块）。
+
+**剩余分布（293ms）**：注意力约145ms（多头C64/128/256 约2.2ms×38块≈84；C32 3.0×7+preblock 12.8；ViT 3.35×8=27；post70 body 20.6 内含C32型注意力）；C32 FFN 1.8×7+10；prefix 7.4；pack/crop；decoder入口/上采样投影约10。**下一步该动注意力核**：多头核每组(窗口×头)约65µs，是合理值的~10倍，瓶颈是LDS 28KB限制并发+12个barrier+64线程串行段，不是算力；候选是把scores存f16 exp（省8KB LDS）、分母树并行化、或把C32的QKV/投影GEMM从融合核里拆成整层wave GEMM。
+
 **06:05 累计：暖轮 337.8ms（闇最后基线 472.9ms），15帧全部exact，四项叠加、全部显式flag、默认关闭、游戏DLL未改。**
 
 全部权重驻留GPU本地（DLSS5_TEST_RESIDENT_WEIGHTS=1）：此前所有权重/偏置表/索引表都在UPLOAD堆（系统内存，非本地段492MB），每帧经PCIe读取。NativeMaybeResident在各Buffer helper初始化后复制到DEFAULT堆；非本地占用降到205MB，本地14.44/15.14GB。暖366.0→337.8ms。decoder_stage1在多次运行间4.5/13.9ms双稳态（与同步/延迟提交无关）的根因就是它：decoder39入口权重落在系统内存时慢9ms。证据release/native-network70-resident-weights。
