@@ -19,7 +19,9 @@ def attention(q,k,v,*,experimental_640=False):
  den=denominator(exp[...,:64][...,np.argsort(key_order)])
  for start in range(64,n,64):
   den=H(den+denominator(exp[...,start:start+64][...,np.argsort(key_order)]))
- numerator=H(F(exp[...,:32])@v[:,:32])
+ # Preserve the accumulated half value through the product sum; a float32
+ # intermediate can land on a half midpoint and round the wrong direction.
+ numerator=H(F(exp[...,:32]).astype(np.float64)@v[:,:32].astype(np.float64))
  for start in range(32,n,32):
-  numerator=H(numerator+F(exp[...,start:start+32])@v[:,start:start+32])
+  numerator=H(numerator.astype(np.float64)+F(exp[...,start:start+32]).astype(np.float64)@v[:,start:start+32].astype(np.float64))
  return F(H(numerator*H(1/den))).transpose(1,0,2).reshape(n,1024)

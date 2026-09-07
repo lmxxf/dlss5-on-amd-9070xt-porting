@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：新输入暴露attention32 CPU累加双舍入，局部修正
+
+- session3800结束exit1，在block32 attention仅1值不一致，原版两次replay一致；条件串联的decoder39/40..47没有执行。
+- check_native_color_attention32.py从原版QKV物理输出独立解码复现token209/channel338：原版2.75、CPU2.5。将32项乘积与旧half累加值在float64合并后再half舍入，numerator714.5/den272得到原版2.75，表明float32中间舍入造成边界差异。
+- native_vit_attention_reference.py改为float64乘积累计再H；同层全部655360值现在different0。没有修改原版oracle、没有放宽容差；AMD attention累加实现仍需核对及回归，不能由CPU修正自动推断AMD正确。
+- 已重新启动同源全ViT CPU回归，后接decoder39/40..47；之前任务已确认终态才启动。该新任务尚未完成，游戏DLL未修改。
+
 ### 2026-09-07：新输入encoder1..22全exact，ViT replay通过并启动数值校验
 
 - session88265自然结束exit0，blocks1..22每层原版/CPU main different0、finite；有normalizer中间cast overflow警告，但各层最终数值和有限性断言均通过，不隐藏该警告。
