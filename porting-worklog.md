@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：已部署分块游戏验证DLL并进入真实游戏流程
+
+- 新构建选项--tiled启用NATIVE_GAME_TILED_VERIFICATION，NativeC64Shift无显式环境设置时默认开启分块；标准构建不变。游戏单帧helper改用独立native-game-tiled-assets并记录build_mode，不修改Steam环境或旧资产。
+- deploy_native_tiled_verification.ps1确认游戏退出、核对所有原数值/shader资产（仅c64替换为已通过整网的版本），备份原DLL为native-submission-order.addon64.before-tiled-verification。安装SHA61e731057b39233b8e9c55cdd6d08791c6a7196d99d6cf44e2b812f18552b1cb，原DLL SHA9b83600293e62e2ec2d789dc75fb31ee1d324225dcdec2370a5590d61d6073de。
+- DLSS5GameLaunch启动后实际PID43156 Responding=true；日志确认initialization_started与tiled verification/separate assets。未发出任何神经帧请求，仍背景初始化。
+- F12截图release/native-live-tiled-43156/menu.jpg实看1920×1080主菜单，“继续”选中，无云同步窗口。已按Enter继续现有存档，下一步确认场景、等ready，再发PID/request-id并核对原始before/after。此处只是部署及加载证据，不是画质验收。
+
 ### 2026-09-07：分块整网五帧off/on/reset原版逐字节验收通过
 
 - session5329/PID11048 exit0，完整1920×1080输入、1920×1152处理、post_shift3、分段提交，五帧history=0/1/0/1/0，每帧6635520最终值different=0。已下载stdout/stderr/run.json和两个GPU实际输出，analyze_native_network_profile.py --root release/native-network70-tiled通过。

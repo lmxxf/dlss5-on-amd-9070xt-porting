@@ -13,6 +13,9 @@ public:
   if(input||!d||!src||!width||!height||width>16384||height>16384||shift>3||(channels!=64&&channels!=128&&channels!=256))throw std::runtime_error("multihead shift contract");input=src;input->AddRef();geometry[0]=width;geometry[1]=height;geometry[4]=(shift&1)?4:0;geometry[5]=(shift&2)?4:0;geometry[2]=(width+geometry[4]+7)&~7u;geometry[3]=(height+geometry[5]+7)&~7u;
   // Explicit whole-network experiment only; ordinary/game callers stay legacy.
   const wchar_t*tile_setting=_wgetenv(L"DLSS5_TEST_TILED_C64");
+#ifdef NATIVE_GAME_TILED_VERIFICATION
+  if(!tile_setting)tile_setting=L"1";
+#endif
   if(tile_setting&&wcscmp(tile_setting,L"0")&&wcscmp(tile_setting,L"1"))throw std::runtime_error("invalid DLSS5_TEST_TILED_C64");
   const bool tiled=tile_setting&&!wcscmp(tile_setting,L"1");
   padded=Buffer(d,UINT64(geometry[2])*geometry[3]*channels*4);output=Buffer(d,UINT64(width)*height*channels*4);body.Create(d,padded,geometry[2],geometry[3],fw,aw,dir,raw_output,channels,false,tiled,tiled,tiled,tiled);

@@ -25,7 +25,12 @@ class NativeGameOneShot {
    std::ifstream f(noise_path,std::ios::binary|std::ios::ate);if(!f||f.tellg()!=201326592)throw std::runtime_error("one-shot noise size");
    std::vector<float>noise(201326592/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(noise.data()),201326592))throw std::runtime_error("one-shot noise read");
    self->frame=new NativeGameFrame;
+#ifdef NATIVE_GAME_TILED_VERIFICATION
+   Log("build_mode","tiled verification; separate assets; reset-history only");
+   self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-game-tiled-assets)");
+#else
    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-color-frame-samegpu)");
+#endif
    Log("ready","await explicit PID/request-id; history_reset=1; not temporal acceptance");
    self->phase.store(2,std::memory_order_release);
   }catch(const std::exception&e){Log("initialization_failed",e.what());self->phase.store(5);}
