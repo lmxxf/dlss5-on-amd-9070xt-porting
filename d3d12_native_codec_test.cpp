@@ -4,12 +4,14 @@
 #include "native_game_submission.h"
 // Execute captured and candidate DXBC on identical half input, compare half output.
 int wmain(int argc,wchar_t**argv){try{
- if(argc!=4)return 2;UINT vendor=wcstoul(argv[3],nullptr,16);
+ if(argc!=4&&argc!=5)return 2;
+ const bool game=argc==5&&!wcscmp(argv[4],L"game");if(argc==5&&!game)return 2;
+ UINT vendor=wcstoul(argv[3],nullptr,16);
  IDXGIFactory6*f=nullptr;ck(CreateDXGIFactory2(0,IID_PPV_ARGS(&f)));ID3D12Device*d=nullptr;
  for(UINT i=0;;i++){IDXGIAdapter1*a=nullptr;if(f->EnumAdapters1(i,&a)==DXGI_ERROR_NOT_FOUND)break;DXGI_ADAPTER_DESC1 desc{};a->GetDesc1(&desc);if(desc.VendorId==vendor)ck(D3D12CreateDevice(a,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&d)));a->Release();if(d)break;}if(!d)throw std::runtime_error("adapter missing");
  auto read=[](const wchar_t*p){std::ifstream in(p,std::ios::binary|std::ios::ate);if(!in)throw std::runtime_error("DXBC missing");auto n=in.tellg();if(n<=0||n>1024*1024)throw std::runtime_error("DXBC size");std::vector<char>v(static_cast<size_t>(n));in.seekg(0);if(!in.read(v.data(),n))throw std::runtime_error("DXBC truncated");return v;};
  auto original=read(argv[1]),candidate=read(argv[2]);
- const UINT W=256,H=256;D3D12_RESOURCE_DESC td{};td.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;td.Width=W;td.Height=H;td.DepthOrArraySize=td.MipLevels=1;td.Format=DXGI_FORMAT_R16G16B16A16_FLOAT;td.SampleDesc.Count=1;
+ const UINT W=game?1920:256,H=game?1080:256;D3D12_RESOURCE_DESC td{};td.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;td.Width=W;td.Height=H;td.DepthOrArraySize=td.MipLevels=1;td.Format=DXGI_FORMAT_R16G16B16A16_FLOAT;td.SampleDesc.Count=1;
  D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;ID3D12Resource*input=nullptr,*out[2]{};
  ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&td,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&input)));
  td.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;for(auto&v:out)ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&td,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&v)));
@@ -29,8 +31,8 @@ int wmain(int argc,wchar_t**argv){try{
  for(UINT test=0;test<3;test++){
   uint32_t words[16]={W,H,W,H,0,0,W,H,0x3f800000,0x3f800000,0x3f800000,1};float scale=test==0?1.f:test==1?.5f:2.f;std::memcpy(words+8,&scale,4);
   submit.Submit([&](ID3D12GraphicsCommandList*c){c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(root);auto gpu=heap->GetGPUDescriptorHandleForHeapStart();c->SetComputeRootDescriptorTable(0,gpu);c->SetComputeRoot32BitConstants(2,16,words,0);
-   for(UINT i=0;i<2;i++){if(test)transition(c,out[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);auto u=gpu;u.ptr+=(i+1)*stride;c->SetComputeRootDescriptorTable(1,u);c->SetPipelineState(pso[i]);c->Dispatch(W/16,H/16,1);transition(c,out[i],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=out[i];src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=rb;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;dst.PlacedFootprint.Offset+=bytes*i;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
+   for(UINT i=0;i<2;i++){if(test)transition(c,out[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);auto u=gpu;u.ptr+=(i+1)*stride;c->SetComputeRootDescriptorTable(1,u);c->SetPipelineState(pso[i]);c->Dispatch((W+15)/16,(H+15)/16,1);transition(c,out[i],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=out[i];src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=rb;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;dst.PlacedFootprint.Offset+=bytes*i;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
   });
-  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++)different+=a[i]!=a[bytes/2+i];rb->Unmap(0,&none);printf("codec vendor=%x scale=%g half_values=%llu different=%zu\n",vendor,scale,(unsigned long long)bytes/2,different);fflush(stdout);if(different)throw std::runtime_error("codec differs");
+  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0,invalid=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++){different+=a[i]!=a[bytes/2+i];for(UINT side=0;side<2;side++){auto v=a[side*bytes/2+i];invalid+=(i%4==3)?v!=0x3c00:((v&0x7c00)==0x7c00||v>0x3c00);}}rb->Unmap(0,&none);printf("codec vendor=%x size=%ux%u scale=%g half_values=%llu different=%zu invalid=%zu\n",vendor,W,H,scale,(unsigned long long)bytes/2,different,invalid);fflush(stdout);if(different||invalid)throw std::runtime_error("codec differs or invalid coverage");
  }return 0;
 }catch(const std::exception&e){fprintf(stderr,"%s\n",e.what());return 1;}}

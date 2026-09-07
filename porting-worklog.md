@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：输入codec完整1080p两卡对照通过
+
+- d3d12_native_codec_test增加game模式1920×1080，dispatch向上取整120×68，覆盖底部不足16行的边界；保留256模式。增加两个输出的RGB有限/[0,1]与alpha精确half1检查，避免相同未写区域误判exact。
+- 9070XT session78564与5090 session20322：三种PaperWhiteScale=1/.5/2，各8294400个half值different0、invalid0、exit0。原版/候选在每张卡上分别一致；仍未做跨卡输出逐值比较。
+- 此验证为同尺寸零子矩形输入codec，不包括网络输出合成与真实历史反馈。下一步输出codec，游戏DLL未替换。完整shift3网络PID18872最后检查CPU978秒且日志仍在编译推进。
+
 ### 2026-09-07：mode1输入codec原版/候选在5090和9070XT分别全exact
 
 - 新增d3d12_native_codec_test.cpp：D3D12执行捕获原版输入DXBC及候选DXBC，使用相同RGBA16_FLOAT输入/输出、cb0常数与256×256 dispatch。每个通道遍历全部65536个half位模式（非有限替换0），因此覆盖所有有限half值及负值、阈值邻域。
