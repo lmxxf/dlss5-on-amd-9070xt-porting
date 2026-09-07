@@ -144,11 +144,22 @@ void tiled_project(uint3 gid,uint t,uint matrix_offset,uint skip_offset,bool raw
 #else
 #define ATTN_STRIDE 32
 #endif
+#if NATIVE_FUSED_EXP
+#if !NATIVE_COALESCED_QKV_LOAD || !NATIVE_PARALLEL_MULTIHEAD_SOFTMAX || NATIVE_PARALLEL_MULTIHEAD_NORM || NATIVE_SHARED_PROB
+#error fused exp requires coalesced QKV staging and parallel softmax without parallel norm/shared prob
+#endif
+#endif
 #if NATIVE_WAVE_SCORES
 groupshared float16_t queries[2048],keys[2048];
 #if NATIVE_WAVE_AV
 groupshared float16_t values[2048];
+#if NATIVE_FUSED_EXP
+// Raw Q/K, exp values and probabilities all live in the f16 Q/K slots; no f32 score array.
+float ReadAux(uint query,uint key){return key<32?float(queries[query*32+key]):float(keys[query*32+key-32]);}
+void WriteAux(uint query,uint key,float v){if(key<32)queries[query*32+key]=float16_t(v);else keys[query*32+key-32]=float16_t(v);}
+#else
 groupshared float scores[4096];
+#endif
 #else
 groupshared float values[2048],scores[4096];
 #endif
@@ -172,13 +183,19 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
   uint token=i/96,part=(i%96)/32,c=i%32;
   uint pixel=((gid.x/(width/8))*8+token/8)*width+(gid.x%(width/8))*8+token%8;
   float v=feature[pixel*CHANNELS*3+part*CHANNELS+head*32+c];
+#if NATIVE_FUSED_EXP
+  if(part==0)queries[token*32+c]=float16_t(v);else if(part==1)keys[token*32+c]=float16_t(v);else values[token*32+c]=float16_t(F(v));
+#else
   if(part<2)scores[token*64+part*32+c]=v;else values[token*32+c]=float16_t(F(v));
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
  if(t<64){
  float q[32],k[32],qs[16],ks[16];
-#if NATIVE_COALESCED_QKV_LOAD
+#if NATIVE_FUSED_EXP
+ [unroll]for(uint c=0;c<32;c++){q[c]=float(queries[t*32+c]);k[c]=float(keys[t*32+c]);}
+#elif NATIVE_COALESCED_QKV_LOAD
  [unroll]for(uint c=0;c<32;c++){q[c]=scores[t*64+c];k[c]=scores[t*64+32+c];}
 #elif NATIVE_PRECOMPUTED_QKV
  [loop]for(uint c=0;c<32;c++){uint row=head*32+c;q[c]=feature[p*CHANNELS*3+row];k[c]=feature[p*CHANNELS*3+CHANNELS+row];values[t*ATTN_STRIDE+c]=F(feature[p*CHANNELS*3+2*CHANNELS+row]);}
@@ -215,6 +232,30 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 #if NATIVE_WAVE_SCORES
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+#if NATIVE_FUSED_EXP
+ {
+  using SC=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+  // Every wave finishes its QK tiles before any wave overwrites the Q/K slots.
+  uint qr=MULTIHEAD_QUERY;SC s[2];
+  [unroll]for(uint j=0;j<2;j++){
+   uint kr=MULTIHEAD_COL_START+j*MULTIHEAD_COL_STEP;
+   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
+   s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+  }
+  GroupMemoryBarrierWithGroupSync();
+  [unroll]for(uint j=0;j<2;j++){
+   uint kr=MULTIHEAD_COL_START+j*MULTIHEAD_COL_STEP;
+   for(uint i=0;i<s[j].Length();i++){
+    uint2 rc=s[j].GetCoordinate(i);uint query=qr*16+rc.x,key=kr*16+rc.y;
+    float score=H(s[j].Get(i)+weights[4*MATRIX+head*4096+query*64+key]);
+    uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));
+    WriteAux(query,key,f16tof32(((bits<<5)+0x8000u)&65535u));
+   }
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+#else
  for(uint qr=MULTIHEAD_QUERY;qr<4;qr+=MULTIHEAD_QSTEP)for(uint kr=MULTIHEAD_COL_START;kr<4;kr+=MULTIHEAD_COL_STEP){
   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
@@ -223,7 +264,8 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
-#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+#endif
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX && !NATIVE_FUSED_EXP
  for(uint i=t;i<4096;i+=MULTIHEAD_THREADS){
   float score=H(scores[i]+weights[4*MATRIX+head*4096+i]);
   uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));
@@ -232,7 +274,9 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  GroupMemoryBarrierWithGroupSync();
 #endif
  if(t<64){
-#if (NATIVE_SHARED_PROB && NATIVE_WAVE_AV) || NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+#if NATIVE_FUSED_EXP
+ #define EXP_AT(x) ReadAux(t,x)
+#elif (NATIVE_SHARED_PROB && NATIVE_WAVE_AV) || NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
  #define EXP_AT(x) scores[t*64+(x)]
 #else
  float ex[64],prob[64];
@@ -276,9 +320,13 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 #if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
  for(uint i=t;i<4096;i+=MULTIHEAD_THREADS){
   uint query=i/64,key=i%64;
+#if NATIVE_FUSED_EXP
+  WriteAux(query,key,F(H(ReadAux(query,key)*softmax_inverse[query])));
+#else
   float prob=F(H(scores[i]*softmax_inverse[query]));
   if(key<32)queries[query*32+key]=float16_t(prob);
   else keys[query*32+key-32]=float16_t(prob);
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
