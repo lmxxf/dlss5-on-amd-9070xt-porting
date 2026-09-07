@@ -19,6 +19,19 @@ using ExecuteLists=void(STDMETHODCALLTYPE*)(ID3D12CommandQueue*,UINT,ID3D12Comma
 static ExecuteLists original_execute{};
 static std::atomic<bool>execute_install_attempted{};
 static std::atomic<unsigned>native_batches{};
+static constexpr GUID UnwrappedObject={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,0x9c,0xd3,0x7a,0x1b,0x42}};
+static void device_identity(const char*origin,ID3D12Device*d){
+ if(!d)return;
+ IUnknown*identity=nullptr,*unwrapped=nullptr,*native_identity=nullptr;
+ HRESULT identity_hr=d->QueryInterface(IID_PPV_ARGS(&identity));
+ HRESULT unwrap_hr=d->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&unwrapped));
+ HRESULT native_hr=unwrapped?unwrapped->QueryInterface(IID_PPV_ARGS(&native_identity)):E_NOINTERFACE;
+ AcquireSRWLockExclusive(&lock);
+ if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
+  fprintf(f,"pid=%lu kind=device_identity origin=%s device=%p identity=%p identity_hr=%08x unwrapped=%p unwrap_hr=%08x native_identity=%p native_hr=%08x\n",GetCurrentProcessId(),origin,d,identity,unsigned(identity_hr),unwrapped,unsigned(unwrap_hr),native_identity,unsigned(native_hr));fclose(f);
+ }ReleaseSRWLockExclusive(&lock);
+ if(native_identity)native_identity->Release();if(unwrapped)unwrapped->Release();if(identity)identity->Release();
+}
 static void log(const char*kind,void*list,void*queue,unsigned value=0){
  if(!frames.load()||events.fetch_add(1)>=8192)return;
  AcquireSRWLockExclusive(&lock);
@@ -39,6 +52,7 @@ static uint32_t dispatch(void**context,const Header*h){
   tracked_output.store(reinterpret_cast<uint64_t>(output.resource));
   if(n<=8&&output.resource){
    auto*r=static_cast<ID3D12Resource*>(output.resource);auto desc=r->GetDesc();ID3D12Device*device=nullptr;auto hr=r->GetDevice(IID_PPV_ARGS(&device));
+   device_identity("output",device);
    AcquireSRWLockExclusive(&lock);
    if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
     fprintf(f,"pid=%lu kind=native_output_desc frame=%u resource=%p dimension=%u dxgi=%u size=%llux%u samples=%u mips=%u flags=%u device=%p device_hr=%08x\n",GetCurrentProcessId(),n,r,unsigned(desc.Dimension),unsigned(desc.Format),(unsigned long long)desc.Width,desc.Height,desc.SampleDesc.Count,desc.MipLevels,unsigned(desc.Flags),device,unsigned(hr));fclose(f);
@@ -56,6 +70,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
  const unsigned batch=++native_batches;
  if(q&&batch<=8){
   auto desc=q->GetDesc();ID3D12Device*device=nullptr;auto hr=q->GetDevice(IID_PPV_ARGS(&device));
+  device_identity("queue",device);
   AcquireSRWLockExclusive(&lock);
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
    fprintf(f,"pid=%lu kind=native_queue_desc batch=%u queue=%p type=%u flags=%u device=%p device_hr=%08x\n",GetCurrentProcessId(),batch,q,unsigned(desc.Type),unsigned(desc.Flags),device,unsigned(hr));fclose(f);

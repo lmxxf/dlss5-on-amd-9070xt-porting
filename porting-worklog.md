@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：device差异确认为ReShade包装，同一原生COM身份
+
+- ReShade6.8源码确认ID3D12Resource::GetDevice被hook，D3D12Device::QueryInterface支持IID_UnwrappedObject 7f2c9a11-3b4e-4d6a-812f-5e9cd37a1b42并AddRef原对象。观察器新增有配对Release的IUnknown/unwrap/IUnknown查询，不依赖Adapter LUID猜测。
+- 正常退出27000、备份.before-identity后部署，新PID17584 Responding。order-17584.txt显示resource device144428b0→unwrap24ae0010→IUnknown24adfa40；queue device24ae0010→IUnknown24adfa40，queue unwrap返回E_NOINTERFACE（原生对象），两条原生COM身份相同。
+- 这为严格device检查适配提供实证：应比较解包后的IUnknown身份，不应删除检查或仅比LUID。当前尚未修改神经渲染类的检查，下一步实现并验证身份辅助函数后接入。
+- 游戏仍仅运行只读观察器，渲染修正版未部署。
+
 ### 2026-09-07：实机原生FP16/DIRECT确认，同时发现device包装差异
 
 - 观察器增加前8帧output GetDesc/GetDevice与前8批native queue GetDesc/GetDevice，均只读。构建及Windows mock转发测试通过。正常退出5508、备份.before-desc后部署，新PID27000 Responding，日志order-27000.txt已保存。
