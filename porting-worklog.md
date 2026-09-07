@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏after-submit受控一次读回成功
+
+- 新增native_snapshot_gate.h及测试：同线程、producer list唯一且位于batch末尾、count1..64才匹配；空/重复/错误线程/非末尾均拒绝。探针NATIVE_ORDER_SNAPSHOT编译开关只在第120次成功FFX、1080p/声明state2时保留source和unwrapped list，原生提交返回匹配后只执行一次读回，递归保护、失败不重试。默认观察器不执行GPU工作。
+- 正常退出35544，备份.before-snapshot后部署快照版，游戏PID43204。记录frame120/sourcefb5ea840/queue2f3bd540，NativeReadSubmittedFrame成功，16588800 bytes，恢复UAV；后续进程CPU从35秒增至87秒且Responding，没有重启。
+- 下载snapshot/ffx-submitted-43204.f16：1080×1920×4 half全部有限，RGB范围0..1167，非零RGB15832（早期画面稀疏，不能当角色画质验收）；SHA a4e73ae22af047dc0996907589408c9fd730c6ee769e6626833d179db4067137。高亮值进一步说明不能把此线性中间纹理直接作显示色彩。
+- 小型提交后读取/恢复已实机执行，但不是完整神经网络或历史反馈成功。下一步在相同受控边界初始化/执行分段网络，保留实际画面输入与输出核验，目标仍未完成。
+
 ### 2026-09-07：提交后只读FP16快照组件GPU验证通过
 
 - 新增native_submitted_readback.h，限定同原生COM device/DIRECT队列/1080p RGBA16_FLOAT，使用自有list与readback buffer，在调用方给定状态→COPY_SOURCE→原状态之间复制，不改像素；等待自有fence完成后按row pitch解包。异常时保留GPU相关引用/存储，禁止无限重试。
