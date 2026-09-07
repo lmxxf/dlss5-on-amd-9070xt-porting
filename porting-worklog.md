@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：分块整网五帧off/on/reset原版逐字节验收通过
+
+- session5329/PID11048 exit0，完整1920×1080输入、1920×1152处理、post_shift3、分段提交，五帧history=0/1/0/1/0，每帧6635520最终值different=0。已下载stdout/stderr/run.json和两个GPU实际输出，analyze_native_network_profile.py --root release/native-network70-tiled通过。
+- 实际输出与独立原版文件逐字节一致：无history SHA82b01ef638b74e79adbacb0e8eceb5d8c94141cdff3e8900f32bb3dfad51abaf；history SHA5fbef833d68c14a75252ede43870ade986310264ed3fc1189c332d3a75719f96。覆盖移位、raw输出进入下采样及完整0～70链，未注入层间CPU特征。
+- 四个暖轮均值原3977.2474675ms→分块2709.6836475ms，包含跨提交间隙，不是游戏FPS。decoder_stage12约1011.853→395.155ms，encoder15_22约360.039→113.097ms，encoder9_14约352.081→75.318ms，encoder5_8约165.648→56.567ms。仍距10/30fps甚远。
+- 全网数值优化这一关通过；游戏新DLL尚未部署。现有候选DLL需显式启用分块且核对shader资产后，再做真实游戏before/after原版对照。真实连续history生产/反馈仍未完成，不能把受控history夹具替代游戏动态验收。
+
 ### 2026-09-07：整网初始化缺失布局文件已修正，重跑中
 
 - session26421/PID35820最终exit1，stderr明确network coefficient missing，尚未执行任何完整帧。查明独立目录复制过滤漏掉hwc-to-vit.i32与vit-to-hwc.i32，并非数值失败。失败stdout/stderr重命名init-missing-map.*.log保留。
