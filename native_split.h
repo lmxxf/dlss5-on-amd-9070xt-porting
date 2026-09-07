@@ -6,7 +6,7 @@
 #include "native_matrix_workspace.h"
 class NativeSplit {
  NativeMatrixWorkspace*workspace{};ID3D12Resource*qkv_weights{};ID3D12PipelineState*aux_pso[2]{};bool matrix_attention{},wave_ffwd{},parallel_ffwd{};
- ID3D12Resource*input{};ID3D12Resource*weights[3]{};ID3D12Resource*result[4]{};
+ ID3D12Resource*input{};ID3D12Resource*weights[3]{};ID3D12Resource*result[4]{};ID3D12Resource*project_weights[2]{};bool wave_project{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[4]{};UINT geometry[2]{};bool recorded{},tiled_projection{},shared_ffwd{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("C64 HRESULT="+std::to_string(unsigned(hr)));}
  static ID3D12Resource* Buffer(ID3D12Device*d,UINT64 bytes,const std::vector<float>*data=nullptr){
@@ -16,7 +16,7 @@ class NativeSplit {
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,bool begin){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,begin?D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE:D3D12_RESOURCE_STATE_UNORDERED_ACCESS,begin?D3D12_RESOURCE_STATE_UNORDERED_ACCESS:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);}
 public:
  NativeSplit()=default;NativeSplit(const NativeSplit&)=delete;
- ~NativeSplit(){if(qkv_weights)qkv_weights->Release();for(auto*p:aux_pso)if(p)p->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
+ ~NativeSplit(){if(qkv_weights)qkv_weights->Release();for(auto*r:project_weights)if(r)r->Release();for(auto*p:aux_pso)if(p)p->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&fp,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,NativeMatrixWorkspace*shared=nullptr){
   if(input||!d||!src||!width||!height||width%8||height%8||fw.size()!=524288||fp.size()!=262656||aw.size()!=1114640)throw std::runtime_error("split contract");
   input=src;input->AddRef();geometry[0]=width;geometry[1]=height;
@@ -46,9 +46,19 @@ public:
    const wchar_t*names[]={L"native_matrix_pack_c512.cso",L"native_matrix_qkv_c512.cso"};
    for(UINT i=0;i<2;i++){blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&aux_pso[i]));blob->Release();Check(hr);}
   }
+  // Wave-matrix FFWD/attention projections: [0]=fp (matrix 0, scale 262144), [1]=aw (matrix 3*MATRIX, scale 4*MATRIX+16*4096+16).
+  if(const wchar_t*wp=_wgetenv(L"DLSS5_TEST_WAVE_SPLIT_PROJECT")){if(wcscmp(wp,L"0")&&wcscmp(wp,L"1"))throw std::runtime_error("invalid wave split project flag");wave_project=!wcscmp(wp,L"1");}
+  if(wave_project){
+   const size_t matrix=512ull*512;const float*sources[2]={fp.data(),aw.data()+3*matrix};const float*scales[2]={fp.data()+matrix,aw.data()+4*matrix+16*4096+16};
+   for(UINT k=0;k<2;k++){
+    std::vector<float>packed(matrix/2+512);
+    for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("split projection weight not exact half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
+    std::memcpy(packed.data()+matrix/2,scales[k],512*4);project_weights[k]=Buffer(d,packed.size()*4,&packed);
+   }
+  }
   const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
   const char*entry[]={shared_ffwd?"ffwd_shared":"ffwd",tiled_projection?"tiled_split_project":"ffwd_projection","attention",tiled_projection?"tiled_attention_project":"projection"};D3D_SHADER_MACRO macros[]={{"RAW_OUTPUT","0"},{"CHANNELS","512"},{"NATIVE_PAD_MULTIHEAD_LDS",pad&&!wcscmp(pad,L"1")?"1":"0"},{nullptr,nullptr}};
-  for(UINT i=0;i<4;i++){macros[0].Definition=raw_output&&i==3?"1":"0";auto path=dir+((i==0||(i==1&&!tiled_projection))?L"\\native_split.hlsl":L"\\native_c64.hlsl");blob=nullptr;error=nullptr;HRESULT hr=(i==0&&wave_ffwd)?D3DReadFileToBlob((dir+(parallel_ffwd?L"\\native_wave_split_ffwd_parallel.cso":L"\\native_wave_split_ffwd.cso")).c_str(),&blob):(i==2&&matrix_attention)?D3DReadFileToBlob((dir+L"\\native_wave_split_attention.cso").c_str(),&blob):CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<4;i++){macros[0].Definition=raw_output&&i==3?"1":"0";auto path=dir+((i==0||(i==1&&!tiled_projection))?L"\\native_split.hlsl":L"\\native_c64.hlsl");blob=nullptr;error=nullptr;HRESULT hr=((i==1||i==3)&&wave_project)?D3DReadFileToBlob((dir+((i==3&&raw_output)?L"\\native_wave_project_raw_c512.cso":L"\\native_wave_project_c512.cso")).c_str(),&blob):(i==0&&wave_ffwd)?D3DReadFileToBlob((dir+(parallel_ffwd?L"\\native_wave_split_ffwd_parallel.cso":L"\\native_wave_split_ffwd.cso")).c_str(),&blob):(i==2&&matrix_attention)?D3DReadFileToBlob((dir+L"\\native_wave_split_attention.cso").c_str(),&blob):CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
 
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
@@ -62,7 +72,7 @@ public:
     c->SetPipelineState(aux_pso[1]);c->SetComputeRootShaderResourceView(0,workspace->packed->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,qkv_weights->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,workspace->qkv->GetGPUVirtualAddress());c->Dispatch((geometry[0]*geometry[1]+31)/32,16,3);Barrier(c,workspace->qkv,false);workspace->qkv_readable=true;
     if(timer)timer->Mark(c,"split_qkv_matrix");
    }
-   c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,(i?result[i-1]:input)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,weights[i<2?i:2]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,(i==3?result[1]:(i==2&&matrix_attention?workspace->qkv:input))->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,result[i]->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(i==0&&wave_ffwd)c->Dispatch(geometry[0]*geometry[1]/16,parallel_ffwd?8:1,1);else if(i==0&&shared_ffwd)c->Dispatch(geometry[0]*geometry[1],1,1);else if(tiled_projection&&(i==1||i==3))c->Dispatch(16,geometry[0]*geometry[1]/8,1);else c->Dispatch(geometry[0]*geometry[1]/64,i==2?16:1,1);Barrier(c,result[i],false);if(timer)timer->Mark(c,"split_stage"+std::to_string(i));}recorded=true;
+   c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,(i?result[i-1]:input)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(((i==1||i==3)&&wave_project)?project_weights[i==1?0:1]:weights[i<2?i:2])->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,(i==3?result[1]:(i==2&&matrix_attention?workspace->qkv:input))->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,result[i]->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if((i==1||i==3)&&wave_project)c->Dispatch(geometry[0]*geometry[1]/16,8,1);else if(i==0&&wave_ffwd)c->Dispatch(geometry[0]*geometry[1]/16,parallel_ffwd?8:1,1);else if(i==0&&shared_ffwd)c->Dispatch(geometry[0]*geometry[1],1,1);else if(tiled_projection&&(i==1||i==3))c->Dispatch(16,geometry[0]*geometry[1]/8,1);else c->Dispatch(geometry[0]*geometry[1]/64,i==2?16:1,1);Barrier(c,result[i],false);if(timer)timer->Mark(c,"split_stage"+std::to_string(i));}recorded=true;
  }
  ID3D12Resource* Stage(UINT i)const{if(i>=4)throw std::runtime_error("split stage index");return result[i];}
  ID3D12Resource* Output()const{return result[3];}
