@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C256矩阵QKV接通，核心耗时约减47%
+
+- native_matrix_qkv将打包half特征×原QKV权重按K32矩阵/F32输出/H累加，写pixel-major三路C256 raw；权重只初始化一次无损打包。NativeC64显式use_matrix_qkv依赖pack_input，重新打包FFN结果后计算QKV，新增原始QKV缓存由根SRV t2传入旧attention。
+- NATIVE_PRECOMPUTED_QKV仅跳过旧QKV点积，保留Q/K规范化、V的F、attention及projection。根参数/状态转换按原管线，下一帧qkv_raw恢复UAV；默认全部关闭。
+- session94780 exit0，block52五轮最终2211840值baseline_diff/fast_diff/bit_diff全0。暖轮旧完整核心13.80241ms，新7.33708ms，约46.8%下降。
+- 新input_pack0.19337、expand1.2643、contract2.05067、FFNprojection0.469、qkv_pack0.01224、qkv_matrix0.34057、attention2.51536、projection0.49157ms；旧attention8.86283ms。已计所有新增GPU阶段，不外推整网FPS。
+- 证据release/matrix-c256-qkv/result.log。编译/diff检查通过，尚未接入整网/安装游戏。下一步跨C256层、raw输出及完整五帧回归，再扩其它通道。
+
 ### 2026-09-07：GPU一次打包输入，矩阵展开含打包快于旧分块
 
 - native_matrix_pack每线程打包两个原FP8格点float到uint half对，无损（当前C256输入合同），输出DEFAULT raw buffer；每帧重用前SRV→UAV，打包后UAV→SRV，矩阵读取ByteAddress half不再重复转完整FP32。

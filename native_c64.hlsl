@@ -110,6 +110,9 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
  uint p=((gid.x/(width/8))*8+t/8)*width+(gid.x%(width/8))*8+t%8;
  float q[32],k[32],qs[16],ks[16];
+#if NATIVE_PRECOMPUTED_QKV
+ [loop]for(uint c=0;c<32;c++){uint row=head*32+c;q[c]=feature[p*CHANNELS*3+row];k[c]=feature[p*CHANNELS*3+CHANNELS+row];values[t*ATTN_STRIDE+c]=F(feature[p*CHANNELS*3+2*CHANNELS+row]);}
+#else
  [loop]for(uint c=0;c<32;c++){
   float a=0,b=0,z=0;uint row=head*32+c;
   [unroll]for(uint g=0;g<HEADS;g++){
@@ -118,6 +121,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
   }
   q[c]=a;k[c]=b;values[t*ATTN_STRIDE+c]=F(z);
  }
+#endif
  [unroll]for(uint i=0;i<16;i++){qs[i]=NativeHalfSquarePair(q[i],q[i+16]);ks[i]=NativeHalfSquarePair(k[i],k[i+16]);}
  [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
