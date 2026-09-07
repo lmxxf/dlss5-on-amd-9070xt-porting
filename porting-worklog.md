@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：真数据矩阵与标量拆开执行，首次独立计时
+
+- matrix_real_probe增加MATRIX_PATH=1矩阵单路、=2标量单路、默认双路比较，单路输出实际数值。runner新增可选输出文件，raw模式只检查finite（原mismatches打印字段此模式实为invalid），实际两路一致性由下载后cmp另验，不以exit0代替比较。
+- session31271 exit0：row0 256像素×32行、完整K256，10次重复dispatch含UAV barrier，矩阵0.056760ms、标量0.100652ms。没有独立暖机，且标量是探针标量实现，不是主线最优分块核；不宣传此倍率为整层收益。
+- 两份8192float输出下载后cmp逐字节一致，SHA均b68a03cab1bf0ca19d303adef847a46e55805d4f87821b96997baba8a1a525d4，finite。证据release/matrix-real-probe/timing-row0.txt。
+- 下一步扩展完整像素/通道及对主线最快实现测量，再接算子链；裁判链与游戏安装未改，10fps尚未达到。编译和diff检查通过。
+
 ### 2026-09-07：真实block52展开矩阵接口对标量全通道取样一致
 
 - prepare_matrix_real_probe.py取原block52 W1全部1024×256权重、原input以索引(i*31)%8640选256像素；每32输出行打包一份，完整K256按8块K32布局，转F16前断言roundtrip无损，SHA/索引记入ignored JSON，不改权重。
