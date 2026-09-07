@@ -23,7 +23,7 @@ public:
   if(shared&&use_matrix_qkv){shared->Validate(d,UINT64(width)*height*channels);workspace=shared;}
   if(use_matrix_qkv&&!pack_input)throw std::runtime_error("matrix QKV requires packed matrix mode");matrix_qkv=use_matrix_qkv;
   if(pack_input&&!use_matrix)throw std::runtime_error("packing requires matrix expand");pack_matrix=pack_input;
-  if(use_matrix&&(!split||(channels!=128&&channels!=256)))throw std::runtime_error("matrix expand requires split C128/C256");matrix_expand=use_matrix;
+  if(use_matrix&&(!split||(channels!=64&&channels!=128&&channels!=256)))throw std::runtime_error("matrix expand requires split C64/C128/C256");matrix_expand=use_matrix;
   if(tile_contract&&(!split||UINT64(width)*height/8>65535))throw std::runtime_error("tiled contract geometry");tiled_contract=tile_contract;if(tile_expand&&!tile_contract)throw std::runtime_error("tiled expand requires tiled contract");tiled_expand=tile_expand;if(tile_projection&&!tile_expand)throw std::runtime_error("tiled projection requires tiled expand");tiled_projection=tile_projection;
   if(split&&(fast_fp8||UINT64(width)*height*4*channels>0xffffffffull))throw std::runtime_error("split FFN experiment contract");split_ffn=split;
   if(input||!d||!src||!width||!height||width%8||height%8||(channels!=64&&channels!=128&&channels!=256)||fw.size()!=9*channels*channels+channels||aw.size()!=4*channels*channels+(channels/32)*4096+channels/32+channels)throw std::runtime_error("multihead contract");input=src;input->AddRef();geometry[0]=width;geometry[1]=height;channel_count=channels;

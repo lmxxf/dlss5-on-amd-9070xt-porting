@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C64矩阵15帧数值通过但算子回退，不推广
+
+- C64开放显式MATRIX_C64开关，shader泛型CHANNELS64；tail/body62均传共享workspace，开启时扩容到488×296×64，未开启保持旧128容量。脚本-IncludeC64编译三份_c64 CSO并明确设开关，默认不启用。
+- session66972/PID12504 exit0，15帧实际最终GPU输出下载后逐字节原版一致，输出/历史状态无数值回退。
+- 暖均1441.3186286、末5帧1437.488868ms；对照共享128/256旧轮encoder5_8增加42.09035、tail63_65增加31.95601、tail62_body增加10.18305ms。local14530695168/budget15396610048，nonlocal820436992，仍在预算内；此轮主要就是C64算子变慢，不能套用上轮显存超预算解释。
+- 维持C64旧tiled路径，不推广；矩阵候选留实验开关。证据release/native-network70-matrix-c64/profile-validation.json。编译与diff检查通过，游戏安装未改，10fps未达到。
+
 ### 2026-09-07：图级矩阵工作区共享，节省1.25GB并恢复性能
 
 - NativeMatrixWorkspace由NativeActualNetwork70持有并先于借用层声明，保证析构顺序；初始化一次分配packed与qkv，容量248×152×128，Validate检查设备与容量。逐层AddRef借用，不做进程全局共享。

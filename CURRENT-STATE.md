@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C64矩阵实验15帧exact但变慢：暖均1441.31863ms、末5帧1437.48887ms；相比C128/C256共享基线，encoder5_8+42.09、tail63_65+31.96、body62+10.18ms，回退主要就在C64。local14.531GB低于15.397GB预算，不是上轮超预算情形。DLSS5_TEST_MATRIX_C64默认关闭，不采纳到游戏；仅开启时扩workspace至488×296×64，否则维持C128大小。证据release/native-network70-matrix-c64/。
+
 图级共享矩阵工作区已通过15帧exact：DLSS5_TEST_SHARED_MATRIX_WORKSPACE=1，按248×152×128元素容量，共用packed/qkv临时量，编码器/解码器显式传入，跨层输出/skip不共享。本地usage15721615360→14468567040，节省1253048320字节，末预算15373082624；同C128+C256配置暖轮1527.07107→1354.10840ms、末5帧1344.92482ms。证据release/native-network70-shared-workspace/。C64矩阵尚未开放，扩大范围前需扩大workspace容量；游戏安装未更新。
 
 显存诊断已确认：C128+C256矩阵整网15帧全部exact；初始化后local用量15049674752，运行后15721615360字节，最后预算15395364848，最高超预算326250512字节；nonlocal819978240。证据release/native-network70-memory-c128/。这说明预算压力，不等同已测到具体换页耗时。下一步优先共用顺序层的matrix_input/qkv_raw工作缓冲，保持独立图/设备隔离和barrier状态，不继续单纯增加每层常驻scratch。

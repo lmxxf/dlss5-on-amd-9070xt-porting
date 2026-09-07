@@ -36,7 +36,7 @@ public:
   }
   device=d;device->AddRef();auto read=[&](const std::wstring&name){return Read(dir+L"\\"+name);};
   if(const wchar_t*v=_wgetenv(L"DLSS5_NETWORK_GPU_PROFILE")){if(wcscmp(v,L"1"))throw std::runtime_error("invalid network profile flag");profile=true;timestamps.Create(d);}
-  if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_SHARED_MATRIX_WORKSPACE")){if(wcscmp(s,L"0")&&wcscmp(s,L"1"))throw std::runtime_error("invalid shared matrix workspace flag");share_matrix=!wcscmp(s,L"1");if(share_matrix)matrix_workspace.Create(d,248ull*152*128);}
+  if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_SHARED_MATRIX_WORKSPACE")){if(wcscmp(s,L"0")&&wcscmp(s,L"1"))throw std::runtime_error("invalid shared matrix workspace flag");share_matrix=!wcscmp(s,L"1");if(share_matrix)matrix_workspace.Create(d,(_wgetenv(L"DLSS5_TEST_MATRIX_C64")&&!wcscmp(_wgetenv(L"DLSS5_TEST_MATRIX_C64"),L"1"))?488ull*296*64:248ull*152*128);}
   pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
   const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir);source=c32[i].Output();}

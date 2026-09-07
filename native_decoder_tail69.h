@@ -30,8 +30,8 @@ public:
   body56.Create(d,project56.Output(),w*2,h*2,NativeDecoderShift(56),read(56,L"ffn"),read(56,L"attention"),dir,false,128,false,workspace);source=body56.Output();
   for(UINT i=0;i<5;i++){c128[i].Create(d,source,w*2,h*2,NativeDecoderShift(57+i),read(57+i,L"ffn"),read(57+i,L"attention"),dir,false,128,false,workspace);source=c128[i].Output();}
   project62.Create(d,source,skip8,w*h*4,128,64,false,read(62,L"weights"),dir,true);
-  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64);source=body62.Output();
-  for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64);source=c64[i].Output();}
+  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace);source=body62.Output();
+  for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64,false,workspace);source=c64[i].Output();}
   project66.Create(d,source,skip4,w*h*16,64,32,false,read(66,L"weights"),dir,true);
   body66.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir);source=body66.Output();
   for(UINT i=0;i<3;i++){c32[i].Create(d,source,w*8,h*8,NativeDecoderShift(67+i),read(67+i,L"ffn"),read(67+i,L"attention"),dir);source=c32[i].Output();}
