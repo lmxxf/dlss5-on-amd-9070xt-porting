@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：参考decoder48..61通过，准备最终合成导出
+
+- session44409完成48..55原版/CPU检查exit0；session70048完成56上采样及57..61检查exit0，全部different0，使用新base中的同源encoder skip，未混入旧图。已启动62→63..65→66→67..69条件串联任务，尚待结果。
+- codec runner外部fixture模式扩展至decode：独立读取oracle-encode.f16、oracle-neural.f16、source.f16，检查有限性，alpha从实际source读取；只有原版/候选different0且invalid0才导出scale1第一路原版输出expected.f16。禁止stage替换参与原版导出。此扩展MinGW编译通过，等待真实neural参考后执行，尚未生成expected。
+- 游戏DLL未部署，整链测试仍待最终原版参考。
+
 ### 2026-09-07：attention32 AMD无须修改，参考推进至decoder47
 
 - check_native_color_attention32导出原版QKV及原版attention输出到amd-isolated；AMD独立执行现有native_vit_attention.hlsl，session30372三帧各655360值different0/max0、exit0。虽然shader也用float累加，实际求和次序/编译路径未重现CPU BLAS问题，不应未经证据把CPU修正照搬GPU。

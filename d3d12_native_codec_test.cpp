@@ -12,7 +12,7 @@ int wmain(int argc,wchar_t**argv){try{
  const wchar_t*stage_dir=_wgetenv(L"DLSS5_TEST_CODEC_STAGE_DIR");
  if(stage_dir&&!game)throw std::runtime_error("codec stage requires game geometry");
  const wchar_t*fixture_dir=_wgetenv(L"DLSS5_CODEC_FIXTURE_DIR");
- if(fixture_dir&&(!game||decode||stage_dir))throw std::runtime_error("fixture export requires original encode game test");
+ if(fixture_dir&&(!game||stage_dir))throw std::runtime_error("fixture export requires original game test");
  UINT vendor=wcstoul(argv[3],nullptr,16);
  IDXGIFactory6*f=nullptr;ck(CreateDXGIFactory2(0,IID_PPV_ARGS(&f)));ID3D12Device*d=nullptr;
  for(UINT i=0;;i++){IDXGIAdapter1*a=nullptr;if(f->EnumAdapters1(i,&a)==DXGI_ERROR_NOT_FOUND)break;DXGI_ADAPTER_DESC1 desc{};a->GetDesc1(&desc);if(desc.VendorId==vendor)ck(D3D12CreateDevice(a,D3D_FEATURE_LEVEL_12_0,IID_PPV_ARGS(&d)));a->Release();if(d)break;}if(!d)throw std::runtime_error("adapter missing");
@@ -31,11 +31,15 @@ int wmain(int argc,wchar_t**argv){try{
  };
  void*m=nullptr;D3D12_RANGE none{};ck(upload->Map(0,&none,&m));
  for(UINT j=0;j<inputs;j++)for(UINT y=0;y<H;y++)for(UINT x=0;x<W;x++)for(UINT ch=0;ch<4;ch++){auto v=sample(y*W+x,ch,j);std::memcpy(static_cast<char*>(m)+bytes*j+fp.Offset+y*fp.Footprint.RowPitch+x*8+ch*2,&v,2);}upload->Unmap(0,nullptr);
- if(fixture_dir){
-  std::wstring path=std::wstring(fixture_dir)+L"\\source.f16";
+ std::vector<uint16_t>fixture_alpha;
+ if(fixture_dir)for(UINT j=0;j<inputs;j++){
+  const wchar_t*name=decode?(j==0?L"\\oracle-encode.f16":j==1?L"\\oracle-neural.f16":L"\\source.f16"):L"\\source.f16";
+  std::wstring path=std::wstring(fixture_dir)+name;
   std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f||f.tellg()!=std::streamoff(bytes))throw std::runtime_error("source fixture size");
   std::vector<unsigned char>raw(bytes);f.seekg(0);if(!f.read(reinterpret_cast<char*>(raw.data()),bytes))throw std::runtime_error("source fixture truncated");
-  ck(upload->Map(0,&none,&m));std::memcpy(m,raw.data(),bytes);upload->Unmap(0,nullptr);
+  for(size_t k=0;k<bytes;k+=2){uint16_t h;std::memcpy(&h,raw.data()+k,2);if((h&0x7c00)==0x7c00)throw std::runtime_error("nonfinite fixture input");}
+  if(decode&&j==2){fixture_alpha.resize(bytes/8);for(size_t k=0;k<fixture_alpha.size();k++)std::memcpy(&fixture_alpha[k],raw.data()+k*8+6,2);}
+  ck(upload->Map(0,&none,&m));std::memcpy(static_cast<char*>(m)+bytes*j,raw.data(),bytes);upload->Unmap(0,nullptr);
  }
  ID3D12DescriptorHeap*heap=nullptr;D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,inputs+2,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};ck(d->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap)));UINT stride=d->GetDescriptorHandleIncrementSize(hd.Type);auto cpu=heap->GetCPUDescriptorHandleForHeapStart();
  D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.Format=td.Format;sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Texture2D.MipLevels=1;for(UINT j=0;j<inputs;j++){if(j)cpu.ptr+=stride;d->CreateShaderResourceView(input[j],&sv,cpu);}
@@ -58,6 +62,6 @@ int wmain(int argc,wchar_t**argv){try{
     transition(c,stage->Output(),D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);continue;
    }if(test)transition(c,out[i],D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);auto u=gpu;u.ptr+=(i+inputs)*stride;c->SetComputeRootDescriptorTable(1,u);c->SetPipelineState(pso[i]);c->Dispatch((W+15)/16,(H+15)/16,1);transition(c,out[i],D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE);D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=out[i];src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=rb;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;dst.PlacedFootprint.Offset+=bytes*i;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
   });
-  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0,invalid=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++){different+=a[i]!=a[bytes/2+i];for(UINT side=0;side<2;side++){auto v=a[side*bytes/2+i];invalid+=(i%4==3)?v!=(decode?sample(UINT(i/4),3,2):0x3c00):((v&0x7c00)==0x7c00||(!decode&&v>0x3c00));}}if(fixture_dir&&test==0){std::ofstream file((std::wstring(fixture_dir)+L"\\oracle-encode.f16").c_str(),std::ios::binary);if(!file.write(static_cast<char*>(m),bytes))throw std::runtime_error("encode export failed");}rb->Unmap(0,&none);printf("codec vendor=%x size=%ux%u scale=%g half_values=%llu different=%zu invalid=%zu\n",vendor,W,H,scale,(unsigned long long)bytes/2,different,invalid);fflush(stdout);if(different||invalid)throw std::runtime_error("codec differs or invalid coverage");
+  D3D12_RANGE range{0,SIZE_T(bytes*2)};ck(rb->Map(0,&range,&m));size_t different=0,invalid=0;auto*a=static_cast<unsigned short*>(m);for(size_t i=0;i<bytes/2;i++){different+=a[i]!=a[bytes/2+i];for(UINT side=0;side<2;side++){auto v=a[side*bytes/2+i];invalid+=(i%4==3)?v!=(decode?(fixture_dir?fixture_alpha[i/4]:sample(UINT(i/4),3,2)):0x3c00):((v&0x7c00)==0x7c00||(!decode&&v>0x3c00));}}if(fixture_dir&&test==0&&!different&&!invalid){std::ofstream file((std::wstring(fixture_dir)+(decode?L"\\expected.f16":L"\\oracle-encode.f16")).c_str(),std::ios::binary);if(!file.write(static_cast<char*>(m),bytes))throw std::runtime_error("encode export failed");}rb->Unmap(0,&none);printf("codec vendor=%x size=%ux%u scale=%g half_values=%llu different=%zu invalid=%zu\n",vendor,W,H,scale,(unsigned long long)bytes/2,different,invalid);fflush(stdout);if(different||invalid)throw std::runtime_error("codec differs or invalid coverage");
  }if(stage)delete stage;return 0;
 }catch(const std::exception&e){fprintf(stderr,"%s\n",e.what());return 1;}}
