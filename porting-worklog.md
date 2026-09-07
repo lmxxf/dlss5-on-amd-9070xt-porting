@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C32注意力复用输入量化，整网1.590秒
+
+- preblock_attention_core新增NATIVE_CACHE_C32_INPUT宏：每像素先存32个F(input)，QKV各通道重用；保持点积顺序及其后所有操作。NativePreblockRuntime以严格DLSS5_TEST_CACHE_C32_INPUT=0/1设置宏，默认0。
+- 独立native-network70-cache-c32继承resident-noise基线六项优化，不启用收益不明的RESIDENT_C32_WEIGHTS。session20886/PID37564 exit0，五轮history off/on/reset全exact，下载实际GPU两输出并逐字节原版验证通过。
+- 四暖轮1678.7057975→1590.0457ms，约5.3%；decoder_stage12=336.6679775、preblock125.80659、encoder1_4=104.52996、post70=103.8849625ms。不是游戏FPS，10fps仍未达到。
+- 编译及diff检查通过，日志与输出在release/native-network70-cache-c32；游戏和测试无运行，安装DLL未变。
+
 ### 2026-09-07：C32系数驻留回归通过，但收益未确认
 
 - NativePreblockRuntime新增严格DLSS5_TEST_RESIDENT_C32_WEIGHTS=1实验开关，创建descriptor前将两个只读系数缓冲拷贝到DEFAULT，无shader改动，默认关闭。

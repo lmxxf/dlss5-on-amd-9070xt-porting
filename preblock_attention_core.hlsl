@@ -25,9 +25,18 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  if(gid.x*64>=TOTAL_OUTPUTS/32)return;
  uint t=tid.x,p=gid.x*64+t;
  float q[32],k[32],v[32],qs[32],ks[32];
+#if NATIVE_CACHE_C32_INPUT
+ float cached_input[32];[unroll]for(uint j=0;j<32;j++)cached_input[j]=F(input[p*32+j]);
+#endif
  [loop]for(uint c=0;c<32;c++){
   float a=0,b=0,z=0;
-  [loop]for(uint j=0;j<32;j++){float f=F(input[p*32+j]);a+=f*weights[c*32+j];b+=f*weights[1024+c*32+j];z+=f*weights[2048+c*32+j];}
+  [loop]for(uint j=0;j<32;j++){
+#if NATIVE_CACHE_C32_INPUT
+   float f=cached_input[j];
+#else
+   float f=F(input[p*32+j]);
+#endif
+   a+=f*weights[c*32+j];b+=f*weights[1024+c*32+j];z+=f*weights[2048+c*32+j];}
   q[c]=H(a);k[c]=H(b);v[c]=F(H(z));
  }
  [unroll]for(uint i=0;i<16;i++){qs[i]=NativeHalfSquarePair(q[i],q[i+16]);ks[i]=NativeHalfSquarePair(k[i],k[i+16]);}
