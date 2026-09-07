@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：C32位元量化无收益，保持关闭
+
+- preblock_attention_core保留LegacyF，以严格DLSS5_TEST_FAST_C32_FP8宏启用已有NativeFastFp8，非finite回旧路径；只测C32注意力，不改C64或FFN。
+- session31178/PID3864 exit0，五轮off/on/reset最终两个GPU输出下载后逐字节原版一致。暖轮1488.7480575ms，慢于1469.7617425ms有效基线，未采纳。
+- 证据release/native-network70-fast-c32/profile-validation.json；默认关闭，编译/diff检查通过。仍未获得换驱动确认，未安装驱动，游戏安装不变。10fps未达成。
+
 ### 2026-09-07：普通shader替代路径——ViT矩阵驻留无收益
 
 - 自动goal不是换驱动许可，因此不安装驱动；继续无需新授权的独立算子实验。NativeVitLinear以严格DLSS5_TEST_RESIDENT_VIT_LINEAR=1将非decoder权重拷贝到DEFAULT，默认原路径，提交边界不变。

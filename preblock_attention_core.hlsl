@@ -9,7 +9,13 @@ StructuredBuffer<float> input:register(t1);
 RWStructuredBuffer<float> output:register(u0);
 groupshared float queries[64*LDS_STRIDE],keys[64*LDS_STRIDE],values[64*LDS_STRIDE];
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
-float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+float LegacyF(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#if NATIVE_FAST_C32_FP8
+#include "native_fp8_fast.hlsli"
+float F(float v){[branch]if(!isfinite(v))return LegacyF(v);return NativeFastFp8(v);}
+#else
+float F(float v){return LegacyF(v);}
+#endif
 float half_add_preserving_midpoint(float a,float b){
  precise float sum=a+b;
  precise float virtual_b=sum-a;
