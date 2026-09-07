@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：分块展开、收缩与双投影五轮逐位通过
+
+- 上轮 session49139 已 exit0：block52 每轮2211840值，五轮 baseline/候选对原版oracle不同0、彼此位差0；暖轮原核心143.32169ms，展开+收缩分块候选21.66677ms。日志 release/c64-tiled-expand-contract/result.log。
+- 新增默认关闭 tile_projection，复用8像素×32通道共享分块处理FFN投影与attention输出投影，保留残差初始化、每32项H舍入和最终F/RAW_OUTPUT选择。测试模式 tiled_full；未启用生产调用。
+- session87755 exit0，独立目录 c64-tiled-full 使用 native-network70-profile 保存的原始shader作基线，同一block52五轮均 baseline_diff=0、fast_diff=0、bit_diff=0。暖轮原FFN/attention/projection均值116.45102/8.94434/4.30725ms，合计129.70261ms；候选expand/contract/FFN projection/attention/projection为2.23590/1.74066/0.46720/8.87715/0.44019ms，合计13.76110ms。日志 release/c64-tiled-full/result.log。
+- 以上仅C256、120×72、RAW_OUTPUT=false隔离核心，不是整网或游戏FPS。C64/C128、raw输出及整网回归仍待做；游戏DLL与发布包未更新。MinGW编译及git diff --check通过。
+- 用户报告5090桌面设为1080p、游戏无边框并停主菜单。未切换其游戏界面；SSH会话查询到的1024×768不能代表交互桌面，后续仍须以真实游戏资源尺寸核验，不能据此否定用户设置。
+
 ### 2026-09-07：原始shader基线确认分块收益，扩展展开展开候选
 
 - session85694 exit0，保存的native-network70-profile原始HLSL与新分块收缩在相同block52数据上五轮均baseline/候选对oracle不同0、彼此位差0。暖轮旧FFN127.56164/attention8.92673/projection4.27012ms，合计约140.75849ms；候选各段合计约44.91509ms，约3.13倍，仅此隔离样本，不能外推整网FPS。
