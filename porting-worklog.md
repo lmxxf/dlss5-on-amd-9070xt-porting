@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：mode1输入codec原版/候选在5090和9070XT分别全exact
+
+- 新增d3d12_native_codec_test.cpp：D3D12执行捕获原版输入DXBC及候选DXBC，使用相同RGBA16_FLOAT输入/输出、cb0常数与256×256 dispatch。每个通道遍历全部65536个half位模式（非有限替换0），因此覆盖所有有限half值及负值、阈值邻域。
+- Windows5090测试session30938、9070XT测试session58893均exit0；PaperWhiteScale=1/.5/2三组各262144个half输出值different0，两卡各自原版对候选逐位相等。未导出跨卡像素，不能将此写成两卡输出彼此逐位一致。
+- 测试仍为256×256无偏移、等尺寸输入，未覆盖完整1080p寻址/子矩形及输出合成codec；当前不接入游戏、不将输入单阶段exact冒充最终游戏修复。候选DXBC保存在ignored codec目录。
+
 ### 2026-09-07：mode1输入codec候选实现编译通过
 
 - 新增native_codec_encode.hlsl，按已捕获原版mode1实现source寻址、非负裁剪/PaperWhiteScale、0.75软肩、sRGB编码、alpha1。要求host创建RGBA16_FLOAT中间纹理以保留原版量化；当前未接进游戏或网络，不改变已通过的RGB夹具路径。
