@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新C64/C128/C256 Wave AV通过15帧最终exact，暖586.27370ms、末5帧588.739364ms。WAVE_MULTIHEAD_AV显式选择独立native_wave_av[_c64/_c128].cso，复用死Q/K存两段K32概率，V为原F8格点half，H/F与概率求和顺序不动；无新增全图scratch。首C64 attention4.07296→3.54480ms，收益有限，归一化/概率阶段仍待细查。证据release/native-network70-multihead-av，运行run_multihead_av_network.ps1继承parallel split配置。游戏未更新，10fps未达到。
+
 最新C64首层细分计时15帧exact，暖601.95719ms（仅增加观测，不是提速）。attention4.07296ms、FFN收缩2.00431ms、展开0.93054ms，pack/crop0.37155/0.34641ms，QKV矩阵0.21472ms。下一步优先原native_c64.hlsl中仍串行的prob×V；只QK已Wave，AV还没换。证据release/native-network70-c64-detail。encoder5_8标签现在排除了首层c64_probe*，必须加回这些区间才能与旧标签比较，不能报27.8ms为收益。游戏未改，10fps未达到。
 
 最新512 FFWD按8个独立通道组并行：15帧最终exact，暖597.88739ms、末5帧598.934558ms。PARALLEL_SPLIT_FFWD显式启用，内部共享mix仅16×80 half，每组只算自身64混合输出但仍读取全部512输入；不增整图scratch、不改网络/权重/舍入。首split_stage0 3.43011→1.17887ms，encoder23_30_body 42.02133→22.32274ms。旧融合8组候选仍保留且WAVE_SPLIT_FFWD=0。证据release/native-network70-parallel-split；run_parallel_split_network.ps1继承649ms配置。游戏DLL未更新，10fps未达到。

@@ -6104,3 +6104,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 直接读实现确认QK已Wave，而归一化概率prob×V仍是每线程串行32通道×64键。下一候选应优先AV Wave及共享区复用；当前无需把pack/crop当主要瓶颈。
 - 计时标签语义变化：encoder5_8现在只含剩余三层和ds8，完整原区间需加c64_probe*。测得27.8044ms绝不是原36.9ms被优化了9ms。
 - 证据release/native-network70-c64-detail/，准备脚本release/prepare-c64-profile.ps1（ignored）；运行仍用run_parallel_split_network.ps1及新构建可执行文件。无游戏DLL更新，10fps仍未完成。
+# 2026-09-08：多头注意力Wave AV
+
+- 在native_c64.hlsl新增NATIVE_WAVE_AV分支，C64/C128/C256各独立CSO；仅WAVE_MULTIHEAD_AV=1且已有wave_scores路径时加载，旧路径保持默认。512 split注意力仍用旧AV。
+- QK结束后复用queries/keys half共享区分别存prob的前后32键；原分母树、inv及F(H(ex*inv))不改。V原为F8格点，改half无损。两个Wave分别负责查询块0/2和1/3，以两次K32 Multiply与原H边界累加，按原8×8空间索引写回；无全图暂存增加。
+- MinGW/DXC编译通过；坐标覆盖检查确认64×32每元素只写一次。远程PID26140退出0，15帧最终different0，下载两份完整结果对独立原版参考byte-exact。
+- 暖586.2737007ms、末5帧588.739364ms；上一细分计时601.95719ms，首C64 attention4.07296→3.544797ms。AV收益小于预期，剩余归一化/指数/分母及局部数组代价需后续定位，不能宣称注意力已优化完。
+- 证据release/native-network70-multihead-av/；准备及manifest更新脚本在release/（ignored）。新增运行入口run_multihead_av_network.ps1。测试后本地仅追加非法宏组合的#error编译保护，不改变有效分支计算；测试shader版本保留远程及manifest。游戏DLL未更新，目标10fps未达到。

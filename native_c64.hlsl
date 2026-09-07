@@ -1,3 +1,6 @@
+#if NATIVE_WAVE_AV && !NATIVE_WAVE_SCORES
+#error Wave AV requires Wave scores
+#endif
 #if NATIVE_WAVE_SCORES
 #include <dx/linalg.h>
 #endif
@@ -109,7 +112,12 @@ void tiled_project(uint3 gid,uint t,uint matrix_offset,uint skip_offset,bool raw
 #endif
 #if NATIVE_WAVE_SCORES
 groupshared float16_t queries[2048],keys[2048];
+#if NATIVE_WAVE_AV
+groupshared float16_t values[2048];
+groupshared float scores[4096];
+#else
 groupshared float values[2048],scores[4096];
+#endif
 #else
 groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_STRIDE];
 #endif
@@ -166,7 +174,28 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
   }parity[odd]=total;
  }
  float inv=H(1/H(parity[0]+parity[1]));[loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
+#if NATIVE_WAVE_AV
+ // Q/K are dead after scores; reuse their rows for the two K32 probability blocks.
+ for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(prob[c]);keys[t*32+c]=float16_t(prob[32+c]);}
+ GroupMemoryBarrierWithGroupSync();
+ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+ for(uint qr=t/32;qr<4;qr+=2)for(uint col=0;col<32;col+=16){
+  A a=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+  B b=B::Load(values,col,32,dx::linalg::MatrixLayout::RowMajor);
+  C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)));
+  a=A::Load(keys,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+  b=B::Load(values,32*32+col,32,dx::linalg::MatrixLayout::RowMajor);
+  C next=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+  for(uint i=0;i<acc.Length();i++){
+   uint2 coord=acc.GetCoordinate(i);uint query=qr*16+coord.x;
+   uint pixel=((gid.x/(width/8))*8+query/8)*width+(gid.x%(width/8))*8+query%8;
+   output[pixel*CHANNELS+head*32+col+coord.y]=F(H(acc.Get(i)+next.Get(i)));
+  }
+ }
+#else
  [loop]for(uint c=0;c<32;c++){float a=0;[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[g*32+key]*values[(g*32+key)*ATTN_STRIDE+c];a=H(a+s);}output[p*CHANNELS+head*32+c]=F(a);}
+#endif
 }
 [numthreads(64,1,1)]void projection(uint3 id:SV_DispatchThreadID){
  uint p=id.x;if(p>=width*height)return;
