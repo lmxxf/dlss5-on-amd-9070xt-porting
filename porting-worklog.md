@@ -2975,6 +2975,11 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：可控场景请求1完成，前后数据待独立核验
+
+- PID34096初始化ready tick593942515；未重启，聚焦游戏后写入PID34096/request1。日志request_armed594020031、render_begin594020078、render_complete594025265，游戏Responding，单次包含记录/等待约5187ms，不是实时帧率达标证据。
+- 请求通过非黑/有限输入门并实际调用完整分段网络，前后FP16已下载release/native-live-neural-34096/neural-34096-request-1-before/after.f16。尚需视觉检查与独立原版参考验证，不能把pixels_changed当最终正确；仍为显式history0诊断帧。
+
 ### 2026-09-07：可控诊断版部署，已进入真实游戏营地
 
 - 正常退出43088，旧addon备份.before-controlled，部署/tmp/native-game-neural-controlled.addon64，新游戏PID34096 Responding。游戏自身编译shader画面85%等待完成后，F12确认主菜单“继续”选中，按Enter进入已有存档，没有新建/覆盖存档。
