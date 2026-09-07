@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <d3d12.h>
 #include <atomic>
 #include <cstdio>
 #include "reshade.hpp"
@@ -14,6 +15,9 @@ using Dispatch=uint32_t(*)(void**,const Header*);
 static Dispatch original{};
 static std::atomic<unsigned> frames{},events{};
 static SRWLOCK lock=SRWLOCK_INIT;
+using ExecuteLists=void(STDMETHODCALLTYPE*)(ID3D12CommandQueue*,UINT,ID3D12CommandList*const*);
+static ExecuteLists original_execute{};
+static std::atomic<bool>execute_install_attempted{};
 static void log(const char*kind,void*list,void*queue,unsigned value=0){
  if(!frames.load()||events.fetch_add(1)>=8192)return;
  AcquireSRWLockExclusive(&lock);
@@ -40,8 +44,26 @@ static uint32_t dispatch(void**context,const Header*h){
  }
  auto result=original(context,h);log("ffx_end",list,nullptr,result);return result;
 }
+static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3D12CommandList*const*lists){
+ log("execute_native_begin",nullptr,q,count);
+ if(lists&&count<=64)for(UINT i=0;i<count;i++)log("execute_native_item",lists[i],q,i);
+ original_execute(q,count,lists);
+ // This proves CPU submission returned, NOT GPU completion. No fence is added.
+ log("execute_native_return",nullptr,q,count);
+}
+static void install_execute(reshade::api::command_queue*q){
+ if(!frames.load()||execute_install_attempted.exchange(true))return;
+ auto*native=reinterpret_cast<ID3D12CommandQueue*>(q->get_native());
+ void**table=nullptr;void*target=nullptr;SIZE_T got=0;
+ if(!ReadProcessMemory(GetCurrentProcess(),native,&table,sizeof(table),&got)||got!=sizeof(table)||!table||
+    !ReadProcessMemory(GetCurrentProcess(),table+10,&target,sizeof(target),&got)||got!=sizeof(target)||!target){log("execute_hook_unreadable",native,nullptr);return;}
+ // ID3D12CommandQueue's SDK vtable slot10 is ExecuteCommandLists.
+ auto s=MH_CreateHook(target,reinterpret_cast<void*>(&execute_native),reinterpret_cast<void**>(&original_execute));
+ if(s==MH_OK)s=MH_EnableHook(target);
+ log("execute_hook_status",target,native,unsigned(s));
+}
 static void close_list(reshade::api::command_list*c){log("close_api",c,nullptr);log("close_native",reinterpret_cast<void*>(c->get_native()),nullptr);}
-static void execute(reshade::api::command_queue*q,reshade::api::command_list*c){log("before_execute_api",c,q);log("before_execute_native",reinterpret_cast<void*>(c->get_native()),reinterpret_cast<void*>(q->get_native()));}
+static void execute(reshade::api::command_queue*q,reshade::api::command_list*c){install_execute(q);log("before_execute_api",c,q);log("before_execute_native",reinterpret_cast<void*>(c->get_native()),reinterpret_cast<void*>(q->get_native()));}
 static bool compute(reshade::api::command_list*c,uint32_t,uint32_t,uint32_t){log("dispatch_api",c,nullptr);return false;}
 static bool draw(reshade::api::command_list*c,uint32_t,uint32_t,uint32_t,uint32_t){log("draw_api",c,nullptr);return false;}
 static void barrier(reshade::api::command_list*c,uint32_t count,const reshade::api::resource*r,const reshade::api::resource_usage*before,const reshade::api::resource_usage*after){

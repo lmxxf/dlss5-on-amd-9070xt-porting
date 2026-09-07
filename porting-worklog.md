@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原生ExecuteCommandLists返回只读观察器构建
+
+- 顺序探针在首个FFX之后的ReShade before-execute事件获取native queue，经SDK vtable slot10安装一次ExecuteCommandLists观察hook；记录begin、batch中至多64个list及原调用return，不修改列表、不插入GPU命令或fence、不重试冲突。
+- return只代表CPU提交调用返回，不代表GPU已完成；未来插入消费者仍依赖同queue顺序/必要fence，不能误把此记录当完成证明。
+- Windows mock验证original_execute恰好调用一次且count/数组指针/内容不变，原FFX转发与barrier测试继续通过。新版addon构建及diff检查通过，尚未部署游戏，实际原生队列入口兼容性仍待确认。
+
 ### 2026-09-07：codec源重绑GPU A/B/A验证通过
 
 - codec测试增加严格DLSS5_TEST_CODEC_REBIND=1，仅stage模式可用。创建另一张独立全零FP16纹理B，完成上传后按A/B/A重绑encode slot0或decode slot2，同时独立原版PSO的SRV指向同一对应输入，保持逐值对照；B的原图alpha为0，decode专门按真实B alpha检查。

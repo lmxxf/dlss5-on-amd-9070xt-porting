@@ -1,6 +1,8 @@
 #include "native_submission_order_probe.cpp"
 static const Header*seen{};static unsigned calls{};
 static uint32_t fake(void**,const Header*h){seen=h;++calls;return 12345;}
+static unsigned execute_calls{};static ID3D12CommandList*const*seen_lists{};static UINT seen_count{};
+static void STDMETHODCALLTYPE fake_execute(ID3D12CommandQueue*,UINT n,ID3D12CommandList*const*l){++execute_calls;seen_count=n;seen_lists=l;}
 int main(){
  original=fake;struct Payload{Header header;void*list;unsigned char padding[288];ResourcePayload output;}p{};p.header.type=0x00010001;p.list=reinterpret_cast<void*>(0x1234);
  if(dispatch(nullptr,&p.header)!=12345||seen!=&p.header||calls!=1||frames!=1)return 1;
@@ -10,5 +12,7 @@ int main(){
  tracked_output=0x123;reshade::api::resource r{0x456};reshade::api::resource_usage before=reshade::api::resource_usage::unordered_access,after=reshade::api::resource_usage::shader_resource;
  auto previous=events.load();barrier(nullptr,1,&r,&before,&after);if(events.load()!=previous)return 5;
  r.handle=0x123;barrier(nullptr,1,&r,&before,&after);if(events.load()!=previous+1||r.handle!=0x123||before!=reshade::api::resource_usage::unordered_access||after!=reshade::api::resource_usage::shader_resource)return 6;
+ original_execute=fake_execute;ID3D12CommandList*list=reinterpret_cast<ID3D12CommandList*>(0x5678);execute_native(nullptr,1,&list);
+ if(execute_calls!=1||seen_count!=1||seen_lists!=&list||list!=reinterpret_cast<ID3D12CommandList*>(0x5678))return 7;
  puts("submission observer forwards original result/payload; events do not suppress work; live ordering not proven");return 0;
 }
