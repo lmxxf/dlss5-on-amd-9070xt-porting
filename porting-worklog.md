@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实际NativeGameFrame整链测试程序构建
+
+- 新增d3d12_native_game_frame_test.cpp，实际创建并调用NativeGameFrame，source/target均1080p FP16纹理，执行encode→全网络shift3→FP16桥→decode→目标复制后读取最终target。重复三帧history=false，严格对比独立expected.f16，保存actual-frame.f16；不以非黑/finite当通过。
+- source.f16与expected.f16在重型初始化前检查尺寸和有限性，必须来自同一原始线性输入的完整原版参考，不能直接复用旧编码RGB网络oracle。GPU超时保留frame对象；source/target用COPY_DEST初态以覆盖输入状态恢复与目标写回。
+- MinGW完整exe编译通过，尚未执行：对应完整原版颜色链fixture尚待生成。这不是外部阻塞，下一步生成原版encode输出，再从该编码输入生成独立网络及decode参考。禁止将候选自己生成的final当expected。
+
 ### 2026-09-07：NativeGameFrame接入完整mode1颜色链（待整链GPU验证）
 
 - NativeGameFrame已由原始RGB→网络→10bit直接打包改为encode→FP16 proxy→RGB unpack→shift3全网络→FP16 neural→decode→FP16 target CopyResource。真正网络输出送入decode，未混用参考图、CPU中间像素或base-only路径。
