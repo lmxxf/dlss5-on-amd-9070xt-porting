@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新普通C32 Wave FFN＋初始化无损打包本地权重：15帧exact，暖均762.82839ms、末5帧756.13036ms。首个C32 FFN9.30389→1.90317ms；每组重复转权重版约867ms无收益。WAVE_C32_FFN=1及WAVE_C32_FFN_LOCAL=1启用，仅raw_features，RGB/noise前缀未改。证据release/native-network70-c32-ffn-local/。新增C32首层细分计时，encoder1_4标签现不含该首层全部区间，比较须加c32_probe*，不能误报标签缩短为加速。游戏未改，10fps未达到。
+
 最新512分裂层矩阵QKV＋Wave评分15帧exact，暖均862.25461ms、末5帧855.93912ms；encoder23_head=58.36901ms（旧109.29753）。MATRIX_SPLIT_ATTENTION显式启用并要求图级workspace，QKV无损half权重GPU本地、临时量共用，FFWD/投影不改。local14.711GB低于15.397GB预算。证据release/native-network70-matrix-split/。下一大项preblock/C32前馈；安装游戏未改，10fps未达到。
 
 最新ViT Wave收缩/投影15帧exact，暖均965.47653ms、末5帧964.39536ms。WAVE_VIT_REDUCE显式开启，K4096/1024两CSO，保持四分区累计、初始残差H、每K32 H，矩阵无损half驻留GPU、skip系数原FP32位元。local14.686GB低于15.387GB预算。证据release/native-network70-wave-vit-reduce/。下一大项encoder23_head约109ms/preblock约103ms；游戏未改，10fps未达到。

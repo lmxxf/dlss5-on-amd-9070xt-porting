@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：C32 Wave FFN本地打包权重，整网763ms
+
+- 初版native_wave_c32_ffn在约14KiB共享区载入原float系数并转half，保留32→128 gate→32和残差/四K32 H；session11046/PID27872 exit0，15帧exact但暖867.3734593ms不优于862.2546129ms，未采用为快路径。
+- 增加首个encoder C32 pack/FFN/attention/finish/crop时间戳：session82510/PID26056 exit0/15帧exact，分别0.25429/9.30389/7.20265/2.76731/0.29515ms。此后encoder1_4标签不含已细分首层，比较必须累加c32_probe*，不能当作性能改善。
+- 新native_wave_c32_ffn_local：W1/W2初始化时检查无损half、打包到DEFAULT，skip尾系数保持FP32；只stage0/weight描述符改raw，其他SRV不变。wave共享区降至约6KiB，RAW输出保持原合同，RGB/noise首层不启用。
+- WAVE_C32_FFN_LOCAL依赖实际wave_ffn路径；session85750/PID41684 exit0，15帧实际两GPU最终输出逐字节原版一致。暖762.8283929ms、末5帧756.13036ms，首层FFN1.90317ms，attention7.11759/finish2.69285ms。
+- local14711234560/budget15394512896，预算内。证据release/native-network70-wave-c32-ffn、-c32-profile、-c32-ffn-local。编译/diff通过，游戏安装未改，10fps未达到。
+
 ### 2026-09-08：512层矩阵QKV和Wave评分，整网862ms
 
 - NativeSplit新增MATRIX_SPLIT_ATTENTION开关：FFWDprojection结果GPU打包后，native_matrix_qkv以CHANNELS512计算Q/K/V；旧normalize/softmax求和/V加权保留，QK评分Wave。前馈与两个projection未改。

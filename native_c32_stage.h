@@ -23,10 +23,10 @@ public:
   Heap(0,source,n,packed,work);Heap(1,raw_output?body.RawTiles():body.Main(),work,output,n);
   const char*entry[]={"pack",raw_output?"crop_raw":"crop"};for(UINT i=0;i<2;i++){ID3DBlob*code=nullptr,*error=nullptr;auto path=dir+L"\\native_c32_reframe.hlsl";auto hr=D3DCompileFromFile(path.c_str(),nullptr,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);if(FAILED(hr)){std::string msg=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C32 shader failed";if(error)error->Release();throw std::runtime_error(msg);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));code->Release();}
  }
- void Record(ID3D12GraphicsCommandList*c){
+ void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(recorded){Barrier(c,packed,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Barrier(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
   auto pass=[&](UINT i,UINT groups){c->SetDescriptorHeaps(1,&heap[i]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[i]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,6,geometry,0);c->SetPipelineState(pso[i]);c->Dispatch(groups,1,1);};
-  pass(0,geometry[2]*geometry[3]/64);Barrier(c,packed,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);body.Record(c,0);pass(1,geometry[0]*geometry[1]/64);Barrier(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;
+  if(timer)timer->Mark(c,"c32_probe_begin");pass(0,geometry[2]*geometry[3]/64);Barrier(c,packed,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,"c32_probe_pack");body.Record(c,0,false,false,timer);pass(1,geometry[0]*geometry[1]/64);Barrier(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,"c32_probe_crop");recorded=true;
  }
  ID3D12Resource* Output()const{return output;}
  ID3D12Resource* PooledWork()const{return body.Downsample();}
