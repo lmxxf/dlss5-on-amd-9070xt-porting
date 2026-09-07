@@ -5,7 +5,8 @@ $Dxc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\bin\x64\dxc.exe'
 $Inc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\inc\hlsl'
 foreach($Channels in $(if($IncludeC64){128,64}else{128})){
 foreach($Name in 'expand','contract'){
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" "native_wave_$Name.hlsl" -Fo "native_wave_${Name}_c$Channels.cso"
+ $Preload=if($Name -eq 'contract' -and $Channels -eq 64 -and $env:DLSS5_TEST_PRELOAD_C64_CONTRACT -eq '1'){1}else{0}
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D "NATIVE_PRELOAD_CONTRACT=$Preload" "native_wave_$Name.hlsl" -Fo "native_wave_${Name}_c$Channels.cso"
  if($LASTEXITCODE -ne 0){throw "Wave compile failed: $Name"}
 }
 & $Dxc -I $Inc -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D "CHANNELS=$Channels" -D NATIVE_PRECOMPUTED_QKV=1 -D NATIVE_WAVE_SCORES=1 native_c64.hlsl -Fo "native_wave_scores_c$Channels.cso"

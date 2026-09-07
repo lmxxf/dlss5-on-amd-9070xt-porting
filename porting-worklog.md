@@ -6117,3 +6117,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 原始ex/prob路径保留，默认SharedProb关闭；未增加共享容量或全图buffer。优化意图是减少局部数组压力，未测ISA寄存器/spill，不把意图当作硬件结论。
 - PID29688退出0，15帧最终different0；下载两份GPU结果对独立原版参考byte-exact。暖587.486075ms、末5帧592.152464ms，首C64 attention3.212126ms（旧3.544797ms）。局部有改善但整网不优于586.273701ms，故不纳入有效配置、不宣称提速。
 - 证据release/native-network70-shared-prob/；准备run-shared-prob.ps1及launch-shared-prob.ps1在release/（ignored）。复现用run_multihead_av_network.ps1 -Folder目标目录 -SharedProb。游戏DLL未改，10fps仍未完成。
+# 2026-09-08：C64收缩预载实验，无整网收益
+
+- 新增NATIVE_PRELOAD_CONTRACT分支，原每K32读512 half和两次barrier改为一次读取完整16×256 half，然后矩阵依原K32顺序读取共享区。C64共享容量1KiB→8KiB，不增整图buffer，H/F与权重不变。
+- runner仅DLSS5_TEST_PRELOAD_C64_CONTRACT=1时为C64 contract编译宏，C128/C256保持旧版。普通runner默认关闭；单独入口run_preload_contract_network.ps1。
+- 覆盖检查确认相同4096输入值；DXC通过，PID38252退出0，15帧最终different0且下载两份结果对独立原版参考byte-exact。
+- 暖589.4202343ms、末5帧589.916056ms，首C64收缩1.949243ms，之前约2.00ms。全网未优于586.273701ms有效基线，保持实验关闭，不把减少barrier当性能保证。
+- 证据release/native-network70-preload-contract/与准备脚本release/prepare-preload-contract.ps1（ignored）。此测试继承multihead-av已验证远程shader，不启用shared-prob实验。无游戏DLL更新，10fps未达到。
