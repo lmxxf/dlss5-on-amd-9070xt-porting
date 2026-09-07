@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：换驱动等待真人确认，自动goal不当授权
+
+- 只读检查preview-driver/Setup.exe仍存在（1041672字节），Authenticode Valid；driver-backup/32.0.31041.1004目录仍在。没有运行安装器、修改注册表、重启或改变当前游戏DLL。
+- install_amd_preview.ps1是一次性脚本，已有driver-install-status.json时主动拒绝；不能未经审查删除旧状态文件后重跑。若用户同意重新安装，应另存此次安装记录并保留旧日志、复核备份与签名。
+- 当前自动goal续跑并非用户对换驱动的确认。本轮仅准备恢复材料，不宣称10fps目标完成或硬件矩阵路径可运行。
+
 ### 2026-09-07：重新检查硬件矩阵路径，发现驱动已回到不支持版本
 
 - 新matrix_rounding_probe.hlsl/d3d12_matrix_rounding_probe.cpp以确定性有符号E4M3可表示输入/权重比较LinAlg F16输入、F32输出与标量32项dot加残差后H，共8192结果。此探针只是候选兼容性测试，不是原版/游戏验证。
