@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：RGB→FP16桥测试发现舍入假设不成立（未通过）
+
+- 新增d3d12_native_rgb_texture_test.cpp，真实NativeRgbTexture输出1080p，对输入构造half可表示值、正中点、中点上下一个float ULP，padding区写123以检查裁剪；计划A/B/A连续帧并检查alpha1。
+- AMD session38419/69749在第一帧失败：8294400值different2332820。诊断示例k1正中点got0401/expected0402，k3略高于中点got0403/expected0404；都落向较小half值，与测试假设round-nearest-even不符。完整桥尚未通过，未接入游戏。
+- 这是直接typed UAV FP16存储的实测差异，不能由此认定原版CUDA surface也用同样规则，也不能直接把测试期望改成截断来宣布修复。需要原版post输出FP16 surface对照，确认需要显式量化还是保留硬件转换。之前codec原版/候选同卡比较仍成立，因为两边使用同类FP16输出；并未证明网络float buffer→原版FP16 surface的舍入合同。
+
 ### 2026-09-07：完整shift3网络最终验收通过，新增RGB→FP16资源阶段
 
 - PID18872自然结束，session28959返回exit0。五帧history0/1/0/1/0各6635520 RGB different0；下载两份GPU结果、stdout及run.json到release/native-temporal-network70-shift3-accepted，validate_native_temporal_network70.py --shift3复核与独立原版shift参考逐byte一致且finite。
