@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：提交后只读FP16快照组件GPU验证通过
+
+- 新增native_submitted_readback.h，限定同原生COM device/DIRECT队列/1080p RGBA16_FLOAT，使用自有list与readback buffer，在调用方给定状态→COPY_SOURCE→原状态之间复制，不改像素；等待自有fence完成后按row pitch解包。异常时保留GPU相关引用/存储，禁止无限重试。
+- d3d12_submitted_readback_test先提交GPU上传生产者而不做CPU等待，随后两次调用读回组件。AMD session63432两次各16588800 byte逐位等于已知FP16图案，exit0，覆盖同queue生产者顺序和恢复UAV后重复读取。
+- 此次尚未把组件挂入游戏hook；升频列表匹配、批次末尾与一次性触发保护仍需接入，不能把独立队列测试称游戏资源状态已验证。下一步在已确认after-submit边界做受控一次快照，再接重网络。
+
 ### 2026-09-07：补齐UAV/alias观察，实机FFX末尾具名UAV同步确认
 
 - 原生barrier观察器按Type分别处理transition、具名/全局UAV、涉及当前输出的alias，避免读错union字段；UAV记录明确no_state_transition=1。Windows转发/过滤测试覆盖匹配、不匹配、全局UAV及alias并通过，保留8192条上限。
