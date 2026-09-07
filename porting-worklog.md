@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：只读codec观察器实机加载，候选常数mode=1
+
+- 5090正常Alt+F4退出PID26572，确认进程消失后部署新增native-codec-constants.addon64，SHA256 f32cc272b5f8f58bc709abd5bd805af9cd547e6c48241d4c7c113dfa64350b61。用已存在的GameRequest-Client任务启动PID11912，未更改原神经渲染DLL。
+- ReShade日志确认API20 addon注册，原feature18 count1/60于13:09:43/45成功，NR输入输出1080p。观察器捕获到16word候选：Size/SourceSize/ProxySize均1920×1080，base0，三个float均1，word11=1；layout10ffadc80/param2。因此设置文件的HDR关闭不能直接作为codec模式0的证据。
+- 目前仅有常数布局匹配，尚未关联实际compute shader身份，仍保留shader_identity_verified=0，不能直接宣称已证明HDR分支。原始日志保存release/native-game-history-contract/codec/live-constants.txt及reshade-11912.log。下一步需关联绑定pipeline/着色器，随后修正真实颜色接入。
+- AMD完整shift3测试仍追踪PID18872/session28959，无重复启动。
+
 ### 2026-09-07：游戏配置为SDR，只读codec常数观察器完成构建
 
 - 5090 GameUserSettings.ini实读：bUseHDRDisplayOutput=False，FullscreenMode=1，ResolutionSizeX/Y=1920/1080，动态分辨率关闭。ReShade配置NRPaperWhiteScale/NRTransferStrength/NRColorStrength均1。这是设置证据，不等于运行时HdrMode直接证据。
