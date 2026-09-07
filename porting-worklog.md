@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：mode1输入codec候选实现编译通过
+
+- 新增native_codec_encode.hlsl，按已捕获原版mode1实现source寻址、非负裁剪/PaperWhiteScale、0.75软肩、sRGB编码、alpha1。要求host创建RGBA16_FLOAT中间纹理以保留原版量化；当前未接进游戏或网络，不改变已通过的RGB夹具路径。
+- disassemble_native_codec增加--compile，Windows cs_5_1/O3编译成功并反汇编。候选中的exp2系数-8.325476、sRGB12.92/0.416667与原版显示值一致；这不是数值验收，仍需运行原版DXBC与候选GPU像素对照，尤其软肩/阈值及FP16舍入边界。
+- 候选仅实现已观测mode1，非法mode/非正PaperWhiteScale写零用于暴露误用，未来host必须拒绝此类参数，不能把它当其它模式fallback。反汇编证据candidate-encode.asm保存在ignored codec目录。
+- AMD PID18872仍Responding，CPU733秒，完整回归未结束，未重复启动。
+
 ### 2026-09-07：实机codec身份闭合，mode1输入编码/输出合成均执行
 
 - 正常退出11912，旧观察器备份为native-codec-constants.addon64.before-pipeline，部署0c2314698ad0095a335c7b6661661a83d5cd6b473bc51f248c0a22eff3f763aa。Steam延迟约一分钟后启动22724，未重复发起；feature18 count1/60在13:14:02/04成功。
