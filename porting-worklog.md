@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD实机输出资源轮换与状态观察
+
+- 正常退出29060后旧顺序addon备份.before-state，再部署新版状态观察器，Steam正常启动PID17196 Responding。旧神经渲染仍停用，无存档覆盖操作。
+- order-17196.txt记录FFX输出payload：format4/1920×1080/declared_state2；frame1/2资源e9a5a9b0，frame3为ada224d0，frame4又回e9a5a9b0，后续轮换。因此NativeGameFrame固定源实例不能直接绑住首帧资源，必须有已同步的源重绑定或固定拷贝中间纹理。
+- 输出barrier可见FFX list上的API usage8→8，以及后续游戏list的4→192、192→4等；声明FFX state与ReShade usage是不同枚举，不能直接当D3D12_RESOURCE_STATES硬传。事件未覆盖所有原生转换，插入点状态仍需进一步验证。
+- 下一步确认原生资源描述及原调用后的提交边界，解决源轮换与同步，尚未部署实际神经渲染DLL。
+
 ### 2026-09-07：FFX输出状态只读观察扩展完成
 
 - 顺序探针增加既有FFX x64 offset312/48byte output payload记录（resource/声明format/尺寸/state），不把声明format当DXGI原生格式；每帧更新追踪resource，读取失败清除追踪，避免归因到旧帧。
