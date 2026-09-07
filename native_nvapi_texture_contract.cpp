@@ -44,7 +44,15 @@ void install_srv(ID3D12Device*d){
  });
 }
 int __cdecl merged(MergedTexture*p){
- const int status=original(p);const unsigned n=++calls;
+ const unsigned n=++calls;
+ if(n<=4096){MergedTexture before{};SIZE_T got=0;
+  if(p&&ReadProcessMemory(GetCurrentProcess(),p,&before,sizeof(before),&got)&&got==sizeof(before)){
+   AcquireSRWLockExclusive(&log_lock);
+   if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"merged_enter pid=%lu tick=%llu call=%u device=%p texture_desc=%llx sampler_desc=%llx\n",GetCurrentProcessId(),GetTickCount64(),n,before.device,(unsigned long long)before.texture.ptr,(unsigned long long)before.sampler.ptr);fclose(f);}
+   ReleaseSRWLockExclusive(&log_lock);
+  }
+ }
+ const int status=original(p);
  if(n<=4096){MergedTexture snapshot{};SIZE_T got=0;
   const bool readable=p&&ReadProcessMemory(GetCurrentProcess(),p,&snapshot,sizeof(snapshot),&got)&&got==sizeof(snapshot);
   if(status==0&&readable&&snapshot.size_in>=sizeof(snapshot)&&snapshot.device)install_srv(snapshot.device);

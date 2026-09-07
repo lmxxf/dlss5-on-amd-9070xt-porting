@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：RTX游戏只读纹理探针已加载，发现返回后descriptor已空需补入口记录
+
+- 正常Alt+F4退出原PID3536，未强杀；Steam09:51:06日志确认3489700 AutoCloud complete、进度存档未修改。新增诊断addon（913ef436...）并核对安装SHA，未替换原renodx/nvngx渲染DLL。
+- DLSSNR-GameRequest启动新游戏PID21420，Responding=True，merged hook和CreateSRV hook均status0。已回到1920×1080主菜单，截图release/native-game-history-contract/rtx-menu.png；不是AMD新DLL画质验收。
+- 同PID参数capture1：slot0=0x8120000a801、slot8=0x8100000a808、slot10=0x8120000a809，均能对应merged记录的CPU descriptor。按记录顺序取返回时最新SRV记录却是null resource/buffer view；不能跳过null盲选旧非空资源。可能是重用或转换内部清理，尚未证明。
+- 源码补merged_enter记录，在调用原函数前采集descriptor事件，再与返回句柄按call关联。新构建SHAd804e6d9268777668a2cd4c829389069579dedc5d4bbbc75f5ce737a685bb6ab，尚未部署；当前游戏仍加载913ef436版。下一步受控更新诊断探针，核对入口时资源，不修改存档。
+- AMD完整数值验收已通过但AMD游戏渲染DLL尚未部署；历史来源/实际输入及最终动态显示仍待证明。
+
 ### 2026-09-07：AMD完整0..70时序五帧验收全exact，下载复核通过
 
 - 修正部署后的PID43244完成，原exec session9405明确exit0。五帧history0/1/0/1/0，各6635520个RGB值different0，覆盖首帧、历史启用、重置、再启用与再重置；同一资源图，生产者/网络按同队列提交。
