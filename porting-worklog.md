@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：raw输出三通道回归通过，准备整网分块测试
+
+- prepare_native_c64_raw_bench.py生成8×8、C64/C128/C256有符号非均匀输入，使用原权重与独立CPU block(raw_output=True)生成参考；明确不是直接CUDA raw oracle。保存的旧HLSL与候选各对CPU参考、彼此位元同时比较。
+- C64 session82111 exit0；C128/C256串行脚本session59395 exit0。三个通道各五轮，4096/8192/16384值每轮，baseline_diff/fast_diff/bit_diff均0。日志release/c64-tiled-raw{64,128,256}/result.log。不以8×8计时估算整网性能。
+- NativeC64Shift新增严格DLSS5_TEST_TILED_C64=0/1实验开关（非法值拒绝），启用时将移位后的body切至完整分块路径，默认仍关闭。尚未通过移位整网验证，游戏部署未改变。
+- 整网测试程序已MinGW编译为/tmp/native-network70-tiled.exe，git diff --check通过。下一步使用独立目录和原版off/on/reset最终oracle跑整网，不能把这些CPU/旧GPU回归冒充最终游戏验收。
+
 ### 2026-09-07：分块核心扩展至C128/C64，原版五轮逐位通过
 
 - bench支持可选geometry.txt（width height channels raw），严格检查字段和输入尺寸，默认保持旧120×72×256。RAW_OUTPUT测试入口已开放，但本轮没有验证raw=true。
