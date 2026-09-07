@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+多头归一化并行候选未采纳：-ParallelNorm新增512B共享倒数，raw Q/K用half暂存后全组逐元素缩放，15帧exact但暖546.822146ms、末5帧545.92308ms，首C64 attention2.44709ms无改善；encoder15_22和tail49_55升到34.10/35.60ms。保持上一八Wave并行softmax约540ms，不加ParallelNorm。证据release/native-network70-multihead-norm，游戏未改，10fps未达到。
+
 多头八Wave＋并行softmax15帧exact，暖540.422252ms、末5帧541.122424ms；首C64 attention2.43663ms（旧四Wave2.85449）。-EightWaves -ParallelSoftmax：256线程按16查询/16输出列拆矩阵，原64查询标量段和求和/H/F保持，无新增共享容量。证据release/native-network70-multihead-eight-wave；C32仍八Wave并行exp/prob/norm。游戏未改，10fps未达到。
 
 多头四Wave并行softmax阶段15帧exact，暖546.147404ms、末5帧546.866452ms；首C64 attention2.85449ms（旧四Wave3.52036）。-ParallelSoftmax全组4096元素原地scores→exp，原64查询分母树写新增256B共享inv，再全组量化概率到死Q/K区。无新增整图buffer，H/F/求和顺序不变。证据release/native-network70-multihead-softmax；入口run_multihead_four_wave_network.ps1 -ParallelSoftmax，C32仍八Wave并行exp/prob/norm。游戏未改，10fps未达到。

@@ -6251,3 +6251,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC、元素覆盖检查和SM6.10/tier0x10门禁正常，PID33392退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。
 - 暖540.422252ms、末5帧541.122424ms；对照四Wave并行softmax546.147404ms，首C64 attention2.436631ms对2.854486ms，保留。
 - 证据release/native-network70-multihead-eight-wave/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax -EightWaves，内部C32保持八Wave并行exp/prob/norm。未更新游戏DLL，10fps未完成。
+# 2026-09-08：多头Q/K逐通道归一化并行，无收益
+
+- NATIVE_PARALLEL_MULTIHEAD_NORM仅预计算QKV＋Wave AV，64查询线程保留原平方和树/rsqrt/H，保存128 float倒数，raw Q/K以已有half共享区暂存；同步后全组按元素执行原Q/K缩放H/F，再同步QK矩阵。
+- 原raw Q/K来自逐K32 H结果，本样本转half无损；未改权重、网络和输入依赖，只新增512B共享，默认关闭。
+- DXC/能力门禁正常，PID14292退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖546.822146ms、末5帧545.92308ms，差于上一540.422252ms；首C64 attention2.447091ms没有改善，encoder15_22/tail49_55为34.100629/35.599209ms，C256相关区间明显退步，未进一步归因硬件原因。
+- 不采纳-ParallelNorm，保持八Wave并行softmax基线。证据release/native-network70-multihead-norm/，准备/manifest脚本在release/（ignored）；显式复现run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax -EightWaves -ParallelNorm。游戏DLL未更新，10fps未完成。

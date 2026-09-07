@@ -38,6 +38,12 @@
 StructuredBuffer<float> input:register(t0),weights:register(t1),feature:register(t2);
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;}
+#if NATIVE_PARALLEL_MULTIHEAD_NORM
+#if !NATIVE_WAVE_AV || !NATIVE_PRECOMPUTED_QKV
+#error Parallel normalization requires precomputed Wave attention
+#endif
+groupshared float normalization_inverse[128];
+#endif
 #if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
 #if !NATIVE_WAVE_AV
 #error Parallel softmax requires Wave AV
@@ -174,9 +180,22 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  [unroll]for(uint i=0;i<8;i++){qs[i]=H(qs[i*2]+qs[i*2+1]);ks[i]=H(ks[i*2]+ks[i*2+1]);}
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
+#if NATIVE_PARALLEL_MULTIHEAD_NORM
+ normalization_inverse[t]=qi;normalization_inverse[64+t]=ki;
+ for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(q[c]);keys[t*32+c]=float16_t(k[c]);}
+#else
  [loop]for(uint c=0;c<32;c++){queries[t*ATTN_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[SCALE_OFFSET+head])));keys[t*ATTN_STRIDE+c]=F(H(k[c]*ki));}
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_PARALLEL_MULTIHEAD_NORM
+ for(uint i=t;i<2048;i+=MULTIHEAD_THREADS){
+  uint query=i/32;
+  queries[i]=float16_t(F(H(H(float(queries[i])*normalization_inverse[query])*H(weights[SCALE_OFFSET+head]))));
+  keys[i]=float16_t(F(H(float(keys[i])*normalization_inverse[64+query])));
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
 #if NATIVE_WAVE_SCORES
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
