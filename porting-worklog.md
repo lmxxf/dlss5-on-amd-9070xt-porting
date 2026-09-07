@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：Wave协作矩阵展开0.732ms且保持exact
+
+- 先测试Thread scope完整K256而非8段H：matrix_wide_expand耗时1.713773ms，8847360值中172676不同，max2/MAE0.0004069441/RMSE0.009112102。相比K32 exact的1.748128ms收益很小，未采用。
+- 从已安装dx/linalg.h确认Wave Matrix×Matrix接口，新增matrix_wave_expand：32线程wave，A16×32输入、B32×16权重ColMajor，八K32分段输出软件H，最后原gate/F。与Thread Load模板不同，Wave Load使用布局参数，ColMajor枚举名；初次编译错误已按实际头文件修正，Load/Store显式16-byte对齐避免虚报128对齐。
+- runner增加wave模式raw UAV与540×64 dispatch。session42805 exit0，完整8847360float全finite，GPU均0.732240ms（10重复含UAV barrier、无独立暖机）。下载matrix_wave_expand.f32对matrix_activated1.f32数值零差/max0/MAE0/RMSE0。
+- 数据由原权重无损half打包，新增--wide只改变存储布局，不改权重。当前只是预打包独立算子，不含实时packing/整网。下一步优先接Wave路径而非降精度，安装游戏未动，10fps未达到。
+
 ### 2026-09-07：C64矩阵15帧数值通过但算子回退，不推广
 
 - C64开放显式MATRIX_C64开关，shader泛型CHANNELS64；tail/body62均传共享workspace，开启时扩容到488×296×64，未开启保持旧128容量。脚本-IncludeC64编译三份_c64 CSO并明确设开关，默认不启用。

@@ -21,7 +21,7 @@ ID3D12Resource *buffer(ID3D12Device*d,UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RE
 }
 int wmain(int argc,wchar_t **argv){
     if(argc<2||argc>5)return 2;
-    const bool full=argc==5;if(full&&wcscmp(argv[4],L"full"))return 2;
+    const bool full=argc==5,wave=full&&!wcscmp(argv[4],L"wave");if(full&&!wave&&wcscmp(argv[4],L"full"))return 2;
     const UINT pixels=full?8640:256,rows=full?1024:32,fixture_bytes=full?4947968:147456;
     std::vector<char> fixture;if(argc>=3){std::ifstream f(argv[2],std::ios::binary|std::ios::ate);if(!f||f.tellg()!=fixture_bytes)return 2;fixture.resize(fixture_bytes);f.seekg(0);if(!f.read(fixture.data(),fixture.size()))return 2;}
     const UINT weight_bytes=fixture.empty()?2048:UINT(fixture.size());
@@ -46,14 +46,14 @@ int wmain(int argc,wchar_t **argv){
     void*m=nullptr;D3D12_RANGE none{0,0};check("map weights",w->Map(0,&none,&m));for(UINT i=0;i<1024;i++){uint32_t h=i*747796405u+2891336453u;h=((h>>((h>>28)+4))^h)*277803737u;static_cast<uint16_t*>(m)[i]=uint16_t(((h>>16)&0x8000)|((9+h%10)<<10)|(((h>>8)&7)<<7));}if(!fixture.empty())std::memcpy(m,fixture.data(),fixture.size());w->Unmap(0,nullptr);
     D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,2,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};ID3D12DescriptorHeap*heap=nullptr;check("heap",d->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap)));
     auto cpu=heap->GetCPUDescriptorHandleForHeapStart();D3D12_SHADER_RESOURCE_VIEW_DESC srv{};srv.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;srv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;srv.Format=DXGI_FORMAT_R32_TYPELESS;srv.Buffer.NumElements=weight_bytes/4;srv.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;d->CreateShaderResourceView(w,&srv,cpu);
-    cpu.ptr+=d->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);D3D12_UNORDERED_ACCESS_VIEW_DESC uv{};uv.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uv.Buffer.NumElements=pixels*rows;uv.Buffer.StructureByteStride=4;d->CreateUnorderedAccessView(out,nullptr,&uv,cpu);
+    cpu.ptr+=d->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);D3D12_UNORDERED_ACCESS_VIEW_DESC uv{};uv.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;uv.Buffer.NumElements=pixels*rows;uv.Buffer.StructureByteStride=wave?0:4;if(wave){uv.Format=DXGI_FORMAT_R32_TYPELESS;uv.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_RAW;}d->CreateUnorderedAccessView(out,nullptr,&uv,cpu);
     D3D12_COMMAND_QUEUE_DESC qd{};ID3D12CommandQueue*q=nullptr;check("queue",d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));
     ID3D12CommandAllocator*allocator=nullptr;check("allocator",d->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));
     ID3D12GraphicsCommandList*cmd=nullptr;check("list",d->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,allocator,pso,IID_PPV_ARGS(&cmd)));
     cmd->SetDescriptorHeaps(1,&heap);cmd->SetComputeRootSignature(root);cmd->SetComputeRootDescriptorTable(0,heap->GetGPUDescriptorHandleForHeapStart());ID3D12QueryHeap*queries=nullptr;D3D12_QUERY_HEAP_DESC qh{};qh.Type=D3D12_QUERY_HEAP_TYPE_TIMESTAMP;qh.Count=2;check("queries",d->CreateQueryHeap(&qh,IID_PPV_ARGS(&queries)));
     auto*times=buffer(d,16,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
     const UINT repeats=argc>=4?10:1;cmd->EndQuery(queries,D3D12_QUERY_TYPE_TIMESTAMP,0);
-    for(UINT pass=0;pass<repeats;pass++){cmd->Dispatch(pixels/32,rows/32,1);D3D12_RESOURCE_BARRIER u{};u.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;u.UAV.pResource=out;cmd->ResourceBarrier(1,&u);}
+    for(UINT pass=0;pass<repeats;pass++){cmd->Dispatch(pixels/(wave?16:32),rows/(wave?16:32),1);D3D12_RESOURCE_BARRIER u{};u.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;u.UAV.pResource=out;cmd->ResourceBarrier(1,&u);}
     cmd->EndQuery(queries,D3D12_QUERY_TYPE_TIMESTAMP,1);cmd->ResolveQueryData(queries,D3D12_QUERY_TYPE_TIMESTAMP,0,2,times,0);
     D3D12_RESOURCE_BARRIER barrier{};barrier.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;barrier.Transition.pResource=out;barrier.Transition.Subresource=D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;barrier.Transition.StateBefore=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;barrier.Transition.StateAfter=D3D12_RESOURCE_STATE_COPY_SOURCE;cmd->ResourceBarrier(1,&barrier);cmd->CopyResource(readback,out);check("close",cmd->Close());
     ID3D12CommandList*lists[]={cmd};q->ExecuteCommandLists(1,lists);ID3D12Fence*fence=nullptr;check("fence",d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));check("signal",q->Signal(fence,1));HANDLE event=CreateEventW(nullptr,FALSE,FALSE,nullptr);check("event",fence->SetEventOnCompletion(1,event));if(WaitForSingleObject(event,30000)!=WAIT_OBJECT_0){std::printf("gpu_timeout removed=%08x\n",unsigned(d->GetDeviceRemovedReason()));return 4;}
