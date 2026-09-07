@@ -2,6 +2,14 @@
 
 ## 2026-09-08 05:30 朱雀接手性能优化（闇 GPT 额度见底）
 
+**06:05 累计：暖轮 337.8ms（闇最后基线 472.9ms），15帧全部exact，四项叠加、全部显式flag、默认关闭、游戏DLL未改。**
+
+全部权重驻留GPU本地（DLSS5_TEST_RESIDENT_WEIGHTS=1）：此前所有权重/偏置表/索引表都在UPLOAD堆（系统内存，非本地段492MB），每帧经PCIe读取。NativeMaybeResident在各Buffer helper初始化后复制到DEFAULT堆；非本地占用降到205MB，本地14.44/15.14GB。暖366.0→337.8ms。decoder_stage1在多次运行间4.5/13.9ms双稳态（与同步/延迟提交无关）的根因就是它：decoder39入口权重落在系统内存时慢9ms。证据release/native-network70-resident-weights。
+
+多头注意力Q/K/V协同装载（-D NATIVE_COALESCED_QKV_LOAD=1，DLSS5_BUILD_COALESCED_QKV=1）：原来只有64线程各做96次跨步标量读；改为256线程按token 128字节连续读入scores/values共享区再分发，数值不变。首C64 attention 2.42→2.25ms，收益小。证据release/native-network70-coalesced-qkv；同配置同步模式对照release/native-network70-coalesced-sync（暖377.8ms，证明per-stage时间戳在同步模式下也把入口权重非本地的9ms记在decoder_stage1）。
+
+ViT寄存器分块（DLSS5_TEST_BLOCKED_VIT=1，native_wave_vit_blocked.hlsl）：expand 1024→4096写f16隐藏层、reduce 4096→1024直接A::Load f16，每wave 4个输出tile，整阶段单dispatch（取消20段chunk）。vit31 stage0 4.1→0.44ms、stage1 4.7→0.63ms；ViT合计115→61ms。暖426.5→359.5ms。证据release/native-network70-blocked-vit。
+
 寄存器分块FFN＋f16隐藏层15帧exact，暖426.5ms（基线456.2ms，vit-chunk2的472.9ms）。DLSS5_TEST_BLOCKED_FFN=1：native_wave_ffn_blocked.hlsl 每wave算16 token×64输出，A tile一次装载复用4份权重tile；expand把隐藏层以f16存（F()输出是FP8格点，转换无损），contract直接A::Load f16、不再经LDS转存。每个输出元素的K32乘加顺序与H()次数不变。首C64 FFN contract 1.982→0.334ms、expand 0.931→0.495ms；encoder5_8 22.9→16.5、tail63_65 22.9→16.4。证据release/native-network70-blocked-ffn/profile-validation.json，入口run_blocked_ffn_network.ps1（叠在async-submit之上）。游戏DLL未改，10fps未达到。
 
 延迟提交（DLSS5_TEST_ASYNC_SUBMIT=1）15帧exact，暖472.9→456.2ms。native_game_submission.h 增加8槽allocator/list环，Submit不再逐条等fence，只在复用槽位时等待；Flush()供读回前调用。队列顺序不变、命令不变。首次运行在NativeResidentTable初始化时DEVICE_REMOVED——该helper在Submit后立刻释放上传缓冲，已加Flush修复（native_submitted_readback同样补上）；失败日志留release/native-network70-async-submit/failed-resident-table.*。注意：延迟模式下各stage时间戳会前移（ViT各段显得变快、decoder_stage1多出9ms是上游未完成的工作），只能信整帧total_ms。游戏DLL默认仍同步模式。

@@ -19,3 +19,11 @@ inline ID3D12Resource* NativeResidentTable(ID3D12Device*d,ID3D12Resource*upload)
  });
  submission->Flush();delete submission;q->Release();upload->Release();return resident;
 }
+// DLSS5_TEST_RESIDENT_WEIGHTS=1: replace an initialization upload buffer with a
+// GPU-local copy. Off by default so ordinary/game callers keep legacy placement.
+inline ID3D12Resource* NativeMaybeResident(ID3D12Device*d,ID3D12Resource*upload){
+ const wchar_t*flag=_wgetenv(L"DLSS5_TEST_RESIDENT_WEIGHTS");
+ if(!flag||!wcscmp(flag,L"0"))return upload;
+ if(wcscmp(flag,L"1"))throw std::runtime_error("invalid resident weights flag");
+ auto*local=NativeResidentTable(d,upload);upload->Release();return local;
+}

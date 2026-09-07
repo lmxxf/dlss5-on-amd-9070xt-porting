@@ -61,7 +61,8 @@ public:
   const wchar_t*resident_flag=_wgetenv(L"DLSS5_TEST_RESIDENT_NOISE");if(resident_flag&&wcscmp(resident_flag,L"0")&&wcscmp(resident_flag,L"1"))throw std::runtime_error("invalid resident noise flag");
   if(noise&&resident_flag&&!wcscmp(resident_flag,L"1")){auto*local=NativeResidentTable(device,noise);noise->Release();noise=local;}
   const wchar_t*weight_flag=_wgetenv(L"DLSS5_TEST_RESIDENT_C32_WEIGHTS");if(weight_flag&&wcscmp(weight_flag,L"0")&&wcscmp(weight_flag,L"1"))throw std::runtime_error("invalid resident C32 weights flag");
-  if(weight_flag&&!wcscmp(weight_flag,L"1"))for(auto*&w:weights){auto*local=NativeResidentTable(device,w);w->Release();w=local;}
+  const wchar_t*all_resident=_wgetenv(L"DLSS5_TEST_RESIDENT_WEIGHTS");
+  if((weight_flag&&!wcscmp(weight_flag,L"1"))||(all_resident&&!wcscmp(all_resident,L"1")))for(auto*&w:weights){auto*local=NativeResidentTable(device,w);w->Release();w=local;}
   if(wave_ffn_local||prefix_wave){
    std::vector<float>packed(4096+32);
    for(size_t i=0;i<8192;i++){uint32_t bits;std::memcpy(&bits,&fw[512+i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m)h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}

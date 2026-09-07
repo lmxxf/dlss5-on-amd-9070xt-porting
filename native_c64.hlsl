@@ -162,9 +162,25 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 [numthreads(MULTIHEAD_THREADS,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
  uint p=((gid.x/(width/8))*8+t/8)*width+(gid.x%(width/8))*8+t%8;
+#if NATIVE_COALESCED_QKV_LOAD
+#if !NATIVE_PRECOMPUTED_QKV || !NATIVE_WAVE_AV || !NATIVE_WAVE_SCORES || MULTIHEAD_THREADS!=256
+#error coalesced QKV staging requires the eight-wave precomputed wave AV path
+#endif
+ // All 256 threads stage this head's Q/K (into the not yet used score rows) and
+ // F(V) with 128-byte contiguous reads per token; values are unchanged.
+ for(uint i=t;i<64*96;i+=256){
+  uint token=i/96,part=(i%96)/32,c=i%32;
+  uint pixel=((gid.x/(width/8))*8+token/8)*width+(gid.x%(width/8))*8+token%8;
+  float v=feature[pixel*CHANNELS*3+part*CHANNELS+head*32+c];
+  if(part<2)scores[token*64+part*32+c]=v;else values[token*32+c]=float16_t(F(v));
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
  if(t<64){
  float q[32],k[32],qs[16],ks[16];
-#if NATIVE_PRECOMPUTED_QKV
+#if NATIVE_COALESCED_QKV_LOAD
+ [unroll]for(uint c=0;c<32;c++){q[c]=scores[t*64+c];k[c]=scores[t*64+32+c];}
+#elif NATIVE_PRECOMPUTED_QKV
  [loop]for(uint c=0;c<32;c++){uint row=head*32+c;q[c]=feature[p*CHANNELS*3+row];k[c]=feature[p*CHANNELS*3+CHANNELS+row];values[t*ATTN_STRIDE+c]=F(feature[p*CHANNELS*3+2*CHANNELS+row]);}
 #else
  [loop]for(uint c=0;c<32;c++){

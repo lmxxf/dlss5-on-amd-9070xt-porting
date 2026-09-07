@@ -1,4 +1,5 @@
 #pragma once
+#include "native_resident_table.h"
 #include "native_preblock_runtime.h"
 #include "native_matrix_workspace.h"
 // Consumes the raw-before-quantization half-pool produced by NativeC32Stage.
@@ -25,7 +26,7 @@ public:
   input=src;input->AddRef();geometry[0]=width/2;geometry[1]=height/2;geometry[3]=(shift&1)?2:0;geometry[4]=(shift&2)?2:0;geometry[2]=width/2+geometry[3]*2;
   if(c64_raw)geometry[2]=width;
   if(padded_head){geometry[0]=32;geometry[1]=20;geometry[3]=width/2;geometry[4]=height/2;}
-  output=Buffer(d,UINT64(geometry[0])*geometry[1]*(c64_raw?2*channels:64)*4,false);weights=Buffer(d,w.size()*4,true);void*ptr=nullptr;D3D12_RANGE empty{};Check(weights->Map(0,&empty,&ptr));std::memcpy(ptr,w.data(),w.size()*4);weights->Unmap(0,nullptr);
+  output=Buffer(d,UINT64(geometry[0])*geometry[1]*(c64_raw?2*channels:64)*4,false);weights=Buffer(d,w.size()*4,true);void*ptr=nullptr;D3D12_RANGE empty{};Check(weights->Map(0,&empty,&ptr));std::memcpy(ptr,w.data(),w.size()*4);weights->Unmap(0,nullptr);weights=NativeMaybeResident(d,weights);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_WAVE_HEAD");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid wave head flag");wave_head=padded_head&&flag&&!wcscmp(flag,L"1");
   const wchar_t*ds_flag=_wgetenv(L"DLSS5_TEST_WAVE_DOWNSAMPLE");if(ds_flag&&wcscmp(ds_flag,L"0")&&wcscmp(ds_flag,L"1"))throw std::runtime_error("invalid wave downsample flag");wave_head=wave_head||(c64_raw&&ds_flag&&!wcscmp(ds_flag,L"1"));wave_channels=channels;
   auto wave_file=[&](const wchar_t*stem){return dir+L"\\"+stem+(channels==512?L"":L"_c"+std::to_wstring(channels))+L".cso";};
