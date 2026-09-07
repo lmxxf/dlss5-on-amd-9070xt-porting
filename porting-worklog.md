@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：CopyResource观察探针导致原版NR暂停，已撤回，重启待确认
+
+- 尝试在NGX Evaluate前安装command-list CopyTextureRegion/CopyResource只读记录（槽16/17经SDK核对），限定前8帧；诊断addon SHA8e47de38...。备份原native-ngx-input-contract为.before-copy-trace，正常退出及Steam同步后更新。
+- 新游戏PID28920两个hook状态均0，但只有evaluate1、无preblock frame捕获。ReShade明确10:10:36 feature18 evaluate失败0xbad00002，保留原游戏输出并暂停NR。该次无copy日志无效，不能用于推断历史写入方式；主菜单画面正常不代表NR有效。
+- 已保存失败日志到release/native-game-history-contract/copy-failed；正常Alt+F4退出，恢复.before-copy-trace并校验hash。失败二进制保留.failed-copy-trace，源代码试改及新增copy header均撤回，不进入正式代码。
+- Steam10:15:47同步完成，10:16:07已发一次重启请求；最新截图仍显示“正在启动”，无SB进程，ReShade日志仍为旧进程退出尾部。未反复下启动命令，也未宣称原版NR已恢复；后续先查Steam启动日志/实际进程。
+- 原版渲染DLL未替换，AMD完整受控网络验收仍有效，但游戏接入目标未完成。下一步更换历史写入观测方法（如输出surface资源映射），避免再使用此不兼容copy hook。
+
 ### 2026-09-07：入口时描述符映射成功，slot8为独立1080p RGBA16资源
 
 - 正常退出PID21420，Steam09:58:51 AutoCloud complete、进度存档未修改；旧913ef436探针备份为.addon64.backup-913ef436并核对SHA，部署d804e6d9版。新游戏PID22904，Responding=True，截图确认回到1920×1080主菜单。没有替换原渲染DLL。
