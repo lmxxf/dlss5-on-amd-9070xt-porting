@@ -6156,3 +6156,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC通过，PID34864退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact。暖608.875417ms、末5帧609.813532ms。
 - post70_body37.798734ms对旧33.609171ms，preblock_detail_stage1 28.993649ms，首c32_probe_stage1 6.939626ms，相关C32区间均倒退；不能凭减少log2/exp2断言更快。
 - 不采纳，不改默认F，不宣称实测寄存器/指令原因。证据release/native-network70-wave-c32-fast-fp8/和准备脚本release/prepare-wave-c32-fast-fp8.ps1（ignored）；显式复现入口run_wave_c32_fast_fp8_network.ps1。有效基线仍约586ms，游戏DLL未改，10fps未完成。
+# 2026-09-08：C32硬件half转换候选，数值未对齐
+
+- NATIVE_C32_HARDWARE_HALF显式分支仅将C32 attention H替换为f16tof32(f32tof16(v))，NativeHalfSquarePair及half_add_preserving_midpoint补偿仍保留，舍入位置不改。权重/网络结构/输入依赖不变，默认仍原软件H。
+- DXC通过，PID35852首帧正确性检查失败并exit1；6627936/6635520值不同。全部RGB finite，范围0..1，MAE0.0061515544、max0.0542297363、RMSE0.0078504765。
+- 首帧submit_wait564.910ms包含冷启动且没有后续暖帧，不报告有效性能收益；也不因用户允许硬件算术误差就直接部署该误差水平。尚未做画面/连续帧验收，不是已获接受的快速版。
+- 原因未定位，不能直接归因RTZ/驱动或移除补偿；若继续该路线，先独立标量舍入探针区分intrinsic行为及表达式重排。
+- 证据release/native-network70-c32-hardware-half/（日志与失败输出，ignored）；准备/manifest脚本在release/。入口run_c32_hardware_half_network.ps1。有效基线仍约586ms，游戏未改，10fps未完成。

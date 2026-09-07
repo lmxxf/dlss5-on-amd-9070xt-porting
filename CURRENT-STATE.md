@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32硬件half转换候选未通过exact：NATIVE_C32_HARDWARE_HALF=1用f16tof32(f32tof16(v))替代H，保持中点补偿/网络结构。PID35852首帧6627936/6635520值不同，RGB finite、MAE0.00615155、max0.05422974、RMSE0.00785048，非可忽略位差；测试exit1，未暖测，未采用。证据release/native-network70-c32-hardware-half。原因尚未独立定位，不预设硬件RTZ/驱动bug；下一步需舍入探针。默认软件H，游戏未改，10fps未达到。
+
 Wave C32 attention位元FP8复测失败（性能）：NATIVE_FAST_C32_FP8=1专门重编完整attention CSO，15帧exact但暖608.875417ms、末5帧609.813532ms，post70_body37.79873ms（原33.60917）、preblock attention28.99365ms、首C32 attention6.93963ms。未采纳，默认旧F。证据release/native-network70-wave-c32-fast-fp8，runner run_wave_c32_fast_fp8_network.ps1。不是早期FXC标量复测，同样结论；游戏未改，10fps未达到。
 
 C32 Wave score行padding候选15帧exact：SCORE_ROW32→33、SCORE_WIDE64→65，score容量4096→4224 float（+512B），矩阵/标量索引同步改。暖585.284452ms、末5帧586.848162ms，post70_body32.85373ms（旧33.60917），首C32 attention5.64669ms。整网差异很小，仍显式候选、默认关闭，不宣称稳定整体提速。证据release/native-network70-padded-c32-scores；runner run_padded_c32_scores_network.ps1。游戏未改，10fps未达到。
