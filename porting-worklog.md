@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：可控诊断版部署，已进入真实游戏营地
+
+- 正常退出43088，旧addon备份.before-controlled，部署/tmp/native-game-neural-controlled.addon64，新游戏PID34096 Responding。游戏自身编译shader画面85%等待完成后，F12确认主菜单“继续”选中，按Enter进入已有存档，没有新建/覆盖存档。
+- F12截图20260907172450_1.jpg确认真实3D营地、角色及HUD，保存release/native-live-neural-34096/world-before-request.jpg；不再把主菜单截图当装备菜单或游戏场景。
+- PID34096日志tick592266203 initialization_started，后台神经初始化仍进行。尚未写neural-frame-request，控制版不会ready后自动渲染；后续等ready再请求同PID编号，检查非黑before与after。当前场景截图不包含神经效果，目标未完成。
+
 ### 2026-09-07：拒绝黑输入并改为显式PID请求诊断帧
 
 - NativeGameOneShot ready后不再自动渲染，250ms节流读取D:\DLSSNR-Lab\neural-frame-request.txt中的PID/单调request-id；仅当前PID、较新正编号且<=1000000接受，旧进程/重复/倒退/非法编号忽略。完成后可由新请求再触发，不重新初始化网络；GPU错误仍phase failed禁止重试。
