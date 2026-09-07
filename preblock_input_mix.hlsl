@@ -26,6 +26,29 @@ float half_round(float v){
  if(rounded>=0x47800000u)return asfloat(sg|0x7f800000u);
  return asfloat(sg|rounded);
 }
+#if RAW_INPUT
+float q8(float v);
+groupshared float raw_prefix[8*32],raw_hidden[8*128];
+[numthreads(64,1,1)]void raw_ffn_shared(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint tile=gid.x+gid.y*65535u,t=tid.x,first=tile*8;
+ if(first>=TOTAL_OUTPUTS/32)return;
+ for(uint i=t;i<256;i+=64)raw_prefix[i]=input[first*32+i];
+ GroupMemoryBarrierWithGroupSync();
+ for(uint i=t;i<1024;i+=64){
+  uint pixel=i/128,row=i%128;float sum=0;
+  [loop]for(uint j=0;j<32;j++)sum+=q8(raw_prefix[pixel*32+j])*weights[512+row*32+j];
+  float a=half_round(sum),g=clamp(a,-4.0,4.0);
+  float poly=half_round(g*half_round(abs(g)*(-.055908203125)+.447265625)+.89453125);
+  raw_hidden[i]=q8(half_round(a*poly));
+ }
+ GroupMemoryBarrierWithGroupSync();
+ for(uint i=t;i<256;i+=64){
+  uint pixel=i/32,c=i%32;float a=half_round(raw_prefix[i]*weights[8704+c]);
+  [unroll]for(uint group=0;group<4;group++){float s=0;[loop]for(uint j=0;j<32;j++)s+=raw_hidden[pixel*128+group*32+j]*weights[4608+c*128+group*32+j];a=half_round(a+s);}
+  output[first*32+i]=RAW_OUTPUT?a:q8(a);
+ }
+}
+#endif
 float q8(float v){float a=abs(v),sg=v<0?-1:1;if(a<0.015625)return sg*round(a*512)/512;float e=floor(log2(a));float m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 #if NATIVE_NOISE_TABLE
 // Direct double -> half RNE. Casting to float first can double-round at ties.

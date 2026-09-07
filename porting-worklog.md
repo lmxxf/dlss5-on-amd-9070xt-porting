@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：普通C32共享前馈整网1.720秒
+
+- preblock_input_mix新增RAW_INPUT限定raw_ffn_shared：8像素一组，shared prefix256/hidden1024，64线程分工，两次同步，保留q8、half残差及四K32舍入。尾组按组拒绝，实际所有路径像素数整除8；2D dispatch按65535组展平。
+- NativePreblockRuntime严格DLSS5_TEST_SHARED_C32=0/1开关，仅raw_features时启用新入口，默认不变；RGB/noise/temporal输入前缀算法未改。
+- 独立native-network70-shared-c32实验session81149/PID42068 exit0，继承四个已验证优化开关，再启用共享C32。五轮off/on/reset最终全exact，下载两份GPU实际输出后analyze_native_network_profile.py逐字节原版核对通过。
+- 四暖轮1856.0057175→1720.227495ms，约7.3%下降；encoder1_4=130.9189、decoder_stage12=364.08605、post70=127.585805、preblock=193.22972ms。阶段变化是实测结果，不单独归因未改算法。10fps仍未达到。
+- 编译与diff检查通过，实验资产/证据位于release/native-network70-shared-c32及远端同名目录；当前游戏退出，安装DLL未改。
+
 ### 2026-09-07：QKV共享分块，整网降至1.856秒
 
 - 核对NativeVitBlock发现stage2为qkv，stage3才attention，纠正此前优化方向。native_vit_qkv新增project_tiled：8tokens×32行块、64线程每线程4行，输入和转置权重共享，保持32项H舍入及两512段最后H合并；normalize不变，无额外全局scratch。
