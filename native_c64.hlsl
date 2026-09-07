@@ -31,6 +31,27 @@ float F(float v){return LegacyF(v);}
   float a=H(input[p*CHANNELS+row]*weights[9*MATRIX+row]);[unroll]for(uint g=0;g<HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=middle[g*32+j]*weights[8*MATRIX+row*CHANNELS+g*32+j];a=H(a+s);}output[p*CHANNELS+row]=F(a);
  }
 }
+// Experimental split FFN: each thread computes one output channel rather than
+// carrying hidden[4*CHANNELS] and middle[CHANNELS] for a whole pixel.
+[numthreads(64,1,1)]void split_ffn_expand(uint3 id:SV_DispatchThreadID){
+ uint n=id.x+id.y*4194240u;if(n>=width*height*4*CHANNELS)return;
+ uint p=n/(4*CHANNELS),row=n%(4*CHANNELS);float a=0;
+ [unroll]for(uint g=0;g<HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*CHANNELS+g*32+j]*weights[row*CHANNELS+g*32+j];a=H(a+s);}
+ float gate=clamp(a,-4.0,4.0),poly=H(gate*H(abs(gate)*(-.055908203125)+.447265625)+.89453125);
+ output[n]=F(H(a*poly));
+}
+[numthreads(64,1,1)]void split_ffn_contract(uint3 id:SV_DispatchThreadID){
+ uint n=id.x+id.y*4194240u;if(n>=width*height*CHANNELS)return;
+ uint p=n/CHANNELS,row=n%CHANNELS;float a=0;
+ [loop]for(uint g=0;g<4*HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*4*CHANNELS+g*32+j]*weights[4*MATRIX+row*4*CHANNELS+g*32+j];a=H(a+s);}
+ output[n]=F(a);
+}
+[numthreads(64,1,1)]void split_ffn_project(uint3 id:SV_DispatchThreadID){
+ uint n=id.x+id.y*4194240u;if(n>=width*height*CHANNELS)return;
+ uint p=n/CHANNELS,row=n%CHANNELS;float a=H(feature[n]*weights[9*MATRIX+row]);
+ [unroll]for(uint g=0;g<HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*CHANNELS+g*32+j]*weights[8*MATRIX+row*CHANNELS+g*32+j];a=H(a+s);}
+ output[n]=F(a);
+}
 groupshared float queries[2048],keys[2048],values[2048];
 #include "native_half_square.hlsli"
 [numthreads(64,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){

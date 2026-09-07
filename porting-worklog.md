@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：三段FFN数值通过，继续细分核心耗时
+
+- native_c64新增默认关闭split_ffn：expand/contract/project三个GPU pass，按输出通道分工，保留每32项sum→H的顺序、gate多项式与原F量化；隐藏/中间量放GPU float buffer，无CPU中间传输。2D dispatch处理超过65535组的展开，索引范围检查，fast_fp8与split同时开启拒绝。
+- block52隔离session60334五轮baseline/候选对原版oracle及彼此位元全部不同0（2211840值/轮）。暖轮均值legacy143.39963ms/候选134.67038ms，但legacy有165.298ms离群点，其余多在134..138ms，不能直接将均值差当稳定收益。日志release/c64-split-ffn-bench/result.log保留，未启用生产。
+- NativeC64::Record增加可选时间戳指针，默认无额外GPU命令；细分FFN三个pass/attention/projection。新detail测试exe编译完成，session10117正在同隔离目录运行，独立detail.log不覆盖初轮结果，下一步据各pass耗时决定优化方向。
+
 ### 2026-09-07：快速量化核心数值通过，但无可靠速度收益
 
 - session2560五轮block52均baseline/fast对原版oracle不同0、彼此float位差0（每轮2211840值）。去首轮均值legacy137.2578ms、三元条件候选139.94405ms，约慢1.96%，不启用。
