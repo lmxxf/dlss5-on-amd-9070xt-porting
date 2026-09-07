@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整AMD时序网络五帧验收已启动，PID24280初始化中
+
+- 新建独立D:\DLSSNR-Lab\native-temporal-network70，复制既有完整网络系数/布局及首帧oracle，更新当前attention midpoint修正和时序shader。新exe从当前源码重新编译。input SHA d69fde8a94ed5e7a2391fe90887385ef9e32b5987a9b5ce4718fe8e833bb8119、temporal oracle SHA ca0e84326d6d9b7df10be8af5cc4b9b970ae4948c7a26b89e7a85dbe99dfd624，本地/AMD一致。
+- 新增run_native_temporal_network70.ps1，检查输入尺寸及同名存活进程，记录run.json，stdout/stderr分别落network日志。第一次PID23172立即消失、日志为空，两次检查均无进程，原因未证明；加入启动器WaitForExit保持存活后重试。
+- 当前有效运行：exec session86169、Windows PID24280，启动器等待其退出。最新两次CPU时间17.6875→84.375秒、Responding=True；日志已推进到native_c64.hlsl attention编译。尚无frame输出，不能称已通过。后续检查同一PID和日志/原session，禁止重启活进程。
+- 验收计划为完整0..70 GPU off/on/off/on/off五帧，分别逐值比较独立首帧/时序RGB。游戏DLL未改，运行仍是受控fixture，成功后还需实际历史生命周期与游戏验证。
+
 ### 2026-09-07：post70二次舍入修复，时序最终RGB参考与AMD独立后处理全exact
 
 - C32 reference可选debug导出最后projection前的feature/av。目标dot64=-9.0347900390625，half残差=-0.00036644935607910156；精确相加-9.035156488418579应half -9.0390625，先转float32落在中点却取-9.03125。原捕获值支持前者。
