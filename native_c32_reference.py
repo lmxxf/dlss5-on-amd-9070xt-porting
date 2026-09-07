@@ -30,7 +30,7 @@ def unpack_bytes(raw):
  scale=np.frombuffer(raw.tobytes(),'<f4',1,19552)[0]
  return w1,w2,*matrices,bias,scale,fs,ats
 
-def block(tiles,w,skip_first=True,raw_output=False):
+def block(tiles,w,skip_first=True,raw_output=False,debug=None):
  w1,w2,qw,kw,vw,pw,bias,scale,fs,ats=w
  expanded=H(F(tiles)@w1.T);gate=np.clip(expanded,-4,4)
  poly=H(gate*H(np.abs(gate)*np.float32(-.055908203125)+np.float32(.447265625))+np.float32(.89453125))
@@ -45,7 +45,9 @@ def block(tiles,w,skip_first=True,raw_output=False):
  den=denominator(exp)
  prob=F(H(exp*H(1/den)));av=np.zeros_like(tiles)
  for k in [0,32]:av=H(av+prob[:,:,k:k+32]@v[:,k:k+32])
- result=H((F(av)@pw.T)+H(feature*ats))
+ projection=F(av)@pw.T
+ result=H(projection.astype(np.float64)+H(feature*ats).astype(np.float64))
+ if debug is not None:debug.update(feature=feature,attention_value=av,projection_weights=pw,residual_scale=ats)
  return result if raw_output else F(result)
 
 if __name__=='__main__':

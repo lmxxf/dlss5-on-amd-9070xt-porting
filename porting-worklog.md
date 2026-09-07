@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：post70二次舍入修复，时序最终RGB参考与AMD独立后处理全exact
+
+- C32 reference可选debug导出最后projection前的feature/av。目标dot64=-9.0347900390625，half残差=-0.00036644935607910156；精确相加-9.035156488418579应half -9.0390625，先转float32落在中点却取-9.03125。原捕获值支持前者。
+- CPU保持原dot顺序，仅用float64相加half残差后直接转half；preblock_attention_core.hlsl用TwoSum恢复和的残差，在normal-half中点才向正确方向挪一个float ULP再H，subnormal路径不变。百万正常half结果域样本全一致，114个中点获修正。
+- session45660全post CPU与原版6635520个RGB值全部exact，oracle.f32正式生成；原投影输入多重集合差异也归零。prepare_native_post70_gpu增加--base，导出独立temporal后处理夹具。
+- session36304在AMD独立native-temporal-post70运行三帧，每帧6635520值different0/max0、无中间CPU传输；下载gpu.f32再cmp原oracle逐byte一致。这里是完整尺寸独立post70，不是整网或游戏验收。
+- 同源时序0..70对照已齐。下一步用native-network70-temporal.exe进行完整GPU off/on/reset五帧验收；新C32修正尚需整网回归，不能提前部署游戏DLL。run_nvidia_ui.ps1用户修改仍未提交。
+
 ### 2026-09-07：post70差异前移到投影输入的单个half特征
 
 - 新增debug_native_post_head.gdb/capture_native_post_head.py，session53088取得裁切post kernel block1,row0,warp1的PCc0a0/c100/c130/c140寄存器。仅观察原kernel，不改权重/计算。

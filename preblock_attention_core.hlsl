@@ -5,6 +5,19 @@ RWStructuredBuffer<float> output:register(u0);
 groupshared float queries[2048],keys[2048],values[2048];
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+float half_add_preserving_midpoint(float a,float b){
+ precise float sum=a+b;
+ precise float virtual_b=sum-a;
+ precise float error=(a-(sum-virtual_b))+(b-virtual_b);
+ uint bits=asuint(sum),magnitude=bits&0x7fffffffu;
+ // Preserve the residual when a normal-half midpoint was created by float32
+ // rounding. Other cases retain the existing conversion, including subnormals.
+ if(magnitude>=0x38800000u&&magnitude<0x47800000u&&(magnitude&0x1fffu)==0x1000u&&error!=0){
+  bool increase_bits=(error>0)==(sum>0);
+  sum=asfloat(increase_bits?bits+1:bits-1);
+ }
+ return H(sum);
+}
 float fast_exp(float x){float a=clamp(H(x*.044921875+1.30078125),1.03125,1.5693359375);uint b=f32tof16(a);return f16tof32(((b<<5)+0x8000u)&65535u);}
 #include "native_half_square.hlsli"
 [numthreads(64,1,1)]
@@ -48,7 +61,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  }
  [loop]for(uint c=0;c<32;c++){
   float a=0;[loop]for(uint j=0;j<32;j++)a+=av[j]*weights[3072+c*32+j];
-  float result=H(a+H(input[p*32+c]*weights[8193+c]));
+  float result=half_add_preserving_midpoint(a,H(input[p*32+c]*weights[8193+c]));
   output[p*32+c]=RAW_OUTPUT?result:F(result);
  }
 }

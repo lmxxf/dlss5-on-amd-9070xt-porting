@@ -3,9 +3,9 @@ from pathlib import Path
 import json,argparse
 import numpy as np
 from native_post70_reference import unpack
-p=argparse.ArgumentParser();p.add_argument('--game-extent',action='store_true');p.add_argument('--valid1080',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--game-extent',action='store_true');p.add_argument('--valid1080',action='store_true');p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));a=p.parse_args()
 if a.valid1080:a.game_extent=True
-base=Path('release/native-post70');source=Path('release/native-rgb-valid1080/post70') if a.valid1080 else base/('game' if a.game_extent else 'reference-512-2851');out=source/'amd' if a.valid1080 else base/('amd-game' if a.game_extent else 'amd');out.mkdir(exist_ok=False)
+base=Path('release/native-post70');source=a.base/'post70' if a.valid1080 else base/('game' if a.game_extent else 'reference-512-2851');out=source/'amd' if a.valid1080 else base/('amd-game' if a.game_extent else 'amd');out.mkdir(exist_ok=False)
 h,w=(1152,1920) if a.game_extent else (512,512)
 report=json.loads((source/'validation.json').read_text());assert report['different']==0 and report['values']==h*w*3
 if a.game_extent:assert report['finite']
