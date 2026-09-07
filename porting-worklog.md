@@ -6219,3 +6219,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC及能力门禁正常，PID34744退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact。暖567.012028ms、末5帧566.189546ms，对照并行exp上版574.629421ms，有收益。
 - post70_body24.759466ms、preblock attention15.376906ms、首C32 attention3.731706ms，分别优于上版26.136314/16.284466/4.196606ms。
 - 证据release/native-network70-c32-parallel-prob/，准备脚本release/prepare-c32-parallel-prob.ps1（ignored）；入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb。游戏DLL未更新，10fps未完成。
+# 2026-09-08：C32末端残差/写回全组并行，无收益
+
+- NATIVE_PARALLEL_C32_OUTPUT把64线程串行32通道写回改为全组按2048元素分工，scores/输入/skip系数映射不变，half_add_preserving_midpoint、H与RAW_OUTPUT/F原样；不增buffer或同步。
+- DXC及能力门禁通过，PID9176退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。
+- 暖568.236776ms、末5帧566.920302ms，不优于567.012028ms基线；post70_body25.59524ms、preblock attention16.140806ms、首C32 attention4.105394ms，均没有局部改善。明确不采用-ParallelOutput。
+- 证据release/native-network70-c32-parallel-output/，准备脚本release/prepare-c32-parallel-output.ps1（ignored）；显式复现run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb -ParallelOutput。有效配置保持不加最后参数，游戏DLL未更新，10fps未完成。

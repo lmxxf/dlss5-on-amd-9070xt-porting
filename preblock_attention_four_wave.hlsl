@@ -255,6 +255,14 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   float a=0;[unroll]for(uint group=0;group<2;group++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[group*32+key]*values[(group*32+key)*LDS_STRIDE+c];a=H(a+s);}av[c]=F(a);
  }
 #endif
+#if NATIVE_PARALLEL_C32_OUTPUT
+ for(uint i=t;i<2048;i+=C32_THREADS){
+  uint query=i/32,c=i%32,pixel=gid.x*64+query;
+  float a=scores[query*SCORE_ROW+c];
+  float result=half_add_preserving_midpoint(a,H(input[pixel*32+c]*weights[8193+c]));
+  output[pixel*32+c]=RAW_OUTPUT?result:F(result);
+ }
+#else
  if(t<64)[loop]for(uint c=0;c<32;c++){
 #if NATIVE_WAVE_C32_PROJECTION
   float a=scores[t*SCORE_ROW+c];
@@ -264,4 +272,5 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   float result=half_add_preserving_midpoint(a,H(input[p*32+c]*weights[8193+c]));
   output[p*32+c]=RAW_OUTPUT?result:F(result);
  }
+#endif
 }
