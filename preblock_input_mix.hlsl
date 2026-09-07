@@ -1,4 +1,7 @@
 // Controlled single-color-texture preblock input mix. Lab oracle uses CTA0
+#ifndef NATIVE_PREFIX_ONLY
+#define NATIVE_PREFIX_ONLY 0
+#endif
 // for every 8x8 tile. Live texture transforms/global seed contract not yet bound.
 StructuredBuffer<float> weights : register(t0);
 StructuredBuffer<float> input : register(t1);
@@ -138,7 +141,7 @@ void main(uint3 id:SV_DispatchThreadID){
 #endif
  }
 #endif
-#if FULL_FFN
+#if FULL_FFN && !NATIVE_PREFIX_ONLY
  float hidden[128];
  [loop]for(uint row=0;row<128;row++){
   float sum=0;[loop]for(uint i=0;i<32;i++)sum+=q8(prefix[i])*weights[512+row*32+i];
@@ -158,6 +161,6 @@ void main(uint3 id:SV_DispatchThreadID){
   output[p*32+c]=RAW_OUTPUT?result:q8(result);
  }
 #else
- [unroll]for(uint c=0;c<32;c++)output[p*32+c]=q8(prefix[c]);
+ [unroll]for(uint c=0;c<32;c++)output[p*32+c]=NATIVE_PREFIX_ONLY?prefix[c]:q8(prefix[c]);
 #endif
 }

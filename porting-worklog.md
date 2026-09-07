@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：F16累加和首层拆分实验未通过采用标准
+
+- matrix_half_accumulate使用F16 accumulator MultiplyAccumulate代替每K32软件H。session24540 exit0，全8847360值finite，但438687不同、max2/MAE0.00118217093/RMSE0.0163191，0.697196ms相对0.732240ms收益小，不采纳。
+- SPLIT_PREBLOCK_FFN仅在RGB/noise首层启用：inputmix输出未量化prefix，复用raw buffer给Wave FFN，随后raw再转UAV供attention，增加专用packed FFN权重/descriptor/PSO，无新全图缓冲；原混合代码未改。额外preblock_detail时间戳需合计比较，不把旧preblock标签缩短当加速。
+- session87182/PID36096 exit1：首帧6635518/6635520值不同。最终范围0.10000008..0.8999999、均值0.4998785，对参考MAE0.0313366/max0.1968994/RMSE0.0396041，接近原输入而不是已验神经结果。未声称数值或速度通过，不按有界硬件误差放行。
+- 证据release/native-network70-split-preblock（stdout/stderr/实际输出）。下一步隔离检查prefix与Wave FFN接口及中间结果，原因尚未定位。默认关闭、游戏安装未改，有效基线746ms，10fps未达到。
+
 ### 2026-09-08：C32 AV及projection Wave通过，整网746ms
 
 - WAVE_C32_AV依赖Wave QKV/scores；exp/prob使用Q/K已闲置half区按key-major存储，无每线程ex/prob数组；原softmax归约顺序不变。QK评分后同步、概率准备后同步，AV两K32矩阵结果每段H，再F。

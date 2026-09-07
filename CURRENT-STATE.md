@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新两个实验未采纳：直接F16矩阵累加0.697196ms但438687/8847360值不同（max2），收益小，保留exact方案。首层prefix→Wave FFN拆分（SPLIT_PREBLOCK_FFN）首帧6635518/6635520最终值不同，输出范围0.1..0.9、接近原输入，MAE0.03134，不能当硬件小误差。默认关闭，数据release/native-network70-split-preblock/；下一步单独核对prefix与FFN接点，当前有效基线仍约746ms，游戏安装未改。
+
 最新C32完整Wave注意力（QKV/QK/AV/projection）15帧exact，暖745.959355ms、末5帧744.382106ms。AV模式先将exp/prob转置存入已闲置Q/K half区（不改softmax求和），V存FP8格点half，后续两K32 H；投影仍保留最后half_add_preserving_midpoint。AV单独约752.19737ms，额外投影收益小。初版F32 B矩阵Cast到F16在初始化存取违例，已移除；直接half V方案恢复，故障证据保留。见release/native-network70-wave-c32-av和-c32-full-attn。游戏未改，10fps未达到。
 
 最新普通C32 Wave FFN＋初始化无损打包本地权重：15帧exact，暖均762.82839ms、末5帧756.13036ms。首个C32 FFN9.30389→1.90317ms；每组重复转权重版约867ms无收益。WAVE_C32_FFN=1及WAVE_C32_FFN_LOCAL=1启用，仅raw_features，RGB/noise前缀未改。证据release/native-network70-c32-ffn-local/。新增C32首层细分计时，encoder1_4标签现不含该首层全部区间，比较须加c32_probe*，不能误报标签缩短为加速。游戏未改，10fps未达到。

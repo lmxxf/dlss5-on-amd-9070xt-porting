@@ -63,7 +63,7 @@ public:
   try{
    timestamps.Reset();
    submit.Submit([&](ID3D12GraphicsCommandList*c){
-    timestamps.Mark(c,"start");pre.Record(c,seed,false,temporal_enabled);timestamps.Mark(c,"preblock");
+    timestamps.Mark(c,"start");pre.Record(c,seed,false,temporal_enabled,profile?&timestamps:nullptr,"preblock_detail");timestamps.Mark(c,"preblock");
     for(UINT i=0;i<4;i++)c32[i].Record(c,profile&&i==0?&timestamps:nullptr);ds4.Record(c);timestamps.Mark(c,"encoder1_4");
     for(auto&s:c64)s.Record(c);ds8.Record(c);timestamps.Mark(c,"encoder5_8");
     for(auto&s:c128)s.Record(c);ds14.Record(c);timestamps.Mark(c,"encoder9_14");
