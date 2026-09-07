@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+共享exp/prob候选15帧exact但未采纳：run_multihead_av_network.ps1 -SharedProb编译NATIVE_SHARED_PROB=1，复用scores行存exp，概率直接写死Q/K区，去掉线程ex/prob数组。首C64 attention3.54480→3.21213ms，但全网暖587.486075ms、末5帧592.152464ms，未优于586.27370ms基线。默认不加SharedProb，当前有效配置不变。证据release/native-network70-shared-prob；不宣称实际测得寄存器spill/银行冲突，仅记录算法及计时。游戏未改，10fps未达到。
+
 最新C64/C128/C256 Wave AV通过15帧最终exact，暖586.27370ms、末5帧588.739364ms。WAVE_MULTIHEAD_AV显式选择独立native_wave_av[_c64/_c128].cso，复用死Q/K存两段K32概率，V为原F8格点half，H/F与概率求和顺序不动；无新增全图scratch。首C64 attention4.07296→3.54480ms，收益有限，归一化/概率阶段仍待细查。证据release/native-network70-multihead-av，运行run_multihead_av_network.ps1继承parallel split配置。游戏未更新，10fps未达到。
 
 最新C64首层细分计时15帧exact，暖601.95719ms（仅增加观测，不是提速）。attention4.07296ms、FFN收缩2.00431ms、展开0.93054ms，pack/crop0.37155/0.34641ms，QKV矩阵0.21472ms。下一步优先原native_c64.hlsl中仍串行的prob×V；只QK已Wave，AV还没换。证据release/native-network70-c64-detail。encoder5_8标签现在排除了首层c64_probe*，必须加回这些区间才能与旧标签比较，不能报27.8ms为收益。游戏未改，10fps未达到。

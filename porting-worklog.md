@@ -6111,3 +6111,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - MinGW/DXC编译通过；坐标覆盖检查确认64×32每元素只写一次。远程PID26140退出0，15帧最终different0，下载两份完整结果对独立原版参考byte-exact。
 - 暖586.2737007ms、末5帧588.739364ms；上一细分计时601.95719ms，首C64 attention4.07296→3.544797ms。AV收益小于预期，剩余归一化/指数/分母及局部数组代价需后续定位，不能宣称注意力已优化完。
 - 证据release/native-network70-multihead-av/；准备及manifest更新脚本在release/（ignored）。新增运行入口run_multihead_av_network.ps1。测试后本地仅追加非法宏组合的#error编译保护，不改变有效分支计算；测试shader版本保留远程及manifest。游戏DLL未更新，目标10fps未达到。
+# 2026-09-08：共享概率暂存实验，整体无收益
+
+- 新增NATIVE_SHARED_PROB实验分支，仅-SharedProb显式编译开启；复用scores本线程64元素行保存exp，原分母求和保持，prob不再落局部数组而直接量化写queries/keys。每线程只覆盖自己的score行，QK完成后已有全组barrier；AV读取前保留全组barrier。
+- 原始ex/prob路径保留，默认SharedProb关闭；未增加共享容量或全图buffer。优化意图是减少局部数组压力，未测ISA寄存器/spill，不把意图当作硬件结论。
+- PID29688退出0，15帧最终different0；下载两份GPU结果对独立原版参考byte-exact。暖587.486075ms、末5帧592.152464ms，首C64 attention3.212126ms（旧3.544797ms）。局部有改善但整网不优于586.273701ms，故不纳入有效配置、不宣称提速。
+- 证据release/native-network70-shared-prob/；准备run-shared-prob.ps1及launch-shared-prob.ps1在release/（ignored）。复现用run_multihead_av_network.ps1 -Folder目标目录 -SharedProb。游戏DLL未改，10fps仍未完成。

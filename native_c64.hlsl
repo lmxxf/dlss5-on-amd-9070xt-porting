@@ -158,25 +158,38 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
+#if NATIVE_SHARED_PROB && NATIVE_WAVE_AV
+ #define EXP_AT(x) scores[t*64+(x)]
+#else
  float ex[64],prob[64];
+ #define EXP_AT(x) ex[x]
+#endif
  [loop]for(uint key=0;key<64;key++){
 #if NATIVE_WAVE_SCORES
   float s=scores[t*64+key];
 #else
   float s=0;[loop]for(uint c=0;c<32;c++)s+=queries[t*ATTN_STRIDE+c]*keys[key*ATTN_STRIDE+c];
 #endif
-  float score=H(s+weights[4*MATRIX+head*4096+t*64+key]);uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));ex[key]=f16tof32(((bits<<5)+0x8000u)&65535u);
+  float score=H(s+weights[4*MATRIX+head*4096+t*64+key]);uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));EXP_AT(key)=f16tof32(((bits<<5)+0x8000u)&65535u);
  }
  float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
   float total=0;[unroll]for(uint lane=0;lane<4;lane++){
-   uint base=odd+(lane%2)*2+(lane/2)*8;float partial=H(ex[base]+ex[base+16]);
-   partial=H(partial+H(ex[base+4]+ex[base+20]));partial=H(partial+H(ex[base+32]+ex[base+48]));partial=H(partial+H(ex[base+36]+ex[base+52]));total=lane==0?partial:H(total+partial);
+   uint base=odd+(lane%2)*2+(lane/2)*8;float partial=H(EXP_AT(base)+EXP_AT(base+16));
+   partial=H(partial+H(EXP_AT(base+4)+EXP_AT(base+20)));partial=H(partial+H(EXP_AT(base+32)+EXP_AT(base+48)));partial=H(partial+H(EXP_AT(base+36)+EXP_AT(base+52)));total=lane==0?partial:H(total+partial);
   }parity[odd]=total;
  }
- float inv=H(1/H(parity[0]+parity[1]));[loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
+ float inv=H(1/H(parity[0]+parity[1]));
+#if !(NATIVE_SHARED_PROB && NATIVE_WAVE_AV)
+ [loop]for(uint key=0;key<64;key++)prob[key]=F(H(EXP_AT(key)*inv));
+#endif
 #if NATIVE_WAVE_AV
  // Q/K are dead after scores; reuse their rows for the two K32 probability blocks.
+#if NATIVE_SHARED_PROB
+ for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(F(H(EXP_AT(c)*inv)));keys[t*32+c]=float16_t(F(H(EXP_AT(32+c)*inv)));}
+#else
  for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(prob[c]);keys[t*32+c]=float16_t(prob[32+c]);}
+#endif
+#undef EXP_AT
  GroupMemoryBarrierWithGroupSync();
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  for(uint qr=t/32;qr<4;qr+=2)for(uint col=0;col<32;col+=16){
