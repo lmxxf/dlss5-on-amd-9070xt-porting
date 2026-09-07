@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：共享FFWD完整尺寸整网通过，再减约10.9%
+
+- 独立native-network70-shared-ffwd复制上一轮完整f32/i32与shader，仅替换native_split.hlsl及新exe、对应manifest条目；TILED_C64/SPLIT_PROJECTION/SPLIT_FFWD均1，PostShift3、分段profile，游戏无运行。
+- session2674/PID1808 exit0。下载stdout/stderr和实际GPU两输出后analyze_native_network_profile.py --root release/native-network70-shared-ffwd通过：五轮history0/1/0/1/0、6635520值均different0，两结果逐字节等于独立原版。
+- 四暖轮2439.2734975→2173.7783275ms；encoder23_head251.35409→106.53807ms。当前最重区间decoder_stage12=402.7347225、preblock200.52805、post70=172.3258375、encoder1_4=171.74482ms。非游戏FPS，10fps目标未达到。
+- /tmp/native-network70-shared-ffwd.exe为本轮构建，远端独立目录留存全部运行资产。游戏安装版未改。下一方向ViT attention单线程两份640浮点暂存，先检查共享分工机会；未启动该实验。
+
 ### 2026-09-07：目标提高到10fps，共享FFWD隔离实验通过
 
 - NativeSplit::Record新增可选四阶段timestamp，默认无计时。d3d12_native_split_test五轮测试同时输出各段GPU时间，不包含读回与CPU比较。
