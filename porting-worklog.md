@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：普通shader替代路径——ViT矩阵驻留无收益
+
+- 自动goal不是换驱动许可，因此不安装驱动；继续无需新授权的独立算子实验。NativeVitLinear以严格DLSS5_TEST_RESIDENT_VIT_LINEAR=1将非decoder权重拷贝到DEFAULT，默认原路径，提交边界不变。
+- 独立native-network70-resident-vit，session32660/PID37408 exit0，五轮off/on/reset最终下载后逐字节原版一致。暖轮1563.7835275ms，慢于基线1469.7617425ms，不采纳到游戏版。
+- 证据release/native-network70-resident-vit/profile-validation.json。编译/diff检查通过；当前游戏与测试均退出，驱动未改，硬件矩阵路线仍等待真人确认。
+
 ### 2026-09-07：换驱动等待真人确认，自动goal不当授权
 
 - 只读检查preview-driver/Setup.exe仍存在（1041672字节），Authenticode Valid；driver-backup/32.0.31041.1004目录仍在。没有运行安装器、修改注册表、重启或改变当前游戏DLL。
