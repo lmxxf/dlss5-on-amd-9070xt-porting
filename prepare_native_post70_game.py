@@ -4,14 +4,14 @@ import subprocess,json,argparse
 import numpy as np
 from native_c32_reference import F
 from encode_tinlayout_global import quantize
-p=argparse.ArgumentParser();p.add_argument('--valid1080',action='store_true');args=p.parse_args()
-root=Path('release/native-rgb-valid1080/post70' if args.valid1080 else 'release/native-post70/game');root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--valid1080',action='store_true');p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+root=args.base/'post70' if args.valid1080 else Path('release/native-post70/game');root.mkdir(exist_ok=False)
 rng=np.random.default_rng(3017);h,w=1152,1920
 main=F(rng.normal(0,.25,(h//2,w//2,32)).astype(np.float32));skip=F(rng.normal(0,.25,(h,w,32)).astype(np.float32))
 color=np.ones((h,w,4),np.float32);color[:,:,:3]=rng.uniform(.1,.9,(h,w,3)).astype(np.float32)
 if args.valid1080:
  from decode_tinlayout_global import e4m3fn
- base=Path('release/native-rgb-valid1080');stage=base/'decoder-c32/decoder-block69'
+ base=args.base;stage=base/'decoder-c32/decoder-block69'
  assert json.loads((stage/'validation.json').read_text())['status']=='pass'
  main=np.fromfile(stage/'oracle.f32',np.float32).reshape(h//2,w//2,32)
  basis=np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048);mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()

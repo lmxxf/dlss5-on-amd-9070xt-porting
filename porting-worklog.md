@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：时序decoder66..69全exact，最终post70参考剩1值差异
+
+- session63565验证encoder1..4主输出全exact并导出同源block4 skip；中间half转换出现overflow warning，但报告最终finite且different0，不隐藏此警告。upsample66及decoder67..69各17694720值与原版全exact。
+- post70准备与验证工具增加--base。同源original.main作为block0 skip，input.f32作为反射底色，decoder69/oracle.f32作为main。session78419生成原post输出并完成CPU逐条带对照，6635520个RGB值仅1值不同，max_abs3.0517578125e-5，finite，但严格失败，未生成oracle.f32。
+- 验证器增加first_mismatches，session55911重现同一差异：x232/y454/channel1，原0.14323392510414124，参考0.14320340752601624。需要定位此差异，不放宽标准、不将旧单帧oracle或CPU结果替换原版验收。
+- 尚未启动AMD完整时序网络或更新游戏DLL。下一步审计post70该像素的中间步骤，并补原版重放稳定性检查。
+
 ### 2026-09-07：同源时序decoder56..65原版/CPU全通过
 
 - session66510验证encoder9..14主输出全exact，使用block14-main.f32与decoder55/oracle.f32生成upsample56，4423680值全exact；继续57..61五层均different0，finite，原shift2/0/3/1/2。
