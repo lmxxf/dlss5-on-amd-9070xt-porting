@@ -26,10 +26,20 @@ static std::atomic<bool>barrier_install_attempted{};
 static void STDMETHODCALLTYPE native_barriers(ID3D12GraphicsCommandList*c,UINT count,const D3D12_RESOURCE_BARRIER*b){
  original_barriers(c,count,b);
  if(!b)return;auto target=tracked_output.load();if(!target)return;
- for(UINT i=0;i<count;i++)if(b[i].Type==D3D12_RESOURCE_BARRIER_TYPE_TRANSITION&&reinterpret_cast<uint64_t>(b[i].Transition.pResource)==target&&events.fetch_add(1)<8192){
+ for(UINT i=0;i<count;i++){
+  const auto&v=b[i];
+  bool relevant=v.Type==D3D12_RESOURCE_BARRIER_TYPE_TRANSITION?reinterpret_cast<uint64_t>(v.Transition.pResource)==target:
+   v.Type==D3D12_RESOURCE_BARRIER_TYPE_UAV?(!v.UAV.pResource||reinterpret_cast<uint64_t>(v.UAV.pResource)==target):
+   v.Type==D3D12_RESOURCE_BARRIER_TYPE_ALIASING?(reinterpret_cast<uint64_t>(v.Aliasing.pResourceBefore)==target||reinterpret_cast<uint64_t>(v.Aliasing.pResourceAfter)==target):false;
+  if(!relevant||events.fetch_add(1)>=8192)continue;
   AcquireSRWLockExclusive(&lock);
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
-   fprintf(f,"pid=%lu thread=%lu tick=%llu kind=native_output_barrier list=%p resource=%llx before=%u after=%u subresource=%u flags=%u\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),c,(unsigned long long)target,unsigned(b[i].Transition.StateBefore),unsigned(b[i].Transition.StateAfter),b[i].Transition.Subresource,unsigned(b[i].Flags));fclose(f);
+   if(v.Type==D3D12_RESOURCE_BARRIER_TYPE_TRANSITION)
+    fprintf(f,"pid=%lu thread=%lu tick=%llu kind=native_output_barrier list=%p resource=%llx before=%u after=%u subresource=%u flags=%u\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),c,(unsigned long long)target,unsigned(v.Transition.StateBefore),unsigned(v.Transition.StateAfter),v.Transition.Subresource,unsigned(v.Flags));
+   else if(v.Type==D3D12_RESOURCE_BARRIER_TYPE_UAV)
+    fprintf(f,"pid=%lu thread=%lu tick=%llu kind=native_output_uav list=%p resource=%p global=%u no_state_transition=1\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),c,v.UAV.pResource,v.UAV.pResource?0u:1u);
+   else fprintf(f,"pid=%lu thread=%lu tick=%llu kind=native_output_alias list=%p before_resource=%p after_resource=%p\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),c,v.Aliasing.pResourceBefore,v.Aliasing.pResourceAfter);
+   fclose(f);
   }ReleaseSRWLockExclusive(&lock);
  }
 }

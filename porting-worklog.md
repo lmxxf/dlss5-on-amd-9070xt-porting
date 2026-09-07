@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：补齐UAV/alias观察，实机FFX末尾具名UAV同步确认
+
+- 原生barrier观察器按Type分别处理transition、具名/全局UAV、涉及当前输出的alias，避免读错union字段；UAV记录明确no_state_transition=1。Windows转发/过滤测试覆盖匹配、不匹配、全局UAV及alias并通过，保留8192条上限。
+- 正常退出32428、备份.before-barrier-kinds后部署，新PID35544 Responding。order-35544.txt记录FFX输出ea56f8a0在native list2497b480上两次具名UAV barrier，紧接着ffx_end（首帧tick588770078/093→109）；后续帧同样可见。此前只记录transition所以遗漏此信息，并非所有原生barrier都不可见。
+- 具名UAV barrier本身不转换状态；结合FFX声明及自然提交边界，可推进受控的提交后读取/还原测试来验证插入状态，而不是直接塞入重网络。全局UAV不得当成当前纹理状态证明。尚未进行GPU读回或部署神经渲染。
+
 ### 2026-09-07：原生barrier观察器实机部署并取得转换记录
 
 - 确认工作树仍在d07c135、仅用户run_nvidia_ui.ps1脏；正常退出17584，备份.before-native-barrier后部署已构建观察器。新PID32428 Responding，native_barrier_hook status0/native_list24f3b930，日志保存order-32428.txt。

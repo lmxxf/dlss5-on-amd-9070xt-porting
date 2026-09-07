@@ -18,5 +18,10 @@ int main(){
  if(execute_calls!=1||seen_count!=1||seen_lists!=&list||list!=reinterpret_cast<ID3D12CommandList*>(0x5678))return 7;
  original_barriers=fake_barriers;D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={reinterpret_cast<ID3D12Resource*>(0x123),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};
  native_barriers(nullptr,1,&b);if(seen_barriers!=&b||seen_barrier_count!=1||b.Transition.StateBefore!=D3D12_RESOURCE_STATE_UNORDERED_ACCESS||b.Transition.StateAfter!=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)return 8;
- puts("submission observer forwards original result/payload; events do not suppress work; live ordering not proven");return 0;
+ b={};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;b.UAV.pResource=reinterpret_cast<ID3D12Resource*>(0x123);previous=events.load();native_barriers(nullptr,1,&b);
+ if(events.load()!=previous+1||b.UAV.pResource!=reinterpret_cast<ID3D12Resource*>(0x123))return 9;
+ b.UAV.pResource=reinterpret_cast<ID3D12Resource*>(0x456);previous=events.load();native_barriers(nullptr,1,&b);if(events.load()!=previous)return 10;
+ b.UAV.pResource=nullptr;native_barriers(nullptr,1,&b);if(events.load()!=previous+1)return 11;
+ b={};b.Type=D3D12_RESOURCE_BARRIER_TYPE_ALIASING;b.Aliasing.pResourceAfter=reinterpret_cast<ID3D12Resource*>(0x123);previous=events.load();native_barriers(nullptr,1,&b);if(events.load()!=previous+1||b.Aliasing.pResourceBefore)return 12;
+ puts("submission observer forwarding and transition/UAV/alias filtering pass; live ordering not proven");return 0;
 }
