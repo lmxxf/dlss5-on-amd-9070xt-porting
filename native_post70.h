@@ -20,13 +20,14 @@ class NativePost70 {
 public:
  NativePost70()=default;NativePost70(const NativePost70&)=delete;
  ~NativePost70(){for(auto*r:{main_input,skip_input,color_input,merged,output,coefficients[0],coefficients[1]})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
- void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f){
+ void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f,UINT shift=0){
+  if(shift>3)throw std::runtime_error("post shift contract");
   if(main_input||!d||!main||!skip||!color||width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16||scales.size()!=64||head.size()!=96)throw std::runtime_error("post70 contract");
   UINT64 pixels=UINT64(width)*height;
   if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<pixels*32*4||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
   main_input=main;skip_input=skip;color_input=color;for(auto*r:{main_input,skip_input,color_input})r->AddRef();geometry[0]=width;geometry[1]=height;std::memcpy(&geometry[2],&input_scale,4);
   merged=buffer(d,pixels*32*4);output=buffer(d,pixels*3*4);coefficients[0]=buffer(d,scales.size()*4,&scales);coefficients[1]=buffer(d,head.size()*4,&head);
-  body.Create(d,merged,width,height,0,ffn,attention,dir,true);
+  body.Create(d,merged,width,height,shift,ffn,attention,dir,true);
   D3D12_ROOT_PARAMETER params[5]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}
   params[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[4].Constants={0,0,3};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=5;desc.pParameters=params;
   ID3DBlob*blob=nullptr,*error=nullptr;ck(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));ck(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();

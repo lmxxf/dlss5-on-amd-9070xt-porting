@@ -21,13 +21,17 @@ def aligned(a,b,acc,acc_exponent_offset=1,truncate_acc=False):
         if truncate_acc:initial=np.trunc(initial/quantum)*quantum
         result[start:start+4096]=H(np.trunc(product/quantum[...,None]).sum(-1)*quantum+initial)
     return result
-def post(main,skip,color,params,input_scale=.03125):
+def post(main,skip,color,params,input_scale=.03125,origin=(0,0)):
     h,w,c=skip.shape
     if c!=32 or h%16 or w%16 or main.shape!=(h//2,w//2,32) or color.shape!=(h,w,3):raise ValueError('post70 shape')
     body,sm,ss,head=params
     merged=H(H(np.repeat(np.repeat(main,2,0),2,1)*sm)+skip*ss)
-    tiles=merged.reshape(h//8,8,w//8,8,32).transpose(0,2,1,3,4).reshape(-1,64,32)
-    features=block(tiles,body,raw_output=True).reshape(h//8,w//8,8,8,32).transpose(0,2,1,3,4).reshape(h*w,32)
+    if len(origin)!=2 or any(v not in (0,-4) for v in origin):raise ValueError('unverified post origin')
+    px,py=-origin[0],-origin[1]
+    merged=np.pad(merged,((py,py),(px,px),(0,0)))
+    hh,ww=merged.shape[:2]
+    tiles=merged.reshape(hh//8,8,ww//8,8,32).transpose(0,2,1,3,4).reshape(-1,64,32)
+    features=block(tiles,body,raw_output=True).reshape(hh//8,ww//8,8,8,32).transpose(0,2,1,3,4).reshape(hh,ww,32)[py:py+h,px:px+w].reshape(h*w,32)
     value=aligned(features[:,:16],head[:,:16],np.zeros((h*w,3),np.float32))
     value=aligned(features[:,16:],head[:,16:],value)
     base=np.float32(color.reshape(-1,3).astype(np.float64)*.125-.0625)

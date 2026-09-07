@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机post原点差异有实质影响，shift参考小样本全exact
+
+- run_original_post.cpp新增严格0/-4的DLSS5_POST_TEST_ORIGIN，仅native实验模式可用，默认零原点不变。相同16×16输入原点改(-4,-4)，768个RGB值全部改变，max_abs0.030853271；重编译后的零原点控制仍与旧输出逐byte一致。
+- native_post70_reference.post新增origin，按负原点在merged特征两侧补零、8×8分窗计算后裁回。check_native_post_origin.py独立运行两组原版oracle，CPU两组different0/max0/finite。该实验只隔离原点，不包含live texture extent/word70合同。
+- NativePost70::Create增加可选shift（默认0、范围0..3），转给已有C32 reframe/body，语法检查通过；尚未GPU执行这个新shift接口，也未更改完整网络默认。
+- 本轮未改游戏。下一步GPU shift3及完整有效1080p纹理合同验证，同时继续历史生命周期调查；不能再把零原点受控验收当实机post等价证明。
+
 ### 2026-09-07：实机后端表确认，同时发现post70运行标量与受控默认不同
 
 - 正常退出PID11188并同步，备份旧参数探针为.before-backend-snapshot，部署e82bcd7d版。新PID26572 NR count1/60成功。backend快照确认vtable RVA0xb6988，slot168→5c0f0、slot170→5c070，确为此前候选表，不能再以“可能选错后端”解释零命中。

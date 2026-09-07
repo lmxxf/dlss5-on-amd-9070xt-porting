@@ -145,6 +145,11 @@ int main(int argc, char **argv) {
     std::memcpy(params + 0x18, &weights_device, 8);
     std::memcpy(params + 0x20, &height, 4);
     std::memcpy(params + 0x24, &width, 4);
+    if(const char*origin_text=std::getenv("DLSS5_POST_TEST_ORIGIN")){
+        if(!native_mode||(std::strcmp(origin_text,"0")&&std::strcmp(origin_text,"-4")))return 2;
+        const int origin=std::atoi(origin_text);
+        std::memcpy(params+0x28,&origin,4);std::memcpy(params+0x2c,&origin,4);
+    }
     std::memcpy(params + 0x30, &input_scale, 4);
     std::memcpy(params + 0x34, &rgb_mode, 4);
     if (texture_mask & 1) std::memcpy(params + 0x38, &texture, 8);
