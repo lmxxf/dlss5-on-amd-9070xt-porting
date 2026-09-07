@@ -14,7 +14,7 @@ class NativeActualDecoder69 {
 public:
  void Create(ID3D12Device*d,ID3D12Resource*vit38,ID3D12Resource*skip30,
              ID3D12Resource*skip22,ID3D12Resource*skip14,ID3D12Resource*skip8,
-             ID3D12Resource*skip4,const std::wstring&dir){
+             ID3D12Resource*skip4,const std::wstring&dir,NativeMatrixWorkspace*workspace=nullptr){
   if(created)throw std::runtime_error("actual decoder already created");
   auto read=[&](const std::wstring&name){
    std::ifstream f((dir+L"\\"+name).c_str(),std::ios::binary|std::ios::ate);
@@ -37,8 +37,8 @@ public:
   }
   up48.Create(d,source,skip22,2160,512,256,false,read(L"block48-weights.f32"),dir,true);
   body48.Create(d,up48.Output(),120,72,NativeDecoderShift(48),read(L"block48-ffn.f32"),
-                read(L"block48-attention.f32"),dir,false,256);
-  tail.Create(d,body48.Output(),skip14,skip8,skip4,dir,true);created=true;
+                read(L"block48-attention.f32"),dir,false,256,false,workspace);
+  tail.Create(d,body48.Output(),skip14,skip8,skip4,dir,true,workspace);created=true;
  }
  // Callers may submit and fence between these stages without CPU feature copies.
  UINT StageCount()const{return 13;}

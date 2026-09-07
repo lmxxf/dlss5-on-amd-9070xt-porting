@@ -10,6 +10,7 @@
 // Actual processing extent, with externally supplied GPU RGB tiles and HWC base.
 // No fixture activations, oracles, game command lists, or CPU pixel readbacks.
 class NativeActualNetwork70 {
+ NativeMatrixWorkspace matrix_workspace;bool share_matrix{};
  NativePreblockRuntime pre;
  NativeC32Stage c32[4];NativeC64Shift c64[4],c128[6],c256[8];
  NativeC32Downsample ds4,ds8,ds14,ds22,head;
@@ -35,12 +36,13 @@ public:
   }
   device=d;device->AddRef();auto read=[&](const std::wstring&name){return Read(dir+L"\\"+name);};
   if(const wchar_t*v=_wgetenv(L"DLSS5_NETWORK_GPU_PROFILE")){if(wcscmp(v,L"1"))throw std::runtime_error("invalid network profile flag");profile=true;timestamps.Create(d);}
+  if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_SHARED_MATRIX_WORKSPACE")){if(wcscmp(s,L"0")&&wcscmp(s,L"1"))throw std::runtime_error("invalid shared matrix workspace flag");share_matrix=!wcscmp(s,L"1");if(share_matrix)matrix_workspace.Create(d,248ull*152*128);}
   pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
   const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir);source=c32[i].Output();}
   ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
   auto group=[&](NativeC64Shift*layers,UINT count,UINT first,UINT w,UINT h,UINT channels,NativeC32Downsample&ds){
-   for(UINT i=0;i<count;i++){auto p=L"block"+std::to_wstring(first+i);layers[i].Create(d,source,w,h,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,i+1==count,channels);source=layers[i].Output();}
+   for(UINT i=0;i<count;i++){auto p=L"block"+std::to_wstring(first+i);layers[i].Create(d,source,w,h,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,i+1==count,channels,false,share_matrix?&matrix_workspace:nullptr);source=layers[i].Output();}
    ds.Create(d,source,w,h,0,read(L"block"+std::to_wstring(first+count-1)+L"-ds.f32"),dir,true,channels);source=ds.Output();
   };
   group(c64,4,5,480,288,64,ds8);group(c128,6,9,240,144,128,ds14);group(c256,8,15,120,72,256,ds22);
@@ -48,7 +50,7 @@ public:
   head.Create(d,source,60,36,0,read(L"head-matrix.f32"),dir,true,512);
   auto rawmap=read(L"hwc-to-vit.i32");if(rawmap.size()!=655360)throw std::runtime_error("network bridge map size");std::vector<UINT>map(rawmap.size());std::memcpy(map.data(),rawmap.data(),map.size()*4);bridge.Create(d,head.Output(),map,dir);source=bridge.Output();
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(31+i)+L"-";vit[i].Create(d,source,640,read(p+L"expand.f32"),read(p+L"contract.f32"),read(p+L"qkv.f32"),read(p+L"projection.f32"),dir);source=vit[i].Output();}
-  decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir);
+  decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
   post.Create(d,decoder.Output(),pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift);ready=true;
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.

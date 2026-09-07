@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：图级矩阵工作区共享，节省1.25GB并恢复性能
+
+- NativeMatrixWorkspace由NativeActualNetwork70持有并先于借用层声明，保证析构顺序；初始化一次分配packed与qkv，容量248×152×128，Validate检查设备与容量。逐层AddRef借用，不做进程全局共享。
+- NativeC64Shift/ActualDecoder/Tail显式传workspace；仅matrix_qkv启用的层借用。packed/qkv读写状态由workspace跟踪，不用每层recorded猜共享资源状态；跨层保留输出/skip原样，GPU失败后原网络poison机制禁止继续。
+- DLSS5_TEST_SHARED_MATRIX_WORKSPACE=1默认关闭。独立15帧session64569/PID4160 exit0，最终实际GPU两输出下载后逐字节原版一致。
+- local最终14468567040字节，预算15373082624；对比独占版15721615360节省1253048320。nonlocal819978240不变。同配置14暖轮1527.0710707→1354.1084021ms，末5帧1526.313064→1344.924816ms。不能把nonlocal等同全部分页，但预算压力与非局部回退得到实测改善。
+- 证据release/native-network70-shared-workspace/profile-validation.json及memory日志。编译/diff检查通过，游戏安装不变。后续矩阵C64尚需扩容量及验证，10fps未达到。
+
 ### 2026-09-07：15帧显存预算诊断，矩阵新暂存造成的压力需处理
 
 - 测试程序新增FRAME_COUNT=5..30和MEMORY_BUDGET=1，按实际device LUID查询IDXGIAdapter3 local/nonlocal预算；默认不启用。分析器--frames参数验证相同轮数，旧5帧回归仍通过。
