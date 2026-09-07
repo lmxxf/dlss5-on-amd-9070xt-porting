@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：全网验收同进程继续编译，补历史资源诊断入口
+
+- 本轮为已验证等待并补集成审计：PID24280始终存活，CPU145.328125→262.171875→396.203125秒、Responding=True，日志推进多个C64 ffn/attention/projection编译完成；stdout尚无frame结果。exec session86169仍为原启动器句柄，不应重启。
+- NativeGameFrame当前仍只绑定单RGB，未建立历史来源/运动纹理转换与更新时间；不能把固定fixture当成真实游戏历史闭环。
+- 查本机NVIDIA nvapi-main/nvapi.h及nvapi_interface.h：GetCudaMergedTextureSamplerObject（0x329fe6e0）参数含device、texDesc、smpDesc、64位textureHandle；GetCudaIndependentDescriptorObject（0x0ddac234）分别支持texture/sampler/surface。旧GetCudaTextureObject（0x80403fc9）只返回32位，不能直接假设与捕获的64位slot相同。
+- 后续可在RTX只读记录merged handle→CPU descriptor，再与CreateShaderResourceView记录的资源对应，核对slot8究竟绑定哪份历史资源。这里只确认存在诊断接口，未安装新hook、未证明历史语义，游戏DLL未改。
+
 ### 2026-09-07：完整AMD时序网络五帧验收已启动，PID24280初始化中
 
 - 新建独立D:\DLSSNR-Lab\native-temporal-network70，复制既有完整网络系数/布局及首帧oracle，更新当前attention midpoint修正和时序shader。新exe从当前源码重新编译。input SHA d69fde8a94ed5e7a2391fe90887385ef9e32b5987a9b5ce4718fe8e833bb8119、temporal oracle SHA ca0e84326d6d9b7df10be8af5cc4b9b970ae4948c7a26b89e7a85dbe99dfd624，本地/AMD一致。
