@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32 Wave score行padding候选15帧exact：SCORE_ROW32→33、SCORE_WIDE64→65，score容量4096→4224 float（+512B），矩阵/标量索引同步改。暖585.284452ms、末5帧586.848162ms，post70_body32.85373ms（旧33.60917），首C32 attention5.64669ms。整网差异很小，仍显式候选、默认关闭，不宣称稳定整体提速。证据release/native-network70-padded-c32-scores；runner run_padded_c32_scores_network.ps1。游戏未改，10fps未达到。
+
 矩阵版C32权重驻留复测15帧exact但未采纳：RESIDENT_C32_WEIGHTS=1，暖587.328718ms、末5帧591.87154ms；post70_body33.63794ms对旧33.60917ms几乎无变化，preblock attention23.91003ms、首C32 attention5.74253ms。仍不启用该flag；证据release/native-network70-resident-c32-matrix，runner run_resident_c32_matrix_network.ps1。权重复制发生初始化，不改数值，游戏未改，10fps未达到。
 
 post70细分15帧exact：body33.60917ms、merge1.10036ms、RGB0.84625ms，begin队列间隔0.33840ms。暖全网591.25693ms，纯观测无提速。大头是末层C32，不是RGB精确投影；下一步定位C32共享注意力/FFN。旧post70标签现在仅最后间隔，完整比较必须加post70_*，不能宣称post降为零。证据release/native-network70-post-detail；有效无诊断基线仍约586ms，游戏未改，10fps未达到。

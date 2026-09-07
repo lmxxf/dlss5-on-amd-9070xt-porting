@@ -7,6 +7,13 @@ cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint r
 #else
 #define LDS_STRIDE 32
 #endif
+#if NATIVE_PAD_WAVE_C32_SCORES
+#define SCORE_ROW 33
+#define SCORE_WIDE 65
+#else
+#define SCORE_ROW 32
+#define SCORE_WIDE 64
+#endif
 // Original-layout 32-wide attention, lab 8x8 windows. Not yet live integration.
 StructuredBuffer<float> weights:register(t0);
 StructuredBuffer<float> input:register(t1);
@@ -15,9 +22,9 @@ RWStructuredBuffer<float> output:register(u0);
 groupshared float16_t queries[2048],keys[2048];
 #if NATIVE_WAVE_C32_AV
 groupshared float16_t values[2048];
-groupshared float scores[4096];
+groupshared float scores[128*SCORE_ROW];
 #else
-groupshared float values[2048],scores[4096];
+groupshared float values[2048],scores[128*SCORE_ROW];
 #endif
 #else
 groupshared float queries[64*LDS_STRIDE],keys[64*LDS_STRIDE],values[64*LDS_STRIDE];
@@ -80,7 +87,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
    QB wb=QB::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
    QC z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,wb);
    for(uint i=0;i<z.Length();i++)z.Set(i,H(z.Get(i)));
-   if(part<2)z.Store(scores,part*2048+qr*16*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor);
+   if(part<2)z.Store(scores,part*64*SCORE_ROW+qr*16*SCORE_ROW+cr*16,SCORE_ROW,dx::linalg::MatrixLayout::RowMajor);
    else {
 #if NATIVE_WAVE_C32_AV
     for(uint i=0;i<z.Length();i++){uint2 coord=z.GetCoordinate(i);values[(qr*16+coord.x)*32+cr*16+coord.y]=float16_t(F(z.Get(i)));}
@@ -91,7 +98,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   }
   GroupMemoryBarrierWithGroupSync();
  }
- for(uint c=0;c<32;c++){q[c]=scores[t*32+c];k[c]=scores[2048+t*32+c];v[c]=F(values[t*32+c]);}
+ for(uint c=0;c<32;c++){q[c]=scores[t*SCORE_ROW+c];k[c]=scores[64*SCORE_ROW+t*SCORE_ROW+c];v[c]=F(values[t*32+c]);}
 #else
 #if NATIVE_CACHE_C32_INPUT
  float cached_input[32];[unroll]for(uint j=0;j<32;j++)cached_input[j]=F(input[p*32+j]);
@@ -122,7 +129,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   C s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
-  s.Store(scores,qr*16*64+kr*16,64,dx::linalg::MatrixLayout::RowMajor);
+  s.Store(scores,qr*16*SCORE_WIDE+kr*16,SCORE_WIDE,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
@@ -131,7 +138,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #endif
  [loop]for(uint key=0;key<64;key++){
 #if NATIVE_WAVE_C32_SCORES
-  float dot=scores[t*64+key];
+  float dot=scores[t*SCORE_WIDE+key];
 #else
   float dot=0;[loop]for(uint c=0;c<32;c++)dot+=queries[t*LDS_STRIDE+c]*keys[key*LDS_STRIDE+c];
 #endif
@@ -170,22 +177,22 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
    for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)+partial.Get(i)));
   }
   for(uint i=0;i<acc.Length();i++)acc.Set(i,F(acc.Get(i)));
-  acc.Store(scores,qr*16*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor);
+  acc.Store(scores,qr*16*SCORE_ROW+cr*16,SCORE_ROW,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
 #if NATIVE_WAVE_C32_PROJECTION
- for(uint c=0;c<32;c++)queries[t*32+c]=float16_t(scores[t*32+c]);
+ for(uint c=0;c<32;c++)queries[t*32+c]=float16_t(scores[t*SCORE_ROW+c]);
  for(uint i=t;i<1024;i+=64)keys[i]=float16_t(weights[3072+i]);
  GroupMemoryBarrierWithGroupSync();
  for(uint qr=t/32;qr<4;qr+=2)for(uint cr=0;cr<2;cr++){
   A aa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B bb=B::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
-  z.Store(scores,qr*16*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor);
+  z.Store(scores,qr*16*SCORE_ROW+cr*16,SCORE_ROW,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
 #else
- for(uint c=0;c<32;c++)av[c]=scores[t*32+c];
+ for(uint c=0;c<32;c++)av[c]=scores[t*SCORE_ROW+c];
 #endif
 #else
  [loop]for(uint key=0;key<64;key++)prob[key]=F(H(ex[key]*inv));
@@ -195,7 +202,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #endif
  [loop]for(uint c=0;c<32;c++){
 #if NATIVE_WAVE_C32_PROJECTION
-  float a=scores[t*32+c];
+  float a=scores[t*SCORE_ROW+c];
 #else
   float a=0;[loop]for(uint j=0;j<32;j++)a+=av[j]*weights[3072+c*32+j];
 #endif

@@ -6143,3 +6143,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - PID42360退出0，15帧最终different0，下载两份完整结果与独立原版参考byte-exact。暖587.328718ms、末5帧591.87154ms。
 - post70_body33.63794ms，对照33.60917ms几乎不变；preblock_detail_stage1 23.91003ms、首c32_probe_stage1 5.74253ms。没有可靠整网收益，不能把不同轮次591→587当确定提速，继续默认关闭。
 - 证据release/native-network70-resident-c32-matrix/，准备脚本release/prepare-resident-c32-matrix.ps1（ignored）；入口run_resident_c32_matrix_network.ps1。下一步应改C32执行方式而非再次仅搬这份权重；游戏未改，10fps未完成。
+# 2026-09-08：C32 Wave浮点中间矩阵行padding候选
+
+- NATIVE_PAD_WAVE_C32_SCORES=1把复用scores区的32列行跨度改33，64列行跨度改65；容量128×33=4224 float兼容双Q/K阶段（需要4224）和单64×65评分阶段（4160），新增512B共享内存。不是改Q/K half布局，不改算术。
+- 所有矩阵Store、标量load、AV/projection中间量索引同步更新；test_c32_score_layout.py验证每阶段矩阵与标量地址集合一致、无重叠遗漏、无越界。默认宏0保持旧布局。
+- DXC通过，PID43940退出0；15帧最终different0，下载两份结果与独立原版参考byte-exact。暖585.2844521ms、末5帧586.848162ms；post70_body32.853729ms对旧33.609171ms，preblock attention23.59904ms，首C32 attention5.646686ms。
+- 局部小幅改善但整网相对586.27370ms基线差异不足以确认稳定收益，保留显式候选而不推广默认。不是已经测到硬件bank冲突计数，当前只有布局与计时证据。
+- 证据release/native-network70-padded-c32-scores/，准备/manifest脚本在release/（ignored）；入口run_padded_c32_scores_network.ps1。游戏未改，10fps未达到。
