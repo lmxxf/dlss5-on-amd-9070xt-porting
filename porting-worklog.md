@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：RTX原版时序ViT重放/56阶段全exact，decoder39同源通过
+
+- 只读确认RTX既有native-valid1080-vit工具，隔离native-temporal-vit-attention目录，session4995用相同Linux生成Q/K/V运行两次，输出逐byte一致。Linux不稳定原因仍未证明，但本输入在RTX有稳定执行路径。
+- 独立native-temporal-valid1080-vit目录上传同源input/权重并复用已验证Windows工具。首次脚本被PowerShell执行策略拒绝、尚未运行；随后仅对本次进程使用ExecutionPolicy Bypass，未修改系统策略。session17239原31..38两轮共56阶段哈希全一致。
+- 下载前将原本地vit保存为vit-linux-replay-failed，未删除失败证据；当前vit保存RTX结果，同一输入及系数不变。session80683 check_native_block256 --base temporal完成56阶段，different0、finite、tail_zero、replay_identical全部通过。
+- check_native_valid1080_decoder39.py增加--base，原输入/skip布局验证及decoder39输出全部exact，temporal decoder39/validation.json pass。后续继续decoder40..70，完整AMD时序网络和游戏DLL仍待验收。
+- 本轮没有启动/退出游戏或修改DLL，RTX只运行隔离CUDA工具。
+
 ### 2026-09-07：时序encoder23..30/head对照通过，Linux ViT参考重放失败不可使用
 
 - 新增build_native_valid1080_split.py，session25905连续八层原CUBIN/CPU branch、ffn、attention、final共32检查全exact。pool/head与ViT准备工具增加--base，session56655主输出/池化/head检查全exact，640token输入已生成于temporal独立目录。

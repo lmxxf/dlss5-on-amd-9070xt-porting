@@ -1,12 +1,13 @@
 """Same-RGB original ViT38 + encoder30 skip -> decoder39, with layout checks."""
 from pathlib import Path
-import json, os, subprocess
+import json, os, subprocess, argparse
 import numpy as np
 from decode_tinlayout_global import e4m3fn
 from native_c32_reference import F, H
 from native_decoder_entry_reference import unpack, project
 
-base = Path('release/native-rgb-valid1080')
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base = args.base
 vit = base / 'vit'
 report = json.loads((vit / 'validation.json').read_text())
 assert len(report['stages']) == 56 and all(
