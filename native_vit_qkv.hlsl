@@ -12,6 +12,23 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  output[id.x]=total;
 }
 uint tensor_channel(uint c){return ((c&1)<<1)|((c&2)>>1)|((c&4)<<2)|((c&8)>>1)|((c&16)>>1);}
+groupshared float tile_input[8*33],tile_weights[32*33];
+[numthreads(64,1,1)]void project_tiled(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint t=tid.x,part=gid.z,token=gid.y*8+t/8,row=gid.x*32+(t%8)*4;
+ if(gid.y*8>=tokens)return;float4 total=0;
+ [unroll]for(uint group=0;group<2;group++){
+  float4 a=0;
+  [loop]for(uint k=group*512;k<(group+1)*512;k+=32){
+   for(uint i=t;i<256;i+=64)tile_input[(i/32)*33+i%32]=input[(gid.y*8+i/32)*1024+k+i%32];
+   for(uint i=t;i<1024;i+=64)tile_weights[(i%32)*33+i/32]=weights[part*1048576+(gid.x*32+i/32)*1024+k+i%32];
+   GroupMemoryBarrierWithGroupSync();float4 s=0;
+   [loop]for(uint j=0;j<32;j++){uint w=j*33+(t%8)*4;float v=tile_input[(t/8)*33+j];s+=v*float4(tile_weights[w],tile_weights[w+1],tile_weights[w+2],tile_weights[w+3]);}
+   a=float4(H(a.x+s.x),H(a.y+s.y),H(a.z+s.z),H(a.w+s.w));GroupMemoryBarrierWithGroupSync();
+  }
+  total=group?float4(H(total.x+a.x),H(total.y+a.y),H(total.z+a.z),H(total.w+a.w)):a;
+ }
+ [unroll]for(uint r=0;r<4;r++)output[(part*tokens+token)*1024+row+r]=total[r];
+}
 #include "native_half_square.hlsli"
 [numthreads(64,1,1)]void normalize(uint3 id:SV_DispatchThreadID){
  if(id.x>=tokens*96)return;uint part=id.x/(tokens*32),token=(id.x/32)%tokens,head=id.x%32,base=(part*tokens+token)*1024+head*32;

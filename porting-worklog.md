@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：QKV共享分块，整网降至1.856秒
+
+- 核对NativeVitBlock发现stage2为qkv，stage3才attention，纠正此前优化方向。native_vit_qkv新增project_tiled：8tokens×32行块、64线程每线程4行，输入和转置权重共享，保持32项H舍入及两512段最后H合并；normalize不变，无额外全局scratch。
+- NativeVitQkv显式DLSS5_TEST_TILED_QKV=1启用（非法值拒绝），project dispatch32×tokens/8×3，默认仍旧实现。
+- 独立native-network70-tiled-qkv实验session93658/PID13276 exit0；前三优化开关继续1，本轮仅新增QKV分块。五帧history off/on/reset最终6635520值全exact，下载两个GPU实际结果并由analyze_native_network_profile.py逐字节原版验证通过。
+- 暖轮2173.7783275→1856.0057175ms，约14.6%下降；各ViT stage2约2.285～2.958ms。主要剩余decoder_stage12=403.1808125、preblock200.8083、encoder1_4=174.25992、post70=171.8827125ms。仍远未到100ms/10fps。
+- 证据release/native-network70-tiled-qkv/profile-validation.json及日志；游戏保持退出、安装DLL未改。编译和git diff检查通过。
+
 ### 2026-09-07：共享FFWD完整尺寸整网通过，再减约10.9%
 
 - 独立native-network70-shared-ffwd复制上一轮完整f32/i32与shader，仅替换native_split.hlsl及新exe、对应manifest条目；TILED_C64/SPLIT_PROJECTION/SPLIT_FFWD均1，PostShift3、分段profile，游戏无运行。
