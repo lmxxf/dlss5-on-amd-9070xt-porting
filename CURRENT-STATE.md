@@ -2,6 +2,12 @@
 
 ## 2026-09-08 05:30 朱雀接手性能优化（闇 GPT 额度见底）
 
+**08:15 累计：暖轮 246.3ms（约 4.1fps；闇最后基线 472.9ms，−48%），15帧全部exact。当前完整入口 `run_local_c32_attention_network.ps1`，证据 release/native-network70-local-c32-attn/。**
+
+07:05 之后新增：fused-exp 289.5（多头注意力exp直接从QK寄存器写入f16 Q/K槽，删掉16KB f32 scores共享区，首C64 attention 2.02→1.69ms）→ vit-attn-half 271.4（ViT注意力读打包f16 QKV、wave load直取K/V、分母树两lane并行，3.33→0.78ms/层）→ wave-project 254.5（Swin FFN/注意力输出投影改wave矩阵，0.45→0.22ms×2×38块）→ local-c32-attn 246.3（C32注意力权重打包f16驻留、wave load直取，不再每窗口4次拷进LDS；preblock stage1 15.5→12.7）。
+
+**剩余分布（246ms）**：C32族≈85（post70 body 20.1、encoder1_4 18.0、tail67_69 16.1、preblock attention 12.7 + FFN 11.8 + prefix 6.8）；多头Swin C64/128/256 编码器≈36 + 解码器≈32（每块约1.6ms注意力 + 0.8 FFN + 0.45 投影 + 0.25 pack/crop + 0.3 QKV）；split C512 ≈ 17+8×2.4；ViT 20；decoder入口/上采样投影≈10。注意力核（多头1.6×38 + C32 2.85×7 + preblock 12.7 + post70内）仍占约120ms，是唯一还没被结构性改造的大项——LDS并发和barrier链，而非算力。
+
 **07:05 累计：暖轮 293.2ms（闇最后基线 472.9ms，−38%），15帧全部exact。** 叠加顺序（每步一个release/native-network70-*目录、一个run_*.ps1 入口，每个入口链式调用上一个）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366（噪声内）→ resident-weights 338 → shift-stack 332（重评闇的COALESCED_MULTIHEAD_SHIFT，现在有效）→ wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293。当前完整入口：`run_blocked_c32_ffn_network.ps1`。
 
 **共同规律**：所有收益来自数据搬运，不是算术——(1) 每wave一份A tile复用4个权重tile（寄存器分块）；(2) 中间层用f16存（F()输出都在FP8格点，转换无损）；(3) 权重全部驻留VRAM；(4) 取消LDS→temp→LDS的转存和多余barrier，用GetCoordinate直接写；(5) 取消分chunk小dispatch。每个输出元素的K32乘加序列和H()调用次数完全不变，所以逐字节exact是构造性保证，不是靠运气。
