@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：codec GPU资源封装，待执行验证
+
+- 新增native_game_codec.h：NativeGameCodec按1张输入编码或3张独立输入合成创建SRV/UAV/root signature/PSO及独立RGBA16_FLOAT输出，直接使用已数值验证的两个HLSL，不读取夹具或CPU中间像素。
+- 限定同设备1920×1080、单采样单mip、RGBA16_FLOAT；拒绝输入别名及未知scale。Record固定实机mode1/TransferStrength1/ColorStrength1，按调用方给定状态转为SRV，执行后恢复输入原状态，输出为NON_PIXEL_SHADER_RESOURCE，重复帧先恢复UAV。调用方仍负责同队列提交与对象存活。
+- MinGW头文件语法检查、diff检查通过。这只是资源封装，尚未GPU执行该封装，也没有插入NativeGameFrame或替换游戏DLL。下一步用现有oracle runner验证封装自身的descriptor/root/state路径，再接完整网络。
+- AMD原PID18872仍Responding，CPU1441秒，shader日志持续推进；完整回归没有终态证据，继续同一进程。
+
 ### 2026-09-07：输出codec三独立纹理在两卡1080p全exact
 
 - d3d12_native_codec_test增加decode/decode-game，三个独立RGBA16_FLOAT资源分别绑定t1 Proxy/t2 Neural/t3 OutputOriginal。数据各有不同位模式，原画面覆盖高亮，Neural每17像素置黑覆盖退化保护，alpha独立变化；检查每个输出alpha等于原画面及RGB有限，不错误要求合成HDR RGB<=1。
