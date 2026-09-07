@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：矩阵展开接原gate/F，保留软件half舍入
+
+- matrix_real_probe可选APPLY_ACTIVATION将原gate多项式、每处H及最终F接回，两独立路径均输出实际值。session22015 exit0，完整8640×1024，矩阵1.748128ms、标量探针2.384248ms，10dispatch/UAV barrier，无独立暖机。
+- 下载matrix_activated1/2.f32，cmp逐字节一致；CPU H/F对已有标量linear输出应用gate，全8847360值different0/max0，finite。
+- 额外NATIVE_HALF=1试float(float16_t(v))代替软件H。session22963 exit0、finite，但2.156008ms且910515值不同、max2.0、MAE0.0020885349；既慢且偏离，不采纳。默认NATIVE_HALF关闭。
+- 证据release/matrix-real-probe/timing-activated.txt和输出。下一步真实GPU算子输入接口与后续层，不把预打包数据的独立展开计时当整网结果；安装DLL/裁判链不动。
+
 ### 2026-09-07：硬件矩阵全尺寸展开0.802ms，实际输出逐字节一致
 
 - prepare_matrix_real_probe.py --full打包完整block52 W1与全部8640像素，4947968字节；矩阵按输出32行/K32块布局，原f32到half逐值无损。shader FULL_EXTENT=1对应8640像素/1024行，dispatch270×32，每线程一像素一32行块。

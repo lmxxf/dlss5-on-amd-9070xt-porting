@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新矩阵展开含gate/F：完整8847360输出矩阵/标量逐字节一致，CPU gate参考也different0。矩阵1.748128ms、标量探针2.384248ms；原生half转换变体2.156008ms且910515值不同、max2、MAE0.0020885349，不采用。仍未包含运行时输入packing及完整网络，下一步接GPU算子接口。证据release/matrix-real-probe/timing-activated.txt。
+
 最新硬件矩阵完整尺寸线性展开：block52全部8640×1024输出，K256每K32 H；矩阵0.801680ms、标量探针2.170559ms（各10次、无独立暖机），8847360实际float结果finite且cmp逐字节一致。证据release/matrix-real-probe/timing-full.txt。尚不含运行时输入packing、gate/收缩、整网，不是对最优旧FFN的端到端速度比较。下一步接真实算子接口与激活。
 
 硬件矩阵初步独立计时：同row0真实样本，MATRIX_PATH=1/2分别只执行矩阵/标量，十次dispatch均值0.056760/0.100652ms，实际32768-byte输出逐字节一致（b68a03ca…25d4）。没有独立暖机，不是对已优化分块整层的比较，更不能外推网络FPS。证据release/matrix-real-probe/timing-row0.txt。下一步完整像素/全通道独立算子与最佳旧核对照。
