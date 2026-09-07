@@ -8,6 +8,8 @@ $Inc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\inc\hlsl'
 if($LASTEXITCODE -ne 0){throw 'Blocked ViT expand compilation failed'}
 & $Dxc -I $Inc -T cs_6_10 -E reduce -HV 2021 -enable-16bit-types -O3 -D VIT_EXPAND=0 -D "BLOCK_N=$BlockN" native_wave_vit_blocked.hlsl -Fo native_wave_vit_reduce_blocked.cso
 if($LASTEXITCODE -ne 0){throw 'Blocked ViT reduce compilation failed'}
+& $Dxc -I $Inc -T cs_6_10 -E reduce -HV 2021 -enable-16bit-types -O3 -D VIT_EXPAND=0 -D INPUT_CHANNELS=1024 -D "BLOCK_N=$BlockN" native_wave_vit_blocked.hlsl -Fo native_wave_vit_reduce_blocked_1024.cso
+if($LASTEXITCODE -ne 0){throw 'Blocked ViT projection compilation failed'}
 $env:DLSS5_TEST_BLOCKED_VIT='1'
 & "$Folder\run_blocked_ffn_network.ps1" -Folder $Folder
 exit $LASTEXITCODE

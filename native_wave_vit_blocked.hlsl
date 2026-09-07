@@ -10,7 +10,15 @@
 #if VIT_EXPAND
 StructuredBuffer<float> input_f32:register(t0);
 #else
-ByteAddressBuffer hidden_f16:register(t0);StructuredBuffer<float> residual:register(t2);
+#ifndef INPUT_CHANNELS
+#define INPUT_CHANNELS 4096
+#endif
+#if INPUT_CHANNELS==4096
+ByteAddressBuffer hidden_f16:register(t0);
+#else
+StructuredBuffer<float> input_f32:register(t0);
+#endif
+StructuredBuffer<float> residual:register(t2);
 #endif
 ByteAddressBuffer weights:register(t1);
 RWByteAddressBuffer output:register(u0);
@@ -64,17 +72,26 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    acc[n]=C::Splat(0.0f);
    if(part==0){
     uint col=(gid.y*BLOCK_N+n)*16;
-    for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(residual[(first+rc.x)*1024+row]*asfloat(weights.Load(4096*1024*2+row*4))));}
+    for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(residual[(first+rc.x)*1024+row]*asfloat(weights.Load(INPUT_CHANNELS*1024*2+row*4))));}
    }
   }
-  [loop]for(uint k=part*1024;k<(part+1)*1024;k+=32){
-   A a=A::Load(hidden_f16,(first*4096+k)*2,4096*2,dx::linalg::MatrixLayout::RowMajor,16);
+  [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
+#if INPUT_CHANNELS==4096
+   A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*2,INPUT_CHANNELS*2,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+   for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(input_f32[(first+i/32)*INPUT_CHANNELS+k+i%32]);
+   GroupMemoryBarrierWithGroupSync();
+   A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+#endif
    [unroll]for(uint n=0;n<BLOCK_N;n++){
     uint col=(gid.y*BLOCK_N+n)*16;
-    B b=B::Load(weights,(col*4096+k)*2,4096*2,dx::linalg::MatrixLayout::ColMajor,16);
+    B b=B::Load(weights,(col*INPUT_CHANNELS+k)*2,INPUT_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
    }
+#if INPUT_CHANNELS!=4096
+   GroupMemoryBarrierWithGroupSync();
+#endif
   }
   [unroll]for(uint n=0;n<BLOCK_N;n++){if(part==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,H(total[n].Get(i)+acc[n].Get(i)));}
  }
