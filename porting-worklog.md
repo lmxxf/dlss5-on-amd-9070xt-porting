@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：逐提交计时证明主要是GPU计算而非等待
+
+- NativeGameSubmission新增默认关闭DLSS5_TEST_SUBMISSION_TIMING=1：独立双timestamp/readback，每次record前后记录GPU区间，fence完成后读取；另记录制开始到等待完成wall，不包含之后打印。保持原分块/等待，失败保留GPU资源逻辑不变。
+- 独立native-network70-submit-profile，session83392/PID11668 exit0；五帧最终GPU两输出下载并逐字节原版一致。主queue2565次=513/帧，另一queue1次是初始化noise拷贝，未混入帧平均。
+- 每帧GPU/wall合计ms：1416.98063/1524.612、1390.25052/1468.128、1396.27524/1472.589、1395.22356/1472.663、1381.93344/1462.831。四暖轮GPU1390.92069/wall1469.05275，差78.13206ms。GPU区间含所录命令及barrier，不是纯ALU；wall差额也不能直接称纯CPU开销。
+- 结论：即便消除全部这些差额也远不能达到100ms，后续必须攻GPU计算本体；不再把小提交数量当主要解释。测试额外时间戳有观察开销，未宣称性能提升。证据release/native-network70-submit-profile。编译/diff通过，游戏未动。
+
 ### 2026-09-07：ViT expand分块无整网收益，默认关闭
 
 - 新expand_tiled使用8token×32行、每线程4输出共享输入/权重，保留每K32 H、gate/F及output_base；host仅EXPAND且显式DLSS5_TEST_TILED_VIT_EXPAND=1启用。Record/RecordChunk均保持原65536输出块和原逐块提交，不合并阶段。
