@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：重新检查硬件矩阵路径，发现驱动已回到不支持版本
+
+- 新matrix_rounding_probe.hlsl/d3d12_matrix_rounding_probe.cpp以确定性有符号E4M3可表示输入/权重比较LinAlg F16输入、F32输出与标量32项dot加残差后H，共8192结果。此探针只是候选兼容性测试，不是原版/游戏验证。
+- MinGW构建成功；DXC需显式-I dxc-preview/inc/hlsl，补路径后cs_6_10编译成功，但PSO创建80070057，session54677 exit1，未执行计算。旧未改matrix_smoke.exe/cso同样PSO80070057，排除只归因新探针。
+- matrix_probe读取私有D3D12Core，device成功，请求SM6.10返回6.9、linalg tier0。WMI AMD32.0.31041.1004，Intel32.0.101.8331。与9/5已记录成功的预览驱动32.0.31007.2048不同；不能推断谁/何时恢复驱动。此次只读检查，无安装/注册表修改。
+- 需要用户确认是否重新切预览驱动；不把当前矩阵路径不可用称为整个优化目标永久阻塞，普通shader路径仍在。游戏DLL未动、有效整网基线仍1.470秒。
+
 ### 2026-09-07：逐提交计时证明主要是GPU计算而非等待
 
 - NativeGameSubmission新增默认关闭DLSS5_TEST_SUBMISSION_TIMING=1：独立双timestamp/readback，每次record前后记录GPU区间，fence完成后读取；另记录制开始到等待完成wall，不包含之后打印。保持原分块/等待，失败保留GPU资源逻辑不变。
