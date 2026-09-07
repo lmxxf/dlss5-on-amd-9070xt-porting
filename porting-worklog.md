@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：被动描述符链映射到post输出资源，仍需历史内容更新证明
+
+- 正常退出PID19264并完成Steam同步，备份865b9e事件addon为.before-descriptor-events，部署40979f49版。新PID6844 NR count1/60成功；无NGX/命令列表函数替换。
+- descriptor-chain目录保存同PID事件、NVAPI、参数、NGX及ReShade日志。post launch154 surface=0xa803，NVAPI descriptor0x220000064。被动copy记录两次从virtual table0xf000000230000060复制到0xf000000220000064；source update对应native view0x3906e0d80，其当时view_init资源为0x3906073b0。
+- 新增check_native_surface_descriptor_chain.py，按事件顺序保留single-descriptor链，单API设备约束，同tick候选歧义/未观察则拒绝。当前first surface转换的owner候选唯一0x3906073b0；不声称任意多描述符范围的完整追踪。
+- 同PID历史slot8绑定0x390606a20，NGX Output为0x390606090，与first post资源均不同。后来native view句柄被重用于另一资源，证明不能只取最后一条view事件。下一步需要内容复制/写入链及帧序列，不能直接假设历史就是输出。
+- AMD完整受控数值通过仍有效，实际AMD游戏显示接入未完成；本轮仅更新诊断addon，原渲染DLL与进度存档未改。
+
 ### 2026-09-07：ReShade虚拟描述符机制查明，准备被动更新/复制链记录
 
 - 阅读本机ReShade6.8源：device_impl::convert_to_original_cpu_descriptor_handle从heap index及offset还原原生CPU句柄；CreateUAV先保存virtual table（0xF000...|虚拟CPU句柄），转换后发init_resource_view原生view，随后update_descriptor_tables同时带table和view。这解释两套数值不同，不能直接比较或猜地址。
