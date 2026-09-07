@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：codec常数与compute pipeline关联观察器
+
+- 扩展native_codec_constants_events：被动跟踪compute pipeline绑定，在候选常数之后的dispatch记录pipeline和group数；命令列表reset/destroy清除状态，后续常数写入清除未消费候选，避免跨命令列表生命周期或部分更新误关联。不抑制dispatch，不发GPU命令。
+- init_pipeline只保存包含CodecConstants反射字符串且不超过1MiB的compute bytecode，最多16份，文件名包含PID/pipeline；保留真实DXBC供后续反射/反汇编，不从碎片化字符串猜完整shader。
+- 扩展Windows测试覆盖compute/pixel绑定过滤、dispatch不抑制、reset清理，测试通过。新addon构建通过但尚未部署，5090仍用上一版观察器。AMD PID18872同一完整回归仍存活，CPU451秒，尚无最终结果。
+
 ### 2026-09-07：只读codec观察器实机加载，候选常数mode=1
 
 - 5090正常Alt+F4退出PID26572，确认进程消失后部署新增native-codec-constants.addon64，SHA256 f32cc272b5f8f58bc709abd5bd805af9cd547e6c48241d4c7c113dfa64350b61。用已存在的GameRequest-Client任务启动PID11912，未更改原神经渲染DLL。
