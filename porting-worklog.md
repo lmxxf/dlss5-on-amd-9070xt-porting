@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原始shader基线确认分块收益，扩展展开展开候选
+
+- session85694 exit0，保存的native-network70-profile原始HLSL与新分块收缩在相同block52数据上五轮均baseline/候选对oracle不同0、彼此位差0。暖轮旧FFN127.56164/attention8.92673/projection4.27012ms，合计约140.75849ms；候选各段合计约44.91509ms，约3.13倍，仅此隔离样本，不能外推整网FPS。
+- 候选剩余展开23.47917ms占主耗时，新增默认关闭tiled_ffn_expand，沿用8像素×32通道共享块与每32项H舍入，末尾保留gate多项式与F。主机仅在显式tile_expand时改变展开dispatch，要求同时启用已有分块收缩；旧默认不变。
+- 新独立c64-tiled-expand-contract实验使用保存旧shader作baseline，session49139/PID23432正在初始化，stdout明确tiled_expand_contract。尚未取得扩展候选数值或计时，不推广到生产。游戏部署未动。
+
 ### 2026-09-07：共享记忆体分块收缩通过，正在核对原始shader基线
 
 - session10117细分五轮均数值exact。暖轮均值baseline FFN132.127ms、attention8.862、projection4.221；拆分候选expand23.211、contract76.004、FFN project4.354，确立收缩乘法是拆分路径主耗时。
