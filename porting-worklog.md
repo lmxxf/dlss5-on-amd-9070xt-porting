@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：C32 Wave QK/QKV整网通过，但收益有限
+
+- preblock_attention_core增加Wave scores动态尺寸CSO，b0五常量与现有Record一致，RAW_OUTPUT1；Q/K half共享、V/scores float总32KiB，保留其余算法。session58109/PID31940 exit0，15帧最终实际输出逐字节原版一致，暖1183.2419557ms。
+- 后续Wave QKV复用同共享区：queries暂存F(input)、keys当前权重、scores原始Q/K、values原始V；三投影阶段各同步，线程载入q/k/v后再转原规范化和评分。CPU检查前3072权重可无损表示normal half或零，不改权重。
+- WAVE_C32_QKV依赖WAVE_C32_SCORES，独立native_wave_c32_qkv.cso；session5767/PID24116 exit0，15帧实际输出逐字节原版一致。暖1170.9890907ms、末5帧1171.23997ms。local14530695168/budget15404474368，预算内。
+- 证据release/native-network70-wave-c32与-wave-c32-qkv；相较旧1187.29283ms整体提升有限，不夸为大突破。下一步ViT/512和preblock主要成本，安装游戏未改，10fps未达到。编译/diff检查通过。
+
 ### 2026-09-08：C64 Wave整网15帧exact/1.187秒
 
 - NativeC64开放64 Wave展开/收缩/QK评分，沿用已参数化shader；WAVE_C64必须对应matrix开启。run_wave_c128_network -IncludeC64编译64专用三CSO并传给matrix脚本，默认仍不启用。

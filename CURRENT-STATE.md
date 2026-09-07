@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新C32 Wave评分及QKV两方案均15帧exact：仅scores暖1183.24196ms，scores+QKV暖1170.98909ms、末5帧1171.23997ms。共享32KiB阶段复用不增全尺寸scratch，QKV权重转half前检查无损。WAVE_C32_QKV依赖WAVE_C32_SCORES，专用CSO；证据release/native-network70-wave-c32[-qkv]/。相对前版1.187秒改善有限，下一步转ViT/512与preblock大项；游戏未改，10fps未达到。
+
 最新C64/C128/C256全Wave路径15帧exact，暖均1187.29283ms、末5帧1188.06103ms。WAVE_C64显式依赖MATRIX_C64，共享区使用C64容量；encoder5_8=37.62461、tail63_65=27.28023ms。local14.531GB低于15.396GB预算。证据release/native-network70-wave-c64/profile-validation.json。此前C64 Thread矩阵回退不适用于本Wave结果；游戏仍未更新，10fps未达到。
 
 最新C128/C256 Wave整网15帧exact，暖均1223.90318ms、末5帧1220.70869ms。C128 encoder9_14=30.22797ms、tail57_61=24.68307ms；local14.469GB在15.381GB预算内。WAVE_C128显式开关、_c128 Wave CSO分开命名，C64仍旧分块。证据release/native-network70-wave-c128/profile-validation.json；游戏未更新，10fps未达到。
