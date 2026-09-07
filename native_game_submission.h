@@ -45,4 +45,5 @@ public:
   }catch(...){poisoned=true;throw;}
  }
  ID3D12Device*Device()const{return device;}
+ UINT64 TimestampFrequency()const{UINT64 f=0;ck(queue->GetTimestampFrequency(&f));return f;}
 };

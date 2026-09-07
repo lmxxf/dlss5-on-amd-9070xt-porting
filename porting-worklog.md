@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：可选网络时间戳量测启动，游戏正常退出
+
+- 新增native_network_timestamps.h，profile模式分配128 timestamp query与readback，标记preblock、encoder分组、各ViT阶段、decoder13阶段及post；最后提交Resolve并完成fence后读取，检查单调时钟。报告明确includes_inter_submission_gaps=1，跨list区间包含CPU提交空档，不冒充纯算子GPU时间。
+- NativeActualNetwork70默认profile关闭，HLSL/权重/运算顺序不变；NativeGameSubmission提供队列频率，runner显式-GpuProfile，拒绝与-SingleList组合。完整测试exe编译通过，量测尚未验收。
+- 为避免游戏及常驻模型与第二份网络争显存，正常退出34096，未替换其DLL。独立native-network70-profile目录复制原已验证shift3夹具/19shader，部署含新快取和量测的exe，校验后启动PID24236/session99945，stdout single_list0/post_shift3，进程Responding、编译持续推进。
+- 下一步收取五帧exact及各阶段时间，定位真正性能瓶颈；连续时序机制仍未完成，目标保持未完成。
+
 ### 2026-09-07：修复核心include重复编译，位元码对照通过
 
 - native_shader_cache原实现凡出现include即不缓存，导致各层重复编译native_c64等。新增已知flat本地native_half_square.hlsli内容快照：key含源/入口/宏/源路径/依赖字节，编译使用同一快照避免读取时序不一致；未知/system/nested依赖保留原不缓存路径，不推测完整依赖图。

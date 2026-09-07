@@ -1,5 +1,7 @@
-param([string]$Folder='D:\DLSSNR-Lab\native-temporal-network70',[ValidateRange(0,3)][int]$PostShift=0,[switch]$SingleList)
+param([string]$Folder='D:\DLSSNR-Lab\native-temporal-network70',[ValidateRange(0,3)][int]$PostShift=0,[switch]$SingleList,[switch]$GpuProfile)
 $ErrorActionPreference='Stop'
+if($SingleList -and $GpuProfile){throw 'Timestamp reporting requires completed segmented submissions'}
+if($GpuProfile){$env:DLSS5_NETWORK_GPU_PROFILE='1'}else{Remove-Item Env:DLSS5_NETWORK_GPU_PROFILE -ErrorAction SilentlyContinue}
 $Exe=Join-Path $Folder 'native-network70-temporal.exe'
 if(Get-Process native-network70-temporal -ErrorAction SilentlyContinue){throw 'Existing full-network test; inspect it instead of restarting'}
 $Manifest=Get-Content (Join-Path $Folder 'shader-manifest.json') -Raw | ConvertFrom-Json
