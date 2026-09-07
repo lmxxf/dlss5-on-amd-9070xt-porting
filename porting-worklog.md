@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原生输出barrier只读观察器构建
+
+- 顺序探针从FFX列表通过已验证unwrap接口获取native list，安装一次SDK slot26 ResourceBarrier观察器；原函数按原count/数组先执行，再只记录当前输出resource的transition before/after/subresource/flags，不发任何barrier或额外GPU操作。
+- 这用于补齐ReShade事件可能漏掉的原生状态转移，严格区别FFX声明state、ReShade usage与D3D12 native states。没有把此前8→8 UAV事件误当状态转换。
+- Windows mock通过，验证原barrier指针/count/状态值原样转发；新版addon构建及diff检查通过，尚未部署实机。实际插入点最终状态仍待此观察器证实，神经渲染DLL未部署。
+
 ### 2026-09-07：严格原生COM装置检查接入并回归
 
 - 新增native_device_identity.h，使用已实机验证的ReShade unwrap接口后查询IUnknown；原生对象E_NOINTERFACE则直接查IUnknown，其它unwrap错误或空返回拒绝。两侧身份非空且相同才通过，不使用LUID宽松判断，全部查询引用成对Release。

@@ -20,6 +20,30 @@ static ExecuteLists original_execute{};
 static std::atomic<bool>execute_install_attempted{};
 static std::atomic<unsigned>native_batches{};
 static constexpr GUID UnwrappedObject={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,0x9c,0xd3,0x7a,0x1b,0x42}};
+using Barriers=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,UINT,const D3D12_RESOURCE_BARRIER*);
+static Barriers original_barriers{};
+static std::atomic<bool>barrier_install_attempted{};
+static void STDMETHODCALLTYPE native_barriers(ID3D12GraphicsCommandList*c,UINT count,const D3D12_RESOURCE_BARRIER*b){
+ original_barriers(c,count,b);
+ if(!b)return;auto target=tracked_output.load();if(!target)return;
+ for(UINT i=0;i<count;i++)if(b[i].Type==D3D12_RESOURCE_BARRIER_TYPE_TRANSITION&&reinterpret_cast<uint64_t>(b[i].Transition.pResource)==target&&events.fetch_add(1)<8192){
+  AcquireSRWLockExclusive(&lock);
+  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
+   fprintf(f,"pid=%lu thread=%lu tick=%llu kind=native_output_barrier list=%p resource=%llx before=%u after=%u subresource=%u flags=%u\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),c,(unsigned long long)target,unsigned(b[i].Transition.StateBefore),unsigned(b[i].Transition.StateAfter),b[i].Transition.Subresource,unsigned(b[i].Flags));fclose(f);
+  }ReleaseSRWLockExclusive(&lock);
+ }
+}
+static void install_native_barriers(void*list){
+ if(!list||barrier_install_attempted.exchange(true))return;
+ ID3D12GraphicsCommandList*native=nullptr;
+ HRESULT hr=static_cast<IUnknown*>(list)->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&native));
+ if(FAILED(hr)||!native)return;
+ void**table=nullptr;void*target=nullptr;SIZE_T got=0;
+ bool readable=ReadProcessMemory(GetCurrentProcess(),native,&table,sizeof(table),&got)&&got==sizeof(table)&&table&&ReadProcessMemory(GetCurrentProcess(),table+26,&target,sizeof(target),&got)&&got==sizeof(target)&&target;
+ MH_STATUS s=MH_ERROR_NOT_EXECUTABLE;
+ if(readable){s=MH_CreateHook(target,reinterpret_cast<void*>(&native_barriers),reinterpret_cast<void**>(&original_barriers));if(s==MH_OK)s=MH_EnableHook(target);}
+ if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu kind=native_barrier_hook status=%u native_list=%p\n",GetCurrentProcessId(),unsigned(s),native);fclose(f);}native->Release();
+}
 static void device_identity(const char*origin,ID3D12Device*d){
  if(!d)return;
  IUnknown*identity=nullptr,*unwrapped=nullptr,*native_identity=nullptr;
@@ -64,6 +88,7 @@ static uint32_t dispatch(void**context,const Header*h){
    }ReleaseSRWLockExclusive(&lock);
   }
  }
+ if(output.resource)install_native_barriers(list);
  auto result=original(context,h);log("ffx_end",list,nullptr,result);return result;
 }
 static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3D12CommandList*const*lists){
