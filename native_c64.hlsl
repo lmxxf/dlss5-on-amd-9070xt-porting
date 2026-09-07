@@ -1,3 +1,11 @@
+#if NATIVE_MULTIHEAD_FOUR_WAVES
+#if !NATIVE_WAVE_AV || !NATIVE_WAVE_SCORES
+#error Parallel multihead requires complete Wave attention
+#endif
+#define MULTIHEAD_THREADS 128
+#else
+#define MULTIHEAD_THREADS 64
+#endif
 #if NATIVE_WAVE_AV && !NATIVE_WAVE_SCORES
 #error Wave AV requires Wave scores
 #endif
@@ -125,9 +133,10 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  #if NATIVE_WAVE_SCORES
 [WaveSize(32)]
 #endif
-[numthreads(64,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+[numthreads(MULTIHEAD_THREADS,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
  uint p=((gid.x/(width/8))*8+t/8)*width+(gid.x%(width/8))*8+t%8;
+ if(t<64){
  float q[32],k[32],qs[16],ks[16];
 #if NATIVE_PRECOMPUTED_QKV
  [loop]for(uint c=0;c<32;c++){uint row=head*32+c;q[c]=feature[p*CHANNELS*3+row];k[c]=feature[p*CHANNELS*3+CHANNELS+row];values[t*ATTN_STRIDE+c]=F(feature[p*CHANNELS*3+2*CHANNELS+row]);}
@@ -146,11 +155,12 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
  [loop]for(uint c=0;c<32;c++){queries[t*ATTN_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[SCALE_OFFSET+head])));keys[t*ATTN_STRIDE+c]=F(H(k[c]*ki));}
+ }
  GroupMemoryBarrierWithGroupSync();
 #if NATIVE_WAVE_SCORES
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
- for(uint qr=t/32;qr<4;qr+=2)for(uint kr=0;kr<4;kr++){
+ for(uint qr=t/32;qr<4;qr+=MULTIHEAD_THREADS/32)for(uint kr=0;kr<4;kr++){
   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   auto s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
@@ -158,6 +168,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
+ if(t<64){
 #if NATIVE_SHARED_PROB && NATIVE_WAVE_AV
  #define EXP_AT(x) scores[t*64+(x)]
 #else
@@ -190,9 +201,10 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(prob[c]);keys[t*32+c]=float16_t(prob[32+c]);}
 #endif
 #undef EXP_AT
+ }
  GroupMemoryBarrierWithGroupSync();
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
- for(uint qr=t/32;qr<4;qr+=2)for(uint col=0;col<32;col+=16){
+ for(uint qr=t/32;qr<4;qr+=MULTIHEAD_THREADS/32)for(uint col=0;col<32;col+=16){
   A a=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B b=B::Load(values,col,32,dx::linalg::MatrixLayout::RowMajor);
   C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
@@ -208,6 +220,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  }
 #else
  [loop]for(uint c=0;c<32;c++){float a=0;[unroll]for(uint g=0;g<2;g++){float s=0;[loop]for(uint key=0;key<32;key++)s+=prob[g*32+key]*values[(g*32+key)*ATTN_STRIDE+c];a=H(a+s);}output[p*CHANNELS+head*32+c]=F(a);}
+ }
 #endif
 }
 [numthreads(64,1,1)]void projection(uint3 id:SV_DispatchThreadID){

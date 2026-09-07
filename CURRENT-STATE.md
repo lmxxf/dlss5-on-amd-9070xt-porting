@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C64/C128/C256四Wave注意力候选15帧exact：MULTIHEAD_FOUR_WAVES=1，128线程、标量段t<64、矩阵查询循环按四Wave分工；无共享容量增加。暖552.613228ms、末5帧552.030206ms，首C64 attention3.52036ms，较555.090092ms基线只小幅整体差异，暂不宣称稳定收益。证据release/native-network70-multihead-four-wave；独立runner run_multihead_four_wave_network.ps1，C32仍八Wave/并行exp/prob/norm。游戏未改，10fps未达到。
+
 C32逐通道Q/K归一化并行15帧exact，暖555.090092ms、末5帧554.68984ms。-EightWaves -ParallelExp -ParallelProb -ParallelNorm，原平方和/rsqrt由64查询线程计算，新增128 float共享倒数；全组从原raw Q/K scores按元素缩放/量化，保留每次H/F和V量化。post70_body21.95771ms、preblock attention12.47767ms、首C32 attention3.01443ms；上版567.012028ms。证据release/native-network70-c32-parallel-norm；ParallelOutput仍关闭，游戏未改，10fps未达到。
 
 C32最终残差/写回并行候选未采纳：-ParallelOutput，2048元素全组分工，原half_add_preserving_midpoint及H/F不变；15帧exact但暖568.236776ms、末5帧566.920302ms，post70_body25.59524ms较基线24.75947ms慢。保持ParallelOutput关闭，有效-EightWaves -ParallelExp -ParallelProb约567ms。证据release/native-network70-c32-parallel-output；游戏未改，10fps未达到。

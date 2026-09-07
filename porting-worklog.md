@@ -6232,3 +6232,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - PID33724退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。暖555.090092ms、末5帧554.68984ms，对照上版567.012028ms，有收益。
 - post70_body21.957709ms、preblock attention12.477671ms、首C32 attention3.014434ms，对照上版24.759466/15.376906/3.731706ms，保留。
 - 证据release/native-network70-c32-parallel-norm/，准备脚本release/prepare-c32-parallel-norm.ps1（ignored）；入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb -ParallelNorm。无收益ParallelOutput仍关闭，游戏DLL未更新，10fps未完成。
+# 2026-09-08：多头四Wave注意力候选
+
+- NATIVE_MULTIHEAD_FOUR_WAVES=1仅完整Wave QK/AV路径使用128线程，四Wave各16查询；归一化与softmax原64线程逻辑保留在t<64，barrier在分支外，AV按原两K32 H/F写回。不增LDS或全图缓冲，默认64线程旧路径。
+- runner仅为C64/C128/C256 native_wave_av CSO开启宏，512 split未开启；继承C32八Wave＋并行exp/prob/norm有效配置。
+- DXC/能力门禁通过，PID37460退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖552.613228ms、末5帧552.030206ms，首C64 attention3.520357ms。
+- 相对555.090092ms基线仅小幅差异，首层注意力局部几乎不变，暂不宣称稳定整网收益；不能把C32的有效结论无条件外推。保留显式候选。
+- 证据release/native-network70-multihead-four-wave/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1。游戏未更新，10fps未完成。
