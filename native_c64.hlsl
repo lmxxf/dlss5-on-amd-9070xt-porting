@@ -24,6 +24,12 @@
 StructuredBuffer<float> input:register(t0),weights:register(t1),feature:register(t2);
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;}
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+#if !NATIVE_WAVE_AV
+#error Parallel softmax requires Wave AV
+#endif
+groupshared float softmax_inverse[64];
+#endif
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float LegacyF(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 #if NATIVE_FAST_FP8
@@ -168,13 +174,22 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+ for(uint i=t;i<4096;i+=MULTIHEAD_THREADS){
+  float score=H(scores[i]+weights[4*MATRIX+head*4096+i]);
+  uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));
+  scores[i]=f16tof32(((bits<<5)+0x8000u)&65535u);
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
  if(t<64){
-#if NATIVE_SHARED_PROB && NATIVE_WAVE_AV
+#if (NATIVE_SHARED_PROB && NATIVE_WAVE_AV) || NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
  #define EXP_AT(x) scores[t*64+(x)]
 #else
  float ex[64],prob[64];
  #define EXP_AT(x) ex[x]
 #endif
+#if !NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
  [loop]for(uint key=0;key<64;key++){
 #if NATIVE_WAVE_SCORES
   float s=scores[t*64+key];
@@ -183,6 +198,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 #endif
   float score=H(s+weights[4*MATRIX+head*4096+t*64+key]);uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));EXP_AT(key)=f16tof32(((bits<<5)+0x8000u)&65535u);
  }
+#endif
  float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
   float total=0;[unroll]for(uint lane=0;lane<4;lane++){
    uint base=odd+(lane%2)*2+(lane/2)*8;float partial=H(EXP_AT(base)+EXP_AT(base+16));
@@ -190,12 +206,17 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
   }parity[odd]=total;
  }
  float inv=H(1/H(parity[0]+parity[1]));
-#if !(NATIVE_SHARED_PROB && NATIVE_WAVE_AV)
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+ softmax_inverse[t]=inv;
+#endif
+#if !(NATIVE_SHARED_PROB && NATIVE_WAVE_AV) && !NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
  [loop]for(uint key=0;key<64;key++)prob[key]=F(H(EXP_AT(key)*inv));
 #endif
 #if NATIVE_WAVE_AV
  // Q/K are dead after scores; reuse their rows for the two K32 probability blocks.
-#if NATIVE_SHARED_PROB
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+ // Probability conversion is assigned to the complete group below.
+#elif NATIVE_SHARED_PROB
  for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(F(H(EXP_AT(c)*inv)));keys[t*32+c]=float16_t(F(H(EXP_AT(32+c)*inv)));}
 #else
  for(uint c=0;c<32;c++){queries[t*32+c]=float16_t(prob[c]);keys[t*32+c]=float16_t(prob[32+c]);}
@@ -203,6 +224,15 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 #undef EXP_AT
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_PARALLEL_MULTIHEAD_SOFTMAX
+ for(uint i=t;i<4096;i+=MULTIHEAD_THREADS){
+  uint query=i/64,key=i%64;
+  float prob=F(H(scores[i]*softmax_inverse[query]));
+  if(key<32)queries[query*32+key]=float16_t(prob);
+  else keys[query*32+key-32]=float16_t(prob);
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  for(uint qr=t/32;qr<4;qr+=MULTIHEAD_THREADS/32)for(uint col=0;col<32;col+=16){
   A a=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);

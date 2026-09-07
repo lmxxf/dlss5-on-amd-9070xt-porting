@@ -6239,3 +6239,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC/能力门禁通过，PID37460退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖552.613228ms、末5帧552.030206ms，首C64 attention3.520357ms。
 - 相对555.090092ms基线仅小幅差异，首层注意力局部几乎不变，暂不宣称稳定整网收益；不能把C32的有效结论无条件外推。保留显式候选。
 - 证据release/native-network70-multihead-four-wave/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1。游戏未更新，10fps未完成。
+# 2026-09-08：多头注意力指数/概率全组并行
+
+- NATIVE_PARALLEL_MULTIHEAD_SOFTMAX仅Wave AV路径，128线程处理4096 score+bias/exp，原地复用scores；全组同步后原64查询分母树写64 float共享倒数；同步后全组计算原F(H(exp*inv))写死Q/K区，再同步进入原两K32 AV。
+- 不改指数近似/舍入/求和顺序，不增整图buffer，仅256B共享倒数。四Wave分工和C32有效配置保留，原shared-prob实验不启用。
+- DXC与能力门禁通过，PID39980退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖546.147404ms、末5帧546.866452ms，对照四Wave候选552.613228ms；首C64 attention2.854486ms对3.520357ms，保留。
+- 证据release/native-network70-multihead-softmax/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax。游戏DLL未更新，10fps未完成。

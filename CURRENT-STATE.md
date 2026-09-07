@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+多头四Wave并行softmax阶段15帧exact，暖546.147404ms、末5帧546.866452ms；首C64 attention2.85449ms（旧四Wave3.52036）。-ParallelSoftmax全组4096元素原地scores→exp，原64查询分母树写新增256B共享inv，再全组量化概率到死Q/K区。无新增整图buffer，H/F/求和顺序不变。证据release/native-network70-multihead-softmax；入口run_multihead_four_wave_network.ps1 -ParallelSoftmax，C32仍八Wave并行exp/prob/norm。游戏未改，10fps未达到。
+
 C64/C128/C256四Wave注意力候选15帧exact：MULTIHEAD_FOUR_WAVES=1，128线程、标量段t<64、矩阵查询循环按四Wave分工；无共享容量增加。暖552.613228ms、末5帧552.030206ms，首C64 attention3.52036ms，较555.090092ms基线只小幅整体差异，暂不宣称稳定收益。证据release/native-network70-multihead-four-wave；独立runner run_multihead_four_wave_network.ps1，C32仍八Wave/并行exp/prob/norm。游戏未改，10fps未达到。
 
 C32逐通道Q/K归一化并行15帧exact，暖555.090092ms、末5帧554.68984ms。-EightWaves -ParallelExp -ParallelProb -ParallelNorm，原平方和/rsqrt由64查询线程计算，新增128 float共享倒数；全组从原raw Q/K scores按元素缩放/量化，保留每次H/F和V量化。post70_body21.95771ms、preblock attention12.47767ms、首C32 attention3.01443ms；上版567.012028ms。证据release/native-network70-c32-parallel-norm；ParallelOutput仍关闭，游戏未改，10fps未达到。
