@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：surface/UAV探针兼容原版NR，捕获post写入句柄但初始资源映射仍缺
+
+- texture probe新增CreateUAV（device vtable19）、NVAPI独立descriptor及legacy surface接口前后记录，参数大小/offset按本机SDK断言。离线Windows转发测试通过4次mock调用，明确不替代真实ABI/hook验收。
+- 新构建SHA63454e711eb83579cbfcf78bfb9057235be6c4516dcdfefb21331c8bbf87c8f4。正常退出PID26192并同步，备份旧探针为.before-surface，安装并核对SHA。
+- 原DLSSNR-GameRequest仍被Steam主进程占用，LastTaskResult2147946720，不能Stop它（会影响Steam）；新增DLSSNR-GameRequest-Client请求任务通知现有客户端。新游戏PID12808，NR count1/60明确成功，未出现copy探针那种feature失败。
+- 原launch154 post70参数下载为surface/post70.bin，输出surface=0xa803；preblock slot8=0x8100000a808对应资源0x3915064a0、1920×1080 format10。surface0xa803首次independent_enter前缺对应非空UAV创建记录，之后记录是null clear，不能跳过null或用后次记录猜资源。需要提前安装view观察点。
+- 记录在release/native-game-history-contract/surface。当前运行63454e版诊断，原渲染DLL未替换。AMD完整受控网络已通过，但实际历史生命周期/游戏显示接入仍未完成。
+
 ### 2026-09-07：正常重启Steam后原版NR恢复，回退验证完成
 
 - Steam console日志确认旧Action6停在CheckShaderDepotManifest，gameprocess日志无新进程。正常执行Steam -shutdown并确认steam进程退出，再发一次启动请求；未强杀、未修改预缓存设置或绕过Steam。
