@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：时序encoder23..30/head对照通过，Linux ViT参考重放失败不可使用
+
+- 新增build_native_valid1080_split.py，session25905连续八层原CUBIN/CPU branch、ffn、attention、final共32检查全exact。pool/head与ViT准备工具增加--base，session56655主输出/池化/head检查全exact，640token输入已生成于temporal独立目录。
+- 新增Linux run_native_valid1080_vit_oracle.py，按既有Windows脚本同调用参数执行两次31..38；已有trial文件时拒绝覆盖。check_native_block256.py增加--base，默认旧目录不变。
+- /tmp旧expand工具起初exit2，重新从当前四个probe源码编译后session36541两次执行完成，但重放失败：block31 expand/contract/Q/K/V全相同，attention有4269字节不同，projection38969字节不同，后层被污染。所有trial保留，不能作为时序最终oracle，也未启动AMD全网错误对照。
+- attention两块aux拆为独立4MiB分配仍两次不一致（separate-A/B，首次字节8314），无效修改已通过apply_patch撤回且Linux工具重新编译。原因尚未证明，不认定是aux重叠；后续优先核对先前已验证的RTX原版执行环境与当前Linux启动合同。
+- 本轮游戏DLL未改。已完成的encoder/head对照仍有效，ViT及后续解码对照待完成，目标active。
+
 ### 2026-09-07：完整时序网络测试接线完成，原版对照推进到encoder22
 
 - d3d12_native_network70_test.cpp支持history/MV/reciprocal/独立temporal-final-oracle四项配套输入，缺任何一项提前拒绝。GPU motion→sampler在同队列先提交，再Run(...,enabled)；五帧off/on/off/on/off分别比较旧首帧与独立时序最终RGB。默认旧三帧单RGB不变，超时失败仍保留整个heap资源图，不在GPU未完成时析构。

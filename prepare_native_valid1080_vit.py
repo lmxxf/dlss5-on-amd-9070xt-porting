@@ -1,11 +1,12 @@
 """Prepare original ViT input from the same RGB head, checking both layouts."""
 from pathlib import Path
-import json
+import json,argparse
 import numpy as np
 from native_split_reference import bits
 from decode_tinlayout_global import e4m3fn
 
-base = Path('release/native-rgb-valid1080')
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base = args.base
 head = base / 'encoder-split/pool-head'
 maps = Path('release/native-vit/repack640')
 out = base / 'vit'

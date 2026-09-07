@@ -1,13 +1,14 @@
 """Original pool/head continuation from same-RGB block30 intermediates."""
 from pathlib import Path
-import json,subprocess
+import json,subprocess,argparse
 import numpy as np
 from native_c32_reference import H,F
 from native_c64_reference import multiply
 from native_split_weights import unpack
 from native_split_reference import bits
 from decode_tinlayout_global import e4m3fn
-base=Path('release/native-rgb-valid1080/encoder-split/decoder-block30');root=base.parent/'pool-head';root.mkdir(exist_ok=False)
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base=args.base/'encoder-split/decoder-block30';root=base.parent/'pool-head';root.mkdir(exist_ok=False)
 r=json.loads((base/'validation.json').read_text());assert r['status']=='pass' and all(c['different']==0 for c in r['checks'])
 subprocess.run(['/tmp/native-split-pool-oracle',str(base/'output.fp8.attn'),str(base/'output.fp8.ffn'),str(base/'block30-3.weights'),str(root/'main.fp8'),str(root/'pool.fp8'),'60','36','32','20'],check=True,timeout=20)
 inv=np.argsort(np.load('release/native-c512/split-view/mapping.npz')['cell_output_to_hwc'])
