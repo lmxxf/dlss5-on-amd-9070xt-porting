@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD完整0..70时序五帧验收全exact，下载复核通过
+
+- 修正部署后的PID43244完成，原exec session9405明确exit0。五帧history0/1/0/1/0，各6635520个RGB值different0，覆盖首帧、历史启用、重置、再启用与再重置；同一资源图，生产者/网络按同队列提交。
+- 下载到release/native-temporal-network70-accepted，保留stdout/stderr、run.json、19-shader manifest及两种最终输出。两文件分别cmp原版oracle逐byte一致，finite。
+- 新增validate_native_temporal_network70.py复核五帧日志、尺寸、原版逐byte与两种输出确实不同。首帧SHA c1d6ab580e4d3bfb46acb90646d1a65d609cbcf6dbdcdde12d1bef18703afbe3；时序SHA ca0e84326d6d9b7df10be8af5cc4b9b970ae4948c7a26b89e7a85dbe99dfd624。报告pass=True、game_verified=False。
+- 这是完整GPU受控valid1080计算验收，不是实际游戏历史反馈/显示验收。未修改游戏DLL，未宣称FPS或最终移植完成。后续转入原版历史资源追踪、实际输入转换/状态与新DLL最终画面验证。
+
 ### 2026-09-07：首轮全网失败来自漏同步input shader，补部署清单后重新验收
 
 - PID24280最终结束；原session86169收尾。frame0 history0的6635520值全exact，frame1 history1有6631403差异后停止。两帧GPU文件SHA均c1d6ab580e4d3bfb46acb90646d1a65d609cbcf6dbdcdde12d1bef18703afbe3，说明历史分支未产生不同输出。
