@@ -2975,6 +2975,11 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机请求1原版参考ViT至decoder47全部通过
+
+- session4634自然结束exit0，vit/validation.json确认56阶段different0/finite/tail_zero/replay_identical；decoder39不同0/有限/反布局exact，40..47各子阶段原版/CPU全部通过。
+- 已启动同源48→49..55→56→57..61条件串联参考/CPU验证，仍使用reference-request-1/network中的encoder skip，不混用旧合成输入。该任务尚待结果；游戏控制版不重启、不新增请求，捕获after仍原样保留待最终独立比较。
+
 ### 2026-09-07：实机请求1参考encoder全过，ViT双重放一致
 
 - session70189原版1..22捕获完成exit0；session86188原版/CPU main1..22全部different0/finite（normalizer中间cast警告仍如实保留）。session88443原版/CPU23..30四子阶段及pool/head全exact，同源ViT输入准备完成。
