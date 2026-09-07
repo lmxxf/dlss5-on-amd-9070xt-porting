@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：分段提交入口审计与FFX顺序观察器
+
+- ReShade6.8源码d3d12_command_queue.cpp中execute_command_list事件在_orig->ExecuteCommandLists之前，且其间还flush immediate list；不能将该回调当成生产者已提交的after事件，否则神经消费者顺序仍错。
+- 新增native_submission_order_probe.cpp，FFX原调用前后、close、before-execute、draw/dispatch只读日志，记录线程/tick/list/native list/queue，首个FFX后最多8192条；不关闭/提交/重置list，不发GPU工作、不吞原结果，遇existing hook冲突不强改其它addon。限定剑星进程，模块pin保证hook存活。
+- addon编译通过；test_native_submission_order在AMD Windows通过，检查原函数返回值/参数转发、null普通调用、事件不抑制命令。尚未部署游戏，后续需处理旧runtime可能占用同一FFX hook，并先备份/正常退出；目前不能声称已观察到实际命令列表边界。
+
 ### 2026-09-07：单list全网络触发DEVICE_HUNG，禁止生产使用
 
 - PID408自然结束，session40586 exit1。所有shader初始化完成后，首帧尚未产生计时/像素结果即报game submission HRESULT2289696774=0x887a0006 DXGI_ERROR_DEVICE_HUNG；不能验收或反复重试同策略。日志/run保存release/native-single-list-failed。
