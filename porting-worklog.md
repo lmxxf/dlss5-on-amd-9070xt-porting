@@ -6089,3 +6089,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 诊断每次增加timestamp查询、读取和fflush，约61.43ms发生在Submit内部wall取样之后及外层其它工作；不能用这个有观察开销的760.6ms直接否定无诊断649ms基线，也不能宣称全部118ms可省。
 - 当前643ms GPU区间仍远超100ms，后续优先512 FFWD分阶段并行等GPU工作。此轮无算子提速、不修改游戏DLL、不改变提交策略；历史整网/整阶段合并的DEVICE_HUNG禁重试边界保持。
 - 证据release/native-network70-current-submit-profile/{profile-validation,submission-validation}.json及日志/输出（ignored）；运行入口run_current_submit_profile.ps1；准备脚本release/prepare-current-submit-profile.ps1。
+# 2026-09-08：512 FFWD独立通道组并行
+
+- 复查旧Wave融合版后发现无需先做三pass全图暂存：八个64通道FFN组互相独立，每组可只计算自身的64行混合投影。新增native_wave_split_ffwd_parallel.hlsl，Dispatch Y=8；每组依然依赖全部512输入，后续64→256→64前馈及K32 H/F/gate原样。
+- mixed共享区16×528 half缩为16×80，其余hidden/tile/temp不变；无新增整图缓冲。原native_wave_split_ffwd.hlsl候选保留不覆盖；PARALLEL_SPLIT_FFWD单独开关，复用原无损half本地权重打包。普通默认路径不变。
+- 静态回归test_parallel_split_contract.py验证8组输出、展开/收缩权重一一覆盖和H/F原样；MinGW/DXC构建通过。完整测试PID41392退出0，15帧最终6635520值different0，下载两份结果与独立原版参考byte-exact。
+- 暖均597.88739ms、末5帧598.934558ms；649.227125ms基线的首split_stage0 3.430111→1.178869ms，encoder23_30_body 42.021329→22.322743ms。整网仍约1.67fps，不能算达到10fps。
+- 证据release/native-network70-parallel-split/，准备脚本release/prepare-parallel-split.ps1（ignored）；运行入口run_parallel_split_network.ps1继承ViT Wave/C32 coalesced基线。未更新游戏DLL，未更改提交策略。

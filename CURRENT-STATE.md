@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新512 FFWD按8个独立通道组并行：15帧最终exact，暖597.88739ms、末5帧598.934558ms。PARALLEL_SPLIT_FFWD显式启用，内部共享mix仅16×80 half，每组只算自身64混合输出但仍读取全部512输入；不增整图scratch、不改网络/权重/舍入。首split_stage0 3.43011→1.17887ms，encoder23_30_body 42.02133→22.32274ms。旧融合8组候选仍保留且WAVE_SPLIT_FFWD=0。证据release/native-network70-parallel-split；run_parallel_split_network.ps1继承649ms配置。游戏DLL未更新，10fps未达到。
+
 最新基线逐提交诊断完成：15帧exact，每帧512次（reflect/temporal＋网络，不含验证读回；连读回计513），暖GPU区间642.60923ms、外层wall760.63721ms、差118.02799ms，其中逐Submit内部wall合计699.20364ms。额外timestamp/readback/fflush造成观察开销，不把此wall与无诊断649ms直接比较；GPU区间含访存/barrier，非纯计算。证据release/native-network70-current-submit-profile；analyze_submission_profile.py排除初始化队列及验证读回。仍需重点改GPU算子，下一候选512 FFWD分阶段并行；不重试已DEVICE_HUNG的整网/整阶段合并。生产路径未改。
 
 最新ViT Wave注意力15帧exact，暖649.227125ms、末5帧652.626334ms。WAVE_VIT_ATTENTION显式开启，16查询/组，QK和AV用Wave矩阵；原exp位映射、denominator树及K32 H/F顺序不变，输入F8→half无损。八层stage3由约7.54～7.83ms变为3.68～4.58ms；其他阶段有波动，整网仅由661.67降到649.23ms。21,568字节组共享区，无新增全图缓冲/无提交合并。证据release/native-network70-wave-vit-attention，运行run_wave_vit_attention_network.ps1继承C32 coalesced配置。游戏DLL未改，10fps未达到。
