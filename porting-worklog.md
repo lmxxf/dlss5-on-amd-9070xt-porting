@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整链初始化持续，排除重复追同一copy wrapper
+
+- AMD同PID24536仍Responding，CPU从65秒继续增长、shader编译日志更新；未重新启动或改正在使用的shader。
+- 原版静态反汇编RVA5c0f0显示其取得source描述后经backend vtable+170转调；已捕获backend表该槽为5c070。因此5c0f0并非一条可绕过既有5c070探针的独立拷贝路径，不应再添加同类hook期待新的证据。
+- 5090最新PID22724的internal-copy日志仅hook_status0/signature_match，没有copy调用；之前11912/26572亦如此。只能判定该wrapper未被观测到，不能证明没有历史更新。当前参数目录native-kernel-params-22724-74955031，可继续追资源绑定/其它写入路径。
+- 本轮未动游戏和GPU实现，完整颜色链仍在session66185等待终态。
+
 ### 2026-09-07：AMD NativeGameFrame完整颜色链测试正式启动
 
 - 重新编译实际NativeGameFrame测试exe；新目录D:\DLSSNR-Lab\native-color-frame-test从已验证网络目录复制顶层系数/着色器，再部署4个颜色路径shader、源图及独立expected。旧目录保留不动。
