@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+矩阵展开已接NativeC64真实GPU特征→收缩→attention→projection，block52五轮最终2211840值与原版oracle和旧分块baseline一致。仅显式use_matrix参数启用（C256/split限定），游戏未启用。性能反而差：展开6.15166ms vs已优化baseline2.14514ms；预打包half探针不能代表直接FP32输入接口成本。证据release/matrix-c256-integrated/result.log。下一步测GPU一次打包供各输出块重用，不能推广此慢版。
+
 最新矩阵展开含gate/F：完整8847360输出矩阵/标量逐字节一致，CPU gate参考也different0。矩阵1.748128ms、标量探针2.384248ms；原生half转换变体2.156008ms且910515值不同、max2、MAE0.0020885349，不采用。仍未包含运行时输入packing及完整网络，下一步接GPU算子接口。证据release/matrix-real-probe/timing-activated.txt。
 
 最新硬件矩阵完整尺寸线性展开：block52全部8640×1024输出，K256每K32 H；矩阵0.801680ms、标量探针2.170559ms（各10次、无独立暖机），8847360实际float结果finite且cmp逐字节一致。证据release/matrix-real-probe/timing-full.txt。尚不含运行时输入packing、gate/收缩、整网，不是对最优旧FFN的端到端速度比较。下一步接真实算子接口与激活。

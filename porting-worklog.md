@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：矩阵展开接完整C256核心，数值通过但直接FP32输入慢
+
+- native_matrix_expand.hlsl采用t0 FP32特征、t1打包half原权重、u0展开float输出，width/height参数；权重初始化一次CPU无损打包K32块，每float→half检查表示范围/尾位，默认不启用。NativeC64最后可选use_matrix仅允许split C256，CSO缺失拒绝。
+- bench新增matrix模式和MATRIX_BENCH构建（Agility721、设备创建前实验特性），baseline也用已有完整tiled FFN/projection，candidate只替换expand，公平比较同一当前设备及输入。后续contract/attention/projection仍旧实现，无层间CPU特征注入。
+- session86180 exit0，block52五轮最终2211840值baseline_diff/fast_diff/bit_diff全部0。暖轮expand baseline2.14514ms vs matrix6.15166ms；其余约接近。直接FP32读取/转换与预打包half探针不同，不能沿用1.75ms宣传接口性能。
+- 日志release/matrix-c256-integrated/result.log。下一步GPU一次packing供矩阵重复读，分开量packing成本；此慢接口仅实验保留，安装游戏DLL/裁判链未改，10fps未达到。
+
 ### 2026-09-07：矩阵展开接原gate/F，保留软件half舍入
 
 - matrix_real_probe可选APPLY_ACTIVATION将原gate多项式、每处H及最终F接回，两独立路径均输出实际值。session22015 exit0，完整8640×1024，矩阵1.748128ms、标量探针2.384248ms，10dispatch/UAV barrier，无独立暖机。
