@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：ReShade被动视图事件可用，避免初始化期虚拟资源查询
+
+- 新增native_resource_view_events.cpp使用API20 init_resource_view通知，无NGX/device方法替换。首版调用get_resource_desc的d77225d1 addon导致PID19072启动访问异常（Steam exit -1073741819），未得到有效日志；已移为.failed-resource-query，截图确认崩溃报告并选Don't Report关闭，未上传。
+- 精简版仅记录事件payload，不调用device虚拟方法；过滤format10/34、最多8192条，维度与native device身份需另证。构建SHA865b9ead756f8fdce996c1a91be9f13ed3d43a900eefd96aa1c06a792f15f64b，安装后PID19264正常，NR count1/60成功。
+- passive目录取得8192视图事件与同步NVAPI日志。ReShade view句柄如0x4eafd240，而NVAPI独立surface的desc为0x1e0000004等；不能直接按数值相等合并。缺CreateUAV不一定是安装晚，也可能是描述符复制/虚拟化；之前“必然初始创建早于安装”的解释收窄为假设。
+- 后续先查ReShade描述符句柄转换/复制的合同，尽量使用已有事件与元数据而非再拦截NGX入口。当前游戏运行payload-only事件addon及63454e surface探针，原渲染DLL未替换；AMD游戏接入仍未完成。
+
 ### 2026-09-07：提前CreateFeature观察入口不兼容，已撤回并确认NR恢复
 
 - 试加CreateFeature入口hook，用GetDevice在原创建前安装view观察；五次离线mock转发检查通过，但不等于真实API兼容。新d56e731e版经备份部署后PID9832的feature18 create报0xbad00002，不能用于资源来源推断。
