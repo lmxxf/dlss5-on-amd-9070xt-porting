@@ -6264,3 +6264,13 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - test_vit_chunk_coverage.py覆盖64/256/640 tokens，验证16-token输出tile集合一致、无重复/遗漏。MinGW编译通过，能力门禁正常，PID42860退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact，无DEVICE_HUNG。
 - 暖472.903032ms、末5帧471.599902ms，对照540.422252ms；八层vit*_stage0合计75.668194→33.150935ms。其余阶段亦有变化，不把全部差额归于纯计算；但单次dispatch粒度在当前矩阵路线显然值得继续研究。
 - 证据release/native-network70-vit-chunk2/，准备脚本release/prepare-vit-chunk2.ps1（ignored）；入口run_vit_expand_chunk2_network.ps1继承多头八Wave/并行softmax与C32八Wave并行exp/prob/norm。游戏DLL未更新，约2.11fps测试链不是10fps，目标未完成。
+
+# 2026-09-08：朱雀接手性能优化（05:15–09:05）
+
+闇 GPT 额度见底后由朱雀（Fable 5.1）继续。起点 472.9ms（vit-chunk2），终点 242～252ms（噪声 ±5ms），15 帧全部逐字节 exact，验收标准未降。全部改动为显式 flag、默认关闭、逐个 release 目录留证、逐个 commit；游戏 DLL 未改。
+
+收益链（暖轮 ms）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366 → resident-weights 338 → shift-stack 332 → wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293 → fused-exp 289 → vit-attn-half 271 → wave-project 254 → local-c32-attn 246。三个中性探针（fast-f / static-length / matrix-store）保留 flag 未采纳。
+
+机制全是数据搬运：权重原本全部在 UPLOAD 堆每帧过 PCIe（非本地段 492MB→205MB）；GEMM 每 16×16 输出 tile 重读整行 A，改为每 wave 4 个 tile 复用一次装载；FP8 格点的中间层用 f32 存改 f16；LDS→temp→LDS 转存与多余 barrier 删除；20 段小 dispatch 合成单 dispatch；ViT 注意力读打包 f16 直取 K/V、分母树两 lane 并行；多头注意力 exp 直接从 QK 寄存器写入 f16 Q/K 槽、删掉 16KB f32 scores。每个输出元素的 K32 乘加序列与 H() 次数不变，exact 是构造性的。
+
+两条工程教训：(a) 延迟提交模式下 per-stage GPU 时间戳会前移到下一个有硬同步的 stage，只能信整帧 total；(b) 闇记录的 decoder_stage1 在 4.5/13.9ms 间的双稳态，根因是 decoder39 入口权重有时落在系统内存，与提交方式无关。另：HLSL round() 是 RNE，位元 FP8 量化若用 half-away 会直接不 exact。

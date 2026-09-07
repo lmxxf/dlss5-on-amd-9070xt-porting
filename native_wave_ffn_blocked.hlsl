@@ -42,9 +42,14 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   uint col=(gid.y*BLOCK_N+n)*16;
   for(uint i=0;i<acc[n].Length();i++){
    float v=acc[n].Get(i),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
-   float r=F(H(v*p));uint2 rc=acc[n].GetCoordinate(i);
-   output.Store<float16_t>(((gid.x*16+rc.x)*HIDDEN+col+rc.y)*2,float16_t(r));
+   acc[n].Set(i,F(H(v*p)));
   }
+#if NATIVE_SCATTER_STORE
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);output.Store<float16_t>(((gid.x*16+rc.x)*HIDDEN+col+rc.y)*2,float16_t(acc[n].Get(i)));}
+#else
+  // Values are on the FP8 grid, so the f16 cast is exact; the matrix store writes coalesced rows.
+  acc[n].Cast<dx::linalg::ComponentType::F16>().Store(output,(gid.x*16*HIDDEN+col)*2,HIDDEN*2,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
  }
 }
 

@@ -53,9 +53,13 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   uint col=(gid.y*BLOCK_N+n)*16;
   for(uint i=0;i<acc[n].Length();i++){
    float a=acc[n].Get(i),g=clamp(a,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
-   float r=F(H(a*p));uint2 rc=acc[n].GetCoordinate(i);
-   output.Store<float16_t>(((first+rc.x)*4096+col+rc.y)*2,float16_t(r));
+   acc[n].Set(i,F(H(a*p)));
   }
+#if NATIVE_SCATTER_STORE
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);output.Store<float16_t>(((first+rc.x)*4096+col+rc.y)*2,float16_t(acc[n].Get(i)));}
+#else
+  acc[n].Cast<dx::linalg::ComponentType::F16>().Store(output,(first*4096+col)*2,4096*2,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
  }
 }
 
