@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：post原点GPU小区块回归通过
+
+- d3d12_native_post70_test增加crop模式（16×16）及严格0..3的DLSS5_TEST_POST_SHIFT，打印实际配置；旧512/game默认shift0保持不变。prepare_native_post_origin_gpu.py生成分开的origin0/origin3夹具，各自使用原版输出，防止混用oracle。
+- session99829完成AMD两组各三帧：每帧768个RGB值different0/max0，无中间CPU传输。shift3对应原点(-4,-4)，不是用zero结果验收平移路径。下载两组gpu.f32再cmp各自oracle逐byte一致。
+- 此验证只覆盖16×16，尚需完整处理1920×1152与有效1920×1080纹理的实机post合同；完整网络默认尚未切换，不将小区块通过称游戏修复完成。本轮游戏未改。
+
 ### 2026-09-07：实机post原点差异有实质影响，shift参考小样本全exact
 
 - run_original_post.cpp新增严格0/-4的DLSS5_POST_TEST_ORIGIN，仅native实验模式可用，默认零原点不变。相同16×16输入原点改(-4,-4)，768个RGB值全部改变，max_abs0.030853271；重编译后的零原点控制仍与旧输出逐byte一致。
