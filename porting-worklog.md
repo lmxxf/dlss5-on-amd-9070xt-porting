@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：真实游戏帧端到端独立原版对照逐位一致
+
+- 实机请求1同源参考48..61任务43619及62..69/post任务58039均exit0，原版/CPU分段检查全部通过。post使用origin-4/valid1080/HALF原版surface，展开float再存half经逐值无损检查后上传AMD原版decode执行器。
+- AMD原版decode/候选三scale各8294400 half不同0/invalid0；下载原版第一路scale1 expected.f16。新增verify_live_neural_reference.py先验证reference source与真实before逐byte相同、尺寸/有限性/非黑/alpha，再比较真实after与独立expected，session39699正式通过。
+- 结果bit_different0/max_abs0，actual和reference SHA均ff760f3cc93b751c4e05a57fee71fc7ea134471bc8595e8b536c568375c5ec40；source SHA3c17d04f07696fb682a32f022e0b88017f2d050dbe841bfbf36d065565b82a3e。报告neural-34096-request-1-reference-validation.json标记single_frame_verified=true，temporal_verified=false、realtime_verified=false。
+- 这是首个真正角色场景在剑星内部执行完整移植链并写回后，得到独立原版逐位一致的证据，不再仅是加载成功/像素变化/黑图或合成夹具通过。仍明确history0诊断重置，不能代替连续时序、性能及动态视觉验收；目标保持未完成。
+
 ### 2026-09-07：实机请求1原版参考ViT至decoder47全部通过
 
 - session4634自然结束exit0，vit/validation.json确认56阶段different0/finite/tail_zero/replay_identical；decoder39不同0/有限/反布局exact，40..47各子阶段原版/CPU全部通过。
