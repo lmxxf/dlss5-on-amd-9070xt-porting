@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：正常重启Steam后原版NR恢复，回退验证完成
+
+- Steam console日志确认旧Action6停在CheckShaderDepotManifest，gameprocess日志无新进程。正常执行Steam -shutdown并确认steam进程退出，再发一次启动请求；未强杀、未修改预缓存设置或绕过Steam。
+- 新Steam PID15328完成登录，启动经过清单阶段后Action1 Completed，游戏PID26192建立并Responding=True。ReShade10:24:35/36明确inline feature18 evaluation succeeded count1/60，输入/输出1920×1080。已确认撤回copy hook后NR恢复，不能只靠菜单画面判断。
+- 恢复日志保存release/native-game-history-contract/restored。已废弃的copy hook源码不在当前树；原渲染DLL未替换。后续改用输出surface/UAV描述符绑定观察历史写入目标，不再碰不兼容的command-list copy hook。
+- AMD完整受控网络通过仍是有效证据，但实际AMD游戏输入/历史生命周期/最终显示接入仍待完成，目标active。
+
 ### 2026-09-07：CopyResource观察探针导致原版NR暂停，已撤回，重启待确认
 
 - 尝试在NGX Evaluate前安装command-list CopyTextureRegion/CopyResource只读记录（槽16/17经SDK核对），限定前8帧；诊断addon SHA8e47de38...。备份原native-ngx-input-contract为.before-copy-trace，正常退出及Steam同步后更新。
