@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：池化和Wave下采样投影，整网688ms
+
+- 原raw下采样单线程算整通道改为pool pack＋Wave GEMM两pass；池化保持top/bottom H、总和H、*.25 H及F，有效矩形外显式零。投影每K32 H和最终F不变，权重初始化无损half/DEFAULT，工作缓冲借图级packed，state显式切换。
+- WAVE_HEAD限定padded head初轮session56561/PID36164 exit0，15帧输出逐字节原版一致，head16.74132→0.044097ms，整网693.0649507ms。
+- 扩展WAVE_DOWNSAMPLE至其他raw通道，首轮session20664/PID3464 exit1：参数化误将F中固定*512改成*MATRIX_CHANNELS，非硬件误差。已改回并增加test_head_quantization_contract.py防回归，错误stdout/stderr/output远端param-error.*保留。
+- 修正后session65029/PID18452 exit0，15帧实际最终两GPU输出逐字节原版一致，暖688.0306321、末5帧685.438654ms。local14712860672/budget15403425792，预算内。
+- 仅raw路径启用，ds4特殊已池化输入不变；extent/工作区检查拒绝未支持尺寸。证据release/native-network70-wave-head、-wave-downsample。编译/diff及静态回归通过，安装游戏未改，10fps未达到。
+
 ### 2026-09-08：512融合Wave FFWD无收益，定位入口head低并行投影
 
 - native_wave_split_ffwd保持512混合→F→八组64/256/64 gate/收缩，各K32 H；一wave16像素，共享mixed/hidden带padding，原权重无损half本地驻留，默认WAVE_SPLIT_FFWD关闭。
