@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：新输入encoder1..22全exact，ViT replay通过并启动数值校验
+
+- session88265自然结束exit0，blocks1..22每层原版/CPU main different0、finite；有normalizer中间cast overflow警告，但各层最终数值和有限性断言均通过，不隐藏该警告。
+- 5090 session16982自然结束exit0，blocks31..38共56个阶段trial1/trial2 hash一致。已下载block目录至新base，未改用Linux不稳定attention执行器。
+- 新session3800执行check_native_block256.py --valid1080 --tokens640 --last-block38 --base新目录，随后条件串联decoder39及decoder40..47；当前已打印block31 expand different0/finite/tail_zero/replay_identical。任务仍运行，后续须检查此session，不重复启动。
+- 最终expected.f16仍待其余解码器/post/原版decode生成，整链GPU测试及游戏DLL验证未执行。
+
 ### 2026-09-07：新颜色输入原版encoder参考推进至ViT
 
 - session53276生成原版blocks1..22完成exit0，capture记录各段输入路径/hash、长度及有限性；不是把此完整生成等同算术校验。
