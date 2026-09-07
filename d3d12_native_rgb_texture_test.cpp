@@ -21,11 +21,13 @@ int wmain(int argc,wchar_t**argv){try{
    float low=half_value(h),high=half_value(h+1),middle=(low+high)*.5f;
    unsigned mode=unsigned(i%4);float value=mode==0?low:mode==1?middle:std::nextafter(middle,mode==2?low:high);
    v[i]=i<expected.size()?value:123.f;
-   if(i<expected.size())expected[i]=mode==0||mode==2?h:mode==3?h+1:h+(h&1);
+   // Original CUDA post HALF surface is truncation for nonnegative RGB;
+   // independently established by check_native_post_half_surface.py.
+   if(i<expected.size())expected[i]=h;
   }input->Unmap(0,nullptr);
   submit.Submit([&](ID3D12GraphicsCommandList*c){bridge->Record(c);D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={bridge->Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};c->ResourceBarrier(1,&b);D3D12_TEXTURE_COPY_LOCATION src{},dst{};src.pResource=bridge->Output();src.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;dst.pResource=rb;dst.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;dst.PlacedFootprint=fp;c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);});
   D3D12_RANGE range{0,SIZE_T(bytes)};ck(rb->Map(0,&range,&p));size_t different=0;
   for(UINT y=0;y<1080;y++){auto*row=reinterpret_cast<unsigned short*>(static_cast<char*>(p)+fp.Offset+y*fp.Footprint.RowPitch);for(UINT x=0;x<1920;x++){for(UINT ch=0;ch<3;ch++){size_t k=(size_t(y)*1920+x)*3+ch;bool bad=row[x*4+ch]!=expected[k];if(bad&&different<12)printf("mismatch k=%zu mode=%zu got=%04x expected=%04x\n",k,k%4,row[x*4+ch],expected[k]);different+=bad;}different+=row[x*4+3]!=0x3c00;}}
-  rb->Unmap(0,&none);printf("rgb_texture frame=%u values=8294400 different=%zu midpoint_round_even=1\n",frame,different);fflush(stdout);if(different)throw std::runtime_error("RGB texture mismatch");
+  rb->Unmap(0,&none);printf("rgb_texture frame=%u values=8294400 different=%zu nonnegative_truncate=1\n",frame,different);fflush(stdout);if(different)throw std::runtime_error("RGB texture mismatch");
  }delete bridge;return 0;
 }catch(const std::exception&e){fprintf(stderr,"%s\n",e.what());return 1;}}

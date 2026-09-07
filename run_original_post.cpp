@@ -97,10 +97,12 @@ int main(int argc, char **argv) {
     check("copy weights", cuMemcpyHtoD(weights_device, weights.data(), weights.size()));
     check("copy blend", cuMemcpyHtoD(blend_device, blend.data(), blend.size()));
 
+    const bool half_surface=std::getenv("DLSS5_POST_TEST_HALF_SURFACE")!=nullptr;
+    if(half_surface&&!native_mode)return 2;
     CUDA_ARRAY3D_DESCRIPTOR output_desc{};
     output_desc.Width = width;
     output_desc.Height = texture_height;
-    output_desc.Format = CU_AD_FORMAT_FLOAT;
+    output_desc.Format = half_surface?CU_AD_FORMAT_HALF:CU_AD_FORMAT_FLOAT;
     output_desc.NumChannels = 4;
     output_desc.Flags = CUDA_ARRAY3D_SURFACE_LDST;
     CUarray output_array;
@@ -179,19 +181,25 @@ int main(int argc, char **argv) {
 
     void *arguments[] = {params};
     std::vector<float> output(static_cast<size_t>(width) * texture_height * 4);
+    std::vector<uint16_t> half_output(half_surface?output.size():0);
     CUDA_MEMCPY2D download{};
     download.srcMemoryType = CU_MEMORYTYPE_ARRAY;
     download.srcArray = output_array;
     download.dstMemoryType = CU_MEMORYTYPE_HOST;
-    download.dstHost = output.data();
-    download.dstPitch = width * 16;
-    download.WidthInBytes = width * 16;
+    download.dstHost = half_surface?static_cast<void*>(half_output.data()):static_cast<void*>(output.data());
+    download.dstPitch = width * (half_surface?8:16);
+    download.WidthInBytes = download.dstPitch;
     download.Height = texture_height;
     const auto launch_and_download = [&]() {
         check("launch", cuLaunchKernel(function, (width + 7) / 8 + 1,
             (height + 7) / 8 + 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));
         check("sync", cuCtxSynchronize());
         check("download", cuMemcpy2D(&download));
+        if(half_surface)for(size_t i=0;i<output.size();i++){
+            unsigned h=half_output[i],e=(h>>10)&31,m=h&1023;
+            float value=e==0?std::ldexp(float(m),-24):e==31?(m?NAN:INFINITY):std::ldexp(float(1024+m),int(e)-25);
+            output[i]=(h&0x8000)?-value:value;
+        }
     };
     if (feature_mode) {
         std::vector<unsigned char> controlled(weights.size(), 0);

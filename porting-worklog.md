@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：原版HALF surface证实截断，RGB纹理桥通过
+
+- run_original_post.cpp新增native-only DLSS5_POST_TEST_HALF_SURFACE，以CU_AD_FORMAT_HALF创建输出surface，按8byte/pixel下载后精确展开half到float；输入/权重/实机尺寸、origin-4、word70=1保持不变。输出live-half-surface.f32。
+- check_native_post_half_surface.py比较原版FLOAT/HALF两次同源输出：8294400 RGBA值，nearest-even差3109247，非负向零截断差0、全部有限。这里是原版CUDA固定夹具，不是直接读游戏像素；确立当前0..1神经RGB输出域的舍入规则。
+- 据此修正桥测试预期为非负截断，保持native_rgb_texture.hlsl不变（不能错误加f32tof16最近舍入）。AMD session49696 A/B/A三帧各8294400值different0，正中点及上下float ULP、底部裁剪、alpha1和重复帧通过。前一失败结果仍在git历史及日志中，明确是nearest-even假设错误。
+- 下一步将已验证encode→network→RGB纹理桥→decode组成实际渲染边界，真实历史反馈与游戏内验收仍未完成。
+
 ### 2026-09-07：RGB→FP16桥测试发现舍入假设不成立（未通过）
 
 - 新增d3d12_native_rgb_texture_test.cpp，真实NativeRgbTexture输出1080p，对输入构造half可表示值、正中点、中点上下一个float ULP，padding区写123以检查裁剪；计划A/B/A连续帧并检查alpha1。
