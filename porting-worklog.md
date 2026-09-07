@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：Wave展开接GPU核心，净收益验证
+
+- native_wave_expand从t0 GPU打包half特征、t1原权重、u0 raw输出，16像素×16输出/32线程wave，保留K32 H和原gate/F。NativeC64显式use_wave依赖pack_input/C256，W1仅该模式改row-major half，QKV权重打包不变，独立native_wave_expand.cso。
+- bench wave模式baseline也开启Thread矩阵展开、GPU packing和矩阵QKV，candidate只改变展开Wave；同一设备交替顺序五轮，完整最终2211840值baseline_diff/fast_diff/bit_diff全0，session70414 exit0。
+- 暖轮baseline input_pack0.19398、expand1.24613；candidate0.19372/0.34431ms。完整核心6.97843→6.11890ms，约12.3%下降；candidate contract1.69639、attention2.68879仍是大项。全部新增打包成本已计入，不使用预打包探针倍率冒充真实收益。
+- 证据release/matrix-c256-wave/result.log；编译/diff检查通过。未整网/游戏启用，下一步Wave收缩及后续整网验收，10fps未达到。
+
 ### 2026-09-08：Wave协作矩阵展开0.732ms且保持exact
 
 - 先测试Thread scope完整K256而非8段H：matrix_wide_expand耗时1.713773ms，8847360值中172676不同，max2/MAE0.0004069441/RMSE0.009112102。相比K32 exact的1.748128ms收益很小，未采用。

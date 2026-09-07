@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新Wave展开已接C256 GPU核心链：同轮baseline为Thread矩阵展开＋矩阵QKV，候选只换Wave展开；五轮最终2211840值原版/两路字节一致。展开1.24613→0.34431ms，打包约0.194ms均计入，完整核心6.97843→6.11890ms。证据release/matrix-c256-wave/result.log。use_wave显式参数、仅packed C256，默认关闭；下一步Wave收缩（当前约1.7ms），尚未整网/游戏启用。
+
 2026-09-08新方向：Wave scope矩阵×矩阵展开探针16×32乘32×16，保留每K32软件H，完整8847360值对exact激活参考零差异，0.732240ms。此前Thread scope完整K256累加1.713773ms且172676值不同，无实质收益不采用。证据release/matrix-real-probe/timing-wide-wave.txt。下一步把Wave算子接GPU链，尚不含运行时packing、不宣称整网速度。
 
 C64矩阵实验15帧exact但变慢：暖均1441.31863ms、末5帧1437.48887ms；相比C128/C256共享基线，encoder5_8+42.09、tail63_65+31.96、body62+10.18ms，回退主要就在C64。local14.531GB低于15.397GB预算，不是上轮超预算情形。DLSS5_TEST_MATRIX_C64默认关闭，不采纳到游戏；仅开启时扩workspace至488×296×64，否则维持C128大小。证据release/native-network70-matrix-c64/。
