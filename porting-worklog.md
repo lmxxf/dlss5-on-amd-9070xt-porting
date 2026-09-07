@@ -6257,3 +6257,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 原raw Q/K来自逐K32 H结果，本样本转half无损；未改权重、网络和输入依赖，只新增512B共享，默认关闭。
 - DXC/能力门禁正常，PID14292退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖546.822146ms、末5帧545.92308ms，差于上一540.422252ms；首C64 attention2.447091ms没有改善，encoder15_22/tail49_55为34.100629/35.599209ms，C256相关区间明显退步，未进一步归因硬件原因。
 - 不采纳-ParallelNorm，保持八Wave并行softmax基线。证据release/native-network70-multihead-norm/，准备/manifest脚本在release/（ignored）；显式复现run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax -EightWaves -ParallelNorm。游戏DLL未更新，10fps未完成。
+# 2026-09-08：ViT展开单dispatch工作块加倍，显著改善
+
+- 重新检查发现Wave展开仍沿用标量时期65536输出分块，每次只有16 token。VIT_EXPAND_CHUNK2=1仅wave_expand设chunk_values131072，即32 token；ChunkCount/RecordChunk/Record使用同一成员，收缩/投影/decoder仍65536。
+- 每个扩大后的块仍独立Submit/fence等待，不把多个旧dispatch合并到同一大command list，也不重试历史整阶段/整网大列表。矩阵shader、K32 H/F、输入依赖与缓冲不变。
+- test_vit_chunk_coverage.py覆盖64/256/640 tokens，验证16-token输出tile集合一致、无重复/遗漏。MinGW编译通过，能力门禁正常，PID42860退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact，无DEVICE_HUNG。
+- 暖472.903032ms、末5帧471.599902ms，对照540.422252ms；八层vit*_stage0合计75.668194→33.150935ms。其余阶段亦有变化，不把全部差额归于纯计算；但单次dispatch粒度在当前矩阵路线显然值得继续研究。
+- 证据release/native-network70-vit-chunk2/，准备脚本release/prepare-vit-chunk2.ps1（ignored）；入口run_vit_expand_chunk2_network.ps1继承多头八Wave/并行softmax与C32八Wave并行exp/prob/norm。游戏DLL未更新，约2.11fps测试链不是10fps，目标未完成。

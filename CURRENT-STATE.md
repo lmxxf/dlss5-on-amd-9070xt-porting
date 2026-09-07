@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+ViT展开单dispatch块16→32 tokens有明显收益：VIT_EXPAND_CHUNK2=1仅Wave expand的chunk_values65536→131072，每块仍单独Submit/fence等待，未合并整阶段command list。15帧exact，暖472.903032ms、末5帧471.599902ms，八层stage0合计75.66819→33.15094ms；旧整网540.422252ms。无新buffer或舍入变化，无DEVICE_HUNG。证据release/native-network70-vit-chunk2，入口run_vit_expand_chunk2_network.ps1；游戏未改，10fps未达到。
+
 多头归一化并行候选未采纳：-ParallelNorm新增512B共享倒数，raw Q/K用half暂存后全组逐元素缩放，15帧exact但暖546.822146ms、末5帧545.92308ms，首C64 attention2.44709ms无改善；encoder15_22和tail49_55升到34.10/35.60ms。保持上一八Wave并行softmax约540ms，不加ParallelNorm。证据release/native-network70-multihead-norm，游戏未改，10fps未达到。
 
 多头八Wave＋并行softmax15帧exact，暖540.422252ms、末5帧541.122424ms；首C64 attention2.43663ms（旧四Wave2.85449）。-EightWaves -ParallelSoftmax：256线程按16查询/16输出列拆矩阵，原64查询标量段和求和/H/F保持，无新增共享容量。证据release/native-network70-multihead-eight-wave；C32仍八Wave并行exp/prob/norm。游戏未改，10fps未达到。
