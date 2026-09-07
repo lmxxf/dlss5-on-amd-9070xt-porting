@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_rgb_reflect.h"
 
 // One stable texture binding per instance. Caller must fence all users before
@@ -21,7 +22,7 @@ public:
   if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||(desc.Flags&D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE))throw std::runtime_error("game RGB texture geometry");
   // Initially accept only explicit float formats; other game formats need proof.
   if(desc.Format!=DXGI_FORMAT_R32G32B32A32_FLOAT&&desc.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT)throw std::runtime_error("unverified game RGB format");
-  ID3D12Device*owner=nullptr;ck(texture->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("game RGB device mismatch");
+  ID3D12Device*owner=nullptr;ck(texture->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("game RGB device mismatch");
   source=texture;source->AddRef();
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC bd{};
   bd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;bd.Width=1920ull*1152*16;bd.Height=1;bd.DepthOrArraySize=bd.MipLevels=1;bd.SampleDesc.Count=1;bd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;bd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;

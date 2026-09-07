@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_game_rgb_input.h"
 #include "native_actual_network70.h"
 #include "native_rgb_texture.h"
@@ -62,7 +63,7 @@ public:
   if(target==resources->original&&source_state!=target_state)throw std::runtime_error("aliased frame texture states disagree");
   auto desc=target->GetDesc();
   if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||desc.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT)throw std::runtime_error("frame target must be1080p FP16");
-  ID3D12Device*owner=nullptr;auto hr=target->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("frame target device query");bool same=owner==resources->submit.Device();owner->Release();if(!same)throw std::runtime_error("frame target device mismatch");
+  ID3D12Device*owner=nullptr;auto hr=target->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("frame target device query");bool same=NativeSameDevice(owner,resources->submit.Device());owner->Release();if(!same)throw std::runtime_error("frame target device mismatch");
   try{
    auto&r=*resources;
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});

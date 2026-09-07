@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_game_codec.h"
 // Caller submits the network producer first on the same queue and retains all
 // resources through completion. No readback or fixture data in this stage.
@@ -13,7 +14,7 @@ public:
  void Create(ID3D12Device*d,ID3D12Resource*rgb,const std::wstring&dir){
   if(input||!d||!rgb)throw std::runtime_error("RGB texture initialization");auto desc=rgb->GetDesc();
   if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||desc.Width<1920ull*1152*12)throw std::runtime_error("RGB texture input capacity");
-  ID3D12Device*owner=nullptr;check(rgb->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("RGB texture device mismatch");input=rgb;input->AddRef();
+  ID3D12Device*owner=nullptr;check(rgb->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("RGB texture device mismatch");input=rgb;input->AddRef();
   D3D12_RESOURCE_DESC td{};td.Dimension=D3D12_RESOURCE_DIMENSION_TEXTURE2D;td.Width=1920;td.Height=1080;td.DepthOrArraySize=td.MipLevels=1;td.Format=DXGI_FORMAT_R16G16B16A16_FLOAT;td.SampleDesc.Count=1;td.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;check(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&td,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&output)));
   D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,1,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};check(d->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap)));

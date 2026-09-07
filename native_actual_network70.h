@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_c32_ds.h"
 #include "native_vit_block.h"
 #include "native_actual_decoder69.h"
@@ -28,7 +29,7 @@ public:
   for(auto*r:{rgb_tiles,rgb_hwc,temporal_rgb}){
    if(!r)continue;
    if(r->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||r->GetDesc().Width<1920ull*1152*16)throw std::runtime_error("network RGB capacity");
-   ID3D12Device*owner=nullptr;auto hr=r->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("network RGB device query");bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("network RGB device mismatch");
+   ID3D12Device*owner=nullptr;auto hr=r->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("network RGB device query");bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("network RGB device mismatch");
   }
   device=d;device->AddRef();auto read=[&](const std::wstring&name){return Read(dir+L"\\"+name);};
   pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
@@ -52,7 +53,7 @@ public:
  // This includes temporal_rgb's sampler producer when temporal_enabled is true.
  // Binding storage does not imply a valid history frame; reset callers pass false.
  template<class Submission> void Run(Submission&submit,UINT seed,bool temporal_enabled=false){
-  if(!ready||failed||submit.Device()!=device)throw std::runtime_error("network unavailable/device mismatch");
+  if(!ready||failed||!NativeSameDevice(submit.Device(),device))throw std::runtime_error("network unavailable/device mismatch");
   if(temporal_enabled&&!temporal_bound)throw std::runtime_error("network temporal RGB not bound");
   try{
    submit.Submit([&](ID3D12GraphicsCommandList*c){pre.Record(c,seed,false,temporal_enabled);for(auto&s:c32)s.Record(c);ds4.Record(c);for(auto&s:c64)s.Record(c);ds8.Record(c);for(auto&s:c128)s.Record(c);ds14.Record(c);for(auto&s:c256)s.Record(c);ds22.Record(c);for(auto&s:split)s.Record(c);head.Record(c);bridge.Record(c);});
@@ -73,7 +74,7 @@ public:
   if(!c)throw std::runtime_error("network null command list");
   ID3D12Device*owner=nullptr;auto hr=c->GetDevice(IID_PPV_ARGS(&owner));
   if(FAILED(hr))throw std::runtime_error("network command list device query");
-  bool same=owner==device;owner->Release();if(!same)throw std::runtime_error("network command list device mismatch");
+  bool same=NativeSameDevice(owner,device);owner->Release();if(!same)throw std::runtime_error("network command list device mismatch");
   InlineRecorder recorder{device,c};Run(recorder,seed,temporal_enabled);
  }
  ID3D12Resource*Output()const{return post.Output();}

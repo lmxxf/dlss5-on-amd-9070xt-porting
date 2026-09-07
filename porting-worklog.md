@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：严格原生COM装置检查接入并回归
+
+- 新增native_device_identity.h，使用已实机验证的ReShade unwrap接口后查询IUnknown；原生对象E_NOINTERFACE则直接查IUnknown，其它unwrap错误或空返回拒绝。两侧身份非空且相同才通过，不使用LUID宽松判断，全部查询引用成对Release。
+- 网络、游戏frame、codec（含重绑）、RGB输入与FP16桥接的owner/device检查改用此辅助函数。测试原生/代理同一身份、不同原生、不同代理、null/错误/空unwrap拒绝与引用计数均通过。
+- MinGW NativeGameFrame语法检查及codec GPU runner完整链接通过；AMD修改后decode A/B/A重绑回归session33654三帧各8294400 half different0/invalid0。此GPU回归为原生设备路径，真实包装身份已有前轮观察证据，完整游戏渲染仍未运行。
+
 ### 2026-09-07：device差异确认为ReShade包装，同一原生COM身份
 
 - ReShade6.8源码确认ID3D12Resource::GetDevice被hook，D3D12Device::QueryInterface支持IID_UnwrappedObject 7f2c9a11-3b4e-4d6a-812f-5e9cd37a1b42并AddRef原对象。观察器新增有配对Release的IUnknown/unwrap/IUnknown查询，不依赖Adapter LUID猜测。

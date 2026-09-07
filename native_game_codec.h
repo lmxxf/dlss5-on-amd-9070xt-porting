@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_game_rgb_input.h"
 #include <array>
 // Validated mode1 math, fixed1080p float16 textures. Caller owns queue ordering.
@@ -21,7 +22,7 @@ public:
    auto*r=inputs[i];if(!r)throw std::runtime_error("codec null input");auto desc=r->GetDesc();
    if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||desc.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT||(desc.Flags&D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE))throw std::runtime_error("codec unverified input format/geometry");
    for(size_t j=0;j<i;j++)if(inputs[j]==r)throw std::runtime_error("codec aliased inputs");
-   ID3D12Device*owner=nullptr;check(r->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("codec device mismatch");
+   ID3D12Device*owner=nullptr;check(r->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("codec device mismatch");
   }
   count=UINT(inputs.size());for(UINT i=0;i<count;i++){source[i]=inputs[i];source[i]->AddRef();}
   auto desc=source[0]->GetDesc();desc.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -47,7 +48,7 @@ public:
   for(UINT i=0;i<count;i++)if(i!=index&&source[i]==replacement)throw std::runtime_error("codec rebind input alias");
   ID3D12Device*d=nullptr,*owner=nullptr;check(heap->GetDevice(IID_PPV_ARGS(&d)));
   auto hr=replacement->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr)){d->Release();check(hr);}
-  bool same=owner==d;owner->Release();if(!same){d->Release();throw std::runtime_error("codec rebind device mismatch");}
+  bool same=NativeSameDevice(owner,d);owner->Release();if(!same){d->Release();throw std::runtime_error("codec rebind device mismatch");}
   D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.Format=desc.Format;sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Texture2D.MipLevels=1;
   auto cpu=heap->GetCPUDescriptorHandleForHeapStart();cpu.ptr+=SIZE_T(index)*d->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
   replacement->AddRef();d->CreateShaderResourceView(replacement,&sv,cpu);d->Release();source[index]->Release();source[index]=replacement;
