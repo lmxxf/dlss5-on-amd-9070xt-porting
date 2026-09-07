@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：FP8位元量化候选在有限half域GPU全exact
+
+- 新增native_fp8_fast.hlsli候选，将正常E4M3FN量化的log2/exp2/floor换为float位元RNE截位与448饱和，保留小数值分支与旧负零语义；当前验证域仅有限half，不宣称所有float32/NaN输入等价。
+- native_fp8_quantize_check.hlsl在同一GPU逐个生成全部65536 half位模式，排除2048个非有限模式，将旧F与候选结果按float位元输出；d3d12_fp8_quantize_check验证覆盖索引并比较。AMD session76727 exit0，finite_half63488/bit_different0。
+- 此候选尚未替换生产HLSL或游戏DLL，也尚未测性能收益。下一步检查目标调用的half输入合同，在隔离C64核心上做数值+计时回归，再决定是否推广；不凭去掉超越函数就宣称FPS提升。
+
 ### 2026-09-07：性能回归五帧exact，定位主要耗时区间
 
 - PID24236自然结束/session99945 exit0，五帧off/on/off/on/off各6635520 RGB不同0。下载两种输出逐byte等于独立shift3原版参考，新增analyze_native_network_profile.py复核输出hash、有限性、五帧/区间完整性及各区间和等于total。
