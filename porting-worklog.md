@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：提前CreateFeature观察入口不兼容，已撤回并确认NR恢复
+
+- 试加CreateFeature入口hook，用GetDevice在原创建前安装view观察；五次离线mock转发检查通过，但不等于真实API兼容。新d56e731e版经备份部署后PID9832的feature18 create报0xbad00002，不能用于资源来源推断。
+- 立即保存early-failed日志，正常退出、恢复.before-early-feature（原63454e版），校验备份；源代码及单元测试的CreateFeature试改全部撤回，未保留失败入口hook。失败二进制保留.failed-early-feature。
+- 使用Ready的DLSSNR-GameRequest-Client启动后，PID27892有响应，ReShade10:58:13/14明确NR count1/60成功。恢复日志保存early-failed/restored-ReShade.log，已重建本地当前正常源码避免release残留失败版本。
+- 只能判定这种入口拦截不兼容，不能凭此断言NVAPI签名检查等具体原因。下一步考虑ReShade被动资源事件或观察器安装后的受控feature重建；不重复修改该入口。游戏原渲染DLL未替换，AMD游戏接入目标仍未完成。
+
 ### 2026-09-07：surface/UAV探针兼容原版NR，捕获post写入句柄但初始资源映射仍缺
 
 - texture probe新增CreateUAV（device vtable19）、NVAPI独立descriptor及legacy surface接口前后记录，参数大小/offset按本机SDK断言。离线Windows转发测试通过4次mock调用，明确不替代真实ABI/hook验收。
