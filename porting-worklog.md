@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：内部整资源复制探针兼容但零命中，需核对实际后端/区域路径
+
+- 正常退出PID3084并同步，核对实机nvngx哈希e16bcf15...，新增3bf83f7e版internal-copy addon（未替换原渲染DLL）。新PID11188 prologue/table guard通过、hook_status0，NR count1/60成功。
+- 多次读取日志只有安装记录、没有copy调用；internal-copy目录保存证据。只能说明此观测窗口未走RVA5c070，不证明没有历史复制。
+- 静态补查相邻封装：5bec0等走buffer copy，不能把邻近地址全部称纹理复制。SDK还存在NvAPI_D3D12_CopyTextureRegion（ID82b91b25，支持HTEX资源），但当前DLL字节扫描未找到该ID或GetCopyableFootprints ID，不足以证明走此API。
+- 下一步应核对实际运行后端的函数表/区域复制路径，再选观察点，避免只凭方法名字猜调用。当前游戏NR保持正常，AMD实际游戏接入仍未完成。
+
 ### 2026-09-07：内部复制封装调用表核对，受保护观察器离线准备完成
 
 - 连续函数指针扫描得到表基址RVA0xb6988，CopyResource封装在slot0x170/index46；构造路径0x5b53d把此表写入对象，支持表身份。其他对象也有slot0x170，不能仅按槽号认定同一方法。静态检查脚本补表候选报告。
