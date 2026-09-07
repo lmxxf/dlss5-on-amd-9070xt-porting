@@ -6212,3 +6212,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - DXC及运行前SM6.10/tier0x10检查通过；PID25980退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。
 - 暖574.629421ms、末5帧575.382012ms；同恢复后环境八Wave582.260006ms。preblock attention16.284466ms（旧18.303491），首C32 attention4.196606ms（旧4.578469），post70_body26.136314ms（旧27.965003），保留。
 - 证据release/native-network70-c32-parallel-exp/，准备脚本release/prepare-c32-parallel-exp.ps1（ignored）；run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp。普通参数仍默认四Wave，优化测试需显式参数。未更新游戏DLL，10fps未完成。
+# 2026-09-08：C32概率量化全组并行
+
+- NATIVE_PARALLEL_C32_PROB保留64查询的原分母树，把inv存64 float共享区（新增256B），同步后全C32_THREADS线程按key-major索引读取exp/对应inv并F(H(exp*inv))，原地写回；再次全组同步后进入原AV矩阵。
+- 不改变分母求和、量化顺序或网络依赖；test_c32_wave_ownership.py补充转置概率元素覆盖检查。显式-ParallelProb，默认不开。
+- DXC及能力门禁正常，PID34744退出0；15帧最终different0，两份下载结果对独立原版参考byte-exact。暖567.012028ms、末5帧566.189546ms，对照并行exp上版574.629421ms，有收益。
+- post70_body24.759466ms、preblock attention15.376906ms、首C32 attention3.731706ms，分别优于上版26.136314/16.284466/4.196606ms。
+- 证据release/native-network70-c32-parallel-prob/，准备脚本release/prepare-c32-parallel-prob.ps1（ignored）；入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves -ParallelExp -ParallelProb。游戏DLL未更新，10fps未完成。

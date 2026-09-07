@@ -32,6 +32,9 @@ cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint r
 StructuredBuffer<float> weights:register(t0);
 StructuredBuffer<float> input:register(t1);
 RWStructuredBuffer<float> output:register(u0);
+#if NATIVE_PARALLEL_C32_PROB
+groupshared float query_inverse[64];
+#endif
 #if NATIVE_WAVE_C32_SCORES
 groupshared float16_t queries[2048],keys[2048];
 #if NATIVE_WAVE_C32_AV
@@ -201,11 +204,23 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   parity[odd]=total;
  }
  float inv=H(1/H(parity[0]+parity[1]));
+#if NATIVE_PARALLEL_C32_PROB
+ query_inverse[t]=inv;
+#endif
  float av[32];
 #if NATIVE_WAVE_C32_AV
+#if !NATIVE_PARALLEL_C32_PROB
  for(uint key=0;key<64;key++)WriteAux(key,t,F(H(ReadAux(key,t)*inv)));
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_PARALLEL_C32_PROB
+ for(uint i=t;i<4096;i+=C32_THREADS){
+  uint key=i/64,query=i%64;
+  WriteAux(key,query,F(H(ReadAux(key,query)*query_inverse[query])));
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
  for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
   C acc=C::Splat(0.0f);
   for(uint g=0;g<2;g++){

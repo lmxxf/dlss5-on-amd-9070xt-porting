@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32概率量化全组并行15帧exact，暖567.012028ms、末5帧566.189546ms。-EightWaves -ParallelExp -ParallelProb：原64查询分母树输出倒数至新增256B共享区，同步后全组按原key-major布局执行F(H(exp*inv))，再同步进入AV。post70_body24.75947ms、preblock attention15.37691ms、首C32 attention3.73171ms；上版574.62942ms。证据release/native-network70-c32-parallel-prob。权重/结构/舍入不变，游戏未改，10fps未达到。
+
 C32八Wave并行exp通过15帧exact：-EightWaves -ParallelExp，4096 score+bias/exp由全256线程按元素处理，增加一次全组同步，再执行原64查询分母树/概率步骤。无新增共享/全图buffer，暖574.629421ms、末5帧575.382012ms；恢复后八Wave基线582.260006ms。preblock attention16.28447ms、首C32 attention4.19661ms、post70_body26.13631ms。证据release/native-network70-c32-parallel-exp；启动能力SM6.10/tier0x10正常。游戏未改，10fps未达到。
 
 重要更正/驱动恢复：八Wave最初PSO失败来自驱动回退，不是该shader不支持。当前检查发现AMD32.0.31041.1004、SM6.9/tier0，已知四Wave也PSO失败；SetupAPI显示09/08 04:22 AMD26.8.1安装器活动（触发者未知）。按既有授权恢复32.0.31007.2048，PID21368退出0，无重启，Intel不变；SM6.10/tier0x10恢复，四/八Wave均PSO成功。一次性任务完成后移除，更新设置未改。

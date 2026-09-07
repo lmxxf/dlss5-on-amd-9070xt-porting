@@ -14,4 +14,6 @@ for waves in [4,8]:
 for threads in [128,256]:
     cells=[(i//64,i%64) for t in range(threads) for i in range(t,4096,threads)]
     assert len(cells)==4096 and set(cells)=={(q,k) for q in range(64) for k in range(64)}
-print('matrix and parallel exponent ownership cover all cells exactly once')
+    transposed=[(i%64,i//64) for t in range(threads) for i in range(t,4096,threads)]
+    assert len(transposed)==4096 and set(transposed)==set(cells)
+print('matrix, exponent and probability ownership cover all cells exactly once')
