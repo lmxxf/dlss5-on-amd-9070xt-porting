@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：全网同PID继续初始化，准备只读merged纹理句柄探针
+
+- PID24280 CPU456.78125→582.1875→648.375秒，Responding=True，日志进入split相关编译后继续attention/projection；stdout暂无frame，原session86169仍应续查，不重启。
+- 新增native_nvapi_texture_contract.cpp与可复现MinHook构建脚本。按本地SDK的48字节merged结构/接口ID只读记录descriptor、sampler、64位handle、返回状态及PID/tick，原函数照常调用，不提交GPU命令；限制前4096调用，DLL pin保证hook生命周期。该映射本身不能把descriptor解析为资源，更不能独立证明历史来源。
+- 构建成功，ignored addon SHA b553fe58fc40d536c760db3dd21305e9d693ce5db59ca31b8104db87a4465d17；尚未安装/加载到游戏，没有live hook验收。不把编译成功当诊断已生效。
+- 游戏DLL和当前AMD验收目录未因该探针改动；目标仍包括完整网络数值、真实历史来源和游戏最终画面。
+
 ### 2026-09-07：全网验收同进程继续编译，补历史资源诊断入口
 
 - 本轮为已验证等待并补集成审计：PID24280始终存活，CPU145.328125→262.171875→396.203125秒、Responding=True，日志推进多个C64 ffn/attention/projection编译完成；stdout尚无frame结果。exec session86169仍为原启动器句柄，不应重启。
