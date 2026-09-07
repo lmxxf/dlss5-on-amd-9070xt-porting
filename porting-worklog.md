@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：入口时描述符映射成功，slot8为独立1080p RGBA16资源
+
+- 正常退出PID21420，Steam09:58:51 AutoCloud complete、进度存档未修改；旧913ef436探针备份为.addon64.backup-913ef436并核对SHA，部署d804e6d9版。新游戏PID22904，Responding=True，截图确认回到1920×1080主菜单。没有替换原渲染DLL。
+- 新增check_native_game_texture_entry.py按PID、call与日志时间顺序，在merged_enter时冻结最近SRV创建记录，不跳过null、不使用返回后的重用状态。当前slot0/8/10均成功解析为非空资源。
+- slot0=0x8120000a801→0x1170b2630，1920×1080 format10，与NGX DLSSNR.Color相同；slot10=0x8120000a809→0x1176c5680，1920×1080 format34，与NGX MVec相同；slot8=0x8100000a808→0x38c0fe210，1920×1080 format10，为独立资源，既不同Color也不同NGX Output（0x38c0feba0）。
+- 数据保存release/native-game-history-contract/entry。只证明绑定关系，不证明该独立资源由上一帧输入、输出还是其他结果更新；下一步需观察copy/写入目标与帧序列。AMD游戏DLL尚未部署，目标未完成。
+
 ### 2026-09-07：RTX游戏只读纹理探针已加载，发现返回后descriptor已空需补入口记录
 
 - 正常Alt+F4退出原PID3536，未强杀；Steam09:51:06日志确认3489700 AutoCloud complete、进度存档未修改。新增诊断addon（913ef436...）并核对安装SHA，未替换原renodx/nvngx渲染DLL。
