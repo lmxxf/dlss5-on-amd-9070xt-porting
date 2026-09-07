@@ -1,3 +1,14 @@
+#if NATIVE_C32_EIGHT_WAVES
+#define C32_THREADS 256
+#define C32_QUERY_WAVE (t/64)
+#define C32_COL_START ((t/32)&1)
+#define C32_COL_STEP 2
+#else
+#define C32_THREADS 128
+#define C32_QUERY_WAVE (t/32)
+#define C32_COL_START 0
+#define C32_COL_STEP 1
+#endif
 #if !NATIVE_WAVE_C32_QKV || !NATIVE_WAVE_C32_AV || !NATIVE_WAVE_C32_PROJECTION || !NATIVE_WAVE_C32_SCORES
 #error Four-wave kernel requires complete matrix attention
 #endif
@@ -78,7 +89,7 @@ float fast_exp(float x){float a=clamp(H(x*.044921875+1.30078125),1.03125,1.56933
 #if NATIVE_WAVE_C32_SCORES
 [WaveSize(32)]
 #endif
-[numthreads(128,1,1)]
+[numthreads(C32_THREADS,1,1)]
 void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #if NATIVE_WAVE_C32_SCORES
  if(gid.x*64>=runtime_width*runtime_height)return;
@@ -90,15 +101,15 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #if NATIVE_WAVE_C32_QKV
  // Phase-local aliases: queries=input, keys=current weight matrix,
  // scores=raw Q/K, values=raw V. Reused after all threads load their rows.
- for(uint i=t;i<2048;i+=128)queries[i]=float16_t(F(input[gid.x*2048+i]));
+ for(uint i=t;i<2048;i+=C32_THREADS)queries[i]=float16_t(F(input[gid.x*2048+i]));
  GroupMemoryBarrierWithGroupSync();
  using QA=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using QB=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using QC=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  for(uint part=0;part<3;part++){
-  for(uint i=t;i<1024;i+=128)keys[i]=float16_t(weights[part*1024+i]);
+  for(uint i=t;i<1024;i+=C32_THREADS)keys[i]=float16_t(weights[part*1024+i]);
   GroupMemoryBarrierWithGroupSync();
-  for(uint qr=t/32;qr<4;qr+=4)for(uint cr=0;cr<2;cr++){
+  for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
    QA qa=QA::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
    QB wb=QB::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
    QC z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,wb);
@@ -143,7 +154,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
- for(uint qr=t/32;qr<4;qr+=4)for(uint kr=0;kr<4;kr++){
+ for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint kr=C32_COL_START;kr<4;kr+=C32_COL_STEP){
   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   C s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
@@ -186,7 +197,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  for(uint key=0;key<64;key++)WriteAux(key,t,F(H(ReadAux(key,t)*inv)));
  }
  GroupMemoryBarrierWithGroupSync();
- for(uint qr=t/32;qr<4;qr+=4)for(uint cr=0;cr<2;cr++){
+ for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
   C acc=C::Splat(0.0f);
   for(uint g=0;g<2;g++){
    A pa;
@@ -201,10 +212,10 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  }
  GroupMemoryBarrierWithGroupSync();
 #if NATIVE_WAVE_C32_PROJECTION
- for(uint i=t;i<2048;i+=128)queries[i]=float16_t(scores[(i/32)*SCORE_ROW+i%32]);
- for(uint i=t;i<1024;i+=128)keys[i]=float16_t(weights[3072+i]);
+ for(uint i=t;i<2048;i+=C32_THREADS)queries[i]=float16_t(scores[(i/32)*SCORE_ROW+i%32]);
+ for(uint i=t;i<1024;i+=C32_THREADS)keys[i]=float16_t(weights[3072+i]);
  GroupMemoryBarrierWithGroupSync();
- for(uint qr=t/32;qr<4;qr+=4)for(uint cr=0;cr<2;cr++){
+ for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
   A aa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B bb=B::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);

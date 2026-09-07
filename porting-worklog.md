@@ -6190,3 +6190,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 查询覆盖检查确认两Wave/四Wave输出集合相同64查询。DXC通过，PID21236退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。
 - 暖569.132636ms、末5帧572.907292ms；preblock attention20.79282ms，首C32 attention5.139723ms，post70_body30.785963ms（旧33.609171）。相对约586ms基线有整体收益，保留独立优化入口。
 - 证据release/native-network70-c32-four-wave/，准备脚本release/prepare-c32-four-wave.ps1（ignored）；运行run_c32_four_wave_network.ps1。不启用硬件half、branch、FP8位元、padding/驻留等实验，游戏DLL未更新，10fps仍未达到。
+# 2026-09-08：八Wave C32候选被管线创建拒绝
+
+- 将四Wave shader参数化：默认128线程/4Wave不变；NATIVE_C32_EIGHT_WAVES=1为256线程/8Wave，每16查询由两个Wave各做16输出列，QK同样按键列拆分。输入/权重载入步长匹配线程数，标量仍t<64，共享容量不变。
+- test_c32_wave_ownership.py检查32/64输出列的两种分工覆盖集合相同且无重复。DXC通过；PID14572在初始化native preblock管线时报HRESULT2147942487=E_INVALIDARG，exit1，无完整帧、无计时/数值结论，也不是DEVICE_HUNG。
+- 不自动重跑、不修改游戏安装；保留四Wave默认及其569ms已验证基线。该错误原因未定位，不能从单个复杂shader拒绝推出GPU普遍不支持256线程。
+- 证据release/native-network70-c32-eight-wave/日志，准备脚本release/prepare-c32-eight-wave.ps1（ignored）。复现入口run_c32_four_wave_network.ps1 -Folder目标 -EightWaves；默认不加该参数。10fps仍未达到。

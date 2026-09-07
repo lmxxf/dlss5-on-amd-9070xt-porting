@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+C32八Wave候选PSO创建被拒绝：256线程按查询/输出列分工，DXC通过但PID14572初始化native preblock HRESULT2147942487(E_INVALIDARG)，exit1，无完整帧/性能数据，无DEVICE_HUNG。原因尚未定位，不宣称硬件普遍不支持256线程。-EightWaves显式开启，默认仍四Wave569ms。证据release/native-network70-c32-eight-wave，test_c32_wave_ownership.py仅验证索引覆盖；游戏未改，10fps未达到。
+
 C32四Wave融合核15帧exact，暖569.132636ms、末5帧572.907292ms。独立preblock_attention_four_wave.hlsl每窗口128线程，四个Wave各负责16查询矩阵工作；标量段仅t<64，barrier保持全组；输入/投影暂存协同连续搬运，不增LDS/全图buffer。preblock attention20.79282ms，首C32 attention5.13972ms，post70_body30.78596ms（旧33.60917）。证据release/native-network70-c32-four-wave；runner run_c32_four_wave_network.ps1，其他无收益候选均关闭。游戏未改，10fps未达到。
 
 C32软件H显式[branch]实验无收益：15帧exact，暖589.228183ms、末5帧589.26818ms，post70_body33.68957ms、preblock attention23.88590ms、首C32 attention5.86296ms。NATIVE_C32_BRANCH_HALF默认关闭。证据release/native-network70-c32-branch-half。量化/舍入/驻留/简单padding这组局部实验已无明显收益，下一步需要调整C32融合核任务分配或分阶段执行，并先核算scratch预算；不重试整网大提交。有效基线586ms，游戏未改，10fps未达到。
