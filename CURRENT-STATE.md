@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+最新ViT Wave展开＋本地half权重15帧exact，暖均1042.86360ms、末5帧1037.73500ms。保留65536输出/逐块提交，权重原值无损half，组内K32软件H。WAVE_VIT_EXPAND与RESIDENT_WAVE_VIT_EXPAND显式启用；先仅Wave为1133.27541ms，再本地权重降到1042.86360ms。local14.598GB在15.387GB预算内，证据release/native-network70-wave-vit-local/。下一步ViT收缩/投影，游戏未改，10fps未达到。
+
 最新C32 Wave评分及QKV两方案均15帧exact：仅scores暖1183.24196ms，scores+QKV暖1170.98909ms、末5帧1171.23997ms。共享32KiB阶段复用不增全尺寸scratch，QKV权重转half前检查无损。WAVE_C32_QKV依赖WAVE_C32_SCORES，专用CSO；证据release/native-network70-wave-c32[-qkv]/。相对前版1.187秒改善有限，下一步转ViT/512与preblock大项；游戏未改，10fps未达到。
 
 最新C64/C128/C256全Wave路径15帧exact，暖均1187.29283ms、末5帧1188.06103ms。WAVE_C64显式依赖MATRIX_C64，共享区使用C64容量；encoder5_8=37.62461、tail63_65=27.28023ms。local14.531GB低于15.396GB预算。证据release/native-network70-wave-c64/profile-validation.json。此前C64 Thread矩阵回退不适用于本Wave结果；游戏仍未更新，10fps未达到。

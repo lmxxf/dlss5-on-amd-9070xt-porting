@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：ViT Wave展开和half权重驻留，整网1.043秒
+
+- native_wave_vit_expand处理16token×16输出，K1024每32项H、原gate/F，组内half小块直接读FP32特征；NativeVitLinear仅expand下显式WAVE_VIT_EXPAND启用，权重初始化无损half row-major。Record/RecordChunk保持原65536输出边界，未合并提交；与旧tiled_expand冲突拒绝。
+- 初轮session18062/PID11644 exit0，15帧最终实际输出逐字节原版一致，暖1133.2754114ms、末5帧1141.256802ms；ViT stage0约16～18ms，收益有限。
+- 发现新packed half权重仍UPLOAD，追加独立RESIDENT_WAVE_VIT_EXPAND在打包后一次拷入DEFAULT（区别于旧resident flag在打包前）。session39304/PID19208 exit0，15帧最终两GPU输出逐字节原版一致，暖1042.8636021ms、末5帧1037.735004ms；各ViT stage0约7.66～10.28ms。
+- local14597804032/budget15386648576，nonlocal696442880，预算内。证据release/native-network70-wave-vit-expand与-wave-vit-local。编译/diff检查通过，游戏安装不变。下一步ViT收缩/投影，10fps未达到。
+
 ### 2026-09-08：C32 Wave QK/QKV整网通过，但收益有限
 
 - preblock_attention_core增加Wave scores动态尺寸CSO，b0五常量与现有Record一致，RAW_OUTPUT1；Q/K half共享、V/scores float总32KiB，保留其余算法。session58109/PID31940 exit0，15帧最终实际输出逐字节原版一致，暖1183.2419557ms。
