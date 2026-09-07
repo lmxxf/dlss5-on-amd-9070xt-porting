@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：描述符资源创建探针准备完成，全网同PID继续编译
+
+- PID24280 CPU698.4375→919.171875秒、Responding=True；编译日志持续出现完成项，stdout仍无frame。原exec session86169保留，不重启。RTX只读查询仍见SB-Win64-Shipping PID3536存活，本轮未退出或重启游戏。
+- texture probe增加CreateShaderResourceView只读记录，设备首次merged成功时安装一次；vtable18经本机ID3D12DeviceVtbl顺序核对。原CreateSRV照常调用，再记录resource指针/尺寸/格式、CPU descriptor及PID/tick，不持有资源、不提交GPU命令。
+- 明确盲区：首次安装之前的descriptor、descriptor复制均未观察，不能根据缺记录推断资源不存在或错误映射。该探针仅建立诊断输入，不自动认定slot8历史来源。
+- 重建成功，addon SHA913ef4365c80a17bf666fe1469f00f9cd3c4342a18a3356ce75946dd12d669be；尚未安装到游戏，live hook/转发行为仍待验收。当前AMD验收目录未受探针修改影响，游戏DLL未改。
+
 ### 2026-09-07：全网同PID继续初始化，准备只读merged纹理句柄探针
 
 - PID24280 CPU456.78125→582.1875→648.375秒，Responding=True，日志进入split相关编译后继续attention/projection；stdout暂无frame，原session86169仍应续查，不重启。
