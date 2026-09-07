@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机codec身份闭合，mode1输入编码/输出合成均执行
+
+- 正常退出11912，旧观察器备份为native-codec-constants.addon64.before-pipeline，部署0c2314698ad0095a335c7b6661661a83d5cd6b473bc51f248c0a22eff3f763aa。Steam延迟约一分钟后启动22724，未重复发起；feature18 count1/60在13:14:02/04成功。
+- 捕获两份包含CodecConstants反射的DXBC：pipeline36e36c050输入（Original t0→Output u0），36e36d370输出（Proxy t1/Neural t2/OutputOriginal t3→Output u0）。同PID候选1/2及后续交替dispatch明确对应两pipeline，groups120×68×1，两者word11均1。至此不只是常数形状猜测，实际着色器反射确认HdrMode偏移44。
+- 新增disassemble_native_codec.cpp调用D3DDisassemble，实机运行成功，原始DXBC及asm保存release/native-game-history-contract/codec/codec-22724-*，关联日志live-pipeline-constants.txt。输入反汇编mode1分支明确先max RGB0、除PaperWhiteScale、0.75以上软肩、sRGB编码，再写alpha1；设置SDR不代表内部输入不是线性HDR路径。
+- 因此当前NativeGameRgbInput无颜色转换、NativeGameRgbOutput直接10bit打包与参考运行路径不等价，必须在网络外补正确codec并以捕获DXBC独立验证。游戏内最终修复尚未完成。AMD完整网络原PID18872持续运行，最后检查CPU572秒。
+
 ### 2026-09-07：codec常数与compute pipeline关联观察器
 
 - 扩展native_codec_constants_events：被动跟踪compute pipeline绑定，在候选常数之后的dispatch记录pipeline和group数；命令列表reset/destroy清除状态，后续常数写入清除未消费候选，避免跨命令列表生命周期或部分更新误关联。不抑制dispatch，不发GPU命令。
