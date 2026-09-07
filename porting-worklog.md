@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：内部复制封装调用表核对，受保护观察器离线准备完成
+
+- 连续函数指针扫描得到表基址RVA0xb6988，CopyResource封装在slot0x170/index46；构造路径0x5b53d把此表写入对象，支持表身份。其他对象也有slot0x170，不能仅按槽号认定同一方法。静态检查脚本补表候选报告。
+- 新增native_internal_copy_contract.cpp，仅对RVA0x5c070的32字节prologue及RVA0xb6af8函数表指针都匹配时安装；四个opaque参数原样转发，只记录前256次返回状态/资源指针，不查资源、不提交GPU命令、不改公开NGX/命令列表入口。
+- 离线Windows mock验证四参数及正/负返回码原样转发；不是live ABI验收。最终addon SHA3bf83f7e3a0edf6580b235b86ff252d8c39896a18a071fd74826e5fb304f11f6，尚未部署。部署前仍须核对实际模块SHA e16bcf15...。
+- 本轮未重启/改动游戏。下一步带备份进行实机兼容与复制源/目的验证，若NR异常立即撤回；AMD游戏接入目标仍未完成。
+
 ### 2026-09-07：静态定位原版内部CopyResource封装，模块身份与实机一致
 
 - 使用x86_64-w64-mingw32-objdump分析PE（本机默认objdump不识别该格式）。发现RVA0x5c070函数：保存RDX为命令列表、R8为目的资源、R9为来源资源，先调用0x46100处理资源记录，再于0x5c0c1取列表vtable+0x88并经CFG dispatch调用；返回int0或-5。不能把所有vtable+0x88引用都当CopyResource，此处参数布置支持这一识别。

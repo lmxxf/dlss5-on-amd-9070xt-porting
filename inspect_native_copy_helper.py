@@ -32,4 +32,9 @@ report={'scope':'static candidate wrapper only; no live call/history proof','dll
  'wrapper_rva':hex(rva),'prologue32':data[offset:offset+32].hex(),'pointer_occurrences':occurrences,
  'inferred_arguments':['backend context','command list','destination resource','source resource'],
  'evidence':'RDX saved as RBX/list, R8 as RSI/destination, R9 as RDI/source; at RVA5c0c1 load list vtable slot0x88 and call guard dispatch; returns int0 or -5'}
+if len(occurrences)==1:
+ entry=int(occurrences[0]['file_offset'],16);begin=entry
+ def code_pointer(value):return any((flags&0x20000000) and image+va<=value<image+va+vs for va,vs,rp,rs,flags in sections)
+ while begin>=8 and code_pointer(struct.unpack_from('<Q',data,begin-8)[0]):begin-=8
+ report['contiguous_function_table_candidate']={'base_rva':hex(offset_rva(begin)),'slot_offset':hex(entry-begin),'slot_index':(entry-begin)//8}
 (out/'validation.json').write_text(json.dumps(report,indent=2)+'\n');print(report)
