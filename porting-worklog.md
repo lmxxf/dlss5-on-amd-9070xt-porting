@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：快速量化核心数值通过，但无可靠速度收益
+
+- session2560五轮block52均baseline/fast对原版oracle不同0、彼此float位差0（每轮2211840值）。去首轮均值legacy137.2578ms、三元条件候选139.94405ms，约慢1.96%，不启用。
+- 隔离目录c64-quantizer-branch只将候选改为显式[branch]非有限fallback，默认NATIVE_FAST_FP8仍关闭。session80342 exit0，五轮数值仍全exact；暖轮legacy137.19509ms/candidate136.57097ms，差约0.45%，小于样本波动，不宣称可靠提升。原始result.log保存在release/c64-quantizer-branch。
+- 候选保留为默认关闭实验，不推广到生产或游戏。后续优先FFN线程布局/大型局部数组导致的寄存器压力，不能把数学操作更少当已测加速。游戏DLL与已验证输出不变。
+
 ### 2026-09-07：C64快速量化隔离核心回归启动
 
 - 审核native_c64.hlsl各F调用：输入由H量化累加/乘积产生；新增NATIVE_FAST_FP8可选分支，有限输入用候选，非有限保留LegacyF。NativeC64::Create追加fast_fp8参数默认false，不修改已有调用默认行为，未部署生产快速模式。

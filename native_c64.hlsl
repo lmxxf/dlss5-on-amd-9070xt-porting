@@ -14,7 +14,7 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
 float LegacyF(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 #if NATIVE_FAST_FP8
 #include "native_fp8_fast.hlsli"
-float F(float v){return isfinite(v)?NativeFastFp8(v):LegacyF(v);}
+float F(float v){[branch]if(!isfinite(v))return LegacyF(v);return NativeFastFp8(v);}
 #else
 float F(float v){return LegacyF(v);}
 #endif
