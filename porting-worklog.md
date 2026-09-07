@@ -6177,3 +6177,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - NATIVE_C32_CORRECTED_HALF=1仅C32 attention替换H，保留原中点补偿及网络。PID14616退出0，15帧最终different0，两份下载输出与独立原版参考byte-exact，修正可解释上一直接硬件H的整网偏差。
 - 暖616.247572ms、末5帧611.408438ms；post70_body39.046643ms，preblock attention29.693434ms，首C32 attention7.2757ms。比约586ms软件H基线慢，明确不采用、默认关闭。不是数值不可能对齐，而是本修正无性能优势。
 - 证据release/half-conversion-probe/half-conversion-corrected.f32及release/native-network70-c32-corrected-half/；准备/manifest脚本在release/（ignored）。显式入口run_c32_corrected_half_network.ps1。游戏未改，10fps未完成。
+# 2026-09-08：软件half分支提示实验，无收益
+
+- NATIVE_C32_BRANCH_HALF=1只给原H的非有限值/次正规值分支加[branch]，算术逐字不变；不启用硬件half或修正half分支。默认无提示保持旧版。
+- PID19652退出0，15帧最终different0，下载两份结果对独立原版参考byte-exact。暖589.228183ms、末5帧589.26818ms；post70_body33.689571ms，preblock attention23.885897ms，首C32 attention5.862957ms。
+- 无明显局部或整网收益，保持关闭。此前位元FP8、硬件舍入修正、权重驻留、共享区小调整也未产生明显收益，后续应转向C32融合核的任务分配/分阶段执行，先核算显存临时量预算，不将困难误报为已无路线。
+- 证据release/native-network70-c32-branch-half/，准备/manifest脚本在release/（ignored）；复现入口run_c32_branch_half_network.ps1。有效基线约586ms，未更新游戏DLL，10fps未达到。
