@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：完整网络传递实机post shift3，独立回归已启动
+
+- NativeActualNetwork70::Create新增post_shift（默认0，入口检查0..3），明确传入NativePost70；NativeGameFrame接入边界指定3以匹配实机origin(-4,-4)。这不是已安装的游戏DLL，历史/codec接线仍未完成。
+- d3d12_native_network70_test支持严格DLSS5_TEST_POST_SHIFT并打印实际值；runner增加PostShift参数，显式设置环境并写入run.json。MinGW完整测试编译、NativeGameFrame头文件语法检查和git diff --check通过。
+- 原版生成首帧origin(-4,-4)/word70=1独立参考，时序参考使用此前已验证的shift-full-oracle。AMD新目录native-temporal-network70-shift3从已验收目录复制顶层资源（不复制失败子目录），替换exe及两份偏移参考，保留旧验收目录不动；runner重新核验19个shader hash。
+- 已启动PID18872，SSH命令session28959；这是完整网络五帧off/on/off/on/off测试，尚未完成，必须检查同一PID和日志而非重复启动。游戏DLL未替换，不能称游戏验证通过。
+
 ### 2026-09-07：post有效1080纹理及word70控制值对照通过
 
 - run_original_post.cpp增加native实验选项DLSS5_POST_TEST_WORD70（严格0/1）与DLSS5_POST_TEST_VALID1080（仅1920×1152处理几何）；后者使用1080高输入纹理、输出surface、纹理变换及有效尺寸，保留1152处理高度。默认实验行为不变。

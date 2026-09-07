@@ -7,6 +7,12 @@
 
 int wmain(int argc,wchar_t**argv){try{
  if(argc!=3)return 2;std::wstring dir=argv[1];
+ UINT post_shift=0;
+ if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_POST_SHIFT")){
+  if(s[0]<L'0'||s[0]>L'3'||s[1])throw std::runtime_error("invalid post shift");
+  post_shift=UINT(s[0]-L'0');
+ }
+ std::printf("network70 post_shift=%u\n",post_shift);std::fflush(stdout);
  auto read=[](const std::wstring&path){std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("fixture missing");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("fixture size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("fixture truncated");return v;};
  auto rgb=read(dir+L"\\input.f32"),oracle=read(dir+L"\\oracle-final.f32"),noise=read(argv[2]);
  const wchar_t*history_path=_wgetenv(L"DLSS5_TEST_TEMPORAL_HISTORY");
@@ -37,7 +43,7 @@ int wmain(int argc,wchar_t**argv){try{
   mv->Release();h->Release();rcp->Release();
  }
  // Keep the whole network alive on failure: timeout is not GPU cancellation.
- auto*network=new NativeActualNetwork70;network->Create(d,reflect->Output(),base,noise,dir,sampler?sampler->Output():nullptr);
+ auto*network=new NativeActualNetwork70;network->Create(d,reflect->Output(),base,noise,dir,sampler?sampler->Output():nullptr,post_shift);
  ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));NativeGameSubmission submit;submit.Create(q);q->Release();
  auto*rb=buf(d,oracle.size()*4,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
  const UINT frames=temporal?5:3;

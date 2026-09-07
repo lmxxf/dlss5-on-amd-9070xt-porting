@@ -29,7 +29,8 @@ public:
   try{
    resources->submit.Create(queue);auto*d=resources->submit.Device();
    resources->input.Create(d,source,directory);
-   resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory);
+   // Captured original post origin(-4,-4) corresponds to shift3.
+   resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,nullptr,3);
    resources->output.Create(d,resources->network.Output(),directory);ready=true;
   }catch(...){failed=true;throw;}
  }

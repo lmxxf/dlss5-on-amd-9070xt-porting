@@ -21,7 +21,8 @@ public:
  NativeActualNetwork70()=default;NativeActualNetwork70(const NativeActualNetwork70&)=delete;
  ~NativeActualNetwork70(){if(device)device->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*rgb_tiles,ID3D12Resource*rgb_hwc,
-             const std::vector<float>&noise,const std::wstring&dir,ID3D12Resource*temporal_rgb=nullptr){
+             const std::vector<float>&noise,const std::wstring&dir,ID3D12Resource*temporal_rgb=nullptr,UINT post_shift=0){
+  if(post_shift>3)throw std::runtime_error("network post shift");
   if(device||!d||!rgb_tiles||!rgb_hwc||noise.size()!=201326592/4)throw std::runtime_error("network initialization contract");
   if(_wgetenv(L"DLSS5_POST_BASE_ONLY"))throw std::runtime_error("diagnostic post forbidden");
   for(auto*r:{rgb_tiles,rgb_hwc,temporal_rgb}){
@@ -44,7 +45,7 @@ public:
   auto rawmap=read(L"hwc-to-vit.i32");if(rawmap.size()!=655360)throw std::runtime_error("network bridge map size");std::vector<UINT>map(rawmap.size());std::memcpy(map.data(),rawmap.data(),map.size()*4);bridge.Create(d,head.Output(),map,dir);source=bridge.Output();
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(31+i)+L"-";vit[i].Create(d,source,640,read(p+L"expand.f32"),read(p+L"contract.f32"),read(p+L"qkv.f32"),read(p+L"projection.f32"),dir);source=vit[i].Output();}
   decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir);
-  post.Create(d,decoder.Output(),pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir);ready=true;
+  post.Create(d,decoder.Output(),pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift);ready=true;
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
