@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07 21:30：阶段合并提交失败并撤回，GPU恢复确认
+
+- 用户中断等待后查原session43310/PID41232，确认已exit1而非仍运行。stderr game submission HRESULT=2289696774（0x887a0006 DXGI_ERROR_DEVICE_HUNG），stdout无完整测试帧。
+- 本实验仅合并ViT同阶段chunks仍失败；已撤回未提交的DLSS5_TEST_BATCH_VIT_STAGE代码，恢复逐chunk Submit/等待，与此前已通过版本一致。不降低TDR、不把超时当完成、不部署游戏。
+- 独立native-codec-fixture-test用原encode DXBC在AMD执行三scale（1/0.5/2），各8294400 half值different0/invalid0，exit0，证明GPU现在可重新提交执行。此检查不是神经正确性或性能验证。
+- 失败stdout/stderr/run.json已保存release/native-network70-batch-vit，游戏安装未动。下一方向保留提交边界、改ViT矩阵算子本身；最新有效整网基线仍1469.7617425ms。
+
 ### 2026-09-07：多通道注意力共享padding，整网1.470秒
 
 - native_c64.hlsl仅queries/keys/values行跨度32→33，保留(g*32+key)的分组长度。NativeC64与NativeSplit共同以严格DLSS5_TEST_PAD_MULTIHEAD_LDS=0/1宏控制，RAW_OUTPUT仍在macros[0]，默认旧布局。
