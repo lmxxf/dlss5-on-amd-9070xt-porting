@@ -56,7 +56,15 @@ int wmain(int argc,wchar_t**argv){try{
  auto*network=new NativeActualNetwork70;network->Create(d,reflect->Output(),base,noise,dir,sampler?sampler->Output():nullptr,post_shift);
  ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));NativeGameSubmission submit;submit.Create(q);q->Release();
  auto*rb=buf(d,oracle.size()*4,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
- const UINT frames=temporal?5:3;
+ UINT frames=temporal?5:3;
+ if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_FRAME_COUNT")){wchar_t*end=nullptr;auto n=wcstoul(s,&end,10);if(!*s||*end||n<5||n>30)throw std::runtime_error("frame count must be 5..30");frames=UINT(n);}
+ IDXGIAdapter3*memory_adapter=nullptr;
+ if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_MEMORY_BUDGET")){
+  if(wcscmp(s,L"1"))throw std::runtime_error("invalid memory budget flag");
+  ck(f->EnumAdapterByLuid(d->GetAdapterLuid(),IID_PPV_ARGS(&memory_adapter)));
+ }
+ auto memory_report=[&](UINT frame){if(!memory_adapter)return;for(UINT segment=0;segment<2;segment++){DXGI_QUERY_VIDEO_MEMORY_INFO info{};ck(memory_adapter->QueryVideoMemoryInfo(0,segment?DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL:DXGI_MEMORY_SEGMENT_GROUP_LOCAL,&info));printf("memory_budget frame=%u segment=%u usage=%llu budget=%llu reservation=%llu\n",frame,segment,info.CurrentUsage,info.Budget,info.CurrentReservation);}fflush(stdout);};
+ memory_report(0);
  for(UINT frame=0;frame<frames;frame++){
   const bool enabled=temporal&&frame%2==1;
   const auto&expected=enabled?temporal_oracle:oracle;
@@ -68,7 +76,7 @@ int wmain(int argc,wchar_t**argv){try{
   void*p=nullptr;D3D12_RANGE range{0,oracle.size()*4},none{};ck(rb->Map(0,&range,&p));auto*actual=static_cast<const float*>(p);size_t different=0;
   for(size_t i=0;i<oracle.size();i++)different+=!std::isfinite(actual[i])||actual[i]!=expected[i];
   std::ofstream out((dir+(enabled?L"\\gpu-network70-temporal.f32":L"\\gpu-network70.f32")).c_str(),std::ios::binary);if(!out.write(reinterpret_cast<const char*>(p),oracle.size()*4))throw std::runtime_error("readback save failed");rb->Unmap(0,&none);
-  std::printf("network70 frame=%u history=%u values=%zu different=%zu\n",frame,enabled,oracle.size(),different);std::fflush(stdout);if(different)throw std::runtime_error("extracted network differs");
+  std::printf("network70 frame=%u history=%u values=%zu different=%zu\n",frame,enabled,oracle.size(),different);std::fflush(stdout);if(different)throw std::runtime_error("extracted network differs");memory_report(frame+1);
  }
- delete network;delete sampler;delete coordinates;delete reflect;std::printf("extracted_network70=exact frames=%u; controlled history; game integration pending\n",frames);return 0;
+ if(memory_adapter)memory_adapter->Release();delete network;delete sampler;delete coordinates;delete reflect;std::printf("extracted_network70=exact frames=%u; controlled history; game integration pending\n",frames);return 0;
 }catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());return 1;}}

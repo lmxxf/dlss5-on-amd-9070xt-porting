@@ -1,5 +1,5 @@
+param([string]$Folder='D:\DLSSNR-Lab\native-network70-matrix-c128')
 $ErrorActionPreference='Stop'
-$Folder='D:\DLSSNR-Lab\native-network70-matrix-c128'
 Set-Location $Folder
 $Dxc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\bin\x64\dxc.exe'
 $Inc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\inc\hlsl'

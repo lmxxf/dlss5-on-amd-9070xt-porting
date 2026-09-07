@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：15帧显存预算诊断，矩阵新暂存造成的压力需处理
+
+- 测试程序新增FRAME_COUNT=5..30和MEMORY_BUDGET=1，按实际device LUID查询IDXGIAdapter3 local/nonlocal预算；默认不启用。分析器--frames参数验证相同轮数，旧5帧回归仍通过。
+- run_matrix_c128_network可指定Folder，独立memory-c128测试session52424/PID27948 exit0；15帧交替history，实际两个最终输出下载后逐字节原版一致。
+- local初始usage15049674752/budget15386451968，frame15 usage15721615360/budget15395364848；最大超预算326250512字节；nonlocal819978240。不能将nonlocal全称换页，也不能凭预算数字量化具体延迟，但已证明确有预算压力。
+- 日志/输出release/native-network70-memory-c128，下一步矩阵输入与QKV工作缓冲按顺序执行生命周期共用，而不是每层常驻。必须图级显式管理，不能进程全局随意共用或漏状态转换。安装游戏不变；10fps未达到。
+
 ### 2026-09-07：矩阵C128整网数值通过，性能存在非局部回退
 
 - 三matrix shader以MATRIX_CHANNELS参数化（默认256），host权重块数/K块数/输入步长/dispatch随channels变；128 CSO加_c128后缀，256旧命名保持。仅128/256可启用，64仍拒绝；NativeC64Shift新增严格MATRIX_C128开关，默认关闭。
