@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07 20:07：慢速游戏展示连续30次处理完成
+
+- 现进程21632初始化耗时约195.266秒，随后自动连续render_begin/render_complete。下载日志截至tick602211578，统计该PID完成30次、render_failed=0，相邻处理约4秒。不是回退普通游戏后只声称生效。
+- request1前后FP16已下载release/native-live-continuous-21632，审计全finite、RGB不同6204885、alpha不同0；before SHA9ff490edd41f09193269c27980f5281531103ecc8b2205e2ecec447de9f8c695，after SHA14111fa4853fd502c50a47f3dae1046d7d2a3896ea6e7f42c37677783ca8990a。本帧独立原版对照未做，不能当新帧正确性验收。
+- 桌面截图确认游戏内装备页，左上显示FPS2，但中央被截图任务终端遮挡，不能作为完整显示验收；F12短按未产生新图，未继续干扰用户。保持游戏运行供用户观察，未宣称实时/时序完成。连续模式仍每帧history0，速度工作按用户要求暂停。
+
 ### 2026-09-07 20:00：按用户要求停止性能工作，安装慢速连续reset展示
 
 - 用户要求省额度，先启动看看，不展开优化。tiled诊断构建检测D:\DLSSNR-Lab\continuous-reset-preview.txt后，在ready/done状态自动申请下一帧，每帧明确history=0；移除该文件即恢复手动请求。不是完整temporal实现，也尚未核验连续屏幕表现。
