@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同GPU原版合成参考的三帧整链回归启动
+
+- runner新增显式-AmdOriginalCodec，固定校验独立AMD原版decode参考SHA cc8f208265dcf8f75233f3d5111728193d3fc22129d4f77af8d16e1af4e0d4a6，写入expected hash及模式元数据；validator对应--amd-original-codec，仍逐byte比较，不放宽容差，默认5090参考不变。
+- 确认旧测试已结束后新建native-color-frame-samegpu目录，复制旧资源及同一exe，只替换该新目录的expected为AMD原版decode结果。原测试目录、失败输出、5090expected全部保留。
+- 23 shader及expected校验通过，启动PID16108/session61892，当前初始化中。仍是三帧固定输入、history=false整链；未验证真实历史反馈或游戏显示。下一步追踪此进程，不重复启动。
+
 ### 2026-09-07：整链首帧差异定位为原版decode跨GPU数值差异
 
 - PID24536自然结束exit1/session66185终态：首帧8294400 half位模式different31390，未执行后两帧。失败日志/output/run保存release/native-color-frame/amd-first-run，不改原expected。数值比较31214不同（其余为正负零位差），max_abs0.00390625，mean_abs4.343255e-7，alpha全部一致且有限。

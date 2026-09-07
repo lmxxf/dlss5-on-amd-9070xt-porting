@@ -2,13 +2,15 @@
 from pathlib import Path
 import argparse,hashlib,json,re
 import numpy as np
-p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);p.add_argument('--amd-original-codec',action='store_true');a=p.parse_args()
 fixture=Path('release/native-color-frame');root=a.results
 digest=lambda b:hashlib.sha256(b).hexdigest()
-reference=(fixture/'expected.f16').read_bytes()
-assert digest(reference)=='e3c82de76e428a682780522b1147650bee5e80ce8ab26bbbe1a4d31712b71535'
+reference=(fixture/('amd-first-run/amd-original-decode.f16' if a.amd_original_codec else 'expected.f16')).read_bytes()
+expected_hash='cc8f208265dcf8f75233f3d5111728193d3fc22129d4f77af8d16e1af4e0d4a6' if a.amd_original_codec else 'e3c82de76e428a682780522b1147650bee5e80ce8ab26bbbe1a4d31712b71535'
+assert digest(reference)==expected_hash
 source=(fixture/'source.f16').read_bytes()
 run=json.loads((root/'frame-run.json').read_text(encoding='utf-8-sig'))
+if a.amd_original_codec:assert run['amd_original_codec'] and run['expected_sha256']==expected_hash
 assert run['source_sha256'].lower()==digest(source),'Wrong source in deployed run'
 log=(root/'frame.stdout.log').read_text()
 rows=[tuple(map(int,v)) for v in re.findall(r'game_frame frame=(\d+) half_values=(\d+) different=(\d+) history=(\d+)',log)]
@@ -22,6 +24,6 @@ original=np.frombuffer(source,np.float16).reshape(pixels.shape)
 assert np.isfinite(pixels).all() and np.array_equal(pixels[:,:,3],original[:,:,3])
 report=dict(scope='fixed linear input full color/network chain; no temporal feedback or game display proof',
  pid=run['pid'],frames=rows,output_sha256=digest(actual),source_sha256=digest(source),
- exe_sha256=run['exe_sha256'],pass_result=True,game_verified=False)
+ exe_sha256=run['exe_sha256'],amd_original_codec=a.amd_original_codec,pass_result=True,game_verified=False)
 (root/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
