@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：512层矩阵QKV和Wave评分，整网862ms
+
+- NativeSplit新增MATRIX_SPLIT_ATTENTION开关：FFWDprojection结果GPU打包后，native_matrix_qkv以CHANNELS512计算Q/K/V；旧normalize/softmax求和/V加权保留，QK评分Wave。前馈与两个projection未改。
+- 原QKV矩阵无损half分块打包并驻留DEFAULT；pack/qkv暂存必须图级显式workspace，编码/解码SplitWindow传递，状态按workspace跟踪；不新增每层大scratch，默认关闭。
+- session57241/PID42352 exit0，15帧实际GPU两最终输出下载后逐字节原版一致。暖均862.2546129ms、末5帧855.93912ms；encoder23_head109.2975343→58.3690143ms。
+- local14711050240/budget15396610048，nonlocal528605184，预算内。证据release/native-network70-matrix-split/profile-validation.json。编译/diff通过，游戏安装未改，10fps未达到，下一步preblock/C32前馈大项。
+
 ### 2026-09-08：ViT Wave收缩/投影，整网965ms
 
 - native_wave_vit_reduce输出1024，支持K4096/K1024，两独立CSO；每wave16token×16输出，四K分区，首分区以原FP32 skip系数乘残差后H初始化，其余0，K32矩阵结果每步H，分区依次H合并，最终F。仍按65536输出分块提交。

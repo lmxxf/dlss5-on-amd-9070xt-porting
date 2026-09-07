@@ -32,7 +32,7 @@ public:
   for(UINT i=0;i<8;i++){
    auto prefix=L"block"+std::to_wstring(40+i)+L"-";
    split[i].Create(d,source,60,36,NativeDecoderShift(40+i),read(prefix+L"ffwd.f32"),
-                   read(prefix+L"ffwd-projection.f32"),read(prefix+L"attention.f32"),dir);
+                   read(prefix+L"ffwd-projection.f32"),read(prefix+L"attention.f32"),dir,false,workspace);
    source=split[i].Output();
   }
   up48.Create(d,source,skip22,2160,512,256,false,read(L"block48-weights.f32"),dir,true);
