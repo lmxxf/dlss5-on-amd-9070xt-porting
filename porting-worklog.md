@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同PID帧边界kernel序列留档
+
+- 从5090读取PID22724实际launch日志，保存current-sequence/launches-22724.txt。第一帧post为launch154，后面155=cc_cb_clear、156=下一帧preblock，未夹其它被该launch入口观测到的kernel。它不覆盖其它API写入或资源别名，因此不能推断历史未更新。
+- preblock捕获0/1时刻74962234/74962500，seed0→1，处理1152×1920不变。下一步应用同PID、时间顺序的descriptor关联，比跨帧混用旧resource数字更可靠；原始preblock-live-0..7.bin还在5090日志目录。
+- AMD同PID24536仍Responding，CPU213→293秒，shader编译日志推进，session66185未终态。未修改正在执行的文件、没有重复启动或游戏部署。
+
 ### 2026-09-07：整链初始化持续，排除重复追同一copy wrapper
 
 - AMD同PID24536仍Responding，CPU从65秒继续增长、shader编译日志更新；未重新启动或改正在使用的shader。
