@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：新颜色输入原版encoder参考推进至ViT
+
+- session53276生成原版blocks1..22完成exit0，capture记录各段输入路径/hash、长度及有限性；不是把此完整生成等同算术校验。
+- session25948完成blocks23..30原版/CPU四子阶段各different0，共32项；pool/head验证main/pool/head全部exact，655360个head值。prepare_native_valid1080_vit为同源head生成ViT输入，双布局一致性检查通过。
+- blocks1..22 CPU校验独立session88265仍运行，已打印block1/2 different0/finite；后续须轮询同一session，不重跑覆盖目录。
+- ViT输入及权重上传5090 D:\DLSSNR-Lab\native-color-frame\vit，复制既有原版exe/cubin。首次调用公共路径runner发现脚本不存在（未运行任何ViT）；已将本地runner上传native-color-frame后启动session16982，原版31..38两次replay实际在推进。该session尚未终态，后续需核验56项hash及CPU数值，不能提前称通过。
+- 游戏原版进程未操作，AMD整链测试仍等待同源最终参考。
+
 ### 2026-09-07：整链线性源→原版编码→原版block0参考生成
 
 - prepare_native_color_frame.py生成独立1080p线性FP16图（空间梯度/高亮/零像素/变化alpha），保存release/native-color-frame/source.f16及hash元数据；不是最终oracle。
