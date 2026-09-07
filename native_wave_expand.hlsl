@@ -1,3 +1,6 @@
+#ifndef MATRIX_CHANNELS
+#define MATRIX_CHANNELS 256
+#endif
 #include <dx/linalg.h>
 ByteAddressBuffer input:register(t0),weights:register(t1);
 cbuffer Geometry:register(b0){uint width;uint height;}
@@ -11,13 +14,13 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  C acc;
- [loop]for(uint g=0;g<8;g++){
-  A a=A::Load(input,(gid.x*16*256+g*32)*2,512,dx::linalg::MatrixLayout::RowMajor,16);
-  B b=B::Load(weights,(gid.y*16*256+g*32)*2,512,dx::linalg::MatrixLayout::ColMajor,16);
+ [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
+  A a=A::Load(input,(gid.x*16*MATRIX_CHANNELS+g*32)*2,MATRIX_CHANNELS*2,dx::linalg::MatrixLayout::RowMajor,16);
+  B b=B::Load(weights,(gid.y*16*MATRIX_CHANNELS+g*32)*2,MATRIX_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
   C partial=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
   if(g==0){acc=partial;for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)));}
   else for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)+partial.Get(i)));
  }
  for(uint i=0;i<acc.Length();i++){float a=acc.Get(i),g=clamp(a,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);acc.Set(i,F(H(a*p)));}
- acc.Store(output,(gid.x*16*1024+gid.y*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
+ acc.Store(output,(gid.x*16*(4*MATRIX_CHANNELS)+gid.y*16)*4,4*MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
 }

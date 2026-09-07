@@ -20,9 +20,9 @@ public:
  NativeC64()=default;NativeC64(const NativeC64&)=delete;
  ~NativeC64(){if(qkv_weights)qkv_weights->Release();if(qkv_raw)qkv_raw->Release();if(qkv_pso)qkv_pso->Release();if(matrix_input)matrix_input->Release();if(pack_pso)pack_pso->Release();if(matrix_weights)matrix_weights->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();for(auto*r:scratch)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();for(auto*p:split_pso)if(p)p->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,UINT channels=64,bool fast_fp8=false,bool split=false,bool tile_contract=false,bool tile_expand=false,bool tile_projection=false,bool use_matrix=false,bool pack_input=false,bool use_matrix_qkv=false,NativeMatrixWorkspace*shared=nullptr,bool use_wave=false,bool use_wave_contract=false,bool use_wave_scores=false){
-  if(use_wave_scores&&(!use_matrix_qkv||channels!=256))throw std::runtime_error("wave scores require matrix QKV C256");wave_scores=use_wave_scores;
+  if(use_wave_scores&&(!use_matrix_qkv||(channels!=128&&channels!=256)))throw std::runtime_error("wave scores require matrix QKV C128/C256");wave_scores=use_wave_scores;
   if(use_wave_contract&&!use_wave)throw std::runtime_error("wave contract requires wave expand");wave_contract=use_wave_contract;
-  if(use_wave&&(!pack_input||channels!=256))throw std::runtime_error("wave expand requires packed C256");wave_expand=use_wave;
+  if(use_wave&&(!pack_input||(channels!=128&&channels!=256)))throw std::runtime_error("wave expand requires packed C128/C256");wave_expand=use_wave;
   if(shared&&use_matrix_qkv){shared->Validate(d,UINT64(width)*height*channels);workspace=shared;}
   if(use_matrix_qkv&&!pack_input)throw std::runtime_error("matrix QKV requires packed matrix mode");matrix_qkv=use_matrix_qkv;
   if(pack_input&&!use_matrix)throw std::runtime_error("packing requires matrix expand");pack_matrix=pack_input;

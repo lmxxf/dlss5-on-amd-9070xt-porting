@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：C128 Wave三段整网exact/1.224秒
+
+- native_wave_expand/contract使用MATRIX_CHANNELS参数化所有K范围、矩阵stride、W2偏移与输出stride，默认256；NativeC64允许128 Wave，C64暂仍禁止。WAVE_C128依赖对应matrix路径。
+- run_wave_c128_network.ps1编译128展开/收缩/QK CSO并启用C256+C128 Wave、共享workspace、15帧与显存监控。session3879/PID27196 exit0，实际两GPU最终输出下载后逐字节独立原版一致。
+- 暖均1223.9031757ms、末5帧1220.708688ms，旧C256-only Wave暖1311.1369221ms；encoder9_14=30.2279686（旧69.6928857）、tail57_61=24.6830686（旧57.8308457）ms。
+- local14468567040/budget15380881408，nonlocal829939712，预算内。证据release/native-network70-wave-c128/profile-validation.json。编译/diff检查通过，安装游戏未改，10fps未达到。
+
 ### 2026-09-08：C256 Wave完整网络15帧exact/1.311秒
 
 - NativeC64Shift新增严格WAVE_C256=0/1显式开关，依赖matrix路径，统一开启已验证Wave展开/收缩/QK评分；其它通道保持原设置。
