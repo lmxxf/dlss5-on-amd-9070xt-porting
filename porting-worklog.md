@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：独立完整颜色链expected.f16生成完成
+
+- session80600自然结束exit0，62..69所有原版/CPU检查different0。prepare_native_post70_game新增--live-half，清除继承的测试环境并显式设置origin-4/word70=1/valid1080/HALF surface，保留默认模式；新颜色输入post参考成功。
+- 原版HALF输出展开float再存half前检查逐值无损，生成oracle-neural.f16。5090 session79741把同源source/oracle-encode/oracle-neural交给捕获原版decode，三scale不同0/invalid0；scale1第一路原版输出expected.f16已下载。
+- expected共1080×1920×4 half，全部有限、alpha与source一致，与source有6210387个值不同。SHA e3c82de76e428a682780522b1147650bee5e80ce8ab26bbbe1a4d31712b71535，元数据game_verified=false。独立参考完整，但AMD NativeGameFrame整链尚待执行，不宣称已修好游戏。
+
 ### 2026-09-07：参考decoder48..61通过，准备最终合成导出
 
 - session44409完成48..55原版/CPU检查exit0；session70048完成56上采样及57..61检查exit0，全部different0，使用新base中的同源encoder skip，未混入旧图。已启动62→63..65→66→67..69条件串联任务，尚待结果。
