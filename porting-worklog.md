@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：被动资源复制通知兼容，但尚未覆盖NR历史目标
+
+- 事件addon增加copy_resource/copy_texture_region和destroy_resource。只跟踪已见format10/34资源，销毁时移除；记录子资源/源目的box，不调用设备虚拟方法、始终返回false。离线测试确认不抑制、不改payload及生命周期过滤。
+- 正常退出PID6844并同步，备份40979f49版为.before-resource-copies，部署7ba6f7fb版。新PID3084 NR count1/60成功，无先前直接copy hook失败现象。
+- resource-copy目录取得8192条复制记录。同PID NGX Color=0x368c72890、Output=0x368c73220、历史slot8=0x3a8966dd0；当前复制记录没有匹配这三个目标，多数为游戏外层资源之间的完整纹理复制。事件上限/原生调用绕过等都可能造成观测缺口，不能据此声称历史由shader写入或没有复制。
+- 当前只读观察器可保留，下一步查原版内部复制调用/其他明确证据，而不是继续重复同样的事件捕获。原渲染DLL未替换，AMD游戏接入仍未完成。
+
 ### 2026-09-07：被动描述符链映射到post输出资源，仍需历史内容更新证明
 
 - 正常退出PID19264并完成Steam同步，备份865b9e事件addon为.before-descriptor-events，部署40979f49版。新PID6844 NR count1/60成功；无NGX/命令列表函数替换。
