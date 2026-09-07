@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：FFX输出状态只读观察扩展完成
+
+- 顺序探针增加既有FFX x64 offset312/48byte output payload记录（resource/声明format/尺寸/state），不把声明format当DXGI原生格式；每帧更新追踪resource，读取失败清除追踪，避免归因到旧帧。
+- 被动barrier事件只记录该输出resource的before/after API usage、list/thread/tick，沿用8192条上限，不发barrier或其它GPU工作。用来核对FFX返回后的实际状态迁移，不以单一payload声明代替运行时证据。
+- 扩展mock payload为完整布局，Windows测试通过：过滤其它资源、匹配资源记录、payload/state不变、原调用转发不受影响。新addon构建及diff检查通过，尚未部署；当前AMD仍运行上一版只读探针，渲染修正版未部署。
+
 ### 2026-09-07：AMD游戏正常启动，发现FFX自然提交边界
 
 - 查看AMD桌面确认旧pendingcloudsessions弹窗；5090已经正常退出并完成同步后，点击取消旧启动请求，再发一次新请求。没有点击仍然进行游戏/覆盖存档。Steam action111完成启动，AMD新PID29060 Responding，只读顺序观察器生效。
