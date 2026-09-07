@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整链线性源→原版编码→原版block0参考生成
+
+- prepare_native_color_frame.py生成独立1080p线性FP16图（空间梯度/高亮/零像素/变化alpha），保存release/native-color-frame/source.f16及hash元数据；不是最终oracle。
+- codec runner增加DLSS5_CODEC_FIXTURE_DIR，仅允许原版encode game模式且禁用stage替换，从source.f16填充输入、导出第一路捕获原版DXBC的scale1输出oracle-encode.f16。5090测试三scale仍different0/invalid0，已下载原版编码结果，不用候选结果当oracle。
+- prepare_native_rgb_valid1080.py增加--base/--encoded-half；以原版编码half精确展开float，生成release/native-color-frame/network/block0-main.fp8与block0-down.fp8，长度及finite FP8检查通过。后续网络参考需沿此新base继续，旧RGB参考不能混入。
+- 整链expected.f16尚未生成，NativeGameFrame测试仍未运行；下一步原版encoder→ViT→decoder→post及原版decode完成独立参考。游戏DLL未替换。
+
 ### 2026-09-07：实际NativeGameFrame整链测试程序构建
 
 - 新增d3d12_native_game_frame_test.cpp，实际创建并调用NativeGameFrame，source/target均1080p FP16纹理，执行encode→全网络shift3→FP16桥→decode→目标复制后读取最终target。重复三帧history=false，严格对比独立expected.f16，保存actual-frame.f16；不以非黑/finite当通过。
