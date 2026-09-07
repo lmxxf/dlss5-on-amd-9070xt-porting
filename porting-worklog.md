@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：整链首帧差异定位为原版decode跨GPU数值差异
+
+- PID24536自然结束exit1/session66185终态：首帧8294400 half位模式different31390，未执行后两帧。失败日志/output/run保存release/native-color-frame/amd-first-run，不改原expected。数值比较31214不同（其余为正负零位差），max_abs0.00390625，mean_abs4.343255e-7，alpha全部一致且有限。
+- 另建AMD native-color-codec-cross，用相同source执行捕获原版encode：与5090原版encode逐位完全一致。再将独立原版CUDA网络/post输出oracle-neural送入AMD捕获原版decode，候选/原版decode三scale每组different0/invalid0。
+- 下载amd-original-decode.f16后核对：它与AMD整链actual-frame逐byte一致；它与5090原版expected差31390个half位，完全解释整链首帧差异。因此此次首帧接线可由同GPU原版decode的独立参考证明，不应为跨GPU原版自身差异修改网络或放宽数值容差。
+- 仍未完成三帧整链回归；下一步以明确单独存档的AMD原版decode参考重复验证，保留5090参考及失败日志，不替换其历史含义。真实历史反馈与游戏DLL部署/画面验证未完成。
+
 ### 2026-09-07：整链下载结果核验器就绪，测试仍运行
 
 - 新增validate_native_color_frame.py，要求独立expected固定SHA、部署source hash、三帧history0/different0记录及完成标记，并将下载actual-frame.f16与原版逐byte比较、检查有限性与alpha。不以日志单独宣称通过，报告固定game_verified=false。
