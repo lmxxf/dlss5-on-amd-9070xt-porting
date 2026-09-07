@@ -1,22 +1,22 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
-## 2026-09-08 05:30 朱雀接手性能优化（闇 GPT 额度见底）
+## 2026-09-08 05:15 朱雀接手性能优化（闇 GPT 额度见底）
 
-**09:05 收工：暖轮 242～252ms（约 4fps；run-to-run 噪声约 ±5ms，小于 5ms 的差异不要当结论）。完整入口 `run_local_c32_attention_network.ps1`（246.3ms，release/native-network70-local-c32-attn）。**
+**06:12 收工：暖轮 242～252ms（约 4fps；run-to-run 噪声约 ±5ms，小于 5ms 的差异不要当结论）。完整入口 `run_local_c32_attention_network.ps1`（246.3ms，release/native-network70-local-c32-attn）。**
 
-08:15 之后三个探针都在噪声内、未采纳（flag 保留、默认关）：fast-f（位元 FP8 量化，DLSS5_BUILD_FAST_F；第一版用 half-away 舍入直接 differs——HLSL round() 是 RNE，改 RNE 后 exact 但无收益，失败日志 release/native-network70-fast-f/failed-half-away.stdout.log）；static-length（acc.Length() 循环改静态 8 次展开，DLSS5_BUILD_STATIC_LENGTH，证实 Length()==8，收益 ≤ 噪声）；matrix-store（f16 隐藏层输出从 GetCoordinate 逐元素 Store 改 Cast<F16>().Store，现为默认，NATIVE_SCATTER_STORE=1 可回退，中性）。**结论：C32 FFN 每 token 5ns、多头注意力每组 65µs 的成本都不在算术，也不在带宽（pack/crop 拷贝实测 530GB/s，FFN 只到带宽下限的 1/4）；剩下的解释只有 wave 矩阵路径本身的指令开销/延迟链，没有指令级 profiler 之前别再猜。**
+06:05 之后三个探针都在噪声内、未采纳（flag 保留、默认关）：fast-f（位元 FP8 量化，DLSS5_BUILD_FAST_F；第一版用 half-away 舍入直接 differs——HLSL round() 是 RNE，改 RNE 后 exact 但无收益，失败日志 release/native-network70-fast-f/failed-half-away.stdout.log）；static-length（acc.Length() 循环改静态 8 次展开，DLSS5_BUILD_STATIC_LENGTH，证实 Length()==8，收益 ≤ 噪声）；matrix-store（f16 隐藏层输出从 GetCoordinate 逐元素 Store 改 Cast<F16>().Store，现为默认，NATIVE_SCATTER_STORE=1 可回退，中性）。**结论：C32 FFN 每 token 5ns、多头注意力每组 65µs 的成本都不在算术，也不在带宽（pack/crop 拷贝实测 530GB/s，FFN 只到带宽下限的 1/4）；剩下的解释只有 wave 矩阵路径本身的指令开销/延迟链，没有指令级 profiler 之前别再猜。**
 
 **给下一位（闇或我）的下一步，按预期收益排**：(1) 多头注意力（1.6ms×38≈61ms）——让 QKV GEMM 直接输出窗口主序的 f16，注意力核用 wave load 直取 Q/K/V、不再经 LDS 转存，同时把输出改矩阵 Store；(2) C32 注意力（preblock 12.7 + 7×2.85 + post70 内）——把 QKV/投影 GEMM 从每窗口融合核拆成整层 wave GEMM（像多头路径那样），融合核只留 QK/softmax/AV；(3) decoder 入口与三段上采样投影（约 10ms）仍是标量 NativeVitLinear decoder 形态，可套 blocked reduce；(4) 512 split 注意力/QKV/投影三段各 0.5ms×16。注意力以外的 GEMM 类算子已全部在 wave 矩阵路径上，再挤空间很小。
 
 **没动的东西**：游戏 DLL、发行包、任何默认行为（所有新路径都是显式 flag）；闇的“整阶段合并提交 DEVICE_HUNG”结论未复测；AMD 驱动自动更新未关（04:22 那次回退的触发者仍未知）。
 
-**08:15 累计：暖轮 246.3ms（约 4.1fps；闇最后基线 472.9ms，−48%），15帧全部exact。当前完整入口 `run_local_c32_attention_network.ps1`，证据 release/native-network70-local-c32-attn/。**
+**06:05 累计：暖轮 246.3ms（约 4.1fps；闇最后基线 472.9ms，−48%），15帧全部exact。当前完整入口 `run_local_c32_attention_network.ps1`，证据 release/native-network70-local-c32-attn/。**
 
-07:05 之后新增：fused-exp 289.5（多头注意力exp直接从QK寄存器写入f16 Q/K槽，删掉16KB f32 scores共享区，首C64 attention 2.02→1.69ms）→ vit-attn-half 271.4（ViT注意力读打包f16 QKV、wave load直取K/V、分母树两lane并行，3.33→0.78ms/层）→ wave-project 254.5（Swin FFN/注意力输出投影改wave矩阵，0.45→0.22ms×2×38块）→ local-c32-attn 246.3（C32注意力权重打包f16驻留、wave load直取，不再每窗口4次拷进LDS；preblock stage1 15.5→12.7）。
+05:52 之后新增：fused-exp 289.5（多头注意力exp直接从QK寄存器写入f16 Q/K槽，删掉16KB f32 scores共享区，首C64 attention 2.02→1.69ms）→ vit-attn-half 271.4（ViT注意力读打包f16 QKV、wave load直取K/V、分母树两lane并行，3.33→0.78ms/层）→ wave-project 254.5（Swin FFN/注意力输出投影改wave矩阵，0.45→0.22ms×2×38块）→ local-c32-attn 246.3（C32注意力权重打包f16驻留、wave load直取，不再每窗口4次拷进LDS；preblock stage1 15.5→12.7）。
 
 **剩余分布（246ms）**：C32族≈85（post70 body 20.1、encoder1_4 18.0、tail67_69 16.1、preblock attention 12.7 + FFN 11.8 + prefix 6.8）；多头Swin C64/128/256 编码器≈36 + 解码器≈32（每块约1.6ms注意力 + 0.8 FFN + 0.45 投影 + 0.25 pack/crop + 0.3 QKV）；split C512 ≈ 17+8×2.4；ViT 20；decoder入口/上采样投影≈10。注意力核（多头1.6×38 + C32 2.85×7 + preblock 12.7 + post70内）仍占约120ms，是唯一还没被结构性改造的大项——LDS并发和barrier链，而非算力。
 
-**07:05 累计：暖轮 293.2ms（闇最后基线 472.9ms，−38%），15帧全部exact。** 叠加顺序（每步一个release/native-network70-*目录、一个run_*.ps1 入口，每个入口链式调用上一个）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366（噪声内）→ resident-weights 338 → shift-stack 332（重评闇的COALESCED_MULTIHEAD_SHIFT，现在有效）→ wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293。当前完整入口：`run_blocked_c32_ffn_network.ps1`。
+**05:52 累计：暖轮 293.2ms（闇最后基线 472.9ms，−38%），15帧全部exact。** 叠加顺序（每步一个release/native-network70-*目录、一个run_*.ps1 入口，每个入口链式调用上一个）：async-submit 456 → blocked-ffn 427 → blocked-vit 359 → coalesced-qkv 366（噪声内）→ resident-weights 338 → shift-stack 332（重评闇的COALESCED_MULTIHEAD_SHIFT，现在有效）→ wave-vit-qkv 321 → blocked-vit-proj 312 → split-blocked 303 → c32-ffn-blocked 293。当前完整入口：`run_blocked_c32_ffn_network.ps1`。
 
 **共同规律**：所有收益来自数据搬运，不是算术——(1) 每wave一份A tile复用4个权重tile（寄存器分块）；(2) 中间层用f16存（F()输出都在FP8格点，转换无损）；(3) 权重全部驻留VRAM；(4) 取消LDS→temp→LDS的转存和多余barrier，用GetCoordinate直接写；(5) 取消分chunk小dispatch。每个输出元素的K32乘加序列和H()调用次数完全不变，所以逐字节exact是构造性保证，不是靠运气。
 
@@ -24,7 +24,7 @@
 
 **剩余分布（293ms）**：注意力约145ms（多头C64/128/256 约2.2ms×38块≈84；C32 3.0×7+preblock 12.8；ViT 3.35×8=27；post70 body 20.6 内含C32型注意力）；C32 FFN 1.8×7+10；prefix 7.4；pack/crop；decoder入口/上采样投影约10。**下一步该动注意力核**：多头核每组(窗口×头)约65µs，是合理值的~10倍，瓶颈是LDS 28KB限制并发+12个barrier+64线程串行段，不是算力；候选是把scores存f16 exp（省8KB LDS）、分母树并行化、或把C32的QKV/投影GEMM从融合核里拆成整层wave GEMM。
 
-**06:05 累计：暖轮 337.8ms（闇最后基线 472.9ms），15帧全部exact，四项叠加、全部显式flag、默认关闭、游戏DLL未改。**
+**05:41 累计：暖轮 337.8ms（闇最后基线 472.9ms），15帧全部exact，四项叠加、全部显式flag、默认关闭、游戏DLL未改。**
 
 全部权重驻留GPU本地（DLSS5_TEST_RESIDENT_WEIGHTS=1）：此前所有权重/偏置表/索引表都在UPLOAD堆（系统内存，非本地段492MB），每帧经PCIe读取。NativeMaybeResident在各Buffer helper初始化后复制到DEFAULT堆；非本地占用降到205MB，本地14.44/15.14GB。暖366.0→337.8ms。decoder_stage1在多次运行间4.5/13.9ms双稳态（与同步/延迟提交无关）的根因就是它：decoder39入口权重落在系统内存时慢9ms。证据release/native-network70-resident-weights。
 
