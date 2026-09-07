@@ -5,7 +5,7 @@
 #include "native_matrix_workspace.h"
 class NativeC64 {
  NativeMatrixWorkspace*workspace{};
- ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{};
+ ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{},wave_scores{};
  ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{};
  ID3D12Resource*input{};ID3D12Resource*weights[2]{};ID3D12Resource*result[3]{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[3]{};UINT geometry[2]{},channel_count{64};bool recorded{};
@@ -19,7 +19,8 @@ class NativeC64 {
 public:
  NativeC64()=default;NativeC64(const NativeC64&)=delete;
  ~NativeC64(){if(qkv_weights)qkv_weights->Release();if(qkv_raw)qkv_raw->Release();if(qkv_pso)qkv_pso->Release();if(matrix_input)matrix_input->Release();if(pack_pso)pack_pso->Release();if(matrix_weights)matrix_weights->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();for(auto*r:scratch)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();for(auto*p:split_pso)if(p)p->Release();}
- void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,UINT channels=64,bool fast_fp8=false,bool split=false,bool tile_contract=false,bool tile_expand=false,bool tile_projection=false,bool use_matrix=false,bool pack_input=false,bool use_matrix_qkv=false,NativeMatrixWorkspace*shared=nullptr,bool use_wave=false,bool use_wave_contract=false){
+ void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,UINT channels=64,bool fast_fp8=false,bool split=false,bool tile_contract=false,bool tile_expand=false,bool tile_projection=false,bool use_matrix=false,bool pack_input=false,bool use_matrix_qkv=false,NativeMatrixWorkspace*shared=nullptr,bool use_wave=false,bool use_wave_contract=false,bool use_wave_scores=false){
+  if(use_wave_scores&&(!use_matrix_qkv||channels!=256))throw std::runtime_error("wave scores require matrix QKV C256");wave_scores=use_wave_scores;
   if(use_wave_contract&&!use_wave)throw std::runtime_error("wave contract requires wave expand");wave_contract=use_wave_contract;
   if(use_wave&&(!pack_input||channels!=256))throw std::runtime_error("wave expand requires packed C256");wave_expand=use_wave;
   if(shared&&use_matrix_qkv){shared->Validate(d,UINT64(width)*height*channels);workspace=shared;}
@@ -62,7 +63,7 @@ public:
   if(matrix_qkv){if(workspace){qkv_raw=workspace->qkv;qkv_raw->AddRef();}else qkv_raw=Buffer(d,UINT64(width)*height*channels*12);blob=nullptr;Check(D3DReadFileToBlob(matrix_file(L"native_matrix_qkv").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&qkv_pso));blob->Release();Check(hr);}
   const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
   const char*entry[]={"ffn","attention",tiled_projection?"tiled_attention_project":"projection"};auto path=dir+L"\\native_c64.hlsl";auto channel_text=std::to_string(channels);D3D_SHADER_MACRO macros[]={{"RAW_OUTPUT",raw_output?"1":"0"},{"CHANNELS",channel_text.c_str()},{"NATIVE_PRECOMPUTED_QKV",matrix_qkv?"1":"0"},{"NATIVE_FAST_FP8",fast_fp8?"1":"0"},{"NATIVE_PAD_MULTIHEAD_LDS",pad&&!wcscmp(pad,L"1")?"1":"0"},{nullptr,nullptr}};
-  for(UINT i=0;i<3;i++){if(split_ffn&&i==0)continue;macros[0].Definition=(raw_output&&i==2)?"1":"0";blob=nullptr;error=nullptr;HRESULT hr=CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C64 shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<3;i++){if(split_ffn&&i==0)continue;macros[0].Definition=(raw_output&&i==2)?"1":"0";blob=nullptr;error=nullptr;HRESULT hr=(i==1&&wave_scores)?D3DReadFileToBlob(matrix_file(L"native_wave_scores").c_str(),&blob):CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C64 shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
   if(split_ffn){
    scratch[0]=Buffer(d,UINT64(width)*height*channels*16);scratch[1]=Buffer(d,UINT64(width)*height*channels*4);
    const char*names[]={tiled_expand?"tiled_ffn_expand":"split_ffn_expand",tiled_contract?"tiled_ffn_contract":"split_ffn_contract",tiled_projection?"tiled_ffn_project":"split_ffn_project"};macros[0].Definition="0";

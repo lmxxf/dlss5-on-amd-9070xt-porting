@@ -1,3 +1,6 @@
+#if NATIVE_WAVE_SCORES
+#include <dx/linalg.h>
+#endif
 #ifndef CHANNELS
 #define CHANNELS 64
 #endif
@@ -99,13 +102,21 @@ void tiled_project(uint3 gid,uint t,uint matrix_offset,uint skip_offset,bool raw
  [unroll]for(uint g=0;g<HEADS;g++){float s=0;[loop]for(uint j=0;j<32;j++)s+=input[p*CHANNELS+g*32+j]*weights[8*MATRIX+row*CHANNELS+g*32+j];a=H(a+s);}
  output[n]=F(a);
 }
-#if NATIVE_PAD_MULTIHEAD_LDS
+#if NATIVE_PAD_MULTIHEAD_LDS && !NATIVE_WAVE_SCORES
 #define ATTN_STRIDE 33
 #else
 #define ATTN_STRIDE 32
 #endif
+#if NATIVE_WAVE_SCORES
+groupshared float16_t queries[2048],keys[2048];
+groupshared float values[2048],scores[4096];
+#else
 groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_STRIDE];
+#endif
 #include "native_half_square.hlsli"
+ #if NATIVE_WAVE_SCORES
+[WaveSize(32)]
+#endif
 [numthreads(64,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x;if(gid.x>=width*height/64||head>=HEADS)return;
  uint p=((gid.x/(width/8))*8+t/8)*width+(gid.x%(width/8))*8+t%8;
@@ -127,9 +138,25 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  [unroll]for(uint step=4;step>0;step/=2){[loop]for(uint i=0;i<step;i++){qs[i]=H(qs[i]+qs[i+step]);ks[i]=H(ks[i]+ks[i+step]);}}
  float qi=H(rsqrt(max(qs[0],6.198883056640625e-5))),ki=H(rsqrt(max(ks[0],6.198883056640625e-5)));
  [loop]for(uint c=0;c<32;c++){queries[t*ATTN_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[SCALE_OFFSET+head])));keys[t*ATTN_STRIDE+c]=F(H(k[c]*ki));}
- GroupMemoryBarrierWithGroupSync();float ex[64],prob[64];
+ GroupMemoryBarrierWithGroupSync();
+#if NATIVE_WAVE_SCORES
+ using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+ using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+ for(uint qr=t/32;qr<4;qr+=2)for(uint kr=0;kr<4;kr++){
+  A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+  B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
+  auto s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+  s.Store(scores,qr*16*64+kr*16,64,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+#endif
+ float ex[64],prob[64];
  [loop]for(uint key=0;key<64;key++){
+#if NATIVE_WAVE_SCORES
+  float s=scores[t*64+key];
+#else
   float s=0;[loop]for(uint c=0;c<32;c++)s+=queries[t*ATTN_STRIDE+c]*keys[key*ATTN_STRIDE+c];
+#endif
   float score=H(s+weights[4*MATRIX+head*4096+t*64+key]);uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));ex[key]=f16tof32(((bits<<5)+0x8000u)&65535u);
  }
  float parity[2];[unroll]for(uint odd=0;odd<2;odd++){

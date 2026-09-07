@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：Wave QK评分，C256核心3.43ms
+
+- native_c64 attention可选NATIVE_WAVE_SCORES：Q/K共享half（均为FP8格点可无损表示），V仍float；scores4096float，合计32KiB共享存储，Wave分支行stride32，不叠加旧33-padding超预算。64线程两wave分别覆盖四个query16块与四个key16块，乘积写共享scores，再全组同步。
+- 仅替换QK32点积，bias/H、softmax近似、精确旧求和顺序、prob F、V加权均不变。NativeC64仅显式use_wave_scores且matrix_qkv/C256时读取独立native_wave_scores.cso，默认FXC路径不变。
+- bench wave_scores对照组已含Wave展开/收缩和矩阵QKV，候选只改scores；session77953 exit0，五轮最终2211840值baseline_diff/fast_diff/bit_diff全0。
+- 暖轮attention2.71318→0.96467ms，完整核心5.17005→3.42863ms，约33.7%下降。日志release/matrix-c256-wave-scores/result.log。DXC提示half隐式转换和auto扩展警告，编译成功；half输入FP8域和最终对照均验证。
+- 编译/diff检查通过，尚未整网/游戏启用，10fps未达到。
+
 ### 2026-09-08：Wave收缩净收益，C256核心4.89ms
 
 - 新native_wave_contract：16像素×16输出wave，每K32将512个FP8格点float转组内half，barrier后Mat16×32/32×16乘法，H累计32次，最后F。权重初始化时在Wave展开权重后追加W2的row-major half并逐值检查无损；无新增全尺寸scratch。
