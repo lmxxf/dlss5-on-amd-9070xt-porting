@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07 22:24：真人批准预览驱动，首个矩阵舍入探针exact
+
+- 用户22:21明确批准：保留exact裁判，允许快速版有界硬件算术误差但不改权重/网络/输入依赖，先测硬件矩阵能否exact，不自动重启。
+- install_amd_preview.ps1增加RunTag，独立driver-install-20260907-approved状态/输出/日志，不覆盖9/5；安装前查签名Valid AMD、当前oem201.inf/32.0.31041.1004、回退INF和无游戏/测试/Setup进程。SYSTEM任务启动Setup PID29188，14:23:12Z→14:24:03Z exit0。
+- AMD实查32.0.31007.2048、Intel32.0.101.8331未改，boot仍2026/8/31，未重启。一次性任务Ready/LastTaskResult0后移除，备份及日志保留。
+- matrix_probe不加--experimental仍tier0是调用模式问题；加该参数后experimental/device成功、SM6.10、LinAlg tier0x10。旧smoke8192值不同0，新matrix_rounding_probe8192值不同0，重复调用也成功。不是全网验收，真实层数据仍待验证。
+- 当前游戏DLL未改，现有exact裁判保留。证据release/driver-install-20260907-approved。后续按用户新批准路线推进，不继续等待已获得的权限。
+
 ### 2026-09-07：C32位元量化无收益，保持关闭
 
 - preblock_attention_core保留LegacyF，以严格DLSS5_TEST_FAST_C32_FP8宏启用已有NativeFastFp8，非finite回旧路径；只测C32注意力，不改C64或FFN。
