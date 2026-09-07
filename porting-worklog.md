@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：NativeGameCodec封装在AMD输入/输出GPU对照通过
+
+- d3d12_native_codec_test增加DLSS5_TEST_CODEC_STAGE_DIR，要求game几何。启用后第二路实际调用NativeGameCodec::Create/Record及其Output，不再用测试程序自己的候选PSO输出；第一路仍独立执行捕获原版DXBC。消费封装输出后恢复NON_PIXEL_SHADER_RESOURCE以允许下一次Record。
+- AMD输出合成session11999及输入编码测试均exit0：每路scale1/.5/2连续三帧、每帧8294400 half different0/invalid0。验证封装的descriptor/root绑定、FP16中间输出与重复Record输出状态转换；源纹理before本次为NON_PIXEL_SHADER_RESOURCE，其它source状态路径尚未实测。
+- 没有游戏DLL部署。下一接线点为网络RGB buffer→FP16纹理（与原版NR输出纹理精度一致）→已验证decode，不能沿用旧10bit打包直接呈现。
+- AMD完整网络同PID18872最后检查CPU1553秒且Responding，继续追踪原任务，尚未宣布其通过。
+
 ### 2026-09-07：codec GPU资源封装，待执行验证
 
 - 新增native_game_codec.h：NativeGameCodec按1张输入编码或3张独立输入合成创建SRV/UAV/root signature/PSO及独立RGBA16_FLOAT输出，直接使用已数值验证的两个HLSL，不读取夹具或CPU中间像素。
