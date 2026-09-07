@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：NativeGameFrame完整颜色链三帧全部通过
+
+- PID16108自然完成，session61892 exit0。下载actual-frame.f16、frame日志/run元数据到release/native-color-frame/amd-samegpu-accepted；validate_native_color_frame --amd-original-codec正式通过。
+- 三帧各8294400 half different0/history0，最终目标纹理逐byte等于同GPU原版合成参考，全部有限、alpha等于source。output SHA cc8f208265dcf8f75233f3d5111728193d3fc22129d4f77af8d16e1af4e0d4a6；source SHA683f8194da1010b60db8c3de779537623aaa154da617f0ccf0a0c5079ddef7b6；exe SHA CC8D5015B50832CDF8B081BDD2584A006398A1F6B2B85D0E81EC191B72E76B49。
+- 此次实际调用NativeGameFrame的encode→RGB unpack→全网络shift3→FP16纹理桥→decode→目标复制，涵盖重复帧输出资源状态恢复，没有CPU中间像素或参考替代网络输出。
+- 原NVIDIA合成跨卡差异及失败样本仍保留。当前无该整链测试进程。此结论仅固定线性输入/无history反馈，不是实际剑星画面验收；下一阶段游戏入口挂接、真实历史生命周期和动态画面验证，目标仍未完成。
+
 ### 2026-09-07：同GPU原版合成参考的三帧整链回归启动
 
 - runner新增显式-AmdOriginalCodec，固定校验独立AMD原版decode参考SHA cc8f208265dcf8f75233f3d5111728193d3fc22129d4f77af8d16e1af4e0d4a6，写入expected hash及模式元数据；validator对应--amd-original-codec，仍逐byte比较，不放宽容差，默认5090参考不变。
