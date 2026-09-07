@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：游戏配置为SDR，只读codec常数观察器完成构建
+
+- 5090 GameUserSettings.ini实读：bUseHDRDisplayOutput=False，FullscreenMode=1，ResolutionSizeX/Y=1920/1080，动态分辨率关闭。ReShade配置NRPaperWhiteScale/NRTransferStrength/NRColorStrength均1。这是设置证据，不等于运行时HdrMode直接证据。
+- 新增native_codec_constants_events.cpp：只注册ReShade push_constants事件，筛选16个word、1080p尺寸及mode0..2的候选结构，最多记录32次原始word、list/layout/param；不查询device、不发GPU命令、不hook D3D方法。每条明确shader_identity_verified=0，避免将相似常数误认codec。
+- 配套test_native_codec_constants_events.cpp检查空指针、截断/偏移拒绝、mode范围及payload不变。MinGW addon/test构建成功；尚未部署到游戏，需正常退出后再加载验证，不能称已观测到运行时模式。
+- 完整网络shift3回归仍为PID18872/session28959，检查时CPU继续增长且编译日志推进，未重启。
+
 ### 2026-09-07：已安装参考addon颜色路径证据留档
 
 - 从5090游戏实际目录读取renodx-dlss5.addon64到/tmp/native-reference-renodx.addon64，SHA256 e1c28fde0922b12fc10734e58c3d24a36808e575247f4fd4f36226540d7ee023。没有部署或重启游戏。
