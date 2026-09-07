@@ -5,17 +5,27 @@
 #include <cstdio>
 #include "reshade.hpp"
 #include "MinHook.h"
+#ifdef NATIVE_ORDER_NEURAL
+#define NATIVE_ORDER_SNAPSHOT
+#include "native_game_oneshot.h"
+static NativeGameOneShot neural_oneshot;
+#endif
 #ifdef NATIVE_ORDER_SNAPSHOT
 #include "native_submitted_readback.h"
 #include "native_snapshot_gate.h"
-struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};};
+struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};unsigned frame{};};
 static PendingSnapshot pending_snapshot;
 static std::mutex snapshot_mutex;
 static bool snapshot_taken{};
 static thread_local bool snapshot_active{};
 #endif
+#ifdef NATIVE_ORDER_NEURAL
+extern "C" __declspec(dllexport) const char*NAME="DLSS5 AMD single-frame verification";
+extern "C" __declspec(dllexport) const char*DESCRIPTION="Background initialization then one reset-history neural frame; not a completed temporal renderer.";
+#else
 extern "C" __declspec(dllexport) const char*NAME="Native FFX submission order observer";
-extern "C" __declspec(dllexport) const char*DESCRIPTION="Records FFX and command-list ordering; no GPU work or command mutation.";
+extern "C" __declspec(dllexport) const char*DESCRIPTION="Records FFX and command-list ordering; optional diagnostic snapshot build.";
+#endif
 struct Header {uint64_t type;Header*next;};
 struct ResourcePayload {void*resource;uint32_t type,format,width,height,depth,mips,flags,usage,state,padding;};
 static_assert(sizeof(ResourcePayload)==48,"FFX x64 resource layout");
@@ -110,11 +120,19 @@ static uint32_t dispatch(void**context,const Header*h){
  if(output.resource)install_native_barriers(list);
  auto result=original(context,h);log("ffx_end",list,nullptr,result);
 #ifdef NATIVE_ORDER_SNAPSHOT
- if(n==120&&result==0&&output_bytes==sizeof(output)&&output.resource&&output.width==1920&&output.height==1080&&output.state==2&&list){
+ bool request=n==120;
+#ifdef NATIVE_ORDER_NEURAL
+ request=request||neural_oneshot.WantsFrame();
+#endif
+ if(request&&result==0&&output_bytes==sizeof(output)&&output.resource&&output.width==1920&&output.height==1080&&output.state==2&&list){
   ID3D12GraphicsCommandList*native=nullptr;
   if(SUCCEEDED(static_cast<IUnknown*>(list)->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&native)))&&native){
    std::lock_guard<std::mutex>guard(snapshot_mutex);
-   if(!snapshot_taken&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();pending_snapshot={native,r,GetCurrentThreadId()};}
+   bool eligible=!snapshot_taken;
+#ifdef NATIVE_ORDER_NEURAL
+   eligible=eligible||neural_oneshot.WantsFrame();
+#endif
+   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n};}
    else native->Release();
   }
  }
@@ -140,19 +158,30 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
  if(!snapshot_active){
   PendingSnapshot job{};
   {std::lock_guard<std::mutex>guard(snapshot_mutex);
+   if(pending_snapshot.list&&pending_snapshot.frame!=frames.load()){
+    pending_snapshot.list->Release();pending_snapshot.source->Release();pending_snapshot={};
+   }
    uintptr_t items[64]{};if(lists&&count<=64)for(UINT i=0;i<count;i++)items[i]=reinterpret_cast<uintptr_t>(lists[i]);
-   if(!snapshot_taken&&NativeSnapshotBatchMatch(pending_snapshot.thread,GetCurrentThreadId(),reinterpret_cast<uintptr_t>(pending_snapshot.list),lists?items:nullptr,count)){
+   bool eligible=!snapshot_taken;
+#ifdef NATIVE_ORDER_NEURAL
+   eligible=eligible||neural_oneshot.WantsFrame();
+#endif
+   if(eligible&&NativeSnapshotBatchMatch(pending_snapshot.thread,GetCurrentThreadId(),reinterpret_cast<uintptr_t>(pending_snapshot.list),lists?items:nullptr,count)){
     job=pending_snapshot;pending_snapshot={};snapshot_taken=true;
    }
   }
   if(job.list){
    snapshot_active=true;
+#ifdef NATIVE_ORDER_NEURAL
+   neural_oneshot.OnSubmitted(q,job.source);
+#else
    try{
     auto pixels=NativeReadSubmittedFrame(q,job.source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\ffx-submitted-%lu.f16)",GetCurrentProcessId());
     FILE*f=_wfopen(path,L"wb");if(!f)throw std::runtime_error("snapshot file open");auto written=fwrite(pixels.data(),1,pixels.size(),f);fclose(f);if(written!=pixels.size())throw std::runtime_error("snapshot short write");
     if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-snapshot-result.txt)",L"ab")){fprintf(f,"pid=%lu frame=120 bytes=%zu queue=%p source=%p state_restored=UAV success=1\n",GetCurrentProcessId(),pixels.size(),q,job.source);fclose(f);}
    }catch(const std::exception&e){if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-snapshot-result.txt)",L"ab")){fprintf(f,"pid=%lu success=0 error=%s\n",GetCurrentProcessId(),e.what());fclose(f);}}
+#endif
    job.list->Release();job.source->Release();snapshot_active=false;
   }
  }

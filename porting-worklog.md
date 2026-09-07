@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机单帧神经渲染诊断DLL构建，尚未部署
+
+- 新增NativeGameOneShot：首次合格after-submit边界仅启动后台初始化NativeGameFrame，保留queue/source引用，不让游戏线程承担长shader编译；ready后下一合格帧先保存真实before，再重绑当前源、分段执行完整颜色+网络并写回同一FP16目标，最后保存after。阶段原子状态防重复，错误不自动重试，queue变更拒绝。
+- NATIVE_ORDER_NEURAL构建复用已验证批次匹配/递归保护，明确导出名称为单帧验证，不冒充只读或完成版。seed0/history0是明确诊断重置，不替代最终连续历史反馈。新增pending帧代次检查，过期list/source引用丢弃，防止列表复用后错误匹配旧帧。
+- MinGW神经版DLL完整链接成功，默认观察器mock回归通过，diff检查通过。产物/tmp/native-game-neural-oneshot.addon64尚未部署，游戏仍为上一快照版。下一步核验外部23shader/系数路径与部署，然后观察后台初始化及真实before/after；不能将构建成功当实机输出成功。
+
 ### 2026-09-07：游戏after-submit受控一次读回成功
 
 - 新增native_snapshot_gate.h及测试：同线程、producer list唯一且位于batch末尾、count1..64才匹配；空/重复/错误线程/非末尾均拒绝。探针NATIVE_ORDER_SNAPSHOT编译开关只在第120次成功FFX、1080p/声明state2时保留source和unwrapped list，原生提交返回匹配后只执行一次读回，递归保护、失败不重试。默认观察器不执行GPU工作。
