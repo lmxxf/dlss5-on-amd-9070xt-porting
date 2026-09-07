@@ -2,9 +2,23 @@
 #if !NATIVE_WAVE_AV || !NATIVE_WAVE_SCORES
 #error Parallel multihead requires complete Wave attention
 #endif
+#if NATIVE_MULTIHEAD_EIGHT_WAVES
+#define MULTIHEAD_THREADS 256
+#define MULTIHEAD_QUERY (t/64)
+#define MULTIHEAD_QSTEP 4
+#define MULTIHEAD_COL_START ((t/32)&1)
+#define MULTIHEAD_COL_STEP 2
+#else
 #define MULTIHEAD_THREADS 128
+#endif
 #else
 #define MULTIHEAD_THREADS 64
+#endif
+#ifndef MULTIHEAD_QUERY
+#define MULTIHEAD_QUERY (t/32)
+#define MULTIHEAD_QSTEP (MULTIHEAD_THREADS/32)
+#define MULTIHEAD_COL_START 0
+#define MULTIHEAD_COL_STEP 1
 #endif
 #if NATIVE_WAVE_AV && !NATIVE_WAVE_SCORES
 #error Wave AV requires Wave scores
@@ -166,7 +180,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
 #if NATIVE_WAVE_SCORES
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
- for(uint qr=t/32;qr<4;qr+=MULTIHEAD_THREADS/32)for(uint kr=0;kr<4;kr++){
+ for(uint qr=MULTIHEAD_QUERY;qr<4;qr+=MULTIHEAD_QSTEP)for(uint kr=MULTIHEAD_COL_START;kr<4;kr+=MULTIHEAD_COL_STEP){
   A qa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B kb=B::Load(keys,kr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
   auto s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
@@ -234,7 +248,7 @@ groupshared float queries[64*ATTN_STRIDE],keys[64*ATTN_STRIDE],values[64*ATTN_ST
  GroupMemoryBarrierWithGroupSync();
 #endif
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
- for(uint qr=t/32;qr<4;qr+=MULTIHEAD_THREADS/32)for(uint col=0;col<32;col+=16){
+ for(uint qr=MULTIHEAD_QUERY;qr<4;qr+=MULTIHEAD_QSTEP)for(uint col=MULTIHEAD_COL_START*16;col<32;col+=16*MULTIHEAD_COL_STEP){
   A a=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
   B b=B::Load(values,col,32,dx::linalg::MatrixLayout::RowMajor);
   C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);

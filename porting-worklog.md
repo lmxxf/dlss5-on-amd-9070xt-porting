@@ -6245,3 +6245,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 不改指数近似/舍入/求和顺序，不增整图buffer，仅256B共享倒数。四Wave分工和C32有效配置保留，原shared-prob实验不启用。
 - DXC与能力门禁通过，PID39980退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。暖546.147404ms、末5帧546.866452ms，对照四Wave候选552.613228ms；首C64 attention2.854486ms对3.520357ms，保留。
 - 证据release/native-network70-multihead-softmax/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax。游戏DLL未更新，10fps未完成。
+# 2026-09-08：多头八Wave分工
+
+- NATIVE_MULTIHEAD_EIGHT_WAVES在既有四Wave模式内切256线程/8Wave，每16查询由两个Wave各做一半输出列，QK键列同步拆分。仍保留64查询标量归一化、分母树，概率全组处理；barrier保持全组，LDS容量/全图buffer不变。
+- DXC、元素覆盖检查和SM6.10/tier0x10门禁正常，PID33392退出0；15帧最终different0，下载两份结果对独立原版参考byte-exact。
+- 暖540.422252ms、末5帧541.122424ms；对照四Wave并行softmax546.147404ms，首C64 attention2.436631ms对2.854486ms，保留。
+- 证据release/native-network70-multihead-eight-wave/，准备/manifest脚本在release/（ignored）；入口run_multihead_four_wave_network.ps1 -Folder目标 -ParallelSoftmax -EightWaves，内部C32保持八Wave并行exp/prob/norm。未更新游戏DLL，10fps未完成。
