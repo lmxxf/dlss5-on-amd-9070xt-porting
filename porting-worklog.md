@@ -6183,3 +6183,10 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - PID19652退出0，15帧最终different0，下载两份结果对独立原版参考byte-exact。暖589.228183ms、末5帧589.26818ms；post70_body33.689571ms，preblock attention23.885897ms，首C32 attention5.862957ms。
 - 无明显局部或整网收益，保持关闭。此前位元FP8、硬件舍入修正、权重驻留、共享区小调整也未产生明显收益，后续应转向C32融合核的任务分配/分阶段执行，先核算显存临时量预算，不将困难误报为已无路线。
 - 证据release/native-network70-c32-branch-half/，准备/manifest脚本在release/（ignored）；复现入口run_c32_branch_half_network.ps1。有效基线约586ms，未更新游戏DLL，10fps未达到。
+# 2026-09-08：C32融合核四Wave工作分配，有收益
+
+- 新独立preblock_attention_four_wave.hlsl要求完整QKV/QK/AV/projection矩阵路径，每窗口64查询由128线程/4Wave执行，矩阵循环每Wave只负责16查询而非两块串行。
+- 标量q/k归一化、softmax树/概率、最终残差写回仅t<64执行；全组barrier保持在条件外，额外线程没有提前return。权重加载步长128、输入与AV→projection暂存按元素协同搬运；共享容量与整图buffer均不增加。原软件H/F、权重和输入依赖不变。
+- 查询覆盖检查确认两Wave/四Wave输出集合相同64查询。DXC通过，PID21236退出0，15帧最终different0，下载两份结果与独立原版参考byte-exact。
+- 暖569.132636ms、末5帧572.907292ms；preblock attention20.79282ms，首C32 attention5.139723ms，post70_body30.785963ms（旧33.609171）。相对约586ms基线有整体收益，保留独立优化入口。
+- 证据release/native-network70-c32-four-wave/，准备脚本release/prepare-c32-four-wave.ps1（ignored）；运行run_c32_four_wave_network.ps1。不启用硬件half、branch、FP8位元、padding/驻留等实验，游戏DLL未更新，10fps仍未达到。
