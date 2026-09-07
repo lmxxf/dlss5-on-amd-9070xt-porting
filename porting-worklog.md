@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD顺序观察器部署，等待正常云同步
+
+- AMD游戏已退出，实际安装目录C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64。deploy_native_order_probe.ps1先校验进程/路径，将旧dlss5-1080p-runtime.addon64改名保留为.before-order-probe，放入新只读native-submission-order.addon64，记录两份hash到D:\DLSSNR-Lab\order-probe-deployment.json。既有native-present-contract观察器保留。没有删除旧补丁，可恢复文件名回退。
+- DLSS5GameLaunch任务成功发出Steam启动请求，但console显示SynchronizingCloud/pendingcloudsessions，尚未产生新AMD游戏PID。日志里pid29496/list1234属于此前mock测试，不能认成实机证据。
+- 5090原版游戏仍开着，已用正常Alt+F4退出，等待Steam自行完成同步，没有选择覆盖存档或忽略云同步。接下来检查AMD启动请求/窗口，不能重复发起或把启动请求当游戏已运行。
+
 ### 2026-09-07：分段提交入口审计与FFX顺序观察器
 
 - ReShade6.8源码d3d12_command_queue.cpp中execute_command_list事件在_orig->ExecuteCommandLists之前，且其间还flush immediate list；不能将该回调当成生产者已提交的after事件，否则神经消费者顺序仍错。
