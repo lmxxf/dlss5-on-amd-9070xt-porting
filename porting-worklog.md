@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：AMD游戏正常启动，发现FFX自然提交边界
+
+- 查看AMD桌面确认旧pendingcloudsessions弹窗；5090已经正常退出并完成同步后，点击取消旧启动请求，再发一次新请求。没有点击仍然进行游戏/覆盖存档。Steam action111完成启动，AMD新PID29060 Responding，只读顺序观察器生效。
+- 下载order-29060.txt，新增audit_native_ffx_boundary.py：72个完整同线程FFX返回→下一close边界，中间draw/dispatch均0；FFX list与close API接口指针差8为本次观察值，不硬编码成跨版本ABI。首例ffx list2ef62130→API2ef62138→native2494e590，提交queue native248a28d0。
+- 第一批before-execute之后才出现后续draw/dispatch记录，说明可进一步验证自然升频列表提交之后的插入边界，而不是关闭/重置游戏正在记录的list。当前事件仍是before-execute，不等于真实提交返回，下一步需after原调用观测和输出资源状态证明。
+- 旧渲染addon仍以.before-order-probe保留停用，新神经渲染DLL尚未部署。现在游戏运行不表示移植生效，目标未完成。
+
 ### 2026-09-07：AMD顺序观察器部署，等待正常云同步
 
 - AMD游戏已退出，实际安装目录C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64。deploy_native_order_probe.ps1先校验进程/路径，将旧dlss5-1080p-runtime.addon64改名保留为.before-order-probe，放入新只读native-submission-order.addon64，记录两份hash到D:\DLSSNR-Lab\order-probe-deployment.json。既有native-present-contract观察器保留。没有删除旧补丁，可恢复文件名回退。
