@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：准备从已验证launch hook读取实际后端函数表
+
+- 静态核对RVA449a0：self+8为后端对象，self+0x10为命令列表，后续从后端vtable调用0x150/0xd8等槽。不能用未命中的D3D12候选表直接代表实际运行后端。
+- preblock_live_parameters.cpp仅增加ReadProcessMemory快照：最初三次launch及首次0x108 preblock记录self/backend/command-list、vtable所属模块及RVA、候选槽0xd8/0x150/0x168/0x170的目标模块/RVA。不执行这些候选方法，不新增hook入口，不改原参数。
+- 重新构建成功，尚未部署；当前PID11188仍有响应，旧internal-copy日志仍只有安装记录。本轮未重启游戏、未修改运行中的探针。
+- 下一步更新既有参数探针，取得实际表身份后再选择复制观察点。AMD游戏接入目标仍未完成。
+
 ### 2026-09-07：内部整资源复制探针兼容但零命中，需核对实际后端/区域路径
 
 - 正常退出PID3084并同步，核对实机nvngx哈希e16bcf15...，新增3bf83f7e版internal-copy addon（未替换原渲染DLL）。新PID11188 prologue/table guard通过、hook_status0，NR count1/60成功。

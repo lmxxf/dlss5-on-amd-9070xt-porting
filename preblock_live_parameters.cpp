@@ -16,6 +16,22 @@ GetKernel original_get=nullptr;SRWLOCK names_lock=SRWLOCK_INIT;
 std::vector<std::pair<void*,std::string>> names;std::atomic<unsigned> launches{0};
 constexpr wchar_t Log[]=LR"(D:\DLSSNR-Lab\logs\preblock-live-parameters.txt)";
 wchar_t parameter_directory[MAX_PATH]{};
+void record_backend(void*self,unsigned seq){
+ void*fields[3]{};SIZE_T got=0;
+ if(!self||!ReadProcessMemory(GetCurrentProcess(),self,fields,sizeof(fields),&got)||got!=sizeof(fields))return;
+ void*table=nullptr;
+ if(!fields[1]||!ReadProcessMemory(GetCurrentProcess(),fields[1],&table,sizeof(table),&got)||got!=sizeof(table))return;
+ HMODULE owner=nullptr;GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,reinterpret_cast<LPCWSTR>(table),&owner);
+ char name[MAX_PATH]{};if(owner)GetModuleFileNameA(owner,name,MAX_PATH);
+ if(FILE*f=_wfopen(Log,L"ab")){
+  fprintf(f,"backend_snapshot pid=%lu seq=%u self=%p backend=%p command_list=%p vtable=%p module=%p vtable_rva=%llx module_path=%s\n",GetCurrentProcessId(),seq,self,fields[1],fields[2],table,owner,owner?static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(table)-reinterpret_cast<uintptr_t>(owner)):0,name);
+  for(unsigned offset:{0xd8u,0x150u,0x168u,0x170u}){
+   void*target=nullptr;bool readable=ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<unsigned char*>(table)+offset,&target,sizeof(target),&got)&&got==sizeof(target);
+   HMODULE target_owner=nullptr;if(readable&&target)GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,reinterpret_cast<LPCWSTR>(target),&target_owner);
+   fprintf(f,"backend_slot pid=%lu seq=%u offset=%x readable=%u target=%p module=%p target_rva=%llx\n",GetCurrentProcessId(),seq,offset,unsigned(readable),target,target_owner,target_owner?static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(target)-reinterpret_cast<uintptr_t>(target_owner)):0);
+  }fclose(f);
+ }
+}
 void* get_hook(void*self,const char*name,uint32_t x,uint32_t y,uint32_t z,uint64_t shared){
  void*result=original_get(self,name,x,y,z,shared);
  if(result&&name){if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"kernel_create name=%s args_xyz=%u,%u,%u shared_arg=%llu\n",name,x,y,z,shared);fclose(f);}}
@@ -23,6 +39,7 @@ void* get_hook(void*self,const char*name,uint32_t x,uint32_t y,uint32_t z,uint64
 }
 int64_t hook(void*self,void*context,uint32_t x,uint32_t y,uint32_t z,void*blob,uint64_t bytes,uint8_t flag){
  unsigned seq=launches.fetch_add(1);
+ if(seq<3||(bytes==0x108&&count.load()==0))record_backend(self,seq);
  if(seq<200){std::string name="unknown";AcquireSRWLockShared(&names_lock);for(const auto&item:names)if(item.first==context){name=item.second;break;}ReleaseSRWLockShared(&names_lock);
   if(FILE*f=_wfopen(Log,L"ab")){fprintf(f,"launch=%u kernel=%s grid=%u,%u,%u bytes=%llu\n",seq,name.c_str(),x,y,z,bytes);fclose(f);}
   // Read CPU argument blobs only, never dereference captured GPU resources.
