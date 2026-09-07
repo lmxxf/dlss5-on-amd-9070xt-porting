@@ -4,8 +4,8 @@ import json,argparse
 import numpy as np
 from native_c64_reference import block,unpack
 from decode_tinlayout_global import e4m3fn
-p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--c128',action='store_true');g.add_argument('--c256',action='store_true');args=p.parse_args()
-base=Path('release/native-rgb-valid1080');root=base/('encoder-c256' if args.c256 else 'encoder-c128' if args.c128 else 'encoder-c64');h,w,C=(72,120,256) if args.c256 else (144,240,128) if args.c128 else (288,480,64);n=h*w*C
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));g=p.add_mutually_exclusive_group();g.add_argument('--c128',action='store_true');g.add_argument('--c256',action='store_true');args=p.parse_args()
+base=args.base;root=base/('encoder-c256' if args.c256 else 'encoder-c128' if args.c128 else 'encoder-c64');h,w,C=(72,120,256) if args.c256 else (144,240,128) if args.c128 else (288,480,64);n=h*w*C
 raw=np.fromfile(base/('encoder-c128/block14-down.fp8' if args.c256 else 'encoder-c64/block8-down.fp8' if args.c128 else 'encoder-c32/block4-down.fp8'),np.uint8)[:n]
 c=np.arange(C);perm=(c&~3)|((c&1)<<1)|((c&2)>>1)
 x=e4m3fn(raw).reshape(C//16,h,w,16).transpose(1,2,0,3).reshape(h,w,C)[...,perm]

@@ -3,8 +3,10 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import argparse
 
-base = Path('release/native-rgb-valid1080')
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base = args.base
 report = json.loads((base / 'decoder39/validation.json').read_text())
 assert report['different'] == 0 and report['finite'] and report['tail_zero']
 previous = base / 'decoder39/result.output.fp8'

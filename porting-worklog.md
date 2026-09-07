@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同源时序decoder40..55原版/CPU验证通过
+
+- decoder_split、encoder C64/128/256验证、upsample48及decoder49..55工具增加--base，默认旧单帧目录保持不变。所有新结果在native-temporal-valid1080。
+- session65798完成decoder40..47，八层四阶段共32项different0。session2740验证encoder15..22主输出全exact并导出同源block22 skip，随后upsample48输出2211840值全exact，finite/tail_zero通过。
+- session82038连续decoder49..55，七层各2211840值与原版全部一致，shift3/1/2/0/3/1/2保持原合同。对照已推进到55，尚缺56..70及最终RGB。
+- 本轮只生成并审计原版/CPU对照，未运行AMD完整时序网络或更新游戏DLL；不能将本次逐层通过升级为游戏验收。
+
 ### 2026-09-07：RTX原版时序ViT重放/56阶段全exact，decoder39同源通过
 
 - 只读确认RTX既有native-valid1080-vit工具，隔离native-temporal-vit-attention目录，session4995用相同Linux生成Q/K/V运行两次，输出逐byte一致。Linux不稳定原因仍未证明，但本输入在RTX有稳定执行路径。

@@ -6,11 +6,11 @@ from native_c32_reference import F
 from encode_tinlayout_global import quantize
 from decode_tinlayout_global import e4m3fn
 from native_upsample48_reference import unpack,upsample
-p=argparse.ArgumentParser();p.add_argument('--valid1080',action='store_true');args=p.parse_args()
-root=Path('release/native-rgb-valid1080/upsample48' if args.valid1080 else 'release/native-upsample48/game')
+p=argparse.ArgumentParser();p.add_argument('--valid1080',action='store_true');p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+root=args.base/'upsample48' if args.valid1080 else Path('release/native-upsample48/game')
 rng=np.random.default_rng(3013);x=F(rng.normal(0,.25,(36,60,512)).astype(np.float32));skip=F(rng.normal(0,.25,(72,120,256)).astype(np.float32))
 if args.valid1080:
- base=Path('release/native-rgb-valid1080');stage=base/'decoder-split/decoder-block47'
+ base=args.base;stage=base/'decoder-split/decoder-block47'
  assert json.loads((stage/'validation.json').read_text())['status']=='pass'
  x=np.fromfile(stage/'oracle-0.f32',np.float32).reshape(36,60,512)
  skip=np.fromfile(base/'encoder-c256/block22-main.f32',np.float32).reshape(72,120,256)

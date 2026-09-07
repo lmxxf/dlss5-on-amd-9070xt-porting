@@ -5,12 +5,13 @@ import subprocess
 import sys
 import argparse
 
-base = Path('release/native-rgb-valid1080')
 p = argparse.ArgumentParser()
+p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'))
 group = p.add_mutually_exclusive_group()
 group.add_argument('--c128', action='store_true')
 group.add_argument('--c64', action='store_true')
 args = p.parse_args()
+base = args.base
 entry = 62 if args.c64 else 56 if args.c128 else 48
 report = json.loads((base / f'upsample{entry}/validation.json').read_text())
 assert report['different'] == 0 and report['finite'] and report['tail_zero']
