@@ -60,6 +60,9 @@ int main(int argc, char **argv) {
     const bool native_mode = argc > 14 && !std::strcmp(argv[14], "native");
     if (argc > 14 && !feature_mode && !native_mode) return 2;
     if(native_mode&&(width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16))return 2;
+    const bool valid1080=std::getenv("DLSS5_POST_TEST_VALID1080")!=nullptr;
+    if(valid1080&&(!native_mode||width!=1920||height!=1152))return 2;
+    const int texture_height=valid1080?1080:height;
     if (width <= 0 || height <= 0) {
         std::fprintf(stderr, "invalid dimensions %dx%d\n", width, height);
         return 2;
@@ -70,7 +73,7 @@ int main(int argc, char **argv) {
     auto skip_view = native_mode?read_native(argv[4],activation_bytes,size_t(width)*height*32):read_file(argv[4], activation_bytes);
     auto weights = read_file(argv[5], 21808);
     auto blend = read_file(argv[6], 2);
-    auto rgba = read_file(argv[7], static_cast<size_t>(width) * height * 16);
+    auto rgba = read_file(argv[7], static_cast<size_t>(width) * texture_height * 16);
 
     check("cuInit", cuInit(0));
     CUdevice device;
@@ -96,7 +99,7 @@ int main(int argc, char **argv) {
 
     CUDA_ARRAY3D_DESCRIPTOR output_desc{};
     output_desc.Width = width;
-    output_desc.Height = height;
+    output_desc.Height = texture_height;
     output_desc.Format = CU_AD_FORMAT_FLOAT;
     output_desc.NumChannels = 4;
     output_desc.Flags = CUDA_ARRAY3D_SURFACE_LDST;
@@ -110,7 +113,7 @@ int main(int argc, char **argv) {
 
     CUDA_ARRAY3D_DESCRIPTOR texture_desc{};
     texture_desc.Width = width;
-    texture_desc.Height = height;
+    texture_desc.Height = texture_height;
     texture_desc.Format = CU_AD_FORMAT_FLOAT;
     texture_desc.NumChannels = 4;
     CUarray texture_array;
@@ -122,7 +125,7 @@ int main(int argc, char **argv) {
     upload.dstMemoryType = CU_MEMORYTYPE_ARRAY;
     upload.dstArray = texture_array;
     upload.WidthInBytes = width * 16;
-    upload.Height = height;
+    upload.Height = texture_height;
     check("texture upload", cuMemcpy2D(&upload));
     CUDA_RESOURCE_DESC texture_resource{};
     texture_resource.resType = CU_RESOURCE_TYPE_ARRAY;
@@ -159,19 +162,23 @@ int main(int argc, char **argv) {
         0x0ull, 0x4507000045700000ull, 0x39f2b9d639888889ull};
     std::memcpy(params + 0x40, texture_transform, sizeof(texture_transform));
     std::memcpy(params + 0x68, &blend_device, 8);
+    if(const char*text=std::getenv("DLSS5_POST_TEST_WORD70")){
+        if(!native_mode||(std::strcmp(text,"0")&&std::strcmp(text,"1")))return 2;
+        const uint32_t value=uint32_t(text[0]-'0');std::memcpy(params+0x70,&value,4);
+    }
     const unsigned long long live_tail[3] = {
         0x3988888900000000ull, 0x00000f0039f2b9d6ull, 0x870ull};
     std::memcpy(params + 0xa0, live_tail, sizeof(live_tail));
     if(native_mode){
-        const float transform[]={0,0,float(width),float(height),1.0f/width,1.0f/height};
+        const float transform[]={0,0,float(width),float(texture_height),1.0f/width,1.0f/texture_height};
         std::memcpy(params+0x40,transform,sizeof(transform));
-        const float inv_width=1.0f/width,inv_height=1.0f/height;
+        const float inv_width=1.0f/width,inv_height=1.0f/texture_height;
         std::memcpy(params+0xa4,&inv_width,4);std::memcpy(params+0xa8,&inv_height,4);
-        std::memcpy(params+0xac,&width,4);std::memcpy(params+0xb0,&height,4);
+        std::memcpy(params+0xac,&width,4);std::memcpy(params+0xb0,&texture_height,4);
     }
 
     void *arguments[] = {params};
-    std::vector<float> output(static_cast<size_t>(width) * height * 4);
+    std::vector<float> output(static_cast<size_t>(width) * texture_height * 4);
     CUDA_MEMCPY2D download{};
     download.srcMemoryType = CU_MEMORYTYPE_ARRAY;
     download.srcArray = output_array;
@@ -179,7 +186,7 @@ int main(int argc, char **argv) {
     download.dstHost = output.data();
     download.dstPitch = width * 16;
     download.WidthInBytes = width * 16;
-    download.Height = height;
+    download.Height = texture_height;
     const auto launch_and_download = [&]() {
         check("launch", cuLaunchKernel(function, (width + 7) / 8 + 1,
             (height + 7) / 8 + 1, 1, 32, 2, 1, 0, nullptr, arguments, nullptr));

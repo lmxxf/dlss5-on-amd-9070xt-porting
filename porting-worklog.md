@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：post有效1080纹理及word70控制值对照通过
+
+- run_original_post.cpp增加native实验选项DLSS5_POST_TEST_WORD70（严格0/1）与DLSS5_POST_TEST_VALID1080（仅1920×1152处理几何）；后者使用1080高输入纹理、输出surface、纹理变换及有效尺寸，保留1152处理高度。默认实验行为不变。
+- 相同固定时序main/skip/color夹具、origin(-4,-4)、mask1/rgb1分支下，word70=1与0的8847360个RGBA值一致；有效1080原版输出与1152结果前1080行8294400个RGBA值一致。不能据此推断word70所有分支均无效。
+- 新增check_native_post_live_extents.py，进一步将有效1080原版输出与已下载shift3 AMD结果裁剪比较：6220800个RGB值different0/max0/finite。RGB SHA256 ab7c140544af58b0ea8d6ada27731e41e8acdfbd656a7b27120470e0c254af5c；报告保存release/native-temporal-valid1080/post70/live-extents-validation.json，明确game_verified=false。
+- 5090进程26572仍Responding；ReShade日志记录NR输入/输出1920×1080、feature18 count1/60成功。本轮未重启游戏或替换游戏DLL。完整网络post默认仍shift0，真实历史帧来源、codec和AMD游戏内接线仍待完成，不能把此次固定输入通过称移植完成。
+
 ### 2026-09-07：完整尺寸post shift3原版/CPU/AMD全exact
 
 - 原post70在同源时序main/skip/color夹具上使用origin(-4,-4)生成origin-minus4-full.f32，默认零原点文件保留。
