@@ -15,15 +15,19 @@ static std::mutex state_mutex;
 struct ListState { uint64_t pipeline{};unsigned candidate_id{}; };
 static std::map<reshade::api::command_list*,ListState> lists;
 static unsigned shader_count{};
+static unsigned small_shader_count{},nearby_dispatch_count{};
 static void pipeline_init(reshade::api::device*,reshade::api::pipeline_layout,uint32_t count,const reshade::api::pipeline_subobject*objects,reshade::api::pipeline p){
  if(!objects)return;
  for(uint32_t i=0;i<count;i++)if(objects[i].type==reshade::api::pipeline_subobject_type::compute_shader&&objects[i].data){
   auto&s=*static_cast<const reshade::api::shader_desc*>(objects[i].data);
   if(!s.code||!s.code_size||s.code_size>1024*1024)continue;
   auto*b=static_cast<const char*>(s.code);const char marker[]="CodecConstants";
-  if(std::search(b,b+s.code_size,marker,marker+sizeof(marker)-1)==b+s.code_size)continue;
-  std::lock_guard<std::mutex>guard(state_mutex);if(shader_count>=16)continue;++shader_count;
-  wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\codec-%lu-%llx.dxbc)",GetCurrentProcessId(),(unsigned long long)p.handle);
+  bool codec=std::search(b,b+s.code_size,marker,marker+sizeof(marker)-1)!=b+s.code_size;
+  if(!codec&&s.code_size>16384)continue;
+  std::lock_guard<std::mutex>guard(state_mutex);
+  if(codec){if(shader_count>=16)continue;++shader_count;}
+  else {if(small_shader_count>=256)continue;++small_shader_count;}
+  wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\%ls-%lu-%llx.dxbc)",codec?L"codec":L"small-compute",GetCurrentProcessId(),(unsigned long long)p.handle);
   if(FILE*f=_wfopen(path,L"wb")){fwrite(s.code,1,s.code_size,f);fclose(f);}
  }
 }
@@ -34,6 +38,14 @@ static void pipeline_bind(reshade::api::command_list*c,reshade::api::pipeline_st
 static void list_reset(reshade::api::command_list*c){std::lock_guard<std::mutex>guard(state_mutex);lists.erase(c);}
 static bool dispatch(reshade::api::command_list*c,uint32_t x,uint32_t y,uint32_t z){
  std::lock_guard<std::mutex>guard(state_mutex);auto it=lists.find(c);
+ // Bounded nearby compute sequence after the first recognized codec constants.
+ // These are candidates only; binding/resource identity still requires tracing.
+ if(captured.load()>0&&nearby_dispatch_count<256){
+  ++nearby_dispatch_count;
+  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-codec-constants.txt)",L"ab")){
+   fprintf(f,"nearby_dispatch pid=%lu tick=%llu call=%u list=%p pipeline=%llx groups=%u,%u,%u observation_only=1\n",GetCurrentProcessId(),GetTickCount64(),nearby_dispatch_count,c,it==lists.end()?0ull:(unsigned long long)it->second.pipeline,x,y,z);fclose(f);
+  }
+ }
  if(it!=lists.end()&&it->second.candidate_id){
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-codec-constants.txt)",L"ab")){
    fprintf(f,"dispatch pid=%lu candidate=%u list=%p pipeline=%llx groups=%u,%u,%u observation_only=1\n",GetCurrentProcessId(),it->second.candidate_id,c,(unsigned long long)it->second.pipeline,x,y,z);fclose(f);

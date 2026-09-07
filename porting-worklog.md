@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：扩展只读nearby compute观察器实机加载
+
+- native_codec_constants_events保留codec捕获，额外保存<=16KiB非codec compute（最多256份，约4MiB上限）及首个codec常数后256次dispatch的时间/list/pipeline/group。只读payload，不发GPU命令，不抑制dispatch；不是无限抓取，也不宣称覆盖全部shader。
+- MinGW构建和Windows现有过滤/生命周期测试通过。正常退出22724后，旧addon备份.before-nearby，部署新观察器；第一轮退出检查发现进程还在，等待真实退出后才替换，未强杀。
+- 新游戏PID18528 Responding，原NR count1/60于14:09:18/20成功。小shader捕获已达256上限，因此可能漏掉后创建shader，下一步必须先核对nearby pipeline是否在捕获集合，不能把缺文件当没有执行。
+- AMD整链原PID24536本轮仍在编译，未修改其文件或重启；session66185继续有效。
+
 ### 2026-09-07：同帧历史资源创建顺序确认
 
 - current-sequence保存PID22724的preblock-live0..7、NVAPI/view事件及post launch154。frame0 history slot8=0，frame1..7为8100000a808；当前RGB handle8120000a801不变，motion handle逐帧变化。
