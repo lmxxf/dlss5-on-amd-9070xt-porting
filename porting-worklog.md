@@ -2975,6 +2975,14 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-08：512融合Wave FFWD无收益，定位入口head低并行投影
+
+- native_wave_split_ffwd保持512混合→F→八组64/256/64 gate/收缩，各K32 H；一wave16像素，共享mixed/hidden带padding，原权重无损half本地驻留，默认WAVE_SPLIT_FFWD关闭。
+- session30282/PID18536 exit0，15帧实际输出下载后逐字节原版一致；暖708.7535321、末5帧707.392882ms，不优于706.43771ms，未采用。local14795157504/budget15403425792，预算内，不归因爆显存。
+- 增加首NativeSplitWindow/NativeSplit分段及head/bridge计时，session44483/PID19728 exit0/15帧exact。首层FFWD3.48644、FFNprojection0.59519、qkvpack0.01660、qkv0.23348、attention0.45686、projection0.56423ms；head独立16.74132ms。
+- encoder23_head标签现在仅bridge约0.0635ms，不能当整段加速；应累加首层split*、encoder23_30_body及encoder_head。下一步优先低并行pool/head矩阵，游戏未改、10fps未达到。
+- 证据release/native-network70-wave-split-ffwd与-split-profile；编译/diff通过。
+
 ### 2026-09-08：定位prefix转换回退，等价整数舍入修复/706ms
 
 - d3d12_preblock_split_debug只跑64×64双路，读取FFN/Main及prefix样本；初版Win32 SetEnvironmentVariable不更新CRT getenv缓存，改_wputenv_s后真正切换两路。修复前FFN131072值全不同，prefix全微小正数，首值6.16312e-5；WaveFFN只是消费了错误prefix。

@@ -68,7 +68,7 @@ public:
     for(auto&s:c64)s.Record(c);ds8.Record(c);timestamps.Mark(c,"encoder5_8");
     for(auto&s:c128)s.Record(c);ds14.Record(c);timestamps.Mark(c,"encoder9_14");
     for(auto&s:c256)s.Record(c);ds22.Record(c);timestamps.Mark(c,"encoder15_22");
-    for(auto&s:split)s.Record(c);head.Record(c);bridge.Record(c);timestamps.Mark(c,"encoder23_head");
+    for(UINT i=0;i<8;i++)split[i].Record(c,profile&&i==0?&timestamps:nullptr);timestamps.Mark(c,"encoder23_30_body");head.Record(c);timestamps.Mark(c,"encoder_head");bridge.Record(c);timestamps.Mark(c,"encoder23_head");
    });
    for(UINT b=0;b<8;b++){auto&layer=vit[b];for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));});}
    for(UINT stage=0;stage<decoder.StageCount();stage++)submit.Submit([&](ID3D12GraphicsCommandList*c){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));});
