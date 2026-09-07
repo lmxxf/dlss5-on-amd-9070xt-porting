@@ -1,5 +1,7 @@
 # 2026-09-07 收工现场：正确画面慢速展示
 
+多头shift合并访存候选15帧exact：COALESCED_MULTIHEAD_SHIFT=1使用元素级二维dispatch，原零填充/短高度循环/crop索引保持；首C64 pack/crop0.14298/0.09751ms（此前约0.37/0.35）。整网暖583.589209ms、末5帧587.675586ms，较586.27370ms有效基线差异小，尚不宣称稳定整网提升，默认仍旧路径。证据release/native-network70-coalesced-shift，runner run_coalesced_shift_network.ps1。无新buffer，游戏未改，10fps未达到。
+
 C64收缩全tile预载实验未采纳：PRELOAD_C64_CONTRACT=1一次载入16×256 half到8KiB LDS（旧1KiB逐K32），保留K32 H/F，15帧exact。暖589.420234ms、末5帧589.916056ms，首收缩1.94924ms，局部改善极小，未优于586.27370ms有效基线。默认关闭，证据release/native-network70-preload-contract，runner run_preload_contract_network.ps1。没有新增全图buffer，游戏未改，10fps未达到。
 
 共享exp/prob候选15帧exact但未采纳：run_multihead_av_network.ps1 -SharedProb编译NATIVE_SHARED_PROB=1，复用scores行存exp，概率直接写死Q/K区，去掉线程ex/prob数组。首C64 attention3.54480→3.21213ms，但全网暖587.486075ms、末5帧592.152464ms，未优于586.27370ms基线。默认不加SharedProb，当前有效配置不变。证据release/native-network70-shared-prob；不宣称实际测得寄存器spill/银行冲突，仅记录算法及计时。游戏未改，10fps未达到。

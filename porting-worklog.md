@@ -6124,3 +6124,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 覆盖检查确认相同4096输入值；DXC通过，PID38252退出0，15帧最终different0且下载两份结果对独立原版参考byte-exact。
 - 暖589.4202343ms、末5帧589.916056ms，首C64收缩1.949243ms，之前约2.00ms。全网未优于586.273701ms有效基线，保持实验关闭，不把减少barrier当性能保证。
 - 证据release/native-network70-preload-contract/与准备脚本release/prepare-preload-contract.ps1（ignored）。此测试继承multihead-av已验证远程shader，不启用shared-prob实验。无游戏DLL更新，10fps未达到。
+# 2026-09-08：多头移位pack/crop合并访存候选
+
+- NativeC64Shift增加COALESCED_MULTIHEAD_SHIFT显式开关，按元素而非像素派线程，二维65535行展开；新pack_coalesced/crop_coalesced入口保留原负坐标分支补零、PLAIN_SHORT_Y特殊循环和位移方向，原入口默认保留。
+- test_coalesced_shift_dispatch.py通过C64/C128/C256、多shift及短高度几何覆盖/边界检查。MinGW编译通过，PID43372退出0；完整15帧最终different0，下载两份结果对独立原版参考byte-exact。
+- 首C64 pack0.142977ms、crop0.097509ms（原约0.37/0.35ms），局部收益明确。整网暖583.589209ms、末5帧587.675586ms，较586.273701ms基线仅小幅差异，未做重复配对测量，暂不宣称稳定整体提速；候选显式开启，默认仍旧路径。
+- 证据release/native-network70-coalesced-shift/，准备/manifest更新脚本在release/（ignored）；运行run_coalesced_shift_network.ps1。不启用共享概率/收缩预载实验，无新增buffer、无游戏DLL更新，10fps未达到。
