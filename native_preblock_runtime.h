@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
@@ -35,14 +35,14 @@ class NativePreblockRuntime {
   auto h=heap[stage]->GetCPUDescriptorHandleForHeapStart();UINT step=device->GetDescriptorHandleIncrementSize(d.Type);
   ID3D12Resource* resources[]={a,b,c};UINT64 sizes[]={asize,bsize,csize};
   for(UINT i=0;i<3;i++){
-   if(i<(finish?1u:2u)){D3D12_SHADER_RESOURCE_VIEW_DESC s{};s.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;s.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;s.Buffer.StructureByteStride=4;s.Buffer.NumElements=UINT(sizes[i]/4);if(i==0&&((stage==0&&wave_ffn_local)||(stage==3&&prefix_wave))){s.Format=DXGI_FORMAT_R32_TYPELESS;s.Buffer.StructureByteStride=0;s.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;}device->CreateShaderResourceView(resources[i],&s,h);}
+   if(i<(finish?1u:2u)){D3D12_SHADER_RESOURCE_VIEW_DESC s{};s.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;s.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;s.Buffer.StructureByteStride=4;s.Buffer.NumElements=UINT(sizes[i]/4);if(i==0&&((stage==0&&wave_ffn_local)||(stage==3&&prefix_wave)||(stage==1&&attention_local))){s.Format=DXGI_FORMAT_R32_TYPELESS;s.Buffer.StructureByteStride=0;s.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;}device->CreateShaderResourceView(resources[i],&s,h);}
    else{D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.StructureByteStride=4;u.Buffer.NumElements=UINT(sizes[i]/4);device->CreateUnorderedAccessView(resources[i],nullptr,&u,h);}
    h.ptr+=step;
   }
  }
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER x{};x.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;x.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&x);}
 public:
- ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
+ ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
  NativePreblockRuntime()=default;NativePreblockRuntime(const NativePreblockRuntime&)=delete;NativePreblockRuntime& operator=(const NativePreblockRuntime&)=delete;
  void Create(ID3D12Device*d,ID3D12Resource*input,UINT w,UINT h,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&shader_dir,bool live_profile,bool raw_features=false,const std::vector<float>*noise_table=nullptr,ID3D12Resource*temporal_input=nullptr){
   if(noise_table&&(raw_features||noise_table->size()!=size_t(3)*(1<<24)))throw std::runtime_error("invalid universal noise table");
@@ -71,7 +71,18 @@ public:
    auto*local=NativeResidentTable(device,u);u->Release();if(prefix_wave)prefix_ffn_weights=local;else{weights[0]->Release();weights[0]=local;}
   }
   root=Root(2,1,noise!=nullptr,temporal!=nullptr);finish_root=Root(1,2);
-  Heap(0,weights[0],weights[0]->GetDesc().Width,input,UINT64(w)*h*(raw_features?128:16),prefix_wave?raw:ffn,bytes,false);Heap(1,weights[1],aw.size()*4,ffn,bytes,raw,bytes,false);Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
+  Heap(0,weights[0],weights[0]->GetDesc().Width,input,UINT64(w)*h*(raw_features?128:16),prefix_wave?raw:ffn,bytes,false);{
+   // Packed attention weights (f16 QKV/projection + f32 bias/scales) read directly by wave loads.
+   const wchar_t*local_attention=_wgetenv(L"DLSS5_TEST_LOCAL_C32_ATTENTION");if(local_attention&&wcscmp(local_attention,L"0")&&wcscmp(local_attention,L"1"))throw std::runtime_error("invalid local C32 attention flag");
+   if(local_attention&&!wcscmp(local_attention,L"1")){
+    std::vector<float>packed(6177);unsigned char*bytes_out=reinterpret_cast<unsigned char*>(packed.data());
+    for(size_t i=0;i<4096;i++){uint32_t b;std::memcpy(&b,&aw[i],4);uint32_t m=b&0x7fffffffu;uint16_t h=uint16_t((b>>16)&0x8000);if(m){if((m&0x1fffu)||(m>>23)<113||(m>>23)>142)throw std::runtime_error("C32 attention weights not exact normal half");h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));}std::memcpy(bytes_out+i*2,&h,2);}
+    std::memcpy(bytes_out+8192,aw.data()+4096,4096*4);std::memcpy(bytes_out+24576,aw.data()+8192,33*4);
+    auto*u=Buffer(packed.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(u->Map(0,&none,&p));std::memcpy(p,packed.data(),packed.size()*4);u->Unmap(0,nullptr);
+    attention_local=NativeResidentTable(device,u);u->Release();
+   }
+  }
+  Heap(1,attention_local?attention_local:weights[1],attention_local?attention_local->GetDesc().Width:aw.size()*4,ffn,bytes,raw,bytes,false);Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");
   if(prefix_wave)Heap(3,prefix_ffn_weights,prefix_ffn_weights->GetDesc().Width,raw,bytes,ffn,bytes,false);
   const wchar_t* names[]={L"preblock_input_mix.hlsl",L"preblock_attention_core.hlsl",L"preblock_finish.hlsl"};

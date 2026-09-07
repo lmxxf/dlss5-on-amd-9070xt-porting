@@ -29,7 +29,23 @@ cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint r
 #define SCORE_WIDE 64
 #endif
 // Original-layout 32-wide attention, lab 8x8 windows. Not yet live integration.
+#if NATIVE_C32_LOCAL_WEIGHTS
+// Packed layout: [0,6144) f16 QKV weights (part-major, original row/col order),
+// [6144,8192) f16 projection weights, [8192,24576) f32 bias table,
+// [24576] f32 head scale, [24580,24708) f32 residual scales.
+#if !NATIVE_WAVE_C32_SCORES || !NATIVE_WAVE_C32_QKV || !NATIVE_WAVE_C32_PROJECTION || !NATIVE_PARALLEL_C32_EXP
+#error packed weights require the complete wave path with parallel exp
+#endif
+ByteAddressBuffer weights:register(t0);
+#define W_BIAS(i) asfloat(weights.Load(8192+(i)*4))
+#define W_SCALE asfloat(weights.Load(24576))
+#define W_RESIDUAL(c) asfloat(weights.Load(24580+(c)*4))
+#else
 StructuredBuffer<float> weights:register(t0);
+#define W_BIAS(i) weights[4096+(i)]
+#define W_SCALE weights[8192]
+#define W_RESIDUAL(c) weights[8193+(c)]
+#endif
 StructuredBuffer<float> input:register(t1);
 RWStructuredBuffer<float> output:register(u0);
 #if NATIVE_PARALLEL_C32_NORM
@@ -113,11 +129,17 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  using QB=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using QC=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  for(uint part=0;part<3;part++){
+#if !NATIVE_C32_LOCAL_WEIGHTS
   for(uint i=t;i<1024;i+=C32_THREADS)keys[i]=float16_t(weights[part*1024+i]);
   GroupMemoryBarrierWithGroupSync();
+#endif
   for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
    QA qa=QA::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_C32_LOCAL_WEIGHTS
+   QB wb=QB::Load(weights,(part*1024+cr*16*32)*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+#else
    QB wb=QB::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
+#endif
    QC z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,wb);
    for(uint i=0;i<z.Length();i++)z.Set(i,H(z.Get(i)));
    if(part<2)z.Store(scores,part*64*SCORE_ROW+qr*16*SCORE_ROW+cr*16,SCORE_ROW,dx::linalg::MatrixLayout::RowMajor);
@@ -156,14 +178,14 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #if NATIVE_PARALLEL_C32_NORM
  norm_inverse[t]=qi;norm_inverse[64+t]=ki;
 #else
- [loop]for(uint c=0;c<32;c++){queries[t*LDS_STRIDE+c]=F(H(H(q[c]*qi)*H(weights[8192])));keys[t*LDS_STRIDE+c]=F(H(k[c]*ki));values[t*LDS_STRIDE+c]=v[c];}
+ [loop]for(uint c=0;c<32;c++){queries[t*LDS_STRIDE+c]=F(H(H(q[c]*qi)*H(W_SCALE)));keys[t*LDS_STRIDE+c]=F(H(k[c]*ki));values[t*LDS_STRIDE+c]=v[c];}
 #endif
  }
  GroupMemoryBarrierWithGroupSync();
 #if NATIVE_PARALLEL_C32_NORM
  for(uint i=t;i<2048;i+=C32_THREADS){
   uint query=i/32,c=i%32;
-  queries[i]=float16_t(F(H(H(scores[query*SCORE_ROW+c]*norm_inverse[query])*H(weights[8192]))));
+  queries[i]=float16_t(F(H(H(scores[query*SCORE_ROW+c]*norm_inverse[query])*H(W_SCALE))));
   keys[i]=float16_t(F(H(scores[64*SCORE_ROW+query*SCORE_ROW+c]*norm_inverse[64+query])));
   values[i]=float16_t(F(values[i]));
  }
@@ -184,7 +206,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #if NATIVE_PARALLEL_C32_EXP
  for(uint i=t;i<4096;i+=C32_THREADS){
   uint query=i/64,key=i%64;
-  WriteAux(key,query,fast_exp(H(scores[query*SCORE_WIDE+key]+weights[4096+i])));
+  WriteAux(key,query,fast_exp(H(scores[query*SCORE_WIDE+key]+W_BIAS(i))));
  }
  GroupMemoryBarrierWithGroupSync();
 #endif
@@ -200,9 +222,9 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
   float dot=0;[loop]for(uint c=0;c<32;c++)dot+=queries[t*LDS_STRIDE+c]*keys[key*LDS_STRIDE+c];
 #endif
 #if NATIVE_WAVE_C32_AV
-  WriteAux(key,t,fast_exp(H(dot+weights[4096+t*64+key])));
+  WriteAux(key,t,fast_exp(H(dot+W_BIAS(t*64+key))));
 #else
-  ex[key]=fast_exp(H(dot+weights[4096+t*64+key]));
+  ex[key]=fast_exp(H(dot+W_BIAS(t*64+key)));
 #endif
  }
 #endif
@@ -253,11 +275,17 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  GroupMemoryBarrierWithGroupSync();
 #if NATIVE_WAVE_C32_PROJECTION
  for(uint i=t;i<2048;i+=C32_THREADS)queries[i]=float16_t(scores[(i/32)*SCORE_ROW+i%32]);
+#if !NATIVE_C32_LOCAL_WEIGHTS
  for(uint i=t;i<1024;i+=C32_THREADS)keys[i]=float16_t(weights[3072+i]);
+#endif
  GroupMemoryBarrierWithGroupSync();
  for(uint qr=C32_QUERY_WAVE;qr<4;qr+=4)for(uint cr=C32_COL_START;cr<2;cr+=C32_COL_STEP){
   A aa=A::Load(queries,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_C32_LOCAL_WEIGHTS
+  B bb=B::Load(weights,6144+cr*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+#else
   B bb=B::Load(keys,cr*16*32,32,dx::linalg::MatrixLayout::ColMajor);
+#endif
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
   z.Store(scores,qr*16*SCORE_ROW+cr*16,SCORE_ROW,dx::linalg::MatrixLayout::RowMajor);
  }
@@ -275,7 +303,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  for(uint i=t;i<2048;i+=C32_THREADS){
   uint query=i/32,c=i%32,pixel=gid.x*64+query;
   float a=scores[query*SCORE_ROW+c];
-  float result=half_add_preserving_midpoint(a,H(input[pixel*32+c]*weights[8193+c]));
+  float result=half_add_preserving_midpoint(a,H(input[pixel*32+c]*W_RESIDUAL(c)));
   output[pixel*32+c]=RAW_OUTPUT?result:F(result);
  }
 #else
@@ -285,7 +313,7 @@ void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
 #else
   float a=0;[loop]for(uint j=0;j<32;j++)a+=av[j]*weights[3072+c*32+j];
 #endif
-  float result=half_add_preserving_midpoint(a,H(input[p*32+c]*weights[8193+c]));
+  float result=half_add_preserving_midpoint(a,H(input[p*32+c]*W_RESIDUAL(c)));
   output[p*32+c]=RAW_OUTPUT?result:F(result);
  }
 #endif
