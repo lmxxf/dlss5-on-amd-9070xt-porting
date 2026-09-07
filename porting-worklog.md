@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：实机请求1参考encoder全过，ViT双重放一致
+
+- session70189原版1..22捕获完成exit0；session86188原版/CPU main1..22全部different0/finite（normalizer中间cast警告仍如实保留）。session88443原版/CPU23..30四子阶段及pool/head全exact，同源ViT输入准备完成。
+- 5090新目录live-reference-34096-1/vit执行原版31..38双次replay，session49696 exit0，56阶段两次hash一致，未使用Linux不稳定attention执行器。已启动下载并逐阶段CPU验证，条件通过后接decoder39与40..47；新任务仍运行，未提前验收最终输出。
+- 游戏仍保留已初始化控制版，未新增渲染请求/重启。实际after像素独立参考尚待完成，目标未达成。
+
 ### 2026-09-07：实机场景前后可视化与独立原版参考启动
 
 - audit_live_neural_frame.py按固定同一soft-shoulder/sRGB映射生成诊断预览（不是最终swapchain截图），确认before/after为同一角色/洞穴场景，未见明显大块网格；不据预览宣称数值或时序通过。
