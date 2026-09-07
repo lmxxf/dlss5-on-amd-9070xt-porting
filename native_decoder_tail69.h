@@ -37,12 +37,13 @@ public:
   for(UINT i=0;i<3;i++){c32[i].Create(d,source,w*8,h*8,NativeDecoderShift(67+i),read(67+i,L"ffn"),read(67+i,L"attention"),dir);source=c32[i].Output();}
   output=source;
  }
- void Record(ID3D12GraphicsCommandList*c){
+ void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(!output)throw std::runtime_error("decoder tail not created");
-  for(auto&layer:c256)layer.Record(c);project56.Record(c);body56.Record(c);
-  for(auto&layer:c128)layer.Record(c);project62.Record(c);body62.Record(c);
-  for(auto&layer:c64)layer.Record(c);project66.Record(c);body66.Record(c);
-  for(auto&layer:c32)layer.Record(c);
+  auto mark=[&](const char*name){if(timer)timer->Mark(c,name);};
+  for(auto&layer:c256)layer.Record(c);mark("tail49_55");project56.Record(c);mark("tail56_project");body56.Record(c);mark("tail56_body");
+  for(auto&layer:c128)layer.Record(c);mark("tail57_61");project62.Record(c);mark("tail62_project");body62.Record(c);mark("tail62_body");
+  for(auto&layer:c64)layer.Record(c);mark("tail63_65");project66.Record(c);mark("tail66_project");body66.Record(c);mark("tail66_body");
+  for(auto&layer:c32)layer.Record(c);mark("tail67_69");
  }
  ID3D12Resource*Output()const{return output;}
 };

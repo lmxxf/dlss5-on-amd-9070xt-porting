@@ -42,14 +42,14 @@ public:
  }
  // Callers may submit and fence between these stages without CPU feature copies.
  UINT StageCount()const{return 13;}
- void RecordStage(ID3D12GraphicsCommandList*c,UINT stage){
+ void RecordStage(ID3D12GraphicsCommandList*c,UINT stage,NativeNetworkTimestamps*timer=nullptr){
   if(!created||!c||stage>=StageCount())throw std::runtime_error("actual decoder stage");
   if(stage==0)inverse.Record(c);
   else if(stage==1)entry.Record(c);
   else if(stage<10)split[stage-2].Record(c);
   else if(stage==10)up48.Record(c);
   else if(stage==11)body48.Record(c);
-  else tail.Record(c);
+  else tail.Record(c,timer);
  }
  ID3D12Resource*Output()const{return tail.Output();}
 };

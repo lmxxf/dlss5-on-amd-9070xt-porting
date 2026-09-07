@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：解码尾段细分完成，排除上采样投影瓶颈
+
+- NativeDecoderTail69::Record/NativeActualDecoder69::RecordStage可选timestamp，profile下分十段；network额外tail_begin隔离跨提交间隙，默认无数学改动。
+- session2872/PID38820 exit0，五轮off/on/reset输出下载后逐字节原版一致，证据release/native-network70-tail-profile/profile-validation.json。
+- 暖轮tail49_55=104.12212、tail57_61=63.01362、tail63_65=42.59553、tail67_69=76.53984ms；body56/62/66=12.91446/13.83436/24.99802；project56/62/66=1.85727/0.93045/0.76581ms。上采样投影不是主要瓶颈，后续攻各通道核心。
+- 计时分段后decoder_stage12不再代表整段，应合计tail*，不能将标签变化误报加速。本轮只是profiling，不宣称性能提升。编译/diff检查通过，游戏安装不变。
+
 ### 2026-09-07：C32注意力复用输入量化，整网1.590秒
 
 - preblock_attention_core新增NATIVE_CACHE_C32_INPUT宏：每像素先存32个F(input)，QKV各通道重用；保持点积顺序及其后所有操作。NativePreblockRuntime以严格DLSS5_TEST_CACHE_C32_INPUT=0/1设置宏，默认0。
