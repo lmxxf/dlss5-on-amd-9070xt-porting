@@ -1,4 +1,4 @@
-param([string]$Folder='D:\DLSSNR-Lab\native-temporal-network70',[ValidateRange(0,3)][int]$PostShift=0)
+param([string]$Folder='D:\DLSSNR-Lab\native-temporal-network70',[ValidateRange(0,3)][int]$PostShift=0,[switch]$SingleList)
 $ErrorActionPreference='Stop'
 $Exe=Join-Path $Folder 'native-network70-temporal.exe'
 if(Get-Process native-network70-temporal -ErrorAction SilentlyContinue){throw 'Existing full-network test; inspect it instead of restarting'}
@@ -17,6 +17,7 @@ $env:DLSS5_TEST_RECIPROCAL_TABLE=Join-Path $Folder 'normalized-output.f32'
 $env:DLSS5_TEST_TEMPORAL_ORACLE=Join-Path $Folder 'oracle-temporal.f32'
 $env:DLSS5_SHADER_PROGRESS='1'
 $env:DLSS5_TEST_POST_SHIFT=[string]$PostShift
+if($SingleList){$env:DLSS5_TEST_SINGLE_LIST='1'}else{Remove-Item Env:DLSS5_TEST_SINGLE_LIST -ErrorAction SilentlyContinue}
 foreach($Item in @(@($Noise,201326592),@($env:DLSS5_TEST_TEMPORAL_HISTORY,33177600),@($env:DLSS5_TEST_TEMPORAL_MOTION,33177600),@($env:DLSS5_TEST_RECIPROCAL_TABLE,33554432),@($env:DLSS5_TEST_TEMPORAL_ORACLE,26542080))){
  if((Get-Item $Item[0]).Length -ne $Item[1]){throw "Fixture size mismatch: $($Item[0])"}
 }

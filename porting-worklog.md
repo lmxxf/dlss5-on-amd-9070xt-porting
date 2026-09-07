@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：单command-list原网络回归启动
+
+- d3d12_native_network70_test增加严格DLSS5_TEST_SINGLE_LIST=1路径，输入生产者/时序采样/RecordUnsubmitted全部记录到同一个测试自有list，统一提交等待；保留原分段模式。每帧记录submit_wait_ms（CPU记录+提交等待墙钟，不冒充纯GPU计时），结果仍逐值比较独立原版参考。
+- runner增加-SingleList，未指定则清环境以避免污染默认测试。MinGW完整exe编译、diff检查通过。
+- 新建AMD native-network70-single-list，复制已验证shift3固定时序夹具/19shader/系数，替换exe；校验通过后启动PID408/session40586，stdout明确single_list1/post_shift3，当前Responding初始化中。目标为五帧off/on/off/on/off及单list安全性，尚未运行至结果，不据编译成功宣称TDR安全。
+- 游戏DLL未修改，不能在此验证之前直接把全网络塞入FFX游戏list。
+
 ### 2026-09-07：游戏挂接顺序审计与只记录网络接口
 
 - 现有hook_ffx_dispatch在原ffxDispatch之前读取dispatch.color并降到960×544，之后记录旧网络；这不等于原版NR使用升频后完整1080p的路径。新挂接应验证dispatch.output（升频后）及其真实资源状态，不能原封沿用旧输入桥。
