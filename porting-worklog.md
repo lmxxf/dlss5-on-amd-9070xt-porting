@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：输出codec三独立纹理在两卡1080p全exact
+
+- d3d12_native_codec_test增加decode/decode-game，三个独立RGBA16_FLOAT资源分别绑定t1 Proxy/t2 Neural/t3 OutputOriginal。数据各有不同位模式，原画面覆盖高亮，Neural每17像素置黑覆盖退化保护，alpha独立变化；检查每个输出alpha等于原画面及RGB有限，不错误要求合成HDR RGB<=1。
+- 5090 session91552及9070XT session51134：256×256三种scale均262144 half different0/invalid0。AMD原输入编码回归同session通过，确保扩展未破坏单纹理路径。
+- 完整1080p session98125两卡：scale1/.5/2各8294400 half different0/invalid0、exit0。仅各卡原版对候选相等，不宣称跨卡互相exact。TransferStrength/ColorStrength仍为实机值1，其它强度尚未测；没有真实历史反馈或游戏最终输出验收。
+- 输出合成候选现在有独立捕获原版DXBC的GPU对照依据，可推进codec接入。完整网络shift3原PID18872最后检查CPU1262秒仍Responding。
+
 ### 2026-09-07：mode1输出合成候选实现完成，尚待GPU对照
 
 - 新增native_codec_decode.hlsl，按捕获输出DXBC与嵌入函数常数还原mode1：Proxy/Neural sRGB解码、Original按PaperWhiteScale归一化、亮度比例及OkLab色相修正/AP1非负处理、TransferStrength和ColorStrength混合、亮度比例0..4限幅、恢复PaperWhiteScale并保留source alpha。
