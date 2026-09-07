@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：已安装参考addon颜色路径证据留档
+
+- 从5090游戏实际目录读取renodx-dlss5.addon64到/tmp/native-reference-renodx.addon64，SHA256 e1c28fde0922b12fc10734e58c3d24a36808e575247f4fd4f36226540d7ee023。没有部署或重启游戏。
+- audit_native_reference_codec.py记录嵌入shader中的CodecConstants/HdrMode、sRGB编码解码、UpgradeToneMap及NGX创建flags键的文件偏移。UI文本明确HDR转换以NGX HDR标志为条件；这只能证明实现存在，不能证明当前SDR/线性HDR/PQ分支。shader尾部字符串碎片化，未将strings输出冒充完整shader源码。
+- 当前NativeGameRgbInput是无颜色转换的Load，NativeGameRgbOutput是直接10bit打包；需要核实它们与实机选中分支是否一致，不能凭FP16格式就假定HDR或强加sRGB转换。报告live_hdr_mode=null、game_color_contract_verified=false。
+- AMD同一PID18872仍Responding，CPU由46秒增至156秒，着色器编译日志继续前进；session28959保留，未重复启动。完整shift3回归未结束。
+
 ### 2026-09-07：完整网络传递实机post shift3，独立回归已启动
 
 - NativeActualNetwork70::Create新增post_shift（默认0，入口检查0..3），明确传入NativePost70；NativeGameFrame接入边界指定3以匹配实机origin(-4,-4)。这不是已安装的游戏DLL，历史/codec接线仍未完成。
