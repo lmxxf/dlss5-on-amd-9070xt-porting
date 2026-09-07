@@ -17,6 +17,27 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
  uint group=gid.y;
+ #if NATIVE_SPLIT_FFWD_BLOCKED
+ // Register-blocked: the input tile is staged once per K step for all four mix blocks.
+ {
+  C acc[4];[unroll]for(uint block=0;block<4;block++)acc[block]=C::Splat(0.0f);
+  for(uint k=0;k<16;k++){
+   for(uint i=t;i<512;i+=32)tile[i]=float16_t(input[(first+i/32)*512+k*32+i%32]);
+   GroupMemoryBarrierWithGroupSync();
+   A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+   [unroll]for(uint block=0;block<4;block++){
+    B b=B::Load(weights,((group*64+block*16)*512+k*32)*2,1024,dx::linalg::MatrixLayout::ColMajor,16);
+    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+    for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,H(acc[block].Get(i)+p.Get(i)));
+   }
+   GroupMemoryBarrierWithGroupSync();
+  }
+  [unroll]for(uint block=0;block<4;block++){
+   for(uint i=0;i<acc[block].Length();i++){uint2 rc=acc[block].GetCoordinate(i);mixed[rc.x*80+block*16+rc.y]=float16_t(F(acc[block].Get(i)));}
+  }
+  GroupMemoryBarrierWithGroupSync();
+ }
+ #else
  for(uint block=0;block<4;block++){
   C acc=C::Splat(0.0f);
   for(uint k=0;k<16;k++){
@@ -33,6 +54,7 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   for(uint i=t;i<256;i+=32)mixed[(i/16)*80+block*16+i%16]=float16_t(temp[i]);
   GroupMemoryBarrierWithGroupSync();
  }
+ #endif
  {
   for(uint block=0;block<16;block++){
    C acc=C::Splat(0.0f);
@@ -42,11 +64,33 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)+p.Get(i)));
    }
+#if NATIVE_SPLIT_FFWD_BLOCKED
+   for(uint i=0;i<acc.Length();i++){float v=acc.Get(i),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);uint2 rc=acc.GetCoordinate(i);hidden[rc.x*272+block*16+rc.y]=float16_t(F(H(v*p)));}
+#else
    for(uint i=0;i<acc.Length();i++){float v=acc.Get(i),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);acc.Set(i,F(H(v*p)));}
    acc.Store(temp,0,16,dx::linalg::MatrixLayout::RowMajor);GroupMemoryBarrierWithGroupSync();
    for(uint i=t;i<256;i+=32)hidden[(i/16)*272+block*16+i%16]=float16_t(temp[i]);
    GroupMemoryBarrierWithGroupSync();
+#endif
   }
+#if NATIVE_SPLIT_FFWD_BLOCKED
+  GroupMemoryBarrierWithGroupSync();
+  {
+   C acc[4];[unroll]for(uint block=0;block<4;block++)acc[block]=C::Splat(0.0f);
+   for(uint k=0;k<8;k++){
+    A a=A::Load(hidden,k*32,272,dx::linalg::MatrixLayout::RowMajor);
+    [unroll]for(uint block=0;block<4;block++){
+     B b=B::Load(weights,(393216+group*16384+block*16*256+k*32)*2,512,dx::linalg::MatrixLayout::ColMajor,16);
+     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+     for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,H(acc[block].Get(i)+p.Get(i)));
+    }
+   }
+   [unroll]for(uint block=0;block<4;block++){
+    for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,F(acc[block].Get(i)));
+    acc[block].Store(output,(first*512+group*64+block*16)*4,512*4,dx::linalg::MatrixLayout::RowMajor,16);
+   }
+  }
+#else
   for(uint block=0;block<4;block++){
    C acc=C::Splat(0.0f);
    for(uint k=0;k<8;k++){
@@ -58,6 +102,7 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
    for(uint i=0;i<acc.Length();i++)acc.Set(i,F(acc.Get(i)));
    acc.Store(output,(first*512+group*64+block*16)*4,512*4,dx::linalg::MatrixLayout::RowMajor,16);
   }
+#endif
   GroupMemoryBarrierWithGroupSync();
  }
 }
