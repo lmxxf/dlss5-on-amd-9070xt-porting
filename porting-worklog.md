@@ -6096,3 +6096,11 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - 静态回归test_parallel_split_contract.py验证8组输出、展开/收缩权重一一覆盖和H/F原样；MinGW/DXC构建通过。完整测试PID41392退出0，15帧最终6635520值different0，下载两份结果与独立原版参考byte-exact。
 - 暖均597.88739ms、末5帧598.934558ms；649.227125ms基线的首split_stage0 3.430111→1.178869ms，encoder23_30_body 42.021329→22.322743ms。整网仍约1.67fps，不能算达到10fps。
 - 证据release/native-network70-parallel-split/，准备脚本release/prepare-parallel-split.ps1（ignored）；运行入口run_parallel_split_network.ps1继承ViT Wave/C32 coalesced基线。未更新游戏DLL，未更改提交策略。
+# 2026-09-08：C64首层瓶颈细分
+
+- NativeC64Shift::Record增加可选timer，传入已有NativeC64细分计时并额外记录pack/crop，仅完整网络开启profile时首个C64实例使用；不改算子或提交。
+- PID8392退出0，15帧最终和下载的两份输出均与原版逐字节一致。暖601.9571914ms，新增观测不算优化收益。
+- 首层attention4.07296ms、FFN收缩2.004306ms、FFN展开0.930537ms；前馈投影0.453237ms、注意力投影0.463386ms；pack/crop0.371551/0.346411ms；QKV矩阵0.21472ms，两个half pack合计约0.12779ms。
+- 直接读实现确认QK已Wave，而归一化概率prob×V仍是每线程串行32通道×64键。下一候选应优先AV Wave及共享区复用；当前无需把pack/crop当主要瓶颈。
+- 计时标签语义变化：encoder5_8现在只含剩余三层和ds8，完整原区间需加c64_probe*。测得27.8044ms绝不是原36.9ms被优化了9ms。
+- 证据release/native-network70-c64-detail/，准备脚本release/prepare-c64-profile.ps1（ignored）；运行仍用run_parallel_split_network.ps1及新构建可执行文件。无游戏DLL更新，10fps仍未完成。

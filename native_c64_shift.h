@@ -31,10 +31,11 @@ public:
   const char*entry[]={"pack","crop"};auto path=dir+L"\\native_c64_shift.hlsl";auto channel_text=std::to_string(channels);D3D_SHADER_MACRO macros[]={{"CHANNELS",channel_text.c_str()},{"PLAIN_SHORT_Y",plain_short_y?"1":"0"},{nullptr,nullptr}};
   for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C64 shift shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
- void Record(ID3D12GraphicsCommandList*c){
+ void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(recorded){Barrier(c,padded,true);Barrier(c,output,true);}
   auto pass=[&](UINT i,ID3D12Resource*src,ID3D12Resource*dst,UINT pixels){c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(1,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,6,geometry,0);c->Dispatch((pixels+63)/64,1,1);};
-  pass(0,input,padded,geometry[2]*geometry[3]);Barrier(c,padded,false);body.Record(c);pass(1,body.Output(),output,geometry[0]*geometry[1]);Barrier(c,output,false);recorded=true;
+  if(timer)timer->Mark(c,"c64_probe_begin");
+  pass(0,input,padded,geometry[2]*geometry[3]);Barrier(c,padded,false);if(timer)timer->Mark(c,"c64_probe_pack");body.Record(c,timer,"c64_probe");pass(1,body.Output(),output,geometry[0]*geometry[1]);Barrier(c,output,false);if(timer)timer->Mark(c,"c64_probe_crop");recorded=true;
  }
  ID3D12Resource* Output()const{return output;}
 };
