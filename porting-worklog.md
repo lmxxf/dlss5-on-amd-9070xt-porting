@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：nearby compute覆盖核验，确认观测入口盲区
+
+- 下载PID18528 bounded小shader及codec shader到nearby目录。新增audit_native_nearby_compute.py：256条nearby dispatch共22个pipeline，全部在捕获文件集合有对应文件；虽256小shader上限耗尽，这22项没有缺文件。
+- 九次encode pipeline370f7a7e0到decode370f7b170在nearby序列中均相邻，中间observed dispatch数0。原NR明明成功运行，说明该ReShade dispatch入口未观察到NR内部GPU执行，不能用“没有额外compute”证明历史不是compute更新，也不应继续扩大同一日志额度期待覆盖缺口。
+- 原始事件及coverage.json留在ignored nearby目录；此审计只证明观测范围和关联，不证明资源写入内容。下一步需要换能够观察NR内部命令的入口或资源内容对照，而不是对这22个外围shader逐个盲猜。
+- AMD整链同PID24536本轮CPU664秒且Responding，仍编译推进；游戏渲染DLL未替换。
+
 ### 2026-09-07：扩展只读nearby compute观察器实机加载
 
 - native_codec_constants_events保留codec捕获，额外保存<=16KiB非codec compute（最多256份，约4MiB上限）及首个codec常数后256次dispatch的时间/list/pipeline/group。只读payload，不发GPU命令，不抑制dispatch；不是无限抓取，也不宣称覆盖全部shader。
