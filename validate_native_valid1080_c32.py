@@ -1,12 +1,13 @@
 """Validate original encoder1..4 main outputs from the same valid1080 input."""
 from pathlib import Path
-import json
+import json,argparse
 import numpy as np
 from native_c32_reference import block,unpack
 from decode_tinlayout_global import e4m3fn
-root=Path('release/native-rgb-valid1080/encoder-c32');w,h=960,576;n=w*h*32
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+root=args.base/'encoder-c32';w,h=960,576;n=w*h*32
 basis=np.fromfile('release/post-skip-basis/matrix.f32','<f4').reshape(2048,2048);mapping=np.argmax(abs(basis),axis=0).reshape(8,8,32)[:4,:4].ravel()
-raw=np.fromfile('release/native-rgb-valid1080/block0-down.fp8',np.uint8);assert raw.size==n
+raw=np.fromfile(args.base/'block0-down.fp8',np.uint8);assert raw.size==n
 x=e4m3fn(raw).reshape(2,h,w,16).transpose(1,2,0,3).reshape(h,w,32);checks=[]
 for b,shift in ((1,0),(2,3),(3,1),(4,2)):
  raw=np.fromfile(root/f'block{b}-main.fp8',np.uint8);assert not raw[n:].any() and not np.any((raw[:n]&127)==127)

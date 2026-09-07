@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同源时序decoder56..65原版/CPU全通过
+
+- session66510验证encoder9..14主输出全exact，使用block14-main.f32与decoder55/oracle.f32生成upsample56，4423680值全exact；继续57..61五层均different0，finite，原shift2/0/3/1/2。
+- session64910验证encoder5..8主输出全exact，使用block8-main.f32与decoder61/oracle.f32生成upsample62，8847360值全exact；继续63..65三层均different0，原shift3/1/2。两个skip都来自本次时序输入，没有混用单帧激活。
+- encoder C32验证及decoder67..69脚本增加--base，默认路径不变，--help语法检查通过；准备下一步验证block4 skip并续66..70。当前尚未运行最后这一段。
+- 游戏DLL未改，AMD完整时序网络尚未启动；以上是独立原版/CPU对照，不是游戏验收。
+
 ### 2026-09-07：同源时序decoder40..55原版/CPU验证通过
 
 - decoder_split、encoder C64/128/256验证、upsample48及decoder49..55工具增加--base，默认旧单帧目录保持不变。所有新结果在native-temporal-valid1080。

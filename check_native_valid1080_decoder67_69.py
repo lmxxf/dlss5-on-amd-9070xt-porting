@@ -3,8 +3,10 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import argparse
 
-base = Path('release/native-rgb-valid1080')
+p=argparse.ArgumentParser();p.add_argument('--base',type=Path,default=Path('release/native-rgb-valid1080'));args=p.parse_args()
+base = args.base
 r = json.loads((base / 'upsample66/validation.json').read_text())
 assert r['different'] == 0 and r['finite'] and r['tail_zero']
 previous = base / 'upsample66/output.fp8'
