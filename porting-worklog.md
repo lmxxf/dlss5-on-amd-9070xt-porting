@@ -6137,3 +6137,9 @@ check_native_decoder_spatial.py严格比较并分别写spatial-validation.json�
 - post70_body33.609171ms，merge1.100363ms，RGB0.846251ms，begin含跨提交间隔0.338404ms。故约36ms绝大多数是最后C32网络，不是末端RGB的整数精确舍入。下一步优先C32核心而非RGB投影。
 - post70标签现在是最后微小间隔，需加post70_*才是原范围；禁止拿接近零的旧标签当提速。
 - 证据release/native-network70-post-detail/，准备脚本release/prepare-post-detail.ps1（ignored）；运行multihead-av有效基线，没有开启最近三个未确认/无收益候选。游戏DLL未改，10fps未达到。
+# 2026-09-08：矩阵版C32权重驻留复测，无可靠收益
+
+- 早期驻留实验发生在不同标量实现，本次在当前multihead-av/post-detail有效矩阵基线复测既有RESIDENT_C32_WEIGHTS=1。NativeResidentTable初始化CopyBufferRegion至DEFAULT，不量化或修改权重，运行阶段不复制。
+- PID42360退出0，15帧最终different0，下载两份完整结果与独立原版参考byte-exact。暖587.328718ms、末5帧591.87154ms。
+- post70_body33.63794ms，对照33.60917ms几乎不变；preblock_detail_stage1 23.91003ms、首c32_probe_stage1 5.74253ms。没有可靠整网收益，不能把不同轮次591→587当确定提速，继续默认关闭。
+- 证据release/native-network70-resident-c32-matrix/，准备脚本release/prepare-resident-c32-matrix.ps1（ignored）；入口run_resident_c32_matrix_network.ps1。下一步应改C32执行方式而非再次仅搬这份权重；游戏未改，10fps未完成。
