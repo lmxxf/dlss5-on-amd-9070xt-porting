@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：单帧神经诊断DLL实际部署，后台初始化中
+
+- AMD native-color-frame-samegpu目录23个shader hash全部校验通过；正常退出43204，观察器备份native-submission-order.addon64.before-neural-oneshot，部署真实NATIVE_ORDER_NEURAL构建。安装文件SHA 7C33272069A7EDB471C12A6A13F00CB3568037A906ACA7F2C6177AA4A632748C，旧渲染及所有观察器备份保留。
+- Steam启动新游戏PID43088 Responding。native-game-oneshot.txt记录tick589894906 initialization_started/background/game output unchanged；后续进程仍有响应，尚无ready/render_begin/render_complete或失败记录。后台编译不在游戏渲染线程执行。
+- 这一次确实把含完整神经网络的诊断DLL放入游戏，但不能把加载成功/初始化开始当输出生效。下一步追踪此PID及初始化日志，等待一帧before/after数据并核验；不重复启动或改正在使用的shader。此版本明确history0单帧，不是最终连续时序版。
+
 ### 2026-09-07：实机单帧神经渲染诊断DLL构建，尚未部署
 
 - 新增NativeGameOneShot：首次合格after-submit边界仅启动后台初始化NativeGameFrame，保留queue/source引用，不让游戏线程承担长shader编译；ready后下一合格帧先保存真实before，再重绑当前源、分段执行完整颜色+网络并写回同一FP16目标，最后保存after。阶段原子状态防重复，错误不自动重试，queue变更拒绝。
