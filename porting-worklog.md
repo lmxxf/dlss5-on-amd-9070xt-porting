@@ -2975,6 +2975,13 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07：同帧历史资源创建顺序确认
+
+- current-sequence保存PID22724的preblock-live0..7、NVAPI/view事件及post launch154。frame0 history slot8=0，frame1..7为8100000a808；当前RGB handle8120000a801不变，motion handle逐帧变化。
+- NVAPI历史handle在tick74962500关联SRV desc220000104/resource36e173e70；上一帧post surface a803的UAV关联resource36e170ea0。view事件中post资源74962234建UAV、74962281建SRV；history资源74962281先建UAV、74962500建SRV。这证明两资源不同及历史具备写入视图，不证明写入内容/算法。
+- 被动resource_copy日志未包含这两个资源，下一方向为额外compute写入或未覆盖API；简单扫描原DLL未发现合法长度头的裸DXBC，不能以此断言没有shader（可能压缩/运行时创建）。不再把缺日志当无历史更新。
+- AMD完整颜色链PID24536本轮检查CPU353秒且Responding，未终态。游戏未改。
+
 ### 2026-09-07：同PID帧边界kernel序列留档
 
 - 从5090读取PID22724实际launch日志，保存current-sequence/launches-22724.txt。第一帧post为launch154，后面155=cc_cb_clear、156=下一帧preblock，未夹其它被该launch入口观测到的kernel。它不覆盖其它API写入或资源别名，因此不能推断历史未更新。
