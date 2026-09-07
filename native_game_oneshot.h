@@ -15,6 +15,9 @@ class NativeGameOneShot {
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-oneshot.txt)",L"ab")){fprintf(f,"pid=%lu tick=%llu event=%s detail=%s\n",GetCurrentProcessId(),GetTickCount64(),event,detail);fclose(f);}
  }
  static void Save(unsigned long request,const wchar_t*label,const std::vector<unsigned char>&bytes){
+#ifdef NATIVE_GAME_TILED_VERIFICATION
+  if(request>1&&GetFileAttributesW(LR"(D:\DLSSNR-Lab\continuous-reset-preview.txt)")!=INVALID_FILE_ATTRIBUTES)return;
+#endif
   wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\neural-%lu-request-%lu-%ls.f16)",GetCurrentProcessId(),request,label);
   FILE*f=_wfopen(path,L"wb");if(!f)throw std::runtime_error("one-shot file open");auto n=fwrite(bytes.data(),1,bytes.size(),f);fclose(f);if(n!=bytes.size())throw std::runtime_error("one-shot short write");
  }
@@ -42,6 +45,13 @@ public:
   unsigned state=phase.load(std::memory_order_acquire);if(state!=2&&state!=4)return false;
   auto now=GetTickCount64();if(now>=next_poll){
    next_poll=now+250;unsigned long pid=0,id=0;
+#ifdef NATIVE_GAME_TILED_VERIFICATION
+   // Slow visual demonstration only: each frame deliberately resets history.
+   // Remove this file to return to explicit single-frame requests.
+   if(GetFileAttributesW(LR"(D:\DLSSNR-Lab\continuous-reset-preview.txt)")!=INVALID_FILE_ATTRIBUTES&&!armed_request){
+    if(last_request<1000000){armed_request=++last_request;phase=2;}
+   }
+#endif
    if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\neural-frame-request.txt)",L"rb")){
     int fields=fscanf(f,"%lu %lu",&pid,&id);fclose(f);
     if(fields==2&&NativeFrameRequestValid(GetCurrentProcessId(),pid,id,last_request)&&!armed_request){last_request=id;armed_request=id;phase=2;Log("request_armed",std::to_string(id).c_str());}

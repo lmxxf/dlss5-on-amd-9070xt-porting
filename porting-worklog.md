@@ -2975,6 +2975,12 @@ native_preblock_mix_reference.py保存实测规则；preblock_input_mix.hlsl的N
 
 ## 工作纪律
 
+### 2026-09-07 20:00：按用户要求停止性能工作，安装慢速连续reset展示
+
+- 用户要求省额度，先启动看看，不展开优化。tiled诊断构建检测D:\DLSSNR-Lab\continuous-reset-preview.txt后，在ready/done状态自动申请下一帧，每帧明确history=0；移除该文件即恢复手动请求。不是完整temporal实现，也尚未核验连续屏幕表现。
+- 连续模式仅保存request1前后原始文件，避免每帧33MB无限落盘。手动模式保留原有逐请求保存。正常Alt+F4退出43156并确认进程不存在后，备份DLL为.before-continuous-reset，部署SHA b6e42d355396a88a3f4181556240497a9514dfb9827e8aeee517b5aa322c0903，安装散列一致；DLSS5GameLaunch已重新启动。
+- 43156/request1已下载审计：before SHA88b9291b554088ecbe7c624f4a1d77828248fd4e1ca76a560f9d2aace25a27b6，after SHA8dd413404f9745c23cd38531f36fc3a737dff7b9b4e13e2dcb4547486a1031e6，RGB不同6205580、alpha不同0、全finite。实看为人物正面近景。独立原版encode已在live-reference-43156-1生成（原DXBC两次执行，只作为原版运算，不冒充候选比较）；后续原版整网对照未完成。
+
 ### 2026-09-07：已部署分块游戏验证DLL并进入真实游戏流程
 
 - 新构建选项--tiled启用NATIVE_GAME_TILED_VERIFICATION，NativeC64Shift无显式环境设置时默认开启分块；标准构建不变。游戏单帧helper改用独立native-game-tiled-assets并记录build_mode，不修改Steam环境或旧资产。
