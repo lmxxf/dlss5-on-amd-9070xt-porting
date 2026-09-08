@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**快速版阶段 2/3（光，钟点以用户下一条消息为准）：暖轮 111.9ms（约 8.9fps），对 exact 链 PSNR 42.0dB、max 0.057、≥4/255 像素 5.2%。入口 `run_fast_fp8_qkv_network.ps1`，证据 release/fast-fp8-proj/fast-validation.json。游戏 assets 已同步该版 shader。** 链条：fast-accumulate 159.8 → fp8-ffn 154.8（Swin FFN E4M3 操作数，误差与阶段 1 逐位相同——乘积精确、累加器同一个）→ fp8-vit 151.6（ViT expand/reduce E4M3；**LDS 打包 8 位矩阵 Load 的 stride/StartIdx 单位是打包后的 uint，不是元素**，写成 32 会得到 34.8dB 的"半坏"结果）→ fast-epilogue 130.1（FFN 激活多项式去掉 3 次中间 H()、单次 RNE 量化：C32 FFN 1.47→0.56、preblock FFN 8.6→4.2）→ fast-attention 115.3（归一化用 WaveActiveSum、exp 去 H、分母 f32 四 lane 求和、概率单次量化、残差单次 H：C32 attention 1.66→1.12、preblock attention 8.7→5.1）→ fp8-proj/qkv 111.9（投影 E4M3 中性；多头 QKV 从 thread-scope f16 matvec 换 wave E4M3 GEMM 0.23→0.13）。踩坑：分裂块投影权重漏打 FP8 包，PSNR 8.8 的垃圾就是它。所有权重矩阵部分 100% 在 FP8 格点上（偏置/scale 向量不是，仍走 f32）。
+
 **11:09 快速版阶段 1 用户游戏内确认：效果在、无异常，约 6fps（日志 avg_ms_per_frame=164）。** tag `0.01` = exact 终点（186ms）。阶段 1（DLSS5_FAST_ACCUMULATE=1 编译期宏，入口 run_fast_accumulate_network.ps1，证据 release/fast-accumulate/fast-validation.json）：所有 wave 矩阵 GEMM 去掉每 K32 一次的软件 H()，硬件 FP32 累加跑完整 K、末尾 H 一次；测试台 186→159.8ms，对 exact 链 PSNR 42.6dB、max 0.055、≥4/255 像素 3.8%。游戏 assets 已同步快速版 shader（同名覆盖），回 exact：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\native-network70-shared-scratch`。误差报告工具 compare_fast_output.py，测试程序 DLSS5_TEST_ALLOW_INEXACT=1 不再因不一致中止。
 
 **09:00 用户进游戏确认：画面连贯，约 5fps（光）。** 首版 DLL（45fe8f…）画面一帧神经一帧默认闪烁——老诊断模式每 250ms 轮询只替换一帧；游戏内 render_begin→render_complete 稳定 187ms，与测试台一致，无换页。第二版 DLL（SHA `934b3d5e1b9515c591ebbfbed809deb722f038a1f67b94af8fcf17a658af28d6`，当前安装）加 `continuous-every-frame.txt` 每帧同步模式：每个 FSR 帧都跑网络回写，首帧后不读回不落盘，日志每 100 帧一行 `every_frame avg_ms_per_frame`。仍每帧 reset history，时序累积未做。回退方法同上。
