@@ -2,7 +2,7 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
-**09:20 游戏 DLL 已部署（光）——等用户手动进游戏验收。**
+**08:32 之后（钟点以下一条用户消息的时间戳为准）游戏 DLL 已部署（光）——等用户手动进游戏验收。**
 
 - 显存：块内 scratch 共享（DLSS5_TEST_SHARED_SCRATCH：多头块的 result/scratch 走 workspace；DLSS5_TEST_SHARED_C32_SCRATCH：所有 C32 实例共用一对 ffn/raw，按首个创建者加 shift 余量定容），测试进程本地段 14.68→7.26GB，15帧exact，暖 186ms。证据 release/native-network70-shared-scratch。
 - 安装的 DLL：`native-submission-order.addon64` SHA `45fe8f29b11f8c463802884493389b737321332dfb9cc9b89804df8418d0a26a`（源码本仓库 HEAD，`bash build_native_game_verification.sh ... --tiled`）。**回退**：游戏退出后把同目录 `native-submission-order.addon64.before-fast-20260908`（SHA `b6e42d35…c903`，即 09-07 的慢速展示版）复制回去；并把 `D:\DLSSNR-Lab\native-game-tiled-assets.shaders-before-fast-20260908\` 里的 cso/hlsl 拷回 assets 目录（只有 shader 变了，权重没动）；删掉 `D:\DLSSNR-Lab\enable-game-sdk721.txt`。部署脚本 deploy_native_fast_verification.ps1（游戏运行中会拒绝执行）。
