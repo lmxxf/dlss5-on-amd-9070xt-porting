@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include "native_device_identity.h"
 #include "native_game_rgb_input.h"
 #include "native_actual_network70.h"
@@ -21,6 +22,8 @@ class NativeGameFrame {
   NativeRgbTexture neural;
   NativeGameCodec decode;
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
+  // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
+  NativeNetworkTimestamps probe;bool probe_on{};double probe_sum[3]{};double probe_cpu{};unsigned probe_frames{};
   NativeTemporalFeed feed;NativeTemporalCoordinates coordinates;NativeTemporalSample sampler;ID3D12Resource*reciprocals{};bool temporal{};UINT motion_w{},motion_h{};ID3D12CommandQueue*queue{};
   UINT feed_motion_width()const{return motion_w;}UINT feed_motion_height()const{return motion_h;}ID3D12CommandQueue*submit_queue()const{return queue;}
   ~Resources(){if(reciprocals)reciprocals->Release();}
@@ -43,6 +46,7 @@ public:
   resources=new Resources;
   try{
    resources->submit.Create(queue);auto*d=resources->submit.Device();resources->queue=queue;
+   {const wchar_t*pf=_wgetenv(L"DLSS5_GAME_PROBE");resources->probe_on=pf&&!wcscmp(pf,L"1");if(resources->probe_on)resources->probe.Create(d);}
    resources->encode.Create(d,{source},directory);
    resources->original=source;
    resources->input.Create(d,resources->encode.Output(),directory);
@@ -121,11 +125,12 @@ public:
   try{
    auto&r=*resources;
    const bool use_history=r.temporal&&motion_texture&&!reset&&r.feed.HasHistory();
-   r.submit.Submit([&](ID3D12GraphicsCommandList*c){r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-    if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}});
+   const auto cpu_start=std::chrono::steady_clock::now();if(r.probe_on)r.probe.Reset();
+   r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
    if(!dump_prefix.empty()&&use_history){r.submit.Flush();DumpTemporalNow(dump_prefix);dump_prefix.clear();}
    r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
-   r.submit.Submit([&](ID3D12GraphicsCommandList*c){
+   r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
     if(r.temporal)r.feed.RecordHistory(c);
     r.neural.Record(c);r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,source_state});
     D3D12_RESOURCE_BARRIER b[2]{};for(auto&v:b)v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -135,7 +140,11 @@ public:
     c->CopyResource(target,r.decode.Output());
     for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
+    if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}
    });
+   if(r.probe_on){r.submit.Flush();std::vector<double>iv;if(r.probe.Intervals(r.submit.TimestampFrequency(),iv)&&iv.size()==3){for(int i=0;i<3;i++)r.probe_sum[i]+=iv[i];}
+    r.probe_cpu+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-cpu_start).count();
+    if(++r.probe_frames%100==0){if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-probe.txt)",L"ab")){fprintf(f,"frames=%u avg_ms pre=%.2f network=%.2f post=%.2f gpu_total=%.2f cpu_frame=%.2f\n",r.probe_frames,r.probe_sum[0]/100,r.probe_sum[1]/100,r.probe_sum[2]/100,(r.probe_sum[0]+r.probe_sum[1]+r.probe_sum[2])/100,r.probe_cpu/100);fclose(f);}for(auto&v:r.probe_sum)v=0;r.probe_cpu=0;}}
   }catch(...){failed=true;throw;}
  }
 };

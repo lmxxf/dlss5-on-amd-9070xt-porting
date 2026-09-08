@@ -17,6 +17,13 @@ public:
  void Reset(){labels.clear();}
  void Mark(ID3D12GraphicsCommandList*c,const std::string&label){if(!heap)return;if(labels.size()>=128)throw std::runtime_error("timestamp capacity");c->EndQuery(heap,D3D12_QUERY_TYPE_TIMESTAMP,UINT(labels.size()));labels.push_back(label);}
  void Resolve(ID3D12GraphicsCommandList*c){if(heap)c->ResolveQueryData(heap,D3D12_QUERY_TYPE_TIMESTAMP,0,UINT(labels.size()),readback,0);}
+ // Raw intervals (ms) between consecutive marks, no printing (game-side probe).
+ bool Intervals(UINT64 frequency,std::vector<double>&out){
+  out.clear();if(!heap||!frequency||labels.size()<2)return false;
+  UINT64*p=nullptr;D3D12_RANGE range{0,labels.size()*8},none{};check(readback->Map(0,&range,reinterpret_cast<void**>(&p)));
+  bool ok=true;for(size_t i=1;i<labels.size();i++){if(p[i]<p[i-1])ok=false;out.push_back(1000.0*double(p[i]-p[i-1])/frequency);}
+  readback->Unmap(0,&none);return ok;
+ }
  void Report(UINT64 frequency){
   if(!heap)return;if(!frequency||labels.size()<2)throw std::runtime_error("timestamp frequency/count");
   UINT64*p=nullptr;D3D12_RANGE range{0,labels.size()*8},none{};check(readback->Map(0,&range,reinterpret_cast<void**>(&p)));
