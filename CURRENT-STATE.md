@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**19:07 之后 继续：测试台 80.6ms，已部署（光）。** C32 Q/K/V 硬件 Cast 进 aux（84.3）、ViT 注意力快速版（去软件 H/老 F，82.4）、ViT contract split-K 四分区并行 + combine（80.6）。游戏：DLL `b9d9c9f5…f690`，assets = `D:\DLSSNR-Lab\vit-splitk`，flag `native-game-flags-fast3.txt`（= fast2 + DLSS5_VIT_SPLIT_K=1）。回退到 87.9 版：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\hw-h -Flags D:\DLSSNR-Lab\native-game-flags-fast2.txt`。链入口 `run_vit_split_k_network.ps1`。踩坑：新 runner 在链顶端编译时下层 runner 还没设 DLSS5_FP8_OPERANDS 等环境变量，shader 按 f16 编译去读 FP8 权重 → PSNR 28dB 还更慢；顶层 runner 要自己先把快速链的编译变量设上。探针（release/c32-aprobe-*）：C32 注意力核里 exp/P 归一化/输出量化都不是成本，qkv 核 2.7ms 里肉是每 lane 48 次软件 Ffast。
+
 **19:06 用户游戏内确认 87.9ms 版速度更快、效果在；雨景下画面闪烁，F6 切 FSR 不闪，先搁置（光）。** 二分只做了一步（只留时序去 double 那版用户说"又变慢了"，没看闪不闪就切回来了）。待查线索：FAST_PREFIX 把噪声从表改成 ALU 生成、C32 FFN 硬件 Cast、HW_H 的 f16 denormal 处理（max_abs 0.062→0.083）。A/B 方法：按 release 目录逐步 deploy（fast-prefix 前一步是 fp8-qkv 目录），DLL 通用，flag 文件按步裁。
 
 **18:15 之后 计划第二～四步一口气做完，测试台 112 → 87.9ms，已部署待用户游戏内确认（光）。** 游戏：DLL `547853ca…6255`，assets = `D:\DLSSNR-Lab\hw-h`（累计所有快速版 cso），flag 文件 `native-game-flags-fast2.txt`（= fast-temporal + FUSED_QKV_NORMALIZE / FUSED_FFN / FP8_ACTIVATIONS / FP8_QKV_NORM / FAST_PREFIX / C32_FUSED_ATTENTION）。回退：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\fast-temporal -Flags D:\DLSSNR-Lab\native-game-flags-fast-temporal.txt`。测试台链入口 `run_hw_h_network.ps1`（叠 run_c32_ffn_fp8 → run_c32_ffn_fast2 → run_c32_fused_attention → run_fast_prefix → run_fp8_qkv_norm → run_hw_quantize → run_fp8_activations → run_fused_ffn → run_fused_qkv_normalize → run_fast_temporal → 原 fast 链），证据 release/{fused-qkv-norm,fused-ffn,fp8-act,hw-quant,fp8-qkv,fast-prefix,c32-fused,c32-ffn2,c32-ffn8,hw-h}/fast-validation.json。PSNR 对 exact 链一直在 42.1～42.2dB，没掉。
