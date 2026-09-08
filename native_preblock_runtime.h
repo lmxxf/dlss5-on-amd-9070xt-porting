@@ -79,7 +79,12 @@ public:
    // Layout: expand f16 [128][32] @0, contract f16 [32][128] @8192, residual scale f32[32] @16384, contract E4M3 [32][128] @16512 (fast path).
    // FAST PATH 3 (NATIVE_C32_FFN_FAST3): E4M3 copy of the expand weights [128][32] at byte 20608 (tile-contiguous when DLSS5_C32_TILED_WEIGHTS=1).
    const wchar_t*fast3_flag=_wgetenv(L"DLSS5_C32_FFN_FAST3");if(fast3_flag&&wcscmp(fast3_flag,L"0")&&wcscmp(fast3_flag,L"1"))throw std::runtime_error("invalid C32 FFN fast3 flag");const bool fast3=fast3_flag&&!wcscmp(fast3_flag,L"1");
-   std::vector<float>packed(4096+32+1024+(fast3?1024+768:0));
+   std::vector<float>packed(4096+32+1024+(fast3?1024+768+512:0));
+   if(fast3){ // prefix mix weights as two f16 B tiles [n][k 32][j 16] (k>=16 zero) at byte 27776 for the inline-prefix FFN (mode 5)
+    unsigned char*bt=reinterpret_cast<unsigned char*>(packed.data())+27776;std::memset(bt,0,2048);
+    for(size_t n=0;n<2;n++)for(size_t k=0;k<16;k++)for(size_t j=0;j<16;j++){float v=fw[(n*16+j)*16+k];uint32_t b;std::memcpy(&b,&v,4);uint32_t m=b&0x7fffffffu;uint16_t h=uint16_t((b>>16)&0x8000);if(m){int e=int(m>>23);if(e>=113){if((m&0x1fffu)||e>142)throw std::runtime_error("prefix weight not exact half");h|=uint16_t(((e-112)<<10)|((m&0x7fffff)>>13));}else{float q=std::fabs(v)*16777216.f;if(q!=std::floor(q)||q>1023.f)throw std::runtime_error("prefix weight not exact subnormal half");h|=uint16_t(q);}}std::memcpy(bt+(n*512+k*16+j)*2,&h,2);}
+   }
+   ffn_fast3=fast3;
    for(size_t i=0;i<8192;i++){uint32_t bits;std::memcpy(&bits,&fw[512+i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m)h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
    std::memcpy(packed.data()+4096,fw.data()+8704,128);
    {unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data())+16512;for(size_t i=0;i<4096;i++){float v=fw[4608+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
@@ -144,7 +149,6 @@ public:
    }
   }Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");
-  if(prefix_wave)Heap(3,prefix_ffn_weights,prefix_ffn_weights->GetDesc().Width,raw,bytes,ffn,bytes,false);
   const wchar_t* names[]={L"preblock_input_mix.hlsl",L"preblock_attention_core.hlsl",L"preblock_finish.hlsl"};
   auto count=std::to_string(UINT64(w)*h*32);
   const wchar_t*cache_flag=_wgetenv(L"DLSS5_TEST_CACHE_C32_INPUT");if(cache_flag&&wcscmp(cache_flag,L"0")&&wcscmp(cache_flag,L"1"))throw std::runtime_error("invalid cached C32 input flag");
@@ -152,7 +156,9 @@ public:
   // FAST PATH: input-mix prefix as a plain float dot + f16 round instead of the integer-emulated HMMA.
   const wchar_t*fp=_wgetenv(L"DLSS5_FAST_PREFIX");if(fp&&wcscmp(fp,L"0")&&wcscmp(fp,L"1"))throw std::runtime_error("invalid fast prefix flag");const bool fast_prefix=fp&&!wcscmp(fp,L"1");
   // FAST PATH: wave-matrix prefix mix (native_wave_prefix.cso, dxc-compiled; live profile + noise + prefix-only contract baked in).
-  {const wchar_t*wp=_wgetenv(L"DLSS5_WAVE_PREFIX");if(wp&&wcscmp(wp,L"0")&&wcscmp(wp,L"1"))throw std::runtime_error("invalid wave prefix flag");wave_prefix=wp&&!wcscmp(wp,L"1")&&prefix_wave&&fast_prefix&&live_profile&&!raw_features&&noise;if(wp&&!wcscmp(wp,L"1"))fprintf(stderr,"wave_prefix=%d prefix_wave=%d fast_prefix=%d live=%d raw=%d noise=%d local=%d\n",wave_prefix?1:0,prefix_wave?1:0,fast_prefix?1:0,live_profile?1:0,raw_features?1:0,noise?1:0,wave_ffn_local?1:0);}
+  {const wchar_t*wp=_wgetenv(L"DLSS5_WAVE_PREFIX");if(wp&&wcscmp(wp,L"0")&&wcscmp(wp,L"1"))throw std::runtime_error("invalid wave prefix flag");wave_prefix=wp&&!wcscmp(wp,L"1")&&prefix_wave&&fast_prefix&&live_profile&&!raw_features&&noise;
+   const wchar_t*ip=_wgetenv(L"DLSS5_INLINE_PREFIX");if(ip&&wcscmp(ip,L"0")&&wcscmp(ip,L"1"))throw std::runtime_error("invalid inline prefix flag");inline_prefix=ip&&!wcscmp(ip,L"1")&&prefix_wave&&fast_prefix&&live_profile&&!raw_features&&noise&&ffn_fast3;if(inline_prefix)mapping[0]=5;}
+  if(prefix_wave)Heap(3,prefix_ffn_weights,prefix_ffn_weights->GetDesc().Width,inline_prefix?stage_input:raw,inline_prefix?UINT64(w)*h*16:bytes,ffn,bytes,false);
   const wchar_t*fast_flag=_wgetenv(L"DLSS5_TEST_FAST_C32_FP8");if(fast_flag&&wcscmp(fast_flag,L"0")&&wcscmp(fast_flag,L"1"))throw std::runtime_error("invalid fast C32 flag");
   D3D_SHADER_MACRO macros[]={{"TOTAL_OUTPUTS",count.c_str()},{"FULL_FFN","1"},{"NATIVE_PREFIX_ONLY",prefix_wave?"1":"0"},{"RAW_OUTPUT","1"},{"RAW_INPUT",raw_features?"1":"0"},{"DEBUG_FEATURES","0"},{"DYNAMIC_PARAMETERS","1"},{"LIVE_PROFILE",live_profile?"1":"0"},{"NOISE_SEED","0"},{"NATIVE_NOISE_TABLE",noise?"1":"0"},{"NATIVE_TEMPORAL_RGB",temporal?"1":"0"},{"NATIVE_FAST_C32_FP8",fast_flag&&!wcscmp(fast_flag,L"1")?"1":"0"},{"NATIVE_PAD_C32_LDS",pad_flag&&!wcscmp(pad_flag,L"1")?"1":"0"},{"NATIVE_CACHE_C32_INPUT",cache_flag&&!wcscmp(cache_flag,L"1")?"1":"0"},{"NATIVE_FAST_PREFIX",fast_prefix?"1":"0"},{nullptr,nullptr}};
   const wchar_t*wave_flag=_wgetenv(L"DLSS5_TEST_WAVE_C32_SCORES");if(wave_flag&&wcscmp(wave_flag,L"0")&&wcscmp(wave_flag,L"1"))throw std::runtime_error("invalid wave C32 flag");
@@ -196,13 +202,14 @@ public:
     }
    }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
     c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if(mapping[0]==4){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+   }else if(stage==0&&inline_prefix){
    }else{
    c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_prefix){UINT n=width*height/16;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    }
    if(stage==0&&prefix_wave){
     Barrier(c,raw,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,std::string(label)+"_prefix");
     if(test_prefix_readback){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(test_prefix_readback,0,raw,0,4096);Barrier(c,raw,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
-    if(blocked_ffn_raw_store){c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,prefix_ffn_weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);}else{c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);}c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    if(blocked_ffn_raw_store){c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,prefix_ffn_weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(inline_prefix?stage_input:raw)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if(inline_prefix){c->SetComputeRootShaderResourceView(4,(temporal?temporal:stage_input)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,prefix_ffn_weights->GetGPUVirtualAddress());}}else{c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(inline_prefix){if(noise)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());}}c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
     Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Barrier(c,ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
@@ -217,6 +224,6 @@ public:
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
- bool skip_finish{},wave_prefix{},attn_fast3{};void SetSkipFinish(bool v){skip_finish=v;}
+ bool skip_finish{},wave_prefix{},attn_fast3{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
  ID3D12Resource* Main()const{return main;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };

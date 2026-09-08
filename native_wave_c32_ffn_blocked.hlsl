@@ -24,6 +24,11 @@ ByteAddressBuffer input_bytes:register(t1);
 // value = H(H(low*w[c]) + skip*w[32+c]) exactly as native_post70.hlsl merge, computed in the gather instead of a pass.
 ByteAddressBuffer skip_bytes:register(t2);
 ByteAddressBuffer merge_w:register(t3);
+// Mode 5 (pre block, inline prefix): the input-mix prefix (16 features -> 32 channels) is computed here from the RGB tiles
+// (t1, f32 [pixel][4]) and the temporal history (t3 root SRV, float4 per raster pixel); prefix weights as f16 B tiles at byte 27776.
+uint pcg(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>22)^w;}
+float uniform24(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return float(((w>>30)^(w>>8))+1)*5.9604644775390625e-8;}
+float half_round(float v){return f16tof32(f32tof16(v));}
 #else
 StructuredBuffer<float> input:register(t1);
 #define input_at(i) input[i]
@@ -109,6 +114,29 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   }else{
    // Mapped source: gather the 16 token rows into LDS (lane j<16 resolves token j once), then load them as accumulators.
    const int mine=t<16?source_index(first+t):0;
+   [branch]if(map_mode==5){
+    if(t<16){
+     const uint p=first+t;
+     uint x=p%8,y=(p/8)%8;
+     if(!local_oracle){uint tile=p/64;x=(tile%(width/8))*8+p%8;y=(tile/(width/8))*8+(p%64)/8;}
+     uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^(seed*0x9e3779b9u)^0x243f6a88u);
+     float a=uniform24(h*0xcaa5b80d+0x21dd796b),b=uniform24(h*0x2c9277b5+0xac564b05);
+     float c=uniform24(h*0x83232c31+0x3463e0ac),d=uniform24(h*0xfa6dc5f9+0x4712a88e);
+     float r0=sqrt(-2*log(a)),r1=sqrt(-2*log(b));
+     float g0=half_round(r0*cos(6.283185482025146*c)),g1=half_round(r1*cos(6.283185482025146*d)),g2=half_round(r1*sin(6.283185482025146*d));
+     float r=half_round(half_round(half_round(input_at(p*4))-0.5)*.125),g=half_round(half_round(half_round(input_at(p*4+1))-0.5)*.125),bl=half_round(half_round(half_round(input_at(p*4+2))-0.5)*.125);
+     float features[16]={g1,g2,g,bl,g0,1,.0078125,1,r,g,1,1,bl,r,1,0};
+     if(temporal){uint tile=p/64;uint tx=(tile%(width/8))*8+p%8,ty=(tile/(width/8))*8+(p%64)/8;float3 hist=asfloat(merge_w.Load3((ty*width+tx)*16));
+      features[13]=half_round(half_round(half_round(hist.x)-.5)*.125);features[2]=half_round(half_round(half_round(hist.y)-.5)*.125);features[3]=half_round(half_round(half_round(hist.z)-.5)*.125);}
+     [unroll]for(uint i=0;i<16;i++)prefix[t*32+i]=float16_t(features[i]);
+     [unroll]for(uint i=16;i<32;i++)prefix[t*32+i]=float16_t(0.0);
+    }
+    GroupMemoryBarrierWithGroupSync();
+    A fa=A::Load(prefix,0,32,dx::linalg::MatrixLayout::RowMajor);
+    B b0=B::Load(weights,27776,32,dx::linalg::MatrixLayout::RowMajor,16),b1=B::Load(weights,27776+1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+    in0=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(fa,b0);in1=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(fa,b1);
+    ELEM_LOOP(in0){in0.Set(i,half_round(in0.Get(i)));in1.Set(i,half_round(in1.Get(i)));}
+   }else{
    [branch]if(map_mode==4){
     const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));
     [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=0;
@@ -119,6 +147,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    }
    GroupMemoryBarrierWithGroupSync();
    in0=C::Load(raw,0,32,dx::linalg::MatrixLayout::RowMajor);in1=C::Load(raw,16,32,dx::linalg::MatrixLayout::RowMajor);
+   }
   }
 #endif
   in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
