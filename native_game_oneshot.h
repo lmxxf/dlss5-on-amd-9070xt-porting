@@ -32,9 +32,9 @@ class NativeGameOneShot {
    self->frame=new NativeGameFrame;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
    Log("build_mode","tiled verification; separate assets; reset-history only");
-   // Runtime path selection: NAME=VALUE lines (DLSS5_TEST_* only) applied to the process
+   // Runtime path selection: NAME=VALUE lines (DLSS5_* only) applied to the process
    // environment before the network is created, mirroring the validated test runner chain.
-   {unsigned applied=0;if(FILE*flags=_wfopen(LR"(D:\DLSSNR-Lab\native-game-flags.txt)",L"rb")){char line[256];while(fgets(line,sizeof line,flags)){size_t n=strlen(line);while(n&&(line[n-1]=='\n'||line[n-1]=='\r'||line[n-1]==' '))line[--n]=0;if(n<12||strncmp(line,"DLSS5_TEST_",11)||!strchr(line,'='))continue;if(!_putenv(line))applied++;}fclose(flags);}
+   {unsigned applied=0;if(FILE*flags=_wfopen(LR"(D:\DLSSNR-Lab\native-game-flags.txt)",L"rb")){char line[256];while(fgets(line,sizeof line,flags)){size_t n=strlen(line);while(n&&(line[n-1]=='\n'||line[n-1]=='\r'||line[n-1]==' '))line[--n]=0;if(n<8||strncmp(line,"DLSS5_",6)||!strchr(line,'='))continue;if(!_putenv(line))applied++;}fclose(flags);}
     Log("flags_applied",std::to_string(applied).c_str());}
    {const bool temporal_on=GetFileAttributesW(LR"(D:\DLSSNR-Lab\temporal-history.txt)")!=INVALID_FILE_ATTRIBUTES&&task->temporal.motion_width&&task->temporal.render_width;
     char text[160];snprintf(text,sizeof text,"temporal=%u motion=%ux%u render=%ux%u",temporal_on?1u:0u,task->temporal.motion_width,task->temporal.motion_height,task->temporal.render_width,task->temporal.render_height);Log("temporal_config",text);

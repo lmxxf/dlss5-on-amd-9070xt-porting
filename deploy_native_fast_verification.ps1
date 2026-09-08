@@ -1,4 +1,4 @@
-param([string]$Source='D:\DLSSNR-Lab\native-network70-shared-scratch',[string]$Dll='D:\DLSSNR-Lab\native-game-fast.addon64')
+param([string]$Source='D:\DLSSNR-Lab\native-network70-shared-scratch',[string]$Dll='D:\DLSSNR-Lab\native-game-fast.addon64',[string]$Flags='D:\DLSSNR-Lab\native-game-flags-exact.txt')
 $ErrorActionPreference='Stop'
 if(Get-Process SB-Win64-Shipping -ErrorAction SilentlyContinue){throw 'Game is running; not touching assets or DLL'}
 $Assets='D:\DLSSNR-Lab\native-game-tiled-assets';$Src=$Source
@@ -6,7 +6,7 @@ $Backup="$Assets.shaders-before-fast-20260908"
 if(!(Test-Path $Backup)){New-Item -ItemType Directory $Backup | Out-Null;Get-ChildItem $Assets -File | Where-Object {$_.Extension -in '.cso','.hlsl','.hlsli'} | Copy-Item -Destination $Backup}
 $n=0;Get-ChildItem $Src -File | Where-Object {$_.Extension -in '.cso','.hlsl','.hlsli'} | ForEach-Object {Copy-Item $_.FullName (Join-Path $Assets $_.Name) -Force;$n++}
 "shaders synced: $n (backup: $Backup)"
-Copy-Item 'D:\DLSSNR-Lab\native-game-flags.txt' 'D:\DLSSNR-Lab\native-game-flags.txt' -ErrorAction SilentlyContinue
+Copy-Item $Flags 'D:\DLSSNR-Lab\native-game-flags.txt' -Force;'flags: '+$Flags
 Set-Content 'D:\DLSSNR-Lab\enable-game-sdk721.txt' 'sdk721'
 $Game='C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64'
 $Cur=Join-Path $Game 'native-submission-order.addon64'
