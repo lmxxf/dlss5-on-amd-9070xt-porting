@@ -14,7 +14,16 @@
 #endif
 #include <dx/linalg.h>
 ByteAddressBuffer weights:register(t0);
+#ifndef NATIVE_C32_ATTN_FAST2
+#define NATIVE_C32_ATTN_FAST2 0
+#endif
+#if NATIVE_C32_ATTN_FAST2
+ByteAddressBuffer input:register(t1);
+#define INPUT_AT(i) asfloat(input.Load((i)*4))
+#else
 StructuredBuffer<float> input:register(t1);
+#define INPUT_AT(i) input[i]
+#endif
 RWByteAddressBuffer qk:register(u0);
 RWByteAddressBuffer aux:register(u1);
 cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;}
@@ -70,10 +79,53 @@ groupshared float16_t tile[512];
 groupshared float squares[2*512];
 groupshared float inv[2*16];
 #endif
+#ifndef NATIVE_C32_ATTN_FAST2
+#define NATIVE_C32_ATTN_FAST2 0
+#endif
+#if NATIVE_C32_ATTN_FAST2
+#if !(NATIVE_C32_FUSED&&NATIVE_C32_FP8_QKV)
+#error NATIVE_C32_ATTN_FAST2 needs the fused FP8 QKV
+#endif
+// FAST PATH (qkv fast2): input tile loaded as accumulators and cast to E4M3 for an FP8 x FP8 QKV GEMM (E4M3 weight copy
+// at byte 25856); row sums of squares from one MMA of the f16 squared tile against all-ones; no scalar F()/LDS reductions.
+groupshared uint in8[128];
+groupshared float16_t sq16[2*512];
+groupshared float16_t ones16[512];
+using A8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 [WaveSize(32)]
 [numthreads(32,1,1)]void qkv(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=(gid.x+gid.y*65535u)*16;if(first>=runtime_width*runtime_height)return;
- for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(F(input[first*32+i]));
+ for(uint i=tid.x;i<512;i+=32)ones16[i]=float16_t(1.0);
+ {C in0=C::Load(input,first*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,first*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
+  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(in8,0,8,dx::linalg::MatrixLayout::RowMajor);
+  in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(in8,4,8,dx::linalg::MatrixLayout::RowMajor);}
+ GroupMemoryBarrierWithGroupSync();
+ A8 a=A8::Load(in8,0,8,dx::linalg::MatrixLayout::RowMajor);
+ C z[6];
+ [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+  B8 b=B8::Load(weights,25856+(part*32+cr*16)*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+  z[part*2+cr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+ }
+ [unroll]for(uint h=0;h<2;h++)[unroll]for(uint cr=0;cr<2;cr++){C sq=z[h*2+cr];for(uint i=0;i<sq.Length();i++){float v=sq.Get(i);sq.Set(i,v*v);}sq.Cast<dx::linalg::ComponentType::F16>().Store(sq16,h*512+cr*16,32,dx::linalg::MatrixLayout::RowMajor);}
+ GroupMemoryBarrierWithGroupSync();
+ [unroll]for(uint h=0;h<2;h++){
+  A st=A::Load(sq16,h*512,32,dx::linalg::MatrixLayout::RowMajor);B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(st,ones);
+  for(uint i=0;i<rs.Length();i++){uint2 rc=rs.GetCoordinate(i);if(rc.y==0)inv[h*16+rc.x]=rsqrt(max(rs.Get(i),6.198883056640625e-5))*(h==0?W_SCALE:1);}
+ }
+ GroupMemoryBarrierWithGroupSync();
+ [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+  C t=z[part*2+cr];
+  if(part<2)for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,t.Get(i)*inv[part*16+rc.x]);}
+  t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#else
+[WaveSize(32)]
+[numthreads(32,1,1)]void qkv(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=(gid.x+gid.y*65535u)*16;if(first>=runtime_width*runtime_height)return;
+ for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(F(INPUT_AT(first*32+i)));
  GroupMemoryBarrierWithGroupSync();
  A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
 #if NATIVE_C32_FUSED
@@ -106,6 +158,7 @@ groupshared float inv[2*16];
  }
 #endif
 }
+#endif
 #elif PASS==1
 [WaveSize(32)]
 [numthreads(32,1,1)]void normalize(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
@@ -207,7 +260,7 @@ groupshared float16_t ones16[512];
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
   for(uint i=0;i<z.Length();i++){
    uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
-   float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));
+   float result=H(z.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
    z.Set(i,RAW_OUTPUT?result:F(result));
   }
   z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
@@ -306,7 +359,7 @@ groupshared float16_t ones16[512];
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
   for(uint i=0;i<z.Length();i++){
    uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
-   float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));
+   float result=H(z.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
    z.Set(i,RAW_OUTPUT?result:F(result));
   }
   z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
@@ -355,7 +408,7 @@ groupshared float16_t attn[16*32];
    [unroll]for(uint cr=0;cr<2;cr++){
     B bb=B::Load(weights,6144+cr*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
     C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
-    for(uint i=0;i<z.Length();i++){uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));z.Set(i,RAW_OUTPUT?result:F(result));}
+    for(uint i=0;i<z.Length();i++){uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;float result=H(z.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));z.Set(i,RAW_OUTPUT?result:F(result));}
     z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
    }
   }
@@ -373,9 +426,9 @@ groupshared float16_t attn[16*32];
   for(uint i=0;i<z.Length();i++){
    uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
 #if NATIVE_FAST_ATTENTION
-   float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));
+   float result=H(z.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
 #else
-   float result=half_add_preserving_midpoint(z.Get(i),H(input[p*32+c]*W_RESIDUAL(c)));
+   float result=half_add_preserving_midpoint(z.Get(i),H(INPUT_AT(p*32+c)*W_RESIDUAL(c)));
 #endif
    z.Set(i,RAW_OUTPUT?result:F(result));
   }
