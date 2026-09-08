@@ -34,6 +34,12 @@ ByteAddressBuffer weights:register(t1);
 #ifndef NATIVE_MATRIX_RESIDUAL
 #define NATIVE_MATRIX_RESIDUAL 0
 #endif
+#ifndef NATIVE_TILED_WEIGHTS
+#define NATIVE_TILED_WEIGHTS 0
+#endif
+#if NATIVE_TILED_WEIGHTS && !NATIVE_FP8_OPERANDS
+#error tiled weights are packed as E4M3 bytes
+#endif
 #if NATIVE_FP8_FEATURE
 // FAST PATH: residual stream stored as E4M3 bytes.
 ByteAddressBuffer feature8:register(t2);
@@ -127,7 +133,11 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #endif
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
+#if NATIVE_TILED_WEIGHTS
+   B b=B::Load(weights,((col/16)*(MATRIX_CHANNELS/32)+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,(col*MATRIX_CHANNELS+g*32)*ELEM,MATRIX_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
 #if NATIVE_FAST_ACCUMULATE
    acc[n].MultiplyAccumulate(a,b);
 #else

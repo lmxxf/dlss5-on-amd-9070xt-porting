@@ -11,7 +11,19 @@
 #define ELEM_LOOP(m) for(uint i=0;i<m.Length();i++)
 #endif
 ByteAddressBuffer weights:register(t0);
+#ifndef NATIVE_C32_FFN_FAST3
+#define NATIVE_C32_FFN_FAST3 0
+#endif
+#if NATIVE_C32_FFN_FAST3
+// FAST PATH 3: the f32 input tile is loaded as two 16x16 accumulator matrices (residual) and quantized to E4M3 through
+// the hardware Cast into LDS (A operand); expand runs FP8 x FP8 on the E4M3 expand-weight copy at byte 20608.
+// Requires FAST2 + FP8 and the root-descriptor (raw store) binding; only the identity mapping (map_mode 0) takes this path.
+ByteAddressBuffer input_bytes:register(t1);
+#define input_at(i) asfloat(input_bytes.Load((i)*4))
+#else
 StructuredBuffer<float> input:register(t1);
+#define input_at(i) input[i]
+#endif
 #if NATIVE_C32_FFN_FAST2
 RWByteAddressBuffer output:register(u0);
 #else
@@ -46,9 +58,16 @@ groupshared float raw[512];
 #ifndef NATIVE_C32_FFN_FP8
 #define NATIVE_C32_FFN_FP8 0
 #endif
+// FAST PATH: B tiles contiguous — expand f16 tile `block` (32 K-rows x 16 halves) at block*1024; contract E4M3 tile (block,g) at 16512+(block*4+g)*512.
+#ifndef NATIVE_C32_TILED_WEIGHTS
+#define NATIVE_C32_TILED_WEIGHTS 0
+#endif
 #if NATIVE_C32_FFN_FP8
 // FAST PATH: hidden layer as E4M3 through the hardware cast (no scalar Ffast); contract weights are an FP8 copy at byte 16512.
 groupshared uint hidden8[512];
+#if NATIVE_C32_FFN_FAST3
+groupshared uint prefix8[128];
+#endif
 float ActivatePoly(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return v*p;}
 #endif
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
@@ -70,26 +89,82 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
  using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+#if NATIVE_C32_FFN_FAST3
+ {
+  using A8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+  using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+  C in0,in1;
+#if NATIVE_C32_MAPPED_INPUT
+  [branch]if(map_mode==0){
+#endif
+   in0=C::Load(input_bytes,first*128,128,dx::linalg::MatrixLayout::RowMajor,16);in1=C::Load(input_bytes,first*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_C32_MAPPED_INPUT
+  }else{
+   // Mapped source: gather the 16 token rows into LDS (lane j<16 resolves token j once), then load them as accumulators.
+   const int mine=t<16?source_index(first+t):0;
+   [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:input_at(uint(src)+t);}
+   GroupMemoryBarrierWithGroupSync();
+   in0=C::Load(raw,0,32,dx::linalg::MatrixLayout::RowMajor);in1=C::Load(raw,16,32,dx::linalg::MatrixLayout::RowMajor);
+  }
+#endif
+  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
+  in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,4,8,dx::linalg::MatrixLayout::RowMajor);
+  GroupMemoryBarrierWithGroupSync();
+  {
+   A8 a=A8::Load(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
+   [unroll]for(uint block=0;block<8;block++){
+#if NATIVE_C32_TILED_WEIGHTS
+    B8 b=B8::Load(weights,20608+block*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+    B8 b=B8::Load(weights,20608+block*16*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
+    C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+    ELEM_LOOP(h)h.Set(i,ActivatePoly(h.Get(i)));
+    h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,32,dx::linalg::MatrixLayout::RowMajor);
+   }
+  }
+  GroupMemoryBarrierWithGroupSync();
+  C acc[2];
+  ELEM_LOOP(acc[0]){uint2 rc=acc[0].GetCoordinate(i);acc[0].Set(i,in0.Get(i)*asfloat(weights.Load(16384+rc.y*4)));acc[1].Set(i,in1.Get(i)*asfloat(weights.Load(16384+64+rc.y*4)));}
+  for(uint g=0;g<4;g++){
+   A8 a=A8::Load(hidden8,g*8,32,dx::linalg::MatrixLayout::RowMajor);
+   [unroll]for(uint block=0;block<2;block++){
+#if NATIVE_C32_TILED_WEIGHTS
+    B8 b=B8::Load(weights,16512+(block*4+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+    B8 b=B8::Load(weights,16512+block*16*128+g*32,128,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
+    acc[block].MultiplyAccumulate(a,b);
+   }
+  }
+  [unroll]for(uint block=0;block<2;block++){ELEM_LOOP(acc[block])acc[block].Set(i,f16tof32(f32tof16(acc[block].Get(i))));acc[block].Store(output,(first*32+block*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);}
+  return;
+ }
+#endif
 #if NATIVE_C32_FFN_FAST2
  // FAST PATH: raw input tile kept in LDS for the residual; quantized copy for the A operand.
 #if NATIVE_C32_MAPPED_INPUT
- [branch]if(map_mode==0){for(uint i=t;i<512;i+=32){float v=input[first*32+i];raw[i]=v;prefix[i]=float16_t(Ffast(v));}}
+ [branch]if(map_mode==0){for(uint i=t;i<512;i+=32){float v=input_at(first*32+i);raw[i]=v;prefix[i]=float16_t(Ffast(v));}}
  else{
   // Lane j<16 resolves token j's source once; the staging loop reads it back with a uniform lane index.
   const int mine=t<16?source_index(first+t):0;
-  [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);uint i=j*32+t;float v=src<0?0:input[uint(src)+t];raw[i]=v;prefix[i]=float16_t(Ffast(v));}
+  [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);uint i=j*32+t;float v=src<0?0:input_at(uint(src)+t);raw[i]=v;prefix[i]=float16_t(Ffast(v));}
  }
 #else
- for(uint i=t;i<512;i+=32){float v=input[first*32+i];raw[i]=v;prefix[i]=float16_t(Ffast(v));}
+ for(uint i=t;i<512;i+=32){float v=input_at(first*32+i);raw[i]=v;prefix[i]=float16_t(Ffast(v));}
 #endif
 #else
- for(uint i=t;i<512;i+=32)prefix[i]=float16_t(F(input[first*32+i]));
+ for(uint i=t;i<512;i+=32)prefix[i]=float16_t(F(input_at(first*32+i)));
 #endif
  GroupMemoryBarrierWithGroupSync();
  {
   A a=A::Load(prefix,0,32,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint block=0;block<8;block++){
+#if NATIVE_C32_TILED_WEIGHTS
+   B b=B::Load(weights,block*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,block*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
 #if NATIVE_C32_FFN_FP8
    ELEM_LOOP(h)h.Set(i,ActivatePoly(h.Get(i)));
@@ -111,7 +186,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #if NATIVE_C32_FFN_FAST2
   ELEM_LOOP(acc[block]){uint2 rc=acc[block].GetCoordinate(i);uint c=block*16+rc.y;acc[block].Set(i,raw[rc.x*32+c]*asfloat(weights.Load(16384+c*4)));}
 #else
-  ELEM_LOOP(acc[block]){uint2 rc=acc[block].GetCoordinate(i);uint c=block*16+rc.y;acc[block].Set(i,H(input[(first+rc.x)*32+c]*asfloat(weights.Load(16384+c*4))));}
+  ELEM_LOOP(acc[block]){uint2 rc=acc[block].GetCoordinate(i);uint c=block*16+rc.y;acc[block].Set(i,H(input_at((first+rc.x)*32+c)*asfloat(weights.Load(16384+c*4))));}
 #endif
  }
  for(uint g=0;g<4;g++){
@@ -120,7 +195,11 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
   A8 a=A8::Load(hidden8,g*8,32,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint block=0;block<2;block++){
+#if NATIVE_C32_TILED_WEIGHTS
+   B8 b=B8::Load(weights,16512+(block*4+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B8 b=B8::Load(weights,16512+block*16*128+g*32,128,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
 #else
   A a=A::Load(hidden,g*32,128,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint block=0;block<2;block++){

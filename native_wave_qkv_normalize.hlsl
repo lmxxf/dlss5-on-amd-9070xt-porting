@@ -16,6 +16,9 @@ StructuredBuffer<float> attention_weights:register(t2);
 RWByteAddressBuffer packed:register(u0);
 groupshared float squares[1024];
 groupshared float inv[32];
+#ifndef NATIVE_TILED_WEIGHTS
+#define NATIVE_TILED_WEIGHTS 0
+#endif
 #ifndef NATIVE_FP8_QKV_OUT
 #define NATIVE_FP8_QKV_OUT 0
 #endif
@@ -35,7 +38,11 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   A a=A::Load(input,gid.x*16*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
   [unroll]for(uint n=0;n<4;n++){
    uint col=(gid.y*4+n)*16; // 0..3C-1, weights row-major [3C][C] in part order
+#if NATIVE_TILED_WEIGHTS
+   B b=B::Load(weights,((col/16)*(MATRIX_CHANNELS/32)+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,col*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    if(g==0)acc[n]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);else acc[n].MultiplyAccumulate(a,b);
   }
  }

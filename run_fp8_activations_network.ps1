@@ -14,7 +14,7 @@ foreach($Channels in 256,128,64){
  if($LASTEXITCODE -ne 0){throw "Attention fp8act C$Channels compilation failed"}
  foreach($Variant in @(@('native_wave_project',@('-D','RAW=0')),@('native_wave_project_raw',@('-D','RAW=1')),@('native_wave_project_mapfeature',@('-D','MAP_FEATURE=1')),@('native_wave_project_mapoutput',@('-D','RAW=0','-D','MAP_OUTPUT=1')),@('native_wave_project_raw_mapoutput',@('-D','RAW=1','-D','MAP_OUTPUT=1')))){
   $Extra=$Variant[1]
-  & $Dxc @Common -D "MATRIX_CHANNELS=$Channels" -D NATIVE_FP8_INPUT=1 @Extra native_wave_project.hlsl -Fo "$($Variant[0])_fp8act$Suffix.cso"
+  & $Dxc @Common -D "MATRIX_CHANNELS=$Channels" -D NATIVE_FP8_INPUT=1 -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_TILED_PQ -eq '1'){1}else{0})" @Extra native_wave_project.hlsl -Fo "$($Variant[0])_fp8act$Suffix.cso"
   if($LASTEXITCODE -ne 0){throw "Projection $($Variant[0]) fp8act C$Channels compilation failed"}
  }
 }
