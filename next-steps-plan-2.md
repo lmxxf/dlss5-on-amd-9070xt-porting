@@ -23,6 +23,13 @@
 
 C32 家族合计 33.7，占 54%。
 
+## 09-09 07:40 补记（光之朱雀）
+- 已做：多头 direct-cast/矩阵残差/tile 权重，C32 FFN fast3、注意力 fast2/fast3（QKV 合进注意力 dispatch，−8ms）、QKV fast2，post70 direct + merge fold，C32 链读 raw tiles，wave ds4，ViT FP8 注意力，C512 pack/crop 向量化，多头注意力 fast2。测试台 62.7→~35ms，游戏 33ms GPU。
+- 游戏侧：CPU 每帧 = GPU + 3ms；掉帧 21→13→8 是 Splashtop 抓屏（探针 cpu_frame 阶梯上涨、GPU 不变，关远程即回落）。fast16 起用延迟提交（环 64），GPU 38.5→33.2。
+- 试过无收益：C32 权重平铺、多头 QKV 归一化 MMA 平方和、MAP_FEATURE 矩阵残差、wave prefix（1.84→1.58 但 PSNR 42.05）、多头 QKV+注意力合核（每 head 重读输入，反而慢 +0.3/段；要赚得一组做整窗全部 head，C256 LDS 放不下）。
+- 教训：root 描述符槽位有核在偷读上一次的绑定（把小 buffer 绑到 t2 就 GPU 挂），新核换绑定要看后续 dispatch；Create 里 flag 解析必须在 pso 加载之前。
+- 剩下：pre prefix 合进 FFN（1.8）、ViT FP8 权重（~1）、rgb 头/finish 改 f16（~0.5）、C512 合核、多头 FFN+投影合核。
+
 ## 一、C32 注意力核结构（约 8ms 在册）——21:40 后两项实验都排除了
 
 - 占用：塞 12KB 假 LDS 时间不变（release/c32-aprobe3-*）→ 不是占用。
