@@ -68,7 +68,7 @@ public:
    timestamps.Reset();
    submit.Submit([&](ID3D12GraphicsCommandList*c){
     timestamps.Mark(c,"start");pre.Record(c,seed,false,temporal_enabled,profile?&timestamps:nullptr,"preblock_detail");timestamps.Mark(c,"preblock");
-    for(UINT i=0;i<4;i++)c32[i].Record(c,profile&&i==0?&timestamps:nullptr);ds4.Record(c);timestamps.Mark(c,"encoder1_4");
+    for(UINT i=0;i<4;i++){c32[i].Record(c,profile&&i==0?&timestamps:nullptr);if(profile)timestamps.Mark(c,"enc_c32_"+std::to_string(i));}ds4.Record(c);timestamps.Mark(c,"encoder1_4");
     for(UINT i=0;i<4;i++)c64[i].Record(c,profile&&i==0?&timestamps:nullptr);ds8.Record(c);timestamps.Mark(c,"encoder5_8");
     for(auto&s:c128)s.Record(c);ds14.Record(c);timestamps.Mark(c,"encoder9_14");
     for(auto&s:c256)s.Record(c);ds22.Record(c);timestamps.Mark(c,"encoder15_22");
