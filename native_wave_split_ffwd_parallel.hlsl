@@ -8,13 +8,75 @@ RWByteAddressBuffer output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;}
 groupshared float16_t mixed[16*80],hidden[16*272],tile[512];
 groupshared float temp[256];
+#ifndef NATIVE_HW_H
+#define NATIVE_HW_H 0
+#endif
+#if NATIVE_HW_H
+float H(float v){return f16tof32(f32tof16(v));}
+float F(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+#else
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#endif
 #if NATIVE_FAST_EPILOGUE
 // FAST PATH stage 3a: activation polynomial without intermediate f16 roundings; single RNE quantization to the FP8 grid.
 float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
 float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return Ffast(v*p);}
 #endif
+#ifndef NATIVE_SPLIT_FFWD_WAVES4
+#define NATIVE_SPLIT_FFWD_WAVES4 0
+#endif
+#if NATIVE_SPLIT_FFWD_WAVES4
+// FAST PATH: four waves per 16-token group. mix: one 16-column block per wave (all 16 K steps, input tile
+// staged once per K step by the whole group); expand: four hidden blocks per wave; contract: one output block per wave.
+// Same arithmetic as the blocked fast path; only the work split changes (2160-token layers are latency-bound).
+[WaveSize(32)]
+[numthreads(128,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16,t=tid.x;if(first>=width*height)return;
+ using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+ using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+ const uint group=gid.y,wave=t/32;
+ {
+  C acc=C::Splat(0.0f);
+  for(uint k=0;k<16;k++){
+   for(uint i=t;i<512;i+=128)tile[i]=float16_t(input[(first+i/32)*512+k*32+i%32]);
+   GroupMemoryBarrierWithGroupSync();
+   A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+   B b=B::Load(weights,((group*64+wave*16)*512+k*32)*2,1024,dx::linalg::MatrixLayout::ColMajor,16);
+   acc.MultiplyAccumulate(a,b);
+   GroupMemoryBarrierWithGroupSync();
+  }
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+  acc.Cast<dx::linalg::ComponentType::F16>().Store(mixed,wave*16,80,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  [unroll]for(uint j=0;j<4;j++){
+   const uint block=wave*4+j;
+   C acc=C::Splat(0.0f);
+   [unroll]for(uint k=0;k<2;k++){
+    A a=A::Load(mixed,k*32,80,dx::linalg::MatrixLayout::RowMajor);
+    B b=B::Load(weights,(262144+group*16384+block*16*64+k*32)*2,128,dx::linalg::MatrixLayout::ColMajor,16);
+    acc.MultiplyAccumulate(a,b);
+   }
+   for(uint i=0;i<acc.Length();i++)acc.Set(i,Activate(H(acc.Get(i))));
+   acc.Cast<dx::linalg::ComponentType::F16>().Store(hidden,block*16,272,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  C acc=C::Splat(0.0f);
+  for(uint k=0;k<8;k++){
+   A a=A::Load(hidden,k*32,272,dx::linalg::MatrixLayout::RowMajor);
+   B b=B::Load(weights,(393216+group*16384+wave*16*256+k*32)*2,512,dx::linalg::MatrixLayout::ColMajor,16);
+   acc.MultiplyAccumulate(a,b);
+  }
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+  acc.Store(output,(first*512+group*64+wave*16)*4,512*4,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#else
 [WaveSize(32)]
 [numthreads(32,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16,t=tid.x;if(first>=width*height)return;
@@ -136,3 +198,4 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   GroupMemoryBarrierWithGroupSync();
  }
 }
+#endif
