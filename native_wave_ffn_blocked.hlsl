@@ -33,15 +33,25 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
    B b=B::Load(weights,(col*MATRIX_CHANNELS+g*32)*2,MATRIX_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   // Fast path: hardware FP32 accumulation across the whole K, one H() at the end.
+   if(g==0)acc[n]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);else acc[n].MultiplyAccumulate(a,b);
+#else
    C partial=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    if(g==0){acc[n]=partial;for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)));}
    else for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+partial.Get(i)));
+#endif
   }
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;
   for(uint i=0;i<acc[n].Length();i++){
-   float v=acc[n].Get(i),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
+#if NATIVE_FAST_ACCUMULATE
+   float v=H(acc[n].Get(i));
+#else
+   float v=acc[n].Get(i);
+#endif
+   float g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
    acc[n].Set(i,F(H(v*p)));
   }
 #if NATIVE_SCATTER_STORE
@@ -65,12 +75,20 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
    B b=B::Load(weights,HIDDEN*MATRIX_CHANNELS*2+(col*HIDDEN+g*32)*2,HIDDEN*2,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   acc[n].MultiplyAccumulate(a,b);
+#else
    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
+#endif
   }
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
+#if NATIVE_FAST_ACCUMULATE
+  for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,F(H(acc[n].Get(i))));
+#else
   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,F(acc[n].Get(i)));
+#endif
   acc[n].Store(output,(gid.x*16*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16)*4,MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
