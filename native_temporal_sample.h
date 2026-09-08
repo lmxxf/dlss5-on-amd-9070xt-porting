@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_rgb_reflect.h"
 // GPU history + already-transformed coordinates (pixel centers by default,
 // normalized UV when explicitly selected) -> reconstructed
@@ -16,12 +17,12 @@ public:
   if(history||!d||!source||!xy||!width||!height||!count||width>16384||height>16384||count>65535u*64)throw std::runtime_error("temporal sampler geometry");
   for(auto item:{std::pair<ID3D12Resource*,UINT64>{source,UINT64(width)*height*16},{xy,UINT64(count)*8}}){
    if(item.first->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||item.first->GetDesc().Width<item.second)throw std::runtime_error("temporal sampler capacity");
-   ID3D12Device*owner=nullptr;ck(item.first->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("temporal sampler device mismatch");
+   ID3D12Device*owner=nullptr;ck(item.first->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("temporal sampler device mismatch");
   }
   history=source;history->AddRef();coordinates=xy;coordinates->AddRef();geometry[0]=width;geometry[1]=height;geometry[2]=count;
   if(reciprocal_source){
    if(reciprocal_source->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||reciprocal_source->GetDesc().Width!=33554432)throw std::runtime_error("reciprocal table capacity");
-   ID3D12Device*owner=nullptr;ck(reciprocal_source->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("reciprocal table device mismatch");
+   ID3D12Device*owner=nullptr;ck(reciprocal_source->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("reciprocal table device mismatch");
    reciprocals=reciprocal_source;reciprocals->AddRef();
   }
   const float inverse[]={float(1.0/width),float(1.0/height)};std::memcpy(geometry+3,inverse,sizeof(inverse));

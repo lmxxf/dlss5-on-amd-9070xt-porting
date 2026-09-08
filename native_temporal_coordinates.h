@@ -1,4 +1,5 @@
 #pragma once
+#include "native_device_identity.h"
 #include "native_rgb_reflect.h"
 #include <cmath>
 // No slot18 path. HWC float2 output is pixel centers by default, optionally UV;
@@ -17,7 +18,7 @@ public:
   for(float v:transform)if(!std::isfinite(v))throw std::runtime_error("nonfinite motion transform");
   if(transform[2]<=0||transform[3]<=0)throw std::runtime_error("motion subrect extent");
   if(src->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||src->GetDesc().Width<UINT64(mw)*mh*16)throw std::runtime_error("motion buffer capacity");
-  ID3D12Device*owner=nullptr;ck(src->GetDevice(IID_PPV_ARGS(&owner)));bool same=owner==d;owner->Release();if(!same)throw std::runtime_error("motion buffer device mismatch");
+  ID3D12Device*owner=nullptr;ck(src->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("motion buffer device mismatch");
   motion=src;motion->AddRef();UINT dims[]={vw,vh,pw,ph,mw,mh};std::memcpy(constants,dims,sizeof(dims));std::memcpy(constants+6,transform,sizeof(transform));
   const float reciprocal[]={float(1.0/double(vw)),float(1.0/double(vh)),float(1.0/double(mw)),float(1.0/double(mh))};std::memcpy(constants+12,reciprocal,sizeof(reciprocal));
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=UINT64(pw)*ph*8;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&output)));
