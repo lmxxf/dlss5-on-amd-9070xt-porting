@@ -35,6 +35,8 @@ static std::atomic<uint64_t>tracked_output{};
 using Dispatch=uint32_t(*)(void**,const Header*);
 static Dispatch original{};
 static std::atomic<unsigned> frames{},events{};
+// Flicker triage: how many FFX dispatches were armed for the neural path and how many actually ran it.
+static std::atomic<unsigned> armed_frames{},neural_jobs{},dropped_pending{};
 static SRWLOCK lock=SRWLOCK_INIT;
 using ExecuteLists=void(STDMETHODCALLTYPE*)(ID3D12CommandQueue*,UINT,ID3D12CommandList*const*);
 static ExecuteLists original_execute{};
@@ -149,10 +151,13 @@ static uint32_t dispatch(void**context,const Header*h){
 #ifdef NATIVE_ORDER_NEURAL
    eligible=eligible||neural_oneshot.WantsFrame();
 #endif
-   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset};}
+   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset};++armed_frames;}
    else native->Release();
   }
  }
+ if(n%100==0){AcquireSRWLockExclusive(&lock);
+  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu kind=neural_coverage ffx_frames=%u armed=%u ran=%u dropped_pending=%u\n",GetCurrentProcessId(),n,armed_frames.load(),neural_jobs.load(),dropped_pending.load());fclose(f);}
+  ReleaseSRWLockExclusive(&lock);}
 #endif
  return result;
 }
@@ -176,7 +181,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
   PendingSnapshot job{};
   {std::lock_guard<std::mutex>guard(snapshot_mutex);
    if(pending_snapshot.list&&pending_snapshot.frame!=frames.load()){
-    pending_snapshot.list->Release();pending_snapshot.source->Release();if(pending_snapshot.motion)pending_snapshot.motion->Release();pending_snapshot={};
+    pending_snapshot.list->Release();pending_snapshot.source->Release();if(pending_snapshot.motion)pending_snapshot.motion->Release();pending_snapshot={};++dropped_pending;
    }
    uintptr_t items[64]{};if(lists&&count<=64)for(UINT i=0;i<count;i++)items[i]=reinterpret_cast<uintptr_t>(lists[i]);
    bool eligible=!snapshot_taken;
@@ -190,7 +195,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
   if(job.list){
    snapshot_active=true;
 #ifdef NATIVE_ORDER_NEURAL
-   neural_oneshot.OnSubmitted(q,job.source,job.motion,job.reset,observed_motion_w.load(),observed_motion_h.load(),observed_render_w.load(),observed_render_h.load());if(job.motion)job.motion->Release();
+   ++neural_jobs;neural_oneshot.OnSubmitted(q,job.source,job.motion,job.reset,observed_motion_w.load(),observed_motion_h.load(),observed_render_w.load(),observed_render_h.load());if(job.motion)job.motion->Release();
 #else
    try{
     auto pixels=NativeReadSubmittedFrame(q,job.source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);

@@ -81,6 +81,8 @@ int wmain(int argc,wchar_t**argv){try{
   submit.Flush();
   void*p=nullptr;D3D12_RANGE range{0,oracle.size()*4},none{};ck(rb->Map(0,&range,&p));auto*actual=static_cast<const float*>(p);size_t different=0;
   for(size_t i=0;i<oracle.size();i++)different+=!std::isfinite(actual[i])||actual[i]!=expected[i];
+  // Determinism probe: bitwise compare against the previous frame with the same history state (same inputs, same seed).
+  {static std::vector<float>previous[2];auto&prev=previous[enabled?1:0];if(prev.size()==oracle.size()){size_t unstable=0;for(size_t i=0;i<oracle.size();i++)unstable+=actual[i]!=prev[i];std::printf("network70 frame=%u history=%u frame_to_frame_different=%zu\n",frame,enabled,unstable);}prev.assign(actual,actual+oracle.size());}
   std::ofstream out((dir+(enabled?L"\\gpu-network70-temporal.f32":L"\\gpu-network70.f32")).c_str(),std::ios::binary);if(!out.write(reinterpret_cast<const char*>(p),oracle.size()*4))throw std::runtime_error("readback save failed");rb->Unmap(0,&none);
   std::printf("network70 frame=%u history=%u values=%zu different=%zu\n",frame,enabled,oracle.size(),different);std::fflush(stdout);if(different&&!allow_inexact)throw std::runtime_error("extracted network differs");memory_report(frame+1);
  }

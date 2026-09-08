@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**22:16～22:45 闪烁排查，四条假设全部排除，挂起。**（1）时序反馈：改名 `temporal-history.txt` 重启游戏仍闪，且菜单静态立绘也闪 → 排除。（2）回写竞争：游戏 flag 没开 ASYNC_SUBMIT，同步提交、同一条 DIRECT queue、CPU 等 fence → 排除。（3）网络不确定性：`d3d12_native_network70_test.cpp` 加了同 history 状态相邻帧逐位比对（`frame_to_frame_different`），15 帧全 0（release/determinism）→ 排除。（4）跳帧：`native_submission_order_probe.cpp` 加 `neural_coverage` 计数（每 100 次 FFX dispatch 记 ffx_frames/armed/ran/dropped_pending），游戏里 ran 与 ffx_frames 严格同步增加、dropped=0 → 每帧都替换，排除。剩下的解释：FSR 输出静态场景也带亚像素 jitter 微变，快速链（FP8 量化阈值）把微差放大成可见明暗；exact 链多半同样。下一步（未做）：DLL 连续 dump 两帧输入，灌回测试台比两次输出。游戏当前 DLL `1a3137f9…`（= fast7 功能 + 计数，无性能影响），`temporal-history.txt` 已恢复。
+
 **21:40～22:00 C32 注意力两项假设实验（占用、组同步）均排除，详见 next-steps-plan-2.md 第一节；一窗一 wave 核保留（flag 默认关）。测试台空载约 55ms、游戏同时跑约 63ms，早先几轮的绝对数混有两种状态。tag `0.03` = 62.7ms 版（fast7 部署）。**
 
 **试过无收益（未采纳）：** finish 段位元 F（内存绑定的 tile→raster 转置，0 收益）；C32 注意力 exp 表矩阵整块存 LDS（0）。C32 注意力核结构（每窗 256 线程、LDS 16KB→占用低）是下一步的假设，没验证。
