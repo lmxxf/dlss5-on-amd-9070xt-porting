@@ -204,6 +204,105 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #if !(NATIVE_C32_FUSED&&NATIVE_C32_FP8_QKV&&NATIVE_FAST_ATTENTION&&NATIVE_FAST_ACCUMULATE)
 #error NATIVE_C32_ATTN_FAST2 needs the fused FP8 fast attention
 #endif
+#ifndef NATIVE_C32_ATTN_FAST3
+#define NATIVE_C32_ATTN_FAST3 0
+#endif
+#if NATIVE_C32_ATTN_FAST3
+// FAST PATH (attention fast3): the QKV GEMM + normalize runs inside the attention dispatch. Waves 0..3 each produce the
+// E4M3 Q/K/V rows of 16 tokens into LDS ([token][96] bytes, same layout as aux); all 8 waves then run the fast2
+// attention from LDS. Saves the aux round trip and one dispatch. Reuses ex (squares) and p8 (input tile) as scratch.
+groupshared uint qkv8[64*24];
+groupshared float inv4[4*32];
+groupshared float partial_sum[2*64];
+groupshared uint attn8[64*8];
+groupshared float16_t ones16[512];
+[WaveSize(32)]
+[numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint window=gid.x,t=tid.x;if(window*64>=runtime_width*runtime_height)return;
+ uint qr=t/64,col_start=(t/32)&1,base=window*64,wave=t/32,lane=t%32;
+ for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
+ const bool qwave=wave<4;const uint qfirst=base+wave*16;
+ if(qwave){C in0=C::Load(input,qfirst*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,qfirst*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
+  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,wave*128,8,dx::linalg::MatrixLayout::RowMajor);
+  in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,wave*128+4,8,dx::linalg::MatrixLayout::RowMajor);}
+ GroupMemoryBarrierWithGroupSync();
+ C z[6];
+ if(qwave){
+  A8 a=A8::Load(p8,wave*128,8,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+   B8 b=B8::Load(weights,25856+(part*32+cr*16)*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+   z[part*2+cr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+  }
+  [unroll]for(uint h=0;h<2;h++)[unroll]for(uint cr=0;cr<2;cr++){C sq=z[h*2+cr];for(uint i=0;i<sq.Length();i++){float v=sq.Get(i);sq.Set(i,v*v);}sq.Cast<dx::linalg::ComponentType::F16>().Store(ex,wave*1024+h*512+cr*16,32,dx::linalg::MatrixLayout::RowMajor);}
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(qwave){
+  [unroll]for(uint h=0;h<2;h++){
+   A st=A::Load(ex,wave*1024+h*512,32,dx::linalg::MatrixLayout::RowMajor);B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+   C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(st,ones);
+   for(uint i=0;i<rs.Length();i++){uint2 rc=rs.GetCoordinate(i);if(rc.y==0)inv4[wave*32+h*16+rc.x]=rsqrt(max(rs.Get(i),6.198883056640625e-5))*(h==0?W_SCALE:1);}
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(qwave){
+  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+   C tt=z[part*2+cr];
+   if(part<2)for(uint i=0;i<tt.Length();i++){uint2 rc=tt.GetCoordinate(i);tt.Set(i,tt.Get(i)*inv4[wave*32+part*16+rc.x]);}
+   tt.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,(wave*16)*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ C s[2];
+ {
+  A8 qa=A8::Load(qkv8,(qr*16)*24,24,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint j=0;j<2;j++){
+   uint kr=col_start+j*2;
+   B8 kb=B8::Load(qkv8,(kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+   s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+   for(uint i=0;i<s[j].Length();i++){uint2 rc=s[j].GetCoordinate(i);s[j].Set(i,fast_exp_raw(s[j].Get(i)+W_BIAS((qr*16+rc.x)*64+kr*16+rc.y)));}
+   s[j].Cast<dx::linalg::ComponentType::F16>().Store(ex,wave*512+j*16,32,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  A et=A::Load(ex,wave*512,32,dx::linalg::MatrixLayout::RowMajor);
+  B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(et,ones);
+  for(uint i=0;i<rs.Length();i++){uint2 rc=rs.GetCoordinate(i);if(rc.y==0)partial_sum[col_start*64+qr*16+rc.x]=rs.Get(i);}
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(t<64)softmax_inverse[t]=1/(partial_sum[t]+partial_sum[64+t]);
+ GroupMemoryBarrierWithGroupSync();
+ [unroll]for(uint j=0;j<2;j++){
+  uint kr=col_start+j*2;
+  for(uint i=0;i<s[j].Length();i++){uint2 rc=s[j].GetCoordinate(i);s[j].Set(i,s[j].Get(i)*softmax_inverse[qr*16+rc.x]);}
+  s[j].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,qr*16*16+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  uint col=col_start*16;C acc=C::Splat(0.0f);
+  [unroll]for(uint g=0;g<2;g++){
+   A8 pa=A8::Load(p8,qr*16*16+g*8,16,dx::linalg::MatrixLayout::RowMajor);
+   B8 vb=B8::Load(qkv8,(g*32)*24+16+col/4,24,dx::linalg::MatrixLayout::RowMajor);
+   acc.MultiplyAccumulate(pa,vb);
+  }
+  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(attn8,qr*16*8+col/4,8,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  const uint cr=col_start,first=base+qr*16;
+  A8 aa=A8::Load(attn8,qr*16*8,8,dx::linalg::MatrixLayout::RowMajor);
+  B8 bb=B8::Load(weights,24832+cr*16*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+  C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
+  for(uint i=0;i<z.Length();i++){
+   uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
+   float result=H(z.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
+   z.Set(i,RAW_OUTPUT?result:F(result));
+  }
+  z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#else
 // FAST PATH (attention fast2): scores stay in registers through exp; each wave stores its 16x32 f16 exp tile with one
 // matrix Store, row sums come from one MMA against an all-ones B, P is quantized by the hardware E4M3 cast, the PV output
 // is cast to E4M3 for an FP8 x FP8 projection (E4M3 projection weight copy at byte 24832). No scalar Ffast/E4M3 loops.
@@ -266,6 +365,7 @@ groupshared float16_t ones16[512];
   z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
+#endif
 #else
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){

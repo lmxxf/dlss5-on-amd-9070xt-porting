@@ -117,6 +117,7 @@ public:
    if(local_attention&&!wcscmp(local_attention,L"1")){
     // FAST PATH (attention fast2): E4M3 copy of the projection weights [32][32] at byte 24832.
     const wchar_t*attn2=_wgetenv(L"DLSS5_C32_ATTN_FAST2");if(attn2&&wcscmp(attn2,L"0")&&wcscmp(attn2,L"1"))throw std::runtime_error("invalid C32 attention fast2 flag");const bool attn_fast2=attn2&&!wcscmp(attn2,L"1");
+    {const wchar_t*a3=_wgetenv(L"DLSS5_C32_ATTN_FAST3");if(a3&&wcscmp(a3,L"0")&&wcscmp(a3,L"1"))throw std::runtime_error("invalid C32 attention fast3 flag");attn_fast3=attn_fast2&&a3&&!wcscmp(a3,L"1");}
     std::vector<float>packed(attn_fast2?7232:6177);unsigned char*bytes_out=reinterpret_cast<unsigned char*>(packed.data());
     // qkv fast2: E4M3 copy of the QKV weights [96][32] at byte 25856.
     if(attn_fast2){unsigned char*o8=bytes_out+25856;for(size_t i=0;i<3072;i++){float v=aw[i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 QKV weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 QKV weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
@@ -186,7 +187,7 @@ public:
     c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,main->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?main:raw;}
     const UINT tokens=width*height;const UINT g16=tokens/16;
-    c->SetPipelineState(split_pso[0]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);c->ResourceBarrier(2,uav);if(timer)timer->Mark(c,std::string(label)+"_qkv");
+    if(!attn_fast3){c->SetPipelineState(split_pso[0]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);c->ResourceBarrier(2,uav);}if(timer)timer->Mark(c,std::string(label)+"_qkv");
     if(fused_attention){c->SetPipelineState(split_pso[2]);if(wave_attention){UINT w=tokens/64;c->Dispatch(w<65535?w:65535,(w+65534)/65535,1);}else c->Dispatch(tokens/64,1,1);}
     else{
     c->SetPipelineState(split_pso[1]);c->Dispatch(tokens<65535?tokens:65535,(tokens+65534)/65535,1);c->ResourceBarrier(1,uav);
@@ -216,6 +217,6 @@ public:
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
- bool skip_finish{},wave_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
+ bool skip_finish{},wave_prefix{},attn_fast3{};void SetSkipFinish(bool v){skip_finish=v;}
  ID3D12Resource* Main()const{return main;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };
