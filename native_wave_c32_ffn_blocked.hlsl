@@ -23,6 +23,11 @@ float F(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return
 #else
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 #endif
+#if NATIVE_FAST_EPILOGUE
+// FAST PATH stage 3a: activation polynomial without intermediate f16 roundings; single RNE quantization to the FP8 grid.
+float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return Ffast(v*p);}
+#endif
 [WaveSize(32)]
 [numthreads(32,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=(gid.x+gid.y*65535u)*16,t=tid.x;if(first>=width*height)return;
@@ -36,7 +41,11 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   [unroll]for(uint block=0;block<8;block++){
    B b=B::Load(weights,block*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
    C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+#if NATIVE_FAST_EPILOGUE
+   ELEM_LOOP(h){uint2 rc=h.GetCoordinate(i);hidden[rc.x*128+block*16+rc.y]=float16_t(Activate(h.Get(i)));}
+#else
    ELEM_LOOP(h){float v=H(h.Get(i)),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);uint2 rc=h.GetCoordinate(i);hidden[rc.x*128+block*16+rc.y]=float16_t(F(H(v*p)));}
+#endif
   }
  }
  GroupMemoryBarrierWithGroupSync();

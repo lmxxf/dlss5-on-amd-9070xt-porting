@@ -14,7 +14,7 @@ foreach($Channels in 64,128,256){
   }
  }
  foreach($Entry in 'expand','contract'){
-  & $Dxc -I $Inc -T cs_6_10 -E $Entry -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D "BLOCK_N=$BlockN" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" native_wave_ffn_blocked.hlsl -Fo "native_wave_ffn_${Entry}_blocked$Suffix.cso"
+  & $Dxc -I $Inc -T cs_6_10 -E $Entry -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D "BLOCK_N=$BlockN" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" native_wave_ffn_blocked.hlsl -Fo "native_wave_ffn_${Entry}_blocked$Suffix.cso"
   if($LASTEXITCODE -ne 0){throw "Blocked FFN $Entry C$Channels compilation failed"}
  }
 }
