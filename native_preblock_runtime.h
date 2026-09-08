@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{};bool blocked_ffn_raw_store{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
@@ -36,7 +36,7 @@ class NativePreblockRuntime {
   ID3D12Resource* resources[]={a,b,c};UINT64 sizes[]={asize,bsize,csize};
   for(UINT i=0;i<3;i++){
    if(i<(finish?1u:2u)){D3D12_SHADER_RESOURCE_VIEW_DESC s{};s.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;s.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;s.Buffer.StructureByteStride=4;s.Buffer.NumElements=UINT(sizes[i]/4);if(i==0&&((stage==0&&wave_ffn_local)||(stage==3&&prefix_wave)||(stage==1&&attention_local))){s.Format=DXGI_FORMAT_R32_TYPELESS;s.Buffer.StructureByteStride=0;s.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;}device->CreateShaderResourceView(resources[i],&s,h);}
-   else{D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.StructureByteStride=4;u.Buffer.NumElements=UINT(sizes[i]/4);device->CreateUnorderedAccessView(resources[i],nullptr,&u,h);}
+   else{D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.StructureByteStride=4;u.Buffer.NumElements=UINT(sizes[i]/4);if(i==2&&blocked_ffn_raw_store&&(stage==(prefix_wave?3u:0u))){u.Format=DXGI_FORMAT_R32_TYPELESS;u.Buffer.StructureByteStride=0;u.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_RAW;}device->CreateUnorderedAccessView(resources[i],nullptr,&u,h);}
    h.ptr+=step;
   }
  }
@@ -71,6 +71,7 @@ public:
    auto*local=NativeResidentTable(device,u);u->Release();if(prefix_wave)prefix_ffn_weights=local;else{weights[0]->Release();weights[0]=local;}
   }
   root=Root(2,1,noise!=nullptr,temporal!=nullptr);finish_root=Root(1,2);
+  if(const wchar_t*rs=_wgetenv(L"DLSS5_TEST_BLOCKED_C32_FFN")){const wchar_t*ro=_wgetenv(L"DLSS5_TEST_C32_FFN_RAW_STORE");blocked_ffn_raw_store=!wcscmp(rs,L"1")&&wave_ffn_local&&ro&&!wcscmp(ro,L"1");}
   Heap(0,weights[0],weights[0]->GetDesc().Width,input,UINT64(w)*h*(raw_features?128:16),prefix_wave?raw:ffn,bytes,false);{
    // Packed attention weights (f16 QKV/projection + f32 bias/scales) read directly by wave loads.
    const wchar_t*local_attention=_wgetenv(L"DLSS5_TEST_LOCAL_C32_ATTENTION");if(local_attention&&wcscmp(local_attention,L"0")&&wcscmp(local_attention,L"1"))throw std::runtime_error("invalid local C32 attention flag");
