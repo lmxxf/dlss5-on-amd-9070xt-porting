@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**02:45～03:05（12）ViT 注意力 FP8**（`DLSS5_VIT_ATTN_FP8`，新核 `native_wave_vit_attention_fp8.hlsl` main/pack8，runner `run_vit_attn_fp8_network.ps1`）：Q/K/V 打包成 E4M3（都在 F8 网格，精确），exp 留寄存器，P 硬件 Cast 进 LDS [query][key] 字节，分母 = 滚动 f16 tile × 全 1 MMA 累加，PV FP8×FP8。每块 0.36→0.18，8 块 −1.35，逐位相同。warm 46.6，sum-of-mins 42.6。**游戏已部署 fast13**：DLL `e62e851a…`，assets `attn-fast2`（目录名沿用，内容含 ViT FP8），flag `native-game-flags-fast13.txt`（fast12 + VIT_ATTN_FP8）。链入口 `run_vit_attn_fp8_network.ps1`。
+
 **01:40～02:45（9）C32 QKV fast2**（同 `NATIVE_C32_ATTN_FAST2`）：输入累加器 Load + 硬件 Cast，FP8×FP8 QKV（host 在 25856 追加 E4M3 QKV 副本），平方和 = v² 的 f16 tile × 全 1 MMA。pre qkv 1.92→1.19、post70 1.04→0.85、探针 −36%。注意力段现在有 `_qkv` 标记。（10）**多头注意力 fast2**（`NATIVE_ATTN_FAST2`，build env `DLSS5_BUILD_ATTN_FAST2`，C64/128/256/512 同一核）：同 C32 方案，c64 探针注意力 0.154→0.114，八段合计 −0.8。（11）多头 QKV 归一化 MMA 平方和：无收益（探针 0.103→0.099），define 留着关。测试台 warm 49.4，sum-of-mins 45.1（0.03 时 55.7）。**游戏已部署 fast12**：DLL `cd03ed35…`，assets `D:\DLSSNR-Lab\attn-fast2`，flag `native-game-flags-fast12.txt`（= fast11；新刀都是编译期）。链入口 `run_attn_fast2_network.ps1`。
 
 **01:10～01:40（8）wave-matrix ds4**（`DLSS5_WAVE_C32_DS`，`native_wave_c32_ds.hlsl`，runner `run_wave_c32_ds_network.ps1`）：encoder1_4 里藏着一个 cs_5_1 标量 downsample（每线程 64×32 乘加、输入每次重读），2.79→0.06ms，**−2.7ms**。发现方式：给 encoder 每块加 `enc_c32_i` 标记后剩余的 2.8ms 只能是 ds4。PSNR 42.15/42.18。测试台 warm 51.4ms，sum-of-mins ≈ 47.8。**游戏已部署 fast11**：DLL `9b376561…`，assets `D:\DLSSNR-Lab\wave-ds`，flag `native-game-flags-fast11.txt`。
