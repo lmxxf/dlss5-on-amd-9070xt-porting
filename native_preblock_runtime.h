@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{};bool blocked_ffn_raw_store{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
@@ -36,13 +36,13 @@ class NativePreblockRuntime {
   ID3D12Resource* resources[]={a,b,c};UINT64 sizes[]={asize,bsize,csize};
   for(UINT i=0;i<3;i++){
    if(i<(finish?1u:2u)){D3D12_SHADER_RESOURCE_VIEW_DESC s{};s.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;s.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;s.Buffer.StructureByteStride=4;s.Buffer.NumElements=UINT(sizes[i]/4);if(i==0&&((stage==0&&wave_ffn_local)||(stage==3&&prefix_wave)||(stage==1&&attention_local))){s.Format=DXGI_FORMAT_R32_TYPELESS;s.Buffer.StructureByteStride=0;s.Buffer.Flags=D3D12_BUFFER_SRV_FLAG_RAW;}device->CreateShaderResourceView(resources[i],&s,h);}
-   else{D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.StructureByteStride=4;u.Buffer.NumElements=UINT(sizes[i]/4);if(i==2&&blocked_ffn_raw_store&&(stage==(prefix_wave?3u:0u))){u.Format=DXGI_FORMAT_R32_TYPELESS;u.Buffer.StructureByteStride=0;u.Buffer.Flags=D3D12_BUFFER_UAV_FLAG_RAW;}device->CreateUnorderedAccessView(resources[i],nullptr,&u,h);}
+   else{D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.StructureByteStride=4;u.Buffer.NumElements=UINT(sizes[i]/4);device->CreateUnorderedAccessView(resources[i],nullptr,&u,h);}
    h.ptr+=step;
   }
  }
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER x{};x.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;x.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&x);}
 public:
- ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(split_root)split_root->Release();for(auto*p:split_pso)if(p)p->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
+ ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(split_root)split_root->Release();for(auto*p:split_pso)if(p)p->Release();if(ffn_root)ffn_root->Release();if(stage_input)stage_input->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
  NativePreblockRuntime()=default;NativePreblockRuntime(const NativePreblockRuntime&)=delete;NativePreblockRuntime& operator=(const NativePreblockRuntime&)=delete;
  void Create(ID3D12Device*d,ID3D12Resource*input,UINT w,UINT h,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&shader_dir,bool live_profile,bool raw_features=false,const std::vector<float>*noise_table=nullptr,ID3D12Resource*temporal_input=nullptr){
   if(noise_table&&(raw_features||noise_table->size()!=size_t(3)*(1<<24)))throw std::runtime_error("invalid universal noise table");
@@ -72,6 +72,13 @@ public:
   }
   root=Root(2,1,noise!=nullptr,temporal!=nullptr);finish_root=Root(1,2);
   if(const wchar_t*rs=_wgetenv(L"DLSS5_TEST_BLOCKED_C32_FFN")){const wchar_t*ro=_wgetenv(L"DLSS5_TEST_C32_FFN_RAW_STORE");blocked_ffn_raw_store=!wcscmp(rs,L"1")&&wave_ffn_local&&ro&&!wcscmp(ro,L"1");}
+  if(blocked_ffn_raw_store){
+   // Root-descriptor binding for the blocked FFN so the matrix Store targets a raw UAV.
+   D3D12_ROOT_PARAMETER rp[3]{};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].Descriptor={0,0};rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[1].Descriptor={1,0};rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[2].Descriptor={0,0};
+   D3D12_ROOT_PARAMETER all[4]={rp[0],rp[1],rp[2],{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,5};
+   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=4;rd.pParameters=all;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&ffn_root)));rb->Release();if(re)re->Release();
+  }
+  stage_input=input;stage_input->AddRef();
   Heap(0,weights[0],weights[0]->GetDesc().Width,input,UINT64(w)*h*(raw_features?128:16),prefix_wave?raw:ffn,bytes,false);{
    // Packed attention weights (f16 QKV/projection + f32 bias/scales) read directly by wave loads.
    const wchar_t*local_attention=_wgetenv(L"DLSS5_TEST_LOCAL_C32_ATTENTION");if(local_attention&&wcscmp(local_attention,L"0")&&wcscmp(local_attention,L"1"))throw std::runtime_error("invalid local C32 attention flag");
@@ -111,11 +118,11 @@ public:
   if(wave_qkv)for(size_t i=0;i<(wave_projection?4096:3072);i++){uint32_t b;std::memcpy(&b,&aw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 QKV weights not exact normal half");}
   const wchar_t*blocked_flag=_wgetenv(L"DLSS5_TEST_BLOCKED_C32_FFN");if(blocked_flag&&wcscmp(blocked_flag,L"0")&&wcscmp(blocked_flag,L"1"))throw std::runtime_error("invalid blocked C32 FFN flag");const bool blocked_ffn=blocked_flag&&!wcscmp(blocked_flag,L"1");
   const wchar_t*local_ffn_file=blocked_ffn?L"\\native_wave_c32_ffn_blocked.cso":L"\\native_wave_c32_ffn_local.cso";
-  if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+local_ffn_file).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
+  if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+local_ffn_file).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=blocked_ffn_raw_store?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
   for(UINT i=0;i<3;i++){
    ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?local_ffn_file:L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==2&&coalesced_finish)?"finish_coalesced":(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
    if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"compile failed";if(error)error->Release();throw std::runtime_error(message);}
-   if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[i])));code->Release();
+   if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:(i==0&&blocked_ffn_raw_store&&!prefix_wave)?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[i])));code->Release();
   }
  }
  void Record(ID3D12GraphicsCommandList*c,UINT seed,bool local_oracle=false,bool temporal_enabled=false,NativeNetworkTimestamps*timer=nullptr,const char*label="c32_probe"){
@@ -132,13 +139,15 @@ public:
     c->SetPipelineState(split_pso[1]);c->Dispatch(tokens<65535?tokens:65535,(tokens+65534)/65535,1);c->ResourceBarrier(1,uav);
     c->SetPipelineState(split_pso[2]);c->Dispatch(tokens/64,1,1);c->ResourceBarrier(2,uav);
     c->SetPipelineState(split_pso[3]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);
+   }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
+    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,stage_input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,5,constants,0);c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
    }else{
    c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    }
    if(stage==0&&prefix_wave){
     Barrier(c,raw,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,std::string(label)+"_prefix");
     if(test_prefix_readback){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(test_prefix_readback,0,raw,0,4096);Barrier(c,raw,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
-    c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    if(blocked_ffn_raw_store){c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,prefix_ffn_weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,5,constants,0);}else{c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);}c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
     Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Barrier(c,ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
