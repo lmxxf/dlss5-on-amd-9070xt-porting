@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**19:06 用户游戏内确认 87.9ms 版速度更快、效果在；雨景下画面闪烁，F6 切 FSR 不闪，先搁置（光）。** 二分只做了一步（只留时序去 double 那版用户说"又变慢了"，没看闪不闪就切回来了）。待查线索：FAST_PREFIX 把噪声从表改成 ALU 生成、C32 FFN 硬件 Cast、HW_H 的 f16 denormal 处理（max_abs 0.062→0.083）。A/B 方法：按 release 目录逐步 deploy（fast-prefix 前一步是 fp8-qkv 目录），DLL 通用，flag 文件按步裁。
+
 **18:15 之后 计划第二～四步一口气做完，测试台 112 → 87.9ms，已部署待用户游戏内确认（光）。** 游戏：DLL `547853ca…6255`，assets = `D:\DLSSNR-Lab\hw-h`（累计所有快速版 cso），flag 文件 `native-game-flags-fast2.txt`（= fast-temporal + FUSED_QKV_NORMALIZE / FUSED_FFN / FP8_ACTIVATIONS / FP8_QKV_NORM / FAST_PREFIX / C32_FUSED_ATTENTION）。回退：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\fast-temporal -Flags D:\DLSSNR-Lab\native-game-flags-fast-temporal.txt`。测试台链入口 `run_hw_h_network.ps1`（叠 run_c32_ffn_fp8 → run_c32_ffn_fast2 → run_c32_fused_attention → run_fast_prefix → run_fp8_qkv_norm → run_hw_quantize → run_fp8_activations → run_fused_ffn → run_fused_qkv_normalize → run_fast_temporal → 原 fast 链），证据 release/{fused-qkv-norm,fused-ffn,fp8-act,hw-quant,fp8-qkv,fast-prefix,c32-fused,c32-ffn2,c32-ffn8,hw-h}/fast-validation.json。PSNR 对 exact 链一直在 42.1～42.2dB，没掉。
 - 每步收益（warm total，±1ms）：QKV+normalize 融合 115→104.5；expand+contract 融合 0（隐藏层本来就 FP8，流量不是瓶颈）；FP8 激活/硬件量化/FP8 QKV 合计 →99.5；preblock prefix 去 200MB 噪声表改 ALU Box-Muller 99.5→97.6（prefix 7.2→2.0ms，随机读表是真凶，不是整数 HMMA 仿真）；C32 注意力四段融两段 →95.1；C32 FFN 整块存取 →93.9，隐藏层硬件 E4M3 Cast + FP8 contract 权重 →90.0（探针证明 4.9ms 里 Activate 软件量化占 1.9、矩阵乘只 0.3）；软件 H()/F() 换硬件 f32tof16 对和位元 FP8 →87.9。
 - **教训（定量）**：这台卡上每个核的成本几乎全在逐元素标量尾巴（Get/Set + 软件舍入 + 散写），不在带宽也不在矩阵乘：C64 块 32 TFLOPS 而 C256 块 119 TFLOPS，字节减半没用，去掉一个 Ffast 就是 30%。后面所有优化只看一件事：每个元素经过多少条标量指令。
