@@ -19,6 +19,7 @@ ByteAddressBuffer hidden_f16:register(t0);
 StructuredBuffer<float> input_f32:register(t0);
 #endif
 StructuredBuffer<float> residual:register(t2);
+#define REDUCE_SRC(i) input_f32[(first+(i)/32)*INPUT_CHANNELS+k+(i)%32]
 #endif
 ByteAddressBuffer weights:register(t1);
 RWByteAddressBuffer output:register(u0);
@@ -109,6 +110,56 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #else
 // input: f16 hidden [tokens][4096]; residual f32 [tokens][1024]; output f32 [tokens][1024].
 // Four K partitions accumulated separately then combined, as in the reference.
+#ifndef NATIVE_SPLIT_K
+#define NATIVE_SPLIT_K 0
+#endif
+#if NATIVE_SPLIT_K
+// FAST PATH: the four K partitions run as separate groups (gid.z) writing f32 partials
+// [part][tokens][1024]; `combine` sums them with the scaled residual and quantizes.
+// Four times the waves in flight for a 640-token layer whose waves are otherwise 128 dependent K steps long.
+[WaveSize(32)]
+[numthreads(32,1,1)]void reduce(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16;if(first>=tokens)return;
+ [loop]for(uint part=gid.z;part<(NATIVE_SPLIT_K==2?4:gid.z+1);part++){
+  C acc[BLOCK_N];
+  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
+  [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
+#if INPUT_CHANNELS==4096
+   A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+   STAGE_A(REDUCE_SRC)
+   GroupMemoryBarrierWithGroupSync();
+   A a=LOAD_A();
+#endif
+   [unroll]for(uint n=0;n<BLOCK_N;n++){
+    uint col=(gid.y*BLOCK_N+n)*16;
+    B b=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
+    acc[n].MultiplyAccumulate(a,b);
+   }
+#if INPUT_CHANNELS!=4096
+   GroupMemoryBarrierWithGroupSync();
+#endif
+  }
+  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n].Store(output,((part*tokens+first)*1024+(gid.y*BLOCK_N+n)*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+// combine binds the partial buffer at t0 (the reduce input slot).
+#if INPUT_CHANNELS==4096
+#define PARTIAL(i) asfloat(hidden_f16.Load((i)*4))
+#else
+#define PARTIAL(i) input_f32[i]
+#endif
+[numthreads(64,1,1)]void combine(uint3 id:SV_DispatchThreadID){
+ uint idx=id.x*4;if(idx>=tokens*1024)return;uint token=idx/1024,row=idx%1024;
+ float4 v;
+ [unroll]for(uint j=0;j<4;j++){
+  float sum=H(residual[idx+j]*asfloat(weights.Load(INPUT_CHANNELS*1024*ELEM+(row+j)*4)));
+  [unroll]for(uint part=0;part<4;part++)sum+=PARTIAL((part*tokens+token)*1024+row+j);
+  v[j]=F(H(sum));
+ }
+ output.Store4(idx*4,asuint(v));
+}
+#else
 [WaveSize(32)]
 [numthreads(32,1,1)]void reduce(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16;if(first>=tokens)return;
@@ -126,7 +177,6 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #if INPUT_CHANNELS==4096
    A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
 #else
-#define REDUCE_SRC(i) input_f32[(first+(i)/32)*INPUT_CHANNELS+k+(i)%32]
    STAGE_A(REDUCE_SRC)
    GroupMemoryBarrierWithGroupSync();
    A a=LOAD_A();
@@ -161,4 +211,5 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   total[n].Store(output,(first*1024+(gid.y*BLOCK_N+n)*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
+#endif
 #endif
