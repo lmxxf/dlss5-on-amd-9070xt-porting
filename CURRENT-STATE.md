@@ -2,6 +2,14 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**09:20 游戏 DLL 已部署（光）——等用户手动进游戏验收。**
+
+- 显存：块内 scratch 共享（DLSS5_TEST_SHARED_SCRATCH：多头块的 result/scratch 走 workspace；DLSS5_TEST_SHARED_C32_SCRATCH：所有 C32 实例共用一对 ffn/raw，按首个创建者加 shift 余量定容），测试进程本地段 14.68→7.26GB，15帧exact，暖 186ms。证据 release/native-network70-shared-scratch。
+- 安装的 DLL：`native-submission-order.addon64` SHA `45fe8f29b11f8c463802884493389b737321332dfb9cc9b89804df8418d0a26a`（源码本仓库 HEAD，`bash build_native_game_verification.sh ... --tiled`）。**回退**：游戏退出后把同目录 `native-submission-order.addon64.before-fast-20260908`（SHA `b6e42d35…c903`，即 09-07 的慢速展示版）复制回去；并把 `D:\DLSSNR-Lab\native-game-tiled-assets.shaders-before-fast-20260908\` 里的 cso/hlsl 拷回 assets 目录（只有 shader 变了，权重没动）；删掉 `D:\DLSSNR-Lab\enable-game-sdk721.txt`。部署脚本 deploy_native_fast_verification.ps1（游戏运行中会拒绝执行）。
+- DLL 相比 09-07 版的两处新行为：(1) ReShade `create_device` 事件里在游戏建设备前 `SetSDKVersion(721,".\DLSS5-D3D12-721\")` + `D3D12EnableExperimentalFeatures`（游戏目录里 09-05 放的 D3D12Core.dll 仍在），由 `enable-game-sdk721.txt` 门控，结果写 `logs\native-submission-order.txt` 的 `sdk721_before_device get/set/experimental`（三个都要 00000000）；(2) 初始化时读 `D:\DLSSNR-Lab\native-game-flags.txt`（56 条 DLSS5_TEST_*，与 run_shared_scratch_network.ps1 链完全一致、ASYNC_SUBMIT 未开）写进进程环境，`logs\native-game-oneshot.txt` 里 `flags_applied=56`。
+- 怎么看：正常从 Steam 启动，`continuous-reset-preview.txt` 仍在则自动慢速连续处理（每帧 reset history），看 oneshot 日志的 render_begin→render_complete 间隔；09-07 版约 4 秒/帧，现在预期 0.3 秒量级（含读回/落盘开销，不是 186ms）。初始化仍要编译 shader，约两三分钟。**如果 sdk721 三个值有非零或出现 initialization_failed，先别猜，把日志尾巴贴过来。**
+- 显存：网络 7.26GB + 游戏 7.2GB 贴着 16GB，若 render 时间远大于 0.5 秒且日志无错，先怀疑换页。
+
 **08:35 累计（光）：暖轮 183ms（约 5.5fps），15帧exact。完整入口 `run_c32_ffn_raw_store_network.ps1`（叠在 fused-shift → c32-split → direct-attn 之上），证据 release/native-network70-c32-rawstore2/。** 四项进展：(1) 多头注意力 direct-attn2 203.5ms——新 normalize pass（每 token 一个 wave，lane=通道，用 WaveReadLaneAt 复现平方和树）输出窗口主序 f16 Q/K/V 到共享 workspace（首版每块独立分配把显存推过预算 850MB 导致换页，已改共享），注意力核 wave load 直取、只有 exp 表进 LDS：首C64 attention 1.72→0.32 + normalize 0.35；(2) C32 注意力 c32-split 184.6ms——闇的融合核拆成 qkv/normalize/attention/projection 四个 pass，用 raw（f16 [token][64] 恰好等于 f32 [token][32] 字节数）和 main（前半 v16、后半注意力输出）当暂存，零额外显存：C32 stage1 2.80→1.69、preblock 12.2→7.4、post70 19.8→15.5；(3) fused-shift 183.8——pack/crop 折进 body（f16 pack 直接读 raster、FFN 残差映射读、注意力投影映射写 raster），exact 但只 −1ms，散射写抵消了省下的拷贝；(4) C32 FFN：矩阵 Store 经描述符表 raw UAV 得到垃圾（release/native-network70-c32-rawstore/failed-*），改走根描述符后 exact 但中性（183.2）。C32 FFN 每 token 5ns 的成本仍无解释，需要 RGP。
 
 **进游戏前的硬阻塞：显存。** 测试进程本地段 14.68GB / 预算 14.86GB，全是每块各自分配的中间 scratch（C64 一块约 300MB×8、C128 ×12、C256 ×16、C32 各 283MB×7、preblock/post70 全分辨率各 1.1GB+）。游戏本身要 7.2GB，叠上去必换页，FPS 没意义。需要把块内 scratch（padded/result/scratch/qkv_raw/matrix_input/qkv_norm、C32 的 ffn/raw/main/down）改成串行共享，只保留 decoder 需要的各段跳接输出常驻；估计能压到 5GB 上下。另外游戏 DLL 里没有 env，需要从配置文件读 flag 再 _wputenv，且新 cso 要一并放进 assets 目录。

@@ -219,10 +219,25 @@ static DWORD WINAPI worker(void*){
  // Do not retry an existing-hook conflict or modify another addon's hook.
  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu hook_status=%u\n",GetCurrentProcessId(),unsigned(s));fclose(f);}return s==MH_OK?0:4;
 }
+// Before the game creates its D3D12 device: select the private Agility 721 runtime shipped in
+// the game folder and enable the experimental shader-model feature so SM6.10 wave-matrix PSOs
+// can be created on the game device. Gated by D:\DLSSNR-Lab\enable-game-sdk721.txt.
+static bool on_create_device(reshade::api::device_api api,uint32_t&){
+ if(api!=reshade::api::device_api::d3d12||GetFileAttributesW(LR"(D:\DLSSNR-Lab\enable-game-sdk721.txt)")==INVALID_FILE_ATTRIBUTES)return false;
+ static std::atomic<bool>attempted{false};if(attempted.exchange(true))return false;
+ const GUID clsid={0x7cda6aca,0xa03e,0x49c8,{0x94,0x58,0x03,0x34,0xd2,0x0e,0x07,0xce}};
+ using GetInterfaceFn=HRESULT(WINAPI*)(REFCLSID,REFIID,void**);HMODULE d3d=GetModuleHandleW(L"d3d12.dll");auto get_interface=d3d?reinterpret_cast<GetInterfaceFn>(GetProcAddress(d3d,"D3D12GetInterface")):nullptr;
+ ID3D12SDKConfiguration*configuration=nullptr;HRESULT get=get_interface?get_interface(clsid,IID_PPV_ARGS(&configuration)):HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND),set=E_ABORT,experimental=E_ABORT;
+ if(SUCCEEDED(get)){set=configuration->SetSDKVersion(721,".\\DLSS5-D3D12-721\\");configuration->Release();}
+ if(SUCCEEDED(set)){const GUID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};experimental=D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr);}
+ if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu sdk721_before_device get=%08x set=%08x experimental=%08x\n",GetCurrentProcessId(),unsigned(get),unsigned(set),unsigned(experimental));fclose(f);}
+ return false;
+}
 BOOL WINAPI DllMain(HINSTANCE h,DWORD reason,LPVOID){
  if(reason==DLL_PROCESS_ATTACH){
   DisableThreadLibraryCalls(h);wchar_t path[MAX_PATH]{};GetModuleFileNameW(nullptr,path,MAX_PATH);
   if(!wcsstr(path,L"SB-Win64-Shipping.exe")||!reshade::register_addon(h))return FALSE;
+  reshade::register_event<reshade::addon_event::create_device>(on_create_device);
   reshade::register_event<reshade::addon_event::close_command_list>(close_list);
   reshade::register_event<reshade::addon_event::execute_command_list>(execute);
   reshade::register_event<reshade::addon_event::dispatch>(compute);

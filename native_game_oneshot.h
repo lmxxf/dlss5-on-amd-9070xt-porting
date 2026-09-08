@@ -3,6 +3,8 @@
 #include "native_submitted_readback.h"
 #include "native_frame_input_check.h"
 #include <atomic>
+#include <cstring>
+#include <string>
 #include <cstdio>
 // Diagnostic milestone: one real game frame with explicit history reset.
 // Not the final temporal renderer. Failed initialization/render is never retried.
@@ -30,6 +32,10 @@ class NativeGameOneShot {
    self->frame=new NativeGameFrame;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
    Log("build_mode","tiled verification; separate assets; reset-history only");
+   // Runtime path selection: NAME=VALUE lines (DLSS5_TEST_* only) applied to the process
+   // environment before the network is created, mirroring the validated test runner chain.
+   {unsigned applied=0;if(FILE*flags=_wfopen(LR"(D:\DLSSNR-Lab\native-game-flags.txt)",L"rb")){char line[256];while(fgets(line,sizeof line,flags)){size_t n=strlen(line);while(n&&(line[n-1]=='\n'||line[n-1]=='\r'||line[n-1]==' '))line[--n]=0;if(n<12||strncmp(line,"DLSS5_TEST_",11)||!strchr(line,'='))continue;if(!_putenv(line))applied++;}fclose(flags);}
+    Log("flags_applied",std::to_string(applied).c_str());}
    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-game-tiled-assets)");
 #else
    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-color-frame-samegpu)");
