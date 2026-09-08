@@ -46,20 +46,46 @@ using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::Matr
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
 uint attn_base(){return runtime_width*runtime_height*32*2;} // byte offset of the attention output inside aux
 
+#ifndef NATIVE_C32_FUSED
+#define NATIVE_C32_FUSED 0
+#endif
 #if PASS==0
 groupshared float16_t tile[512];
+#if NATIVE_C32_FUSED
+// FAST PATH: qkv + normalize in one wave. Row square sums via LDS, q/k scaled and
+// FP8-quantized in registers, stored as f16 with coalesced matrix stores.
+groupshared float squares[2*512];
+groupshared float inv[2*16];
+#endif
 [WaveSize(32)]
 [numthreads(32,1,1)]void qkv(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=(gid.x+gid.y*65535u)*16;if(first>=runtime_width*runtime_height)return;
  for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(F(input[first*32+i]));
  GroupMemoryBarrierWithGroupSync();
  A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_C32_FUSED
+ C z[6];
+ [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+  B b=B::Load(weights,(part*1024+cr*16*32)*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+  z[part*2+cr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+ }
+ [unroll]for(uint h=0;h<2;h++)[unroll]for(uint cr=0;cr<2;cr++)for(uint i=0;i<z[h*2+cr].Length();i++){uint2 rc=z[h*2+cr].GetCoordinate(i);float v=z[h*2+cr].Get(i);squares[h*512+rc.x*32+cr*16+rc.y]=v*v;}
+ GroupMemoryBarrierWithGroupSync();
+ {const uint h=tid.x/16,r=tid.x%16;float ss=0;[unroll]for(uint c=0;c<32;c++)ss+=squares[h*512+r*32+c];inv[h*16+r]=rsqrt(max(ss,6.198883056640625e-5))*(h==0?W_SCALE:1);}
+ GroupMemoryBarrierWithGroupSync();
+ [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+  C t=z[part*2+cr];
+  if(part<2){for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,Ffast(t.Get(i)*inv[part*16+rc.x]));}t.Cast<dx::linalg::ComponentType::F16>().Store(qk,(first*64+part*32+cr*16)*2,128,dx::linalg::MatrixLayout::RowMajor,16);}
+  else{for(uint i=0;i<t.Length();i++)t.Set(i,Ffast(H(t.Get(i))));t.Cast<dx::linalg::ComponentType::F16>().Store(aux,(first*32+cr*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);}
+ }
+#else
  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
   B b=B::Load(weights,(part*1024+cr*16*32)*2,64,dx::linalg::MatrixLayout::ColMajor,16);
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
   if(part<2){for(uint i=0;i<z.Length();i++)z.Set(i,H(z.Get(i)));z.Cast<dx::linalg::ComponentType::F16>().Store(qk,(first*64+part*32+cr*16)*2,128,dx::linalg::MatrixLayout::RowMajor,16);}
   else{for(uint i=0;i<z.Length();i++)z.Set(i,F(H(z.Get(i))));z.Cast<dx::linalg::ComponentType::F16>().Store(aux,(first*32+cr*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);}
  }
+#endif
 }
 #elif PASS==1
 [WaveSize(32)]
@@ -84,6 +110,12 @@ groupshared float16_t tile[512];
 #elif PASS==2
 groupshared float16_t ex[4096];
 groupshared float softmax_inverse[64];
+#ifndef NATIVE_C32_FUSED
+#define NATIVE_C32_FUSED 0
+#endif
+#if NATIVE_C32_FUSED
+groupshared float16_t attn[64*32];
+#endif
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint window=gid.x,t=tid.x;if(window*64>=runtime_width*runtime_height)return;
@@ -145,8 +177,28 @@ groupshared float softmax_inverse[64];
 #else
   for(uint i=0;i<acc.Length();i++)acc.Set(i,F(acc.Get(i)));
 #endif
+#if NATIVE_C32_FUSED
+  // FAST PATH: projection fused. Stage the window's attention output (64x32 f16) in LDS, then
+  // each wave projects its 16 queries x 16 output channels and applies the residual.
+  acc.Cast<dx::linalg::ComponentType::F16>().Store(attn,qr*16*32+col,32,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  const uint cr=col_start,first=base+qr*16;
+  A aa=A::Load(attn,qr*16*32,32,dx::linalg::MatrixLayout::RowMajor);
+  B bb=B::Load(weights,6144+cr*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+  C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
+  for(uint i=0;i<z.Length();i++){
+   uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
+   float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));
+   z.Set(i,RAW_OUTPUT?result:F(result));
+  }
+  z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+#else
   acc.Cast<dx::linalg::ComponentType::F16>().Store(aux,attn_base()+((base+qr*16)*32+col)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
  }
+#endif
 }
 #else
 [WaveSize(32)]
