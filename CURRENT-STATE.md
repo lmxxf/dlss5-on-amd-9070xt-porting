@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**11:09 快速版阶段 1 用户游戏内确认：效果在、无异常，约 6fps（日志 avg_ms_per_frame=164）。** tag `0.01` = exact 终点（186ms）。阶段 1（DLSS5_FAST_ACCUMULATE=1 编译期宏，入口 run_fast_accumulate_network.ps1，证据 release/fast-accumulate/fast-validation.json）：所有 wave 矩阵 GEMM 去掉每 K32 一次的软件 H()，硬件 FP32 累加跑完整 K、末尾 H 一次；测试台 186→159.8ms，对 exact 链 PSNR 42.6dB、max 0.055、≥4/255 像素 3.8%。游戏 assets 已同步快速版 shader（同名覆盖），回 exact：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\native-network70-shared-scratch`。误差报告工具 compare_fast_output.py，测试程序 DLSS5_TEST_ALLOW_INEXACT=1 不再因不一致中止。
+
 **09:00 用户进游戏确认：画面连贯，约 5fps（光）。** 首版 DLL（45fe8f…）画面一帧神经一帧默认闪烁——老诊断模式每 250ms 轮询只替换一帧；游戏内 render_begin→render_complete 稳定 187ms，与测试台一致，无换页。第二版 DLL（SHA `934b3d5e1b9515c591ebbfbed809deb722f038a1f67b94af8fcf17a658af28d6`，当前安装）加 `continuous-every-frame.txt` 每帧同步模式：每个 FSR 帧都跑网络回写，首帧后不读回不落盘，日志每 100 帧一行 `every_frame avg_ms_per_frame`。仍每帧 reset history，时序累积未做。回退方法同上。
 
 **08:32 之后（钟点以下一条用户消息的时间戳为准）游戏 DLL 已部署（光）——等用户手动进游戏验收。**
