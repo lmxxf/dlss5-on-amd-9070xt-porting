@@ -7,6 +7,52 @@ StructuredBuffer<uint> reciprocal_table : register(t2);
 #endif
 RWStructuredBuffer<float4> reconstructed : register(u0);
 cbuffer Geometry : register(b0) { uint width; uint height; uint count; float inverse_width; float inverse_height; }
+#ifndef NATIVE_FAST_TEMPORAL
+#define NATIVE_FAST_TEMPORAL 0
+#endif
+#if NATIVE_FAST_TEMPORAL
+// Fast path: same five-tap cross kernel, float arithmetic only. No fixed-point
+// UV/weight quantization, no double accumulation, no reciprocal table.
+void axis(float p,uint extent,out float3 positions,out float3 weights) {
+#if NORMALIZED_COORDINATES
+    float scaled_p=p*float(extent);
+#else
+    float scaled_p=p;
+#endif
+    float center=floor(scaled_p-.5)+.5;
+    float t=saturate(scaled_p-center);
+    float t2=t*t,t3=t2*t;
+    float left=t2-.5*(t+t3);
+    float middle=1.5*t3-2.5*t2+1;
+    float right=.5*(t3-t2);
+    float other=1-left-middle-right;
+    float sum=middle+other;
+    float position=mad(other,1.0/sum,center);
+    positions=clamp(float3(center-1,position,center+2),.5,float(extent)-.5);
+    weights=float3(left,sum,right);
+}
+float3 fetch(float2 xy) {
+    float2 p=clamp(xy-.5,0,float2(width-1,height-1));
+    uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(width-1,height-1));
+    float2 f=p-float2(lo);
+    float3 top=lerp(history[lo.y*width+lo.x].xyz,history[lo.y*width+hi.x].xyz,f.x);
+    float3 bottom=lerp(history[hi.y*width+lo.x].xyz,history[hi.y*width+hi.x].xyz,f.x);
+    return lerp(top,bottom,f.y);
+}
+[numthreads(64,1,1)]
+void main(uint3 id:SV_DispatchThreadID) {
+    if(id.x>=count)return;
+    float3 px,py,wx,wy;axis(coordinates[id.x].x,width,px,wx);axis(coordinates[id.x].y,height,py,wy);
+    float top=wx.y*wy.x,left=wx.x*wy.y,center=wx.y*wy.y,bottom=wx.y*wy.z,right=wx.z*wy.y;
+    float3 result=fetch(float2(px.y,py.x))*top;
+    result=mad(fetch(float2(px.x,py.y)),left,result);
+    result=mad(fetch(float2(px.y,py.y)),center,result);
+    result=mad(fetch(float2(px.y,py.z)),bottom,result);
+    result=mad(fetch(float2(px.z,py.y)),right,result);
+    float total=left+top+center+bottom+right;
+    reconstructed[id.x]=float4(result/total,1);
+}
+#else
 float temporal_reciprocal(float x) {
 #if TEMPORAL_RECIPROCAL_TABLE
     if(x>=.5&&x<2.0) {
@@ -105,3 +151,4 @@ void main(uint3 id:SV_DispatchThreadID) {
     precise float reciprocal=temporal_reciprocal(total);
     reconstructed[id.x]=float4(result*reciprocal,1);
 }
+#endif

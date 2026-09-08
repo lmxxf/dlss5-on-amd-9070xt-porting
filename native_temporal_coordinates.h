@@ -2,6 +2,9 @@
 #include "native_device_identity.h"
 #include "native_rgb_reflect.h"
 #include <cmath>
+// DLSS5_FAST_TEMPORAL=1: float bilinear temporal passes (no fixed-point/double
+// bit-exact reproduction). Inexact by design; only for the fast chain.
+inline bool NativeFastTemporal(){const wchar_t*f=_wgetenv(L"DLSS5_FAST_TEMPORAL");if(f&&wcscmp(f,L"0")&&wcscmp(f,L"1"))throw std::runtime_error("invalid fast temporal flag");return f&&!wcscmp(f,L"1");}
 // No slot18 path. HWC float2 output is pixel centers by default, optionally UV;
 // callers must select the same convention on the downstream sampler.
 class NativeTemporalCoordinates {
@@ -24,7 +27,8 @@ public:
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=UINT64(pw)*ph*8;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&output)));
   D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,16};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=3;desc.pParameters=p;
   ID3DBlob*code=nullptr,*error=nullptr;auto hr=D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&code,&error);if(error)error->Release();ck(hr);ck(d->CreateRootSignature(0,code->GetBufferPointer(),code->GetBufferSize(),IID_PPV_ARGS(&root)));code->Release();code=nullptr;error=nullptr;
-  D3D_SHADER_MACRO macros[]={{"NORMALIZED_COORDINATES",normalized_coordinates?"1":"0"},{nullptr,nullptr}};hr=CompileNativeShader(dir+L"\\native_temporal_coordinates.hlsl",macros,"main",&code,&error);if(error)error->Release();ck(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));code->Release();
+  const bool fast=NativeFastTemporal();
+  D3D_SHADER_MACRO macros[]={{"NORMALIZED_COORDINATES",normalized_coordinates?"1":"0"},{"NATIVE_FAST_TEMPORAL",fast?"1":"0"},{nullptr,nullptr}};hr=CompileNativeShader(dir+L"\\native_temporal_coordinates.hlsl",macros,"main",&code,&error);if(error)error->Release();ck(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));code->Release();
  }
  void Record(ID3D12GraphicsCommandList*c){
   if(!pso||!c)throw std::runtime_error("motion coordinate pass unavailable");if(recorded)transition(c,true);

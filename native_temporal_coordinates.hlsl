@@ -8,6 +8,20 @@ cbuffer Geometry : register(b0) {
     float motion_extent_x; float motion_extent_y; float motion_uv_scale_x; float motion_uv_scale_y;
     float valid_inverse_width; float valid_inverse_height; float motion_inverse_width; float motion_inverse_height;
 }
+#ifndef NATIVE_FAST_TEMPORAL
+#define NATIVE_FAST_TEMPORAL 0
+#endif
+#if NATIVE_FAST_TEMPORAL
+// Fast path: plain float bilinear, no 21-bit UV / 8-bit weight quantization, no double.
+float2 fetch_motion(float2 uv) {
+    float2 p=clamp(uv*float2(motion_width,motion_height)-.5,0,float2(motion_width-1,motion_height-1));
+    uint2 lo=uint2(floor(p)),hi=min(lo+1,uint2(motion_width-1,motion_height-1));
+    float2 f=p-float2(lo);
+    float2 top=lerp(motion[lo.y*motion_width+lo.x].xy,motion[lo.y*motion_width+hi.x].xy,f.x);
+    float2 bottom=lerp(motion[hi.y*motion_width+lo.x].xy,motion[hi.y*motion_width+hi.x].xy,f.x);
+    return lerp(top,bottom,f.y);
+}
+#else
 float2 fetch_motion(float2 uv) {
     precise float2 fixed_uv=floor(uv*2097152.0);
     precise float2 pixel=fixed_uv*(float2(motion_width,motion_height)/2097152.0)-.5;
@@ -25,6 +39,7 @@ float2 fetch_motion(float2 uv) {
     v+=double2(motion[hi.y*motion_width+hi.x].xy)*double(w.w);
     return float2(v);
 }
+#endif
 [numthreads(64,1,1)]
 void main(uint3 id:SV_DispatchThreadID) {
     if(id.x>=processing_width*processing_height)return;
@@ -37,9 +52,13 @@ void main(uint3 id:SV_DispatchThreadID) {
     precise float2 motion_reciprocal=float2(motion_inverse_width,motion_inverse_height);
     sample_uv=sample_uv*motion_reciprocal;
     float2 vectors=fetch_motion(sample_uv);
+#if NATIVE_FAST_TEMPORAL
+    float2 previous_uv=mad(vectors,float2(motion_uv_scale_x,motion_uv_scale_y),uv);
+#else
     precise float2 previous_uv=float2(
         float(fma(double(vectors.x),double(motion_uv_scale_x),double(uv.x))),
         float(fma(double(vectors.y),double(motion_uv_scale_y),double(uv.y))));
+#endif
 #if NORMALIZED_COORDINATES
     coordinates[id.x]=previous_uv;
 #else
