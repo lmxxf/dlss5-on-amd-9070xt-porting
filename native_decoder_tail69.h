@@ -25,13 +25,13 @@ public:
    std::vector<float>v(size_t(bytes)/4);f.seekg(0);if(!f.read((char*)v.data(),bytes))throw std::runtime_error("short decoder coefficient");return v;
   };
   auto*source=input48;
-  for(UINT i=0;i<7;i++){c256[i].Create(d,source,w,h,NativeDecoderShift(49+i),read(49+i,L"ffn"),read(49+i,L"attention"),dir,false,256,false,workspace);source=c256[i].Output();}
+  for(UINT i=0;i<7;i++){c256[i].Create(d,source,w,h,NativeDecoderShift(49+i),read(49+i,L"ffn"),read(49+i,L"attention"),dir,false,256,false,workspace,i>0,i<6);source=c256[i].Output();}
   project56.Create(d,source,skip14,w*h,256,128,false,read(56,L"weights"),dir,true);
-  body56.Create(d,project56.Output(),w*2,h*2,NativeDecoderShift(56),read(56,L"ffn"),read(56,L"attention"),dir,false,128,false,workspace);source=body56.Output();
-  for(UINT i=0;i<5;i++){c128[i].Create(d,source,w*2,h*2,NativeDecoderShift(57+i),read(57+i,L"ffn"),read(57+i,L"attention"),dir,false,128,false,workspace);source=c128[i].Output();}
+  body56.Create(d,project56.Output(),w*2,h*2,NativeDecoderShift(56),read(56,L"ffn"),read(56,L"attention"),dir,false,128,false,workspace,false,true);source=body56.Output();
+  for(UINT i=0;i<5;i++){c128[i].Create(d,source,w*2,h*2,NativeDecoderShift(57+i),read(57+i,L"ffn"),read(57+i,L"attention"),dir,false,128,false,workspace,true,i<4);source=c128[i].Output();}
   project62.Create(d,source,skip8,w*h*4,128,64,false,read(62,L"weights"),dir,true);
-  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace);source=body62.Output();
-  for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64,false,workspace);source=c64[i].Output();}
+  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace,false,true);source=body62.Output();
+  for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64,false,workspace,true,i<2);source=c64[i].Output();}
   project66.Create(d,source,skip4,w*h*16,64,32,false,read(66,L"weights"),dir,true);
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");const bool chain=c32_mapped&&!wcscmp(c32_mapped,L"1");
   for(UINT i=0;i<4;i++){NativeC32Stage&stage=i?c32[i-1]:body66;const NativeC32Stage*prev=i>1?&c32[i-2]:i==1?&body66:nullptr;

@@ -22,7 +22,24 @@ ByteAddressBuffer input:register(t0);
 StructuredBuffer<float> input:register(t0);
 #endif
 ByteAddressBuffer weights:register(t1);
+#ifndef NATIVE_FP8_FEATURE
+#define NATIVE_FP8_FEATURE 0
+#endif
+#ifndef NATIVE_FP8_STORE
+#define NATIVE_FP8_STORE 0
+#endif
+#if NATIVE_FP8_FEATURE
+// FAST PATH: residual stream stored as E4M3 bytes.
+ByteAddressBuffer feature8:register(t2);
+float FromE4M3(uint b){uint e=(b>>3)&15u,m=b&7u;float v=e?asfloat(((e+120u)<<23)|(m<<20)):float(m)*0.001953125;return (b&0x80u)?-v:v;}
+float FeatureAt(uint index){return FromE4M3((feature8.Load(index&~3u)>>((index&3u)*8u))&255u);}
+#else
 StructuredBuffer<float> feature:register(t2);
+float FeatureAt(uint index){return feature[index];}
+#endif
+#if NATIVE_FP8_STORE
+groupshared uint otile[BLOCK_N*64];
+#endif
 RWByteAddressBuffer output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint raster_height;uint pad_x;uint pad_y;}
 #ifndef MAP_FEATURE
@@ -68,9 +85,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;acc[n]=C::Splat(0.0f);
 #if MAP_FEATURE
-  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;int src=raster_index(first+rc.x);float f=src<0?0:feature[uint(src)+row];acc[n].Set(i,H(f*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;int src=raster_index(first+rc.x);float f=src<0?0:FeatureAt(uint(src)+row);acc[n].Set(i,H(f*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
 #else
-  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(feature[(first+rc.x)*MATRIX_CHANNELS+row]*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(FeatureAt((first+rc.x)*MATRIX_CHANNELS+row)*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
 #endif
  }
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
@@ -105,11 +122,21 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #elif !RAW
   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,F(acc[n].Get(i)));
 #endif
-#if MAP_OUTPUT
+#if NATIVE_FP8_STORE && MAP_OUTPUT
+  // E4M3 tile staged in LDS (16 rows x 16 bytes = 4 uints per row), then 4-channel stores into the cropped raster.
+  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,n*64,4,dx::linalg::MatrixLayout::RowMajor);
+#elif NATIVE_FP8_STORE
+  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#elif MAP_OUTPUT
   // Write the cropped raster directly; border tokens are dropped (the crop never read them).
   for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);int dst=raster_index(first+rc.x);if(dst>=0)output.Store(uint(dst+int((gid.y*BLOCK_N+n)*16+rc.y))*4,asuint(acc[n].Get(i)));}
 #else
   acc[n].Store(output,(first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16)*4,MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
 #endif
  }
+#if NATIVE_FP8_STORE && MAP_OUTPUT
+ GroupMemoryBarrierWithGroupSync();
+ // BLOCK_N tiles x 16 rows x 4 uints = 256 uints; each lane stores 8, one row of one tile per pair of lanes.
+ [unroll]for(uint k=0;k<BLOCK_N*64/32;k++){uint slot=k*32+tid.x,n=slot/64,row=(slot%64)/4,q=slot%4;int dst=raster_index(first+row);if(dst>=0)output.Store(uint(dst)+(gid.y*BLOCK_N+n)*16+q*4,otile[n*64+row*4+q]);}
+#endif
 }

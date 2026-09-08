@@ -1,7 +1,15 @@
 #ifndef MATRIX_CHANNELS
 #define MATRIX_CHANNELS 256
 #endif
+#ifndef NATIVE_FP8_SOURCE
+#define NATIVE_FP8_SOURCE 0
+#endif
+#if NATIVE_FP8_SOURCE
+// FAST PATH: the source raster is already E4M3 bytes; the mapped pack is a byte gather.
+ByteAddressBuffer input8:register(t0);
+#else
 StructuredBuffer<float> input:register(t0);
+#endif
 RWByteAddressBuffer output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint raster_height;uint pad_x;uint pad_y;}
 // E4M3 bits of an FP8-lattice value (exact by construction; ties cannot occur).
@@ -18,7 +26,11 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #else
  uint src=q;
 #endif
+#if NATIVE_FP8_SOURCE
+ output.Store(q*4,input8.Load(src*4));
+#else
  output.Store(q*4,E4M3(input[src*4])|(E4M3(input[src*4+1])<<8)|(E4M3(input[src*4+2])<<16)|(E4M3(input[src*4+3])<<24));
+#endif
 #else
  uint n=id.x+id.y*4194240u;if(n>=width*height*(MATRIX_CHANNELS/2))return;
 #if MAPPED_INPUT
