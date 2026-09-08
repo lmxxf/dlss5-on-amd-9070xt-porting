@@ -94,8 +94,11 @@ public:
    if(q!=queue)throw std::runtime_error("one-shot queue changed");
    if(every_frame&&request>1){
     // Steady state: no readback, no files; one log line per 100 frames with the average interval.
+    // Temporal alignment probe: dump history/motion/color/warped at frames 300 and 600 while the user pans the camera.
+    if(every_frame_count==299||every_frame_count==599){wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\temporal-probe-%lu-%lu)",GetCurrentProcessId(),every_frame_count+1);frame->RequestTemporalDump(prefix);Log("temporal_dump_requested",std::to_string(every_frame_count+1).c_str());}
     frame->RebindSourceAfterCompletion(source);
     frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
+    // Temporal alignment probe: dump history/motion/color at frames 300 and 600 while the user pans the camera.
     auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);every_frame_tick=now;}
     if(every_frame_count==1)every_frame_tick=now;
     phase=4;return;
