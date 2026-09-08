@@ -76,9 +76,11 @@ public:
   const wchar_t*all_resident=_wgetenv(L"DLSS5_TEST_RESIDENT_WEIGHTS");
   if((weight_flag&&!wcscmp(weight_flag,L"1"))||(all_resident&&!wcscmp(all_resident,L"1")))for(auto*&w:weights){auto*local=NativeResidentTable(device,w);w->Release();w=local;}
   if(wave_ffn_local||prefix_wave){
-   std::vector<float>packed(4096+32);
+   // Layout: expand f16 [128][32] @0, contract f16 [32][128] @8192, residual scale f32[32] @16384, contract E4M3 [32][128] @16512 (fast path).
+   std::vector<float>packed(4096+32+1024);
    for(size_t i=0;i<8192;i++){uint32_t bits;std::memcpy(&bits,&fw[512+i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m)h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
    std::memcpy(packed.data()+4096,fw.data()+8704,128);
+   {unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data())+16512;for(size_t i=0;i<4096;i++){float v=fw[4608+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
    auto*u=Buffer(packed.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(u->Map(0,&none,&p));std::memcpy(p,packed.data(),packed.size()*4);u->Unmap(0,nullptr);
    auto*local=NativeResidentTable(device,u);u->Release();if(prefix_wave)prefix_ffn_weights=local;else{weights[0]->Release();weights[0]=local;}
   }
