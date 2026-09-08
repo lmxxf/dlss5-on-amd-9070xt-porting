@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**20:17 用户确认 12～13fps；继续到 70.8ms，已部署（光）。** C32 stage 的 FFN 核按 shift 映射直接读上一块的 Main()（工作网格光栅序）或首块的光栅源，pack 全省、中间块 crop 省（DLSS5_C32_MAPPED_INPUT=1 + 编译 DLSS5_BUILD_C32_MAPPED_INPUT）；收益比预期小（tail 段 −1.8，encoder 段没动，总 −0.5）。踩坑 3：pre 块的 FFN 走描述符表根签名，只给 5 个常量，shader 读第 6 个常量 map_mode 读到垃圾 → 28dB；三条根签名都扩到 13。试过失败：C32 注意力 exp 表改矩阵整块存 LDS（无收益，已回退）；FFN 映射用 LDS + barrier 比 wave 广播慢 0.7ms@2.2M。游戏：DLL `c04c65e1…ddd1`，assets = `D:\DLSSNR-Lab\c32-mapped`，flag `native-game-flags-fast5.txt`（= fast4 + DLSS5_C32_MAPPED_INPUT=1）。链入口 `run_c32_mapped_input_network.ps1`。
+
 **19:44 用户确认 12fps；继续到 71.3ms，已部署（光）。** ViT：pack8/pack16 一次性操作数副本（expand/qkv/投影不再每 K 步 LDS 重排）、expand/contract/qkv 每 wave 4 个 token tile 共用权重加载（权重流量 /4，DLSS5_VIT_BLOCK_M=4；1024 投影的 m4 变体结果不对未查，投影固定不用）。游戏：DLL `7627d75e…474e`，assets = `D:\DLSSNR-Lab\vit-m4`，flag `native-game-flags-fast4.txt`（= fast3 + DLSS5_VIT_PACKED_INPUT=1 + DLSS5_VIT_BLOCK_M=4）。回退到 74.9 版：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\split-w4 -Flags D:\DLSSNR-Lab\native-game-flags-fast3.txt`（DLL 也要换回 b9d9c9f5，在 native-game-fast.addon64 之前的备份里没有——需要时重编 tag 前一 commit）。链入口 `run_vit_block_m_network.ps1`。踩坑 2：runner 里用字面量替换生成编译行，字面量没匹配上就静默漏掉 -D，结果核按单 tile 编译却按四分之一组数派发。
 
 **继续到 74.9ms，已部署（光）。** C512 注意力（native_c64.hlsl attention, CHANNELS=512）编译期换硬件 H + 位元 F（79.1）；C512 ffwd 改每组 4 wave 分块并行（split_stage0 0.289→0.077，74.9）。游戏 assets = `D:\DLSSNR-Lab\split-w4`，DLL 和 flag 同 fast3（`b9d9c9f5…`，native-game-flags-fast3.txt）。链入口 `run_split_ffwd_waves4_network.ps1`。剩余大头：C32 家族（encoder1_4 9.4、post70 6.6、preblock 9、tail 约 10）、C512 注意力 16×0.31、ViT 8×1.3、多头 Swin 约 12。
