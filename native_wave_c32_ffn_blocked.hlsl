@@ -45,7 +45,10 @@ int source_index(uint p){
  if(map_mode==1)return int((uint(sy)*src_width+uint(sx))*32);
  // Main() of the previous stage is row-major over its (shifted) work grid.
  uint px=uint(sx)+prev_shift_x,py=uint(sy)+prev_shift_y;
- return int((py*prev_work_width+px)*32);
+ if(map_mode==2)return int((py*prev_work_width+px)*32);
+ // Mode 3 (FAST PATH 3 chain): the previous stage's raw tiles (tile-major over its work grid, unquantized);
+ // the FFN quantizes for both the A operand and the residual, so the previous finish stage can be skipped.
+ uint ptile=(py/8)*(prev_work_width/8)+px/8;return int((ptile*64+(py%8)*8+px%8)*32);
 }
 #endif
 groupshared float16_t prefix[512],hidden[2048];
@@ -125,6 +128,14 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   }
   GroupMemoryBarrierWithGroupSync();
   C acc[2];
+#if NATIVE_C32_MAPPED_INPUT
+  [branch]if(map_mode==3){
+   // Residual = F(input)*scale as three E4M3 MMAs on the quantized tile (scale = s0+s1+s2, diagonals packed at byte 24704).
+   acc[0]=C::Splat(0.0f);acc[1]=C::Splat(0.0f);
+   A8 q=A8::Load(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
+   [unroll]for(uint block=0;block<2;block++)[unroll]for(uint part=0;part<3;part++){B8 d=B8::Load(weights,24704+(block*3+part)*512,16,dx::linalg::MatrixLayout::RowMajor,16);acc[block].MultiplyAccumulate(q,d);}
+  }else
+#endif
   ELEM_LOOP(acc[0]){uint2 rc=acc[0].GetCoordinate(i);acc[0].Set(i,in0.Get(i)*asfloat(weights.Load(16384+rc.y*4)));acc[1].Set(i,in1.Get(i)*asfloat(weights.Load(16384+64+rc.y*4)));}
   for(uint g=0;g<4;g++){
    A8 a=A8::Load(hidden8,g*8,32,dx::linalg::MatrixLayout::RowMajor);

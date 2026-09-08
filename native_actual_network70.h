@@ -40,8 +40,9 @@ public:
   pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
   const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");if(c32_mapped&&wcscmp(c32_mapped,L"0")&&wcscmp(c32_mapped,L"1")&&wcscmp(c32_mapped,L"2"))throw std::runtime_error("invalid mapped C32 flag");
+  const wchar_t*cr=_wgetenv(L"DLSS5_C32_CHAIN_RAW");if(cr&&wcscmp(cr,L"0")&&wcscmp(cr,L"1"))throw std::runtime_error("invalid C32 chain raw flag");const bool chain_raw=cr&&!wcscmp(cr,L"1");
   for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir);
-   if(c32_mapped&&!wcscmp(c32_mapped,L"1")){if(i)c32[i].ChainFrom(c32[i-1]);else c32[i].MapFromRaster(source);if(i)c32[i-1].SetCropNeeded(false);}else if(c32_mapped&&!wcscmp(c32_mapped,L"2")&&i==0)c32[i].MapFromRaster(source);
+   if(c32_mapped&&!wcscmp(c32_mapped,L"1")){if(i){if(chain_raw){c32[i].ChainFromRaw(c32[i-1]);c32[i-1].SetSkipFinish(true);}else c32[i].ChainFrom(c32[i-1]);}else c32[i].MapFromRaster(source);if(i)c32[i-1].SetCropNeeded(false);}else if(c32_mapped&&!wcscmp(c32_mapped,L"2")&&i==0)c32[i].MapFromRaster(source);
    source=c32[i].Output();}
   ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
   auto group=[&](NativeC64Shift*layers,UINT count,UINT first,UINT w,UINT h,UINT channels,NativeC32Downsample&ds){

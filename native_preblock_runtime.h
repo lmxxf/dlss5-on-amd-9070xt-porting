@@ -79,11 +79,16 @@ public:
    // Layout: expand f16 [128][32] @0, contract f16 [32][128] @8192, residual scale f32[32] @16384, contract E4M3 [32][128] @16512 (fast path).
    // FAST PATH 3 (NATIVE_C32_FFN_FAST3): E4M3 copy of the expand weights [128][32] at byte 20608 (tile-contiguous when DLSS5_C32_TILED_WEIGHTS=1).
    const wchar_t*fast3_flag=_wgetenv(L"DLSS5_C32_FFN_FAST3");if(fast3_flag&&wcscmp(fast3_flag,L"0")&&wcscmp(fast3_flag,L"1"))throw std::runtime_error("invalid C32 FFN fast3 flag");const bool fast3=fast3_flag&&!wcscmp(fast3_flag,L"1");
-   std::vector<float>packed(4096+32+1024+(fast3?1024:0));
+   std::vector<float>packed(4096+32+1024+(fast3?1024+768:0));
    for(size_t i=0;i<8192;i++){uint32_t bits;std::memcpy(&bits,&fw[512+i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m)h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
    std::memcpy(packed.data()+4096,fw.data()+8704,128);
    {unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data())+16512;for(size_t i=0;i<4096;i++){float v=fw[4608+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 contract weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
-   if(fast3){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data())+20608;for(size_t i=0;i<4096;i++){float v=fw[512+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 expand weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 expand weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
+   if(fast3){
+    // Residual diagonals for the raw-tile chain (mode 3): per 16-column block three 32x16 E4M3 matrices at 24704, scale=s0+s1+s2.
+    unsigned char*diag=reinterpret_cast<unsigned char*>(packed.data())+24704;std::memset(diag,0,3072);
+    auto e4m3r=[](float v,float&decoded)->uint8_t{uint32_t b;std::memcpy(&b,&v,4);uint8_t sg=uint8_t((b>>24)&0x80u);float m=std::fabs(v);if(m<0.015625f){float q=std::nearbyint(m*512.f);if(q>7)q=7;decoded=(sg?-1.f:1.f)*q/512.f;return uint8_t(sg|uint8_t(q));}if(m>=448.f)throw std::runtime_error("C32 residual scale out of FP8 range");int e=int(std::floor(std::log2(m)));float step=std::ldexp(1.f,e-3);float q=std::nearbyint(m/step);if(q==16){q=8;e++;step*=2.f;}if(e+7<1||e+7>15)throw std::runtime_error("C32 residual scale part out of FP8 range");decoded=(sg?-1.f:1.f)*q*step;return uint8_t(sg|((e+7)<<3)|(uint8_t(q)&7));};
+    for(size_t j=0;j<32;j++){float r=fw[8704+j];for(int part=0;part<3;part++){float dec;uint8_t byte=e4m3r(r,dec);r-=dec;diag[((j/16)*3+part)*512+j*16+(j%16)]=byte;}}
+    unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data())+20608;for(size_t i=0;i<4096;i++){float v=fw[512+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 expand weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 expand weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
    if(const wchar_t*tw=_wgetenv(L"DLSS5_C32_TILED_WEIGHTS")){if(wcscmp(tw,L"0")&&wcscmp(tw,L"1"))throw std::runtime_error("invalid C32 tiled weights flag");if(!wcscmp(tw,L"1")){
     // FAST PATH (NATIVE_C32_TILED_WEIGHTS): expand f16 tiles [block][k 32][j 16] at block*1024; contract E4M3 tiles [block][g][k 32][j 16] at 16512+(block*4+g)*512.
     unsigned char*base=reinterpret_cast<unsigned char*>(packed.data());std::vector<unsigned char>t(8192);
@@ -162,13 +167,15 @@ public:
   if(!device||!c)throw std::runtime_error("native preblock not created");
   if(shared_c32){
    if(SharedFfnReadable()){Barrier(c,ffn,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedFfnReadable()=false;}
-   if(SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   // Mode 3 mapping reads the (shared) raw tiles of the previous stage in the FFN; keep them readable until the attention stage.
+   if(SharedRawReadable()&&!(mapping[0]==3&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(recorded)for(auto*r:{main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   }else if(recorded)for(auto*r:{ffn,raw,main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
    if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
+   if(stage==1&&shared_c32&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(stage==1&&split_attention){
     c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,main->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?main:raw;}
