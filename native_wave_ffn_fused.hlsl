@@ -13,6 +13,9 @@ cbuffer Geometry:register(b0){uint width;uint height;}
 RWByteAddressBuffer output:register(u0);
 #define HIDDEN (4*MATRIX_CHANNELS)
 #define WAVES (MATRIX_CHANNELS/16)
+#ifndef NATIVE_TILED_WEIGHTS
+#define NATIVE_TILED_WEIGHTS 0
+#endif
 #define OPERAND dx::linalg::ComponentType::F8_E4M3FN
 #ifndef NATIVE_HW_H
 #define NATIVE_HW_H 0
@@ -44,7 +47,11 @@ groupshared uint hidden[16*HIDDEN/4];
    A a=A::Load(input,gid.x*16*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
    [unroll]for(uint n=0;n<4;n++){
     uint col=(wave*4+n)*16;
+#if NATIVE_TILED_WEIGHTS
+    B b=B::Load(weights,((col/16)*(MATRIX_CHANNELS/32)+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
     B b=B::Load(weights,col*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
     if(g==0)acc[n]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);else acc[n].MultiplyAccumulate(a,b);
    }
   }
@@ -65,7 +72,11 @@ groupshared uint hidden[16*HIDDEN/4];
   const uint col=wave*16;
   [loop]for(uint g=0;g<HIDDEN/32;g++){
    A a=A::Load(hidden,g*32/4,HIDDEN/4,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_TILED_WEIGHTS
+   B b=B::Load(weights,HIDDEN*MATRIX_CHANNELS+((col/16)*(HIDDEN/32)+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,HIDDEN*MATRIX_CHANNELS+col*HIDDEN+g*32,HIDDEN,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    acc.MultiplyAccumulate(a,b);
   }
 #if !(NATIVE_HW_QUANTIZE&&NATIVE_FP8_OUTPUT)

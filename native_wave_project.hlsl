@@ -28,6 +28,12 @@ ByteAddressBuffer weights:register(t1);
 #ifndef NATIVE_FP8_STORE
 #define NATIVE_FP8_STORE 0
 #endif
+#ifndef NATIVE_DIRECT_CAST
+#define NATIVE_DIRECT_CAST 0
+#endif
+#ifndef NATIVE_MATRIX_RESIDUAL
+#define NATIVE_MATRIX_RESIDUAL 0
+#endif
 #if NATIVE_FP8_FEATURE
 // FAST PATH: residual stream stored as E4M3 bytes.
 ByteAddressBuffer feature8:register(t2);
@@ -47,6 +53,9 @@ cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint rast
 #endif
 #ifndef MAP_OUTPUT
 #define MAP_OUTPUT 0
+#endif
+#if NATIVE_MATRIX_RESIDUAL && (!NATIVE_FP8_FEATURE || MAP_FEATURE || !NATIVE_FP8_OPERANDS)
+#error NATIVE_MATRIX_RESIDUAL needs E4M3 residual bytes, FP8 operands and no MAP_FEATURE
 #endif
 // Padded token -> raster index, or -1 for border tokens.
 int raster_index(uint p){int x=int(p%width)-int(pad_x),y=int(p/width)-int(pad_y);if(x<0||y<0||x>=int(raster_width)||y>=int(raster_height))return -1;return int((uint(y)*raster_width+uint(x))*MATRIX_CHANNELS);}
@@ -82,6 +91,19 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 [numthreads(32,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16;if(first>=width*height)return;
  C acc[BLOCK_N];
+#if NATIVE_MATRIX_RESIDUAL
+ // FAST PATH: residual feature*scale as MMAs. A = E4M3 feature tile of the 32-channel group, B = three E4M3
+ // diagonal matrices whose sum is the f16 scale (packed by the host after the f32 scales).
+ [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
+ [unroll]for(uint gg=0;gg<(BLOCK_N*16+31)/32;gg++){
+  uint g=(gid.y*BLOCK_N*16)/32+gg;
+  A af=A::Load(feature8,first*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint n=0;n<BLOCK_N;n++){
+   uint col=(gid.y*BLOCK_N+n)*16;if(col/32!=g)continue;
+   [unroll]for(uint p=0;p<3;p++){B s=B::Load(weights,MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+MATRIX_CHANNELS*4+((col/16)*3+p)*512,16,dx::linalg::MatrixLayout::RowMajor,16);acc[n].MultiplyAccumulate(af,s);}
+  }
+ }
+#else
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;acc[n]=C::Splat(0.0f);
 #if MAP_FEATURE
@@ -90,6 +112,7 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(FeatureAt((first+rc.x)*MATRIX_CHANNELS+row)*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
 #endif
  }
+#endif
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
 #if NATIVE_FP8_INPUT
   A a=A::Load(input,first*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
@@ -117,7 +140,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #endif
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
-#if NATIVE_FAST_ACCUMULATE
+#if NATIVE_FAST_ACCUMULATE && NATIVE_FP8_STORE && NATIVE_DIRECT_CAST
+  // FAST PATH: the E4M3 Cast below is the quantizer; skip the per-element F(H()) pass (drops the intermediate f16 rounding).
+#elif NATIVE_FAST_ACCUMULATE
   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,RAW?H(acc[n].Get(i)):F(H(acc[n].Get(i))));
 #elif !RAW
   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,F(acc[n].Get(i)));

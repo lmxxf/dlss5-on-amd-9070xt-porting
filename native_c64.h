@@ -8,7 +8,7 @@
 class NativeC64 {
  NativeMatrixWorkspace*workspace{};
  ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{},wave_scores{};
- ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{},fp8_ffn{},fp8_qkv{},fused_qkv_normalize{},fused_ffn{},fp8_activations{},fp8_qkv_norm{},fp8_stream{},input_fp8{},output_fp8{};ID3D12PipelineState*fp8_pack_mapped_src8_pso{};ID3D12PipelineState*fp8_pack_pso{},*fp8_pack_mapped_pso{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
+ ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{},ffn_tiled_weights{},fp8_ffn{},fp8_qkv{},fused_qkv_normalize{},fused_ffn{},fp8_activations{},fp8_qkv_norm{},fp8_stream{},input_fp8{},output_fp8{};ID3D12PipelineState*fp8_pack_mapped_src8_pso{};ID3D12PipelineState*fp8_pack_pso{},*fp8_pack_mapped_pso{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
  ID3D12Resource*input{};ID3D12Resource*weights[2]{};ID3D12Resource*result[3]{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[3]{};UINT geometry[2]{},channel_count{64};bool recorded{};
  ID3D12Resource*scratch[2]{};ID3D12PipelineState*split_pso[3]{};bool split_ffn{},tiled_contract{},tiled_expand{},tiled_projection{};
@@ -47,7 +47,14 @@ public:
    // FAST PATH stage 2: FFN expand/contract weights as E4M3 bytes (matrix values are on the FP8 grid; scales stay f32 elsewhere).
    auto e4m3=[](float v)->uint8_t{uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a)return sg;float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("FFN weight not FP8-representable");return uint8_t(sg|uint8_t(q));}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("FFN weight not FP8-representable");return uint8_t(sg|(e<<3)|((a>>20)&7));};
    std::vector<float>packed(8ull*channels*channels/4);unsigned char*out=reinterpret_cast<unsigned char*>(packed.data());
-   for(size_t i=0;i<8ull*channels*channels;i++)out[i]=e4m3(fw[i]);
+   if(const wchar_t*tw=_wgetenv(L"DLSS5_FFN_TILED_WEIGHTS")){if(wcscmp(tw,L"0")&&wcscmp(tw,L"1"))throw std::runtime_error("invalid tiled weights flag");ffn_tiled_weights=!wcscmp(tw,L"1")&&fused_ffn;}
+   if(ffn_tiled_weights){
+    // FAST PATH: B tiles contiguous (32 K-rows x 16 N-cols bytes, row-major) so each wave-matrix B load is one 512-byte block.
+    // Expand: tile (t over HIDDEN/16, g over C/32) at (t*(C/32)+g)*512; contract: after HIDDEN*C, tile (t over C/16, g over HIDDEN/32).
+    const size_t hidden=4ull*channels;
+    for(size_t t=0;t<hidden/16;t++)for(size_t g=0;g<channels/32;g++)for(size_t k=0;k<32;k++)for(size_t j=0;j<16;j++)out[(t*(channels/32)+g)*512+k*16+j]=e4m3(fw[(t*16+j)*channels+g*32+k]);
+    for(size_t t=0;t<channels/16;t++)for(size_t g=0;g<hidden/32;g++)for(size_t k=0;k<32;k++)for(size_t j=0;j<16;j++)out[hidden*channels+(t*(hidden/32)+g)*512+k*16+j]=e4m3(fw[hidden*channels+(t*16+j)*hidden+g*32+k]);
+   }else for(size_t i=0;i<8ull*channels*channels;i++)out[i]=e4m3(fw[i]);
    matrix_weights=Buffer(d,packed.size()*4,&packed);
   }else if(matrix_expand){
    std::vector<float>packed((wave_contract?8:4)*channels*channels/2);
@@ -69,8 +76,13 @@ public:
    const size_t matrix=size_t(channels)*channels,heads=channels/32;
    const float*sources[2]={fw.data()+8*matrix,aw.data()+3*matrix};const float*scales[2]={fw.data()+9*matrix,aw.data()+4*matrix+heads*4096+heads};
    for(UINT k=0;k<2;k++){
-    std::vector<float>packed(fp8_ffn?matrix/4+channels:matrix/2+channels);
-    if(fp8_ffn){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data());for(size_t i=0;i<matrix;i++){float v=sources[k][i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}std::memcpy(packed.data()+matrix/4,scales[k],channels*4);}
+    // FAST PATH (NATIVE_MATRIX_RESIDUAL): after the f32 scales, per 16-column block three 32x16 E4M3 diagonal
+    // matrices (row-major, K rows of 16 bytes) so the residual feature*scale becomes three MMAs; scale = s0+s1+s2.
+    std::vector<float>packed(fp8_ffn?matrix/4+channels+channels*24:matrix/2+channels);
+    if(fp8_ffn){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data());
+     auto e4m3=[](float v,float&decoded)->uint8_t{uint32_t b;std::memcpy(&b,&v,4);uint8_t sg=uint8_t((b>>24)&0x80u);float m=std::fabs(v);if(m<0.015625f){float q=std::nearbyint(m*512.f);if(q>7)q=7;decoded=(sg?-1.f:1.f)*q/512.f;return uint8_t(sg|uint8_t(q));}if(m>=448.f)throw std::runtime_error("residual scale out of FP8 range");int e=int(std::floor(std::log2(m)));float step=std::ldexp(1.f,e-3);float q=std::nearbyint(m/step);if(q==16){q=8;e++;step*=2.f;}if(e+7<1||e+7>15)throw std::runtime_error("residual scale part out of FP8 range");decoded=(sg?-1.f:1.f)*q*step;return uint8_t(sg|((e+7)<<3)|(uint8_t(q)&7));};
+     unsigned char*diag=o8+matrix+channels*4;std::memset(diag,0,channels*96);
+     for(size_t j=0;j<channels;j++){float s=scales[k][j],r=s;for(int p=0;p<3;p++){float dec;uint8_t byte=e4m3(r,dec);r-=dec;size_t cb=j/16,kk=(j%32),jj=j%16;diag[(cb*3+p)*512+kk*16+jj]=byte;}}for(size_t i=0;i<matrix;i++){float v=sources[k][i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}std::memcpy(packed.data()+matrix/4,scales[k],channels*4);}
     else{for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("projection weight not exact normal half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
     std::memcpy(packed.data()+matrix/2,scales[k],channels*4);}
     project_weights[k]=Buffer(d,packed.size()*4,&packed);
