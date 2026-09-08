@@ -20,6 +20,10 @@ ByteAddressBuffer weights:register(t0);
 // Requires FAST2 + FP8 and the root-descriptor (raw store) binding; only the identity mapping (map_mode 0) takes this path.
 ByteAddressBuffer input_bytes:register(t1);
 #define input_at(i) asfloat(input_bytes.Load((i)*4))
+// Mode 4 (post70 merge fold): input = low-res main [pixel/4][32], skip = full-res residual, merge_w = 64 coefficients;
+// value = H(H(low*w[c]) + skip*w[32+c]) exactly as native_post70.hlsl merge, computed in the gather instead of a pass.
+ByteAddressBuffer skip_bytes:register(t2);
+ByteAddressBuffer merge_w:register(t3);
 #else
 StructuredBuffer<float> input:register(t1);
 #define input_at(i) input[i]
@@ -42,7 +46,7 @@ int source_index(uint p){
  uint tile=p/64,x=(tile%(width/8))*8+p%8,y=(tile/(width/8))*8+(p%64)/8;
  int sx=int(x)-int(shift_x),sy=int(y)-int(shift_y);
  if(sx<0||sy<0||sx>=int(src_width)||sy>=int(src_height))return -1;
- if(map_mode==1)return int((uint(sy)*src_width+uint(sx))*32);
+ if(map_mode==1||map_mode==4)return int((uint(sy)*src_width+uint(sx))*32);
  // Main() of the previous stage is row-major over its (shifted) work grid.
  uint px=uint(sx)+prev_shift_x,py=uint(sy)+prev_shift_y;
  if(map_mode==2)return int((py*prev_work_width+px)*32);
@@ -105,7 +109,14 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   }else{
    // Mapped source: gather the 16 token rows into LDS (lane j<16 resolves token j once), then load them as accumulators.
    const int mine=t<16?source_index(first+t):0;
+   [branch]if(map_mode==4){
+    const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));
+    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=0;
+     if(src>=0){uint p=uint(src)/32,low=(((p/src_width)/2)*(src_width/2)+(p%src_width)/2)*32+t;v=f16tof32(f32tof16(f16tof32(f32tof16(input_at(low)*w0))+asfloat(skip_bytes.Load((uint(src)+t)*4))*w1));}
+     raw[j*32+t]=v;}
+   }else{
    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:input_at(uint(src)+t);}
+   }
    GroupMemoryBarrierWithGroupSync();
    in0=C::Load(raw,0,32,dx::linalg::MatrixLayout::RowMajor);in1=C::Load(raw,16,32,dx::linalg::MatrixLayout::RowMajor);
   }

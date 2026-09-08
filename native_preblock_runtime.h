@@ -105,8 +105,10 @@ public:
   if(blocked_ffn_raw_store){
    // Root-descriptor binding for the blocked FFN so the matrix Store targets a raw UAV.
    D3D12_ROOT_PARAMETER rp[3]{};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].Descriptor={0,0};rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[1].Descriptor={1,0};rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[2].Descriptor={0,0};
-   D3D12_ROOT_PARAMETER all[4]={rp[0],rp[1],rp[2],{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,13};
-   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=4;rd.pParameters=all;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&ffn_root)));rb->Release();if(re)re->Release();
+   D3D12_ROOT_PARAMETER all[6]={rp[0],rp[1],rp[2],{},{},{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,13};
+   // Mode 4 merge fold: t2 = skip residual, t3 = merge coefficients (root SRVs, bound only when mapping[0]==4).
+   all[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;all[4].Descriptor={2,0};all[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;all[5].Descriptor={3,0};
+   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=6;rd.pParameters=all;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&ffn_root)));rb->Release();if(re)re->Release();
   }
   stage_input=input;stage_input->AddRef();
   Heap(0,weights[0],weights[0]->GetDesc().Width,input,UINT64(w)*h*(raw_features?128:16),prefix_wave?raw:ffn,bytes,false);{
@@ -192,7 +194,7 @@ public:
     c->SetPipelineState(split_pso[3]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);
     }
    }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
-    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if(mapping[0]==4){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
    }else{
    c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_prefix){UINT n=width*height/16;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    }
@@ -209,6 +211,8 @@ public:
  void CapturePrefixForTest(ID3D12Resource*r){if(!prefix_wave||test_prefix_readback||!r||r->GetDesc().Width<4096)throw std::runtime_error("prefix capture test contract");D3D12_HEAP_PROPERTIES hp{};D3D12_HEAP_FLAGS flags{};Check(r->GetHeapProperties(&hp,&flags));if(hp.Type!=D3D12_HEAP_TYPE_READBACK)throw std::runtime_error("prefix capture requires readback");test_prefix_readback=r;r->AddRef();}
  ID3D12Resource* FfnTilesForTest()const{return ffn;}
  // FAST PATH: the FFN reads its input through a mapping instead of a pre-packed work buffer (see native_wave_c32_ffn_blocked.hlsl).
+ ID3D12Resource*merge_skip{},*merge_coeff{};
+ void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff,UINT src_w,UINT src_h,UINT sx,UINT sy){MapInput(low,4,src_w,src_h,sx,sy,0,0,0);merge_skip=skip;merge_coeff=coeff;}
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.

@@ -30,6 +30,7 @@ public:
  }
  // FAST PATH (DLSS5_C32_MAPPED_INPUT): the body FFN reads the raster source (first block) or the previous
  // stage's tile-major output directly; the pack pass is skipped, and the crop only runs where Output() is consumed.
+ void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff){body.MapMerge(low,skip,coeff,geometry[0],geometry[1],geometry[4],geometry[5]);mapped=true;}
  void MapFromRaster(ID3D12Resource*src){body.MapInput(src,1,geometry[0],geometry[1],geometry[4],geometry[5],0,0,0);mapped=true;}
  void ChainFrom(const NativeC32Stage&prev){if(prev.geometry[0]!=geometry[0]||prev.geometry[1]!=geometry[1])throw std::runtime_error("C32 chain geometry");body.MapInput(prev.body.Main(),2,geometry[0],geometry[1],geometry[4],geometry[5],prev.geometry[4],prev.geometry[5],prev.geometry[2]);mapped=true;}
  void SetCropNeeded(bool needed){crop_needed=needed;}
