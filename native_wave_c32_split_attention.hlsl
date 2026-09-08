@@ -36,6 +36,11 @@ float half_add_preserving_midpoint(float a,float b){
  return H(sum);
 }
 float fast_exp(float x){float a=clamp(H(x*.044921875+1.30078125),1.03125,1.5693359375);uint b=f32tof16(a);return f16tof32(((b<<5)+0x8000u)&65535u);}
+#if NATIVE_FAST_ATTENTION
+// FAST PATH stage 3b: scalar segments without intermediate f16 roundings.
+float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+float fast_exp_raw(float x){float a=clamp(x*.044921875+1.30078125,1.03125,1.5693359375);uint b=f32tof16(a);return f16tof32(((b<<5)+0x8000u)&65535u);}
+#endif
 using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
 using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
@@ -61,6 +66,12 @@ groupshared float16_t tile[512];
 [numthreads(32,1,1)]void normalize(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint p=gid.x+gid.y*65535u;if(p>=runtime_width*runtime_height)return;uint c=tid.x;
  float q=float(qk.Load<float16_t>((p*64+c)*2)),k=float(qk.Load<float16_t>((p*64+32+c)*2));
+#if NATIVE_FAST_ATTENTION
+ float q0=WaveActiveSum(q*q),k0=WaveActiveSum(k*k);
+ float qi=rsqrt(max(q0,6.198883056640625e-5)),ki=rsqrt(max(k0,6.198883056640625e-5)),scale=W_SCALE;
+ qk.Store<float16_t>((p*64+c)*2,float16_t(Ffast(q*qi*scale)));
+ qk.Store<float16_t>((p*64+32+c)*2,float16_t(Ffast(k*ki)));
+#else
  float qs=NativeHalfSquarePair(q,WaveReadLaneAt(q,c+16)),ks=NativeHalfSquarePair(k,WaveReadLaneAt(k,c+16));
  {float a=WaveReadLaneAt(qs,c*2),b=WaveReadLaneAt(qs,c*2+1);float ka=WaveReadLaneAt(ks,c*2),kb=WaveReadLaneAt(ks,c*2+1);qs=H(a+b);ks=H(ka+kb);}
  [unroll]for(uint step=4;step>0;step/=2){float a=WaveReadLaneAt(qs,c+step),b=WaveReadLaneAt(ks,c+step);qs=H(qs+a);ks=H(ks+b);}
@@ -68,6 +79,7 @@ groupshared float16_t tile[512];
  float qi=H(rsqrt(max(q0,6.198883056640625e-5))),ki=H(rsqrt(max(k0,6.198883056640625e-5))),scale=H(W_SCALE);
  qk.Store<float16_t>((p*64+c)*2,float16_t(F(H(H(q*qi)*scale))));
  qk.Store<float16_t>((p*64+32+c)*2,float16_t(F(H(k*ki))));
+#endif
 }
 #elif PASS==2
 groupshared float16_t ex[4096];
@@ -88,11 +100,21 @@ groupshared float softmax_inverse[64];
    uint kr=col_start+j*2;
    for(uint i=0;i<s[j].Length();i++){
     uint2 rc=s[j].GetCoordinate(i);uint query=qr*16+rc.x,key=kr*16+rc.y;
+#if NATIVE_FAST_ATTENTION
+    ex[query*64+key]=float16_t(fast_exp_raw(s[j].Get(i)+W_BIAS(query*64+key)));
+#else
     ex[query*64+key]=float16_t(fast_exp(H(s[j].Get(i)+W_BIAS(query*64+key))));
+#endif
    }
   }
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_FAST_ATTENTION
+ {uint query=t/4,part=t%4;float sum=0;[unroll]for(uint j=0;j<16;j++)sum+=float(ex[query*64+part*16+j]);
+  sum+=WaveReadLaneAt(sum,(t&31)^1);sum+=WaveReadLaneAt(sum,(t&31)^2);if(part==0)softmax_inverse[query]=1/sum;}
+ GroupMemoryBarrierWithGroupSync();
+ for(uint i=t;i<4096;i+=256)ex[i]=float16_t(Ffast(float(ex[i])*softmax_inverse[i/64]));
+#else
  if(t<64){
   float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
    float total=0;[unroll]for(uint lane=0;lane<4;lane++){
@@ -104,6 +126,7 @@ groupshared float softmax_inverse[64];
  }
  GroupMemoryBarrierWithGroupSync();
  for(uint i=t;i<4096;i+=256)ex[i]=float16_t(F(H(float(ex[i])*softmax_inverse[i/64])));
+#endif
  GroupMemoryBarrierWithGroupSync();
  {
   uint col=col_start*16;C acc=C::Splat(0.0f);
@@ -135,7 +158,11 @@ groupshared float softmax_inverse[64];
   C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
   for(uint i=0;i<z.Length();i++){
    uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;
+#if NATIVE_FAST_ATTENTION
+   float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));
+#else
    float result=half_add_preserving_midpoint(z.Get(i),H(input[p*32+c]*W_RESIDUAL(c)));
+#endif
    z.Set(i,RAW_OUTPUT?result:F(result));
   }
   z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);

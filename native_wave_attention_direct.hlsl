@@ -22,6 +22,11 @@ cbuffer Geometry:register(b0){uint width;uint height;}
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
 #include "native_half_square.hlsli"
+#if NATIVE_FAST_ATTENTION
+// FAST PATH stage 3b: attention scalar segments without intermediate f16 roundings.
+float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+float fast_exp_raw(float x){float a=clamp(x*.044921875+1.30078125,1.03125,1.5693359375);uint b=f32tof16(a);return f16tof32(((b<<5)+0x8000u)&65535u);}
+#endif
 uint window_pixel(uint window,uint token){return ((window/(width/8))*8+token/8)*width+(window%(width/8))*8+token%8;}
 
 #if DIRECT_NORMALIZE
@@ -33,6 +38,14 @@ RWByteAddressBuffer packed:register(u0);
  uint n=gid.x+gid.y*65535u;if(n>=width*height*HEADS)return;
  uint window=n/(64*HEADS),rest=n%(64*HEADS),token=rest/HEADS,head=rest%HEADS,p=window_pixel(window,token),c=tid.x;
  float q=feature[p*STRIDE+head*32+c],k=feature[p*STRIDE+CHANNELS+head*32+c],v=feature[p*STRIDE+2*CHANNELS+head*32+c];
+#if NATIVE_FAST_ATTENTION
+ float q0=WaveActiveSum(q*q),k0=WaveActiveSum(k*k);
+ float qi=rsqrt(max(q0,6.198883056640625e-5)),ki=rsqrt(max(k0,6.198883056640625e-5)),scale=weights[SCALE_OFFSET+head];
+ uint base=(window*64+token)*STRIDE+head*32+c;
+ packed.Store<float16_t>(base*2,float16_t(Ffast(q*qi*scale)));
+ packed.Store<float16_t>((base+CHANNELS)*2,float16_t(Ffast(k*ki)));
+ packed.Store<float16_t>((base+2*CHANNELS)*2,float16_t(Ffast(v)));
+#else
  float qs=NativeHalfSquarePair(q,WaveReadLaneAt(q,c+16)),ks=NativeHalfSquarePair(k,WaveReadLaneAt(k,c+16));
  {float a=WaveReadLaneAt(qs,c*2),b=WaveReadLaneAt(qs,c*2+1);float ka=WaveReadLaneAt(ks,c*2),kb=WaveReadLaneAt(ks,c*2+1);qs=H(a+b);ks=H(ka+kb);}
  [unroll]for(uint step=4;step>0;step/=2){float a=WaveReadLaneAt(qs,c+step),b=WaveReadLaneAt(ks,c+step);qs=H(qs+a);ks=H(ks+b);}
@@ -42,6 +55,7 @@ RWByteAddressBuffer packed:register(u0);
  packed.Store<float16_t>(base*2,float16_t(F(H(H(q*qi)*scale))));
  packed.Store<float16_t>((base+CHANNELS)*2,float16_t(F(H(k*ki))));
  packed.Store<float16_t>((base+2*CHANNELS)*2,float16_t(F(v)));
+#endif
 }
 #else
 RWStructuredBuffer<float> output:register(u0);
@@ -67,13 +81,24 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    uint kr=col_start+j*2;
    for(uint i=0;i<s[j].Length();i++){
     uint2 rc=s[j].GetCoordinate(i);uint query=qr*16+rc.x,key=kr*16+rc.y;
+#if NATIVE_FAST_ATTENTION
+    ex[query*64+key]=float16_t(fast_exp_raw(s[j].Get(i)+weights[4*MATRIX+head*4096+query*64+key]));
+#else
     float score=H(s[j].Get(i)+weights[4*MATRIX+head*4096+query*64+key]);
     uint bits=f32tof16(clamp(H(score*.044921875+1.30078125),1.03125,1.5693359375));
     ex[query*64+key]=float16_t(f16tof32(((bits<<5)+0x8000u)&65535u));
+#endif
    }
   }
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_FAST_ATTENTION
+ // Four lanes per query sum 16 exps each in f32; the wave combines them.
+ {uint query=t/4,part=t%4;float sum=0;[unroll]for(uint j=0;j<16;j++)sum+=float(ex[query*64+part*16+j]);
+  sum+=WaveReadLaneAt(sum,(t&31)^1);sum+=WaveReadLaneAt(sum,(t&31)^2);if(part==0)softmax_inverse[query]=1/sum;}
+ GroupMemoryBarrierWithGroupSync();
+ for(uint i=t;i<4096;i+=256)ex[i]=float16_t(Ffast(float(ex[i])*softmax_inverse[i/64]));
+#else
  if(t<64){
   float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
    float total=0;[unroll]for(uint lane=0;lane<4;lane++){
@@ -85,6 +110,7 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  }
  GroupMemoryBarrierWithGroupSync();
  for(uint i=t;i<4096;i+=256)ex[i]=float16_t(F(H(float(ex[i])*softmax_inverse[i/64])));
+#endif
  GroupMemoryBarrierWithGroupSync();
  {
   uint col=col_start*16;
