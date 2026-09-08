@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "native_resident_table.h"
 #include "native_split.h"
 class NativeVitLinear {
@@ -37,7 +38,16 @@ public:
    weights->Release();weights=buffer(d,packed.size()*4,&packed);
    blocked=true;chunk_values=tokens*out;
   }
-  if(wave_expand||wave_reduce){
+  const wchar_t*fp8_flag=_wgetenv(L"DLSS5_FP8_OPERANDS");const wchar_t*fp8_hidden=_wgetenv(L"DLSS5_FP8_HIDDEN");const wchar_t*fp8_lds=_wgetenv(L"DLSS5_FP8_LDS");
+  // Weights are E4M3 when the kernel that consumes them uses FP8 operands: reduce(4096) follows the hidden format, expand/reduce(1024) follow the LDS staging flag.
+  const bool fp8=(wave_reduce&&inputs==4096)?(fp8_hidden&&!wcscmp(fp8_hidden,L"1")):((wave_expand||wave_reduce)&&fp8_lds&&!wcscmp(fp8_lds,L"1"));
+  if(fp8){
+   // FAST PATH stage 2: E4M3 weight bytes followed by the f32 residual scales (reduce only).
+   size_t matrix_values=size_t(inputs)*out;std::vector<float>packed(matrix_values/4+(wave_reduce?out:0));unsigned char*outb=reinterpret_cast<unsigned char*>(packed.data());
+   for(size_t i=0;i<matrix_values;i++){float v=coefficients[i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){outb[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("ViT weight not FP8-representable");outb[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("ViT weight not FP8-representable");outb[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}
+   if(wave_reduce)std::memcpy(packed.data()+matrix_values/4,coefficients.data()+matrix_values,out*4);
+   weights->Release();weights=nullptr;weights=buffer(d,packed.size()*4,&packed);
+  }else if(wave_expand||wave_reduce){
    size_t matrix_values=size_t(inputs)*out;std::vector<float>packed(matrix_values/2+(wave_reduce?out:0));
    for(size_t i=0;i<matrix_values;i++){uint32_t bits;std::memcpy(&bits,&coefficients[i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m){int e=int(m>>23)-112;if(e<=0||e>=31||(m&0x1fff))throw std::runtime_error("ViT expand weight not exact half");h|=uint16_t((e<<10)|((m&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
    if(wave_reduce)std::memcpy(packed.data()+matrix_values/2,coefficients.data()+matrix_values,out*4);

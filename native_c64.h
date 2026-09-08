@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "native_resident_table.h"
 #include "native_preblock_runtime.h"
 #include "native_shader_cache.h"
@@ -7,7 +8,7 @@
 class NativeC64 {
  NativeMatrixWorkspace*workspace{};
  ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{},wave_scores{};
- ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
+ ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{},fp8_ffn{};ID3D12PipelineState*fp8_pack_pso{},*fp8_pack_mapped_pso{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
  ID3D12Resource*input{};ID3D12Resource*weights[2]{};ID3D12Resource*result[3]{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[3]{};UINT geometry[2]{},channel_count{64};bool recorded{};
  ID3D12Resource*scratch[2]{};ID3D12PipelineState*split_pso[3]{};bool split_ffn{},tiled_contract{},tiled_expand{},tiled_projection{};
@@ -19,7 +20,7 @@ class NativeC64 {
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,bool begin){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,begin?D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE:D3D12_RESOURCE_STATE_UNORDERED_ACCESS,begin?D3D12_RESOURCE_STATE_UNORDERED_ACCESS:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);}
 public:
  NativeC64()=default;NativeC64(const NativeC64&)=delete;
- ~NativeC64(){if(qkv_weights)qkv_weights->Release();if(qkv_raw)qkv_raw->Release();if(qkv_pso)qkv_pso->Release();if(matrix_input)matrix_input->Release();if(pack_pso)pack_pso->Release();if(matrix_weights)matrix_weights->Release();for(auto*r:project_weights)if(r)r->Release();if(qkv_norm)qkv_norm->Release();if(normalize_pso)normalize_pso->Release();if(raster_input)raster_input->Release();if(raster_output)raster_output->Release();if(mapped_pack_pso)mapped_pack_pso->Release();for(auto*p:mapped_project_pso)if(p)p->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();for(auto*r:scratch)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();for(auto*p:split_pso)if(p)p->Release();}
+ ~NativeC64(){if(qkv_weights)qkv_weights->Release();if(qkv_raw)qkv_raw->Release();if(qkv_pso)qkv_pso->Release();if(matrix_input)matrix_input->Release();if(pack_pso)pack_pso->Release();if(matrix_weights)matrix_weights->Release();for(auto*r:project_weights)if(r)r->Release();if(qkv_norm)qkv_norm->Release();if(normalize_pso)normalize_pso->Release();if(fp8_pack_pso)fp8_pack_pso->Release();if(fp8_pack_mapped_pso)fp8_pack_mapped_pso->Release();if(raster_input)raster_input->Release();if(raster_output)raster_output->Release();if(mapped_pack_pso)mapped_pack_pso->Release();for(auto*p:mapped_project_pso)if(p)p->Release();if(input)input->Release();for(auto*r:weights)if(r)r->Release();for(auto*r:result)if(r)r->Release();for(auto*r:scratch)if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();for(auto*p:split_pso)if(p)p->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT width,UINT height,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&dir,bool raw_output=false,UINT channels=64,bool fast_fp8=false,bool split=false,bool tile_contract=false,bool tile_expand=false,bool tile_projection=false,bool use_matrix=false,bool pack_input=false,bool use_matrix_qkv=false,NativeMatrixWorkspace*shared=nullptr,bool use_wave=false,bool use_wave_contract=false,bool use_wave_scores=false){
   if(use_wave_scores&&(!use_matrix_qkv||(channels!=64&&channels!=128&&channels!=256)))throw std::runtime_error("wave scores require matrix QKV C64/C128/C256");wave_scores=use_wave_scores;
   if(use_wave_contract&&!use_wave)throw std::runtime_error("wave contract requires wave expand");wave_contract=use_wave_contract;
@@ -37,7 +38,14 @@ public:
   shared_scratch=shared&&use_matrix_qkv&&shared->result[0]!=nullptr;
   if(shared_scratch){shared->Validate(d,UINT64(width)*height*channels);for(UINT k=0;k<3;k++){result[k]=shared->result[k];result[k]->AddRef();}}else for(auto&r:result)r=Buffer(d,UINT64(width)*height*channels*4);
   auto matrix_file=[&](const wchar_t*stem){return dir+L"\\"+stem+(channels==256?L"":L"_c"+std::to_wstring(channels))+L".cso";};
-  if(matrix_expand){
+  if(const wchar_t*f8=_wgetenv(L"DLSS5_FP8_OPERANDS")){if(wcscmp(f8,L"0")&&wcscmp(f8,L"1"))throw std::runtime_error("invalid fp8 operands flag");fp8_ffn=!wcscmp(f8,L"1")&&use_wave&&use_wave_contract&&pack_input;}
+  if(fp8_ffn){
+   // FAST PATH stage 2: FFN expand/contract weights as E4M3 bytes (matrix values are on the FP8 grid; scales stay f32 elsewhere).
+   auto e4m3=[](float v)->uint8_t{uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a)return sg;float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("FFN weight not FP8-representable");return uint8_t(sg|uint8_t(q));}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("FFN weight not FP8-representable");return uint8_t(sg|(e<<3)|((a>>20)&7));};
+   std::vector<float>packed(8ull*channels*channels/4);unsigned char*out=reinterpret_cast<unsigned char*>(packed.data());
+   for(size_t i=0;i<8ull*channels*channels;i++)out[i]=e4m3(fw[i]);
+   matrix_weights=Buffer(d,packed.size()*4,&packed);
+  }else if(matrix_expand){
    std::vector<float>packed((wave_contract?8:4)*channels*channels/2);
    for(UINT block=0;block<4*channels/32;block++)for(UINT g=0;g<channels/32;g++)for(UINT row=0;row<32;row++)for(UINT j=0;j<32;j++){
     float v=fw[(block*32+row)*channels+g*32+j];uint32_t bits;std::memcpy(&bits,&v,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);
@@ -76,6 +84,7 @@ public:
   if(pack_matrix){
    if(workspace){matrix_input=workspace->packed;matrix_input->AddRef();}else matrix_input=Buffer(d,UINT64(width)*height*channels*2);
    blob=nullptr;Check(D3DReadFileToBlob(matrix_file(L"native_matrix_pack").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pack_pso));blob->Release();Check(hr);
+   if(fp8_ffn){for(UINT k=0;k<2;k++){ID3DBlob*fb=nullptr;Check(D3DReadFileToBlob(matrix_file(k?L"native_matrix_pack_fp8_mapped":L"native_matrix_pack_fp8").c_str(),&fb));D3D12_COMPUTE_PIPELINE_STATE_DESC fd{};fd.pRootSignature=root;fd.CS={fb->GetBufferPointer(),fb->GetBufferSize()};auto fh=d->CreateComputePipelineState(&fd,IID_PPV_ARGS(k?&fp8_pack_mapped_pso:&fp8_pack_pso));fb->Release();Check(fh);}}
   }
   if(matrix_qkv){if(workspace){qkv_raw=workspace->qkv;qkv_raw->AddRef();}else qkv_raw=Buffer(d,UINT64(width)*height*channels*12);blob=nullptr;Check(D3DReadFileToBlob(matrix_file(L"native_matrix_qkv").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&qkv_pso));blob->Release();Check(hr);}
   const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
@@ -110,8 +119,8 @@ public:
    for(UINT k=0;k<2;k++)if(shared_scratch?workspace->scratch_readable[k]:recorded){Barrier(c,scratch[k],true);if(shared_scratch)workspace->scratch_readable[k]=false;}
    if(pack_matrix){
     if(workspace?workspace->packed_readable:recorded)Barrier(c,matrix_input,true);
-    c->SetComputeRootSignature(root);c->SetPipelineState(fused_shift?mapped_pack_pso:pack_pso);c->SetComputeRootShaderResourceView(0,(fused_shift?raster_input:input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,matrix_input->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(fused_shift)c->SetComputeRoot32BitConstants(4,4,raster,2);
-    UINT n=geometry[0]*geometry[1]*channel_count/128;c->Dispatch(std::min(n,65535u),(n+65534)/65535,1);Barrier(c,matrix_input,false);if(workspace)workspace->packed_readable=true;
+    c->SetComputeRootSignature(root);c->SetPipelineState(fp8_ffn?(fused_shift?fp8_pack_mapped_pso:fp8_pack_pso):(fused_shift?mapped_pack_pso:pack_pso));c->SetComputeRootShaderResourceView(0,(fused_shift?raster_input:input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,matrix_input->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(fused_shift)c->SetComputeRoot32BitConstants(4,4,raster,2);
+    UINT n=geometry[0]*geometry[1]*channel_count/(fp8_ffn?256:128);c->Dispatch(std::min(n,65535u),(n+65534)/65535,1);Barrier(c,matrix_input,false);if(workspace)workspace->packed_readable=true;
     if(timer)timer->Mark(c,std::string(label)+"_input_pack");
    }
    for(UINT i=0;i<3;i++){auto*src=i?scratch[i-1]:(pack_matrix?matrix_input:input);auto*dst=i==2?result[0]:scratch[i];c->SetComputeRootSignature(root);c->SetPipelineState((i==2&&fused_shift)?mapped_project_pso[0]:split_pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(i==2&&wave_project)?project_weights[0]->GetGPUVirtualAddress():((i==0&&matrix_expand)||(i==1&&wave_contract)?matrix_weights:weights[0])->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,((i==2&&fused_shift)?raster_input:input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(i==2&&fused_shift)c->SetComputeRoot32BitConstants(4,4,raster,2);UINT64 groups=(UINT64(geometry[0])*geometry[1]*channel_count*(i==0?4:1)+63)/64;if(i==2&&wave_project)c->Dispatch(geometry[0]*geometry[1]/16,channel_count/64,1);else if(i==1&&wave_contract)c->Dispatch(geometry[0]*geometry[1]/16,channel_count/(blocked_ffn?64:16),1);else if(i==0&&wave_expand)c->Dispatch(geometry[0]*geometry[1]/16,4*channel_count/(blocked_ffn?64:16),1);else if(i==0&&matrix_expand)c->Dispatch((geometry[0]*geometry[1]+31)/32,4*channel_count/32,1);else if(i==0&&tiled_expand)c->Dispatch(channel_count*4/32,geometry[0]*geometry[1]/8,1);else if((i==1&&tiled_contract)||(i==2&&tiled_projection))c->Dispatch(channel_count/32,geometry[0]*geometry[1]/8,1);else c->Dispatch(UINT(std::min<UINT64>(groups,65535)),UINT((groups+65534)/65535),1);Barrier(c,dst,false);if(shared_scratch){if(i==2)workspace->result_readable[0]=true;else workspace->scratch_readable[i]=true;}if(timer)timer->Mark(c,std::string(label)+"_ffn_part"+std::to_string(i));}
