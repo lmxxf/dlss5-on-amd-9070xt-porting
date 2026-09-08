@@ -103,6 +103,72 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 using A=dx::linalg::Matrix<QKV_TYPE,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
 using B=dx::linalg::Matrix<QKV_TYPE,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+#ifndef NATIVE_ATTN_FAST2
+#define NATIVE_ATTN_FAST2 0
+#endif
+#if NATIVE_ATTN_FAST2
+#if !(NATIVE_FAST_ATTENTION&&NATIVE_FP8_QKV&&NATIVE_FP8_OUTPUT&&NATIVE_FAST_ACCUMULATE)
+#error NATIVE_ATTN_FAST2 needs the FP8 fast attention with E4M3 output
+#endif
+// FAST PATH (attention fast2, same scheme as the C32 kernel): scores stay in registers through exp, each wave stores its
+// 16x32 f16 exp tile with one matrix Store, row sums come from one MMA against all-ones, P and the output tile are
+// quantized by the hardware E4M3 cast. No scalar Ffast/E4M3 loops.
+groupshared float partial_sum[2*64];
+groupshared float16_t ones16[512];
+[WaveSize(32)]
+[numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint head=gid.y,t=tid.x,window=gid.x;if(window>=width*height/64||head>=HEADS)return;
+ uint base=window*64*STRIDE+head*32;
+ uint qr=t/64,col_start=(t/32)&1,wave=t/32,lane=t%32;
+ for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
+ C s[2];
+ {
+  A qa=A::Load(qkv,(base+qr*16*STRIDE)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint j=0;j<2;j++){
+   uint kr=col_start+j*2;
+   B kb=B::Load(qkv,(base+kr*16*STRIDE+CHANNELS)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::ColMajor,16);
+   s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+   for(uint i=0;i<s[j].Length();i++){uint2 rc=s[j].GetCoordinate(i);s[j].Set(i,fast_exp_raw(s[j].Get(i)+weights[4*MATRIX+head*4096+(qr*16+rc.x)*64+kr*16+rc.y]));}
+   s[j].Cast<dx::linalg::ComponentType::F16>().Store(ex,wave*512+j*16,32,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  using AH=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+  using BH=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+  AH et=AH::Load(ex,wave*512,32,dx::linalg::MatrixLayout::RowMajor);
+  BH ones=BH::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(et,ones);
+  for(uint i=0;i<rs.Length();i++){uint2 rc=rs.GetCoordinate(i);if(rc.y==0)partial_sum[col_start*64+qr*16+rc.x]=rs.Get(i);}
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(t<64)softmax_inverse[t]=1/(partial_sum[t]+partial_sum[64+t]);
+ GroupMemoryBarrierWithGroupSync();
+ [unroll]for(uint j=0;j<2;j++){
+  uint kr=col_start+j*2;
+  for(uint i=0;i<s[j].Length();i++){uint2 rc=s[j].GetCoordinate(i);s[j].Set(i,s[j].Get(i)*softmax_inverse[qr*16+rc.x]);}
+  s[j].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,qr*16*16+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  uint col=col_start*16;
+  A pa=A::Load(p8,qr*16*16,16,dx::linalg::MatrixLayout::RowMajor);
+  B vb=B::Load(qkv,(base+2*CHANNELS+col)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
+  C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(pa,vb);
+  pa=A::Load(p8,qr*16*16+8,16,dx::linalg::MatrixLayout::RowMajor);
+  vb=B::Load(qkv,(base+32*STRIDE+2*CHANNELS+col)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
+  acc.MultiplyAccumulate(pa,vb);
+  // E4M3 tile staged by the hardware cast: 16 rows x 4 uints per wave (otile reused as [wave][64] uints).
+  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,wave*64,4,dx::linalg::MatrixLayout::RowMajor);
+  GroupMemoryBarrierWithGroupSync();
+  [unroll]for(uint k=0;k<2;k++){
+   uint slot=lane*2+k,row=slot/4,q=slot%4;
+   uint pixel=window_pixel(window,qr*16+row);
+   output.Store(pixel*CHANNELS+head*32+col+q*4,otile[wave*64+row*4+q]);
+  }
+ }
+}
+#else
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint head=gid.y,t=tid.x,window=gid.x;if(window>=width*height/64||head>=HEADS)return;
@@ -201,4 +267,5 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #endif
  }
 }
+#endif
 #endif
