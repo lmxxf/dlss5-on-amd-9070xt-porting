@@ -10,6 +10,8 @@ foreach($Channels in 256,128,64){
  if($LASTEXITCODE -ne 0){throw "FP8 QKV normalize C$Channels compilation failed"}
  & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D "CHANNELS=$Channels" -D DIRECT_NORMALIZE=0 -D NATIVE_FAST_ACCUMULATE=1 -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D NATIVE_FAST_ATTENTION=1 -D NATIVE_FP8_OUTPUT=1 -D NATIVE_FP8_QKV=1 -D "NATIVE_ATTN_FAST2=$(if($env:DLSS5_BUILD_ATTN_FAST2 -eq '1'){1}else{0})" native_wave_attention_direct.hlsl -Fo "native_wave_attention_direct_fp8qkv_fp8act$Suffix.cso"
  if($LASTEXITCODE -ne 0){throw "FP8 QKV attention C$Channels compilation failed"}
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D "CHANNELS=$Channels" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_TILED_PQ -eq '1'){1}else{0})" native_wave_attention_fused_qkv.hlsl -Fo "native_wave_attention_fused_qkv$Suffix.cso"
+ if($LASTEXITCODE -ne 0){throw "Fused QKV attention C$Channels compilation failed"}
 }
 $env:DLSS5_FP8_QKV_NORM='1'
 & "$Folder\run_hw_quantize_network.ps1" -Folder $Folder
