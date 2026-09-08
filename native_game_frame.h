@@ -3,6 +3,9 @@
 #include "native_game_rgb_input.h"
 #include "native_actual_network70.h"
 #include "native_rgb_texture.h"
+#include "native_temporal_feed.h"
+#include "native_temporal_coordinates.h"
+#include "native_temporal_sample.h"
 
 // Integration boundary, not a ReShade callback. The caller must establish the
 // correct source/color contract and submit all input producers before Process.
@@ -16,7 +19,13 @@ class NativeGameFrame {
   NativeActualNetwork70 network;
   NativeRgbTexture neural;
   NativeGameCodec decode;
+  // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
+  NativeTemporalFeed feed;NativeTemporalCoordinates coordinates;NativeTemporalSample sampler;ID3D12Resource*reciprocals{};bool temporal{};
+  ~Resources(){if(reciprocals)reciprocals->Release();}
  };
+public:
+ struct TemporalConfig {UINT motion_width{},motion_height{},render_width{},render_height{};};
+private:
  Resources*resources{};bool ready{},failed{};std::mutex mutex;
 public:
  NativeGameFrame()=default;NativeGameFrame(const NativeGameFrame&)=delete;
@@ -26,7 +35,7 @@ public:
   if(!failed)delete resources;
  }
  void Create(ID3D12CommandQueue*queue,ID3D12Resource*source,
-             const std::vector<float>&noise,const std::wstring&directory,ID3D12Resource*temporal_rgb=nullptr){
+             const std::vector<float>&noise,const std::wstring&directory,ID3D12Resource*temporal_rgb=nullptr,const TemporalConfig*temporal_config=nullptr){
   std::lock_guard<std::mutex>guard(mutex);
   if(resources||!queue||!source)throw std::runtime_error("frame initialization contract");
   resources=new Resources;
@@ -35,9 +44,26 @@ public:
    resources->encode.Create(d,{source},directory);
    resources->original=source;
    resources->input.Create(d,resources->encode.Output(),directory);
+   if(temporal_config&&!temporal_rgb){
+    // Motion vectors arrive in UV units of the render grid; the coordinate pass uses the captured
+    // NGX contract (subrect 0,0..render extent over the motion texture; displacement scale 1/1920,1/1080).
+    auto&t=*temporal_config;auto&r=*resources;
+    r.feed.Create(d,t.motion_width,t.motion_height,1920.f,1080.f,directory);
+    const float transform[6]={0,0,float(t.render_width),float(t.render_height),1.f/1920.f,1.f/1080.f};
+    r.coordinates.Create(d,r.feed.Motion(),1920,1080,1920,1152,t.motion_width,t.motion_height,transform,directory,true);
+    std::ifstream f((directory+L"\\normalized-output.f32").c_str(),std::ios::binary|std::ios::ate);if(!f||f.tellg()!=33554432)throw std::runtime_error("reciprocal table missing");
+    std::vector<float>table(8388608);f.seekg(0);if(!f.read(reinterpret_cast<char*>(table.data()),33554432))throw std::runtime_error("reciprocal table read");
+    D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_UPLOAD;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=33554432;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    ID3D12Resource*upload=nullptr;if(FAILED(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_GENERIC_READ,nullptr,IID_PPV_ARGS(&upload))))throw std::runtime_error("reciprocal upload");
+    void*p=nullptr;D3D12_RANGE none{};if(FAILED(upload->Map(0,&none,&p)))throw std::runtime_error("reciprocal map");std::memcpy(p,table.data(),33554432);upload->Unmap(0,nullptr);
+    r.reciprocals=NativeResidentTable(d,upload);
+    r.sampler.Create(d,r.feed.History(),r.coordinates.Output(),1920,1080,1920*1152,directory,true,r.reciprocals);
+    temporal_rgb=r.sampler.Output();r.temporal=true;
+   }
    // Captured original post origin(-4,-4) corresponds to shift3.
    resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
    resources->neural.Create(d,resources->network.Output(),directory);
+   if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
    resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);ready=true;
   }catch(...){failed=true;throw;}
  }
@@ -56,8 +82,11 @@ public:
  // This is NOT a swapchain present hook. Target is the game's float16 NR result.
  // Temporal sampler producer, if enabled, must already be submitted on this queue;
  // history provenance/reset policy remain the caller's responsibility.
+ bool TemporalReady()const{return resources&&resources->temporal;}
+ // motion_texture: this frame's FSR motion vectors (compute-read state). reset: FFX reset flag.
+ // History is the previous processed frame's network output; the first frame and reset frames run without it.
  void ProcessSubmittedFrame(ID3D12Resource*target,D3D12_RESOURCE_STATES source_state,
-                            D3D12_RESOURCE_STATES target_state,UINT seed,bool temporal_enabled=false){
+                            D3D12_RESOURCE_STATES target_state,UINT seed,bool temporal_enabled=false,ID3D12Resource*motion_texture=nullptr,bool reset=false){
   std::lock_guard<std::mutex>guard(mutex);
   if(!ready||failed||!target)throw std::runtime_error("frame unavailable");
   if(target==resources->original&&source_state!=target_state)throw std::runtime_error("aliased frame texture states disagree");
@@ -66,9 +95,12 @@ public:
   ID3D12Device*owner=nullptr;auto hr=target->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("frame target device query");bool same=NativeSameDevice(owner,resources->submit.Device());owner->Release();if(!same)throw std::runtime_error("frame target device mismatch");
   try{
    auto&r=*resources;
-   r.submit.Submit([&](ID3D12GraphicsCommandList*c){r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});
-   r.network.Run(r.submit,seed,temporal_enabled);
+   const bool use_history=r.temporal&&motion_texture&&!reset&&r.feed.HasHistory();
+   r.submit.Submit([&](ID3D12GraphicsCommandList*c){r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}});
+   r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){
+    if(r.temporal)r.feed.RecordHistory(c);
     r.neural.Record(c);r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,source_state});
     D3D12_RESOURCE_BARRIER b[2]{};for(auto&v:b)v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     b[0].Transition={r.decode.Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};

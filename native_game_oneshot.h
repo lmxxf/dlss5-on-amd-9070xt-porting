@@ -12,7 +12,7 @@ class NativeGameOneShot {
  std::atomic<unsigned>phase{0}; // idle, initializing, ready, rendering, done, failed
  NativeGameFrame*frame{};ID3D12CommandQueue*queue{};
  std::mutex request_mutex;unsigned long last_request{},armed_request{};ULONGLONG next_poll{};bool every_frame{};unsigned long every_frame_count{};ULONGLONG every_frame_tick{};bool bypass{},f6_down{};
- struct Init {NativeGameOneShot*self;ID3D12Resource*source;};
+ struct Init {NativeGameOneShot*self;ID3D12Resource*source;NativeGameFrame::TemporalConfig temporal;};
  static void Log(const char*event,const char*detail=""){
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-oneshot.txt)",L"ab")){fprintf(f,"pid=%lu tick=%llu event=%s detail=%s\n",GetCurrentProcessId(),GetTickCount64(),event,detail);fclose(f);}
  }
@@ -36,7 +36,9 @@ class NativeGameOneShot {
    // environment before the network is created, mirroring the validated test runner chain.
    {unsigned applied=0;if(FILE*flags=_wfopen(LR"(D:\DLSSNR-Lab\native-game-flags.txt)",L"rb")){char line[256];while(fgets(line,sizeof line,flags)){size_t n=strlen(line);while(n&&(line[n-1]=='\n'||line[n-1]=='\r'||line[n-1]==' '))line[--n]=0;if(n<12||strncmp(line,"DLSS5_TEST_",11)||!strchr(line,'='))continue;if(!_putenv(line))applied++;}fclose(flags);}
     Log("flags_applied",std::to_string(applied).c_str());}
-   self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-game-tiled-assets)");
+   {const bool temporal_on=GetFileAttributesW(LR"(D:\DLSSNR-Lab\temporal-history.txt)")!=INVALID_FILE_ATTRIBUTES&&task->temporal.motion_width&&task->temporal.render_width;
+    char text[160];snprintf(text,sizeof text,"temporal=%u motion=%ux%u render=%ux%u",temporal_on?1u:0u,task->temporal.motion_width,task->temporal.motion_height,task->temporal.render_width,task->temporal.render_height);Log("temporal_config",text);
+    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-game-tiled-assets)",nullptr,temporal_on?&task->temporal:nullptr);}
 #else
    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-color-frame-samegpu)");
 #endif
@@ -73,12 +75,12 @@ public:
   }
   return phase.load()==2&&armed_request!=0;
  }
- void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source){
+ void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0){
   unsigned expected=0;
   if(phase.compare_exchange_strong(expected,1)){
    if(!q||!source||q->GetDesc().Type!=D3D12_COMMAND_LIST_TYPE_DIRECT){Log("initialization_failed","queue/source");phase=5;return;}
    Init*task=nullptr;
-   try{task=new Init{this,source};}catch(const std::exception&e){Log("initialization_failed",e.what());phase=5;return;}
+   try{task=new Init{this,source,{mw,mh,rw,rh}};}catch(const std::exception&e){Log("initialization_failed",e.what());phase=5;return;}
    queue=q;queue->AddRef();source->AddRef();
    HANDLE thread=CreateThread(nullptr,0,Initialize,task,0,nullptr);
    if(!thread){source->Release();delete task;Log("initialization_failed","thread creation");phase=5;return;}
@@ -93,7 +95,7 @@ public:
    if(every_frame&&request>1){
     // Steady state: no readback, no files; one log line per 100 frames with the average interval.
     frame->RebindSourceAfterCompletion(source);
-    frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false);
+    frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
     auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);every_frame_tick=now;}
     if(every_frame_count==1)every_frame_tick=now;
     phase=4;return;
@@ -102,8 +104,8 @@ public:
    auto input_check=CheckNativeFrameInput(before);
    if(input_check!=NativeFrameInputCheck::valid){Log("input_rejected",input_check==NativeFrameInputCheck::black?"black RGB; no neural write; new request required":"invalid input; no neural write; new request required");phase=2;return;}
    frame->RebindSourceAfterCompletion(source);
-   Log("render_begin","seed=0 history=0 explicit diagnostic reset");
-   frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false);
+   Log("render_begin",frame->TemporalReady()?"seed=0 temporal path armed (history from previous processed frame)":"seed=0 history=0 explicit diagnostic reset");
+   frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
    auto after=NativeReadSubmittedFrame(q,source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Save(request,L"after",after);
    Log("render_complete",before==after?"pixels_identical; investigate":"pixels_changed; independent verification pending");phase=4;
   }catch(const std::exception&e){Log("render_failed",e.what());phase=5;}

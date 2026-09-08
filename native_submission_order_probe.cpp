@@ -13,7 +13,9 @@ static NativeGameOneShot neural_oneshot;
 #ifdef NATIVE_ORDER_SNAPSHOT
 #include "native_submitted_readback.h"
 #include "native_snapshot_gate.h"
-struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};unsigned frame{};};
+struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};unsigned frame{};ID3D12Resource*motion{};bool reset{};};
+// Temporal contract observed on the first FFX dispatch (motion texture size, render size); zero until seen.
+static std::atomic<unsigned>observed_motion_w{0},observed_motion_h{0},observed_render_w{0},observed_render_h{0};
 static PendingSnapshot pending_snapshot;
 static std::mutex snapshot_mutex;
 static bool snapshot_taken{};
@@ -98,7 +100,7 @@ static uint32_t dispatch(void**context,const Header*h){
  void*list=nullptr;SIZE_T got=0;
  ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+16,&list,sizeof(list),&got);
  unsigned n=++frames;log("ffx_begin",got==sizeof(list)?list:nullptr,nullptr,n);
- ResourcePayload output{};
+ ResourcePayload output{};ID3D12Resource*frame_motion=nullptr;bool frame_reset=false;
  tracked_output.store(0); // Never attribute later barriers to an unreadable frame.
  SIZE_T output_bytes=0;
  if(ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+312,&output,sizeof(output),&output_bytes)&&output_bytes==sizeof(output)){
@@ -116,13 +118,16 @@ static uint32_t dispatch(void**context,const Header*h){
     fprintf(f,"pid=%lu thread=%lu tick=%llu kind=ffx_output frame=%u list=%p resource=%p format=%u size=%ux%u declared_state=%u payload_only=1\n",GetCurrentProcessId(),GetCurrentThreadId(),GetTickCount64(),n,list,output.resource,output.format,output.width,output.height,output.state);fclose(f);
    }ReleaseSRWLockExclusive(&lock);
   }
-  // Temporal contract probe: motion vectors payload (+120), scale/sizes/reset (+360..) per the FFX upscale layout.
+  // Temporal contract: motion vectors payload (+120), scale/sizes/reset (+360..) per the FFX upscale layout.
+  ResourcePayload motion{};float mvscale[4]{};unsigned sizes[4]{};unsigned char reset=0;SIZE_T a=0,b=0,c=0,d=0;
+  ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+120,&motion,sizeof(motion),&a);
+  ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+360,mvscale,16,&b);
+  ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+376,sizes,16,&c);
+  ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+408,&reset,1,&d);
+  if(a==sizeof(motion)&&c==16&&motion.resource&&!observed_motion_w.load()){observed_motion_w=motion.width;observed_motion_h=motion.height;observed_render_w=sizes[0];observed_render_h=sizes[1];}
+  frame_motion=(a==sizeof(motion)&&motion.width==observed_motion_w.load()&&motion.height==observed_motion_h.load()&&sizes[0]==observed_render_w.load()&&sizes[1]==observed_render_h.load())?static_cast<ID3D12Resource*>(motion.resource):nullptr;
+  frame_reset=reset!=0;
   if(n<=8){
-   ResourcePayload motion{};float mvscale[4]{};unsigned sizes[4]{};unsigned char reset=0;SIZE_T a=0,b=0,c=0,d=0;
-   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+120,&motion,sizeof(motion),&a);
-   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+360,mvscale,16,&b);
-   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+376,sizes,16,&c);
-   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+408,&reset,1,&d);
    AcquireSRWLockExclusive(&lock);
    if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){
     fprintf(f,"pid=%lu kind=ffx_temporal frame=%u motion=%p format=%u size=%ux%u state=%u jitter=%g,%g mvscale=%g,%g render=%ux%u upscale=%ux%u reset=%u\n",GetCurrentProcessId(),n,motion.resource,motion.format,motion.width,motion.height,motion.state,mvscale[0],mvscale[1],mvscale[2],mvscale[3],sizes[0],sizes[1],sizes[2],sizes[3],unsigned(reset));fclose(f);
@@ -144,7 +149,7 @@ static uint32_t dispatch(void**context,const Header*h){
 #ifdef NATIVE_ORDER_NEURAL
    eligible=eligible||neural_oneshot.WantsFrame();
 #endif
-   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n};}
+   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset};}
    else native->Release();
   }
  }
@@ -171,7 +176,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
   PendingSnapshot job{};
   {std::lock_guard<std::mutex>guard(snapshot_mutex);
    if(pending_snapshot.list&&pending_snapshot.frame!=frames.load()){
-    pending_snapshot.list->Release();pending_snapshot.source->Release();pending_snapshot={};
+    pending_snapshot.list->Release();pending_snapshot.source->Release();if(pending_snapshot.motion)pending_snapshot.motion->Release();pending_snapshot={};
    }
    uintptr_t items[64]{};if(lists&&count<=64)for(UINT i=0;i<count;i++)items[i]=reinterpret_cast<uintptr_t>(lists[i]);
    bool eligible=!snapshot_taken;
@@ -185,7 +190,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
   if(job.list){
    snapshot_active=true;
 #ifdef NATIVE_ORDER_NEURAL
-   neural_oneshot.OnSubmitted(q,job.source);
+   neural_oneshot.OnSubmitted(q,job.source,job.motion,job.reset,observed_motion_w.load(),observed_motion_h.load(),observed_render_w.load(),observed_render_h.load());if(job.motion)job.motion->Release();
 #else
    try{
     auto pixels=NativeReadSubmittedFrame(q,job.source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
