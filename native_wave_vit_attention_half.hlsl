@@ -7,8 +7,17 @@
 ByteAddressBuffer qkv:register(t0);
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint tokens;}
+#ifndef NATIVE_FAST_VIT_ATTENTION
+#define NATIVE_FAST_VIT_ATTENTION 0
+#endif
+#if NATIVE_FAST_VIT_ATTENTION
+// FAST PATH: hardware f16 rounding, bit-level FP8 quantizer, plain float sums, FP32 accumulation across keys.
+float H(float v){return f16tof32(f32tof16(v));}
+float F(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+#else
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#endif
 uint key_index(uint c){return ((c&16)>>4)|((c&1)<<1)|((c&2)<<1)|(c&8)|((c&4)<<2)|(c&32);}
 groupshared half ex[640*16];
 groupshared float inverse[16];
@@ -24,12 +33,24 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   C s=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(q,k);
   for(uint i=0;i<s.Length();i++){
    uint2 c=s.GetCoordinate(i);
+#if NATIVE_FAST_VIT_ATTENTION
+   float affine=clamp(s.Get(i)*f16tof32(0x2dbb)+1.708984375,1.439453125,1.9775390625);
+#else
    float affine=clamp(H(H(s.Get(i))*f16tof32(0x2dbb)+1.708984375),1.439453125,1.9775390625);
+#endif
    uint b=f32tof16(affine);
    ex[(key+c.y)*16+c.x]=half(f16tof32(((b<<4)+0x4000)&65535));
   }
  }
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_FAST_VIT_ATTENTION
+ {
+  uint qi=t&15,parity=t>>4;float denominator=0;
+  for(uint key=parity;key<tokens;key+=2)denominator+=float(ex[key*16+qi]);
+  denominator+=WaveReadLaneAt(denominator,t^16);
+  if(t<16)inverse[t]=1.0/denominator;
+ }
+#else
  {
   // Two lanes per query: lane>>4 selects the parity half of every 64-key chunk.
   uint qi=t&15,parity=t>>4;float denominator=0;
@@ -49,6 +70,7 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   }
   if(t<16)inverse[t]=H(1.0/denominator);
  }
+#endif
  GroupMemoryBarrierWithGroupSync();
  for(uint i=t;i<tokens*16;i+=32)ex[i]=half(F(float(ex[i])));
  GroupMemoryBarrierWithGroupSync();
@@ -57,8 +79,12 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   A a=A::Load(ex,key*16,16,dx::linalg::MatrixLayout::ColMajor);
   [unroll]for(uint half_index=0;half_index<2;half_index++){
    B b=B::Load(qkv,((2*tokens+key)*1024+head*32+half_index*16)*2,2048,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_FAST_VIT_ATTENTION
+   acc[half_index].MultiplyAccumulate(a,b);
+#else
    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    for(uint i=0;i<acc[half_index].Length();i++)acc[half_index].Set(i,H(acc[half_index].Get(i)+p.Get(i)));
+#endif
   }
  }
  [unroll]for(uint half_index=0;half_index<2;half_index++)for(uint i=0;i<acc[half_index].Length();i++){
