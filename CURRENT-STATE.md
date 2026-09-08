@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**17:55 运动向量约定已数值验证（光）。** 游戏内第 300/600 帧（用户持续转镜头，约 50px/帧）抓 history/motion/color/warped 四份（release/temporal-probe-48648/）。离线双线性复算四种符号/单位假设：不 warp 0.0866，管线 warp 0.0541，+mv 0.0530，−mv 0.0904，单轴反号 0.077/0.089。结论：当前"UV 单位 ×(1920,1080) 得 1080p 像素、uv+mv 指向上一帧"约定正确，坐标/采样 pass 与离线复算只差 0.001。探针留在 DLL 里（每帧模式第 300/600 帧触发）。tag `0.02` = 时序 + 快速版 8fps。
+
 **17:41 快速版 + 时序，用户游戏内确认效果与 exact 版一致、约 8fps（光）。当前安装：DLL `72b4035c…777d`，assets = fast-fp8-proj 的 shader，flag 文件 native-game-flags-fast.txt（多 DLSS5_FP8_OPERANDS/QKV/HIDDEN/LDS 四条宿主 flag）。** 踩坑：首次叠加时 DLL 只放行 DLSS5_TEST_ 前缀，四条宿主 flag 没进去 → shader 按 FP8 读、宿主按 f16 打包 → FFN 输出近零、网络退化成恒等，症状是"效果很小"而不是花屏，186ms 那个时间也对不上。切换命令：`deploy_fast.ps1 -Source <目录> -Flags <flag文件>`，exact 对 native-network70-shared-scratch + native-game-flags-exact.txt，fast 对 fast-fp8-proj + native-game-flags-fast.txt。
 
 **17:32 时序接通，用户游戏内确认 F6 切换效果明显（光）。** 快速版停在 111.9ms 那个 commit 不再推进（用户 17:07 决定）；游戏 assets 已换回 exact shader。DLL `ce229a2f…7aa1`：从 ffxDispatch 读运动向量纹理（+120，1284×724 RG16F，UV 单位，motionVectorScale=renderSize=1281×721）与 reset（+408），native_temporal_feed.hlsl 把运动向量换算成 1080p 像素单位、把上一帧网络输出转成 float4 history，再走闇验证过的 native_temporal_coordinates/sample（变换 {0,0,1281,721,1/1920,1/1080}，与 09-05 抓的 NGX 参数 A0/A4=1/1920,1/1080 同构），网络 temporal 输入 = 采样结果；首帧和 reset 帧无 history。门控文件 `D:\DLSSNR-Lab\temporal-history.txt`。踩坑：坐标/采样类用指针相等判设备，在 ReShade 下失败（initialization_failed: motion buffer device mismatch），已改 NativeSameDevice。未做：运动向量方向/单位只按两家文档约定推断，用户观感正常但没有数值裁判；jitter 未用；history 是我们自己的上一帧输出，与 NGX 的独立 history 纹理语义假定一致。
