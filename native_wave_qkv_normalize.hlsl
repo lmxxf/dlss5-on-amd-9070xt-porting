@@ -14,7 +14,17 @@
 ByteAddressBuffer input:register(t0),weights:register(t1);
 StructuredBuffer<float> attention_weights:register(t2);
 RWByteAddressBuffer packed:register(u0);
+#ifndef NATIVE_QKV_FAST2
+#define NATIVE_QKV_FAST2 0
+#endif
+#if NATIVE_QKV_FAST2
+groupshared float16_t sq16[1024];
+groupshared float16_t ones16[512];
+using AH=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using BH=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+#else
 groupshared float squares[1024];
+#endif
 groupshared float inv[32];
 #ifndef NATIVE_TILED_WEIGHTS
 #define NATIVE_TILED_WEIGHTS 0
@@ -51,6 +61,19 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  // squares scattered by (row, channel), 16 lanes sum their row, epilogue reads inv[head][row].
  const uint lane=WaveGetLaneIndex();
  if(part<2){
+#if NATIVE_QKV_FAST2
+  // FAST PATH (qkv fast2): squared tiles stored as f16 with matrix Stores, row sums from one MMA against all-ones.
+  for(uint i=lane;i<512;i+=32)ones16[i]=float16_t(1.0);
+  [unroll]for(uint h=0;h<2;h++)[unroll]for(uint n=0;n<2;n++){C sq=acc[h*2+n];for(uint i=0;i<sq.Length();i++){float v=sq.Get(i);sq.Set(i,v*v);}sq.Cast<dx::linalg::ComponentType::F16>().Store(sq16,h*512+n*16,32,dx::linalg::MatrixLayout::RowMajor);}
+  GroupMemoryBarrierWithGroupSync();
+  [unroll]for(uint h=0;h<2;h++){
+   AH st=AH::Load(sq16,h*512,32,dx::linalg::MatrixLayout::RowMajor);BH ones=BH::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+   C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(st,ones);
+   float scale=part==0?attention_weights[SCALE_OFFSET+head0+h]:1;
+   for(uint i=0;i<rs.Length();i++){uint2 rc=rs.GetCoordinate(i);if(rc.y==0)inv[h*16+rc.x]=rsqrt(max(rs.Get(i),6.198883056640625e-5))*scale;}
+  }
+  GroupMemoryBarrierWithGroupSync();
+#else
   [unroll]for(uint h=0;h<2;h++){
    [unroll]for(uint n=0;n<2;n++)for(uint i=0;i<acc[h*2+n].Length();i++){uint2 rc=acc[h*2+n].GetCoordinate(i);float v=acc[h*2+n].Get(i);squares[h*512+rc.x*32+n*16+rc.y]=v*v;}
   }
@@ -62,6 +85,7 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    inv[h*16+r]=rsqrt(max(ss,6.198883056640625e-5))*scale;
   }
   GroupMemoryBarrierWithGroupSync();
+#endif
  }
  [unroll]for(uint n=0;n<4;n++){
   uint row=(gid.y*64)%MATRIX_CHANNELS+n*16;
