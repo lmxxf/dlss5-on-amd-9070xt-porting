@@ -14,7 +14,15 @@ RWByteAddressBuffer output:register(u0);
 #define HIDDEN (4*MATRIX_CHANNELS)
 #define WAVES (MATRIX_CHANNELS/16)
 #define OPERAND dx::linalg::ComponentType::F8_E4M3FN
+#ifndef NATIVE_HW_H
+#define NATIVE_HW_H 0
+#endif
+#if NATIVE_HW_H
+// FAST PATH: f16 RNE through the hardware conversion pair (SM6 f32tof16 is round-to-nearest-even).
+float H(float v){return f16tof32(f32tof16(v));}
+#else
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
+#endif
 float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
 #ifndef NATIVE_HW_QUANTIZE
 #define NATIVE_HW_QUANTIZE 0

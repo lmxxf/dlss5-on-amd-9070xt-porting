@@ -18,8 +18,21 @@ StructuredBuffer<float> input:register(t1);
 RWByteAddressBuffer qk:register(u0);
 RWByteAddressBuffer aux:register(u1);
 cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;}
+#ifndef NATIVE_HW_H
+#define NATIVE_HW_H 0
+#endif
+#if NATIVE_HW_H
+// FAST PATH: f16 RNE through the hardware conversion pair (SM6 f32tof16 is round-to-nearest-even).
+float H(float v){return f16tof32(f32tof16(v));}
+#else
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
+#endif
+#if NATIVE_HW_H
+// FAST PATH: bit-level RNE FP8 quantizer (same grid as the legacy F, no log2/exp2).
+float F(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+#else
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+#endif
 #include "native_half_square.hlsli"
 #define W_BIAS(i) asfloat(weights.Load(8192+(i)*4))
 #define W_SCALE asfloat(weights.Load(24576))
