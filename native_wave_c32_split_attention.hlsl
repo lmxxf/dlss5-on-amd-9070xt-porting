@@ -88,8 +88,14 @@ groupshared float inv[2*16];
  GroupMemoryBarrierWithGroupSync();
  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
   C t=z[part*2+cr];
+#if NATIVE_C32_FP8_QKV
+  // Q/K/V as E4M3 bytes in aux [token][96] (q 32, k 32, v 32) through the hardware cast; qk buffer is left for the output.
+  if(part<2)for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,t.Get(i)*inv[part*16+rc.x]);}
+  t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   if(part<2){for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,Ffast(t.Get(i)*inv[part*16+rc.x]));}t.Cast<dx::linalg::ComponentType::F16>().Store(qk,(first*64+part*32+cr*16)*2,128,dx::linalg::MatrixLayout::RowMajor,16);}
   else{for(uint i=0;i<t.Length();i++)t.Set(i,Ffast(H(t.Get(i))));t.Cast<dx::linalg::ComponentType::F16>().Store(aux,(first*32+cr*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);}
+#endif
  }
 #else
  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
@@ -129,18 +135,36 @@ groupshared float softmax_inverse[64];
 #if NATIVE_C32_FUSED
 groupshared float16_t attn[64*32];
 #endif
+#ifndef NATIVE_C32_FP8_QKV
+#define NATIVE_C32_FP8_QKV 0
+#endif
+#if NATIVE_C32_FP8_QKV
+using A8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+groupshared uint p8[1024];
+uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)return sg;float m=abs(v);if(m<0.015625)return sg|uint(round(m*512.0));uint e=(a>>23)-127+7,mant=(a>>20)&7u;if(e>15)return sg|0x7eu;return sg|(e<<3)|mant;}
+#endif
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint window=gid.x,t=tid.x;if(window*64>=runtime_width*runtime_height)return;
  uint qr=t/64,col_start=(t/32)&1,base=window*64;
  {
   C s[2];
+#if NATIVE_C32_FP8_QKV
+  A8 qa=A8::Load(aux,(base+qr*16)*96,96,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint j=0;j<2;j++){
+   uint kr=col_start+j*2;
+   B8 kb=B8::Load(aux,(base+kr*16)*96+32,96,dx::linalg::MatrixLayout::ColMajor,16);
+   s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+  }
+#else
   A qa=A::Load(qk,((base+qr*16)*64)*2,128,dx::linalg::MatrixLayout::RowMajor,16);
   [unroll]for(uint j=0;j<2;j++){
    uint kr=col_start+j*2;
    B kb=B::Load(qk,((base+kr*16)*64+32)*2,128,dx::linalg::MatrixLayout::ColMajor,16);
    s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
   }
+#endif
   [unroll]for(uint j=0;j<2;j++){
    uint kr=col_start+j*2;
    for(uint i=0;i<s[j].Length();i++){
@@ -158,7 +182,11 @@ groupshared float16_t attn[64*32];
  {uint query=t/4,part=t%4;float sum=0;[unroll]for(uint j=0;j<16;j++)sum+=float(ex[query*64+part*16+j]);
   sum+=WaveReadLaneAt(sum,(t&31)^1);sum+=WaveReadLaneAt(sum,(t&31)^2);if(part==0)softmax_inverse[query]=1/sum;}
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_C32_FP8_QKV
+ {uint i0=t*16;uint4 w=0;[unroll]for(uint j=0;j<16;j++){uint e=E4M3(Ffast(float(ex[i0+j])*softmax_inverse[i0/64]));w[j/4]|=e<<((j%4)*8);}p8[t*4]=w.x;p8[t*4+1]=w.y;p8[t*4+2]=w.z;p8[t*4+3]=w.w;}
+#else
  for(uint i=t;i<4096;i+=256)ex[i]=float16_t(Ffast(float(ex[i])*softmax_inverse[i/64]));
+#endif
 #else
  if(t<64){
   float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
@@ -176,8 +204,13 @@ groupshared float16_t attn[64*32];
  {
   uint col=col_start*16;C acc=C::Splat(0.0f);
   [unroll]for(uint g=0;g<2;g++){
+#if NATIVE_C32_FP8_QKV
+   A8 pa=A8::Load(p8,qr*16*16+g*8,16,dx::linalg::MatrixLayout::RowMajor);
+   B8 vb=B8::Load(aux,(base+g*32)*96+64+col,96,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    A pa=A::Load(ex,qr*16*64+g*32,64,dx::linalg::MatrixLayout::RowMajor);
    B vb=B::Load(aux,((base+g*32)*32+col)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
 #if NATIVE_FAST_ACCUMULATE
    acc.MultiplyAccumulate(pa,vb);
 #else
