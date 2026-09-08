@@ -2,13 +2,13 @@
 #include "native_resident_table.h"
 #include "native_split.h"
 class NativeVitQkv {
- ID3D12Resource *input{},*weights{},*raw{},*output{},*packed_weights{};ID3D12RootSignature*root{};ID3D12PipelineState*pso[2]{};UINT count{};bool recorded{},tiled{},wave{};
+ ID3D12Resource *input{},*weights{},*raw{},*output{},*packed_weights{},*packed_input{};ID3D12RootSignature*root{};ID3D12PipelineState*pso[2]{},*pack_pso{};UINT count{};bool recorded{},tiled{},wave{},packed{};
  static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("ViT QKV HRESULT="+std::to_string(unsigned(h)));}
  static ID3D12Resource* buffer(ID3D12Device*d,UINT64 bytes,const std::vector<float>*data=nullptr){D3D12_HEAP_PROPERTIES hp{};hp.Type=data?D3D12_HEAP_TYPE_UPLOAD:D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=data?D3D12_RESOURCE_FLAG_NONE:D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,data?D3D12_RESOURCE_STATE_GENERIC_READ:D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));if(data){void*p=nullptr;D3D12_RANGE none{};ck(r->Map(0,&none,&p));std::memcpy(p,data->data(),bytes);r->Unmap(0,nullptr);r=NativeMaybeResident(d,r);}return r;}
  static void barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,bool begin){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,begin?D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE:D3D12_RESOURCE_STATE_UNORDERED_ACCESS,begin?D3D12_RESOURCE_STATE_UNORDERED_ACCESS:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);}
 public:
  NativeVitQkv()=default;NativeVitQkv(const NativeVitQkv&)=delete;
- ~NativeVitQkv(){for(auto*r:{input,weights,raw,output,packed_weights})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
+ ~NativeVitQkv(){for(auto*r:{input,weights,raw,output,packed_weights,packed_input})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();if(pack_pso)pack_pso->Release();}
  void Create(ID3D12Device*d,ID3D12Resource*src,UINT tokens,const std::vector<float>&coefficients,const std::wstring&dir){
   if(input||!d||!src||(tokens!=64&&tokens!=256&&tokens!=640)||coefficients.size()!=3145760)throw std::runtime_error("ViT QKV contract");input=src;input->AddRef();count=tokens;weights=buffer(d,coefficients.size()*4,&coefficients);raw=buffer(d,UINT64(tokens)*3072*4);output=buffer(d,UINT64(tokens)*3072*4);
   D3D12_ROOT_PARAMETER params[4]{};for(UINT i=0;i<2;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}params[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[3].Constants={0,0,1};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=4;desc.pParameters=params;ID3DBlob*blob=nullptr,*error=nullptr;ck(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));ck(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();
@@ -21,7 +21,19 @@ public:
    packed_weights=buffer(d,packed.size()*4,&packed);auto*local=NativeResidentTable(d,packed_weights);packed_weights->Release();packed_weights=local;
   }
   const char*entries[]={tiled?"project_tiled":"project","normalize"};for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=(i==0&&wave)?D3DReadFileToBlob((dir+L"\\native_wave_vit_qkv.cso").c_str(),&blob):CompileNativeShader(dir+L"\\native_vit_qkv.hlsl",nullptr,entries[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"QKV compilation";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  PackedInput(d,dir);
  }
- void Record(ID3D12GraphicsCommandList*c){if(recorded){barrier(c,raw,true);barrier(c,output,true);}for(UINT i=0;i<2;i++){c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,(i?raw:input)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,((i==0&&wave)?packed_weights:weights)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,(i?output:raw)->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,1,&count,0);if(i==0&&wave)c->Dispatch(count/16,48,1);else if(i==0&&tiled)c->Dispatch(32,count/8,3);else c->Dispatch((count*(i?96:3072)+63)/64,1,1);barrier(c,i?output:raw,false);}recorded=true;}
+ void PackedInput(ID3D12Device*d,const std::wstring&dir){
+  // FAST PATH: f16 operand copy of the input for the wave QKV kernel (A tiles from memory, no per-K-step LDS restaging).
+  const wchar_t*pi=_wgetenv(L"DLSS5_VIT_PACKED_INPUT");if(pi&&wcscmp(pi,L"0")&&wcscmp(pi,L"1"))throw std::runtime_error("invalid ViT packed input flag");
+  if(!(pi&&!wcscmp(pi,L"1")&&wave))return;
+  packed=true;packed_input=buffer(d,UINT64(count)*1024*2);
+  const wchar_t*names[]={L"\\native_vit_pack16.cso",L"\\native_wave_vit_qkv_packed.cso"};ID3D12PipelineState**targets[]={&pack_pso,&pso[0]};
+  for(UINT k=0;k<2;k++){ID3DBlob*blob=nullptr;if(FAILED(D3DReadFileToBlob((dir+names[k]).c_str(),&blob)))throw std::runtime_error("ViT QKV packed shader missing");if(k)pso[0]->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(targets[k]));blob->Release();if(FAILED(hr))throw std::runtime_error("ViT QKV packed pipeline");}
+ }
+ void Record(ID3D12GraphicsCommandList*c){if(recorded){barrier(c,raw,true);barrier(c,output,true);}
+  if(packed){D3D12_RESOURCE_BARRIER t{};t.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;t.Transition={packed_input,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS};if(recorded)c->ResourceBarrier(1,&t);
+   c->SetComputeRootSignature(root);c->SetPipelineState(pack_pso);c->SetComputeRootShaderResourceView(0,input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,packed_input->GetGPUVirtualAddress());UINT values=count*1024;c->SetComputeRoot32BitConstants(3,1,&values,0);c->Dispatch((values/2+63)/64,1,1);std::swap(t.Transition.StateBefore,t.Transition.StateAfter);c->ResourceBarrier(1,&t);}
+  for(UINT i=0;i<2;i++){c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,(i?raw:(packed?packed_input:input))->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,((i==0&&wave)?packed_weights:weights)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,(i?output:raw)->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,1,&count,0);if(i==0&&wave)c->Dispatch(count/16,48,1);else if(i==0&&tiled)c->Dispatch(32,count/8,3);else c->Dispatch((count*(i?96:3072)+63)/64,1,1);barrier(c,i?output:raw,false);}recorded=true;}
  ID3D12Resource* Output()const{return output;}
 };

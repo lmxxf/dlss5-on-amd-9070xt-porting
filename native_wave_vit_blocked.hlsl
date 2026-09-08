@@ -7,14 +7,23 @@
 #define BLOCK_N 4
 #endif
 #include <dx/linalg.h>
+#ifndef NATIVE_PACKED_INPUT
+#define NATIVE_PACKED_INPUT 0
+#endif
 #if VIT_EXPAND
+#if NATIVE_PACKED_INPUT
+ByteAddressBuffer input8:register(t0);
+#else
 StructuredBuffer<float> input_f32:register(t0);
+#endif
 #else
 #ifndef INPUT_CHANNELS
 #define INPUT_CHANNELS 4096
 #endif
 #if INPUT_CHANNELS==4096
 ByteAddressBuffer hidden_f16:register(t0);
+#elif NATIVE_PACKED_INPUT
+ByteAddressBuffer input8:register(t0);
 #else
 StructuredBuffer<float> input_f32:register(t0);
 #endif
@@ -68,10 +77,14 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  C acc[BLOCK_N];
  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
  [loop]for(uint g=0;g<32;g++){
+#if NATIVE_PACKED_INPUT
+  A a=A::Load(input8,first*1024+g*32,1024,dx::linalg::MatrixLayout::RowMajor,16);
+#else
 #define EXPAND_SRC(i) input_f32[(first+(i)/32)*1024+g*32+(i)%32]
   STAGE_A(EXPAND_SRC)
   GroupMemoryBarrierWithGroupSync();
   A a=LOAD_A();
+#endif
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
    B b=B::Load(weights,(col*1024+g*32)*ELEM,1024*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
@@ -82,7 +95,9 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
 #endif
   }
+#if !NATIVE_PACKED_INPUT
   GroupMemoryBarrierWithGroupSync();
+#endif
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;
@@ -126,6 +141,8 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
 #if INPUT_CHANNELS==4096
    A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#elif NATIVE_PACKED_INPUT
+   A a=A::Load(input8,first*INPUT_CHANNELS+k,INPUT_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #else
    STAGE_A(REDUCE_SRC)
    GroupMemoryBarrierWithGroupSync();
@@ -136,7 +153,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
     B b=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
     acc[n].MultiplyAccumulate(a,b);
    }
-#if INPUT_CHANNELS!=4096
+#if INPUT_CHANNELS!=4096 && !NATIVE_PACKED_INPUT
    GroupMemoryBarrierWithGroupSync();
 #endif
   }
@@ -146,6 +163,8 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 // combine binds the partial buffer at t0 (the reduce input slot).
 #if INPUT_CHANNELS==4096
 #define PARTIAL(i) asfloat(hidden_f16.Load((i)*4))
+#elif NATIVE_PACKED_INPUT
+#define PARTIAL(i) asfloat(input8.Load((i)*4))
 #else
 #define PARTIAL(i) input_f32[i]
 #endif
@@ -176,6 +195,8 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
 #if INPUT_CHANNELS==4096
    A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#elif NATIVE_PACKED_INPUT
+   A a=A::Load(input8,first*INPUT_CHANNELS+k,INPUT_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #else
    STAGE_A(REDUCE_SRC)
    GroupMemoryBarrierWithGroupSync();
@@ -191,7 +212,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
     for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
 #endif
    }
-#if INPUT_CHANNELS!=4096
+#if INPUT_CHANNELS!=4096 && !NATIVE_PACKED_INPUT
    GroupMemoryBarrierWithGroupSync();
 #endif
   }

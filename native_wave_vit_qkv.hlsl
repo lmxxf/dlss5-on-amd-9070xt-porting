@@ -5,7 +5,15 @@
 #define BLOCK_N 4
 #endif
 #include <dx/linalg.h>
+#ifndef NATIVE_PACKED_INPUT
+#define NATIVE_PACKED_INPUT 0
+#endif
+#if NATIVE_PACKED_INPUT
+// FAST PATH: f16 operand copy of the input; A tiles loaded straight from memory.
+ByteAddressBuffer input16:register(t0);
+#else
 StructuredBuffer<float> input:register(t0);
+#endif
 ByteAddressBuffer weights:register(t1);
 RWByteAddressBuffer output:register(u0);
 cbuffer Geometry:register(b0){uint tokens;}
@@ -23,9 +31,13 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   C acc[BLOCK_N];
   [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
   [loop]for(uint k=group*512;k<(group+1)*512;k+=32){
+#if NATIVE_PACKED_INPUT
+   A a=A::Load(input16,(first*1024+k)*2,2048,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(input[(first+i/32)*1024+k+i%32]);
    GroupMemoryBarrierWithGroupSync();
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+#endif
    [unroll]for(uint n=0;n<BLOCK_N;n++){
     B b=B::Load(weights,(part*1048576+(row0+n*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
 #if NATIVE_FAST_ACCUMULATE
@@ -35,7 +47,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
     for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
 #endif
    }
+#if !NATIVE_PACKED_INPUT
    GroupMemoryBarrierWithGroupSync();
+#endif
   }
 #if NATIVE_FAST_ACCUMULATE
   [unroll]for(uint n=0;n<BLOCK_N;n++){if(group==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,total[n].Get(i)+acc[n].Get(i));}
