@@ -11,7 +11,7 @@
 class NativeGameOneShot {
  std::atomic<unsigned>phase{0}; // idle, initializing, ready, rendering, done, failed
  NativeGameFrame*frame{};ID3D12CommandQueue*queue{};
- std::mutex request_mutex;unsigned long last_request{},armed_request{};ULONGLONG next_poll{};
+ std::mutex request_mutex;unsigned long last_request{},armed_request{};ULONGLONG next_poll{};bool every_frame{};unsigned long every_frame_count{};ULONGLONG every_frame_tick{};
  struct Init {NativeGameOneShot*self;ID3D12Resource*source;};
  static void Log(const char*event,const char*detail=""){
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-oneshot.txt)",L"ab")){fprintf(f,"pid=%lu tick=%llu event=%s detail=%s\n",GetCurrentProcessId(),GetTickCount64(),event,detail);fclose(f);}
@@ -49,6 +49,11 @@ public:
  bool WantsFrame(){
   std::lock_guard<std::mutex>guard(request_mutex);
   unsigned state=phase.load(std::memory_order_acquire);if(state!=2&&state!=4)return false;
+#ifdef NATIVE_GAME_TILED_VERIFICATION
+  // Every-frame mode: replace every FSR frame synchronously (coherent picture at network speed).
+  // Still resets history each frame; remove the file to fall back to the polled slow preview.
+  if(!armed_request&&GetFileAttributesW(LR"(D:\DLSSNR-Lab\continuous-every-frame.txt)")!=INVALID_FILE_ATTRIBUTES){if(last_request<100000000){armed_request=++last_request;every_frame=true;phase=2;}}
+#endif
   auto now=GetTickCount64();if(now>=next_poll){
    next_poll=now+250;unsigned long pid=0,id=0;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
@@ -82,6 +87,14 @@ public:
   if(!request){phase=2;return;}
   try{
    if(q!=queue)throw std::runtime_error("one-shot queue changed");
+   if(every_frame&&request>1){
+    // Steady state: no readback, no files; one log line per 100 frames with the average interval.
+    frame->RebindSourceAfterCompletion(source);
+    frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false);
+    auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);every_frame_tick=now;}
+    if(every_frame_count==1)every_frame_tick=now;
+    phase=4;return;
+   }
    auto before=NativeReadSubmittedFrame(q,source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Save(request,L"before",before);
    auto input_check=CheckNativeFrameInput(before);
    if(input_check!=NativeFrameInputCheck::valid){Log("input_rejected",input_check==NativeFrameInputCheck::black?"black RGB; no neural write; new request required":"invalid input; no neural write; new request required");phase=2;return;}
