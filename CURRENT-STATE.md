@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**继续到 74.9ms，已部署（光）。** C512 注意力（native_c64.hlsl attention, CHANNELS=512）编译期换硬件 H + 位元 F（79.1）；C512 ffwd 改每组 4 wave 分块并行（split_stage0 0.289→0.077，74.9）。游戏 assets = `D:\DLSSNR-Lab\split-w4`，DLL 和 flag 同 fast3（`b9d9c9f5…`，native-game-flags-fast3.txt）。链入口 `run_split_ffwd_waves4_network.ps1`。剩余大头：C32 家族（encoder1_4 9.4、post70 6.6、preblock 9、tail 约 10）、C512 注意力 16×0.31、ViT 8×1.3、多头 Swin 约 12。
+
 **19:07 之后 继续：测试台 80.6ms，已部署（光）。** C32 Q/K/V 硬件 Cast 进 aux（84.3）、ViT 注意力快速版（去软件 H/老 F，82.4）、ViT contract split-K 四分区并行 + combine（80.6）。游戏：DLL `b9d9c9f5…f690`，assets = `D:\DLSSNR-Lab\vit-splitk`，flag `native-game-flags-fast3.txt`（= fast2 + DLSS5_VIT_SPLIT_K=1）。回退到 87.9 版：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\hw-h -Flags D:\DLSSNR-Lab\native-game-flags-fast2.txt`。链入口 `run_vit_split_k_network.ps1`。踩坑：新 runner 在链顶端编译时下层 runner 还没设 DLSS5_FP8_OPERANDS 等环境变量，shader 按 f16 编译去读 FP8 权重 → PSNR 28dB 还更慢；顶层 runner 要自己先把快速链的编译变量设上。探针（release/c32-aprobe-*）：C32 注意力核里 exp/P 归一化/输出量化都不是成本，qkv 核 2.7ms 里肉是每 lane 48 次软件 Ffast。
 
 **19:06 用户游戏内确认 87.9ms 版速度更快、效果在；雨景下画面闪烁，F6 切 FSR 不闪，先搁置（光）。** 二分只做了一步（只留时序去 double 那版用户说"又变慢了"，没看闪不闪就切回来了）。待查线索：FAST_PREFIX 把噪声从表改成 ALU 生成、C32 FFN 硬件 Cast、HW_H 的 f16 denormal 处理（max_abs 0.062→0.083）。A/B 方法：按 release 目录逐步 deploy（fast-prefix 前一步是 fp8-qkv 目录），DLL 通用，flag 文件按步裁。
