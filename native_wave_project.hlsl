@@ -25,11 +25,20 @@ cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint rast
 #endif
 // Padded token -> raster index, or -1 for border tokens.
 int raster_index(uint p){int x=int(p%width)-int(pad_x),y=int(p/width)-int(pad_y);if(x<0||y<0||x>=int(raster_width)||y>=int(raster_height))return -1;return int((uint(y)*raster_width+uint(x))*MATRIX_CHANNELS);}
+#if NATIVE_FP8_OPERANDS
+#define OPERAND dx::linalg::ComponentType::F8_E4M3FN
+#define ELEM 1
+groupshared uint tile8[128];
+uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)return sg;float m=abs(v);if(m<0.015625)return sg|uint(round(m*512.0));uint e=(a>>23)-127+7,mant=(a>>20)&7u;if(e>15)return sg|0x7eu;return sg|(e<<3)|mant;}
+#else
+#define OPERAND dx::linalg::ComponentType::F16
+#define ELEM 2
 groupshared float16_t tile[512];
+#endif
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
-using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
-using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+using A=dx::linalg::Matrix<OPERAND,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using B=dx::linalg::Matrix<OPERAND,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
 [WaveSize(32)]
 [numthreads(32,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
@@ -38,18 +47,24 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;acc[n]=C::Splat(0.0f);
 #if MAP_FEATURE
-  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;int src=raster_index(first+rc.x);float f=src<0?0:feature[uint(src)+row];acc[n].Set(i,H(f*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*2+row*4))));}
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;int src=raster_index(first+rc.x);float f=src<0?0:feature[uint(src)+row];acc[n].Set(i,H(f*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
 #else
-  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(feature[(first+rc.x)*MATRIX_CHANNELS+row]*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*2+row*4))));}
+  for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);uint row=col+rc.y;acc[n].Set(i,H(feature[(first+rc.x)*MATRIX_CHANNELS+row]*asfloat(weights.Load(MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+row*4))));}
 #endif
  }
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
+#if NATIVE_FP8_OPERANDS
+  for(uint u=tid.x;u<128;u+=32){uint i0=u*4;uint row=(first+i0/32)*MATRIX_CHANNELS+g*32+i0%32;tile8[u]=E4M3(input[row])|(E4M3(input[row+1])<<8)|(E4M3(input[row+2])<<16)|(E4M3(input[row+3])<<24);}
+  GroupMemoryBarrierWithGroupSync();
+  A a=A::Load(tile8,0,8,dx::linalg::MatrixLayout::RowMajor);
+#else
   for(uint i=tid.x;i<512;i+=32)tile[i]=float16_t(input[(first+i/32)*MATRIX_CHANNELS+g*32+i%32]);
   GroupMemoryBarrierWithGroupSync();
   A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+#endif
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
-   B b=B::Load(weights,(col*MATRIX_CHANNELS+g*32)*2,MATRIX_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
+   B b=B::Load(weights,(col*MATRIX_CHANNELS+g*32)*ELEM,MATRIX_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
 #if NATIVE_FAST_ACCUMULATE
    acc[n].MultiplyAccumulate(a,b);
 #else

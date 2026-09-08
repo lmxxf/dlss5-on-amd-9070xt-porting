@@ -8,7 +8,7 @@ foreach($Channels in 64,128,256){
  $Suffix=if($Channels -eq 256){''}else{"_c$Channels"}
  foreach($Raw in 0,1){
   $Name=if($Raw){"native_wave_project_raw$Suffix.cso"}else{"native_wave_project$Suffix.cso"}
-  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
   if($LASTEXITCODE -ne 0){throw "Wave projection C$Channels raw=$Raw compilation failed"}
  }
 }

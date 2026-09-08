@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "native_resident_table.h"
 #include "native_preblock_runtime.h"
 #include "native_shader_cache.h"
@@ -51,9 +52,12 @@ public:
   if(wave_project){
    const size_t matrix=512ull*512;const float*sources[2]={fp.data(),aw.data()+3*matrix};const float*scales[2]={fp.data()+matrix,aw.data()+4*matrix+16*4096+16};
    for(UINT k=0;k<2;k++){
-    std::vector<float>packed(matrix/2+512);
-    for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("split projection weight not exact half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
-    std::memcpy(packed.data()+matrix/2,scales[k],512*4);project_weights[k]=Buffer(d,packed.size()*4,&packed);
+    const wchar_t*f8=_wgetenv(L"DLSS5_FP8_OPERANDS");const bool fp8=f8&&!wcscmp(f8,L"1");
+    std::vector<float>packed(fp8?matrix/4+512:matrix/2+512);
+    if(fp8){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data());for(size_t i=0;i<matrix;i++){float v=sources[k][i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}std::memcpy(packed.data()+matrix/4,scales[k],512*4);}
+    else{for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("split projection weight not exact half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
+    std::memcpy(packed.data()+matrix/2,scales[k],512*4);}
+    project_weights[k]=Buffer(d,packed.size()*4,&packed);
    }
   }
   const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");

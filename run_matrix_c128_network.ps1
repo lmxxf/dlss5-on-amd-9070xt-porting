@@ -8,6 +8,7 @@ foreach($Channels in $(if($IncludeC64){128,64}else{128})){foreach($Name in 'pack
  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D PACKED_INPUT=1 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" "native_matrix_$Name.hlsl" -Fo $Output
  if($LASTEXITCODE -ne 0){throw "Compile failed: $Name"}
 }}
+if($env:DLSS5_FP8_OPERANDS -eq '1'){foreach($Channels in 256,128,64){$Suffix=if($Channels -eq 256){''}else{"_c$Channels"};& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" native_wave_qkv.hlsl -Fo "native_wave_qkv$Suffix.cso";if($LASTEXITCODE -ne 0){throw "Wave QKV C$Channels compilation failed"}}}
 [Environment]::SetEnvironmentVariable('DLSS5_TEST_MATRIX_C64',$(if($IncludeC64){'1'}else{'0'}),'Process')
 foreach($Name in 'TILED_C64','SPLIT_PROJECTION','SPLIT_FFWD','TILED_QKV','SHARED_C32','RESIDENT_NOISE','CACHE_C32_INPUT','PAD_C32_LDS','PAD_MULTIHEAD_LDS','MATRIX_C256','MATRIX_C128'){
  [Environment]::SetEnvironmentVariable("DLSS5_TEST_$Name",'1','Process')
