@@ -13,7 +13,15 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
   Mat m=Mat::Load<dx::linalg::MatrixLayout::RowMajor>(weights,((id.z*(MATRIX_CHANNELS/32)+id.y)*(MATRIX_CHANNELS/32)+g)*2048,64);
   vector<float16_t,32>x;[unroll]for(uint j=0;j<32;j++){uint pos=(p*MATRIX_CHANNELS+g*32+j)*2,b=input.Load(pos&~3u);x[j]=float16_t(f16tof32((b>>((pos&2)*8))&65535u));}
-  vector<float,32>y=dx::linalg::Multiply<float>(m,x);[unroll]for(uint r=0;r<32;r++)a[r]=H(a[r]+y[r]);
+  vector<float,32>y=dx::linalg::Multiply<float>(m,x);
+#if NATIVE_FAST_ACCUMULATE
+  [unroll]for(uint r=0;r<32;r++)a[r]+=y[r];
+#else
+  [unroll]for(uint r=0;r<32;r++)a[r]=H(a[r]+y[r]);
+#endif
  }
+#if NATIVE_FAST_ACCUMULATE
+ [unroll]for(uint r=0;r<32;r++)a[r]=H(a[r]);
+#endif
  [unroll]for(uint r=0;r<32;r++)output[(p*3+id.z)*MATRIX_CHANNELS+id.y*32+r]=a[r];
 }

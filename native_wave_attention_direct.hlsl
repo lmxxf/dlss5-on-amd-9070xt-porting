@@ -91,14 +91,24 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   A pa=A::Load(ex,qr*16*64,64,dx::linalg::MatrixLayout::RowMajor);
   B vb=B::Load(qkv,(base+2*CHANNELS+col)*2,STRIDE*2,dx::linalg::MatrixLayout::RowMajor,16);
   C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(pa,vb);
+#if !NATIVE_FAST_ACCUMULATE
   for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)));
+#endif
   pa=A::Load(ex,qr*16*64+32,64,dx::linalg::MatrixLayout::RowMajor);
   vb=B::Load(qkv,(base+32*STRIDE+2*CHANNELS+col)*2,STRIDE*2,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+  acc.MultiplyAccumulate(pa,vb);
+  for(uint i=0;i<acc.Length();i++){
+   uint2 rc=acc.GetCoordinate(i);uint query=qr*16+rc.x,pixel=window_pixel(window,query);
+   output[pixel*CHANNELS+head*32+col+rc.y]=F(H(acc.Get(i)));
+  }
+#else
   C next=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(pa,vb);
   for(uint i=0;i<acc.Length();i++){
    uint2 rc=acc.GetCoordinate(i);uint query=qr*16+rc.x,pixel=window_pixel(window,query);
    output[pixel*CHANNELS+head*32+col+rc.y]=F(H(acc.Get(i)+next.Get(i)));
   }
+#endif
  }
 }
 #endif

@@ -50,13 +50,19 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
    B b=B::Load(weights,(col*MATRIX_CHANNELS+g*32)*2,MATRIX_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   acc[n].MultiplyAccumulate(a,b);
+#else
    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
+#endif
   }
   GroupMemoryBarrierWithGroupSync();
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
-#if !RAW
+#if NATIVE_FAST_ACCUMULATE
+  for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,RAW?H(acc[n].Get(i)):F(H(acc[n].Get(i))));
+#elif !RAW
   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,F(acc[n].Get(i)));
 #endif
 #if MAP_OUTPUT

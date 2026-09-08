@@ -28,12 +28,23 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
    [unroll]for(uint n=0;n<BLOCK_N;n++){
     B b=B::Load(weights,(part*1048576+(row0+n*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+    acc[n].MultiplyAccumulate(a,b);
+#else
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
+#endif
    }
    GroupMemoryBarrierWithGroupSync();
   }
+#if NATIVE_FAST_ACCUMULATE
+  [unroll]for(uint n=0;n<BLOCK_N;n++){if(group==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,total[n].Get(i)+acc[n].Get(i));}
+#else
   [unroll]for(uint n=0;n<BLOCK_N;n++){if(group==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,H(total[n].Get(i)+acc[n].Get(i)));}
+#endif
  }
+#if NATIVE_FAST_ACCUMULATE
+ [unroll]for(uint n=0;n<BLOCK_N;n++)for(uint i=0;i<total[n].Length();i++)total[n].Set(i,H(total[n].Get(i)));
+#endif
  [unroll]for(uint n=0;n<BLOCK_N;n++)total[n].Store(output,((part*tokens+first)*1024+row0+n*16)*4,4096,dx::linalg::MatrixLayout::RowMajor,16);
 }

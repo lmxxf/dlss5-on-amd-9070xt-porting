@@ -110,10 +110,18 @@ groupshared float softmax_inverse[64];
   [unroll]for(uint g=0;g<2;g++){
    A pa=A::Load(ex,qr*16*64+g*32,64,dx::linalg::MatrixLayout::RowMajor);
    B vb=B::Load(aux,((base+g*32)*32+col)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   acc.MultiplyAccumulate(pa,vb);
+#else
    C partial=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(pa,vb);
    for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)+partial.Get(i)));
+#endif
   }
+#if NATIVE_FAST_ACCUMULATE
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+#else
   for(uint i=0;i<acc.Length();i++)acc.Set(i,F(acc.Get(i)));
+#endif
   acc.Cast<dx::linalg::ComponentType::F16>().Store(aux,attn_base()+((base+qr*16)*32+col)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }

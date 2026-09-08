@@ -4,7 +4,7 @@ Set-Location $Folder
 $Dxc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\bin\x64\dxc.exe'
 $Inc='D:\DLSSNR-Lab\matrix-probe\dxc-preview\inc\hlsl'
 foreach($Name in 'pack','qkv'){
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 "native_matrix_$Name.hlsl" -Fo "native_matrix_${Name}_c512.cso"
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" "native_matrix_$Name.hlsl" -Fo "native_matrix_${Name}_c512.cso"
  if($LASTEXITCODE -ne 0){throw "Compile failed: $Name"}
 }
 & $Dxc -I $Inc -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D CHANNELS=512 -D NATIVE_PRECOMPUTED_QKV=1 -D NATIVE_WAVE_SCORES=1 native_c64.hlsl -Fo native_wave_split_attention.cso

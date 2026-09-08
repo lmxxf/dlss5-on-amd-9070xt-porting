@@ -49,9 +49,16 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
   A a=A::Load(hidden,g*32,128,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint block=0;block<2;block++){
    B b=B::Load(weights,8192+(block*16*128+g*32)*2,256,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   acc[block].MultiplyAccumulate(a,b);
+#else
    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    ELEM_LOOP(acc[block])acc[block].Set(i,H(acc[block].Get(i)+p.Get(i)));
+#endif
   }
  }
+#if NATIVE_FAST_ACCUMULATE
+ [unroll]for(uint block=0;block<2;block++)ELEM_LOOP(acc[block])acc[block].Set(i,H(acc[block].Get(i)));
+#endif
  [unroll]for(uint block=0;block<2;block++)ELEM_LOOP(acc[block]){uint2 rc=acc[block].GetCoordinate(i);output[(first+rc.x)*32+block*16+rc.y]=acc[block].Get(i);}
 }

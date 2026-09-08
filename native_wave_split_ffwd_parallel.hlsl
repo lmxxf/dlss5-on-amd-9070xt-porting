@@ -27,13 +27,21 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
    [unroll]for(uint block=0;block<4;block++){
     B b=B::Load(weights,((group*64+block*16)*512+k*32)*2,1024,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+    acc[block].MultiplyAccumulate(a,b);
+#else
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,H(acc[block].Get(i)+p.Get(i)));
+#endif
    }
    GroupMemoryBarrierWithGroupSync();
   }
   [unroll]for(uint block=0;block<4;block++){
+#if NATIVE_FAST_ACCUMULATE
+   for(uint i=0;i<acc[block].Length();i++){uint2 rc=acc[block].GetCoordinate(i);mixed[rc.x*80+block*16+rc.y]=float16_t(F(H(acc[block].Get(i))));}
+#else
    for(uint i=0;i<acc[block].Length();i++){uint2 rc=acc[block].GetCoordinate(i);mixed[rc.x*80+block*16+rc.y]=float16_t(F(acc[block].Get(i)));}
+#endif
   }
   GroupMemoryBarrierWithGroupSync();
  }
@@ -61,9 +69,16 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
    for(uint k=0;k<2;k++){
     A a=A::Load(mixed,k*32,80,dx::linalg::MatrixLayout::RowMajor);
     B b=B::Load(weights,(262144+group*16384+block*16*64+k*32)*2,128,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+    acc.MultiplyAccumulate(a,b);
+#else
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)+p.Get(i)));
+#endif
    }
+#if NATIVE_FAST_ACCUMULATE
+   for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)));
+#endif
 #if NATIVE_SPLIT_FFWD_BLOCKED
    for(uint i=0;i<acc.Length();i++){float v=acc.Get(i),g=clamp(v,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);uint2 rc=acc.GetCoordinate(i);hidden[rc.x*272+block*16+rc.y]=float16_t(F(H(v*p)));}
 #else
@@ -81,12 +96,20 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
     A a=A::Load(hidden,k*32,272,dx::linalg::MatrixLayout::RowMajor);
     [unroll]for(uint block=0;block<4;block++){
      B b=B::Load(weights,(393216+group*16384+block*16*256+k*32)*2,512,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+     acc[block].MultiplyAccumulate(a,b);
+#else
      C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
      for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,H(acc[block].Get(i)+p.Get(i)));
+#endif
     }
    }
    [unroll]for(uint block=0;block<4;block++){
+#if NATIVE_FAST_ACCUMULATE
+    for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,F(H(acc[block].Get(i))));
+#else
     for(uint i=0;i<acc[block].Length();i++)acc[block].Set(i,F(acc[block].Get(i)));
+#endif
     acc[block].Store(output,(first*512+group*64+block*16)*4,512*4,dx::linalg::MatrixLayout::RowMajor,16);
    }
   }

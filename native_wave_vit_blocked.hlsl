@@ -44,15 +44,24 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;
    B b=B::Load(weights,(col*1024+g*32)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+   acc[n].MultiplyAccumulate(a,b);
+#else
    C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
    for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
+#endif
   }
   GroupMemoryBarrierWithGroupSync();
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;
   for(uint i=0;i<acc[n].Length();i++){
-   float a=acc[n].Get(i),g=clamp(a,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
+#if NATIVE_FAST_ACCUMULATE
+   float a=H(acc[n].Get(i));
+#else
+   float a=acc[n].Get(i);
+#endif
+   float g=clamp(a,-4.0,4.0),p=H(g*H(abs(g)*(-.055908203125)+.447265625)+.89453125);
    acc[n].Set(i,F(H(a*p)));
   }
 #if NATIVE_SCATTER_STORE
@@ -90,17 +99,30 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    [unroll]for(uint n=0;n<BLOCK_N;n++){
     uint col=(gid.y*BLOCK_N+n)*16;
     B b=B::Load(weights,(col*INPUT_CHANNELS+k)*2,INPUT_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
+#if NATIVE_FAST_ACCUMULATE
+    acc[n].MultiplyAccumulate(a,b);
+#else
     C p=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,H(acc[n].Get(i)+p.Get(i)));
+#endif
    }
 #if INPUT_CHANNELS!=4096
    GroupMemoryBarrierWithGroupSync();
 #endif
   }
+#if NATIVE_FAST_ACCUMULATE
+  // Partitions are summed in FP32 without intermediate rounding.
+  [unroll]for(uint n=0;n<BLOCK_N;n++){if(part==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,total[n].Get(i)+acc[n].Get(i));}
+#else
   [unroll]for(uint n=0;n<BLOCK_N;n++){if(part==0)total[n]=acc[n];else for(uint i=0;i<total[n].Length();i++)total[n].Set(i,H(total[n].Get(i)+acc[n].Get(i)));}
+#endif
  }
  [unroll]for(uint n=0;n<BLOCK_N;n++){
+#if NATIVE_FAST_ACCUMULATE
+  for(uint i=0;i<total[n].Length();i++)total[n].Set(i,F(H(total[n].Get(i))));
+#else
   for(uint i=0;i<total[n].Length();i++)total[n].Set(i,F(total[n].Get(i)));
+#endif
   total[n].Store(output,(first*1024+(gid.y*BLOCK_N+n)*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
