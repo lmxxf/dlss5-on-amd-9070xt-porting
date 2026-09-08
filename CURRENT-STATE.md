@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**试过无收益（未采纳）：** finish 段位元 F（内存绑定的 tile→raster 转置，0 收益）；C32 注意力 exp 表矩阵整块存 LDS（0）。C32 注意力核结构（每窗 256 线程、LDS 16KB→占用低）是下一步的假设，没验证。
+
 **C512 注意力换 direct 路径，62.7ms，已部署（光）。** FP8 pack → 融合 QKV+normalize（FP8 权重行主序）→ direct attention（FP8 Q/K/V、FP8 输出）→ FP8 直读投影（DLSS5_SPLIT_DIRECT_ATTENTION=1）；split_stage2 0.31→0.02ms，16 块合计 −4.8。游戏：DLL `5ed8e88d…`，assets = `D:\DLSSNR-Lab\split-direct`，flag `native-game-flags-fast7.txt`。链入口 `run_split_direct_attention_network.ps1`。
 
 **20:58 之后 多头残差流全 FP8，67.5ms，已部署（光）。** result[0] 和链内 raster 输出存 E4M3（DLSS5_FP8_STREAM=1）：QKV pack 通道没了（融合 QKV 核直接读 result[0]），带 shift 的 FFN pack 变字节 gather，投影残差读 FP8 解码。链首块（组首、body56/body62）输入 f32、链尾（组末 raw、c256[6]/c128[4]/c64[2] 喂 project）输出 f32，由构建处按位置传 fp8_input/fp8_output。输出逐位相同。游戏：DLL `f2e49b77…`，assets = `D:\DLSSNR-Lab\fp8-stream`，flag `native-game-flags-fast6.txt`。链入口 `run_fp8_stream_network.ps1`。
