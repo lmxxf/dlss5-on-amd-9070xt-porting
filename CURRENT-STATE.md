@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**19:44 用户确认 12fps；继续到 71.3ms，已部署（光）。** ViT：pack8/pack16 一次性操作数副本（expand/qkv/投影不再每 K 步 LDS 重排）、expand/contract/qkv 每 wave 4 个 token tile 共用权重加载（权重流量 /4，DLSS5_VIT_BLOCK_M=4；1024 投影的 m4 变体结果不对未查，投影固定不用）。游戏：DLL `7627d75e…474e`，assets = `D:\DLSSNR-Lab\vit-m4`，flag `native-game-flags-fast4.txt`（= fast3 + DLSS5_VIT_PACKED_INPUT=1 + DLSS5_VIT_BLOCK_M=4）。回退到 74.9 版：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\split-w4 -Flags D:\DLSSNR-Lab\native-game-flags-fast3.txt`（DLL 也要换回 b9d9c9f5，在 native-game-fast.addon64 之前的备份里没有——需要时重编 tag 前一 commit）。链入口 `run_vit_block_m_network.ps1`。踩坑 2：runner 里用字面量替换生成编译行，字面量没匹配上就静默漏掉 -D，结果核按单 tile 编译却按四分之一组数派发。
+
 **继续到 74.9ms，已部署（光）。** C512 注意力（native_c64.hlsl attention, CHANNELS=512）编译期换硬件 H + 位元 F（79.1）；C512 ffwd 改每组 4 wave 分块并行（split_stage0 0.289→0.077，74.9）。游戏 assets = `D:\DLSSNR-Lab\split-w4`，DLL 和 flag 同 fast3（`b9d9c9f5…`，native-game-flags-fast3.txt）。链入口 `run_split_ffwd_waves4_network.ps1`。剩余大头：C32 家族（encoder1_4 9.4、post70 6.6、preblock 9、tail 约 10）、C512 注意力 16×0.31、ViT 8×1.3、多头 Swin 约 12。
 
 **19:07 之后 继续：测试台 80.6ms，已部署（光）。** C32 Q/K/V 硬件 Cast 进 aux（84.3）、ViT 注意力快速版（去软件 H/老 F，82.4）、ViT contract split-K 四分区并行 + combine（80.6）。游戏：DLL `b9d9c9f5…f690`，assets = `D:\DLSSNR-Lab\vit-splitk`，flag `native-game-flags-fast3.txt`（= fast2 + DLSS5_VIT_SPLIT_K=1）。回退到 87.9 版：`deploy_fast.ps1 -Source D:\DLSSNR-Lab\hw-h -Flags D:\DLSSNR-Lab\native-game-flags-fast2.txt`。链入口 `run_vit_split_k_network.ps1`。踩坑：新 runner 在链顶端编译时下层 runner 还没设 DLSS5_FP8_OPERANDS 等环境变量，shader 按 f16 编译去读 FP8 权重 → PSNR 28dB 还更慢；顶层 runner 要自己先把快速链的编译变量设上。探针（release/c32-aprobe-*）：C32 注意力核里 exp/P 归一化/输出量化都不是成本，qkv 核 2.7ms 里肉是每 lane 48 次软件 Ffast。
