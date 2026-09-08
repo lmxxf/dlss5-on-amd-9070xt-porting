@@ -14,6 +14,14 @@
 ByteAddressBuffer input:register(t0),weights:register(t1);
 StructuredBuffer<float> attention_weights:register(t2);
 RWByteAddressBuffer packed:register(u0);
+groupshared float squares[1024];
+groupshared float inv[32];
+#ifndef NATIVE_FP8_QKV_OUT
+#define NATIVE_FP8_QKV_OUT 0
+#endif
+#if NATIVE_FP8_QKV_OUT
+groupshared uint tile8[256];
+#endif
 cbuffer Geometry:register(b0){uint width;uint height;}
 float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
 using A=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
@@ -32,23 +40,44 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   }
  }
  const uint part=(gid.y*64)/MATRIX_CHANNELS,head0=((gid.y*64)%MATRIX_CHANNELS)/32;
- // Per-token inverse norm for the two heads (tiles 0,1 = head0; tiles 2,3 = head0+1). V needs none.
- float inv[2][16];
- [unroll]for(uint h=0;h<2;h++){
-  float ss[16];[unroll]for(uint r=0;r<16;r++)ss[r]=0;
-  if(part<2){
-   [unroll]for(uint n=0;n<2;n++)for(uint i=0;i<acc[h*2+n].Length();i++){uint2 rc=acc[h*2+n].GetCoordinate(i);float v=acc[h*2+n].Get(i);[unroll]for(uint r=0;r<16;r++)ss[r]+=(rc.x==r)?v*v:0;}
+ // Per-token inverse norm for the two heads (tiles 0,1 = head0; tiles 2,3 = head0+1), via LDS:
+ // squares scattered by (row, channel), 16 lanes sum their row, epilogue reads inv[head][row].
+ const uint lane=WaveGetLaneIndex();
+ if(part<2){
+  [unroll]for(uint h=0;h<2;h++){
+   [unroll]for(uint n=0;n<2;n++)for(uint i=0;i<acc[h*2+n].Length();i++){uint2 rc=acc[h*2+n].GetCoordinate(i);float v=acc[h*2+n].Get(i);squares[h*512+rc.x*32+n*16+rc.y]=v*v;}
+  }
+  GroupMemoryBarrierWithGroupSync();
+  {
+   const uint h=lane/16,r=lane%16;float ss=0;
+   [unroll]for(uint c=0;c<32;c++)ss+=squares[h*512+r*32+c];
    float scale=part==0?attention_weights[SCALE_OFFSET+head0+h]:1;
-   [unroll]for(uint r=0;r<16;r++)inv[h][r]=rsqrt(max(WaveActiveSum(ss[r]),6.198883056640625e-5))*scale;
-  }else{[unroll]for(uint r=0;r<16;r++)inv[h][r]=1;}
+   inv[h*16+r]=rsqrt(max(ss,6.198883056640625e-5))*scale;
+  }
+  GroupMemoryBarrierWithGroupSync();
  }
  [unroll]for(uint n=0;n<4;n++){
   uint row=(gid.y*64)%MATRIX_CHANNELS+n*16;
+#if NATIVE_FP8_QKV_OUT
+  // Scale rows, hardware-cast to E4M3 into an LDS [16 token][64 byte] tile, then copy out 16-byte chunks.
+  if(part<2)for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);acc[n].Set(i,acc[n].Get(i)*inv[(n/2)*16+rc.x]);}
+  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(tile8,n*4,16,dx::linalg::MatrixLayout::RowMajor);
+#else
   for(uint i=0;i<acc[n].Length();i++){
    uint2 rc=acc[n].GetCoordinate(i);
-   float k=1;[unroll]for(uint r=0;r<16;r++)k=(rc.x==r)?inv[n/2][r]:k;
+   float k=part<2?inv[(n/2)*16+rc.x]:1;
    uint p=gid.x*16+rc.x,px=p%width,py=p/width,window=(py/8)*(width/8)+px/8,token=(py%8)*8+px%8;
    packed.Store<float16_t>(((window*64+token)*STRIDE+part*MATRIX_CHANNELS+row+rc.y)*2,float16_t(Ffast(acc[n].Get(i)*k)));
   }
+#endif
  }
+#if NATIVE_FP8_QKV_OUT
+ GroupMemoryBarrierWithGroupSync();
+ {
+  const uint t=lane/2,half=lane%2,p=gid.x*16+t,px=p%width,py=p/width,window=(py/8)*(width/8)+px/8,token=(py%8)*8+px%8;
+  const uint dst=(window*64+token)*STRIDE+part*MATRIX_CHANNELS+(gid.y*64)%MATRIX_CHANNELS+half*32,src=t*16+half*8;
+  packed.Store4(dst,uint4(tile8[src],tile8[src+1],tile8[src+2],tile8[src+3]));
+  packed.Store4(dst+16,uint4(tile8[src+4],tile8[src+5],tile8[src+6],tile8[src+7]));
+ }
+#endif
 }

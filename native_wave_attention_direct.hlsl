@@ -58,11 +58,37 @@ RWByteAddressBuffer packed:register(u0);
 #endif
 }
 #else
+#ifndef NATIVE_FP8_OUTPUT
+#define NATIVE_FP8_OUTPUT 0
+#endif
+#if NATIVE_FP8_OUTPUT
+// FAST PATH step 3: output E4M3 bytes [pixel][C]. Tile rows are 8-pixel raster runs, so each wave
+// stages its 16x16 tile as one byte per uint slot in LDS and packs 4 channels per store.
+RWByteAddressBuffer output:register(u0);
+groupshared uint otile[8*256];
+uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)return sg;float m=abs(v);if(m<0.015625)return sg|uint(round(m*512.0));uint e=(a>>23)-127+7,mant=(a>>20)&7u;if(e>15)return sg|0x7eu;return sg|(e<<3)|mant;}
+#else
 RWStructuredBuffer<float> output:register(u0);
+#endif
 groupshared float16_t ex[4096];
 groupshared float softmax_inverse[64];
-using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
-using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+#ifndef NATIVE_FP8_QKV
+#define NATIVE_FP8_QKV 0
+#endif
+#if NATIVE_FP8_QKV
+// FAST PATH step 3c: Q/K/V arrive as E4M3 bytes (window-major [token][3C]); P is re-packed as E4M3 for the AV product.
+#define QKV_TYPE dx::linalg::ComponentType::F8_E4M3FN
+#define QELEM 1
+groupshared uint p8[1024];
+#if !NATIVE_FP8_OUTPUT
+uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)return sg;float m=abs(v);if(m<0.015625)return sg|uint(round(m*512.0));uint e=(a>>23)-127+7,mant=(a>>20)&7u;if(e>15)return sg|0x7eu;return sg|(e<<3)|mant;}
+#endif
+#else
+#define QKV_TYPE dx::linalg::ComponentType::F16
+#define QELEM 2
+#endif
+using A=dx::linalg::Matrix<QKV_TYPE,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using B=dx::linalg::Matrix<QKV_TYPE,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
@@ -71,10 +97,10 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  uint qr=t/64,col_start=(t/32)&1;
  {
   C s[2];
-  A qa=A::Load(qkv,(base+qr*16*STRIDE)*2,STRIDE*2,dx::linalg::MatrixLayout::RowMajor,16);
+  A qa=A::Load(qkv,(base+qr*16*STRIDE)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
   [unroll]for(uint j=0;j<2;j++){
    uint kr=col_start+j*2;
-   B kb=B::Load(qkv,(base+kr*16*STRIDE+CHANNELS)*2,STRIDE*2,dx::linalg::MatrixLayout::ColMajor,16);
+   B kb=B::Load(qkv,(base+kr*16*STRIDE+CHANNELS)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::ColMajor,16);
    s[j]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
   }
   [unroll]for(uint j=0;j<2;j++){
@@ -97,7 +123,11 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  {uint query=t/4,part=t%4;float sum=0;[unroll]for(uint j=0;j<16;j++)sum+=float(ex[query*64+part*16+j]);
   sum+=WaveReadLaneAt(sum,(t&31)^1);sum+=WaveReadLaneAt(sum,(t&31)^2);if(part==0)softmax_inverse[query]=1/sum;}
  GroupMemoryBarrierWithGroupSync();
+#if NATIVE_FP8_QKV
+ {uint i0=t*16;uint4 w=0;[unroll]for(uint j=0;j<16;j++){uint e=E4M3(Ffast(float(ex[i0+j])*softmax_inverse[i0/64]));w[j/4]|=e<<((j%4)*8);}p8[t*4]=w.x;p8[t*4+1]=w.y;p8[t*4+2]=w.z;p8[t*4+3]=w.w;}
+#else
  for(uint i=t;i<4096;i+=256)ex[i]=float16_t(Ffast(float(ex[i])*softmax_inverse[i/64]));
+#endif
 #else
  if(t<64){
   float parity[2];[unroll]for(uint odd=0;odd<2;odd++){
@@ -114,15 +144,36 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  GroupMemoryBarrierWithGroupSync();
  {
   uint col=col_start*16;
+  #if NATIVE_FP8_QKV
+  A pa=A::Load(p8,qr*16*16,16,dx::linalg::MatrixLayout::RowMajor);
+#else
   A pa=A::Load(ex,qr*16*64,64,dx::linalg::MatrixLayout::RowMajor);
-  B vb=B::Load(qkv,(base+2*CHANNELS+col)*2,STRIDE*2,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
+  B vb=B::Load(qkv,(base+2*CHANNELS+col)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
   C acc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(pa,vb);
 #if !NATIVE_FAST_ACCUMULATE
   for(uint i=0;i<acc.Length();i++)acc.Set(i,H(acc.Get(i)));
 #endif
+  #if NATIVE_FP8_QKV
+  pa=A::Load(p8,qr*16*16+8,16,dx::linalg::MatrixLayout::RowMajor);
+#else
   pa=A::Load(ex,qr*16*64+32,64,dx::linalg::MatrixLayout::RowMajor);
-  vb=B::Load(qkv,(base+32*STRIDE+2*CHANNELS+col)*2,STRIDE*2,dx::linalg::MatrixLayout::RowMajor,16);
-#if NATIVE_FAST_ACCUMULATE
+#endif
+  vb=B::Load(qkv,(base+32*STRIDE+2*CHANNELS+col)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_FAST_ACCUMULATE&&NATIVE_FP8_OUTPUT
+  acc.MultiplyAccumulate(pa,vb);
+  {
+   const uint wave=t/32,lane=t%32;
+   for(uint i=0;i<acc.Length();i++){uint2 rc=acc.GetCoordinate(i);otile[wave*256+rc.x*16+rc.y]=E4M3(F(H(acc.Get(i))));}
+   GroupMemoryBarrierWithGroupSync();
+   [unroll]for(uint k=0;k<2;k++){
+    uint idx=(lane*2+k)*4,row=idx/16,c4=idx%16,base_slot=wave*256+idx;
+    uint packed=otile[base_slot]|(otile[base_slot+1]<<8)|(otile[base_slot+2]<<16)|(otile[base_slot+3]<<24);
+    uint pixel=window_pixel(window,qr*16+row);
+    output.Store(pixel*CHANNELS+head*32+col+c4,packed);
+   }
+  }
+#elif NATIVE_FAST_ACCUMULATE
   acc.MultiplyAccumulate(pa,vb);
   for(uint i=0;i<acc.Length();i++){
    uint2 rc=acc.GetCoordinate(i);uint query=qr*16+rc.x,pixel=window_pixel(window,query);

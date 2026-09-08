@@ -16,6 +16,10 @@ RWByteAddressBuffer output:register(u0);
 #define OPERAND dx::linalg::ComponentType::F8_E4M3FN
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
+#ifndef NATIVE_HW_QUANTIZE
+#define NATIVE_HW_QUANTIZE 0
+#endif
+float ActivatePoly(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return v*p;}
 float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return Ffast(v*p);}
 using A=dx::linalg::Matrix<OPERAND,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
 using B=dx::linalg::Matrix<OPERAND,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
@@ -38,7 +42,12 @@ groupshared uint hidden[16*HIDDEN/4];
   }
   [unroll]for(uint n=0;n<4;n++){
    uint col=(wave*4+n)*16;
+#if NATIVE_HW_QUANTIZE
+   // Polynomial only; the E4M3 cast below is the (hardware RNE) quantization.
+   for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,ActivatePoly(acc[n].Get(i)));
+#else
    for(uint i=0;i<acc[n].Length();i++)acc[n].Set(i,Activate(acc[n].Get(i)));
+#endif
    acc[n].Cast<OPERAND>().Store(hidden,col/4,HIDDEN/4,dx::linalg::MatrixLayout::RowMajor);
   }
  }
@@ -51,7 +60,14 @@ groupshared uint hidden[16*HIDDEN/4];
    B b=B::Load(weights,HIDDEN*MATRIX_CHANNELS+col*HIDDEN+g*32,HIDDEN,dx::linalg::MatrixLayout::ColMajor,16);
    acc.MultiplyAccumulate(a,b);
   }
+#if !(NATIVE_HW_QUANTIZE&&NATIVE_FP8_OUTPUT)
   for(uint i=0;i<acc.Length();i++)acc.Set(i,Ffast(H(acc.Get(i))));
+#endif
+#if NATIVE_FP8_OUTPUT
+  // FAST PATH step 3: values are on the FP8 grid; store E4M3 bytes for the projection's direct A load.
+  acc.Cast<OPERAND>().Store(output,gid.x*16*MATRIX_CHANNELS+col,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   acc.Store(output,(gid.x*16*MATRIX_CHANNELS+col)*4,MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
  }
 }
