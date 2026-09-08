@@ -33,8 +33,11 @@ public:
   body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace);source=body62.Output();
   for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64,false,workspace);source=c64[i].Output();}
   project66.Create(d,source,skip4,w*h*16,64,32,false,read(66,L"weights"),dir,true);
-  body66.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir);source=body66.Output();
-  for(UINT i=0;i<3;i++){c32[i].Create(d,source,w*8,h*8,NativeDecoderShift(67+i),read(67+i,L"ffn"),read(67+i,L"attention"),dir);source=c32[i].Output();}
+  const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");const bool chain=c32_mapped&&!wcscmp(c32_mapped,L"1");
+  for(UINT i=0;i<4;i++){NativeC32Stage&stage=i?c32[i-1]:body66;const NativeC32Stage*prev=i>1?&c32[i-2]:i==1?&body66:nullptr;
+   if(i)stage.Create(d,source,w*8,h*8,NativeDecoderShift(66+i),read(66+i,L"ffn"),read(66+i,L"attention"),dir);else stage.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir);
+   if(chain){if(prev){stage.ChainFrom(*prev);const_cast<NativeC32Stage*>(prev)->SetCropNeeded(false);}else stage.MapFromRaster(project66.Output());}
+   source=stage.Output();}
   output=source;
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){

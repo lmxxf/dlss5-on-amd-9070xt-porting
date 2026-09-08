@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{};bool shared_c32{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{},*mapped_source{};bool shared_c32{};UINT mapping[8]{};
  static ID3D12Resource*&SharedFfn(){static ID3D12Resource*r=nullptr;return r;}
  static ID3D12Resource*&SharedRaw(){static ID3D12Resource*r=nullptr;return r;}
  static UINT64&SharedBytes(){static UINT64 b=0;return b;}
@@ -31,7 +31,7 @@ class NativePreblockRuntime {
  }
  ID3D12RootSignature* Root(UINT srvs,UINT uavs,bool with_noise=false,bool with_temporal=false){
   D3D12_DESCRIPTOR_RANGE ranges[]={{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,srvs,0,0,0},{D3D12_DESCRIPTOR_RANGE_TYPE_UAV,uavs,0,0,srvs}};
-  D3D12_ROOT_PARAMETER p[4]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;p[0].DescriptorTable={2,ranges};p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[1].Constants={0,0,5};p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[2].Descriptor={2,0};p[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[3].Descriptor={3,0};
+  D3D12_ROOT_PARAMETER p[4]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;p[0].DescriptorTable={2,ranges};p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[1].Constants={0,0,13};p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[2].Descriptor={2,0};p[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[3].Descriptor={3,0};
   D3D12_ROOT_SIGNATURE_DESC d{};d.NumParameters=with_temporal?4:with_noise?3:2;d.pParameters=p;ID3DBlob*b=nullptr,*error=nullptr;
   Check(D3D12SerializeRootSignature(&d,D3D_ROOT_SIGNATURE_VERSION_1,&b,&error));ID3D12RootSignature*r=nullptr;Check(device->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&r)));b->Release();if(error)error->Release();return r;
  }
@@ -89,7 +89,7 @@ public:
   if(blocked_ffn_raw_store){
    // Root-descriptor binding for the blocked FFN so the matrix Store targets a raw UAV.
    D3D12_ROOT_PARAMETER rp[3]{};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].Descriptor={0,0};rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[1].Descriptor={1,0};rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[2].Descriptor={0,0};
-   D3D12_ROOT_PARAMETER all[4]={rp[0],rp[1],rp[2],{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,5};
+   D3D12_ROOT_PARAMETER all[4]={rp[0],rp[1],rp[2],{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,13};
    D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=4;rd.pParameters=all;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&ffn_root)));rb->Release();if(re)re->Release();
   }
   stage_input=input;stage_input->AddRef();
@@ -151,7 +151,7 @@ public:
    if(recorded)for(auto*r:{main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   }else if(recorded)for(auto*r:{ffn,raw,main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
-  const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u};const UINT groups=width*height/64;
+  const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
    if(stage==1&&split_attention){
     c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,main->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
@@ -165,14 +165,14 @@ public:
     c->SetPipelineState(split_pso[3]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);
     }
    }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
-    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,stage_input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,5,constants,0);c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
    }else{
-   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
+   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    }
    if(stage==0&&prefix_wave){
     Barrier(c,raw,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,std::string(label)+"_prefix");
     if(test_prefix_readback){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);c->CopyBufferRegion(test_prefix_readback,0,raw,0,4096);Barrier(c,raw,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
-    if(blocked_ffn_raw_store){c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,prefix_ffn_weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,5,constants,0);}else{c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,5,constants,0);}c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    if(blocked_ffn_raw_store){c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,prefix_ffn_weights->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);}else{c->SetDescriptorHeaps(1,&heap[3]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[3]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);}c->SetPipelineState(pso[3]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
     Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Barrier(c,ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
@@ -181,5 +181,8 @@ public:
  }
  void CapturePrefixForTest(ID3D12Resource*r){if(!prefix_wave||test_prefix_readback||!r||r->GetDesc().Width<4096)throw std::runtime_error("prefix capture test contract");D3D12_HEAP_PROPERTIES hp{};D3D12_HEAP_FLAGS flags{};Check(r->GetHeapProperties(&hp,&flags));if(hp.Type!=D3D12_HEAP_TYPE_READBACK)throw std::runtime_error("prefix capture requires readback");test_prefix_readback=r;r->AddRef();}
  ID3D12Resource* FfnTilesForTest()const{return ffn;}
+ // FAST PATH: the FFN reads its input through a mapping instead of a pre-packed work buffer (see native_wave_c32_ffn_blocked.hlsl).
+ void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
+ bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  ID3D12Resource* Main()const{return main;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };

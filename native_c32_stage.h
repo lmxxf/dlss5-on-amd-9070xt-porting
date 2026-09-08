@@ -6,7 +6,7 @@ class NativeC32Stage {
  NativePreblockRuntime body;
  ID3D12Device*device{};ID3D12Resource*packed{},*output{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[2]{};ID3D12DescriptorHeap*heap[2]{};
- UINT geometry[6]{};bool recorded{};
+ UINT geometry[6]{};bool recorded{},mapped{},crop_needed{true};
  static void Check(HRESULT h){if(FAILED(h))throw std::runtime_error("C32 stage HRESULT="+std::to_string(unsigned(h)));}
  ID3D12Resource* Buffer(UINT64 n){D3D12_HEAP_PROPERTIES h{};h.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC d{};d.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;d.Width=n;d.Height=1;d.DepthOrArraySize=d.MipLevels=1;d.SampleDesc.Count=1;d.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;d.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;Check(device->CreateCommittedResource(&h,D3D12_HEAP_FLAG_NONE,&d,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));return r;}
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER v{};v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;v.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&v);}
@@ -24,10 +24,15 @@ public:
   const char*entry[]={"pack",raw_output?"crop_raw":"crop"};for(UINT i=0;i<2;i++){ID3DBlob*code=nullptr,*error=nullptr;auto path=dir+L"\\native_c32_reframe.hlsl";auto hr=D3DCompileFromFile(path.c_str(),nullptr,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);if(FAILED(hr)){std::string msg=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C32 shader failed";if(error)error->Release();throw std::runtime_error(msg);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));code->Release();}
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
-  if(recorded){Barrier(c,packed,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Barrier(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
+  if(recorded){if(!mapped)Barrier(c,packed,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(crop_needed)Barrier(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
   auto pass=[&](UINT i,UINT groups){c->SetDescriptorHeaps(1,&heap[i]);c->SetComputeRootSignature(root);c->SetComputeRootDescriptorTable(0,heap[i]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,6,geometry,0);c->SetPipelineState(pso[i]);c->Dispatch(groups,1,1);};
-  if(timer)timer->Mark(c,"c32_probe_begin");pass(0,geometry[2]*geometry[3]/64);Barrier(c,packed,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,"c32_probe_pack");body.Record(c,0,false,false,timer);pass(1,geometry[0]*geometry[1]/64);Barrier(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,"c32_probe_crop");recorded=true;
+  if(timer)timer->Mark(c,"c32_probe_begin");if(!mapped){pass(0,geometry[2]*geometry[3]/64);Barrier(c,packed,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}if(timer)timer->Mark(c,"c32_probe_pack");body.Record(c,0,false,false,timer);if(crop_needed){pass(1,geometry[0]*geometry[1]/64);Barrier(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}if(timer)timer->Mark(c,"c32_probe_crop");recorded=true;
  }
+ // FAST PATH (DLSS5_C32_MAPPED_INPUT): the body FFN reads the raster source (first block) or the previous
+ // stage's tile-major output directly; the pack pass is skipped, and the crop only runs where Output() is consumed.
+ void MapFromRaster(ID3D12Resource*src){body.MapInput(src,1,geometry[0],geometry[1],geometry[4],geometry[5],0,0,0);mapped=true;}
+ void ChainFrom(const NativeC32Stage&prev){if(prev.geometry[0]!=geometry[0]||prev.geometry[1]!=geometry[1])throw std::runtime_error("C32 chain geometry");body.MapInput(prev.body.Main(),2,geometry[0],geometry[1],geometry[4],geometry[5],prev.geometry[4],prev.geometry[5],prev.geometry[2]);mapped=true;}
+ void SetCropNeeded(bool needed){crop_needed=needed;}
  ID3D12Resource* Output()const{return output;}
  ID3D12Resource* PooledWork()const{return body.Downsample();}
 };

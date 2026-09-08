@@ -17,7 +17,25 @@ RWByteAddressBuffer output:register(u0);
 #else
 RWStructuredBuffer<float> output:register(u0);
 #endif
-cbuffer Geometry:register(b0){uint seed;uint width;uint height;uint local_oracle;uint temporal;}
+cbuffer Geometry:register(b0){uint seed;uint width;uint height;uint local_oracle;uint temporal;
+ // FAST PATH input mapping (NATIVE_C32_MAPPED_INPUT): 0 = tile-major work buffer as-is; 1 = HWC raster source;
+ // 2 = previous stage's Main() (row-major over its own shifted work grid). Border tokens read zero.
+ uint map_mode;uint src_width;uint src_height;uint shift_x;uint shift_y;uint prev_shift_x;uint prev_shift_y;uint prev_work_width;}
+#ifndef NATIVE_C32_MAPPED_INPUT
+#define NATIVE_C32_MAPPED_INPUT 0
+#endif
+#if NATIVE_C32_MAPPED_INPUT
+int source_index(uint p){
+ if(map_mode==0)return int(p*32);
+ uint tile=p/64,x=(tile%(width/8))*8+p%8,y=(tile/(width/8))*8+(p%64)/8;
+ int sx=int(x)-int(shift_x),sy=int(y)-int(shift_y);
+ if(sx<0||sy<0||sx>=int(src_width)||sy>=int(src_height))return -1;
+ if(map_mode==1)return int((uint(sy)*src_width+uint(sx))*32);
+ // Main() of the previous stage is row-major over its (shifted) work grid.
+ uint px=uint(sx)+prev_shift_x,py=uint(sy)+prev_shift_y;
+ return int((py*prev_work_width+px)*32);
+}
+#endif
 groupshared float16_t prefix[512],hidden[2048];
 #ifndef NATIVE_C32_FFN_FAST2
 #define NATIVE_C32_FFN_FAST2 0
@@ -54,7 +72,16 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
 #if NATIVE_C32_FFN_FAST2
  // FAST PATH: raw input tile kept in LDS for the residual; quantized copy for the A operand.
+#if NATIVE_C32_MAPPED_INPUT
+ [branch]if(map_mode==0){for(uint i=t;i<512;i+=32){float v=input[first*32+i];raw[i]=v;prefix[i]=float16_t(Ffast(v));}}
+ else{
+  // Lane j<16 resolves token j's source once; the staging loop reads it back with a uniform lane index.
+  const int mine=t<16?source_index(first+t):0;
+  [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);uint i=j*32+t;float v=src<0?0:input[uint(src)+t];raw[i]=v;prefix[i]=float16_t(Ffast(v));}
+ }
+#else
  for(uint i=t;i<512;i+=32){float v=input[first*32+i];raw[i]=v;prefix[i]=float16_t(Ffast(v));}
+#endif
 #else
  for(uint i=t;i<512;i+=32)prefix[i]=float16_t(F(input[first*32+i]));
 #endif
