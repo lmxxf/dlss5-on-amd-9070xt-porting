@@ -2,6 +2,9 @@
 #ifndef NATIVE_PREFIX_ONLY
 #define NATIVE_PREFIX_ONLY 0
 #endif
+#ifndef NATIVE_FAST_PREFIX
+#define NATIVE_FAST_PREFIX 0
+#endif
 #if NATIVE_PREFIX_ONLY
 #include "native_scaled_integer_half.hlsli"
 #endif
@@ -84,7 +87,7 @@ void main(uint3 id:SV_DispatchThreadID){
  if(!local_oracle){uint tile=p/64;x=(tile%(runtime_width/8))*8+p%8;y=(tile/(runtime_width/8))*8+(p%64)/8;}
 #endif
  uint h=pcg((x*0x8da6b343)^(y*0xd8163841)^(seed*0x9e3779b9u)^0x243f6a88u);
-#if NATIVE_NOISE_TABLE
+#if NATIVE_NOISE_TABLE && !NATIVE_FAST_PREFIX
  uint ia=uniform_index(h*0xcaa5b80d+0x21dd796b),ib=uniform_index(h*0x2c9277b5+0xac564b05);
  uint ic=uniform_index(h*0x83232c31+0x3463e0ac),idn=uniform_index(h*0xfa6dc5f9+0x4712a88e);
  precise float ng0=noise_table[ia*3]*noise_table[ic*3+1];
@@ -121,7 +124,7 @@ void main(uint3 id:SV_DispatchThreadID){
  return;
 #endif
  [loop]for(uint channel=0;channel<32;channel++){
-#if NATIVE_NOISE_TABLE
+#if NATIVE_NOISE_TABLE && !NATIVE_FAST_PREFIX
   // Measured HMMA: align by operand exponent sums, truncate to 27 bits,
   // then add exactly. Sixteen signed terms fit the 32-bit accumulator.
   float products[16];int maximum_exponent=-1000;
