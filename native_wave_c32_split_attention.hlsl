@@ -246,6 +246,51 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
  }
 #endif
 }
+#elif PASS==4
+// FAST PATH: one wave per window, no group synchronisation. Requires NATIVE_C32_FP8_QKV layout (aux [token][96] E4M3),
+// fast attention arithmetic, and the fused projection semantics. Each of the four 16-query batches is independent:
+// QK (4 MMA) -> exp in registers -> row sums by wave reductions -> P as E4M3 through a 1KB wave-private LDS tile ->
+// AV (4 MMA) -> F(H) -> f16 tile in LDS -> projection (2 MMA) -> residual -> store.
+using A8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+groupshared uint p8[256];
+groupshared float16_t attn[16*32];
+[WaveSize(32)]
+[numthreads(32,1,1)]void attention_wave(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint window=gid.x+gid.y*65535u,t=tid.x;if(window*64>=runtime_width*runtime_height)return;
+ const uint base=window*64;
+ B8 kb[4];[unroll]for(uint kr=0;kr<4;kr++)kb[kr]=B8::Load(aux,(base+kr*16)*96+32,96,dx::linalg::MatrixLayout::ColMajor,16);
+ [loop]for(uint qr=0;qr<4;qr++){
+  A8 qa=A8::Load(aux,(base+qr*16)*96,96,dx::linalg::MatrixLayout::RowMajor,16);
+  C s[4];float rowsum[16];[unroll]for(uint r=0;r<16;r++)rowsum[r]=0;
+  [unroll]for(uint kr=0;kr<4;kr++){
+   s[kr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb[kr]);
+   for(uint i=0;i<s[kr].Length();i++){uint2 rc=s[kr].GetCoordinate(i);float e=fast_exp_raw(s[kr].Get(i)+W_BIAS((qr*16+rc.x)*64+kr*16+rc.y));s[kr].Set(i,e);[unroll]for(uint r=0;r<16;r++)rowsum[r]+=(rc.x==r)?e:0;}
+  }
+  float inv[16];[unroll]for(uint r=0;r<16;r++)inv[r]=1/WaveActiveSum(rowsum[r]);
+  [unroll]for(uint kr=0;kr<4;kr++){
+   for(uint i=0;i<s[kr].Length();i++){uint2 rc=s[kr].GetCoordinate(i);float k=0;[unroll]for(uint r=0;r<16;r++)k=(rc.x==r)?inv[r]:k;s[kr].Set(i,s[kr].Get(i)*k);}
+   s[kr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,kr*4,16,dx::linalg::MatrixLayout::RowMajor);
+  }
+  GroupMemoryBarrierWithGroupSync();
+  C acc[2];[unroll]for(uint col=0;col<2;col++){acc[col]=C::Splat(0.0f);
+   [unroll]for(uint g=0;g<2;g++){A8 pa=A8::Load(p8,g*8,16,dx::linalg::MatrixLayout::RowMajor);B8 vb=B8::Load(aux,(base+g*32)*96+64+col*16,96,dx::linalg::MatrixLayout::RowMajor,16);acc[col].MultiplyAccumulate(pa,vb);}
+   for(uint i=0;i<acc[col].Length();i++)acc[col].Set(i,F(H(acc[col].Get(i))));
+   acc[col].Cast<dx::linalg::ComponentType::F16>().Store(attn,col*16,32,dx::linalg::MatrixLayout::RowMajor);
+  }
+  GroupMemoryBarrierWithGroupSync();
+  {
+   A aa=A::Load(attn,0,32,dx::linalg::MatrixLayout::RowMajor);const uint first=base+qr*16;
+   [unroll]for(uint cr=0;cr<2;cr++){
+    B bb=B::Load(weights,6144+cr*16*32*2,64,dx::linalg::MatrixLayout::ColMajor,16);
+    C z=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
+    for(uint i=0;i<z.Length();i++){uint2 rc=z.GetCoordinate(i);uint p=first+rc.x,c=cr*16+rc.y;float result=H(z.Get(i)+input[p*32+c]*W_RESIDUAL(c));z.Set(i,RAW_OUTPUT?result:F(result));}
+    z.Store(qk,(first*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+   }
+  }
+  GroupMemoryBarrierWithGroupSync();
+ }
+}
 #else
 [WaveSize(32)]
 [numthreads(32,1,1)]void projection(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){

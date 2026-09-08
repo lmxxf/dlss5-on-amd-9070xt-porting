@@ -17,7 +17,12 @@
 
 C32 家族合计 33.7，占 54%。
 
-## 一、C32 注意力核结构（约 8ms 在册，预期 −3～4）
+## 一、C32 注意力核结构（约 8ms 在册）——21:40 后两项实验都排除了
+
+- 占用：塞 12KB 假 LDS 时间不变（release/c32-aprobe3-*）→ 不是占用。
+- 组同步：写了一窗一 wave、零组同步的版本（PASS 4 `attention_wave`，flag DLSS5_C32_WAVE_ATTENTION，链 `run_c32_wave_attention_network.ps1`，代码保留默认关），输出逐位相同，stage1 反而 4.7ms → 不是同步。
+- 还没排除：K=32 小 tile 下 Q/K/V 的矩阵加载效率（aux 行距 96 字节，每行 16～32 字节散读）。验证要换存储布局（Q/K/V 各自连续 [token][32]），或者干脆量一次"只做加载不做算"的探针。
+- 另：同一份代码空载跑 55ms、有游戏跑 63ms，早先的绝对数混了两种状态，只能同批次 A/B。
 
 探针（release/c32-aprobe-*）已排除 exp、P 归一化、输出量化、bias 读；残差散读约 0.4ms@2.2M。剩下的假设：每窗 256 线程、4 次组同步、LDS 16KB（ex 8K + attn 4K + p8 4K）→ 每 WGP 只能驻 4 组。验证方法：先做占用实验——把 attn 和 p8 合并到同一块 uint LDS（p8 用完再放 attn，中间本来就有同步）看时间；如果占用是真凶，再考虑一窗 4 wave（每 wave 16 query × 64 key 全行，exp/求和/归一化在 wave 内做，组同步降到 1 次）。
 

@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{},*mapped_source{};bool shared_c32{};UINT mapping[8]{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{},wave_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{},*mapped_source{};bool shared_c32{};UINT mapping[8]{};
  static ID3D12Resource*&SharedFfn(){static ID3D12Resource*r=nullptr;return r;}
  static ID3D12Resource*&SharedRaw(){static ID3D12Resource*r=nullptr;return r;}
  static UINT64&SharedBytes(){static UINT64 b=0;return b;}
@@ -114,7 +114,8 @@ public:
     D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=5;rd.pParameters=rp;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&split_root)));rb->Release();if(re)re->Release();
     // FAST PATH: qkv+normalize and attention+projection fused (two dispatches instead of four).
     if(const wchar_t*fz=_wgetenv(L"DLSS5_C32_FUSED_ATTENTION")){if(wcscmp(fz,L"0")&&wcscmp(fz,L"1"))throw std::runtime_error("invalid fused C32 attention flag");fused_attention=!wcscmp(fz,L"1");}
-    const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",fused_attention?L"\\native_wave_c32_fused_attention.cso":L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
+    const wchar_t*wa=_wgetenv(L"DLSS5_C32_WAVE_ATTENTION");if(wa&&wcscmp(wa,L"0")&&wcscmp(wa,L"1"))throw std::runtime_error("invalid C32 wave attention flag");wave_attention=fused_attention&&wa&&!wcscmp(wa,L"1");
+    const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?L"\\native_wave_c32_fused_attention.cso":L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
     for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+names[i]).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
    }
   }Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
@@ -158,7 +159,7 @@ public:
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?main:raw;}
     const UINT tokens=width*height;const UINT g16=tokens/16;
     c->SetPipelineState(split_pso[0]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);c->ResourceBarrier(2,uav);
-    if(fused_attention){c->SetPipelineState(split_pso[2]);c->Dispatch(tokens/64,1,1);}
+    if(fused_attention){c->SetPipelineState(split_pso[2]);if(wave_attention){UINT w=tokens/64;c->Dispatch(w<65535?w:65535,(w+65534)/65535,1);}else c->Dispatch(tokens/64,1,1);}
     else{
     c->SetPipelineState(split_pso[1]);c->Dispatch(tokens<65535?tokens:65535,(tokens+65534)/65535,1);c->ResourceBarrier(1,uav);
     c->SetPipelineState(split_pso[2]);c->Dispatch(tokens/64,1,1);c->ResourceBarrier(2,uav);

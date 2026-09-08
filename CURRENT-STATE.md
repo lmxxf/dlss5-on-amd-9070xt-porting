@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**21:40～22:00 C32 注意力两项假设实验（占用、组同步）均排除，详见 next-steps-plan-2.md 第一节；一窗一 wave 核保留（flag 默认关）。测试台空载约 55ms、游戏同时跑约 63ms，早先几轮的绝对数混有两种状态。tag `0.03` = 62.7ms 版（fast7 部署）。**
+
 **试过无收益（未采纳）：** finish 段位元 F（内存绑定的 tile→raster 转置，0 收益）；C32 注意力 exp 表矩阵整块存 LDS（0）。C32 注意力核结构（每窗 256 线程、LDS 16KB→占用低）是下一步的假设，没验证。
 
 **C512 注意力换 direct 路径，62.7ms，已部署（光）。** FP8 pack → 融合 QKV+normalize（FP8 权重行主序）→ direct attention（FP8 Q/K/V、FP8 输出）→ FP8 直读投影（DLSS5_SPLIT_DIRECT_ATTENTION=1）；split_stage2 0.31→0.02ms，16 块合计 −4.8。游戏：DLL `5ed8e88d…`，assets = `D:\DLSSNR-Lab\split-direct`，flag `native-game-flags-fast7.txt`。链入口 `run_split_direct_attention_network.ps1`。
