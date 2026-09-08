@@ -11,7 +11,7 @@
 class NativeGameOneShot {
  std::atomic<unsigned>phase{0}; // idle, initializing, ready, rendering, done, failed
  NativeGameFrame*frame{};ID3D12CommandQueue*queue{};
- std::mutex request_mutex;unsigned long last_request{},armed_request{};ULONGLONG next_poll{};bool every_frame{};unsigned long every_frame_count{};ULONGLONG every_frame_tick{};
+ std::mutex request_mutex;unsigned long last_request{},armed_request{};ULONGLONG next_poll{};bool every_frame{};unsigned long every_frame_count{};ULONGLONG every_frame_tick{};bool bypass{},f6_down{};
  struct Init {NativeGameOneShot*self;ID3D12Resource*source;};
  static void Log(const char*event,const char*detail=""){
   if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-oneshot.txt)",L"ab")){fprintf(f,"pid=%lu tick=%llu event=%s detail=%s\n",GetCurrentProcessId(),GetTickCount64(),event,detail);fclose(f);}
@@ -50,6 +50,9 @@ public:
   std::lock_guard<std::mutex>guard(request_mutex);
   unsigned state=phase.load(std::memory_order_acquire);if(state!=2&&state!=4)return false;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
+  // F6 toggles the neural override (edge-triggered); while bypassed the game's own FSR output is shown.
+  {bool down=(GetAsyncKeyState(VK_F6)&0x8000)!=0;if(down&&!f6_down){bypass=!bypass;Log("toggle",bypass?"F6: neural override OFF (game FSR)":"F6: neural override ON");}f6_down=down;}
+  if(bypass)return false;
   // Every-frame mode: replace every FSR frame synchronously (coherent picture at network speed).
   // Still resets history each frame; remove the file to fall back to the polled slow preview.
   if(!armed_request&&GetFileAttributesW(LR"(D:\DLSSNR-Lab\continuous-every-frame.txt)")!=INVALID_FILE_ATTRIBUTES){if(last_request<100000000){armed_request=++last_request;every_frame=true;phase=2;}}
