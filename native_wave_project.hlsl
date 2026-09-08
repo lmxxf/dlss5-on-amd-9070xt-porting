@@ -60,8 +60,12 @@ cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint rast
 #ifndef MAP_OUTPUT
 #define MAP_OUTPUT 0
 #endif
-#if NATIVE_MATRIX_RESIDUAL && (!NATIVE_FP8_FEATURE || MAP_FEATURE || !NATIVE_FP8_OPERANDS)
-#error NATIVE_MATRIX_RESIDUAL needs E4M3 residual bytes, FP8 operands and no MAP_FEATURE
+#if NATIVE_MATRIX_RESIDUAL && (!NATIVE_FP8_FEATURE || !NATIVE_FP8_OPERANDS)
+#error NATIVE_MATRIX_RESIDUAL needs E4M3 residual bytes and FP8 operands
+#endif
+#if NATIVE_MATRIX_RESIDUAL && MAP_FEATURE
+// MAP_FEATURE: the wave's 16 token rows (only its BLOCK_N*16 columns) are gathered by raster index into LDS first.
+groupshared uint ftile8[BLOCK_N*64];
 #endif
 // Padded token -> raster index, or -1 for border tokens.
 int raster_index(uint p){int x=int(p%width)-int(pad_x),y=int(p/width)-int(pad_y);if(x<0||y<0||x>=int(raster_width)||y>=int(raster_height))return -1;return int((uint(y)*raster_width+uint(x))*MATRIX_CHANNELS);}
@@ -103,7 +107,16 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
  [unroll]for(uint gg=0;gg<(BLOCK_N*16+31)/32;gg++){
   uint g=(gid.y*BLOCK_N*16)/32+gg;
+#if MAP_FEATURE
+  // Gather: 16 tokens x (BLOCK_N*16 bytes) = BLOCK_N*64 uints; each lane copies uint4 chunks (zeros for border tokens).
+  if(gg==0){
+   [unroll]for(uint kk=0;kk<BLOCK_N*16;kk+=32){uint k=kk+tid.x;uint row=k/BLOCK_N,q=k%BLOCK_N;int src=raster_index(first+row);uint4 v=src<0?uint4(0,0,0,0):feature8.Load4(uint(src)+gid.y*BLOCK_N*16+q*16);ftile8[row*(BLOCK_N*4)+q*4]=v.x;ftile8[row*(BLOCK_N*4)+q*4+1]=v.y;ftile8[row*(BLOCK_N*4)+q*4+2]=v.z;ftile8[row*(BLOCK_N*4)+q*4+3]=v.w;}
+   GroupMemoryBarrierWithGroupSync();
+  }
+  A af=A::Load(ftile8,gg*8,BLOCK_N*4,dx::linalg::MatrixLayout::RowMajor);
+#else
   A af=A::Load(feature8,first*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    uint col=(gid.y*BLOCK_N+n)*16;if(col/32!=g)continue;
    [unroll]for(uint p=0;p<3;p++){B s=B::Load(weights,MATRIX_CHANNELS*MATRIX_CHANNELS*ELEM+MATRIX_CHANNELS*4+((col/16)*3+p)*512,16,dx::linalg::MatrixLayout::RowMajor,16);acc[n].MultiplyAccumulate(af,s);}
