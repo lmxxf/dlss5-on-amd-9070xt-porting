@@ -1,6 +1,17 @@
 StructuredBuffer<float> input:register(t0),weights:register(t1),skip_or_color:register(t2);
 RWStructuredBuffer<float> output:register(u0);
-cbuffer Geometry:register(b0){uint width;uint height;float input_scale;}
+cbuffer Geometry:register(b0){uint width;uint height;float input_scale;uint work_width;uint shift_x;uint shift_y;}
+#ifndef POST_TILED_INPUT
+#define POST_TILED_INPUT 0
+#endif
+// FAST PATH (POST_TILED_INPUT): the rgb head reads the body's tile-major raw work buffer directly (same indexing as crop_raw).
+uint feature_base(uint p){
+#if POST_TILED_INPUT
+ uint x=p%width+shift_x,y=p/width+shift_y;uint tile=(y/8)*(work_width/8)+x/8;return (tile*64+(y%8)*8+x%8)*32;
+#else
+ return p*32;
+#endif
+}
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float aligned_half(int sum,float acc,float scale,int e){
  float scaled_acc=acc*scale;
@@ -25,14 +36,14 @@ float aligned_half(int sum,float acc,float scale,int e){
  output[i]=H(H(input[low*32+c]*weights[c])+skip_or_color[i]*weights[32+c]);
 }
 [numthreads(64,1,1)]void finish(uint3 id:SV_DispatchThreadID){
- uint i=id.x+id.y*width*height,p=i/3,row=i%3;if(p>=width*height)return;float acc=0;
+ uint i=id.x+id.y*width*height,p=i/3,row=i%3;if(p>=width*height)return;float acc=0;const uint fb=feature_base(p);
 #if POST_BASE_ONLY == 1
  output[i]=skip_or_color[p*4+row];return;
 #endif
 #if POST_BASE_ONLY != 2
  [unroll]for(uint part=0;part<2;part++){
   float products[16];int e=acc==0?-1000:int((asuint(acc)>>23)&255u)-125;
-  [unroll]for(uint j=0;j<16;j++){float a=input[p*32+part*16+j],b=weights[row*32+part*16+j];products[j]=a*b;if(products[j]!=0)e=max(e,int((asuint(a)>>23)&255u)+int((asuint(b)>>23)&255u)-252);}
+  [unroll]for(uint j=0;j<16;j++){float a=input[fb+part*16+j],b=weights[row*32+part*16+j];products[j]=a*b;if(products[j]!=0)e=max(e,int((asuint(a)>>23)&255u)+int((asuint(b)>>23)&255u)-252);}
   if(e!=-1000){float scale=asfloat(uint(27-e+127)<<23);int sum=0;
    [unroll]for(uint j=0;j<16;j++)sum+=(int)(products[j]*scale);
    acc=aligned_half(sum,acc,scale,e);

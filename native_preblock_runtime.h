@@ -108,7 +108,10 @@ public:
    // Packed attention weights (f16 QKV/projection + f32 bias/scales) read directly by wave loads.
    const wchar_t*local_attention=_wgetenv(L"DLSS5_TEST_LOCAL_C32_ATTENTION");if(local_attention&&wcscmp(local_attention,L"0")&&wcscmp(local_attention,L"1"))throw std::runtime_error("invalid local C32 attention flag");
    if(local_attention&&!wcscmp(local_attention,L"1")){
-    std::vector<float>packed(6177);unsigned char*bytes_out=reinterpret_cast<unsigned char*>(packed.data());
+    // FAST PATH (attention fast2): E4M3 copy of the projection weights [32][32] at byte 24832.
+    const wchar_t*attn2=_wgetenv(L"DLSS5_C32_ATTN_FAST2");if(attn2&&wcscmp(attn2,L"0")&&wcscmp(attn2,L"1"))throw std::runtime_error("invalid C32 attention fast2 flag");const bool attn_fast2=attn2&&!wcscmp(attn2,L"1");
+    std::vector<float>packed(attn_fast2?6464:6177);unsigned char*bytes_out=reinterpret_cast<unsigned char*>(packed.data());
+    if(attn_fast2){unsigned char*o8=bytes_out+24832;for(size_t i=0;i<1024;i++){float v=aw[3072+i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("C32 projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("C32 projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}}
     for(size_t i=0;i<4096;i++){uint32_t b;std::memcpy(&b,&aw[i],4);uint32_t m=b&0x7fffffffu;uint16_t h=uint16_t((b>>16)&0x8000);if(m){if((m&0x1fffu)||(m>>23)<113||(m>>23)>142)throw std::runtime_error("C32 attention weights not exact normal half");h|=uint16_t(((int(m>>23)-112)<<10)|((m&0x7fffff)>>13));}std::memcpy(bytes_out+i*2,&h,2);}
     std::memcpy(bytes_out+8192,aw.data()+4096,4096*4);std::memcpy(bytes_out+24576,aw.data()+8192,33*4);
     auto*u=Buffer(packed.size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(u->Map(0,&none,&p));std::memcpy(p,packed.data(),packed.size()*4);u->Unmap(0,nullptr);
@@ -165,6 +168,7 @@ public:
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
+   if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
    if(stage==1&&split_attention){
     c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,main->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?main:raw;}
@@ -196,5 +200,7 @@ public:
  // FAST PATH: the FFN reads its input through a mapping instead of a pre-packed work buffer (see native_wave_c32_ffn_blocked.hlsl).
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
+ // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
+ bool skip_finish{};void SetSkipFinish(bool v){skip_finish=v;}
  ID3D12Resource* Main()const{return main;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };
