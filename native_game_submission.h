@@ -18,7 +18,9 @@ class NativeGameSubmission {
  // Deferred mode (DLSS5_TEST_ASYNC_SUBMIT=1): a ring of allocators/lists is
  // executed back to back and only the ring slot being reused is waited on.
  // Queue order is unchanged, so every list still observes the previous one.
- static constexpr UINT ring_slots=8;
+ // 64 slots: a game frame issues ~100 lists; with 8 slots the CPU waited on slot reuse a dozen times per frame, and each
+ // wake-up costs ~0.5ms once the game has background threads (the post-cutscene 21->8 fps collapse).
+ static constexpr UINT ring_slots=64;
  bool deferred{};ID3D12CommandAllocator*ring_allocators[ring_slots]{};ID3D12GraphicsCommandList*ring_lists[ring_slots]{};UINT64 ring_values[ring_slots]{};
  static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("game submission HRESULT="+std::to_string(unsigned(h)));}
  void WaitValue(UINT64 target,DWORD timeout_ms){
