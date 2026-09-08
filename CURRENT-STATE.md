@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**09:00 用户进游戏确认：画面连贯，约 5fps（光）。** 首版 DLL（45fe8f…）画面一帧神经一帧默认闪烁——老诊断模式每 250ms 轮询只替换一帧；游戏内 render_begin→render_complete 稳定 187ms，与测试台一致，无换页。第二版 DLL（SHA `934b3d5e1b9515c591ebbfbed809deb722f038a1f67b94af8fcf17a658af28d6`，当前安装）加 `continuous-every-frame.txt` 每帧同步模式：每个 FSR 帧都跑网络回写，首帧后不读回不落盘，日志每 100 帧一行 `every_frame avg_ms_per_frame`。仍每帧 reset history，时序累积未做。回退方法同上。
+
 **08:32 之后（钟点以下一条用户消息的时间戳为准）游戏 DLL 已部署（光）——等用户手动进游戏验收。**
 
 - 显存：块内 scratch 共享（DLSS5_TEST_SHARED_SCRATCH：多头块的 result/scratch 走 workspace；DLSS5_TEST_SHARED_C32_SCRATCH：所有 C32 实例共用一对 ffn/raw，按首个创建者加 shift 余量定容），测试进程本地段 14.68→7.26GB，15帧exact，暖 186ms。证据 release/native-network70-shared-scratch。
