@@ -2,6 +2,8 @@
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
 
+**C512 注意力换 direct 路径，62.7ms，已部署（光）。** FP8 pack → 融合 QKV+normalize（FP8 权重行主序）→ direct attention（FP8 Q/K/V、FP8 输出）→ FP8 直读投影（DLSS5_SPLIT_DIRECT_ATTENTION=1）；split_stage2 0.31→0.02ms，16 块合计 −4.8。游戏：DLL `5ed8e88d…`，assets = `D:\DLSSNR-Lab\split-direct`，flag `native-game-flags-fast7.txt`。链入口 `run_split_direct_attention_network.ps1`。
+
 **20:58 之后 多头残差流全 FP8，67.5ms，已部署（光）。** result[0] 和链内 raster 输出存 E4M3（DLSS5_FP8_STREAM=1）：QKV pack 通道没了（融合 QKV 核直接读 result[0]），带 shift 的 FFN pack 变字节 gather，投影残差读 FP8 解码。链首块（组首、body56/body62）输入 f32、链尾（组末 raw、c256[6]/c128[4]/c64[2] 喂 project）输出 f32，由构建处按位置传 fp8_input/fp8_output。输出逐位相同。游戏：DLL `f2e49b77…`，assets = `D:\DLSSNR-Lab\fp8-stream`，flag `native-game-flags-fast6.txt`。链入口 `run_fp8_stream_network.ps1`。
 
 **20:17 用户确认 12～13fps；继续到 70.8ms，已部署（光）。** C32 stage 的 FFN 核按 shift 映射直接读上一块的 Main()（工作网格光栅序）或首块的光栅源，pack 全省、中间块 crop 省（DLSS5_C32_MAPPED_INPUT=1 + 编译 DLSS5_BUILD_C32_MAPPED_INPUT）；收益比预期小（tail 段 −1.8，encoder 段没动，总 −0.5）。踩坑 3：pre 块的 FFN 走描述符表根签名，只给 5 个常量，shader 读第 6 个常量 map_mode 读到垃圾 → 28dB；三条根签名都扩到 13。试过失败：C32 注意力 exp 表改矩阵整块存 LDS（无收益，已回退）；FFN 映射用 LDS + barrier 比 wave 广播慢 0.7ms@2.2M。游戏：DLL `c04c65e1…ddd1`，assets = `D:\DLSSNR-Lab\c32-mapped`，flag `native-game-flags-fast5.txt`（= fast4 + DLSS5_C32_MAPPED_INPUT=1）。链入口 `run_c32_mapped_input_network.ps1`。
