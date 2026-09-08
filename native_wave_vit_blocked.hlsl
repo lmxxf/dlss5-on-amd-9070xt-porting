@@ -71,6 +71,30 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 
 // input: f32 [tokens][1024]; output: f16 hidden [tokens][4096].
 #if VIT_EXPAND
+#ifndef BLOCK_M
+#define BLOCK_M 1
+#endif
+#if BLOCK_M>1
+// FAST PATH: BLOCK_M token tiles per wave share every B tile load (weight traffic / BLOCK_M). Packed input only.
+[WaveSize(32)]
+[numthreads(32,1,1)]void expand(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16*BLOCK_M;if(first>=tokens)return;
+ C acc[BLOCK_M][BLOCK_N];
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
+ [loop]for(uint g=0;g<32;g++){
+  B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;b[n]=B::Load(weights,(col*1024+g*32)*ELEM,1024*ELEM,dx::linalg::MatrixLayout::ColMajor,16);}
+  [unroll]for(uint m=0;m<BLOCK_M;m++){
+   A a=A::Load(input8,(first+m*16)*1024+g*32,1024,dx::linalg::MatrixLayout::RowMajor,16);
+   [unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n].MultiplyAccumulate(a,b[n]);
+  }
+ }
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++){
+  uint col=(gid.y*BLOCK_N+n)*16;
+  for(uint i=0;i<acc[m][n].Length();i++)acc[m][n].Set(i,Activate(acc[m][n].Get(i)));
+  acc[m][n].Cast<HIDDEN_TYPE>().Store(output,((first+m*16)*4096+col)*HELEM,4096*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#else
 [WaveSize(32)]
 [numthreads(32,1,1)]void expand(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16;if(first>=tokens)return;
@@ -121,6 +145,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #endif
  }
 }
+#endif
 
 #else
 // input: f16 hidden [tokens][4096]; residual f32 [tokens][1024]; output f32 [tokens][1024].
@@ -134,30 +159,36 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 // Four times the waves in flight for a 640-token layer whose waves are otherwise 128 dependent K steps long.
 [WaveSize(32)]
 [numthreads(32,1,1)]void reduce(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
- uint first=gid.x*16;if(first>=tokens)return;
- [loop]for(uint part=gid.z;part<(NATIVE_SPLIT_K==2?4:gid.z+1);part++){
-  C acc[BLOCK_N];
-  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n]=C::Splat(0.0f);
-  [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
-#if INPUT_CHANNELS==4096
-   A a=A::Load(hidden_f16,(first*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
-#elif NATIVE_PACKED_INPUT
-   A a=A::Load(input8,first*INPUT_CHANNELS+k,INPUT_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
-#else
-   STAGE_A(REDUCE_SRC)
-   GroupMemoryBarrierWithGroupSync();
-   A a=LOAD_A();
+#ifndef BLOCK_M
+#define BLOCK_M 1
 #endif
-   [unroll]for(uint n=0;n<BLOCK_N;n++){
-    uint col=(gid.y*BLOCK_N+n)*16;
-    B b=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
-    acc[n].MultiplyAccumulate(a,b);
+ uint first=gid.x*16*BLOCK_M;if(first>=tokens)return;
+#if NATIVE_SPLIT_K==2
+ [loop]for(uint part=gid.z;part<4;part++){
+#else
+ {const uint part=gid.z;
+#endif
+  C acc[BLOCK_M][BLOCK_N];
+  [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
+  [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
+   B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;b[n]=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);}
+   [unroll]for(uint m=0;m<BLOCK_M;m++){
+#if INPUT_CHANNELS==4096
+    A a=A::Load(hidden_f16,((first+m*16)*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#elif NATIVE_PACKED_INPUT
+    A a=A::Load(input8,(first+m*16)*INPUT_CHANNELS+k,INPUT_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+    STAGE_A(REDUCE_SRC)
+    GroupMemoryBarrierWithGroupSync();
+    A a=LOAD_A();
+#endif
+    [unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n].MultiplyAccumulate(a,b[n]);
    }
 #if INPUT_CHANNELS!=4096 && !NATIVE_PACKED_INPUT
    GroupMemoryBarrierWithGroupSync();
 #endif
   }
-  [unroll]for(uint n=0;n<BLOCK_N;n++)acc[n].Store(output,((part*tokens+first)*1024+(gid.y*BLOCK_N+n)*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n].Store(output,((part*tokens+first+m*16)*1024+(gid.y*BLOCK_N+n)*16)*4,1024*4,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
 // combine binds the partial buffer at t0 (the reduce input slot).

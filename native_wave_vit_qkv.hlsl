@@ -22,6 +22,30 @@ float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800
 using A=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
 using B=dx::linalg::Matrix<dx::linalg::ComponentType::F16,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+#ifndef BLOCK_M
+#define BLOCK_M 1
+#endif
+#if BLOCK_M>1
+// FAST PATH: BLOCK_M token tiles per wave share every weight tile load. Packed f16 input only.
+[WaveSize(32)]
+[numthreads(32,1,1)]void project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16*BLOCK_M;if(first>=tokens)return;
+ uint col0=gid.y*BLOCK_N*16,part=col0/1024,row0=col0%1024;
+ C acc[BLOCK_M][BLOCK_N];
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
+ [loop]for(uint k=0;k<1024;k+=32){
+  A a[BLOCK_M];[unroll]for(uint m=0;m<BLOCK_M;m++)a[m]=A::Load(input16,((first+m*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint n=0;n<BLOCK_N;n++){
+   B b=B::Load(weights,(part*1048576+(row0+n*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
+   [unroll]for(uint m=0;m<BLOCK_M;m++)acc[m][n].MultiplyAccumulate(a[m],b);
+  }
+ }
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++){
+  for(uint i=0;i<acc[m][n].Length();i++)acc[m][n].Set(i,H(acc[m][n].Get(i)));
+  acc[m][n].Store(output,((part*tokens+first+m*16)*1024+row0+n*16)*4,4096,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#else
 [WaveSize(32)]
 [numthreads(32,1,1)]void project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16;if(first>=tokens)return;
@@ -62,3 +86,4 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #endif
  [unroll]for(uint n=0;n<BLOCK_N;n++)total[n].Store(output,((part*tokens+first)*1024+row0+n*16)*4,4096,dx::linalg::MatrixLayout::RowMajor,16);
 }
+#endif
