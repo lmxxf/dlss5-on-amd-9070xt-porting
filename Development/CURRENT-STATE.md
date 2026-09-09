@@ -1,7 +1,7 @@
 ## 2026-09-09 11:00 fast25 部署；仓库重整后第一批小刀（光之朱雀）
 
 - 仓库重整（a9bdd07…319cf11）：根目录 src/ shaders/ scripts/ tools/ README(en/zh) LICENSE(MIT, Kien)；其余进 Development/。scripts/bench.ps1 = 76 层 runner 拍平，PSNR 41.913911 与原链一位不差。约定：过程文件只进 Development，打 tag 时刷新根目录。
-- fast24：关探针（探针每帧 Flush 等 GPU，疑即 CPU−GPU 那 3ms）。fast25 = fast24 + `DLSS5_PREBLOCK_MAIN8`（pre finish 写 E4M3 main，post70 merge fold mode 7 读字节；exact；pre stage2 1.69→1.21、post70 stage0 −0.09，合计 −0.55）。DLL `75610990…`，源 `D:\DLSSNR-Lab\down-only`，链顶 `run_preblock_main8_network.ps1`。等 Zero 报 fps。
+- fast24：关探针（探针每帧 Flush 等 GPU，即 CPU−GPU 那 3ms——**Zero 11:41 实测 fast25 27～28fps**，fast23 是 24～25）。fast25 = fast24 + `DLSS5_PREBLOCK_MAIN8`（pre finish 写 E4M3 main，post70 merge fold mode 7 读字节；exact；pre stage2 1.69→1.21、post70 stage0 −0.09，合计 −0.55）。DLL `75610990…`，源 `D:\DLSSNR-Lab\down-only`，链顶 `run_preblock_main8_network.ps1`。等 Zero 报 fps。
 - 试过不取：`DLSS5_PREBLOCK_DOWN_ONLY`（post70 读 pre raw tiles，mode 6，pre 需私有 raw——shared scratch 到 post70 时早被覆盖）只 −0.33，因 post70 tiled 读 +0.32；代码保留默认关。C32 FFN 激活多项式全网约 0.9ms、Get/Set 循环 0.4ms（探针：去掉激活 −1.3）；`NATIVE_STATIC_LENGTH` 展开无效；f16 packed 每元素只省 1 指令，不做。
 - 待办：CPU 录制/GPU 重叠；C512 块 6 dispatch（ffwd/投影/pack/QKV/注意力/投影，各 ~40µs 延迟，16 块 3.8ms）——pack 并进投影要写平移窗口序 + 清边界；ViT expand+contract。
 - 测试台基线漂移：同一份代码上午 33.9、中午 32.8～33.5，A/B 只信同批。
