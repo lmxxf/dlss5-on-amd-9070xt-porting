@@ -39,7 +39,7 @@ public:
   for(UINT i=0;i<4;i++){NativeC32Stage&stage=i?c32[i-1]:body66;const NativeC32Stage*prev=i>1?&c32[i-2]:i==1?&body66:nullptr;
    if(i)stage.Create(d,source,w*8,h*8,NativeDecoderShift(66+i),read(66+i,L"ffn"),read(66+i,L"attention"),dir);else stage.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir);
    if(chain){if(prev){if(chain_raw){stage.ChainFromRaw(*prev);const_cast<NativeC32Stage*>(prev)->SetSkipFinish(true);}else stage.ChainFrom(*prev);const_cast<NativeC32Stage*>(prev)->SetCropNeeded(false);}else stage.MapFromRaster(project66.Output());}
-   source=stage.Output();}
+   source=(chain_raw&&i<3)?stage.RawWork():stage.Output();}
   output=source;
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){

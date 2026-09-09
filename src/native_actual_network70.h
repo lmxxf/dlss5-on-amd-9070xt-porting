@@ -5,6 +5,7 @@
 #include "native_actual_decoder69.h"
 #include "native_post70.h"
 #include "native_block_skip.h"
+#include "native_vram_log.h"
 #include "native_game_submission.h"
 #include "native_network_timestamps.h"
 
@@ -39,26 +40,26 @@ public:
   device=d;device->AddRef();auto read=[&](const std::wstring&name){return Read(dir+L"\\"+name);};
   if(const wchar_t*v=_wgetenv(L"DLSS5_NETWORK_GPU_PROFILE")){if(wcscmp(v,L"1"))throw std::runtime_error("invalid network profile flag");profile=true;timestamps.Create(d);}
   if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_SHARED_MATRIX_WORKSPACE")){if(wcscmp(s,L"0")&&wcscmp(s,L"1"))throw std::runtime_error("invalid shared matrix workspace flag");share_matrix=!wcscmp(s,L"1");if(share_matrix)matrix_workspace.Create(d,(_wgetenv(L"DLSS5_TEST_MATRIX_C64")&&!wcscmp(_wgetenv(L"DLSS5_TEST_MATRIX_C64"),L"1"))?488ull*296*64:248ull*152*128);}
-  pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
-  const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
+  NativeVramLog(d,"before");pre.Create(d,rgb_tiles,1920,1152,read(L"block0-ffn.f32"),read(L"block0-attention.f32"),dir,true,false,&noise,temporal_rgb);temporal_bound=temporal_rgb!=nullptr;
+  NativeVramLog(d,"pre");const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");if(c32_mapped&&wcscmp(c32_mapped,L"0")&&wcscmp(c32_mapped,L"1")&&wcscmp(c32_mapped,L"2"))throw std::runtime_error("invalid mapped C32 flag");
   const wchar_t*cr=_wgetenv(L"DLSS5_C32_CHAIN_RAW");if(cr&&wcscmp(cr,L"0")&&wcscmp(cr,L"1"))throw std::runtime_error("invalid C32 chain raw flag");const bool chain_raw=cr&&!wcscmp(cr,L"1");
   for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir);
    if(c32_mapped&&!wcscmp(c32_mapped,L"1")){if(i){if(chain_raw){c32[i].ChainFromRaw(c32[i-1]);c32[i-1].SetSkipFinish(true);}else c32[i].ChainFrom(c32[i-1]);}else c32[i].MapFromRaster(source);if(i)c32[i-1].SetCropNeeded(false);}else if(c32_mapped&&!wcscmp(c32_mapped,L"2")&&i==0)c32[i].MapFromRaster(source);
-   source=c32[i].Output();}
-  ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
+   source=(chain_raw&&i<3)?c32[i].RawWork():c32[i].Output();} // chained stages: the next Create only needs a resource for its unused SRV
+  NativeVramLog(d,"c32x4");ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
   auto group=[&](NativeC64Shift*layers,UINT count,UINT first,UINT w,UINT h,UINT channels,NativeC32Downsample&ds){
    for(UINT i=0;i<count;i++){auto p=L"block"+std::to_wstring(first+i);layers[i].Create(d,source,w,h,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,i+1==count,channels,false,share_matrix?&matrix_workspace:nullptr,i>0,i+1<count);source=layers[i].Output();}
    ds.Create(d,source,w,h,0,read(L"block"+std::to_wstring(first+count-1)+L"-ds.f32"),dir,true,channels,share_matrix?&matrix_workspace:nullptr);source=ds.Output();
   };
-  group(c64,4,5,480,288,64,ds8);group(c128,6,9,240,144,128,ds14);group(c256,8,15,120,72,256,ds22);
+  group(c64,4,5,480,288,64,ds8);NativeVramLog(d,"c64x4");group(c128,6,9,240,144,128,ds14);NativeVramLog(d,"c128x6");group(c256,8,15,120,72,256,ds22);NativeVramLog(d,"c256x8");
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(23+i);split[i].Create(d,source,60,36,shifts[i],read(p+L"-ffwd.f32"),read(p+L"-ffwd-projection.f32"),read(p+L"-attention.f32"),dir,i==7,share_matrix?&matrix_workspace:nullptr);source=split[i].Output();}
   head.Create(d,source,60,36,0,read(L"head-matrix.f32"),dir,true,512,share_matrix?&matrix_workspace:nullptr);
   auto rawmap=read(L"hwc-to-vit.i32");if(rawmap.size()!=655360)throw std::runtime_error("network bridge map size");std::vector<UINT>map(rawmap.size());std::memcpy(map.data(),rawmap.data(),map.size()*4);bridge.Create(d,head.Output(),map,dir);source=bridge.Output();
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(31+i)+L"-";vit[i].Create(d,source,640,read(p+L"expand.f32"),read(p+L"contract.f32"),read(p+L"qkv.f32"),read(p+L"projection.f32"),dir);source=vit[i].Output();}
-  decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
+  NativeVramLog(d,"c512+vit");decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
   {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1")&&wcscmp(bs,L"2"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs?UINT(bs[0]-L'0'):0u;}
-  post.Create(d,decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u);ready=true;
+  NativeVramLog(d,"decoder");post.Create(d,decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u);NativeVramLog(d,"post70");ready=true;
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
