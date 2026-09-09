@@ -28,9 +28,10 @@ public:
   UINT64 pixels=UINT64(width)*height;
   if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<(skip_mode==7?pixels*32:pixels*32*4)||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
   main_input=main;skip_input=skip;color_input=color;for(auto*r:{main_input,skip_input,color_input})r->AddRef();geometry[0]=width;geometry[1]=height;std::memcpy(&geometry[2],&input_scale,4);
-  merged=buffer(d,pixels*32*4);output=buffer(d,pixels*3*4);coefficients[0]=buffer(d,scales.size()*4,&scales);coefficients[1]=buffer(d,head.size()*4,&head);
+  {const char*pd=std::getenv("DLSS5_POST70_DIRECT");direct=pd&&!std::strcmp(pd,"1");const char*mf=std::getenv("DLSS5_POST70_MERGE_FOLD");merge_fold=direct&&mf&&!std::strcmp(mf,"1");}
+  merged=buffer(d,merge_fold?16:pixels*32*4);output=buffer(d,pixels*3*4); /* merge fold never writes merged */coefficients[0]=buffer(d,scales.size()*4,&scales);coefficients[1]=buffer(d,head.size()*4,&head);
   {const wchar_t*o8=_wgetenv(L"DLSS5_POST70_OUT8");NativePreblockRuntime::PendingOut8()=o8&&!wcscmp(o8,L"1");}
-  body.Create(d,merged,width,height,shift,ffn,attention,dir,true);
+  body.Create(d,merged,width,height,shift,ffn,attention,dir,true,direct||merge_fold);
   // FAST PATH (DLSS5_POST70_DIRECT): FFN reads the merged raster through the mapping (no pack), finish stage skipped
   // (rgb only needs the raw tiles), rgb head indexes the tile-major raw work buffer directly (no crop).
   {const char*pd=std::getenv("DLSS5_POST70_DIRECT");if(pd&&std::strcmp(pd,"0")&&std::strcmp(pd,"1"))throw std::runtime_error("invalid post70 direct flag");direct=pd&&!std::strcmp(pd,"1");}

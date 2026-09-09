@@ -3,6 +3,7 @@
 #include "native_split_window.h"
 #include "native_decoder_tail69.h"
 #include "native_block_skip.h"
+#include "native_vram_log.h"
 
 // Captured 1920x1152 processing extent. All sources remain resident on the GPU.
 class NativeActualDecoder69 {
@@ -36,10 +37,10 @@ public:
                    read(prefix+L"ffwd-projection.f32"),read(prefix+L"attention.f32"),dir,false,workspace);
    source=split[i].Output();
   }
-  up48.Create(d,source,skip22,2160,512,256,false,read(L"block48-weights.f32"),dir,true);
+  NativeVramLog(d,"dec entry+split8");up48.Create(d,source,skip22,2160,512,256,false,read(L"block48-weights.f32"),dir,true);
   body48.Create(d,up48.Output(),120,72,NativeDecoderShift(48),read(L"block48-ffn.f32"),
                 read(L"block48-attention.f32"),dir,false,256,false,workspace);
-  tail.Create(d,body48.Output(),skip14,skip8,skip4,dir,true,workspace);created=true;
+  NativeVramLog(d,"dec up48+body48");tail.Create(d,body48.Output(),skip14,skip8,skip4,dir,true,workspace);created=true;
  }
  // Callers may submit and fence between these stages without CPU feature copies.
  UINT StageCount()const{return 13;}

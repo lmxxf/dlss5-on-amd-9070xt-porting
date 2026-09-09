@@ -36,7 +36,7 @@ class NativePreblockRuntime {
   D3D12_ROOT_SIGNATURE_DESC d{};d.NumParameters=with_temporal?4:with_noise?3:2;d.pParameters=p;ID3DBlob*b=nullptr,*error=nullptr;
   Check(D3D12SerializeRootSignature(&d,D3D_ROOT_SIGNATURE_VERSION_1,&b,&error));ID3D12RootSignature*r=nullptr;Check(device->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&r)));b->Release();if(error)error->Release();return r;
  }
- void Heap(UINT stage,ID3D12Resource*a,UINT64 asize,ID3D12Resource*b,UINT64 bsize,ID3D12Resource*c,UINT64 csize,bool finish){
+ void Heap(UINT stage,ID3D12Resource*a,UINT64 asize,ID3D12Resource*b,UINT64 bsize,ID3D12Resource*c,UINT64 csize,bool finish){asize=std::min<UINT64>(asize,a->GetDesc().Width);bsize=std::min<UINT64>(bsize,b->GetDesc().Width);csize=std::min<UINT64>(csize,c->GetDesc().Width);
   D3D12_DESCRIPTOR_HEAP_DESC d{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,3,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};Check(device->CreateDescriptorHeap(&d,IID_PPV_ARGS(&heap[stage])));
   auto h=heap[stage]->GetCPUDescriptorHandleForHeapStart();UINT step=device->GetDescriptorHandleIncrementSize(d.Type);
   ID3D12Resource* resources[]={a,b,c};UINT64 sizes[]={asize,bsize,csize};
