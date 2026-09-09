@@ -1,3 +1,9 @@
+## 2026-09-09 22:05 post70 rgb 头：误判（光之朱雀）
+
+- `post70_rgb` 0.77ms 不是 rgb 头：POST_BASE_ONLY=1（只拷颜色不读特征）仍 0.777。是时间戳归属——标记在命令流顶端写下，前一段注意力的尾巴算进了下一段。**凡是紧跟大核后面的小段，它的 interval 都不可信**（同理 c32_probe_stage2、post70_detail_stage2 之类）。
+- 做了 `DLSS5_POST70_FAST_RGB`（一线程一像素、特征读一次、f32 点积一次 f16 舍入，PSNR 41.9155）和 `DLSS5_POST70_OUT8`（注意力顺手存 E4M3 输出 71MB，rgb 头读字节，PSNR 41.84，注意力 +0.13）；都默认关。剩余清单里 rgb 头这项划掉。
+- 记忆/工具：memory 文件砍成规矩+运维+测量纪律；scratchpad 工具入库 `Development/tools/`。
+
 ## 2026-09-09 18:22 掉帧根因：显存驱逐；fast28 部署（光之朱雀）
 
 - fast27 Zero 玩半天 28～29 稳定（过场也不掉），过了很久掉到 16 不回升。抓现场：GPU 93% 全在游戏进程、CPU 闲 → GPU 侧每帧翻倍；adapter dedicated 15.1/16GB，游戏进程 Total Committed 14.4GB，**Shared Usage 523MB**（已被挤到系统内存）。判断：我们的 f32 大 buffer 被 Windows 降级到系统内存，网络走 PCIe。与 fast27 收 1.8GB 后"稳定很多"一致。
