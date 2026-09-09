@@ -1,5 +1,6 @@
 #pragma once
 #include "native_game_frame.h"
+void NativeReleaseReservedVram();
 #include "native_submitted_readback.h"
 #include "native_frame_input_check.h"
 #include <atomic>
@@ -38,6 +39,7 @@ class NativeGameOneShot {
     Log("flags_applied",std::to_string(applied).c_str());}
    {const bool temporal_on=GetFileAttributesW(LR"(D:\DLSSNR-Lab\temporal-history.txt)")!=INVALID_FILE_ATTRIBUTES&&task->temporal.motion_width&&task->temporal.render_width;
     char text[160];snprintf(text,sizeof text,"temporal=%u motion=%ux%u render=%ux%u",temporal_on?1u:0u,task->temporal.motion_width,task->temporal.motion_height,task->temporal.render_width,task->temporal.render_height);Log("temporal_config",text);
+    NativeReleaseReservedVram();
     self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-game-tiled-assets)",nullptr,temporal_on?&task->temporal:nullptr);}
 #else
    self->frame->Create(self->queue,task->source,noise,LR"(D:\DLSSNR-Lab\native-color-frame-samegpu)");

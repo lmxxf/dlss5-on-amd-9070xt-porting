@@ -255,11 +255,25 @@ static bool on_create_device(reshade::api::device_api api,uint32_t&){
  if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu sdk721_before_device get=%08x set=%08x experimental=%08x\n",GetCurrentProcessId(),unsigned(get),unsigned(set),unsigned(experimental));fclose(f);}
  return false;
 }
+// VRAM reservation (DLSS5_RESERVE_VRAM_MB=N in native-game-flags.txt): right after the game creates its device, hold N MB of
+// video memory in a placeholder buffer so the game sizes its texture pool with that much less; the placeholder is released
+// just before the network allocates its own buffers, which then take that room instead of pushing the game's textures out.
+static ID3D12Resource*reserved_vram=nullptr;
+void NativeReleaseReservedVram(){if(reserved_vram){reserved_vram->Release();reserved_vram=nullptr;if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu reserved_vram_released\n",GetCurrentProcessId());fclose(f);}}}
+static void on_init_device(reshade::api::device*device){
+ if(!device||device->get_api()!=reshade::api::device_api::d3d12||reserved_vram)return;
+ unsigned long mb=0;if(FILE*flags=_wfopen(LR"(D:\DLSSNR-Lab\native-game-flags.txt)",L"rb")){char line[256];while(fgets(line,sizeof line,flags))if(!strncmp(line,"DLSS5_RESERVE_VRAM_MB=",22))mb=strtoul(line+22,nullptr,10);fclose(flags);}
+ if(!mb)return;auto*d=reinterpret_cast<ID3D12Device*>(device->get_native());
+ D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=UINT64(mb)<<20;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+ HRESULT hr=d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COMMON,nullptr,IID_PPV_ARGS(&reserved_vram));
+ if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu reserved_vram_mb=%lu hr=%08x\n",GetCurrentProcessId(),mb,unsigned(hr));fclose(f);}
+}
 BOOL WINAPI DllMain(HINSTANCE h,DWORD reason,LPVOID){
  if(reason==DLL_PROCESS_ATTACH){
   DisableThreadLibraryCalls(h);wchar_t path[MAX_PATH]{};GetModuleFileNameW(nullptr,path,MAX_PATH);
   if(!wcsstr(path,L"SB-Win64-Shipping.exe")||!reshade::register_addon(h))return FALSE;
   reshade::register_event<reshade::addon_event::create_device>(on_create_device);
+  reshade::register_event<reshade::addon_event::init_device>(on_init_device);
   reshade::register_event<reshade::addon_event::close_command_list>(close_list);
   reshade::register_event<reshade::addon_event::execute_command_list>(execute);
   reshade::register_event<reshade::addon_event::dispatch>(compute);
