@@ -1,3 +1,10 @@
+## 2026-09-09 18:25 显存收敛；fast27 部署（光之朱雀）
+
+- `DLSS5_VRAM_LOG=1` 分段统计（测试台进程峰值 6.9GB）：pre 1144 / enc C32 887 / 多头 423 / C512+ViT 936 / decoder 1711 / post70 1181。
+- 收：preblock `Main()` 懒分配（MAIN8/chain-raw/skip-finish 下无人读）；C32 stage 的 crop heap 与 Output() 懒建；链式 stage 的 Create 传 prev.RawWork() 当那个用不到的 SRV。6839→5073MB，输出一位不差。剩余大头：shared ffn/raw 各 283（必需）、decoder 1235（tail 各级 packed/output）、split/vit 每块 39/75MB 权重+buffer。
+- fast27 = fast26 flag + 新 DLL `ff2b27e2…`；游戏显存预计 13.6→~11.8GB。
+- 突然掉帧问题仍待探针抓（Zero 到过场动画位置时）。
+
 ## 2026-09-09 17:55 突然掉帧待查（光之朱雀）
 
 - fast26 进游戏 28～29fps，玩一会儿突然 21 且不回升；Zero 在公司 Splashtop 远程。ssh 采样：GPU 96% 全在游戏进程、SRFeature 1%、CPU 空闲；游戏进程显存 13.6GB/16GB（我们的网络估 3～5GB，f32 中间 buffer 多——值得收）。Zero 判断不是显存。上次同类现象（09-09 早）是 Splashtop：cpu_frame 阶梯涨、GPU 不变、关远程回落。
