@@ -207,7 +207,104 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #ifndef NATIVE_C32_ATTN_FAST3
 #define NATIVE_C32_ATTN_FAST3 0
 #endif
-#if NATIVE_C32_ATTN_FAST3
+#ifndef NATIVE_C32_ATTN_FAST4
+#define NATIVE_C32_ATTN_FAST4 0
+#endif
+#if NATIVE_C32_ATTN_FAST4
+#if !NATIVE_C32_ATTN_FAST3
+#error NATIVE_C32_ATTN_FAST4 needs the fused QKV of fast3
+#endif
+// FAST PATH (attention fast4): one group = two 8x8 windows (128 tokens). All 8 waves produce the E4M3 Q/K/V rows of their
+// own 16 tokens into LDS; then each wave runs its 16 queries against all 64 keys of its own window, so the softmax row
+// sums never leave the wave (no partial_sum, no group sync after the Q/K/V store). Scratch is wave-private: ex holds the
+// squares and then the exp tiles (1KB per wave), pw8 holds the input tile, then P, then the E4M3 attention output (1KB per
+// wave). Two group syncs in total: ones16 ready, Q/K/V ready. Numerics as fast3 (row sum accumulated over two K32 MMAs).
+groupshared uint qkv8[128*24];
+groupshared uint pw8[8*256];
+groupshared float16_t ones16[512];
+[WaveSize(32)]
+[numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ const uint t=tid.x,wave=t/32,window=gid.x*2+wave/4,windows=runtime_width*runtime_height/64;
+ const bool live=window<windows;const uint qfirst=window*64+(wave&3)*16,lfirst=wave*16,lwin=(wave/4)*64,pbase=wave*256,ebase=wave*512;
+ for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
+ C z[6];
+ if(live){
+  C in0=C::Load(input,qfirst*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,qfirst*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
+  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+  in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+4,8,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(live){
+  A8 a=A8::Load(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
+   B8 b=B8::Load(weights,25856+(part*32+cr*16)*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+   z[part*2+cr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+  }
+  B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint h=0;h<2;h++){
+   [unroll]for(uint cr=0;cr<2;cr++){C sq=z[h*2+cr];for(uint i=0;i<sq.Length();i++){float v=sq.Get(i);sq.Set(i,v*v);}sq.Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase+cr*16,32,dx::linalg::MatrixLayout::RowMajor);}
+   GroupMemoryBarrier();
+   A st=A::Load(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor);
+   C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(st,ones);
+   [unroll]for(uint cr=0;cr<2;cr++){for(uint i=0;i<rs.Length();i++)z[h*2+cr].Set(i,z[h*2+cr].Get(i)*(rsqrt(max(rs.Get(i),6.198883056640625e-5))*(h==0?W_SCALE:1)));}
+   GroupMemoryBarrier();
+  }
+  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++)z[part*2+cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,lfirst*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ if(!live)return;
+ C s[4];
+ {
+  A8 qa=A8::Load(qkv8,lfirst*24,24,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint kr=0;kr<4;kr++){
+   B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+   s[kr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+   for(uint i=0;i<s[kr].Length();i++){uint2 rc=s[kr].GetCoordinate(i);s[kr].Set(i,fast_exp_raw(s[kr].Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y)));}
+  }
+ }
+ C rs=C::Splat(0.0f);
+ {
+  B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint g=0;g<2;g++){
+   s[g*2].Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor);
+   s[g*2+1].Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase+16,32,dx::linalg::MatrixLayout::RowMajor);
+   GroupMemoryBarrier();
+   A et=A::Load(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor);
+   rs.MultiplyAccumulate(et,ones);
+   GroupMemoryBarrier();
+  }
+ }
+ [unroll]for(uint kr=0;kr<4;kr++){
+  for(uint i=0;i<s[kr].Length();i++)s[kr].Set(i,s[kr].Get(i)*(1/rs.Get(i)));
+  s[kr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrier();
+ C acc[2];acc[0]=C::Splat(0.0f);acc[1]=C::Splat(0.0f);
+ [unroll]for(uint g=0;g<2;g++){
+  A8 pa=A8::Load(pw8,pbase+g*8,16,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint cc=0;cc<2;cc++){
+   B8 vb=B8::Load(qkv8,(lwin+g*32)*24+16+cc*4,24,dx::linalg::MatrixLayout::RowMajor);
+   acc[cc].MultiplyAccumulate(pa,vb);
+  }
+ }
+ GroupMemoryBarrier();
+ [unroll]for(uint cc=0;cc<2;cc++)acc[cc].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+cc*4,8,dx::linalg::MatrixLayout::RowMajor);
+ GroupMemoryBarrier();
+ {
+  A8 aa=A8::Load(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint cr=0;cr<2;cr++){
+   B8 bb=B8::Load(weights,24832+cr*16*32,32,dx::linalg::MatrixLayout::ColMajor,16);
+   C zp=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
+   for(uint i=0;i<zp.Length();i++){
+    uint2 rc=zp.GetCoordinate(i);uint p=qfirst+rc.x,c=cr*16+rc.y;
+    float result=H(zp.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
+    zp.Set(i,RAW_OUTPUT?result:F(result));
+   }
+   zp.Store(qk,(qfirst*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+  }
+ }
+}
+#elif NATIVE_C32_ATTN_FAST3
 // FAST PATH (attention fast3): the QKV GEMM + normalize runs inside the attention dispatch. Waves 0..3 each produce the
 // E4M3 Q/K/V rows of 16 tokens into LDS ([token][96] bytes, same layout as aux); all 8 waves then run the fast2
 // attention from LDS. Saves the aux round trip and one dispatch. Reuses ex (squares) and p8 (input tile) as scratch.
