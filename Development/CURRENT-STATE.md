@@ -1,4 +1,11 @@
-## 2026-09-09 18:25 显存收敛；fast27 部署（光之朱雀）
+## 2026-09-09 18:22 掉帧根因：显存驱逐；fast28 部署（光之朱雀）
+
+- fast27 Zero 玩半天 28～29 稳定（过场也不掉），过了很久掉到 16 不回升。抓现场：GPU 93% 全在游戏进程、CPU 闲 → GPU 侧每帧翻倍；adapter dedicated 15.1/16GB，游戏进程 Total Committed 14.4GB，**Shared Usage 523MB**（已被挤到系统内存）。判断：我们的 f32 大 buffer 被 Windows 降级到系统内存，网络走 PCIe。与 fast27 收 1.8GB 后"稳定很多"一致。
+- 解法：`native_pinned_resource.h` —— 27 处 CreateCommittedResource 全改走 `NativeCreateCommittedResource`，`DLSS5_RESIDENCY_PRIORITY=high|maximum` 给 default-heap 资源设驻留优先级（ID3D12Device1::SetResidencyPriority）。fast28 = fast27 + high，DLL `103b7859…`。等 Zero 实测。
+- 若仍掉：maximum + 再收显存（decoder 1235MB 里 tail 各级 packed/output；shared ffn/raw 改 f16/E4M3 需核改动）。
+- 注：本段之前一条的时间戳 18:25 是我猜的，实际 18:10 前后；只信 hook 时间。
+
+## 2026-09-09 18:10 显存收敛；fast27 部署（光之朱雀）
 
 - `DLSS5_VRAM_LOG=1` 分段统计（测试台进程峰值 6.9GB）：pre 1144 / enc C32 887 / 多头 423 / C512+ViT 936 / decoder 1711 / post70 1181。
 - 收：preblock `Main()` 懒分配（MAIN8/chain-raw/skip-finish 下无人读）；C32 stage 的 crop heap 与 Output() 懒建；链式 stage 的 Create 传 prev.RawWork() 当那个用不到的 SRV。6839→5073MB，输出一位不差。剩余大头：shared ffn/raw 各 283（必需）、decoder 1235（tail 各级 packed/output）、split/vit 每块 39/75MB 权重+buffer。
