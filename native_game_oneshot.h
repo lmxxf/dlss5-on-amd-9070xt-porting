@@ -95,6 +95,11 @@ public:
    if(every_frame&&request>1){
     // Steady state: no readback, no files; one log line per 100 frames with the average interval.
     // Temporal alignment probe: dump history/motion/color/warped at frames 300 and 600 while the user pans the camera.
+    // Flicker probe (DLSS5_FLICKER_DUMP=<first frame>): dump five consecutive frames (history = previous output, color =
+    // this frame's input) so input vs output frame-to-frame differences can be compared offline.
+    {static long flicker_first=[]{const wchar_t*v=_wgetenv(L"DLSS5_FLICKER_DUMP");return v?wcstol(v,nullptr,10):-1L;}();
+     const long index=long(every_frame_count)+1;
+     if(flicker_first>0&&index>=flicker_first&&index<flicker_first+5){wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\flicker-%lu-%ld)",GetCurrentProcessId(),index);frame->RequestTemporalDump(prefix);Log("flicker_dump_requested",std::to_string(index).c_str());}}
     if(every_frame_count==299||every_frame_count==599){wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,LR"(D:\DLSSNR-Lab\logs\temporal-probe-%lu-%lu)",GetCurrentProcessId(),every_frame_count+1);frame->RequestTemporalDump(prefix);Log("temporal_dump_requested",std::to_string(every_frame_count+1).c_str());}
     frame->RebindSourceAfterCompletion(source);
     frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
