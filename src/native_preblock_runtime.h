@@ -48,6 +48,8 @@ class NativePreblockRuntime {
  }
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER x{};x.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;x.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&x);}
 public:
+ // Set by NativePost70 right before creating its body: only that instance stores the E4M3 output copy.
+ static bool&PendingOut8(){static bool v=false;return v;}
  ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(main8)main8->Release();if(split_root)split_root->Release();for(auto*p:split_pso)if(p)p->Release();if(ffn_root)ffn_root->Release();if(stage_input)stage_input->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
  NativePreblockRuntime()=default;NativePreblockRuntime(const NativePreblockRuntime&)=delete;NativePreblockRuntime& operator=(const NativePreblockRuntime&)=delete;
  void Create(ID3D12Device*d,ID3D12Resource*input,UINT w,UINT h,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&shader_dir,bool live_profile,bool raw_features=false,const std::vector<float>*noise_table=nullptr,ID3D12Resource*temporal_input=nullptr){
@@ -59,6 +61,8 @@ public:
   {const wchar_t*dv=_wgetenv(L"DLSS5_PREBLOCK_DOWN_ONLY");if(dv&&wcscmp(dv,L"0")&&wcscmp(dv,L"1"))throw std::runtime_error("invalid preblock down-only flag");down_only=coalesced_finish&&noise_table!=nullptr&&dv&&!wcscmp(dv,L"1");}
   // FAST PATH (DLSS5_PREBLOCK_MAIN8): finish writes Main() as E4M3 bytes (Main8()); post70 reads them (mode 7).
   {const wchar_t*m8=_wgetenv(L"DLSS5_PREBLOCK_MAIN8");if(m8&&wcscmp(m8,L"0")&&wcscmp(m8,L"1"))throw std::runtime_error("invalid preblock main8 flag");main8_mode=coalesced_finish&&!down_only&&noise_table!=nullptr&&m8&&!wcscmp(m8,L"1");}
+  // FAST PATH (DLSS5_POST70_OUT8): the post70 body (live profile, no noise table) also stores its attention output as E4M3 into main8 for the rgb head.
+  {const wchar_t*o8=_wgetenv(L"DLSS5_POST70_OUT8");if(o8&&wcscmp(o8,L"0")&&wcscmp(o8,L"1"))throw std::runtime_error("invalid post70 out8 flag");attn_out8=PendingOut8()&&o8&&!wcscmp(o8,L"1");PendingOut8()=false;}
   const wchar_t*prefix_flag=_wgetenv(L"DLSS5_TEST_SPLIT_PREBLOCK_FFN");if(prefix_flag&&wcscmp(prefix_flag,L"0")&&wcscmp(prefix_flag,L"1"))throw std::runtime_error("invalid split preblock flag");prefix_wave=!raw_features&&noise_table&&prefix_flag&&!wcscmp(prefix_flag,L"1");
   const wchar_t*ffn_flag=_wgetenv(L"DLSS5_TEST_WAVE_C32_FFN");if(ffn_flag&&wcscmp(ffn_flag,L"0")&&wcscmp(ffn_flag,L"1"))throw std::runtime_error("invalid wave C32 FFN flag");wave_ffn=raw_features&&ffn_flag&&!wcscmp(ffn_flag,L"1");
   if(wave_ffn||prefix_wave)for(size_t i=512;i<8704;i++){uint32_t b;std::memcpy(&b,&fw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 FFN weight not exact half");}
@@ -72,7 +76,7 @@ public:
    if(bytes>SharedBytes())throw std::runtime_error("shared C32 scratch smaller than this instance; create the largest instance first");
    // Down-only preblock: post70 reads this instance's raw tiles at the end of the frame, so they must not live in the shared scratch.
    ffn=SharedFfn();ffn->AddRef();if(down_only){private_raw=true;raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}else{raw=SharedRaw();raw->AddRef();}
-  }else{ffn=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}buffer_bytes=bytes;if(main8_mode)main8=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);down=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+  }else{ffn=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}buffer_bytes=bytes;if(main8_mode||attn_out8)main8=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);down=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   const std::vector<float>* values[]={&fw,&aw};
   for(UINT i=0;i<2;i++){weights[i]=Buffer(values[i]->size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(weights[i]->Map(0,&none,&p));std::memcpy(p,values[i]->data(),values[i]->size()*4);weights[i]->Unmap(0,nullptr);}
   if(noise_table){noise=Buffer(noise_table->size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(noise->Map(0,&none,&p));std::memcpy(p,noise_table->data(),noise_table->size()*4);noise->Unmap(0,nullptr);}
@@ -151,7 +155,7 @@ public:
     // FAST PATH: qkv+normalize and attention+projection fused (two dispatches instead of four).
     if(const wchar_t*fz=_wgetenv(L"DLSS5_C32_FUSED_ATTENTION")){if(wcscmp(fz,L"0")&&wcscmp(fz,L"1"))throw std::runtime_error("invalid fused C32 attention flag");fused_attention=!wcscmp(fz,L"1");}
     const wchar_t*wa=_wgetenv(L"DLSS5_C32_WAVE_ATTENTION");if(wa&&wcscmp(wa,L"0")&&wcscmp(wa,L"1"))throw std::runtime_error("invalid C32 wave attention flag");wave_attention=fused_attention&&wa&&!wcscmp(wa,L"1");
-    const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?L"\\native_wave_c32_fused_attention.cso":L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
+    const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?(attn_out8?L"\\native_wave_c32_fused_attention_out8.cso":L"\\native_wave_c32_fused_attention.cso"):L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
     for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+names[i]).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
    }
   }if(main8_mode)Heap(2,raw,bytes,main8,bytes/4,down,bytes/4,true);
@@ -190,16 +194,16 @@ public:
    // Mode 3 mapping reads the (shared) raw tiles of the previous stage in the FFN; keep them readable until the attention stage.
    if(private_raw){if(recorded)Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
    else if(SharedRawReadable()&&!(mapping[0]==3&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
-   if(recorded)for(auto*r:{main8_mode?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-  }else if(recorded)for(auto*r:{ffn,raw,main8_mode?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+   if(recorded)for(auto*r:{(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+  }else if(recorded)for(auto*r:{ffn,raw,(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
    if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
    if(stage==1&&shared_c32&&!private_raw&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(stage==1&&split_attention){
-    c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,(attn_fast3?raw:Main())->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
-    D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?(attn_fast3?raw:main):raw;}
+    c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,(attn_out8?main8:attn_fast3?raw:Main())->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
+    D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?(attn_out8?main8:attn_fast3?raw:main):raw;}
     const UINT tokens=width*height;const UINT g16=tokens/16;
     if(!attn_fast3){c->SetPipelineState(split_pso[0]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);c->ResourceBarrier(2,uav);}if(timer)timer->Mark(c,std::string(label)+"_qkv");
     if(fused_attention){c->SetPipelineState(split_pso[2]);if(attn_fast4){UINT n=(tokens/64+1)/2;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(wave_attention){UINT w=tokens/64;c->Dispatch(w<65535?w:65535,(w+65534)/65535,1);}else c->Dispatch(tokens/64,1,1);}
@@ -223,7 +227,7 @@ public:
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
   }
-  if(main8_mode?main8:main)Barrier(c,main8_mode?main8:main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){SharedFfnReadable()=true;if(!private_raw)SharedRawReadable()=true;}
+  if((main8_mode||attn_out8)?main8:main)Barrier(c,(main8_mode||attn_out8)?main8:main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){SharedFfnReadable()=true;if(!private_raw)SharedRawReadable()=true;}
  }
  void CapturePrefixForTest(ID3D12Resource*r){if(!prefix_wave||test_prefix_readback||!r||r->GetDesc().Width<4096)throw std::runtime_error("prefix capture test contract");D3D12_HEAP_PROPERTIES hp{};D3D12_HEAP_FLAGS flags{};Check(r->GetHeapProperties(&hp,&flags));if(hp.Type!=D3D12_HEAP_TYPE_READBACK)throw std::runtime_error("prefix capture requires readback");test_prefix_readback=r;r->AddRef();}
  ID3D12Resource* FfnTilesForTest()const{return ffn;}
@@ -233,7 +237,7 @@ public:
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
- bool skip_finish{},down_only{},main8_mode{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
+ bool skip_finish{},down_only{},main8_mode{},attn_out8{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
  // Main() is allocated on first use: with MAIN8, chain-raw or skip-finish nobody reads it (saves one full f32 raster per stage).
- ID3D12Resource* Main()const{if(!main){auto*self=const_cast<NativePreblockRuntime*>(this);self->main=self->Buffer(buffer_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}return main;}bool DownOnly()const{return down_only;}bool Main8Mode()const{return main8_mode;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
+ ID3D12Resource* Main()const{if(!main){auto*self=const_cast<NativePreblockRuntime*>(this);self->main=self->Buffer(buffer_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}return main;}bool DownOnly()const{return down_only;}bool Main8Mode()const{return main8_mode;}bool AttnOut8()const{return attn_out8;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };

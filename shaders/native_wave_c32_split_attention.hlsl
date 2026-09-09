@@ -210,6 +210,9 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #ifndef NATIVE_C32_ATTN_FAST4
 #define NATIVE_C32_ATTN_FAST4 0
 #endif
+#ifndef NATIVE_C32_OUT8
+#define NATIVE_C32_OUT8 0
+#endif
 #if NATIVE_C32_ATTN_FAST4
 #if !NATIVE_C32_ATTN_FAST3
 #error NATIVE_C32_ATTN_FAST4 needs the fused QKV of fast3
@@ -301,6 +304,10 @@ groupshared float16_t ones16[512];
     zp.Set(i,RAW_OUTPUT?result:F(result));
    }
    zp.Store(qk,(qfirst*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_C32_OUT8
+   // FAST PATH (post70 out8): E4M3 copy of the block output into aux ([token][32] bytes) for the rgb head (71MB instead of 283MB).
+   zp.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,qfirst*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
   }
  }
 }

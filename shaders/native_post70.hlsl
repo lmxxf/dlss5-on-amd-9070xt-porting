@@ -1,4 +1,15 @@
+#ifndef POST_INPUT8
+#define POST_INPUT8 0
+#endif
+#if POST_INPUT8
+// FAST PATH (DLSS5_POST70_OUT8): the body's output arrives as E4M3 bytes ([token][32]); decode exactly.
+ByteAddressBuffer input8:register(t0);
+float e4m3_to_float(uint b){uint e=(b>>3)&15u,m=b&7u;float v=e==0?float(m)/512.0:asfloat(((e+120u)<<23)|(m<<20));return (b&0x80u)?-v:v;}
+StructuredBuffer<float> weights:register(t1),skip_or_color:register(t2);
+StructuredBuffer<float> input:register(t3); // only so the unused merge/exact entries still compile; the host requires merge fold with out8
+#else
 StructuredBuffer<float> input:register(t0),weights:register(t1),skip_or_color:register(t2);
+#endif
 RWStructuredBuffer<float> output:register(u0);
 cbuffer Geometry:register(b0){uint width;uint height;float input_scale;uint work_width;uint shift_x;uint shift_y;}
 #ifndef POST_TILED_INPUT
@@ -56,3 +67,24 @@ float aligned_half(int sum,float acc,float scale,int e){
  precise float rgb=encoded*8.0+0.5;
  output[i]=clamp(rgb,0.0,1.0);
 }
+#ifndef POST_FAST_RGB
+#define POST_FAST_RGB 0
+#endif
+#if POST_FAST_RGB
+// FAST PATH (DLSS5_POST70_FAST_RGB): one thread per pixel, the 32 features read once for all three rows, plain f32 dot
+// products with a single f16 rounding (the exact head emulates the Tensor Core integer alignment per 16-term half).
+[numthreads(64,1,1)]void finish_fast(uint3 id:SV_DispatchThreadID){
+ uint p=id.x;if(p>=width*height)return;const uint fb=feature_base(p);
+#if POST_INPUT8
+ float f[32];[unroll]for(uint q=0;q<8;q++){uint w=input8.Load(fb+q*4);[unroll]for(uint k=0;k<4;k++)f[q*4+k]=e4m3_to_float((w>>(k*8))&255u);}
+#else
+ float f[32];[unroll]for(uint j=0;j<32;j++)f[j]=input[fb+j];
+#endif
+ [unroll]for(uint row=0;row<3;row++){
+  float acc=0;[unroll]for(uint j=0;j<32;j++)acc+=f[j]*weights[row*32+j];
+  acc=f16tof32(f32tof16(acc));
+  float base=skip_or_color[p*4+row]*0.125-0.0625;
+  output[p*3+row]=clamp((acc*input_scale+base)*8.0+0.5,0.0,1.0);
+ }
+}
+#endif
