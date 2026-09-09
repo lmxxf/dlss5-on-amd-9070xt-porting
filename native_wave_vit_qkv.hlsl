@@ -25,7 +25,46 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #ifndef BLOCK_M
 #define BLOCK_M 1
 #endif
-#if BLOCK_M>1
+#ifndef NATIVE_QKV_FUSED
+#define NATIVE_QKV_FUSED 0
+#endif
+#if NATIVE_QKV_FUSED
+// FAST PATH (ViT QKV fused): projection + per-head normalize + E4M3 store in one wave. BLOCK_N=4 columns = two heads, so
+// the row sum of squares of a head is one MMA of the f16 squared tile pair against all-ones; q rows are scaled by
+// 5.65625 * head scale (f32 copy appended to the packed weights at byte 6291456), v rows are stored as-is. The output is
+// the E4M3 Q/K/V buffer the FP8 attention reads (no normalize dispatch, no pack8). f32 sums, no intermediate H().
+groupshared float16_t sq16[512];
+groupshared float16_t ones16[512];
+[WaveSize(32)]
+[numthreads(32,1,1)]void project_fused(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16*BLOCK_M;if(first>=tokens)return;
+ uint col0=gid.y*BLOCK_N*16,part=col0/1024,row0=col0%1024;
+ for(uint i=tid.x;i<512;i+=32)ones16[i]=float16_t(1.0);
+ C acc[BLOCK_M][BLOCK_N];
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
+ [loop]for(uint k=0;k<1024;k+=32){
+  A a[BLOCK_M];[unroll]for(uint m=0;m<BLOCK_M;m++)a[m]=A::Load(input16,((first+m*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint n=0;n<BLOCK_N;n++){
+   B b=B::Load(weights,(part*1048576+(row0+n*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
+   [unroll]for(uint m=0;m<BLOCK_M;m++)acc[m][n].MultiplyAccumulate(a[m],b);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+ [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint hp=0;hp<BLOCK_N/2;hp++){
+  if(part<2){
+   [unroll]for(uint j=0;j<2;j++){C sq=acc[m][hp*2+j];for(uint i=0;i<sq.Length();i++){float v=sq.Get(i);sq.Set(i,v*v);}sq.Cast<dx::linalg::ComponentType::F16>().Store(sq16,j*16,32,dx::linalg::MatrixLayout::RowMajor);}
+   GroupMemoryBarrier();
+   A st=A::Load(sq16,0,32,dx::linalg::MatrixLayout::RowMajor);
+   C rs=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(st,ones);
+   float head_scale=part==0?5.65625*asfloat(weights.Load(6291456+((row0+hp*32)/32)*4)):1.0;
+   [unroll]for(uint j=0;j<2;j++)for(uint i=0;i<rs.Length();i++)acc[m][hp*2+j].Set(i,acc[m][hp*2+j].Get(i)*(rsqrt(max(rs.Get(i),6.198883056640625e-5))*head_scale));
+   GroupMemoryBarrier();
+  }
+  [unroll]for(uint j=0;j<2;j++)acc[m][hp*2+j].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,(part*tokens+first+m*16)*1024+row0+(hp*2+j)*16,1024,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#elif BLOCK_M>1
 // FAST PATH: BLOCK_M token tiles per wave share every weight tile load. Packed f16 input only.
 [WaveSize(32)]
 [numthreads(32,1,1)]void project(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){

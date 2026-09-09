@@ -9,7 +9,7 @@ public:
   expand.Create(d,input,nullptr,tokens,1024,4096,true,ew,dir);
   contract.Create(d,expand.Output(),input,tokens,4096,1024,false,cw,dir);
   qkv.Create(d,contract.Output(),tokens,qw,dir);
-  attention.Create(d,qkv.Output(),tokens,dir);
+  if(qkv.Fused())attention.Create(d,qkv.Packed8(),tokens,dir,true);else attention.Create(d,qkv.Output(),tokens,dir);
   projection.Create(d,attention.Output(),contract.Output(),tokens,1024,1024,false,pw,dir);
  }
  void Record(ID3D12GraphicsCommandList*c){expand.Record(c);contract.Record(c);qkv.Record(c);attention.Record(c);projection.Record(c);}
