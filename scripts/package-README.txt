@@ -51,4 +51,4 @@
   退出游戏后删除 d3d12.dll、dlss5-amd.addon64、DLSS5-D3D12-721、DLSS5-AMD 四项，恢复自己备份的文件。
   游戏更新或换版本后需要重新验证。
 
-—— Kien，2026-09-10。用 Claude 和 GPT 协作完成。
+问题与更新：https://github.com/lmxxf/dlss5-on-amd-9070xt-porting
