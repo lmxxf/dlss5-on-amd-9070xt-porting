@@ -57,10 +57,10 @@ powershell -File scripts\deploy_fast.ps1 -Source <lab> -Dll native-game.addon64 
 
 ## Weights
 
-The network weights are NVIDIA's and are **not** included. The host code loads them as raw `.f32`/`.i32` files
-(`block31-expand.f32`, `post70-attention.f32`, …) extracted from a locally owned copy of `nvngx_dlssnr.dll`; the
-extraction scripts (`Development/prepare_native_*_gpu.py` and the per-block notes) document the layouts but are not a
-polished pipeline.
+The network weights are NVIDIA's. The runtime weight files the host code loads (`block31-expand.f32`,
+`post70-attention.f32`, … about 16 GB with the reference dumps) are not in this repository; they were extracted from a
+locally owned copy of `nvngx_dlssnr.dll` with the scripts in `Development/` (`prepare_native_*_gpu.py` and the
+per-block notes), which document the layouts but are not a polished pipeline. No NVIDIA DLL is distributed here.
 
 ## Authors
 
@@ -70,5 +70,4 @@ written with AI collaborators (Claude, GPT); the working notes in `Development/`
 
 ## License
 
-Code in this repository is released under the MIT License. NVIDIA binaries, weights and anything derived from them are
-not covered and are not distributed here.
+Code in this repository is released under the MIT License. NVIDIA binaries and weights are not covered by it.

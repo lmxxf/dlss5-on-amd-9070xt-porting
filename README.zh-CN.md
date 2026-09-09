@@ -51,9 +51,9 @@ powershell -File scripts\deploy_fast.ps1 -Source <lab> -Dll native-game.addon64 
 
 ## 权重
 
-网络权重属于 NVIDIA，**不随仓库分发**。宿主代码按原始 `.f32`/`.i32` 文件加载（`block31-expand.f32`、
-`post70-attention.f32` 等），这些文件需从自己合法拥有的 `nvngx_dlssnr.dll` 提取；提取脚本
-（`Development/prepare_native_*_gpu.py` 和各块笔记）记录了布局，但不是一条整理好的流水线。
+网络权重属于 NVIDIA。宿主代码运行时加载的权重文件（`block31-expand.f32`、`post70-attention.f32` 等，连同参考
+dump 约 16 GB）不在仓库里，是用 `Development/` 里的脚本（`prepare_native_*_gpu.py` 和各块笔记）从自己拥有的
+`nvngx_dlssnr.dll` 提取的；脚本记录了布局，但不是一条整理好的流水线。仓库不分发任何 NVIDIA 的 DLL。
 
 ## 作者
 
@@ -62,4 +62,4 @@ Kien——方向、游戏接入、测试。逆向、核与优化由 AI 协作者
 
 ## 许可
 
-本仓库代码以 MIT 许可发布。NVIDIA 的二进制、权重及其衍生物不在其列，也不在此分发。
+本仓库代码以 MIT 许可发布。NVIDIA 的二进制和权重不在其列。
