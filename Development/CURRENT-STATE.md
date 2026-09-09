@@ -1,3 +1,10 @@
+## 2026-09-09 23:03 掉帧收敛：显存之争的三层处理（光之朱雀）
+
+- 关系坐实：被挤到系统内存的量 ↔ 帧率单调（399MB→20、523→16、737→12），是我们每帧整块扫的 buffer 被降级。游戏进程 13.3GB + 系统 1 + 网络 4.8 ≈ 19 > 16，怎么收都塞不下。
+- 试了三层：①fast30 `DLSS5_RESERVE_VRAM_MB=5120`（建设备时占 5GB、网络初始化前释放，日志 reserved_vram_mb/released）——游戏不是启动时定池，无效；②用户 `Engine.ini` 加 `[SystemSettings] r.Streaming.PoolSize=6000`（备份 Engine.ini.before-poolsize）——游戏 dedicated 没降，但**行为从"钉死"变成"掉几秒自己回来"**；③fast31 `DLSS5_RESIDENCY_PRIORITY=maximum`（日志确认 881 个资源全部 SetResidencyPriority 成功，high 时也成功过，Windows 不按它挤）。
+- 现状 fast31：29fps，换区域下车时掉到 17、5～10 秒回 28。Zero 先玩几天看频率；再压的话池上限 6000→5000。
+- VRAM 4.84GB（split f32 投影权重、fused ViT QKV 的 f32 权重/raw/output 释放 −237MB）。
+
 ## 2026-09-09 21:30 post70 rgb 头：误判（光之朱雀）
 
 - `post70_rgb` 0.77ms 不是 rgb 头：POST_BASE_ONLY=1（只拷颜色不读特征）仍 0.777。是时间戳归属——标记在命令流顶端写下，前一段注意力的尾巴算进了下一段。**凡是紧跟大核后面的小段，它的 interval 都不可信**（同理 c32_probe_stage2、post70_detail_stage2 之类）。
