@@ -1,3 +1,16 @@
+## 2026-09-10 03:25 fast36：finish 和 rgb 头并进注意力收尾（光之朱雀）
+
+- 先用 pre/post 的分段隔离（`pre:0:1..3`、`post:0:1..4`）看清：pre = FFN 0.67 / 注意力 0.73 / **finish_main8 0.68**；post = **FFN 1.69** / 注意力 0.71 / **rgb 头 0.77**（时间戳时代以为 <0.05）。
+- post FFN 1.69→1.2：merge fold 的 gather 循环里每个元素都在做 `p/src_width`、`p%src_width`（除以运行时变量），32 lane × 16 次算同一个 token 的索引。改成每 token 算一次 `low_index()` 广播。逐位相同。
+- `DLSS5_C32_EPILOGUE=1`（build `DLSS5_BUILD_C32_EPILOGUE`，`run_c32_epilogue_network.ps1`）：注意力 fast4 的收尾按 root 常量 `epilogue_mode` 干活——0 只写 raw（链式块）；2 = main8（F 后矩阵 Cast 到 pw8 再按 raster 搬）+ 2×2 池化的 down（一个 wave 的 16 token 正好是窗口两整行，池化不出 wave），不写 raw（pre、块 4/69 的 raw 没人读）；3 = post 的 rgb 头（f32 点积 + 一次 f16 圆整，同 finish_fast），不写 raw。root 签名多 5 个槽（t2 颜色 t3 头权重 u2 main8 u3 down u4 rgb），常量 11 个。
+- 数值：对 exact 链 **41.96**（旧链 41.91）。不是逐位：finish 是运行时 fxc 编的，它的 F() 里 exp2/log2 近似让 88M 值里 15 个 tie 翻向另一边，dxc 这边是干净的 RNE，追不上也不该追。rgb 头换 f32 点积后 PSNR 没动。
+- 隔离量：pre 2.08→1.58，post 2.63→2.20，块 4/69 0.53→0.45；**合计约 −1.5ms**（含 post FFN 那 −0.5）。
+- 坑：
+  1. post 带 shift 3，工作网格比输出大一圈——rgb 头要减 shift 落到输出栅格（pre 没 shift 所以先对了，post 错了半天）。
+  2. 收尾里的标量算术很贵：Ffinish（log2/exp2）×16 + 逐位 E4M3 编码把 finish 省的钱吃掉一半；换位运算 F、硬件 H、矩阵 Cast 才见效。exact 的 rgb 整数对齐仿真同理（0.5ms），换 f32 点积。
+  3. 测试探针：`DLSS5_TEST_EPILOGUE_MODE`（1 保留 raw 写、4 = rgb+raw、5/6/7/8 = 特征/颜色/权重/acc 探针）、`DLSS5_TEST_EPILOGUE_PRE_PROBE`、`DLSS5_TEST_EPILOGUE_KEEP_FINISH`；dump 8/9/10 = pre down/main8、块 69 main8。
+- 今晚合计（fast34→36）：测试台 sum-of-isolates 约 29.3→24.8。游戏 fast36 = fast35 + C32_EPILOGUE=1，源目录 `epi`。
+
 ## 2026-09-10 01:45 fast35：C32 中间量 f16（光之朱雀）
 
 - 起因：算 C32 块的字节数——FFN 写 ffn 70MB、注意力读 ffn 70MB 写 raw 70MB、下一块读 raw 70MB，每块 280MB 光带宽就 0.47ms，块本身 0.53ms：**C32 家族是带宽瓶颈不是算力**。dump 下来验证：raw 和 ffn 1790 万个值 100% 在 f16 格点上（全是 H() 过的），所以 f16 存储逐位无损。

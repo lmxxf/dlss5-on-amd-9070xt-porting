@@ -41,7 +41,46 @@ StructuredBuffer<float> input:register(t1);
 #endif
 RWByteAddressBuffer qk:register(u0);
 RWByteAddressBuffer aux:register(u1);
+#ifndef NATIVE_C32_EPILOGUE
+#define NATIVE_C32_EPILOGUE 0
+#endif
+#ifndef NATIVE_C32_EPILOGUE_EXACT_HEAD
+#define NATIVE_C32_EPILOGUE_EXACT_HEAD 0
+#endif
+#if NATIVE_C32_EPILOGUE
+// FAST PATH (DLSS5_C32_EPILOGUE): the finish stage (main8 + 2x2 pooled down) or the post70 rgb head runs in the attention epilogue
+// on the block output while it is still in registers. epilogue_mode: 0 raw only; 1 raw + main8 + down; 2 main8 + down (no raw);
+// 3 rgb head (no raw). A wave's 16 tokens are two full rows of one 8x8 window, so the 2x2 pooling never leaves the wave.
+cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;uint epilogue_mode;uint rgb_scale_bits;uint rgb_width;uint rgb_height;uint rgb_shift_x;uint rgb_shift_y;}
+StructuredBuffer<float> color:register(t2);      /* rgb head: HWC color [pixel][4] */
+StructuredBuffer<float> head_w:register(t3);     /* rgb head: 3 x 32 weights */
+RWByteAddressBuffer main8_out:register(u2);      /* E4M3 main, raster over the work grid */
+RWStructuredBuffer<float> down_out:register(u3); /* 2x2 pooled, raster over the half work grid */
+RWStructuredBuffer<float> rgb_out:register(u4);  /* rgb head output [pixel][3] */
+/* preblock_finish.hlsl's F (round half away from zero on the mantissa); the fast F above rounds to even, and the two differ on ties. */
+/* preblock_finish.hlsl's H and F, bit for bit (the fast H above is the hardware f32tof16). */
+float Hfinish(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
+float Ffinish(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
+float aligned_half(int sum,float acc,float scale,int e){
+ float scaled_acc=acc*scale;
+ if(scaled_acc!=trunc(scaled_acc)||abs(scaled_acc)>=67108864.0)return asfloat(0x7fc00000u);
+ bool negative=sum<0,aneg=acc<0;uint magnitude=negative?(0u-asuint(sum)):asuint(sum),other=(uint)abs(scaled_acc);
+ if(negative==aneg)magnitude+=other;
+ else if(magnitude>=other)magnitude-=other;
+ else{magnitude=other-magnitude;negative=aneg;}
+ if(magnitude==0)return 0;
+ int quantum_exp=e-27,top=firstbithigh(magnitude),step_exp=max(top+quantum_exp,-14)-10,drop=step_exp-quantum_exp;
+ uint rounded=magnitude;
+ if(drop>32)rounded=0;
+ else if(drop==32)rounded=magnitude>0x80000000u?1:0;
+ else if(drop>0){rounded=magnitude>>drop;uint remainder=magnitude&((1u<<drop)-1u),half=1u<<(drop-1);if(remainder>half||(remainder==half&&(rounded&1u)))rounded++;}
+ else step_exp=quantum_exp;
+ float value=float(rounded)*exp2(float(step_exp));if(value>=65520.0)value=asfloat(0x7f800000u);
+ return negative?-value:value;
+}
+#else
 cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;}
+#endif
 #ifndef NATIVE_HW_H
 #define NATIVE_HW_H 0
 #endif
@@ -318,12 +357,61 @@ groupshared float16_t ones16[512];
     float result=H(zp.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
     zp.Set(i,RAW_OUTPUT?result:F(result));
    }
+#if NATIVE_C32_EPILOGUE
+   if(epilogue_mode<=1||epilogue_mode==4)STORE_OUT(zp,qfirst,cr); /* 4 = rgb head + raw (test) */
+   if(epilogue_mode>=1)zp.Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase+cr*16,32,dx::linalg::MatrixLayout::RowMajor); /* raw tile [16 tokens][32], exact (H-rounded) */
+   if(epilogue_mode>=1&&epilogue_mode<=2){C q=zp;for(uint i=0;i<q.Length();i++)q.Set(i,F(q.Get(i)));q.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+cr*4,8,dx::linalg::MatrixLayout::RowMajor);} /* main8 tile [16][32] bytes */
+#else
    STORE_OUT(zp,qfirst,cr);
+#endif
 #if NATIVE_C32_OUT8
    // FAST PATH (post70 out8): E4M3 copy of the block output into aux ([token][32] bytes) for the rgb head (71MB instead of 283MB).
    zp.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,qfirst*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor,16);
 #endif
   }
+#if NATIVE_C32_EPILOGUE
+  if(epilogue_mode>=1){
+   GroupMemoryBarrier(); /* the wave's own ex tile */
+   /* token -> raster over the work grid (shift already folded into the grid): tile-major, 16 tokens = rows r0, r0+1 of one tile */
+   const uint tiles_x=runtime_width/8,tile=qfirst/64,tx=(tile%tiles_x)*8,ty=(tile/tiles_x)*8+((qfirst%64)/8);
+   const uint lane=t&31;
+   if(epilogue_mode<=2){
+    /* main8: E4M3(F(raw)) through the matrix cast into pw8 (free after the projection); lane l copies 16 bytes = half of token l/2 */
+    {const uint tok=lane>>1,half=lane&1;
+     const uint x=tx+(tok&7),y=ty+(tok>>3);main8_out.Store4(((y*runtime_width+x)*32+half*16),uint4(pw8[pbase+tok*8+half*4],pw8[pbase+tok*8+half*4+1],pw8[pbase+tok*8+half*4+2],pw8[pbase+tok*8+half*4+3]));}
+    /* down: 2x2 pool of the raw values, F(H(H(top+bottom)*.25)); lane = channel, 4 pooled pixels per wave */
+    {const uint c=lane;[unroll]for(uint k=0;k<4;k++){
+      float a00=float(ex[ebase+(2*k)*32+c]),a10=float(ex[ebase+(2*k+1)*32+c]),a01=float(ex[ebase+(8+2*k)*32+c]),a11=float(ex[ebase+(8+2*k+1)*32+c]);
+      float top=H(a00+a10),bottom=H(a01+a11);
+      down_out[(((ty/2)*(runtime_width/2))+(tx/2)+k)*32+c]=F(H(H(top+bottom)*.25));}}
+   }else if(epilogue_mode>=3){
+    /* rgb head (exact integer-alignment emulation of native_post70.hlsl finish): 16 tokens x 3 rows = 48 tasks over 32 lanes */
+    const float input_scale=asfloat(rgb_scale_bits);
+    [unroll(2)]for(uint task=lane;task<48;task+=32){
+     const uint tok=task/3,row=task%3,wx=tx+(tok&7),wy=ty+(tok>>3);if(wx<rgb_shift_x||wy<rgb_shift_y)continue;const uint x=wx-rgb_shift_x,y=wy-rgb_shift_y;if(x>=rgb_width||y>=rgb_height)continue;const uint pix=y*rgb_width+x;float acc=0; /* work grid -> output raster (the crop) */
+#if NATIVE_C32_EPILOGUE_EXACT_HEAD
+     [unroll]for(uint part=0;part<2;part++){
+      float products[16];int e=acc==0?-1000:int((asuint(acc)>>23)&255u)-125;
+      [unroll]for(uint j=0;j<16;j++){float a=float(ex[ebase+tok*32+part*16+j]),b=head_w[row*32+part*16+j];products[j]=a*b;if(products[j]!=0)e=max(e,int((asuint(a)>>23)&255u)+int((asuint(b)>>23)&255u)-252);}
+      if(e!=-1000){float scale=asfloat(uint(27-e+127)<<23);int sum=0;
+       [unroll]for(uint j=0;j<16;j++)sum+=(int)(products[j]*scale);
+       acc=aligned_half(sum,acc,scale,e);
+      }
+     }
+#else
+     /* native_post70.hlsl finish_fast: plain f32 dot product, one f16 rounding (PSNR-equivalent; the exact integer-alignment emulation costs 0.5ms here) */
+     [unroll]for(uint j=0;j<32;j++)acc+=float(ex[ebase+tok*32+j])*head_w[row*32+j];
+     acc=f16tof32(f32tof16(acc));
+#endif
+     precise float base=color[pix*4+row]*0.125-0.0625;
+     precise float encoded=acc*input_scale+base;
+     precise float rgb=encoded*8.0+0.5;
+     /* test probes (DLSS5_TEST_EPILOGUE_MODE): 5 feature, 6 color, 7 head weight, 8 acc */
+     rgb_out[pix*3+row]=epilogue_mode==5?float(ex[ebase+tok*32+row*10]):epilogue_mode==6?color[pix*4+row]:epilogue_mode==7?head_w[row*32+(tok&31)]:epilogue_mode==8?acc:clamp(rgb,0.0,1.0);
+    }
+   }
+  }
+#endif
  }
 }
 #elif NATIVE_C32_ATTN_FAST3

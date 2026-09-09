@@ -40,6 +40,8 @@ public:
   if(skip_mode!=4&&!merge_fold)throw std::runtime_error("non-raster skip needs the post70 merge fold");
   // low_raw_work_width!=0 (DLSS5_POST70_LOW_RAW): main is the previous C32 stage's raw tile buffer (low_mode 8) or main8 (low_mode 9); needs skip_mode 7.
   if(low_raw_work_width&&(skip_mode!=7||!merge_fold))throw std::runtime_error("post70 low raw needs main8 skip and the merge fold");
+  // FAST PATH (DLSS5_C32_EPILOGUE): the rgb head runs in the body's attention epilogue; the head dispatch and the raw write are skipped.
+  {const wchar_t*ep=_wgetenv(L"DLSS5_C32_EPILOGUE");head_in_epilogue=ep&&!wcscmp(ep,L"1");if(head_in_epilogue){if(!merge_fold||!direct)throw std::runtime_error("rgb epilogue needs the merge fold");body.SetRgbEpilogue(color_input,coefficients[1],output,input_scale);}}
   if(merge_fold){body.MapMerge(main_input,skip_input,coefficients[0],low_raw_work_width?low_mode:skip_mode,low_raw_work_width?low_raw_work_width:skip_raw_work_width,low_shift_x,low_shift_y);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   else if(direct){body.MapFromRaster(merged);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   geometry[3]=body.WorkWidth();geometry[4]=body.ShiftX();geometry[5]=body.ShiftY();
@@ -54,11 +56,11 @@ const char*diagnostic=std::getenv("DLSS5_POST_BASE_ONLY");
   D3D_SHADER_MACRO macros[]={{"POST_BASE_ONLY",diagnostic?diagnostic:"0"},{"POST_TILED_INPUT",direct?"1":"0"},{"POST_FAST_RGB",fast_rgb?"1":"0"},{"POST_INPUT8",body.AttnOut8()?"1":"0"},{"POST_INPUT_HALF",body.HalfStream()?"1":"0"},{nullptr,nullptr}};
   for(UINT i=0;i<2;i++){if(i==0&&merge_fold)continue;blob=nullptr;error=nullptr;auto hr=CompileNativeShader(dir+L"\\native_post70.hlsl",macros,entries[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string((char*)error->GetBufferPointer(),error->GetBufferSize()):"post70 compile";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
- UINT isolate_part{};void SetIsolatePart(UINT p){isolate_part=p;body.SetIsolateStage(p<4?p:0);} /* 1..3 body stages, 4 = rgb head only */
+ bool head_in_epilogue{}; UINT isolate_part{};void SetIsolatePart(UINT p){isolate_part=p;body.SetIsolateStage(p<4?p:0);} /* 1..3 body stages, 4 = rgb head only */
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(!output||!c)throw std::runtime_error("post70 not created");if(recorded){if(!merge_fold)barrier(c,merged,true);barrier(c,output,true);}
   auto pass=[&](UINT i,ID3D12Resource*src,ID3D12Resource*extra,ID3D12Resource*dst,UINT planes){c->SetComputeRootSignature(root);c->SetPipelineState(pso[i]);c->SetComputeRootShaderResourceView(0,src->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,coefficients[i]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(2,extra->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,dst->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,6,geometry,0);c->Dispatch(geometry[0]*geometry[1]/64,planes,1);};
-  if(timer)timer->Mark(c,"post70_begin");if(!merge_fold){pass(0,main_input,skip_input,merged,32);barrier(c,merged,false);}if(timer)timer->Mark(c,"post70_merge");if(isolate_part!=4)body.Record(c,timer,"post70_detail");if(timer)timer->Mark(c,"post70_body");if(!isolate_part||isolate_part==4)pass(1,body.AttnOut8()?body.Main8():direct?body.RawWork():body.Output(),color_input,output,fast_rgb?1:3);barrier(c,output,false);if(timer)timer->Mark(c,"post70_rgb");recorded=true;
+  if(timer)timer->Mark(c,"post70_begin");if(!merge_fold){pass(0,main_input,skip_input,merged,32);barrier(c,merged,false);}if(timer)timer->Mark(c,"post70_merge");if(isolate_part!=4)body.Record(c,timer,"post70_detail");if(timer)timer->Mark(c,"post70_body");if(!head_in_epilogue&&(!isolate_part||isolate_part==4))pass(1,body.AttnOut8()?body.Main8():direct?body.RawWork():body.Output(),color_input,output,fast_rgb?1:3);barrier(c,output,false);if(timer)timer->Mark(c,"post70_rgb");recorded=true;
  }
  ID3D12Resource*Output()const{return output;}
  ID3D12Resource*Merged()const{return merged;}

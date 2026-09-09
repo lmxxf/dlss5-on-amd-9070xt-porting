@@ -152,7 +152,7 @@ public:
  }
  ID3D12Resource*Output()const{return post.Output();}
  /* test only (DLSS5_TEST_DUMP_BLOCK4): block 4 finish outputs for CPU comparison */
- ID3D12Resource*Block4Main8()const{return c32[3].Main8();}ID3D12Resource*Project66Output(){return decoder.Tail().Project66Output();}ID3D12Resource*Block4Down()const{return c32[3].PooledWork();}ID3D12Resource*SharedRawScratch()const{return c32[3].RawWork();}ID3D12Resource*SharedFfnScratch()const{return c32[3].FfnScratch();}ID3D12Resource*Block4Main()const{return c32[3].Main8()?nullptr:c32[3].MainF32();}
+ ID3D12Resource*Block4Main8()const{return c32[3].Main8();}ID3D12Resource*Project66Output(){return decoder.Tail().Project66Output();}ID3D12Resource*Block4Down()const{return c32[3].PooledWork();}ID3D12Resource*PreDown()const{return pre.Downsample();}ID3D12Resource*Block69Main8(){return decoder.Tail().Last().Main8();}ID3D12Resource*Block69Down(){return decoder.Tail().Last().PooledWork();}ID3D12Resource*PreMain8()const{return pre.Main8();}ID3D12Resource*SharedRawScratch()const{return c32[3].RawWork();}ID3D12Resource*SharedFfnScratch()const{return c32[3].FfnScratch();}ID3D12Resource*Block4Main()const{return c32[3].Main8()?nullptr:c32[3].MainF32();}
  ID3D12Resource*Head()const{return head.Output();}
  ID3D12Resource*Decoder69()const{return decoder.Output();}
 private:
