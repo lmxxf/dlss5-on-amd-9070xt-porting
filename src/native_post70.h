@@ -22,11 +22,11 @@ class NativePost70 {
 public:
  NativePost70()=default;NativePost70(const NativePost70&)=delete;
  ~NativePost70(){for(auto*r:{main_input,skip_input,color_input,merged,output,coefficients[0],coefficients[1]})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
- void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f,UINT shift=0,UINT skip_mode=4,UINT skip_raw_work_width=0){
+ void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f,UINT shift=0,UINT skip_mode=4,UINT skip_raw_work_width=0,UINT low_raw_work_width=0,UINT low_shift_x=0,UINT low_shift_y=0,UINT low_mode=8){
   if(shift>3)throw std::runtime_error("post shift contract");
   if(main_input||!d||!main||!skip||!color||width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16||scales.size()!=64||head.size()!=96)throw std::runtime_error("post70 contract");
   UINT64 pixels=UINT64(width)*height;
-  if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<(skip_mode==7?pixels*32:pixels*32*4)||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
+  if(main->GetDesc().Width<(low_mode==9&&low_raw_work_width?pixels*8:pixels*8*4)||skip->GetDesc().Width<(skip_mode==7?pixels*32:pixels*32*4)||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
   main_input=main;skip_input=skip;color_input=color;for(auto*r:{main_input,skip_input,color_input})r->AddRef();geometry[0]=width;geometry[1]=height;std::memcpy(&geometry[2],&input_scale,4);
   {const char*pd=std::getenv("DLSS5_POST70_DIRECT");direct=pd&&!std::strcmp(pd,"1");const char*mf=std::getenv("DLSS5_POST70_MERGE_FOLD");merge_fold=direct&&mf&&!std::strcmp(mf,"1");}
   merged=buffer(d,merge_fold?16:pixels*32*4);output=buffer(d,pixels*3*4); /* merge fold never writes merged */coefficients[0]=buffer(d,scales.size()*4,&scales);coefficients[1]=buffer(d,head.size()*4,&head);
@@ -38,7 +38,9 @@ public:
   {const char*mf=std::getenv("DLSS5_POST70_MERGE_FOLD");if(mf&&std::strcmp(mf,"0")&&std::strcmp(mf,"1"))throw std::runtime_error("invalid post70 merge fold flag");merge_fold=direct&&mf&&!std::strcmp(mf,"1");}
   // skip_raw_work_width!=0: skip is the preblock's unquantized raw tile buffer (DLSS5_PREBLOCK_DOWN_ONLY), mode 6 in the FFN.
   if(skip_mode!=4&&!merge_fold)throw std::runtime_error("non-raster skip needs the post70 merge fold");
-  if(merge_fold){body.MapMerge(main_input,skip_input,coefficients[0],skip_mode,skip_raw_work_width);body.SetCropNeeded(false);body.SetSkipFinish(true);}
+  // low_raw_work_width!=0 (DLSS5_POST70_LOW_RAW): main is the previous C32 stage's raw tile buffer (low_mode 8) or main8 (low_mode 9); needs skip_mode 7.
+  if(low_raw_work_width&&(skip_mode!=7||!merge_fold))throw std::runtime_error("post70 low raw needs main8 skip and the merge fold");
+  if(merge_fold){body.MapMerge(main_input,skip_input,coefficients[0],low_raw_work_width?low_mode:skip_mode,low_raw_work_width?low_raw_work_width:skip_raw_work_width,low_shift_x,low_shift_y);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   else if(direct){body.MapFromRaster(merged);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   geometry[3]=body.WorkWidth();geometry[4]=body.ShiftX();geometry[5]=body.ShiftY();
   D3D12_ROOT_PARAMETER params[5]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}

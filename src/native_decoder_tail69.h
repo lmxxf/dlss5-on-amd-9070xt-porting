@@ -38,10 +38,11 @@ public:
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");const bool chain=c32_mapped&&!wcscmp(c32_mapped,L"1");
   const wchar_t*cr=_wgetenv(L"DLSS5_C32_CHAIN_RAW");if(cr&&wcscmp(cr,L"0")&&wcscmp(cr,L"1"))throw std::runtime_error("invalid C32 chain raw flag");const bool chain_raw=chain&&cr&&!wcscmp(cr,L"1");
   for(UINT i=0;i<4;i++){NativeC32Stage&stage=i?c32[i-1]:body66;const NativeC32Stage*prev=i>1?&c32[i-2]:i==1?&body66:nullptr;
+   NativePreblockRuntime::PendingMain8()=NativeDecoderTail69::PendingLastMain8()&&i==3; /* DLSS5_POST70_LOW_RAW=2: block 69 takes the main8 finish */
    if(i)stage.Create(d,source,w*8,h*8,NativeDecoderShift(66+i),read(66+i,L"ffn"),read(66+i,L"attention"),dir,false,chain);else stage.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir,false,chain);
    if(chain){if(prev){if(chain_raw){stage.ChainFromRaw(*prev);const_cast<NativeC32Stage*>(prev)->SetSkipFinish(true);}else stage.ChainFrom(*prev);const_cast<NativeC32Stage*>(prev)->SetCropNeeded(false);}else stage.MapFromRaster(project66.Output());}
    source=(chain_raw&&i<3)?stage.RawWork():stage.Output();}
-  NativeVramLog(d,"tail 66+c32x3");output=source;
+  NativePreblockRuntime::PendingMain8()=false;PendingLastMain8()=false;NativeVramLog(d,"tail 66+c32x3");output=source;
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(!output)throw std::runtime_error("decoder tail not created");
@@ -59,5 +60,7 @@ public:
  }
  void RecordProjection(ID3D12GraphicsCommandList*c,UINT block){if(block==56)project56.Record(c);else if(block==62)project62.Record(c);else if(block==66)project66.Record(c);else throw std::runtime_error("decoder tail projection");}
  void SetIsolatePart(UINT block,UINT part){if(block>=49&&block<=55)c256[block-49].SetIsolatePart(part);else if(block==56)body56.SetIsolatePart(part);else if(block>=57&&block<=61)c128[block-57].SetIsolatePart(part);else if(block==62)body62.SetIsolatePart(part);else if(block>=63&&block<=65)c64[block-63].SetIsolatePart(part);else if(part)throw std::runtime_error("decoder tail part");}
+ static bool&PendingLastMain8(){static bool v=false;return v;}
+ NativeC32Stage&Last(){return c32[2];}ID3D12Resource*Project66Output()const{return project66.Output();}
  ID3D12Resource*Output()const{return output;}
 };

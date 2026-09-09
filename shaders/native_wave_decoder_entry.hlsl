@@ -11,10 +11,22 @@
 #define BLOCK_N (OUTPUT_CHANNELS>=64?4:2)
 #define PARTITIONS (INPUT_CHANNELS==1024?4:1)
 #include <dx/linalg.h>
-StructuredBuffer<float> input:register(t0),residual:register(t2);
+#ifndef SKIP8
+#define SKIP8 0
+#endif
+StructuredBuffer<float> input:register(t0);
 ByteAddressBuffer weights:register(t1);
 RWStructuredBuffer<float> output:register(u0);
+#if SKIP8
+// FAST PATH (DLSS5_C32_SKIP8): the residual is block 4's main8 (E4M3 bytes, raster over its shifted work grid). F(E4M3)=identity.
+ByteAddressBuffer residual8:register(t2);
+cbuffer Geometry:register(b0){uint tokens;uint output_base;uint skip_width;uint skip_shift_x;uint skip_shift_y;}
+float e4m3_to_float(uint b){uint e=(b>>3)&15u,m=b&7u;float v=e==0?float(m)/512.0:asfloat(((e+120u)<<23)|(m<<20));return (b&0x80u)?-v:v;}
+float skip_at(uint x,uint y,uint c){uint a=((y+skip_shift_y)*skip_width+x+skip_shift_x)*32+c;return e4m3_to_float((residual8.Load(a&~3u)>>((a&3u)*8))&255u);}
+#else
+StructuredBuffer<float> residual:register(t2);
 cbuffer Geometry:register(b0){uint tokens;uint output_base;}
+#endif
 groupshared float16_t tile[512];
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u){float q=round(abs(v)*16777216.0)*5.9604644775390625e-8;return sg?-q:q;}uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/512;float e=floor(log2(a)),m=round((a/exp2(e)-1)*8);if(m==8){m=0;e++;}return sg*min(exp2(e)*(1+m/8),448);}
@@ -63,7 +75,12 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
     uint x=token%width*2+dx,y=token/width*2+dy;
     if(x>=output_width||y>=output_height)continue;
     uint index=(y*output_width+x)*OUTPUT_CHANNELS+row;
+#if SKIP8
+    /* precise: the f32 chain must not be contracted into an FMA, or 18% of the outputs move by one f16 ulp against the crop path */
+    precise float prod=skip_at(x,y,row)*scale;precise float sum=t+prod;float merged=H(sum);
+#else
     float merged=H(t+F(residual[index])*scale);
+#endif
     output[index]=OUTPUT_CHANNELS==32?merged:F(merged);
    }
   }

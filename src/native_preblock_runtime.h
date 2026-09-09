@@ -60,7 +60,7 @@ public:
   // FAST PATH (DLSS5_PREBLOCK_DOWN_ONLY): finish writes only the 2x2 pooled buffer; Main() is not produced (post70 reads RawTiles()).
   {const wchar_t*dv=_wgetenv(L"DLSS5_PREBLOCK_DOWN_ONLY");if(dv&&wcscmp(dv,L"0")&&wcscmp(dv,L"1"))throw std::runtime_error("invalid preblock down-only flag");down_only=coalesced_finish&&noise_table!=nullptr&&dv&&!wcscmp(dv,L"1");}
   // FAST PATH (DLSS5_PREBLOCK_MAIN8): finish writes Main() as E4M3 bytes (Main8()); post70 reads them (mode 7).
-  {const wchar_t*m8=_wgetenv(L"DLSS5_PREBLOCK_MAIN8");if(m8&&wcscmp(m8,L"0")&&wcscmp(m8,L"1"))throw std::runtime_error("invalid preblock main8 flag");main8_mode=coalesced_finish&&!down_only&&noise_table!=nullptr&&m8&&!wcscmp(m8,L"1");}
+  {const wchar_t*m8=_wgetenv(L"DLSS5_PREBLOCK_MAIN8");if(m8&&wcscmp(m8,L"0")&&wcscmp(m8,L"1"))throw std::runtime_error("invalid preblock main8 flag");main8_mode=coalesced_finish&&!down_only&&(noise_table!=nullptr||PendingMain8())&&m8&&!wcscmp(m8,L"1");}
   // FAST PATH (DLSS5_POST70_OUT8): the post70 body (live profile, no noise table) also stores its attention output as E4M3 into main8 for the rgb head.
   {const wchar_t*o8=_wgetenv(L"DLSS5_POST70_OUT8");if(o8&&wcscmp(o8,L"0")&&wcscmp(o8,L"1"))throw std::runtime_error("invalid post70 out8 flag");attn_out8=PendingOut8()&&o8&&!wcscmp(o8,L"1");PendingOut8()=false;}
   const wchar_t*prefix_flag=_wgetenv(L"DLSS5_TEST_SPLIT_PREBLOCK_FFN");if(prefix_flag&&wcscmp(prefix_flag,L"0")&&wcscmp(prefix_flag,L"1"))throw std::runtime_error("invalid split preblock flag");prefix_wave=!raw_features&&noise_table&&prefix_flag&&!wcscmp(prefix_flag,L"1");
@@ -193,7 +193,7 @@ public:
    if(SharedFfnReadable()){Barrier(c,ffn,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedFfnReadable()=false;}
    // Mode 3 mapping reads the (shared) raw tiles of the previous stage in the FFN; keep them readable until the attention stage.
    if(private_raw){if(recorded)Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
-   else if(SharedRawReadable()&&!(mapping[0]==3&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   else if(SharedRawReadable()&&!((mapping[0]==3||mapping[0]==8)&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(recorded)for(auto*r:{(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   }else if(recorded)for(auto*r:{ffn,raw,(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
@@ -213,7 +213,7 @@ public:
     c->SetPipelineState(split_pso[3]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);
     }
    }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
-    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if((mapping[0]==4||mapping[0]==6||mapping[0]==7)){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if((mapping[0]==4||mapping[0]==6||mapping[0]==7||mapping[0]==8||mapping[0]==9)){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
    }else if(stage==0&&inline_prefix){
    }else{
    if(stage==2&&!heap[2]){Main();Heap(2,raw,buffer_bytes,main,buffer_bytes,down,buffer_bytes/4,true);}
@@ -237,6 +237,8 @@ public:
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
+ /* DLSS5_C32_SKIP8: the next C32 stage created (block 4) also takes the main8 finish; set/cleared by the network around its Create. */
+ static bool&PendingMain8(){static bool v=false;return v;}
  bool skip_finish{},down_only{},main8_mode{},attn_out8{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
  // Main() is allocated on first use: with MAIN8, chain-raw or skip-finish nobody reads it (saves one full f32 raster per stage).
  ID3D12Resource* Main()const{if(!main){auto*self=const_cast<NativePreblockRuntime*>(this);self->main=self->Buffer(buffer_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}return main;}bool DownOnly()const{return down_only;}bool Main8Mode()const{return main8_mode;}bool AttnOut8()const{return attn_out8;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}

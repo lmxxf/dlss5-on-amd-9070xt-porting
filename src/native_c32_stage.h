@@ -34,13 +34,13 @@ public:
  // FAST PATH (DLSS5_C32_MAPPED_INPUT): the body FFN reads the raster source (first block) or the previous
  // stage's tile-major output directly; the pack pass is skipped, and the crop only runs where Output() is consumed.
  // skip_mode: 4 = f32 raster main, 6 = preblock raw tiles (skip_raw_work_width), 7 = E4M3 raster main.
- void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff,UINT skip_mode=4,UINT skip_raw_work_width=0){body.MapMerge(low,skip,coeff,geometry[0],geometry[1],geometry[4],geometry[5],skip_mode,0,0,skip_raw_work_width);mapped=true;}
+ void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff,UINT skip_mode=4,UINT skip_raw_work_width=0,UINT psx=0,UINT psy=0){body.MapMerge(low,skip,coeff,geometry[0],geometry[1],geometry[4],geometry[5],skip_mode,psx,psy,skip_raw_work_width);mapped=true;}
  void MapFromRaster(ID3D12Resource*src){body.MapInput(src,1,geometry[0],geometry[1],geometry[4],geometry[5],0,0,0);mapped=true;}
  void ChainFrom(const NativeC32Stage&prev){if(prev.geometry[0]!=geometry[0]||prev.geometry[1]!=geometry[1])throw std::runtime_error("C32 chain geometry");body.MapInput(prev.body.Main(),2,geometry[0],geometry[1],geometry[4],geometry[5],prev.geometry[4],prev.geometry[5],prev.geometry[2]);mapped=true;}
  void SetCropNeeded(bool needed){crop_needed=needed;}
  ID3D12Resource* Output()const{if(!output){auto*self=const_cast<NativeC32Stage*>(this);self->output=self->Buffer(n_bytes);}return output;}
  // FAST PATH (post70 direct): tile-major raw work buffer + geometry for consumers that index it themselves; finish stage skipped.
- bool AttnOut8()const{return body.AttnOut8();}ID3D12Resource* Main8()const{return body.Main8();}
+ bool AttnOut8()const{return body.AttnOut8();}ID3D12Resource* Main8()const{return body.Main8();}ID3D12Resource* MainF32()const{return body.Main();}ID3D12Resource* FfnScratch()const{return body.FfnTilesForTest();}
  ID3D12Resource* RawWork()const{return body.RawTiles();}UINT WorkWidth()const{return geometry[2];}UINT ShiftX()const{return geometry[4];}UINT ShiftY()const{return geometry[5];}void SetSkipFinish(bool v){body.SetSkipFinish(v);}
  ID3D12Resource* PooledWork()const{return body.Downsample();}
  // FAST PATH 3 chain: read the previous stage's raw tiles (mode 3); the previous finish can then be skipped when nothing else reads its Main()/Downsample().

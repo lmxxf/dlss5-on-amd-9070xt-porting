@@ -49,9 +49,12 @@ public:
   NativeVramLog(d,"pre");const UINT shifts[]={0,3,1,2,0,3,1,2};auto*source=pre.Downsample();
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");if(c32_mapped&&wcscmp(c32_mapped,L"0")&&wcscmp(c32_mapped,L"1")&&wcscmp(c32_mapped,L"2"))throw std::runtime_error("invalid mapped C32 flag");
   const wchar_t*cr=_wgetenv(L"DLSS5_C32_CHAIN_RAW");if(cr&&wcscmp(cr,L"0")&&wcscmp(cr,L"1"))throw std::runtime_error("invalid C32 chain raw flag");const bool chain_raw=cr&&!wcscmp(cr,L"1");
-  for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,false,c32_mapped&&(!wcscmp(c32_mapped,L"1")||(!wcscmp(c32_mapped,L"2")&&i==0)));
+  // FAST PATH (DLSS5_C32_SKIP8): block 4 finish writes E4M3 main8 (no f32 main, no crop); the block 66 projection reads it as the skip residual.
+  bool skip8=false;{const wchar_t*s8=_wgetenv(L"DLSS5_C32_SKIP8");if(s8&&wcscmp(s8,L"0")&&wcscmp(s8,L"1"))throw std::runtime_error("invalid C32 skip8 flag");skip8=s8&&!wcscmp(s8,L"1");if(skip8&&!(_wgetenv(L"DLSS5_PREBLOCK_MAIN8")&&!wcscmp(_wgetenv(L"DLSS5_PREBLOCK_MAIN8"),L"1")))throw std::runtime_error("C32 skip8 needs DLSS5_PREBLOCK_MAIN8");}
+  for(UINT i=0;i<4;i++){auto p=L"block"+std::to_wstring(i+1);NativePreblockRuntime::PendingMain8()=skip8&&i==3;c32[i].Create(d,source,960,576,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,false,c32_mapped&&(!wcscmp(c32_mapped,L"1")||(!wcscmp(c32_mapped,L"2")&&i==0)));
    if(c32_mapped&&!wcscmp(c32_mapped,L"1")){if(i){if(chain_raw){c32[i].ChainFromRaw(c32[i-1]);c32[i-1].SetSkipFinish(true);}else c32[i].ChainFrom(c32[i-1]);}else c32[i].MapFromRaster(source);if(i)c32[i-1].SetCropNeeded(false);}else if(c32_mapped&&!wcscmp(c32_mapped,L"2")&&i==0)c32[i].MapFromRaster(source);
    source=(chain_raw&&i<3)?c32[i].RawWork():c32[i].Output();} // chained stages: the next Create only needs a resource for its unused SRV
+  NativePreblockRuntime::PendingMain8()=false;if(skip8){if(!c32[3].Main8())throw std::runtime_error("C32 skip8: block 4 has no main8 finish");if(!_wgetenv(L"DLSS5_TEST_SKIP8_PROBE"))c32[3].SetCropNeeded(false);/* probe: keep the crop */NativeVitLinear::PendingSkip8()=NativeSkip8Source{c32[3].Main8(),c32[3].WorkWidth(),c32[3].ShiftX(),c32[3].ShiftY()};}
   NativeVramLog(d,"c32x4");ds4.Create(d,c32[3].PooledWork(),960,576,2,read(L"block4-ds.f32"),dir);source=ds4.Output();
   auto group=[&](NativeC64Shift*layers,UINT count,UINT first,UINT w,UINT h,UINT channels,NativeC32Downsample&ds){
    for(UINT i=0;i<count;i++){auto p=L"block"+std::to_wstring(first+i);layers[i].Create(d,source,w,h,shifts[i],read(p+L"-ffn.f32"),read(p+L"-attention.f32"),dir,i+1==count,channels,false,share_matrix?&matrix_workspace:nullptr,i>0,i+1<count);source=layers[i].Output();}
@@ -62,9 +65,14 @@ public:
   head.Create(d,source,60,36,0,read(L"head-matrix.f32"),dir,true,512,share_matrix?&matrix_workspace:nullptr);
   NativeVramLog(d,"head");auto rawmap=read(L"hwc-to-vit.i32");if(rawmap.size()!=655360)throw std::runtime_error("network bridge map size");std::vector<UINT>map(rawmap.size());std::memcpy(map.data(),rawmap.data(),map.size()*4);bridge.Create(d,head.Output(),map,dir);source=bridge.Output();
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(31+i)+L"-";vit[i].Create(d,source,640,read(p+L"expand.f32"),read(p+L"contract.f32"),read(p+L"qkv.f32"),read(p+L"projection.f32"),dir);source=vit[i].Output();NativeVramLog(d,"vit");}
-  NativeVramLog(d,"c512+vit");decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
+  // FAST PATH (DLSS5_POST70_LOW_RAW): 1 = post70 reads block 69's raw tiles (Ffast; block 69 skips finish+crop; post FFN +0.45ms, not worth it);
+  // 2 = block 69 finish writes E4M3 main8 (no f32 main, no crop) and post70 reads the bytes (mode 9).
+  UINT low_raw=0;{const wchar_t*lr=_wgetenv(L"DLSS5_POST70_LOW_RAW");if(lr&&wcscmp(lr,L"0")&&wcscmp(lr,L"1")&&wcscmp(lr,L"2"))throw std::runtime_error("invalid post70 low raw flag");low_raw=lr?UINT(lr[0]-L'0'):0u;if(low_raw&&!pre.Main8Mode())throw std::runtime_error("post70 low raw needs DLSS5_PREBLOCK_MAIN8");}
+  NativeDecoderTail69::PendingLastMain8()=low_raw==2;
+  NativeVramLog(d,"c512+vit");decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),skip8?c32[3].RawWork():c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
   {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1")&&wcscmp(bs,L"2"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs?UINT(bs[0]-L'0'):0u;}
-  NativeVramLog(d,"decoder");post.Create(d,decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u);NativeVramLog(d,"post70");ready=true;
+  auto&last=decoder.Tail().Last();if(low_raw==1){last.SetSkipFinish(true);last.SetCropNeeded(false);}if(low_raw==2){if(!last.Main8())throw std::runtime_error("post70 low raw 2: block 69 has no main8 finish");last.SetCropNeeded(false);}
+  NativeVramLog(d,"decoder");post.Create(d,low_raw==1?last.RawWork():low_raw==2?last.Main8():decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u,low_raw?last.WorkWidth():0u,low_raw?last.ShiftX():0u,low_raw?last.ShiftY():0u,low_raw==2?9u:8u);NativeVramLog(d,"post70");ready=true;
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
@@ -143,6 +151,8 @@ public:
   if(kind=="tail")decoder.Tail().SetIsolatePart(index,0);
  }
  ID3D12Resource*Output()const{return post.Output();}
+ /* test only (DLSS5_TEST_DUMP_BLOCK4): block 4 finish outputs for CPU comparison */
+ ID3D12Resource*Block4Main8()const{return c32[3].Main8();}ID3D12Resource*Project66Output(){return decoder.Tail().Project66Output();}ID3D12Resource*Block4Down()const{return c32[3].PooledWork();}ID3D12Resource*SharedRawScratch()const{return c32[3].RawWork();}ID3D12Resource*SharedFfnScratch()const{return c32[3].FfnScratch();}ID3D12Resource*Block4Main()const{return c32[3].Main8()?nullptr:c32[3].MainF32();}
  ID3D12Resource*Head()const{return head.Output();}
  ID3D12Resource*Decoder69()const{return decoder.Output();}
 private:
