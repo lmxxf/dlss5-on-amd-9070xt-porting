@@ -1,3 +1,9 @@
+## 2026-09-09 12:25 结论：GPU 已饱和（光之朱雀）
+
+- Zero 实测 fast25 27～28fps。C512 pack 并投影（`DLSS5_SPLIT_COPY8`）exact 但零收益——C512 块分段：ffwd 0.076 / 投影 0.055 / QKV 0.060 / 注意力 0.013 / 投影 0.033，FFN 9 GFLOP@0.076ms≈120 TFLOPS，已近算力上限；"每 dispatch 40µs"的判断作废。
+- 账：网络 30.7 + 游戏自身渲染 ~6～7 ≈ 37ms → 27fps，GPU 满载。跨帧流水只填同步空洞、造不出 GPU 时间，探针关掉后空洞已没了 → **不做**。到 30fps 需 GPU 再 −3ms，只剩多头 Swin 26 块 FFN+投影合核（估 −1/天）之类的小刀。
+- 建议在此打 0.06 停一停。
+
 ## 2026-09-09 11:00 fast25 部署；仓库重整后第一批小刀（光之朱雀）
 
 - 仓库重整（a9bdd07…319cf11）：根目录 src/ shaders/ scripts/ tools/ README(en/zh) LICENSE(MIT, Kien)；其余进 Development/。scripts/bench.ps1 = 76 层 runner 拍平，PSNR 41.913911 与原链一位不差。约定：过程文件只进 Development，打 tag 时刷新根目录。
