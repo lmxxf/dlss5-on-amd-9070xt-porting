@@ -65,7 +65,7 @@ per-block notes), which document the layouts but are not a polished pipeline. No
 ## Authors
 
 Kien — direction, game integration, testing. The reverse engineering, kernels and optimization were
-written with AI collaborators (Claude, GPT); the working notes in `Development/` are theirs. Write-up (Chinese): [WeChat, issue 299](https://mp.weixin.qq.com/s/GpIZ2-GnfPe1rRvi5FsezQ).
+written with AI collaborators (Claude, GPT); the working notes in `Development/` are theirs. Write-ups (Chinese): [WeChat, DLSS5 series](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzYzMzMwNzk0NA==&action=getalbum&album_id=4687269655390453762#wechat_redirect).
 
 ## License
 

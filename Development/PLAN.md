@@ -11,6 +11,8 @@
 
 - 块 4 和块 69 比同类 C32 块多 0.54ms，就是 `SetSkipFinish(false)` + `crop_needed` 那两步（tile 序 → raster f32）。消费者：块 4 → ds4（`PooledWork()`，已读 tile 序？）+ decoder skip4（`c32[3].Output()`）；块 69 → post 的 merge。看这三个消费者能不能直接读 tile 序/E4M3，把 crop 去掉或缩成一半。
 
+## 1b. C32 中间量 f16（已做，09-10 01:45：−1.9ms，fast35）。同样的账要算一遍多头/C512：中间量若都是 H() 过的，f16 化同样白捡
+
 ## 1. 多头 Swin 26 块 FFN+投影合核（量后上限 −0.8ms，两天）
 
 - 现状：每块 FFN（展开+收缩，`native_wave_ffn_blocked.hlsl` 融合版）→ 投影（`native_wave_project.hlsl`，残差 f32 + 逐元素 H）→ QKV+归一化 → 注意力（fast2）→ 投影。两个投影各一个 dispatch，残差读 f32 raster。

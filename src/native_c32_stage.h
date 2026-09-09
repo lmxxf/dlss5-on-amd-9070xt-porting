@@ -40,7 +40,7 @@ public:
  void SetCropNeeded(bool needed){crop_needed=needed;}
  ID3D12Resource* Output()const{if(!output){auto*self=const_cast<NativeC32Stage*>(this);self->output=self->Buffer(n_bytes);}return output;}
  // FAST PATH (post70 direct): tile-major raw work buffer + geometry for consumers that index it themselves; finish stage skipped.
- bool AttnOut8()const{return body.AttnOut8();}ID3D12Resource* Main8()const{return body.Main8();}ID3D12Resource* MainF32()const{return body.Main();}ID3D12Resource* FfnScratch()const{return body.FfnTilesForTest();}
+ bool AttnOut8()const{return body.AttnOut8();}bool HalfStream()const{return body.HalfStream();}ID3D12Resource* Main8()const{return body.Main8();}ID3D12Resource* MainF32()const{return body.Main();}ID3D12Resource* FfnScratch()const{return body.FfnTilesForTest();}
  ID3D12Resource* RawWork()const{return body.RawTiles();}UINT WorkWidth()const{return geometry[2];}UINT ShiftX()const{return geometry[4];}UINT ShiftY()const{return geometry[5];}void SetSkipFinish(bool v){body.SetSkipFinish(v);}
  ID3D12Resource* PooledWork()const{return body.Downsample();}
  // FAST PATH 3 chain: read the previous stage's raw tiles (mode 3); the previous finish can then be skipped when nothing else reads its Main()/Downsample().

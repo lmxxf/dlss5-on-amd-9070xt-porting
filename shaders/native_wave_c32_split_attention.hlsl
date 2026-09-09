@@ -17,9 +17,24 @@ ByteAddressBuffer weights:register(t0);
 #ifndef NATIVE_C32_ATTN_FAST2
 #define NATIVE_C32_ATTN_FAST2 0
 #endif
+#ifndef NATIVE_C32_HALF_STREAM
+#define NATIVE_C32_HALF_STREAM 0
+#endif
 #if NATIVE_C32_ATTN_FAST2
 ByteAddressBuffer input:register(t1);
+#if NATIVE_C32_HALF_STREAM
+// FAST PATH (DLSS5_C32_HALF_STREAM): the FFN output (t1) and the block output (u0) are f16; every value on them is H()-rounded, so this is exact.
+#define INPUT_AT(i) float(input.Load<float16_t>((i)*2))
+using C16=dx::linalg::Matrix<dx::linalg::ComponentType::F16,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+#define LOAD_IN(first) C16::Load(input,(first)*64,64,dx::linalg::MatrixLayout::RowMajor,16).Cast<dx::linalg::ComponentType::F32>()
+#define LOAD_IN1(first) C16::Load(input,(first)*64+32,64,dx::linalg::MatrixLayout::RowMajor,16).Cast<dx::linalg::ComponentType::F32>()
+#define STORE_OUT(z,first,cr) z.Cast<dx::linalg::ComponentType::F16>().Store(qk,((first)*32+(cr)*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16)
+#else
 #define INPUT_AT(i) asfloat(input.Load((i)*4))
+#define LOAD_IN(first) C::Load(input,(first)*128,128,dx::linalg::MatrixLayout::RowMajor,16)
+#define LOAD_IN1(first) C::Load(input,(first)*128+64,128,dx::linalg::MatrixLayout::RowMajor,16)
+#define STORE_OUT(z,first,cr) z.Store(qk,((first)*32+(cr)*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16)
+#endif
 #else
 StructuredBuffer<float> input:register(t1);
 #define INPUT_AT(i) input[i]
@@ -232,7 +247,7 @@ groupshared float16_t ones16[512];
  for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
  C z[6];
  if(live){
-  C in0=C::Load(input,qfirst*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,qfirst*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
+  C in0=LOAD_IN(qfirst),in1=LOAD_IN1(qfirst);
   in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+4,8,dx::linalg::MatrixLayout::RowMajor);
  }
@@ -303,7 +318,7 @@ groupshared float16_t ones16[512];
     float result=H(zp.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
     zp.Set(i,RAW_OUTPUT?result:F(result));
    }
-   zp.Store(qk,(qfirst*32+cr*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);
+   STORE_OUT(zp,qfirst,cr);
 #if NATIVE_C32_OUT8
    // FAST PATH (post70 out8): E4M3 copy of the block output into aux ([token][32] bytes) for the rgb head (71MB instead of 283MB).
    zp.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,qfirst*32+cr*16,32,dx::linalg::MatrixLayout::RowMajor,16);

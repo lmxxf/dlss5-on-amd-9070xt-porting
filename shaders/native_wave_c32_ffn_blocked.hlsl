@@ -20,6 +20,12 @@ ByteAddressBuffer weights:register(t0);
 // Requires FAST2 + FP8 and the root-descriptor (raw store) binding; only the identity mapping (map_mode 0) takes this path.
 ByteAddressBuffer input_bytes:register(t1);
 #define input_at(i) asfloat(input_bytes.Load((i)*4))
+#ifndef NATIVE_C32_HALF_STREAM
+#define NATIVE_C32_HALF_STREAM 0
+#endif
+// FAST PATH (DLSS5_C32_HALF_STREAM): the previous stage's raw tiles (mode 3 input, mode 6/8 skip/low) and this stage's output are f16 (exact: all H()-rounded).
+#define input_h(i) float(input_bytes.Load<float16_t>((i)*2))
+#define skip_h(i) float(skip_bytes.Load<float16_t>((i)*2))
 // Mode 4 (post70 merge fold): input = low-res main [pixel/4][32], skip = full-res residual, merge_w = 64 coefficients;
 // value = H(H(low*w[c]) + skip*w[32+c]) exactly as native_post70.hlsl merge, computed in the gather instead of a pass.
 ByteAddressBuffer skip_bytes:register(t2);
@@ -155,10 +161,10 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    [branch]if(map_mode==4||map_mode==6||map_mode==7||map_mode==8||map_mode==9){
     const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));const int mine_skip=(map_mode==6&&t<16)?skip_index(first+t):0;
     [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);int ssrc=WaveReadLaneAt(mine_skip,j);float v=0;
-     if(src>=0){uint p=uint(src)/32,low=(((p/src_width)/2)*(src_width/2)+(p%src_width)/2)*32+t;float sk;if(map_mode==8){uint px=(p%src_width)/2+prev_shift_x,py=(p/src_width)/2+prev_shift_y;low=(((py/8)*(prev_work_width/8)+px/8)*64+(py%8)*8+px%8)*32+t;}else if(map_mode==9){low=(((p/src_width)/2+prev_shift_y)*prev_work_width+(p%src_width)/2+prev_shift_x)*32+t;}if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
+     if(src>=0){uint p=uint(src)/32,low=(((p/src_width)/2)*(src_width/2)+(p%src_width)/2)*32+t;float sk;if(map_mode==8){uint px=(p%src_width)/2+prev_shift_x,py=(p/src_width)/2+prev_shift_y;low=(((py/8)*(prev_work_width/8)+px/8)*64+(py%8)*8+px%8)*32+t;}else if(map_mode==9){low=(((p/src_width)/2+prev_shift_y)*prev_work_width+(p%src_width)/2+prev_shift_x)*32+t;}if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(NATIVE_C32_HALF_STREAM?skip_h(uint(ssrc)+t):asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(NATIVE_C32_HALF_STREAM?input_h(low):input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
      raw[j*32+t]=v;}
    }else{
-   [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:input_at(uint(src)+t);}
+   [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:((NATIVE_C32_HALF_STREAM&&map_mode==3)?input_h(uint(src)+t):input_at(uint(src)+t));}
    }
    GroupMemoryBarrierWithGroupSync();
    in0=C::Load(raw,0,32,dx::linalg::MatrixLayout::RowMajor);in1=C::Load(raw,16,32,dx::linalg::MatrixLayout::RowMajor);
@@ -203,7 +209,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
     acc[block].MultiplyAccumulate(a,b);
    }
   }
-  [unroll]for(uint block=0;block<2;block++){ELEM_LOOP(acc[block])acc[block].Set(i,f16tof32(f32tof16(acc[block].Get(i))));acc[block].Store(output,(first*32+block*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);}
+  [unroll]for(uint block=0;block<2;block++){ELEM_LOOP(acc[block])acc[block].Set(i,f16tof32(f32tof16(acc[block].Get(i))));if(NATIVE_C32_HALF_STREAM)acc[block].Cast<dx::linalg::ComponentType::F16>().Store(output,(first*32+block*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);else acc[block].Store(output,(first*32+block*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);}
   return;
  }
 #endif
@@ -214,7 +220,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  else{
   // Lane j<16 resolves token j's source once; the staging loop reads it back with a uniform lane index.
   const int mine=t<16?source_index(first+t):0;
-  [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);uint i=j*32+t;float v=src<0?0:input_at(uint(src)+t);raw[i]=v;prefix[i]=float16_t(Ffast(v));}
+  [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);uint i=j*32+t;float v=src<0?0:((NATIVE_C32_HALF_STREAM&&map_mode==3)?input_h(uint(src)+t):input_at(uint(src)+t));raw[i]=v;prefix[i]=float16_t(Ffast(v));}
  }
 #else
  for(uint i=t;i<512;i+=32){float v=input_at(first*32+i);raw[i]=v;prefix[i]=float16_t(Ffast(v));}
@@ -281,7 +287,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  }
 #if NATIVE_C32_FFN_FAST2
  // Output stays f32 (RAW) for the following stage; f16 rounding through a hardware cast pair.
- [unroll]for(uint block=0;block<2;block++){ELEM_LOOP(acc[block])acc[block].Set(i,f16tof32(f32tof16(acc[block].Get(i))));acc[block].Store(output,(first*32+block*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);}
+ [unroll]for(uint block=0;block<2;block++){ELEM_LOOP(acc[block])acc[block].Set(i,f16tof32(f32tof16(acc[block].Get(i))));if(NATIVE_C32_HALF_STREAM)acc[block].Cast<dx::linalg::ComponentType::F16>().Store(output,(first*32+block*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);else acc[block].Store(output,(first*32+block*16)*4,128,dx::linalg::MatrixLayout::RowMajor,16);}
 }
 #else
 #if NATIVE_FAST_ACCUMULATE

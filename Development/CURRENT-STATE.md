@@ -1,3 +1,11 @@
+## 2026-09-10 01:45 fast35：C32 中间量 f16（光之朱雀）
+
+- 起因：算 C32 块的字节数——FFN 写 ffn 70MB、注意力读 ffn 70MB 写 raw 70MB、下一块读 raw 70MB，每块 280MB 光带宽就 0.47ms，块本身 0.53ms：**C32 家族是带宽瓶颈不是算力**。dump 下来验证：raw 和 ffn 1790 万个值 100% 在 f16 格点上（全是 H() 过的），所以 f16 存储逐位无损。
+- `DLSS5_C32_HALF_STREAM=1`（build `DLSS5_BUILD_C32_HALF_STREAM`，`run_c32_half_stream_network.ps1`）：ffn/raw 缓冲减半；FFN 输出 `Cast<F16>().Store`、mode 3/6/8 读 f16；fast4 注意力输入 `C16::Load(...).Cast<F32>()`、输出 f16；`preblock_finish.hlsl`（`NATIVE_RAW_HALF`）和 `native_post70.hlsl`（`POST_INPUT_HALF`，rgb 头没开 OUT8 时直接读 raw）读 f16 对。两个运行时 hlsl 改了要 update-manifest。逐位相同。
+- 隔离量（ms）：pre 2.45→2.07，c32 1–3 0.54→0.39，块 4 0.75→0.52，tail 66–69 同上，post 3.41→3.13；**C32 家族 10.61→8.70，−1.9ms**，其他段不动。显存又省约 500MB（shared scratch 两份各 283→142MB，私有的同比）。
+- 今晚三刀合计约 −3ms：测试台 sum-of-isolates 约 29.3→26.3。游戏 fast35 = fast34 + C32_HALF_STREAM=1，源目录 `half`。
+- 顺手：README 的 299 单篇链接换成公众号 DLSS5 合集。
+
 ## 2026-09-10 00:30 fast34：两个 C32 链尾的 finish+crop（光之朱雀）
 
 - `DLSS5_C32_SKIP8=1`（`run_c32_skip8_network.ps1`，cso 在 run_wave_decoder 里按 `DLSS5_BUILD_C32_SKIP8` 编）：块 4 的 finish 改 `finish_main8`（E4M3 raster，不写 f32 main、不 crop，Output 不再分配 −70MB），块 66 的升采样投影读 E4M3 残差（`native_wave_decoder_entry.hlsl SKIP8`）。逐位相同。A/B 三轮中位数：tail66_project 0.84→0.37，enc_c32_3 1.65→1.20，**−0.9ms**。

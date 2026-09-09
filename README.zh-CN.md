@@ -58,7 +58,7 @@ dump 约 16 GB）不在仓库里，是用 `Development/` 里的脚本（`prepare
 ## 作者
 
 Kien——方向、游戏接入、测试。逆向、核与优化由 AI 协作者（Claude、GPT）完成，`Development/` 里的工作
-笔记是它们写的。完整过程见[公众号第 299 期](https://mp.weixin.qq.com/s/GpIZ2-GnfPe1rRvi5FsezQ)。
+笔记是它们写的。完整过程见[公众号 DLSS5 系列合集](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzYzMzMwNzk0NA==&action=getalbum&album_id=4687269655390453762#wechat_redirect)。
 
 ## 许可
 
