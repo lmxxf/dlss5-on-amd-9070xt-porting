@@ -1,3 +1,9 @@
+## 2026-09-09 09:20 fast20 已部署（光之朱雀）
+
+- 第 3 项：ViT QKV 合核（`DLSS5_VIT_QKV_FUSED`，投影+每头归一化+E4M3 直存，注意力直读，去掉 normalize 和 pack8 两个 dispatch）。每层 stage2 0.17→0.08，8 层 −0.74ms；PSNR 41.91（基线 41.98）。测试台 sum-of-mins 33.94。提交 eee9503。expand+contract 合并不做：ViT 每层 0.42ms 跑 15 GFLOP，是 640 token 铺不满 GPU 的延迟问题，不是流量问题。
+- 第 8 项第一步：`DLSS5_FLICKER_DUMP=<帧号>` 连 dump 5 帧到 `D:\DLSSNR-Lab\logs\flicker-<pid>-<帧>-{history,color,warped,motion}.*`（history = 上一帧输出，color = 本帧输入）。fast20 里设 1500（进游戏约 1 分钟后触发，Zero 那时站着看闪的地方）。分析脚本 `flicker_stats.py`。
+- 游戏：fast20 = fast19 + 上面两项，DLL `70da7ecf…`，源 `D:\DLSSNR-Lab\vit-fused`，链顶 `run_vit_qkv_fused_network.ps1`。fast19 没单独测过，直接被 fast20 覆盖。
+
 ## 2026-09-09 08:55 fast19 已部署（光之朱雀）
 
 - 计划 3 第 1 项：C32 注意力 fast4（`DLSS5_C32_ATTN_FAST4`，一组两窗、8 wave 全做 QKV、softmax 行和不出 wave、组同步 2 次）。测试台逐位 = fast3，3 轮 A/B 各段最小值之和 35.59→34.09（−1.5ms）。坑：qkv8 下标要用组内 token 号（第一版用全局号→28dB）。提交 bd5e5c8。
