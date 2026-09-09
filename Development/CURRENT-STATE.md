@@ -1,3 +1,9 @@
+## 2026-09-09 17:55 突然掉帧待查（光之朱雀）
+
+- fast26 进游戏 28～29fps，玩一会儿突然 21 且不回升；Zero 在公司 Splashtop 远程。ssh 采样：GPU 96% 全在游戏进程、SRFeature 1%、CPU 空闲；游戏进程显存 13.6GB/16GB（我们的网络估 3～5GB，f32 中间 buffer 多——值得收）。Zero 判断不是显存。上次同类现象（09-09 早）是 Splashtop：cpu_frame 阶梯涨、GPU 不变、关远程回落。
+- 计划：Zero 玩到"触发动画"的位置再查——部署 fast27 = fast26 + GAME_PROBE（只改 flag），看掉帧瞬间 network(GPU) 和 cpu_frame 哪列跳。早前也观察过"过场动画后掉帧"。
+- 待办：量网络显存占用（游戏关着时跑测试台看 GPU Process Memory），中间 buffer 改 E4M3/f16、跨块共用。
+
 ## 2026-09-09 17:00 跳块扫描；fast26 部署（光之朱雀）
 
 - `DLSS5_SKIP_BLOCKS`（native_block_skip.h）：列出的残差块用输入→输出拷贝代替。可扫的 45 块（多头组首尾块和 C32 家族格式不对称/链 raw，未扫）。基线 41.91dB。单跳 PSNR：
