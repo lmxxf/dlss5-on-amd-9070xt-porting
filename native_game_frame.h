@@ -12,6 +12,30 @@
 // Integration boundary, not a ReShade callback. The caller must establish the
 // correct source/color contract and submit all input producers before Process.
 // Rebind rotating same-size source only after completed frames; recreate on resize.
+// FAST/QUALITY PATH (DLSS5_OUTPUT_SMOOTH="t,s"): output-side temporal smoothing toward the warped previous output where the
+// difference is below t/255 (blend weight s at zero difference, fading to 0 at t). In place on the network RGB buffer.
+class NativeOutputSmooth {
+ ID3D12Resource*rgb{};ID3D12Resource*warped{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};float threshold{},strength{};
+public:
+ bool enabled{};
+ ~NativeOutputSmooth(){if(rgb)rgb->Release();if(warped)warped->Release();if(root)root->Release();if(pso)pso->Release();}
+ void Create(ID3D12Device*d,ID3D12Resource*network_rgb,ID3D12Resource*warped_history,const std::wstring&dir){
+  const wchar_t*v=_wgetenv(L"DLSS5_OUTPUT_SMOOTH");if(!v||!*v)return;
+  wchar_t*end=nullptr;threshold=float(wcstod(v,&end))/255.f;if(!end||*end!=L','||threshold<=0)throw std::runtime_error("invalid output smooth flag (t,s)");strength=float(wcstod(end+1,nullptr));if(strength<=0||strength>1)throw std::runtime_error("output smooth strength must be in (0,1]");
+  rgb=network_rgb;rgb->AddRef();warped=warped_history;warped->AddRef();
+  D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
+  D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("output smooth root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("output smooth root signature");blob->Release();blob=nullptr;error=nullptr;
+  auto hr=CompileNativeShader(dir+L"\\native_output_smooth.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"output smooth compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("output smooth pipeline");blob->Release();enabled=true;
+ }
+ // rgb is in SRV state after post70; transitioned to UAV for the pass and back. warped must be SRV-readable.
+ void Record(ID3D12GraphicsCommandList*c){
+  if(!enabled)return;const UINT pixels=1920*1080;UINT words[4];std::memcpy(words,&threshold,4);std::memcpy(words+1,&strength,4);words[2]=pixels;words[3]=0;
+  D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={rgb,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS};c->ResourceBarrier(1,&b);
+  c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,warped->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(1,rgb->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,4,words,0);c->Dispatch((pixels+63)/64,1,1);
+  std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
+ }
+};
 class NativeGameFrame {
  struct Resources {
   ID3D12Resource*original{}; // Kept alive by encode/decode resource references.
@@ -19,7 +43,7 @@ class NativeGameFrame {
   NativeGameCodec encode;
   NativeGameRgbInput input;
   NativeActualNetwork70 network;
-  NativeRgbTexture neural;
+  NativeRgbTexture neural;NativeOutputSmooth smooth;
   NativeGameCodec decode;
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
@@ -69,6 +93,7 @@ public:
    // Captured original post origin(-4,-4) corresponds to shift3.
    resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
    resources->neural.Create(d,resources->network.Output(),directory);
+   if(resources->temporal)resources->smooth.Create(d,resources->network.Output(),resources->sampler.Output(),directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
    resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);ready=true;
   }catch(...){failed=true;throw;}
@@ -131,6 +156,7 @@ public:
    if(!dump_prefix.empty()&&use_history){r.submit.Flush();DumpTemporalNow(dump_prefix);dump_prefix.clear();}
    r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
+    if(use_history)r.smooth.Record(c);
     if(r.temporal)r.feed.RecordHistory(c);
     r.neural.Record(c);r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,source_state});
     D3D12_RESOURCE_BARRIER b[2]{};for(auto&v:b)v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
