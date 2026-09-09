@@ -2,22 +2,26 @@
 
 起点：游戏 29fps（网络 GPU 约 30.7ms + 游戏自身 6～7ms，GPU 满载）；测试台 sum-of-mins 约 33ms，PSNR 对 exact 41.91；网络显存 3.75GB。判据不变：结构改动逐位相同（`cmp`），算术改动 PSNR ≥ 41.9；同批 A/B 三轮取每段最小值（`Development/tools/abn.sh` + `cmpmin.py`）。
 
-## 0. 先修量法（半天，做其他事之前）
+## 0. 先修量法（已做，09-09 23:55）
 
-- 09-09 发现：AMD 上时间戳在命令流顶端写下，**紧跟大核后面的小段的 interval 不可信**（post70_rgb 0.77ms 实为注意力尾巴，rgb 头本身 <0.05）。多头块每块 0.5ms 的分段（FFN 0.14 / 注意力 0.15 / 投影 0.16×2 / QKV 0.06）同样可疑。
-- 做法：测试程序加 `DLSS5_TEST_ISOLATE=<stage label>`：只重复录制/提交那一个 dispatch 序列 200 次（同一份输入，输出丢弃），整段 GPU 时间 / 200 = 单核真实成本。对多头 C64/C128/C256 各一块、C32 的 FFN/注意力、ViT 各段各量一次，重画成本表。合核之前先看这张表。
+- `DLSS5_TEST_ISOLATE`：单 stage 重复 N 次取均值（用法和全表见 `CURRENT-STATE.md` 09-09 23:55）。帧内分段时间戳把大核尾巴算进后面的小段，旧的 <0.2ms 分段数字都偏大。
+- 表读出来的顺序（取代下面 1–3 的原顺序）：**1a C32 链尾 finish+crop（块 4、69 各 0.54，−1.0）→ 3 升采样投影 wave 化（proj66 0.56 / proj62 0.31 / proj56 0.13，标量核，−0.7）→ 2a ViT contract 提速（0.152 vs expand 0.078 同 FLOP，−0.6）→ 1 多头 FFN+proj0 合核（上限 −0.8，不是原估 1～1.5）**。合计上限约 −3ms。
 
-## 1. 多头 Swin 26 块 FFN+投影合核（估 −1～1.5ms，两天）
+## 1a. C32 链尾 finish+crop（−1.0，先做）
+
+- 块 4 和块 69 比同类 C32 块多 0.54ms，就是 `SetSkipFinish(false)` + `crop_needed` 那两步（tile 序 → raster f32）。消费者：块 4 → ds4（`PooledWork()`，已读 tile 序？）+ decoder skip4（`c32[3].Output()`）；块 69 → post 的 merge。看这三个消费者能不能直接读 tile 序/E4M3，把 crop 去掉或缩成一半。
+
+## 1. 多头 Swin 26 块 FFN+投影合核（量后上限 −0.8ms，两天）
 
 - 现状：每块 FFN（展开+收缩，`native_wave_ffn_blocked.hlsl` 融合版）→ 投影（`native_wave_project.hlsl`，残差 f32 + 逐元素 H）→ QKV+归一化 → 注意力（fast2）→ 投影。两个投影各一个 dispatch，残差读 f32 raster。
 - 改法：收缩的输出 tile 留寄存器，直接乘投影权重（K=通道数，16×32 A tile 来自收缩累加器 Cast，B 从投影权重）+ 残差矩阵化（`NATIVE_MATRIX_RESIDUAL` 那套三次对角 MMA）在同一核里出块输出。C64 LDS 够，C256 要看 hidden 4× 的 LDS 预算（C256×4=1024 hidden，每 wave 16 token ×1024 f8 = 16KB，可以）。
 - 验证：逐位（收缩→投影中间是 F8 格点，能做到）；量 encoder5_8 / 9_14 / 15_22 与 tail49_55 / 57_61 / 63_65。
 
-## 2. ViT expand+contract 合核（估 −0.3，一天，不确定）
+## 2. ViT contract 提速（−0.6）；expand+contract 合核（−0.3）其次
 
 - 640 token，每层 stage0 0.09 + stage1 0.145。隐层 4096 宽，按 hidden 分段流水（expand 一段 → contract 累加），参考多头融合 FFN。收益上限就是省掉隐层写读（2.6MB）和一个 dispatch，先用 0 的量法确认值不值。
 
-## 3. 升采样投影三段（tail56/62/66_project 0.16/0.37/0.58，估 −0.3）
+## 3. 升采样投影三段 wave 化（隔离量 0.13/0.31/0.56，共 1.0，估 −0.7）
 
 - `native_wave_decoder_entry.hlsl` 路径，没看过内部；先量（0 的方法），再看是不是同样的"标量尾巴"问题。
 

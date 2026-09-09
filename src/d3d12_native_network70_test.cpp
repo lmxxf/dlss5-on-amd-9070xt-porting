@@ -85,6 +85,7 @@ int wmain(int argc,wchar_t**argv){try{
   {static std::vector<float>previous[2];auto&prev=previous[enabled?1:0];if(prev.size()==oracle.size()){size_t unstable=0;for(size_t i=0;i<oracle.size();i++)unstable+=actual[i]!=prev[i];std::printf("network70 frame=%u history=%u frame_to_frame_different=%zu\n",frame,enabled,unstable);}prev.assign(actual,actual+oracle.size());}
   std::ofstream out((dir+(enabled?L"\\gpu-network70-temporal.f32":L"\\gpu-network70.f32")).c_str(),std::ios::binary);if(!out.write(reinterpret_cast<const char*>(p),oracle.size()*4))throw std::runtime_error("readback save failed");rb->Unmap(0,&none);
   std::printf("network70 frame=%u history=%u values=%zu different=%zu\n",frame,enabled,oracle.size(),different);std::fflush(stdout);if(different&&!allow_inexact)throw std::runtime_error("extracted network differs");memory_report(frame+1);
+  if(frame+1==frames&&network->Isolating())network->Isolate(submit,0); // DLSS5_TEST_ISOLATE: after the last readback; output is garbage afterwards
  }
  if(memory_adapter)memory_adapter->Release();delete network;delete sampler;delete coordinates;delete reflect;std::printf("extracted_network70=exact frames=%u; controlled history; game integration pending\n",frames);return 0;
 }catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());return 1;}}

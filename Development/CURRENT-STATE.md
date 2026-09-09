@@ -1,3 +1,44 @@
+## 2026-09-09 23:55 隔离量法：单核真实成本表（光之朱雀）
+
+- 测试台新 flag `DLSS5_TEST_ISOLATE=<kind>[:index[:part]][,...]`（`DLSS5_TEST_ISOLATE_REPEAT`，默认 200）：最后一帧读回之后，把选中的 stage 单独重复录制 N 次夹在两个时间戳之间，总时间/N；之后输出是垃圾，只看 `network_isolate` 行。kind：pre / c32:i / c64|c128|c256:i[:part] / ds:{4,8,14,22} / split:i / head / bridge / vit:b[:stage] / decoder:stage / tail:block[:part]（49..69）/ tailproj:{56,62,66} / post。part（多头 body，`native_c64.h` 的 dispatch 门）：1 pack 2 expand 3 contract 4 proj0 5 qkv 6 normalize 7 attention 8 proj1；barrier 保留、其他 dispatch 跳过。空 part 的底 = 0.0039ms（纯 barrier）。
+- 校准：c64:0 隔离 0.45（同批帧内分段之和 0.60）——帧内分段把前面大核的尾巴算进了小段，此前所有 <0.2ms 的分段数字都偏大。
+- 全表（down-only 目录，fast33 flag，repeat 100，ms/次）：
+
+| 段 | 单块 | 块数 | 合计 | 备注 |
+|---|---|---|---|---|
+| pre（块 0，全分辨率） | 2.46 | 1 | 2.46 | |
+| C32 编码器 1–3 | 0.53–0.55 | 3 | 1.62 | 链式，无 finish/crop |
+| C32 块 4（finish+crop） | 1.08 | 1 | 1.08 | **比同类多 0.54 = finish+crop** |
+| ds4/8/14/22 | 0.034/0.070/0.041/0.035 | 4 | 0.18 | |
+| C64 5–8 | 0.33–0.39 | 4 | 1.45 | contract 0.121 / proj0 0.043 / qkv 0.059 / attn 0.076 / proj1 0.026 |
+| C128 9–14 | 0.24–0.25 | 6 | 1.49 | contract 0.119 / proj0 0.034 / qkv 0.042 / attn 0.046 / proj1 0.021 |
+| C256 15–22 | 0.23–0.25 | 8 | 1.93 | contract 0.151 / proj0 0.025 / qkv 0.034 / attn 0.038 / proj1 0.015 |
+| C512 23–30 | 0.24 | 8 | 1.90 | |
+| head + bridge | 0.035+0.003 | | 0.04 | |
+| ViT 31–38 | 0.41 | 8 | 3.26 | expand 0.078 / contract 0.152 / qkv 0.081 / attn 0.052 / proj 0.069 |
+| decoder 0–1（inverse, entry） | 0.003+0.142 | | 0.15 | |
+| C512 40–47 | 0.25 | 8 | 2.00 | |
+| up48 + body48 | 0.110+0.243 | | 0.35 | |
+| C256 49–55 | 0.37（49，含 pack）/0.23–0.26 | 7 | 1.87 | |
+| proj56 / body56 | 0.127 / 0.255 | | 0.38 | |
+| C128 57–61 | 0.24–0.27 | 5 | 1.27 | |
+| proj62 / body62 | 0.310 / 0.403 | | 0.71 | |
+| C64 63–65 | 0.35/0.36/0.41 | 3 | 1.12 | |
+| proj66 / body66 | 0.558 / 0.529 | | 1.09 | |
+| C32 67–68 | 0.545 | 2 | 1.09 | |
+| C32 69（finish+crop） | 1.08 | 1 | 1.08 | **同块 4** |
+| post（块 70 + merge + head） | 3.07 | 1 | 3.07 | |
+| **合计** | | | **29.3** | 帧内 sum-of-mins 33 → 约 3.7ms 是 dispatch 之间的空转 |
+
+- 读数（合核之前该知道的）：
+  1. **两个 C32 链尾（块 4、69）的 finish+crop 各 0.54ms，共 1.08**——同类块只要 0.53，这一半是搬数据。先查 crop 的消费者能不能直接读 tile 序（ds4 / skip4 / post 的 merge）。
+  2. **升采样投影 proj56/62/66 = 0.13/0.31/0.56，共 1.0ms**，三段 FLOP 相同（各 2.3 GFLOP），越靠外越慢：proj66 只有 4 TFLOPS，是标量核（`NativeVitLinear` 路径）。改成 wave-matrix 估 −0.7。比 PLAN 原估的 −0.3 大。
+  3. **多头 26 块的 FFN contract（融合展开+收缩）0.12–0.15/块 ≈ 3.5ms**，四个尺寸 FLOP 相同（9 GFLOP）都在 75 TFLOPS 左右；两个投影加起来只有 0.04–0.07/块 ≈ 1.4ms。合核 FFN+proj0 的上限约 −0.8（省 proj0 的 launch 和 f32 残差读），不是原估的 1～1.5。
+  4. **ViT contract 0.152 vs expand 0.078，FLOP 相同**（5.4 GFLOP）：contract 慢一倍是 K=4096 的长归约并行度不够（640 token × 1024 输出）。补齐到 expand 的速度 = −0.6ms；比 expand+contract 合核（−0.3）更值。
+  5. pre 2.46 / post 3.07 = 5.5ms，约等于 4 个 C32 块的量，没有明显浪费；C512 16 块 4.0ms 同样。
+- 顺序改为：1 crop/finish（−1.0）→ 2 升采样投影 wave 化（−0.7）→ 3 ViT contract（−0.6）→ 4 多头 FFN+proj0 合核（−0.8）。总上限约 −3ms（33→30）。
+- 源码：`src/native_actual_network70.h`（Isolate）、`native_c64.h`（part 门）、`native_decoder_tail69.h`（RecordBlock/RecordProjection）、`d3d12_native_network70_test.cpp`。逐位：隔离前的读回未动，frame 0–4 different=0。
+
 ## 2026-09-09 23:25 fast33：显存 3.75GB（光之朱雀）
 
 - fast32：每 60 帧对所有 ≥32MB 的 default-heap buffer 调 `MakeResident`（`DLSS5_MAKE_RESIDENT_EVERY`，失败记 make_resident_failed）。fast31 下 Zero 又遇一次火车站出口 13fps 不回升（Shared 533MB，游戏进程提交 15.0GB）。Zero："波动后续慢慢调"。

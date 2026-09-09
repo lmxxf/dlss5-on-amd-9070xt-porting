@@ -52,5 +52,12 @@ public:
   for(UINT i=0;i<3;i++)run(c64[i],63+i);mark("tail63_65");project66.Record(c);mark("tail66_project");body66.Record(c);mark("tail66_body");
   for(auto&layer:c32)layer.Record(c);mark("tail67_69");
  }
+ /* DLSS5_TEST_ISOLATE support: record one block of the tail (49..69; 56/62/66 = the body only) or one upsample projection. */
+ void RecordBlock(ID3D12GraphicsCommandList*c,UINT block){
+  if(block>=49&&block<=55)c256[block-49].Record(c);else if(block==56)body56.Record(c);else if(block>=57&&block<=61)c128[block-57].Record(c);else if(block==62)body62.Record(c);
+  else if(block>=63&&block<=65)c64[block-63].Record(c);else if(block==66)body66.Record(c);else if(block>=67&&block<=69)c32[block-67].Record(c);else throw std::runtime_error("decoder tail block");
+ }
+ void RecordProjection(ID3D12GraphicsCommandList*c,UINT block){if(block==56)project56.Record(c);else if(block==62)project62.Record(c);else if(block==66)project66.Record(c);else throw std::runtime_error("decoder tail projection");}
+ void SetIsolatePart(UINT block,UINT part){if(block>=49&&block<=55)c256[block-49].SetIsolatePart(part);else if(block==56)body56.SetIsolatePart(part);else if(block>=57&&block<=61)c128[block-57].SetIsolatePart(part);else if(block==62)body62.SetIsolatePart(part);else if(block>=63&&block<=65)c64[block-63].SetIsolatePart(part);else if(part)throw std::runtime_error("decoder tail part");}
  ID3D12Resource*Output()const{return output;}
 };

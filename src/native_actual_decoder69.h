@@ -53,5 +53,6 @@ public:
   else if(stage==11)body48.Record(c);
   else tail.Record(c,timer);
  }
+ NativeDecoderTail69&Tail(){return tail;}
  ID3D12Resource*Output()const{return tail.Output();}
 };
