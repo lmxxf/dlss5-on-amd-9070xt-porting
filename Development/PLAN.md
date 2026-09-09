@@ -7,7 +7,7 @@
 - `DLSS5_TEST_ISOLATE`：单 stage 重复 N 次取均值（用法和全表见 `CURRENT-STATE.md` 09-09 23:55）。帧内分段时间戳把大核尾巴算进后面的小段，旧的 <0.2ms 分段数字都偏大。
 - 表读出来的顺序（取代下面 1–3 的原顺序）：**1a C32 链尾 finish+crop（块 4、69 各 0.54，−1.0）→ 3 升采样投影 wave 化（proj66 0.56 / proj62 0.31 / proj56 0.13，标量核，−0.7）→ 2a ViT contract 提速（0.152 vs expand 0.078 同 FLOP，−0.6）→ 1 多头 FFN+proj0 合核（上限 −0.8，不是原估 1～1.5）**。合计上限约 −3ms。
 
-## 1a. C32 链尾 finish+crop（−1.0，先做）
+## 1a. C32 链尾 finish+crop（已做，09-10 00:30：−0.9 + −0.23，fast34）
 
 - 块 4 和块 69 比同类 C32 块多 0.54ms，就是 `SetSkipFinish(false)` + `crop_needed` 那两步（tile 序 → raster f32）。消费者：块 4 → ds4（`PooledWork()`，已读 tile 序？）+ decoder skip4（`c32[3].Output()`）；块 69 → post 的 merge。看这三个消费者能不能直接读 tile 序/E4M3，把 crop 去掉或缩成一半。
 

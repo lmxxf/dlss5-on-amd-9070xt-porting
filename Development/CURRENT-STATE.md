@@ -1,3 +1,14 @@
+## 2026-09-10 00:30 fast34：两个 C32 链尾的 finish+crop（光之朱雀）
+
+- `DLSS5_C32_SKIP8=1`（`run_c32_skip8_network.ps1`，cso 在 run_wave_decoder 里按 `DLSS5_BUILD_C32_SKIP8` 编）：块 4 的 finish 改 `finish_main8`（E4M3 raster，不写 f32 main、不 crop，Output 不再分配 −70MB），块 66 的升采样投影读 E4M3 残差（`native_wave_decoder_entry.hlsl SKIP8`）。逐位相同。A/B 三轮中位数：tail66_project 0.84→0.37，enc_c32_3 1.65→1.20，**−0.9ms**。
+- `DLSS5_POST70_LOW_RAW=2`（`run_post70_low_main8_network.ps1`）：块 69 也走 main8 finish、不 crop，post 的 merge fold 按 mode 9 读字节。逐位相同。隔离量：块 69 1.07→0.74，post 3.44→3.54，**净 −0.23**。（`=1` 读 raw tile + Ffast 的版本 post +0.45，不划算，留着不用。）
+- 坑：
+  1. **投影核加 `precise`**：`t + skip*scale` 在新 shader 里被合成 FMA，18% 输出差一个 f16 ulp；非 SKIP8 路径没合。以后凡是要逐位对上的 f32 尾链都显式 `precise`。
+  2. **顶层 runner 里编 cso 又中招一次**（`NATIVE_FAST_ACCUMULATE` 没设），症状是 PSNR 47 而不是花屏；已改到 run_wave_decoder 里编。
+  3. post 的 FFN 读 low 输入对格式很敏感：raw tile+Ffast +0.45，E4M3 raster +0.10，f32 raster 最快——低分辨率 gather 在 16 次串行 Load 的关键路径上。
+- 测试 dump 钩子：`DLSS5_TEST_DUMP_BLOCK4=1..7`（main8/proj66/down/decoder/head/SharedRaw/SharedFfn），配合 `DLSS5_TEST_ISOLATE=<stage>` REPEAT=1 可以在帧后重跑单块再抓它的 scratch——二分定位用。
+- 游戏：fast34 = fast33 + C32_SKIP8=1 + POST70_LOW_RAW=2，源目录 `low-raw`。
+
 ## 2026-09-09 23:55 隔离量法：单核真实成本表（光之朱雀）
 
 - 测试台新 flag `DLSS5_TEST_ISOLATE=<kind>[:index[:part]][,...]`（`DLSS5_TEST_ISOLATE_REPEAT`，默认 200）：最后一帧读回之后，把选中的 stage 单独重复录制 N 次夹在两个时间戳之间，总时间/N；之后输出是垃圾，只看 `network_isolate` 行。kind：pre / c32:i / c64|c128|c256:i[:part] / ds:{4,8,14,22} / split:i / head / bridge / vit:b[:stage] / decoder:stage / tail:block[:part]（49..69）/ tailproj:{56,62,66} / post。part（多头 body，`native_c64.h` 的 dispatch 门）：1 pack 2 expand 3 contract 4 proj0 5 qkv 6 normalize 7 attention 8 proj1；barrier 保留、其他 dispatch 跳过。空 part 的底 = 0.0039ms（纯 barrier）。
