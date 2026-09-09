@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include "native_preblock_runtime.h"
 // Ordinary C32 stage: zero-pad shifted windows, native FP8 body, crop to HWC.
 // Does not claim to implement the special learned downsample of a DS block.
@@ -8,7 +9,7 @@ class NativeC32Stage {
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[2]{};ID3D12DescriptorHeap*heap[2]{};
  UINT geometry[6]{};bool recorded{},mapped{},crop_needed{true},raw_output_flag{};UINT64 n_bytes{},work_bytes{};
  static void Check(HRESULT h){if(FAILED(h))throw std::runtime_error("C32 stage HRESULT="+std::to_string(unsigned(h)));}
- ID3D12Resource* Buffer(UINT64 n){D3D12_HEAP_PROPERTIES h{};h.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC d{};d.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;d.Width=n;d.Height=1;d.DepthOrArraySize=d.MipLevels=1;d.SampleDesc.Count=1;d.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;d.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;Check(device->CreateCommittedResource(&h,D3D12_HEAP_FLAG_NONE,&d,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));return r;}
+ ID3D12Resource* Buffer(UINT64 n){D3D12_HEAP_PROPERTIES h{};h.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC d{};d.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;d.Width=n;d.Height=1;d.DepthOrArraySize=d.MipLevels=1;d.SampleDesc.Count=1;d.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;d.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;Check(NativeCreateCommittedResource(device,&h,D3D12_HEAP_FLAG_NONE,&d,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));return r;}
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER v{};v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;v.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&v);}
  void Heap(UINT i,ID3D12Resource*src,UINT64 sn,ID3D12Resource*dst,UINT64 dn){D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,2,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};Check(device->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap[i])));auto h=heap[i]->GetCPUDescriptorHandleForHeapStart();D3D12_SHADER_RESOURCE_VIEW_DESC s{};s.ViewDimension=D3D12_SRV_DIMENSION_BUFFER;s.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;s.Buffer.NumElements=UINT(sn/4);s.Buffer.StructureByteStride=4;device->CreateShaderResourceView(src,&s,h);h.ptr+=device->GetDescriptorHandleIncrementSize(hd.Type);D3D12_UNORDERED_ACCESS_VIEW_DESC u{};u.ViewDimension=D3D12_UAV_DIMENSION_BUFFER;u.Buffer.NumElements=UINT(dn/4);u.Buffer.StructureByteStride=4;device->CreateUnorderedAccessView(dst,nullptr,&u,h);}
 public:

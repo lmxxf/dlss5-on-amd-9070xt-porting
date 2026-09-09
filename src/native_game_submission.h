@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include <windows.h>
 #include <d3d12.h>
 #include <mutex>
@@ -61,7 +62,7 @@ public:
   if(flag&&!wcscmp(flag,L"1")){
    D3D12_QUERY_HEAP_DESC hd{};hd.Type=D3D12_QUERY_HEAP_TYPE_TIMESTAMP;hd.Count=2;ck(device->CreateQueryHeap(&hd,IID_PPV_ARGS(&timing_heap)));
    D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_READBACK;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=16;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-   ck(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&timing_readback)));ck(queue->GetTimestampFrequency(&timing_frequency));if(!timing_frequency)throw std::runtime_error("zero GPU clock");
+   ck(NativeCreateCommittedResource(device,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&timing_readback)));ck(queue->GetTimestampFrequency(&timing_frequency));if(!timing_frequency)throw std::runtime_error("zero GPU clock");
   }
  }
  template<class Record>void Submit(Record record,DWORD timeout_ms=30000){

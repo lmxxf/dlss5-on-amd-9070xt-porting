@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include <vector>
@@ -27,7 +28,7 @@ class NativePreblockRuntime {
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
   D3D12_RESOURCE_DESC d{};d.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;d.Width=bytes;d.Height=1;d.DepthOrArraySize=d.MipLevels=1;d.SampleDesc.Count=1;d.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;d.Flags=type==D3D12_HEAP_TYPE_DEFAULT?D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS:D3D12_RESOURCE_FLAG_NONE;
-  ID3D12Resource*r=nullptr;Check(device->CreateCommittedResource(&h,D3D12_HEAP_FLAG_NONE,&d,state,nullptr,IID_PPV_ARGS(&r)));return r;
+  ID3D12Resource*r=nullptr;Check(NativeCreateCommittedResource(device,&h,D3D12_HEAP_FLAG_NONE,&d,state,nullptr,IID_PPV_ARGS(&r)));return r;
  }
  ID3D12RootSignature* Root(UINT srvs,UINT uavs,bool with_noise=false,bool with_temporal=false){
   D3D12_DESCRIPTOR_RANGE ranges[]={{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,srvs,0,0,0},{D3D12_DESCRIPTOR_RANGE_TYPE_UAV,uavs,0,0,srvs}};

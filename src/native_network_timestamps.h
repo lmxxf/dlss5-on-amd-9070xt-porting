@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include <d3d12.h>
 #include <vector>
 #include <string>
@@ -12,7 +13,7 @@ public:
  void Create(ID3D12Device*d){
   D3D12_QUERY_HEAP_DESC q{};q.Type=D3D12_QUERY_HEAP_TYPE_TIMESTAMP;q.Count=128;check(d->CreateQueryHeap(&q,IID_PPV_ARGS(&heap)));
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_READBACK;D3D12_RESOURCE_DESC r{};r.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;r.Width=128*8;r.Height=1;r.DepthOrArraySize=r.MipLevels=1;r.SampleDesc.Count=1;r.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-  check(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&r,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&readback)));
+  check(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&r,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&readback)));
  }
  void Reset(){labels.clear();}
  void Mark(ID3D12GraphicsCommandList*c,const std::string&label){if(!heap)return;if(labels.size()>=128)throw std::runtime_error("timestamp capacity");c->EndQuery(heap,D3D12_QUERY_TYPE_TIMESTAMP,UINT(labels.size()));labels.push_back(label);}

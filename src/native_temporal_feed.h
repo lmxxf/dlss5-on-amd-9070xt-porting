@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include "native_split.h"
 // Motion-vector texture -> motion buffer, and network output -> history buffer.
 class NativeTemporalFeed {
@@ -6,7 +7,7 @@ class NativeTemporalFeed {
  ID3D12RootSignature*motion_root{},*history_root{};ID3D12PipelineState*motion_pso{},*history_pso{};
  UINT mw{},mh{};float scale[2]{};bool motion_recorded{},history_recorded{};
  static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("temporal feed HRESULT="+std::to_string(unsigned(h)));}
- static ID3D12Resource*Buffer(ID3D12Device*d,UINT64 bytes){D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;ck(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));return r;}
+ static ID3D12Resource*Buffer(ID3D12Device*d,UINT64 bytes){D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*r=nullptr;ck(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&r)));return r;}
  static void Transition(ID3D12GraphicsCommandList*c,ID3D12Resource*r,bool to_uav){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,to_uav?D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE:D3D12_RESOURCE_STATE_UNORDERED_ACCESS,to_uav?D3D12_RESOURCE_STATE_UNORDERED_ACCESS:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE};c->ResourceBarrier(1,&b);}
 public:
  NativeTemporalFeed()=default;NativeTemporalFeed(const NativeTemporalFeed&)=delete;

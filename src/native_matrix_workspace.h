@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include <d3d12.h>
 #include <stdexcept>
 #include <cstdlib>
@@ -8,7 +9,7 @@
 class NativeMatrixWorkspace {
  ID3D12Device*device{};UINT64 capacity{};
  static void ck(HRESULT h){if(FAILED(h))throw std::runtime_error("matrix workspace allocation failed");}
- ID3D12Resource*Buffer(UINT64 bytes){D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC r{};r.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;r.Width=bytes;r.Height=1;r.DepthOrArraySize=r.MipLevels=1;r.SampleDesc.Count=1;r.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;r.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*p=nullptr;ck(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&r,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&p)));return p;}
+ ID3D12Resource*Buffer(UINT64 bytes){D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC r{};r.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;r.Width=bytes;r.Height=1;r.DepthOrArraySize=r.MipLevels=1;r.SampleDesc.Count=1;r.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;r.Flags=D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;ID3D12Resource*p=nullptr;ck(NativeCreateCommittedResource(device,&hp,D3D12_HEAP_FLAG_NONE,&r,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&p)));return p;}
 public:
  ID3D12Resource*packed{},*qkv{},*norm{},*result[3]{},*scratch[2]{};bool packed_readable{},qkv_readable{},norm_readable{},result_readable[3]{},scratch_readable[2]{};
  NativeMatrixWorkspace()=default;NativeMatrixWorkspace(const NativeMatrixWorkspace&)=delete;

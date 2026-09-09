@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pinned_resource.h"
 #include "native_game_submission.h"
 #include "native_device_identity.h"
 #include <vector>
@@ -16,7 +17,7 @@ inline std::vector<unsigned char> NativeReadSubmittedFrame(ID3D12CommandQueue*q,
  D3D12_PLACED_SUBRESOURCE_FOOTPRINT fp{};UINT64 bytes;d->GetCopyableFootprints(&desc,0,1,0,&fp,nullptr,nullptr,&bytes);
  D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_READBACK;
  D3D12_RESOURCE_DESC bd{};bd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;bd.Width=bytes;bd.Height=1;bd.DepthOrArraySize=bd.MipLevels=1;bd.SampleDesc.Count=1;bd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
- ID3D12Resource*readback=nullptr;hr=d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&bd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&readback));d->Release();check(hr);
+ ID3D12Resource*readback=nullptr;hr=NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&bd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&readback));d->Release();check(hr);
  // Deliberately retain submission storage, readback and source on failure:
  // a timeout is not cancellation. Caller must not retry this unboundedly.
  source->AddRef();auto*submit=new NativeGameSubmission;submit->Create(q);
