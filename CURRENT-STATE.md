@@ -1,3 +1,10 @@
+## 2026-09-09 09:37 fast22（输出平滑）在游戏里（光之朱雀）
+
+- 闪烁坐实：静止菜单 5 帧 dump（`flicker_stats.py`）——输入不动的像素（85%）输出也不动（>2/255 的只 1.3%）；变动像素上输出幅度 = 输入幅度（11/255 vs 11/255）；但输出幅度 >1/255 的像素数是输入的 2 倍，77% 在输入变化点 3px 内 → 网络把 FSR/动画的边缘抖动摊成一圈 1～4/255 的光晕。**FP8 放大假设排除**，是网络本身的空间扩散。
+- 解法：`native_output_smooth.hlsl` + `NativeOutputSmooth`（native_game_frame.h），网络输出后、history 拷贝前，|out − warped 上帧输出| < t/255 的像素向 warped 混合（权重 s 线性衰减到 t）。flag `DLSS5_OUTPUT_SMOOTH=t,s`。运行时编译 → 已 update-manifest。
+- fast22 = fast21 − FLICKER_DUMP + OUTPUT_SMOOTH=6,0.6，DLL `4398e04e…`。游戏 24～25fps（菜单 25～26），post 段 0.20→0.30ms。Zero："閃爍好像好一點"。下一档试 10,0.8 看拖影。
+- fast20 探针：GPU 网络 30.0ms，cpu_frame 33.7（fast18：32.0 / 35.5）；合批第二档没压掉 CPU−GPU 那 3ms。
+
 ## 2026-09-09 09:20 fast20 已部署（光之朱雀）
 
 - 第 3 项：ViT QKV 合核（`DLSS5_VIT_QKV_FUSED`，投影+每头归一化+E4M3 直存，注意力直读，去掉 normalize 和 pack8 两个 dispatch）。每层 stage2 0.17→0.08，8 层 −0.74ms；PSNR 41.91（基线 41.98）。测试台 sum-of-mins 33.94。提交 eee9503。expand+contract 合并不做：ViT 每层 0.42ms 跑 15 GFLOP，是 640 token 铺不满 GPU 的延迟问题，不是流量问题。
