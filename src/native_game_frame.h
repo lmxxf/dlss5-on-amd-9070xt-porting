@@ -1,4 +1,5 @@
 #pragma once
+#include "native_lab_paths.h"
 #include "native_pinned_resource.h"
 #include <chrono>
 #include "native_device_identity.h"
@@ -152,7 +153,7 @@ public:
    auto&r=*resources;
    const bool use_history=r.temporal&&motion_texture&&!reset&&r.feed.HasHistory();
    {static unsigned every=[]{const wchar_t*v=_wgetenv(L"DLSS5_MAKE_RESIDENT_EVERY");return v?unsigned(wcstoul(v,nullptr,10)):0u;}();static unsigned frames=0;static unsigned fails=0;
-    if(every&&++frames%every==0){HRESULT mr=NativeMakeAllResident(r.submit.Device());if(FAILED(mr)&&++fails<=5)if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-submission-order.txt)",L"ab")){fprintf(f,"pid=%lu make_resident_failed hr=%08x tracked=%u\n",GetCurrentProcessId(),unsigned(mr),unsigned(NativeTrackedResources().size()));fclose(f);}}}
+    if(every&&++frames%every==0){HRESULT mr=NativeMakeAllResident(r.submit.Device());if(FAILED(mr)&&++fails<=5)if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu make_resident_failed hr=%08x tracked=%u\n",GetCurrentProcessId(),unsigned(mr),unsigned(NativeTrackedResources().size()));fclose(f);}}}
    const auto cpu_start=std::chrono::steady_clock::now();if(r.probe_on)r.probe.Reset();
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
@@ -174,7 +175,7 @@ public:
    if(r.probe_on){r.submit.Flush();std::vector<double>iv;if(r.probe.Intervals(r.submit.TimestampFrequency(),iv)&&iv.size()==3){for(int i=0;i<3;i++)r.probe_sum[i]+=iv[i];}
     r.probe_cpu+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-cpu_start).count();
     if(use_history)r.probe_history++;if(reset)r.probe_reset++;if(!motion_texture)r.probe_nomotion++;
-    if(++r.probe_frames%100==0){if(FILE*f=_wfopen(LR"(D:\DLSSNR-Lab\logs\native-game-probe.txt)",L"ab")){fprintf(f,"frames=%u avg_ms pre=%.2f network=%.2f post=%.2f gpu_total=%.2f cpu_frame=%.2f history=%u reset=%u nomotion=%u\n",r.probe_frames,r.probe_sum[0]/100,r.probe_sum[1]/100,r.probe_sum[2]/100,(r.probe_sum[0]+r.probe_sum[1]+r.probe_sum[2])/100,r.probe_cpu/100,r.probe_history,r.probe_reset,r.probe_nomotion);fclose(f);}for(auto&v:r.probe_sum)v=0;r.probe_cpu=0;r.probe_history=r.probe_reset=r.probe_nomotion=0;}}
+    if(++r.probe_frames%100==0){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-probe.txt").c_str(),L"ab")){fprintf(f,"frames=%u avg_ms pre=%.2f network=%.2f post=%.2f gpu_total=%.2f cpu_frame=%.2f history=%u reset=%u nomotion=%u\n",r.probe_frames,r.probe_sum[0]/100,r.probe_sum[1]/100,r.probe_sum[2]/100,(r.probe_sum[0]+r.probe_sum[1]+r.probe_sum[2])/100,r.probe_cpu/100,r.probe_history,r.probe_reset,r.probe_nomotion);fclose(f);}for(auto&v:r.probe_sum)v=0;r.probe_cpu=0;r.probe_history=r.probe_reset=r.probe_nomotion=0;}}
   }catch(...){failed=true;throw;}
  }
 };

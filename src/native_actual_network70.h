@@ -8,6 +8,7 @@
 #include "native_vram_log.h"
 #include "native_game_submission.h"
 #include "native_network_timestamps.h"
+#include "native_lab_paths.h"
 #include <functional>
 
 // Actual processing extent, with externally supplied GPU RGB tiles and HWC base.
@@ -25,9 +26,7 @@ class NativeActualNetwork70 {
  // DLSS5_TEST_ISOLATE=<kind>[:index[:part]][,...] (test only): after the frame is read back, re-record one stage isolate_repeat times
  // between two timestamps; total/repeat is the stage's real GPU cost without top-of-pipe timestamp attribution. Output is garbage afterwards.
  std::string isolate;UINT isolate_repeat{200};NativeNetworkTimestamps isolate_timestamps;
- static std::vector<float>Read(const std::wstring&path){
-  std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)throw std::runtime_error("network coefficient missing");auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("network coefficient size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("network coefficient truncated");return v;
- }
+ static std::vector<float>Read(const std::wstring&path){return NativeReadF32(path,"network coefficient");}
 public:
  NativeActualNetwork70()=default;NativeActualNetwork70(const NativeActualNetwork70&)=delete;
  ~NativeActualNetwork70(){if(device)device->Release();}

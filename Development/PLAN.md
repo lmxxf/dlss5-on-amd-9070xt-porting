@@ -11,7 +11,15 @@
 
 - 块 4 和块 69 比同类 C32 块多 0.54ms，就是 `SetSkipFinish(false)` + `crop_needed` 那两步（tile 序 → raster f32）。消费者：块 4 → ds4（`PooledWork()`，已读 tile 序？）+ decoder skip4（`c32[3].Output()`）；块 69 → post 的 merge。看这三个消费者能不能直接读 tile 序/E4M3，把 crop 去掉或缩成一半。
 
-## 1b. C32 中间量 f16（已做，09-10 01:45：−1.9ms，fast35）。同样的账要算一遍多头/C512：中间量若都是 H() 过的，f16 化同样白捡
+## 1b. C32 中间量 f16（已做，09-10 01:45：−1.9ms，fast35）。多头/C512 查过：已是 E4M3 流或 token 太少，没油水
+
+## 1c. finish + rgb 头并进注意力收尾、post merge fold 的整数除法（已做，09-10 03:25：约 −1.5ms，fast36）
+
+## 下一批候选（按隔离表重排后，09-10 03:30）
+
+- dispatch 之间的空转仍约 3.5ms：只能靠合核减 dispatch 数——多头 FFN+proj0 合核（下面第 1 项）顺带每块少一次 drain。
+- post 的 FFN 仍 1.2 vs pre 0.63（同分辨率）：merge fold 的 gather 里还有 e4m3 解码 ×2 + 4 次 f16 往返，可试把 skip/low 的解码改成 4 字节一次 Load 出 4 个通道（lane 按 4 通道分工）。估 −0.3。
+- pre 的 FFN（mode 5 inline prefix）0.63、注意力 0.73：注意力 fast4 在全分辨率上占 pre 一半；没细看。
 
 ## 1. 多头 Swin 26 块 FFN+投影合核（量后上限 −0.8ms，两天）
 

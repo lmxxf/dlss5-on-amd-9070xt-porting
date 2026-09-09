@@ -1,4 +1,5 @@
 #pragma once
+#include "native_lab_paths.h"
 #include "native_vit_gather.h"
 #include "native_split_window.h"
 #include "native_decoder_tail69.h"
@@ -18,13 +19,7 @@ public:
              ID3D12Resource*skip22,ID3D12Resource*skip14,ID3D12Resource*skip8,
              ID3D12Resource*skip4,const std::wstring&dir,NativeMatrixWorkspace*workspace=nullptr){
   if(created)throw std::runtime_error("actual decoder already created");
-  auto read=[&](const std::wstring&name){
-   std::ifstream f((dir+L"\\"+name).c_str(),std::ios::binary|std::ios::ate);
-   if(!f)throw std::runtime_error("actual decoder coefficient missing");
-   auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error("actual decoder coefficient size");
-   std::vector<float>v(size_t(n)/4);f.seekg(0);
-   if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error("actual decoder coefficient truncated");return v;
-  };
+  auto read=[&](const std::wstring&name){return NativeReadF32(dir+L"\\"+name,"actual decoder coefficient");};
   auto packed=read(L"vit-to-hwc.i32");std::vector<UINT>map(packed.size());
   std::memcpy(map.data(),packed.data(),packed.size()*4);
   if(map.size()!=655360)throw std::runtime_error("actual decoder inverse extent");

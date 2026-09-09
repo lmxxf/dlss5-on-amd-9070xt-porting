@@ -1,4 +1,5 @@
 #pragma once
+#include "native_lab_paths.h"
 #include "native_block_skip.h"
 #include "native_vram_log.h"
 #include <fstream>
@@ -19,13 +20,7 @@ public:
   const UINT w=game_extent?120:32,h=game_extent?72:32;
   auto capacity=[&](ID3D12Resource*r,UINT64 values){if(r->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||r->GetDesc().Width<values*4)throw std::runtime_error("decoder tail buffer capacity");};
   capacity(input48,UINT64(w)*h*256);capacity(skip14,UINT64(w)*h*4*128);capacity(skip8,UINT64(w)*h*16*64);capacity(skip4,UINT64(w)*h*64*32);
-  auto read=[&](UINT block,const wchar_t*name){
-   auto path=dir+L"\\block"+std::to_wstring(block)+L"-"+name+L".f32";
-   std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);
-   if(!f)throw std::runtime_error("missing decoder tail coefficient");auto bytes=f.tellg();
-   if(bytes<=0||size_t(bytes)%4)throw std::runtime_error("decoder coefficient size");
-   std::vector<float>v(size_t(bytes)/4);f.seekg(0);if(!f.read((char*)v.data(),bytes))throw std::runtime_error("short decoder coefficient");return v;
-  };
+  auto read=[&](UINT block,const wchar_t*name){return NativeReadF32(dir+L"\\block"+std::to_wstring(block)+L"-"+name+L".f32","decoder tail coefficient");};
   auto*source=input48;
   for(UINT i=0;i<7;i++){c256[i].Create(d,source,w,h,NativeDecoderShift(49+i),read(49+i,L"ffn"),read(49+i,L"attention"),dir,false,256,false,workspace,i>0,i<6);source=c256[i].Output();}
   NativeVramLog(d,"tail c256x7");project56.Create(d,source,skip14,w*h,256,128,false,read(56,L"weights"),dir,true);
