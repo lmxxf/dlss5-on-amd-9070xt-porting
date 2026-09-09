@@ -1,4 +1,4 @@
-# Builds every shader of the fast chain into $Folder (flattened from the 76 nested run_*_network.ps1 runners in
+# Builds every shader of the fast chain into $Folder (flattened from the 77 nested run_*_network.ps1 runners in
 # Development/, in the same order, so the compiled set and the DLSS5_* runtime flags are identical to the game build)
 # and then runs the bench executable (native-network70-temporal.exe, see build-bench.sh). Needs the SM6.10 preview dxc.
 param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview')
@@ -7,6 +7,9 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_preblock_main8_network.ps1
+# FAST PATH: preblock finish writes Main as E4M3 bytes; post70 merge fold reads them (mode 7). Exact (Main was F()-quantized).
+$env:DLSS5_PREBLOCK_MAIN8='1'
 # ---- run_vit_qkv_fused_network.ps1
 # FAST PATH: ViT QKV projection + per-head normalize + E4M3 store in one kernel; the FP8 attention reads it directly
 # (drops the scalar normalize dispatch and the pack8 dispatch per layer).
