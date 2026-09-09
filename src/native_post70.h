@@ -21,11 +21,11 @@ class NativePost70 {
 public:
  NativePost70()=default;NativePost70(const NativePost70&)=delete;
  ~NativePost70(){for(auto*r:{main_input,skip_input,color_input,merged,output,coefficients[0],coefficients[1]})if(r)r->Release();if(root)root->Release();for(auto*p:pso)if(p)p->Release();}
- void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f,UINT shift=0){
+ void Create(ID3D12Device*d,ID3D12Resource*main,ID3D12Resource*skip,ID3D12Resource*color,UINT width,UINT height,const std::vector<float>&scales,const std::vector<float>&ffn,const std::vector<float>&attention,const std::vector<float>&head,const std::wstring&dir,float input_scale=.03125f,UINT shift=0,UINT skip_mode=4,UINT skip_raw_work_width=0){
   if(shift>3)throw std::runtime_error("post shift contract");
   if(main_input||!d||!main||!skip||!color||width<16||height<16||((width>512||height>512)&&!(width==1920&&height==1152))||width%16||height%16||scales.size()!=64||head.size()!=96)throw std::runtime_error("post70 contract");
   UINT64 pixels=UINT64(width)*height;
-  if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<pixels*32*4||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
+  if(main->GetDesc().Width<pixels*8*4||skip->GetDesc().Width<(skip_mode==7?pixels*32:pixels*32*4)||color->GetDesc().Width<pixels*4*4)throw std::runtime_error("post70 input capacity");
   main_input=main;skip_input=skip;color_input=color;for(auto*r:{main_input,skip_input,color_input})r->AddRef();geometry[0]=width;geometry[1]=height;std::memcpy(&geometry[2],&input_scale,4);
   merged=buffer(d,pixels*32*4);output=buffer(d,pixels*3*4);coefficients[0]=buffer(d,scales.size()*4,&scales);coefficients[1]=buffer(d,head.size()*4,&head);
   body.Create(d,merged,width,height,shift,ffn,attention,dir,true);
@@ -33,7 +33,9 @@ public:
   // (rgb only needs the raw tiles), rgb head indexes the tile-major raw work buffer directly (no crop).
   {const char*pd=std::getenv("DLSS5_POST70_DIRECT");if(pd&&std::strcmp(pd,"0")&&std::strcmp(pd,"1"))throw std::runtime_error("invalid post70 direct flag");direct=pd&&!std::strcmp(pd,"1");}
   {const char*mf=std::getenv("DLSS5_POST70_MERGE_FOLD");if(mf&&std::strcmp(mf,"0")&&std::strcmp(mf,"1"))throw std::runtime_error("invalid post70 merge fold flag");merge_fold=direct&&mf&&!std::strcmp(mf,"1");}
-  if(merge_fold){body.MapMerge(main_input,skip_input,coefficients[0]);body.SetCropNeeded(false);body.SetSkipFinish(true);}
+  // skip_raw_work_width!=0: skip is the preblock's unquantized raw tile buffer (DLSS5_PREBLOCK_DOWN_ONLY), mode 6 in the FFN.
+  if(skip_mode!=4&&!merge_fold)throw std::runtime_error("non-raster skip needs the post70 merge fold");
+  if(merge_fold){body.MapMerge(main_input,skip_input,coefficients[0],skip_mode,skip_raw_work_width);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   else if(direct){body.MapFromRaster(merged);body.SetCropNeeded(false);body.SetSkipFinish(true);}
   geometry[3]=body.WorkWidth();geometry[4]=body.ShiftX();geometry[5]=body.ShiftY();
   D3D12_ROOT_PARAMETER params[5]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}

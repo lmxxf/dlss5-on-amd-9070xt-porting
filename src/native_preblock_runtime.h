@@ -17,7 +17,7 @@ class NativePreblockRuntime {
  ID3D12RootSignature *root{},*finish_root{};
  ID3D12PipelineState* pso[4]{};
  ID3D12DescriptorHeap* heap[4]{};
- UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{},wave_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{},*mapped_source{};bool shared_c32{};UINT mapping[8]{};
+ UINT width{},height{};bool coalesced_finish{},recorded{},shared_raw{},wave_ffn{},wave_ffn_local{};ID3D12Resource*attention_local{},*main8{};ID3D12RootSignature*split_root{};ID3D12PipelineState*split_pso[4]{};bool split_attention{},fused_attention{},wave_attention{};bool blocked_ffn_raw_store{};ID3D12RootSignature*ffn_root{};ID3D12Resource*stage_input{},*mapped_source{};bool shared_c32{};UINT mapping[8]{};
  static ID3D12Resource*&SharedFfn(){static ID3D12Resource*r=nullptr;return r;}
  static ID3D12Resource*&SharedRaw(){static ID3D12Resource*r=nullptr;return r;}
  static UINT64&SharedBytes(){static UINT64 b=0;return b;}
@@ -47,13 +47,17 @@ class NativePreblockRuntime {
  }
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES a,D3D12_RESOURCE_STATES b){D3D12_RESOURCE_BARRIER x{};x.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;x.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,a,b};c->ResourceBarrier(1,&x);}
 public:
- ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(split_root)split_root->Release();for(auto*p:split_pso)if(p)p->Release();if(ffn_root)ffn_root->Release();if(stage_input)stage_input->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
+ ~NativePreblockRuntime(){if(test_prefix_readback)test_prefix_readback->Release();if(attention_local)attention_local->Release();if(main8)main8->Release();if(split_root)split_root->Release();for(auto*p:split_pso)if(p)p->Release();if(ffn_root)ffn_root->Release();if(stage_input)stage_input->Release();if(prefix_ffn_weights)prefix_ffn_weights->Release();for(auto*r:{ffn,raw,main,down,weights[0],weights[1],noise,temporal})if(r)r->Release();for(auto*p:pso)if(p)p->Release();for(auto*h:heap)if(h)h->Release();if(root)root->Release();if(finish_root)finish_root->Release();}
  NativePreblockRuntime()=default;NativePreblockRuntime(const NativePreblockRuntime&)=delete;NativePreblockRuntime& operator=(const NativePreblockRuntime&)=delete;
  void Create(ID3D12Device*d,ID3D12Resource*input,UINT w,UINT h,const std::vector<float>&fw,const std::vector<float>&aw,const std::wstring&shader_dir,bool live_profile,bool raw_features=false,const std::vector<float>*noise_table=nullptr,ID3D12Resource*temporal_input=nullptr){
   if(noise_table&&(raw_features||noise_table->size()!=size_t(3)*(1<<24)))throw std::runtime_error("invalid universal noise table");
   if(device||!d||!input||!w||!h||w%8||h%8||UINT64(w)*h/64>65535||fw.size()!=8736||aw.size()!=8225)throw std::runtime_error("invalid native preblock contract");
   if(temporal_input){if(!noise_table||raw_features||!live_profile||temporal_input->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||temporal_input->GetDesc().Width<UINT64(w)*h*16)throw std::runtime_error("temporal preblock contract");temporal=temporal_input;temporal->AddRef();}
   const wchar_t*finish_flag=_wgetenv(L"DLSS5_TEST_COALESCED_FINISH");if(finish_flag&&wcscmp(finish_flag,L"0")&&wcscmp(finish_flag,L"1"))throw std::runtime_error("invalid coalesced finish flag");coalesced_finish=finish_flag&&!wcscmp(finish_flag,L"1");
+  // FAST PATH (DLSS5_PREBLOCK_DOWN_ONLY): finish writes only the 2x2 pooled buffer; Main() is not produced (post70 reads RawTiles()).
+  {const wchar_t*dv=_wgetenv(L"DLSS5_PREBLOCK_DOWN_ONLY");if(dv&&wcscmp(dv,L"0")&&wcscmp(dv,L"1"))throw std::runtime_error("invalid preblock down-only flag");down_only=coalesced_finish&&noise_table!=nullptr&&dv&&!wcscmp(dv,L"1");}
+  // FAST PATH (DLSS5_PREBLOCK_MAIN8): finish writes Main() as E4M3 bytes (Main8()); post70 reads them (mode 7).
+  {const wchar_t*m8=_wgetenv(L"DLSS5_PREBLOCK_MAIN8");if(m8&&wcscmp(m8,L"0")&&wcscmp(m8,L"1"))throw std::runtime_error("invalid preblock main8 flag");main8_mode=coalesced_finish&&!down_only&&noise_table!=nullptr&&m8&&!wcscmp(m8,L"1");}
   const wchar_t*prefix_flag=_wgetenv(L"DLSS5_TEST_SPLIT_PREBLOCK_FFN");if(prefix_flag&&wcscmp(prefix_flag,L"0")&&wcscmp(prefix_flag,L"1"))throw std::runtime_error("invalid split preblock flag");prefix_wave=!raw_features&&noise_table&&prefix_flag&&!wcscmp(prefix_flag,L"1");
   const wchar_t*ffn_flag=_wgetenv(L"DLSS5_TEST_WAVE_C32_FFN");if(ffn_flag&&wcscmp(ffn_flag,L"0")&&wcscmp(ffn_flag,L"1"))throw std::runtime_error("invalid wave C32 FFN flag");wave_ffn=raw_features&&ffn_flag&&!wcscmp(ffn_flag,L"1");
   if(wave_ffn||prefix_wave)for(size_t i=512;i<8704;i++){uint32_t b;std::memcpy(&b,&fw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 FFN weight not exact half");}
@@ -65,8 +69,9 @@ public:
    // First creator sizes the pair with shift-padding headroom so padded full-resolution stages fit too.
    if(!SharedFfn()){UINT64 cap=UINT64(w+8)*(h+8)*32*4;SharedFfn()=Buffer(cap,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRaw()=Buffer(cap,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedBytes()=cap;}
    if(bytes>SharedBytes())throw std::runtime_error("shared C32 scratch smaller than this instance; create the largest instance first");
-   ffn=SharedFfn();ffn->AddRef();raw=SharedRaw();raw->AddRef();
-  }else{ffn=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}main=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);down=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+   // Down-only preblock: post70 reads this instance's raw tiles at the end of the frame, so they must not live in the shared scratch.
+   ffn=SharedFfn();ffn->AddRef();if(down_only){private_raw=true;raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}else{raw=SharedRaw();raw->AddRef();}
+  }else{ffn=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);raw=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}main=Buffer(bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(main8_mode)main8=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);down=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   const std::vector<float>* values[]={&fw,&aw};
   for(UINT i=0;i<2;i++){weights[i]=Buffer(values[i]->size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(weights[i]->Map(0,&none,&p));std::memcpy(p,values[i]->data(),values[i]->size()*4);weights[i]->Unmap(0,nullptr);}
   if(noise_table){noise=Buffer(noise_table->size()*4,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);void*p=nullptr;D3D12_RANGE none{};Check(noise->Map(0,&none,&p));std::memcpy(p,noise_table->data(),noise_table->size()*4);noise->Unmap(0,nullptr);}
@@ -111,7 +116,7 @@ public:
    // Root-descriptor binding for the blocked FFN so the matrix Store targets a raw UAV.
    D3D12_ROOT_PARAMETER rp[3]{};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].Descriptor={0,0};rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[1].Descriptor={1,0};rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[2].Descriptor={0,0};
    D3D12_ROOT_PARAMETER all[6]={rp[0],rp[1],rp[2],{},{},{}};all[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;all[3].Constants={0,0,13};
-   // Mode 4 merge fold: t2 = skip residual, t3 = merge coefficients (root SRVs, bound only when mapping[0]==4).
+   // Mode 4 merge fold: t2 = skip residual, t3 = merge coefficients (root SRVs, bound only when (mapping[0]==4||mapping[0]==6||mapping[0]==7)).
    all[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;all[4].Descriptor={2,0};all[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;all[5].Descriptor={3,0};
    D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=6;rd.pParameters=all;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&ffn_root)));rb->Release();if(re)re->Release();
   }
@@ -148,7 +153,7 @@ public:
     const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?L"\\native_wave_c32_fused_attention.cso":L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
     for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+names[i]).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
    }
-  }Heap(2,raw,bytes,main,bytes,down,bytes/4,true);
+  }Heap(2,raw,bytes,main8_mode?main8:main,main8_mode?bytes/4:bytes,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");
   const wchar_t* names[]={L"preblock_input_mix.hlsl",L"preblock_attention_core.hlsl",L"preblock_finish.hlsl"};
   auto count=std::to_string(UINT64(w)*h*32);
@@ -172,7 +177,7 @@ public:
   const wchar_t*local_ffn_file=blocked_ffn?L"\\native_wave_c32_ffn_blocked.cso":L"\\native_wave_c32_ffn_local.cso";
   if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+local_ffn_file).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=blocked_ffn_raw_store?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
   for(UINT i=0;i<3;i++){
-   ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_prefix)?D3DReadFileToBlob((shader_dir+L"\\native_wave_prefix.cso").c_str(),&code):(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?local_ffn_file:L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==2&&coalesced_finish)?"finish_coalesced":(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
+   ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_prefix)?D3DReadFileToBlob((shader_dir+L"\\native_wave_prefix.cso").c_str(),&code):(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?local_ffn_file:L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==2&&coalesced_finish)?(down_only?"finish_down":main8_mode?"finish_main8":"finish_coalesced"):(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
    if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"compile failed";if(error)error->Release();throw std::runtime_error(message);}
    if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:(i==0&&blocked_ffn_raw_store&&!prefix_wave)?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[i])));code->Release();
   }
@@ -182,14 +187,15 @@ public:
   if(shared_c32){
    if(SharedFfnReadable()){Barrier(c,ffn,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedFfnReadable()=false;}
    // Mode 3 mapping reads the (shared) raw tiles of the previous stage in the FFN; keep them readable until the attention stage.
-   if(SharedRawReadable()&&!(mapping[0]==3&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
-   if(recorded)for(auto*r:{main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-  }else if(recorded)for(auto*r:{ffn,raw,main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+   if(private_raw){if(recorded)Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
+   else if(SharedRawReadable()&&!(mapping[0]==3&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   if(recorded)for(auto*r:{main8_mode?main8:main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+  }else if(recorded)for(auto*r:{ffn,raw,main8_mode?main8:main,down})Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
    if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
-   if(stage==1&&shared_c32&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   if(stage==1&&shared_c32&&!private_raw&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(stage==1&&split_attention){
     c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,main->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,5,constants,0);
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?main:raw;}
@@ -202,10 +208,10 @@ public:
     c->SetPipelineState(split_pso[3]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);
     }
    }else if(stage==0&&blocked_ffn_raw_store&&!prefix_wave){
-    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if(mapping[0]==4){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
+    c->SetComputeRootSignature(ffn_root);c->SetComputeRootShaderResourceView(0,weights[0]->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,(mapped_source?mapped_source:stage_input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,ffn->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(3,13,constants,0);if((mapping[0]==4||mapping[0]==6||mapping[0]==7)){c->SetComputeRootShaderResourceView(4,merge_skip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(5,merge_coeff->GetGPUVirtualAddress());}c->SetPipelineState(pso[0]);UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);
    }else if(stage==0&&inline_prefix){
    }else{
-   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_prefix){UINT n=width*height/16;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
+   c->SetDescriptorHeaps(1,&heap[stage]);c->SetComputeRootSignature(stage==2?finish_root:root);c->SetComputeRootDescriptorTable(0,heap[stage]->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,13,constants,0);if(noise&&stage<2)c->SetComputeRootShaderResourceView(2,noise->GetGPUVirtualAddress());if(temporal&&stage<2)c->SetComputeRootShaderResourceView(3,temporal->GetGPUVirtualAddress());c->SetPipelineState(pso[stage]);if(stage==2&&coalesced_finish){UINT n=down_only?groups*8:main8_mode?groups*8:groups*32;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_prefix){UINT n=width*height/16;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&wave_ffn){UINT n=groups*4;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else if(stage==0&&shared_raw){UINT n=groups*8;c->Dispatch(n<65535?n:65535,(n+65534)/65535,1);}else c->Dispatch(groups,1,1);
    }
    if(stage==0&&prefix_wave){
     Barrier(c,raw,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);if(timer)timer->Mark(c,std::string(label)+"_prefix");
@@ -215,16 +221,16 @@ public:
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
   }
-  Barrier(c,main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){SharedFfnReadable()=true;SharedRawReadable()=true;}
+  Barrier(c,main8_mode?main8:main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){SharedFfnReadable()=true;if(!private_raw)SharedRawReadable()=true;}
  }
  void CapturePrefixForTest(ID3D12Resource*r){if(!prefix_wave||test_prefix_readback||!r||r->GetDesc().Width<4096)throw std::runtime_error("prefix capture test contract");D3D12_HEAP_PROPERTIES hp{};D3D12_HEAP_FLAGS flags{};Check(r->GetHeapProperties(&hp,&flags));if(hp.Type!=D3D12_HEAP_TYPE_READBACK)throw std::runtime_error("prefix capture requires readback");test_prefix_readback=r;r->AddRef();}
  ID3D12Resource* FfnTilesForTest()const{return ffn;}
  // FAST PATH: the FFN reads its input through a mapping instead of a pre-packed work buffer (see native_wave_c32_ffn_blocked.hlsl).
  ID3D12Resource*merge_skip{},*merge_coeff{};
- void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff,UINT src_w,UINT src_h,UINT sx,UINT sy){MapInput(low,4,src_w,src_h,sx,sy,0,0,0);merge_skip=skip;merge_coeff=coeff;}
+ void MapMerge(ID3D12Resource*low,ID3D12Resource*skip,ID3D12Resource*coeff,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT skip_mode=4,UINT psx=0,UINT psy=0,UINT pww=0){MapInput(low,skip_mode,src_w,src_h,sx,sy,psx,psy,pww);merge_skip=skip;merge_coeff=coeff;}
  void MapInput(ID3D12Resource*src,UINT mode,UINT src_w,UINT src_h,UINT sx,UINT sy,UINT psx,UINT psy,UINT pww){if(!blocked_ffn_raw_store||!wave_ffn_local)throw std::runtime_error("mapped C32 input requires the blocked raw-store FFN");mapped_source=src;UINT m[]={mode,src_w,src_h,sx,sy,psx,psy,pww};std::memcpy(mapping,m,sizeof(m));}
  bool RawStoreFfn()const{return blocked_ffn_raw_store;}
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
- bool skip_finish{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
- ID3D12Resource* Main()const{return main;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
+ bool skip_finish{},down_only{},main8_mode{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
+ ID3D12Resource* Main()const{return main;}bool DownOnly()const{return down_only;}bool Main8Mode()const{return main8_mode;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };
