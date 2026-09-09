@@ -130,7 +130,7 @@ public:
   std::string kind=isolate;UINT index=0,part=0;size_t colon=kind.find(':');if(colon!=std::string::npos){std::string rest=kind.substr(colon+1);kind=kind.substr(0,colon);size_t c2=rest.find(':');if(c2!=std::string::npos){part=UINT(std::stoul(rest.substr(c2+1)));rest=rest.substr(0,c2);}index=UINT(std::stoul(rest));}
   auto multihead=[&](NativeC64Shift*layers,UINT count){if(index>=count)throw std::runtime_error("isolate index");layers[index].SetIsolatePart(part);return [&,index](ID3D12GraphicsCommandList*c){layers[index].Record(c);};};
   std::function<void(ID3D12GraphicsCommandList*)>record;
-  if(kind=="pre")record=[&](ID3D12GraphicsCommandList*c){pre.Record(c,seed,false,false);};
+  if(kind=="pre"){pre.SetIsolateStage(part);record=[&](ID3D12GraphicsCommandList*c){pre.Record(c,seed,false,false);};}
   else if(kind=="c32"){if(index>=4)throw std::runtime_error("isolate index");record=[&](ID3D12GraphicsCommandList*c){c32[index].Record(c);};}
   else if(kind=="c64")record=multihead(c64,4);else if(kind=="c128")record=multihead(c128,6);else if(kind=="c256")record=multihead(c256,8);
   else if(kind=="ds"){NativeC32Downsample*d=index==4?&ds4:index==8?&ds8:index==14?&ds14:index==22?&ds22:nullptr;if(!d)throw std::runtime_error("isolate ds index");record=[d](ID3D12GraphicsCommandList*c){d->Record(c);};}
@@ -141,14 +141,14 @@ public:
   else if(kind=="decoder"){if(index>=decoder.StageCount())throw std::runtime_error("isolate index");record=[&](ID3D12GraphicsCommandList*c){decoder.RecordStage(c,index);};}
   else if(kind=="tail"){decoder.Tail().SetIsolatePart(index,part);record=[&,index](ID3D12GraphicsCommandList*c){decoder.Tail().RecordBlock(c,index);};}
   else if(kind=="tailproj")record=[&,index](ID3D12GraphicsCommandList*c){decoder.Tail().RecordProjection(c,index);};
-  else if(kind=="post")record=[&](ID3D12GraphicsCommandList*c){post.Record(c);};
+  else if(kind=="post"){post.SetIsolatePart(part);record=[&](ID3D12GraphicsCommandList*c){post.Record(c);};}
   else throw std::runtime_error("isolate kind: "+kind);
   isolate_timestamps.Reset();
   submit.Submit([&](ID3D12GraphicsCommandList*c){isolate_timestamps.Mark(c,"isolate_start");D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;for(UINT r=0;r<isolate_repeat;r++){record(c);c->ResourceBarrier(1,&b);}isolate_timestamps.Mark(c,"isolate_end");isolate_timestamps.Resolve(c);});
   submit.Flush();std::vector<double>ms;if(!isolate_timestamps.Intervals(submit.TimestampFrequency(),ms)||ms.size()!=1)throw std::runtime_error("isolate timestamps");
   std::printf("network_isolate stage=%s repeat=%u total_ms=%.3f per_ms=%.4f\n",isolate.c_str(),isolate_repeat,ms[0],ms[0]/isolate_repeat);std::fflush(stdout);
   for(auto*l:{c64,c128,c256})for(UINT i=0;i<8&&!(l==c64&&i>=4)&&!(l==c128&&i>=6);i++)l[i].SetIsolatePart(0);
-  if(kind=="tail")decoder.Tail().SetIsolatePart(index,0);
+  if(kind=="tail")decoder.Tail().SetIsolatePart(index,0);pre.SetIsolateStage(0);post.SetIsolatePart(0);
  }
  ID3D12Resource*Output()const{return post.Output();}
  /* test only (DLSS5_TEST_DUMP_BLOCK4): block 4 finish outputs for CPU comparison */

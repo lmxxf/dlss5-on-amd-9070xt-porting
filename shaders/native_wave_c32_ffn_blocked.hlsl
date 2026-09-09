@@ -73,6 +73,14 @@ int source_index(uint p){
 // Mode 9 (NATIVE_C32_LOW_RAW=2): skip as mode 7, low = the previous C32 stage's main8 (E4M3 raster over its shifted work grid,
 // mapping[5..7] = shift and work width): that stage keeps a main8 finish and skips the crop.
 float e4m3_to_float(uint b){uint e=(b>>3)&15u,m=b&7u;float v=e==0?float(m)/512.0:asfloat(((e+120u)<<23)|(m<<20));return (b&0x80u)?-v:v;}
+// FAST PATH: the low-resolution index of one token (modes 4/7: cropped f32 raster; 8: previous stage's raw tiles; 9: its main8 raster),
+// computed once per token on the owning lane and broadcast -- the per-element integer divisions by src_width were the merge fold's cost.
+int low_index(int src){
+ if(src<0)return -1;uint p=uint(src)/32,lx=(p%src_width)/2,ly=(p/src_width)/2;
+ if(map_mode==8){uint px=lx+prev_shift_x,py=ly+prev_shift_y;return int((((py/8)*(prev_work_width/8)+px/8)*64+(py%8)*8+px%8)*32);}
+ if(map_mode==9)return int(((ly+prev_shift_y)*prev_work_width+lx+prev_shift_x)*32);
+ return int((ly*(src_width/2)+lx)*32);
+}
 int skip_index(uint p){
  uint tile=p/64,x=(tile%(width/8))*8+p%8,y=(tile/(width/8))*8+(p%64)/8;
  int sx=int(x)-int(shift_x),sy=int(y)-int(shift_y);
@@ -159,9 +167,9 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
     ELEM_LOOP(in0){in0.Set(i,half_round(in0.Get(i)));in1.Set(i,half_round(in1.Get(i)));}
    }else{
    [branch]if(map_mode==4||map_mode==6||map_mode==7||map_mode==8||map_mode==9){
-    const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));const int mine_skip=(map_mode==6&&t<16)?skip_index(first+t):0;
+    const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));const int mine_skip=(map_mode==6&&t<16)?skip_index(first+t):0;const int mine_low=t<16?low_index(mine):0;
     [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);int ssrc=WaveReadLaneAt(mine_skip,j);float v=0;
-     if(src>=0){uint p=uint(src)/32,low=(((p/src_width)/2)*(src_width/2)+(p%src_width)/2)*32+t;float sk;if(map_mode==8){uint px=(p%src_width)/2+prev_shift_x,py=(p/src_width)/2+prev_shift_y;low=(((py/8)*(prev_work_width/8)+px/8)*64+(py%8)*8+px%8)*32+t;}else if(map_mode==9){low=(((p/src_width)/2+prev_shift_y)*prev_work_width+(p%src_width)/2+prev_shift_x)*32+t;}if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(NATIVE_C32_HALF_STREAM?skip_h(uint(ssrc)+t):asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(NATIVE_C32_HALF_STREAM?input_h(low):input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
+     if(src>=0){uint low=uint(WaveReadLaneAt(mine_low,j))+t;float sk;if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(NATIVE_C32_HALF_STREAM?skip_h(uint(ssrc)+t):asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(NATIVE_C32_HALF_STREAM?input_h(low):input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
      raw[j*32+t]=v;}
    }else{
    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:((NATIVE_C32_HALF_STREAM&&map_mode==3)?input_h(uint(src)+t):input_at(uint(src)+t));}

@@ -201,6 +201,7 @@ public:
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
   const UINT constants[]={seed,width,height,local_oracle?1u:0u,temporal_enabled?1u:0u,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};const UINT groups=width*height/64;
   for(UINT stage=0;stage<3;stage++){
+   if(isolate_stage&&isolate_stage!=stage+1)continue; /* DLSS5_TEST_ISOLATE part: timing only, other stages skipped (barriers included) */
    if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
    if(stage==1&&shared_c32&&!private_raw&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
    if(stage==1&&split_attention){
@@ -241,7 +242,7 @@ public:
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
  /* DLSS5_C32_SKIP8: the next C32 stage created (block 4) also takes the main8 finish; set/cleared by the network around its Create. */
  static bool&PendingMain8(){static bool v=false;return v;}
- bool half_stream{};UINT64 stream_bytes{};bool skip_finish{},down_only{},main8_mode{},attn_out8{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
+ bool half_stream{};UINT64 stream_bytes{};UINT isolate_stage{};void SetIsolateStage(UINT s){isolate_stage=s;}bool skip_finish{},down_only{},main8_mode{},attn_out8{},private_raw{},wave_prefix{},attn_fast3{},attn_fast4{},ffn_fast3{},inline_prefix{};void SetSkipFinish(bool v){skip_finish=v;}
  // Main() is allocated on first use: with MAIN8, chain-raw or skip-finish nobody reads it (saves one full f32 raster per stage).
  ID3D12Resource* Main()const{if(!main){auto*self=const_cast<NativePreblockRuntime*>(this);self->main=self->Buffer(buffer_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}return main;}bool DownOnly()const{return down_only;}bool HalfStream()const{return half_stream;}bool Main8Mode()const{return main8_mode;}bool AttnOut8()const{return attn_out8;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };
