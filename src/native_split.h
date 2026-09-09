@@ -70,6 +70,7 @@ public:
     else{for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("split projection weight not exact half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
     std::memcpy(packed.data()+matrix/2,scales[k],512*4);}
     project_weights[k]=Buffer(d,packed.size()*4,&packed);
+    if(k==0){weights[1]->Release();weights[1]=Buffer(d,16);} // the f32 ffwd-projection copy is only read by the non-wave path
    }
   }
   const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
