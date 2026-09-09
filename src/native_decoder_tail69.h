@@ -1,4 +1,5 @@
 #pragma once
+#include "native_block_skip.h"
 #include <fstream>
 #include "native_vit_linear.h"
 #include "native_c64_shift.h"
@@ -44,9 +45,10 @@ public:
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(!output)throw std::runtime_error("decoder tail not created");
   auto mark=[&](const char*name){if(timer)timer->Mark(c,name);};
-  for(auto&layer:c256)layer.Record(c);mark("tail49_55");project56.Record(c);mark("tail56_project");body56.Record(c);mark("tail56_body");
-  for(auto&layer:c128)layer.Record(c);mark("tail57_61");project62.Record(c);mark("tail62_project");body62.Record(c);mark("tail62_body");
-  for(auto&layer:c64)layer.Record(c);mark("tail63_65");project66.Record(c);mark("tail66_project");body66.Record(c);mark("tail66_body");
+  auto run=[&](auto&layer,UINT block){if(NativeSkipBlock(block))NativeSkipCopy(c,layer.Input(),layer.Output(),block);else layer.Record(c);};
+  for(UINT i=0;i<7;i++)run(c256[i],49+i);mark("tail49_55");project56.Record(c);mark("tail56_project");body56.Record(c);mark("tail56_body");
+  for(UINT i=0;i<5;i++)run(c128[i],57+i);mark("tail57_61");project62.Record(c);mark("tail62_project");body62.Record(c);mark("tail62_body");
+  for(UINT i=0;i<3;i++)run(c64[i],63+i);mark("tail63_65");project66.Record(c);mark("tail66_project");body66.Record(c);mark("tail66_body");
   for(auto&layer:c32)layer.Record(c);mark("tail67_69");
  }
  ID3D12Resource*Output()const{return output;}

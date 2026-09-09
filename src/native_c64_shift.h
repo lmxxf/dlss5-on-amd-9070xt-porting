@@ -42,5 +42,5 @@ public:
   if(fused){body.Record(c,timer,"c64_probe");Barrier(c,output,false);recorded=true;return;}
   pass(0,input,padded,geometry[2]*geometry[3]);Barrier(c,padded,false);if(timer)timer->Mark(c,"c64_probe_pack");body.Record(c,timer,"c64_probe");pass(1,body.Output(),output,geometry[0]*geometry[1]);Barrier(c,output,false);if(timer)timer->Mark(c,"c64_probe_crop");recorded=true;
  }
- ID3D12Resource* Output()const{return output;}
+ ID3D12Resource* Output()const{return output;}ID3D12Resource* Input()const{return input;}
 };

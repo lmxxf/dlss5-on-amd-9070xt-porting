@@ -2,6 +2,7 @@
 #include "native_vit_gather.h"
 #include "native_split_window.h"
 #include "native_decoder_tail69.h"
+#include "native_block_skip.h"
 
 // Captured 1920x1152 processing extent. All sources remain resident on the GPU.
 class NativeActualDecoder69 {
@@ -46,7 +47,7 @@ public:
   if(!created||!c||stage>=StageCount())throw std::runtime_error("actual decoder stage");
   if(stage==0)inverse.Record(c);
   else if(stage==1)entry.Record(c);
-  else if(stage<10)split[stage-2].Record(c);
+  else if(stage<10){if(NativeSkipBlock(40+stage-2))NativeSkipCopy(c,split[stage-2].Input(),split[stage-2].Output(),40+stage-2);else split[stage-2].Record(c);}
   else if(stage==10)up48.Record(c);
   else if(stage==11)body48.Record(c);
   else tail.Record(c,timer);

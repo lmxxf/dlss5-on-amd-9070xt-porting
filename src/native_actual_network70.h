@@ -4,6 +4,7 @@
 #include "native_vit_block.h"
 #include "native_actual_decoder69.h"
 #include "native_post70.h"
+#include "native_block_skip.h"
 #include "native_game_submission.h"
 #include "native_network_timestamps.h"
 
@@ -71,16 +72,17 @@ public:
    submit.Submit([&](ID3D12GraphicsCommandList*c){
     timestamps.Mark(c,"start");pre.Record(c,seed,false,temporal_enabled,profile?&timestamps:nullptr,"preblock_detail");timestamps.Mark(c,"preblock");
     for(UINT i=0;i<4;i++){c32[i].Record(c,profile&&i==0?&timestamps:nullptr);if(profile)timestamps.Mark(c,"enc_c32_"+std::to_string(i));}ds4.Record(c);timestamps.Mark(c,"encoder1_4");
-    for(UINT i=0;i<4;i++)c64[i].Record(c,profile&&i==0?&timestamps:nullptr);ds8.Record(c);timestamps.Mark(c,"encoder5_8");
-    for(auto&s:c128)s.Record(c);ds14.Record(c);timestamps.Mark(c,"encoder9_14");
-    for(auto&s:c256)s.Record(c);ds22.Record(c);timestamps.Mark(c,"encoder15_22");
-    for(UINT i=0;i<8;i++)split[i].Record(c,profile&&i==0?&timestamps:nullptr);timestamps.Mark(c,"encoder23_30_body");head.Record(c);timestamps.Mark(c,"encoder_head");bridge.Record(c);timestamps.Mark(c,"encoder23_head");
+    auto run=[&](auto&layer,UINT block,NativeNetworkTimestamps*t){if(NativeSkipBlock(block))NativeSkipCopy(c,layer.Input(),layer.Output(),block);else layer.Record(c,t);};
+    for(UINT i=0;i<4;i++)run(c64[i],5+i,profile&&i==0?&timestamps:nullptr);ds8.Record(c);timestamps.Mark(c,"encoder5_8");
+    for(UINT i=0;i<6;i++)run(c128[i],9+i,nullptr);ds14.Record(c);timestamps.Mark(c,"encoder9_14");
+    for(UINT i=0;i<8;i++)run(c256[i],15+i,nullptr);ds22.Record(c);timestamps.Mark(c,"encoder15_22");
+    for(UINT i=0;i<8;i++)run(split[i],23+i,profile&&i==0?&timestamps:nullptr);timestamps.Mark(c,"encoder23_30_body");head.Record(c);timestamps.Mark(c,"encoder_head");bridge.Record(c);timestamps.Mark(c,"encoder23_head");
    });
    // FAST PATH (DLSS5_BATCH_SUBMITS): one command list per ViT layer and per few decoder stages instead of one per chunk
    // (~100 lists/frame -> ~25); the in-list barriers already order the dispatches. CPU recording overhead, not GPU time.
    const bool batch=batch_submits>0;const UINT vit_per_list=batch_submits>=2?4u:1u,decoder_per_list=batch_submits>=2?(decoder.StageCount()+1)/2:3u;
    auto record_vit=[&](ID3D12GraphicsCommandList*c,UINT b){auto&layer=vit[b];for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));}};
-   if(batch)for(UINT b0=0;b0<8;b0+=vit_per_list)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT b=b0;b<b0+vit_per_list;b++)record_vit(c,b);});
+   if(batch)for(UINT b0=0;b0<8;b0+=vit_per_list)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT b=b0;b<b0+vit_per_list;b++){if(NativeSkipBlock(31+b))NativeSkipCopy(c,vit[b].Input(),vit[b].Output(),31+b);else record_vit(c,b);}});
    else for(UINT b=0;b<8;b++){auto&layer=vit[b];
     for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));});}
    if(batch){const UINT n=decoder.StageCount();for(UINT s0=0;s0<n;s0+=decoder_per_list)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT stage=s0;stage<std::min(n,s0+decoder_per_list);stage++){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));}});}
