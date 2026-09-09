@@ -1,3 +1,9 @@
+## 2026-09-09 08:55 fast19 已部署（光之朱雀）
+
+- 计划 3 第 1 项：C32 注意力 fast4（`DLSS5_C32_ATTN_FAST4`，一组两窗、8 wave 全做 QKV、softmax 行和不出 wave、组同步 2 次）。测试台逐位 = fast3，3 轮 A/B 各段最小值之和 35.59→34.09（−1.5ms）。坑：qkv8 下标要用组内 token 号（第一版用全局号→28dB）。提交 bd5e5c8。
+- 第 6 项：`DLSS5_BATCH_SUBMITS=2`（ViT 4 层一列、decoder 两列，约 6 列/帧）；测试台不挂、输出相同。下级 runner 改为“未设则 =1”。
+- 游戏：fast19 = fast18 + 上面两项，DLL `23ea7d8f…`（源 `D:\DLSSNR-Lab\attn-fast4`，链顶 `run_batch_submits2_network.ps1`），探针仍开着以便量 cpu_frame；待 Zero 进游戏看帧率/画面。
+
 # 2026-09-07 收工现场：正确画面慢速展示
 
 ## 2026-09-08 05:15 光之朱雀（Hikari no Suzaku）接手性能优化（闇 GPT 额度见底）
