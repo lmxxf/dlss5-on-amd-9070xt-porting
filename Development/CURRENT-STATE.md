@@ -1,3 +1,9 @@
+## 2026-09-09 23:25 fast33：显存 3.75GB（光之朱雀）
+
+- fast32：每 60 帧对所有 ≥32MB 的 default-heap buffer 调 `MakeResident`（`DLSS5_MAKE_RESIDENT_EVERY`，失败记 make_resident_failed）。fast31 下 Zero 又遇一次火车站出口 13fps 不回升（Shared 533MB，游戏进程提交 15.0GB）。Zero："波动后续慢慢调"。
+- 显存：映射输入的 C32 stage 不再分配 packed（16 字节替身；Heap 的 SRV/UAV 大小 clamp 到资源宽度）；merge fold 的 post70 不分配 merged。4.84→3.75GB，exact。fast33 = fast32 flag + 新 DLL `e62a3225…`。
+- 下一步：单块反复跑取平均的量法（时间戳归属不可信）→ 多头 Swin FFN+投影合核；ViT expand+contract、升采样投影各 0.3。
+
 ## 2026-09-09 23:03 掉帧收敛：显存之争的三层处理（光之朱雀）
 
 - 关系坐实：被挤到系统内存的量 ↔ 帧率单调（399MB→20、523→16、737→12），是我们每帧整块扫的 buffer 被降级。游戏进程 13.3GB + 系统 1 + 网络 4.8 ≈ 19 > 16，怎么收都塞不下。
