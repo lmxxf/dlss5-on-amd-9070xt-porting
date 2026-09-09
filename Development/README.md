@@ -1,6 +1,6 @@
 # 297 期模型结构分析资料
 
-> **现场以 [CURRENT-STATE.md](CURRENT-STATE.md) 为准（最新在最上面；2026-09-09 tag 0.05：游戏 24～25fps，测试台 33.9ms，闪烁已收）。** 三份文档分工：`CURRENT-STATE.md` = 当前状态与每刀记录（唯一持续更新的）；`porting-worklog.md` = 早期逐步移植流水（历史，不再追加）；本 README = 资料索引与结构分析。计划见 `next-steps-plan-3.md`。
+> **现场以 [CURRENT-STATE.md](CURRENT-STATE.md) 为准（最新在最上面；2026-09-09 tag 0.05：游戏 24～25fps，测试台 33.9ms，闪烁已收）。** 三份文档分工：`CURRENT-STATE.md` = 当前状态与每刀记录（唯一持续更新的）；`porting-worklog.md` = 早期逐步移植流水（历史，不再追加）；本 README = 资料索引与结构分析。计划见 `PLAN.md`。
 
 ## 当前结果
 
