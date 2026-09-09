@@ -53,6 +53,13 @@ float FeatureAt(uint index){return feature[index];}
 groupshared uint otile[BLOCK_N*64];
 #endif
 RWByteAddressBuffer output:register(u0);
+#ifndef NATIVE_FP8_COPY
+#define NATIVE_FP8_COPY 0
+#endif
+#if NATIVE_FP8_COPY
+// FAST PATH (split copy8): also store the quantized output as E4M3 bytes ([token][MATRIX_CHANNELS]) so the C512 pack dispatch is skipped.
+RWByteAddressBuffer copy8:register(u1);
+#endif
 cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint raster_height;uint pad_x;uint pad_y;}
 #ifndef MAP_FEATURE
 #define MAP_FEATURE 0
@@ -180,6 +187,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
   for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);int dst=raster_index(first+rc.x);if(dst>=0)output.Store(uint(dst+int((gid.y*BLOCK_N+n)*16+rc.y))*4,asuint(acc[n].Get(i)));}
 #else
   acc[n].Store(output,(first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16)*4,MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_FP8_COPY
+  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(copy8,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
 #endif
  }
 #if NATIVE_FP8_STORE && MAP_OUTPUT
