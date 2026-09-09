@@ -24,7 +24,7 @@ done
 ln -s /usr/x86_64-w64-mingw32/include/windows.h "$probe_build_dir/Windows.h"
 x86_64-w64-mingw32-g++ -w -std=c++17 -O2 -shared -static -DNATIVE_ORDER_NEURAL "${probe_defines[@]}" \
   -I"$probe_build_dir" -I"$probe_minhook_dir/include" -I"$probe_reshade_include" \
-  "$probe_source_dir/native_submission_order_probe.cpp" "${probe_objects[@]}" \
+  "$probe_source_dir/../src/native_submission_order_probe.cpp" "${probe_objects[@]}" \
   -o "$probe_output" -ld3d12 -ldxgi -ld3dcompiler -ldxguid
 sha256sum "$probe_output"
 echo 'Diagnostic single-frame DLL built; not deployed or accepted as a temporal renderer.'
