@@ -1,6 +1,6 @@
 # 297 期模型结构分析资料
 
-> **2026-09-07 20:10 当前现场以 [CURRENT-STATE.md](CURRENT-STATE.md) 为准。** 已在游戏内自动加载慢速连续reset-history展示DLL，用户确认观感；完整时序、新帧独立核验与实时性能仍未完成。源码已提交，二进制/权重/截图及未提交实验封存在被Git忽略的`release/`，具体位置和回退办法见该页。下方保留历史记录，不作为最新验收结论。
+> **现场以 [CURRENT-STATE.md](CURRENT-STATE.md) 为准（最新在最上面；2026-09-09 tag 0.05：游戏 24～25fps，测试台 33.9ms，闪烁已收）。** 三份文档分工：`CURRENT-STATE.md` = 当前状态与每刀记录（唯一持续更新的）；`porting-worklog.md` = 早期逐步移植流水（历史，不再追加）；本 README = 资料索引与结构分析。计划见 `next-steps-plan-3.md`。
 
 ## 当前结果
 
