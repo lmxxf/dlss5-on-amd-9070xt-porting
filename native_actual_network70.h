@@ -16,7 +16,7 @@ class NativeActualNetwork70 {
  NativeC32Downsample ds4,ds8,ds14,ds22,head;
  NativeSplitWindow split[8];NativeVitGather bridge;NativeVitBlock vit[8];
  NativeActualDecoder69 decoder;NativePost70 post;
- bool batch_submits{};
+ UINT batch_submits{}; // 0 = one list per chunk, 1 = per ViT layer / 3 decoder stages, 2 = 4 ViT layers / half the decoder per list
  ID3D12Device*device{};bool ready{},failed{},temporal_bound{};
  NativeNetworkTimestamps timestamps;bool profile{};
  static std::vector<float>Read(const std::wstring&path){
@@ -56,7 +56,7 @@ public:
   auto rawmap=read(L"hwc-to-vit.i32");if(rawmap.size()!=655360)throw std::runtime_error("network bridge map size");std::vector<UINT>map(rawmap.size());std::memcpy(map.data(),rawmap.data(),map.size()*4);bridge.Create(d,head.Output(),map,dir);source=bridge.Output();
   for(UINT i=0;i<8;i++){auto p=L"block"+std::to_wstring(31+i)+L"-";vit[i].Create(d,source,640,read(p+L"expand.f32"),read(p+L"contract.f32"),read(p+L"qkv.f32"),read(p+L"projection.f32"),dir);source=vit[i].Output();}
   decoder.Create(d,source,split[7].Output(),c256[7].Output(),c128[5].Output(),c64[3].Output(),c32[3].Output(),dir,share_matrix?&matrix_workspace:nullptr);
-  {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs&&!wcscmp(bs,L"1");}
+  {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1")&&wcscmp(bs,L"2"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs?UINT(bs[0]-L'0'):0u;}
   post.Create(d,decoder.Output(),pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift);ready=true;
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
@@ -78,11 +78,12 @@ public:
    });
    // FAST PATH (DLSS5_BATCH_SUBMITS): one command list per ViT layer and per few decoder stages instead of one per chunk
    // (~100 lists/frame -> ~25); the in-list barriers already order the dispatches. CPU recording overhead, not GPU time.
-   const bool batch=batch_submits;
-   for(UINT b=0;b<8;b++){auto&layer=vit[b];
-    if(batch)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));}});
-    else for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));});}
-   if(batch){const UINT n=decoder.StageCount();for(UINT s0=0;s0<n;s0+=3)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT stage=s0;stage<std::min(n,s0+3);stage++){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));}});}
+   const bool batch=batch_submits>0;const UINT vit_per_list=batch_submits>=2?4u:1u,decoder_per_list=batch_submits>=2?(decoder.StageCount()+1)/2:3u;
+   auto record_vit=[&](ID3D12GraphicsCommandList*c,UINT b){auto&layer=vit[b];for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));}};
+   if(batch)for(UINT b0=0;b0<8;b0+=vit_per_list)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT b=b0;b<b0+vit_per_list;b++)record_vit(c,b);});
+   else for(UINT b=0;b<8;b++){auto&layer=vit[b];
+    for(UINT stage=0;stage<5;stage++)for(UINT chunk=0;chunk<layer.StageChunks(stage);chunk++)submit.Submit([&](ID3D12GraphicsCommandList*c){layer.RecordStageChunk(c,stage,chunk);if(chunk+1==layer.StageChunks(stage))timestamps.Mark(c,"vit"+std::to_string(31+b)+"_stage"+std::to_string(stage));});}
+   if(batch){const UINT n=decoder.StageCount();for(UINT s0=0;s0<n;s0+=decoder_per_list)submit.Submit([&](ID3D12GraphicsCommandList*c){for(UINT stage=s0;stage<std::min(n,s0+decoder_per_list);stage++){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));}});}
    else for(UINT stage=0;stage<decoder.StageCount();stage++)submit.Submit([&](ID3D12GraphicsCommandList*c){if(stage==12)timestamps.Mark(c,"decoder_tail_begin");decoder.RecordStage(c,stage,profile?&timestamps:nullptr);timestamps.Mark(c,"decoder_stage"+std::to_string(stage));});
    submit.Submit([&](ID3D12GraphicsCommandList*c){post.Record(c,profile?&timestamps:nullptr);timestamps.Mark(c,"post70");timestamps.Resolve(c);});
    if(profile){submit.Flush();timestamps.Report(submit.TimestampFrequency());}
