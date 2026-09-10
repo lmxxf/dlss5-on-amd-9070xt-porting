@@ -1,3 +1,17 @@
+## 2026-09-10 09:05 fast37：C32 家族的 FFN 并进注意力核（光之朱雀）
+
+- `DLSS5_C32_FUSED_FFN=1`（build `DLSS5_BUILD_C32_FUSED_FFN`，`run_c32_fused_ffn_network.ps1`，核在 `shaders/native_c32_ffn_fused.hlsli`，由 fast4 注意力 `NATIVE_C32_FUSED_FFN` 包进来）：pre、块 1–4、67–69、post 共 9 个 stage 的 FFN 在注意力 dispatch 的第一段算——每 wave 正好 16 token = FFN 的一组，输出两个 16×16 累加器直接 Cast 成 QKV 的 A 操作数，同时留在寄存器当投影残差（和 zp 的元素布局一致，`ffn_out[cr].Get(i)`）。ffn 缓冲不写不读，每 stage 少一次 dispatch。
+- LDS 全部复用 wave 私有区：ex 切片放 f16 输入 tile / mode 5 特征（所有映射源都是 H() 过的，f16 无损），pw8 切片放 E4M3 输入（prefix8），自家 qkv8 行放 hidden 层——分两半各 64 通道（1KB），contract 的 g 顺序 0..3 不变。支持 map mode 0/1/2/3/5/9（4/6/7/8 抛错）。
+- **同一 dispatch 读上一级 raw 又写本级 raw**：所有 C32 段共用一对 scratch，合核后 ffn 闲置，改成相邻实例交替用 SharedRaw/SharedFfn 当 raw（`SharedParity()`，`Readable(resource)` 按 buffer 记状态），显存净零。
+- 数值：**对 exact 41.96 不变；对参考链逐位相同**。参考链 = `run_c32_precise_chain_network.ps1`（build-only `DLSS5_BUILD_C32_PRECISE_CHAIN`）：激活多项式、merge fold 的和、注意力残差三处 `precise`。原因见坑 1。
+- 量（隔离，ms）：pre 1.66→1.53，块 1–3 0.42–0.47→0.33，块 4/69 0.445→0.385，67–68 0.42→0.33，post 2.24→1.78；**C32 家族 6.95→5.75（−1.2）**；整帧 A/B 三轮 min-of-means 37.3→35.4（−1.9，少 9 次 dispatch 的空转也进来了）。测试台 sum-of-isolates 约 24.8→23.6。
+- 坑：
+  1. **FMA 收缩是上下文相关的**：同一段 `g*(abs(g)*c1+c2)+c3` 在独立 FFN 核里被合成 FMA，搬进注意力核后没合；`mad()` 也不保证——探针版（FFN 后直接 return）合了、全核不合。所以逐位对照要两边都 `precise`，新参考链就是这么来的。以后**凡是要逐位的标量尾链，两边都显式 precise**，别指望"同样的源码同样的编译"。
+  2. 昨晚清盘把 `matrix-probe\matrix_probe.exe`（runner 链底层的能力探针）删了；从 `Development/d3d12_shader_model_probe.cpp` 重编（`-DDLSS5_AGILITY_PROBE -DDLSS5_AGILITY_VERSION=721`，旁边要有 `D3D12\D3D12Core.dll`）放回去。
+  3. `scripts/bench.ps1` 之前只补了编译行没补顶层 runner（skip8/low_main8/half_stream/epilogue 的 env 缺失），这次补齐并加 fused_ffn/precise_chain；`bench-norebuild.ps1` 改成从它生成（`tools/make-norebuild.sh`）。
+  4. 探针钩子：`DLSS5_BUILD_C32_FUSED_FFN_PROBE=1|2`（FFN 输出写进 aux=raw：1 跳过注意力，2 继续——pre/块 4/69 的收尾不写 raw 所以留得住），配 dump 6 + isolate 抓。
+- 游戏：fast37 = fast36 + C32_FUSED_FFN=1，DLL `62183aac…`，源目录 `ffn-fused`；回退 `epi` + fast36。D 盘只留 epi / ffn-fused。
+
 ## 2026-09-10 03:25 fast36：finish 和 rgb 头并进注意力收尾（光之朱雀）
 
 - 先用 pre/post 的分段隔离（`pre:0:1..3`、`post:0:1..4`）看清：pre = FFN 0.67 / 注意力 0.73 / **finish_main8 0.68**；post = **FFN 1.69** / 注意力 0.71 / **rgb 头 0.77**（时间戳时代以为 <0.05）。
