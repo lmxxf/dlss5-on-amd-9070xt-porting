@@ -20,7 +20,7 @@ network in the loop (GPU network time ≈ 30 ms per frame). Image output matches
 | `shaders/` | The HLSL compute kernels of the fast chain. Wave-matrix kernels are `native_wave_*.hlsl`; the `NATIVE_*` defines select the fast paths. |
 | `scripts/` | `build-addon.sh` (mingw-w64 cross build of the add-on), `build-bench.sh`, `bench.ps1` (compiles every shader of the fast chain with the preview `dxc` and runs the bench), `deploy_fast.ps1` / `update-manifest.ps1` (install into the game's asset folder), `game-flags.txt` (the runtime flag set the game currently runs with). |
 | `tools/` | `compare_fast_output.py` (PSNR against the exact chain), `flicker_stats.py` (frame-to-frame analysis of the in-game dumps). |
-| `Development/` | Everything produced on the way: reverse-engineering notes, per-block reference implementations and validation scripts, the 76 nested experiment runners the fast chain grew out of, plans and the day-by-day state log (`CURRENT-STATE.md`). Kept as history; not needed to build. |
+| `Development/` | Everything produced on the way: reverse-engineering notes, per-block reference implementations and validation scripts, the 76 nested experiment runners the fast chain grew out of, plans and state logs. `DevHistory.md` is the single consolidated development history; the original per-period documents are under `history/`. Not needed to build. |
 
 ## How it works, briefly
 

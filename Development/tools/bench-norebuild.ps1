@@ -21,7 +21,7 @@ $env:DLSS5_BUILD_VIT_TILED='1'
 $env:DLSS5_VIT_TILED='1'
 # ---- run_fused_ffn_proj0_network.ps1
 # FAST PATH: multihead Swin blocks' FFN (expand+contract) and FFN output projection in one dispatch (26 blocks; kernels compiled in run_fp8_activations). Exact against the precise chain.
-# Not in the game build (no measurable gain, see CURRENT-STATE 09-10 10:40): opt in with DLSS5_FUSED_FFN_PROJ0=1 before running.
+# Not in the game build (no measurable gain, see Development/DevHistory.md, 09-10 10:40): opt in with DLSS5_FUSED_FFN_PROJ0=1 before running.
 if($env:DLSS5_FUSED_FFN_PROJ0 -eq '1'){$env:DLSS5_BUILD_FUSED_FFN_PROJ0='1'}
 # ---- run_c32_fused_ffn_network.ps1
 # FAST PATH: the C32 FFN runs inside the fast4 attention dispatch (pre, blocks 1-4, 67-69, post); the ffn scratch becomes the second raw buffer. Exact.
