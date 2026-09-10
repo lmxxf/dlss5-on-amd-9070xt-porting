@@ -2,7 +2,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <d3d12.h>
-#include <d3d12sdklayers.h>
 #include <atomic>
 #include <cstdio>
 #include "reshade.hpp"
@@ -297,8 +296,10 @@ static bool on_create_device(reshade::api::device_api api,uint32_t&){
  ID3D12SDKConfiguration*configuration=nullptr;HRESULT get=get_interface?get_interface(clsid,IID_PPV_ARGS(&configuration)):HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND),set=E_ABORT,experimental=E_ABORT;
  if(SUCCEEDED(get)){set=configuration->SetSDKVersion(721,".\\DLSS5-D3D12-721\\");configuration->Release();}
  /* (after SetSDKVersion so the Agility folder's d3d12SDKLayers.dll is used) Diagnostic (D:\DLSSNR-Lab\enable-d3d12-debug.txt): the D3D12 debug layer (d3d12SDKLayers.dll from the Agility folder); its messages are dumped when initialization fails. */
+#if NATIVE_HAVE_SDKLAYERS
  if(GetFileAttributesW(NativeLabPath(L"enable-d3d12-debug.txt").c_str())!=INVALID_FILE_ATTRIBUTES){ID3D12Debug*dbg=nullptr;HRESULT bh=D3D12GetDebugInterface(IID_PPV_ARGS(&dbg));if(SUCCEEDED(bh)&&dbg){dbg->EnableDebugLayer();dbg->Release();}
   if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu debug_layer hr=%08x\n",GetCurrentProcessId(),unsigned(bh));fclose(f);}}
+#endif
  if(SUCCEEDED(set)){const GUID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};experimental=D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr);}
  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu sdk721_before_device get=%08x set=%08x experimental=%08x\n",GetCurrentProcessId(),unsigned(get),unsigned(set),unsigned(experimental));fclose(f);}
  return false;

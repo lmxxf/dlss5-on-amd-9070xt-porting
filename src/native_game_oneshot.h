@@ -1,5 +1,11 @@
 #pragma once
+/* d3d12sdklayers.h is missing from older mingw-w64 (Ubuntu 22.04); the debug-layer / InfoQueue diagnostics are then compiled out */
+#if __has_include(<d3d12sdklayers.h>)
 #include <d3d12sdklayers.h>
+#define NATIVE_HAVE_SDKLAYERS 1
+#else
+#define NATIVE_HAVE_SDKLAYERS 0
+#endif
 #include "native_lab_paths.h"
 #include "native_game_frame.h"
 void NativeReleaseReservedVram();
@@ -57,7 +63,9 @@ class NativeGameOneShot {
    Log("ready","await explicit PID/request-id; history_reset=1; not temporal acceptance");
    self->phase.store(2,std::memory_order_release);
   }catch(const std::exception&e){Log("initialization_failed",e.what());{ID3D12Device*d=nullptr;if(self->queue&&SUCCEEDED(self->queue->GetDevice(IID_PPV_ARGS(&d)))){char t[64];snprintf(t,sizeof t,"%08x",unsigned(d->GetDeviceRemovedReason()));Log("device_removed_reason",t);
+#if NATIVE_HAVE_SDKLAYERS
      {ID3D12InfoQueue*q=nullptr;if(SUCCEEDED(d->QueryInterface(IID_PPV_ARGS(&q)))&&q){UINT64 n=q->GetNumStoredMessages();if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-d3d12-debug.txt").c_str(),L"ab")){fprintf(f,"pid=%lu stored_messages=%llu\n",GetCurrentProcessId(),(unsigned long long)n);for(UINT64 i=n>40?n-40:0;i<n;i++){SIZE_T len=0;q->GetMessage(i,nullptr,&len);std::vector<char>buf(len+1);auto*m=reinterpret_cast<D3D12_MESSAGE*>(buf.data());if(len&&SUCCEEDED(q->GetMessage(i,m,&len)))fprintf(f,"  [%u/%u] %s\n",unsigned(m->Severity),unsigned(m->ID),m->pDescription?m->pDescription:"");}fclose(f);}q->Release();}}
+#endif
      NativeDredData*dred=nullptr;if(SUCCEEDED(d->QueryInterface(NativeDredIid,reinterpret_cast<void**>(&dred)))&&dred){NativeDredBreadcrumbsOutput bc{};NativeDredPageFaultOutput pf{};HRESULT h1=dred->GetAutoBreadcrumbsOutput(&bc),h2=dred->GetPageFaultAllocationOutput(&pf);
       if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-dred.txt").c_str(),L"ab")){fprintf(f,"pid=%lu breadcrumbs_hr=%08x pagefault_hr=%08x fault_va=%llx\n",GetCurrentProcessId(),unsigned(h1),unsigned(h2),(unsigned long long)pf.va);
        if(SUCCEEDED(h2)){for(auto*n=pf.existing;n;n=n->next)fprintf(f,"  existing alloc type=%u name=%ls\n",unsigned(n->type),n->name?n->name:L"");for(auto*n=pf.freed;n;n=n->next)fprintf(f,"  freed alloc type=%u name=%ls\n",unsigned(n->type),n->name?n->name:L"");}
