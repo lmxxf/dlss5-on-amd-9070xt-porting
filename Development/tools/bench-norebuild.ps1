@@ -7,6 +7,13 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_vit_fused_ffn_network.ps1
+# NULL RESULT (kept off): ViT expand+contract in one dispatch with the hidden layer in LDS is bit-exact but ~2x slower per block
+# (0.35-0.39ms vs 0.08+0.10): 20-40 groups x 16 waves leave ~1 wave per SIMD and every K step is a dependent MMA chain, so the
+# latency is exposed; halving the weight traffic (32-token groups) changed nothing, so it is not bandwidth. See DevHistory 09-11.
+$env:DLSS5_BUILD_VIT_FUSED_FFN='0'
+$env:DLSS5_BUILD_VIT_FUSED_TOK32='0'
+$env:DLSS5_VIT_FUSED_FFN='0'
 # ---- run_decoder_out16_network.ps1
 # FAST PATH: the block 66 upsample projection writes its raster as f16 (values are on the f16 grid); block 66's C32 body reads it as f16 (map mode 10). Bit-exact.
 $env:DLSS5_BUILD_DECODER_OUT16='1'
@@ -172,6 +179,10 @@ $env:DLSS5_VIT_BLOCK_M='4'
 $BlockN=4
 foreach($Name in 'DLSS5_FAST_ACCUMULATE','DLSS5_FAST_EPILOGUE','DLSS5_FP8_OPERANDS','DLSS5_FP8_HIDDEN','DLSS5_FP8_LDS'){Set-Item -Path "Env:$Name" -Value '1'}
 # FAST PATH: ViT operand copies (pack8/pack16) and packed-input kernels (expand, qkv, projection reduce incl. split-K).
+# FAST PATH (DLSS5_BUILD_VIT_FUSED_FFN): expand+contract fused (needs the tiled E4M3 weights and packed input of this chain).
+if($env:DLSS5_BUILD_VIT_FUSED_FFN -eq '1'){
+ if($env:DLSS5_BUILD_VIT_TILED -ne '1'){throw "ViT fused FFN needs DLSS5_BUILD_VIT_TILED"}
+}
 $env:DLSS5_VIT_PACKED_INPUT='1'
 $env:DLSS5_VIT_BLOCK_M=if($env:DLSS5_VIT_BLOCK_M){$env:DLSS5_VIT_BLOCK_M}else{'1'}
 # ---- run_split_ffwd_waves4_network.ps1

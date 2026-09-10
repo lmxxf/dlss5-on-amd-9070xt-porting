@@ -7,6 +7,13 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_vit_fused_ffn_network.ps1
+# NULL RESULT (kept off): ViT expand+contract in one dispatch with the hidden layer in LDS is bit-exact but ~2x slower per block
+# (0.35-0.39ms vs 0.08+0.10): 20-40 groups x 16 waves leave ~1 wave per SIMD and every K step is a dependent MMA chain, so the
+# latency is exposed; halving the weight traffic (32-token groups) changed nothing, so it is not bandwidth. See DevHistory 09-11.
+$env:DLSS5_BUILD_VIT_FUSED_FFN='0'
+$env:DLSS5_BUILD_VIT_FUSED_TOK32='0'
+$env:DLSS5_VIT_FUSED_FFN='0'
 # ---- run_decoder_out16_network.ps1
 # FAST PATH: the block 66 upsample projection writes its raster as f16 (values are on the f16 grid); block 66's C32 body reads it as f16 (map mode 10). Bit-exact.
 $env:DLSS5_BUILD_DECODER_OUT16='1'
@@ -194,6 +201,12 @@ foreach($Name in 'DLSS5_FAST_ACCUMULATE','DLSS5_FAST_EPILOGUE','DLSS5_FP8_OPERAN
 # FAST PATH: ViT operand copies (pack8/pack16) and packed-input kernels (expand, qkv, projection reduce incl. split-K).
 & $Dxc -I $Inc -T cs_6_10 -E pack8 -HV 2021 -enable-16bit-types -O3 -D "NATIVE_VIT_TILED=$(if($env:DLSS5_BUILD_VIT_TILED -eq '1'){1}else{0})" native_vit_pack.hlsl -Fo native_vit_pack8.cso
 if($LASTEXITCODE -ne 0){throw 'pack8 compilation failed'}
+# FAST PATH (DLSS5_BUILD_VIT_FUSED_FFN): expand+contract fused (needs the tiled E4M3 weights and packed input of this chain).
+if($env:DLSS5_BUILD_VIT_FUSED_FFN -eq '1'){
+ if($env:DLSS5_BUILD_VIT_TILED -ne '1'){throw "ViT fused FFN needs DLSS5_BUILD_VIT_TILED"}
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "NATIVE_VIT_FUSED_TOK32=$(if($env:DLSS5_BUILD_VIT_FUSED_TOK32 -eq '1'){1}else{0})" native_wave_vit_ffn_fused.hlsl -Fo native_wave_vit_ffn_fused.cso
+ if($LASTEXITCODE -ne 0){throw 'ViT fused FFN compilation failed'}
+}
 & $Dxc -I $Inc -T cs_6_10 -E pack16 -HV 2021 -enable-16bit-types -O3 -D "NATIVE_VIT_TILED=$(if($env:DLSS5_BUILD_VIT_TILED -eq '1'){1}else{0})" native_vit_pack.hlsl -Fo native_vit_pack16.cso
 if($LASTEXITCODE -ne 0){throw 'pack16 compilation failed'}
 & $Dxc -I $Inc -T cs_6_10 -E expand -HV 2021 -enable-16bit-types -O3 -D VIT_EXPAND=1 -D "BLOCK_N=$BlockN" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_LDS -eq '1'){1}else{0})" -D "NATIVE_FP8_HIDDEN=$(if($env:DLSS5_FP8_HIDDEN -eq '1'){1}else{0})" -D NATIVE_PACKED_INPUT=1 -D "NATIVE_VIT_TILED=$(if($env:DLSS5_BUILD_VIT_TILED -eq '1'){1}else{0})" native_wave_vit_blocked.hlsl -Fo native_wave_vit_expand_packed.cso
