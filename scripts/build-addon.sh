@@ -25,7 +25,12 @@ ln -s /usr/x86_64-w64-mingw32/include/windows.h "$probe_build_dir/Windows.h"
 # Older mingw-w64 (Ubuntu 22.04: gcc 10, win32 thread model, mingw-w64 8): std::mutex needs the -posix variant of the compiler,
 # GetTickCount64 / SRW locks need _WIN32_WINNT >= Vista, and d3d12.h lacks ID3D12SDKConfiguration (build-addon-oneclick.sh drops
 # newer headers into $DLSS5_EXTRA_INCLUDE, searched first).
-probe_cxx=x86_64-w64-mingw32-g++;if [ "$("$probe_cxx" -dumpversion | cut -d. -f1)" -lt 13 ] && "$probe_cxx" -v 2>&1 | grep -q "Thread model: win32" && command -v x86_64-w64-mingw32-g++-posix >/dev/null; then probe_cxx=x86_64-w64-mingw32-g++-posix; fi
+probe_cxx=x86_64-w64-mingw32-g++
+probe_gcc_major=$("$probe_cxx" -dumpversion | sed 's/[^0-9].*//')
+if [ "${probe_gcc_major:-0}" -lt 13 ] && "$probe_cxx" -v 2>&1 | grep -q "Thread model: win32"; then
+  if command -v x86_64-w64-mingw32-g++-posix >/dev/null; then probe_cxx=x86_64-w64-mingw32-g++-posix
+  else echo "gcc $probe_gcc_major with the win32 thread model has no std::mutex: sudo apt install g++-mingw-w64-x86-64-posix" >&2; exit 2; fi
+fi
 probe_extra_include=();[ -n "${DLSS5_EXTRA_INCLUDE:-}" ] && probe_extra_include=(-I"$DLSS5_EXTRA_INCLUDE")
 "$probe_cxx" -w -std=c++17 -O2 -shared -static -D_WIN32_WINNT=0x0A00 -DNATIVE_ORDER_NEURAL "${probe_defines[@]}" \
   "${probe_extra_include[@]}" -I"$probe_build_dir" -I"$probe_minhook_dir/include" -I"$probe_reshade_include" \
