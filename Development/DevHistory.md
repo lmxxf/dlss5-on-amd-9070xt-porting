@@ -288,6 +288,10 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 - 17:40 fast42：解码器入口 / 三段 2× 升采样投影的收尾（`DLSS5_BUILD_DECODER_FAST`，逐位相同）：16×16 tile 先进 LDS，按 token→dx→4 通道 quad 的顺序 float4 连续写、残差/scale Load4、F() 换位元版（原来每个输出元素两次 log2/exp2 版 F + 逐元素散写）：proj62 −0.06、proj66 −0.03，整帧约 −0.1。试过的两个数值改动都不值：硬件 H 再 −0.08 但改位（PSNR 41.96 不变）；"残差已在 E4M3 格点"不成立（56/62 的 skip 是 f16 值）。三段现在是带宽型（proj66 读写 140MB f32 ≈ 0.21ms），再降要输出 f16 并改 C32/多头块首块的读法（估 −0.2）。PLAN 里"升采样投影是标量核"是旧记录，早就是 wave 核了。
 - 17:45 全景（decfast，同批，机器慢态）：整帧 sum-of-mins 36.3。多头 33 块 14.6（C256 编码 3.1 / 解码 2.8，C128 2.6 / 2.2，C64 2.0 / 1.9，每块约 0.44）；C32 家族 9.4（pre 2.84、post 2.90 最大的两个单段，1–3 1.9，67–69 1.8）；C512+ViT 约 5；其余小段。布局类的刀已基本收完，剩下的都在核内部的标量尾巴和延迟，需要指令级 profiler（RGP）才看得见钱在哪。
 
+- 18:00 **指令级视角打通**（工具见 `tools/README.md`）：RDTS 免安装；RGP 无界面抓取要 (a) 测试台有 swapchain（`DLSS5_TEST_PRESENT=1`，composition swapchain，结束前多停 30 秒传 trace）、(b) 跑在交互桌面会话（`schtasks /it`），SSH 会话建不了 swapchain；dispatch 模式抓不到（没有帧边界不结束）。`rga -s dx12` 不认 SM6.10 DXIL，但 .rgp 里带每个 pipeline 的完整 PAL ELF，`rga -s bin` 能反汇编——`isa-stats.py` 一条龙。cso 的 DXBC hash 全是占位符（预览 dxc 不签名），核只能靠代码常量认。
+  - **发现 1：时钟**。RGP 抓取时驱动把时钟锁峰值，同一测试台整帧 27.4ms（平时 36）——下午"机器慢 4ms"就是时钟状态，游戏里网络+游戏 GPU 满载时时钟跑到多少未知，值得查（AMD 软件的性能面板 / 功耗上限）。
+  - **发现 2：C32 合核溢出**。C32 注意力+FFN 合核（除 pre 外 8 个 C32 段都用）：静态 2.6 万条指令、140KB 代码、VGPR 128 且 **scratch 896 字节（寄存器溢出到显存，112 条 scratch 指令散在 5785～19739 行）**、2261 个 s_wait、712 个转换指令；活跃寄存器只在 softmax exp 位映射那 49 条指令冲到 128，其余 <96。不带 FFN 的 C32 注意力（pre/post 尾巴）也溢出 512。多头/C512/ViT 各核都不溢出。下一刀：把 C32 核的峰值压到 96 以下（exp 段的逐元素 global_load 表读、fast4 两窗同时持有的累加器）让溢出消失。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
@@ -433,7 +437,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 4. ~~post merge fold 4 通道 Load~~（fast41，−0.1；post 段 2.90 vs pre 2.81 基本持平了）。
 5. dispatch 之间空转约 3.5ms：只能靠合核压（对带宽型段）。
 6. ViT expand+contract 合核 −0.3。升采样投影输出改 f16（值本来就是 H()），下游 C32 首块 / 多头首块读 f16：估 −0.2（fast42 之后三段已是带宽型）。
-6b. **指令级 profiler**：装 AMD Radeon GPU Profiler（RGP）看 C32 pre/post（各 2.9）和多头块（0.44/块）的核内部——布局类的刀收完了，剩下 24ms 里钱在标量尾巴和延迟，没有 profiler 只能瞎猜。
+6b. ~~指令级 profiler~~ 已打通（09-10 18:00）。待做：(a) C32 合核消溢出（VGPR 峰值 128→<96）；(b) 查游戏内 GPU 时钟（RGP 锁峰值时 27.4 vs 36）；(c) 让 Zero 用 RGP 界面看一次事件时间线，把 pipeline hash 和耗时对上。
 7. 显存与波动：PoolSize 6000→5000 或贴图降档；C512 16 块 result 共享 200MB；shared ffn/raw 已 f16；decoder entry+split8 331MB 里 entry 的 f32 权重。
 8. 网络约化/蒸馏（写作线，周级）：九块跳过版 36.5dB −2ms 等 Zero 看画面；蒸馏 = exact 链当老师、DLL 每帧 dump 当数据，难点是 71 块可反向传播 torch 模型 + FP8 假量化 + 算力。
 9. 浪人崛起验收（上面「当前状态」）；通用化正路是冒充 NGX 的 `nvngx_dlss.dll`（OptiScaler 那条），周级，另一个项目。
