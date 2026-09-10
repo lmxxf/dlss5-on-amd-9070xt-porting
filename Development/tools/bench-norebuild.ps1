@@ -7,6 +7,9 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_decoder_fast_network.ps1
+# FAST PATH: decoder entry / upsample projection epilogue: LDS-staged tile, float4 coalesced writes, bit-level F (no log2/exp2). Bit-exact.
+$env:DLSS5_BUILD_DECODER_FAST='1'
 # ---- run_c32_merge4_network.ps1
 # FAST PATH: post70 merge fold in the fused C32 FFN prologue reads 4 channels per 4-byte load (4 passes instead of 16). Build-only, bit-exact.
 $env:DLSS5_BUILD_C32_MERGE4='1'

@@ -285,6 +285,9 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 16:30 fast41：post70 merge fold（fused C32 FFN 序言里的 mode 9）每 lane 一次 4 字节 Load 出 4 通道、系数 Load4，16 趟改 4 趟（build 宏 `DLSS5_BUILD_C32_MERGE4`，逐位相同）：post −0.09，整帧 −0.1。只换 cso，DLL/flag 沿用 fast40。
 
+- 17:40 fast42：解码器入口 / 三段 2× 升采样投影的收尾（`DLSS5_BUILD_DECODER_FAST`，逐位相同）：16×16 tile 先进 LDS，按 token→dx→4 通道 quad 的顺序 float4 连续写、残差/scale Load4、F() 换位元版（原来每个输出元素两次 log2/exp2 版 F + 逐元素散写）：proj62 −0.06、proj66 −0.03，整帧约 −0.1。试过的两个数值改动都不值：硬件 H 再 −0.08 但改位（PSNR 41.96 不变）；"残差已在 E4M3 格点"不成立（56/62 的 skip 是 f16 值）。三段现在是带宽型（proj66 读写 140MB f32 ≈ 0.21ms），再降要输出 f16 并改 C32/多头块首块的读法（估 −0.2）。PLAN 里"升采样投影是标量核"是旧记录，早就是 wave 核了。
+- 17:45 全景（decfast，同批，机器慢态）：整帧 sum-of-mins 36.3。多头 33 块 14.6（C256 编码 3.1 / 解码 2.8，C128 2.6 / 2.2，C64 2.0 / 1.9，每块约 0.44）；C32 家族 9.4（pre 2.84、post 2.90 最大的两个单段，1–3 1.9，67–69 1.8）；C512+ViT 约 5；其余小段。布局类的刀已基本收完，剩下的都在核内部的标量尾巴和延迟，需要指令级 profiler（RGP）才看得见钱在哪。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
@@ -338,6 +341,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 | C512 FFWD 权重 tile / 输出 E4M3 tile 直读 | 0 / 每块 −0.06 | ≈−0.8 | fast39 |
 | C512 mapped + FP8 stream（去 pack/crop/QKV pack） | 每块 −0.02 | ≈−0.3，显存 −380MB | fast40 |
 | post merge fold 4 通道一次 Load | post −0.09 | ≈−0.1 | fast41 |
+| 解码器投影收尾 float4 连续写 + 位元 F | proj62 −0.06 / proj66 −0.03 | ≈−0.1 | fast42 |
 
 ---
 
@@ -409,7 +413,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 ## 5. 当前状态（截至 2026-09-10 12:10）
 
-- **剑星游戏里装的**：fast41 = fast40 + build 宏 C32_MERGE4（cso 来自 `merge4`），DLL `681801b2…`（fast40 的）、flag 文件 `native-game-flags-fast40.txt`；回退 fast40（`stream8` 目录）。Zero 实测 fast40 静止 36fps。跳块 {42,43,46} 在链里（40.66dB）。
+- **剑星游戏里装的**：fast42 = fast40 + build 宏 C32_MERGE4 + DECODER_FAST（cso 来自 `decfast`），DLL `681801b2…`（fast40 的）、flag 文件 `native-game-flags-fast40.txt`；回退 fast40（`stream8` 目录）。Zero 实测 fast40 静止 36fps。跳块 {42,43,46} 在链里（40.66dB）。
 - **帧率**：fast33 实测 29fps（网络 GPU 约 30.7ms + 游戏 6～7ms，GPU 满载）；fast38 Zero 实测 33～34fps，一般场景 35 上下。换区/下车仍会掉几秒（显存之争）。
 - **测试台**（`stream8`，fast40 flag）：09-10 下午机器整体比上午慢约 4ms、原因未明（GPU 空闲、驱动仍是预览版、无 Splashtop），sum-of-mins 36.5（同批 fast38 基线 37.5）；上午 fast38 是 min-of-means 34.0 / sum-of-mins 33.6；单核隔离合计约 23.6 之后再减 fast38 的 2.4；PSNR 对 exact 41.96（fast36 起，fast37/38 逐位不变）；网络显存 3.75GB。
 - **0.07 发布包** = fast36 已发（网盘）。
@@ -428,7 +432,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 3. ~~C512 家族激活~~：fast39（FFWD→投影 0 E4M3 tile，−0.8）+ fast40（mapped + FP8 stream，−0.3，显存 −380MB）已做。剩下的小尾巴：注意力输出 result[2] 仍是 `[token][512]` E4M3（512B 步长），投影 1 的 A 直读；FFWD 每个 group 都重新 stage 一遍 16×512 输入（8 倍冗余读）。估 −0.1～0.2，先不动。
 4. ~~post merge fold 4 通道 Load~~（fast41，−0.1；post 段 2.90 vs pre 2.81 基本持平了）。
 5. dispatch 之间空转约 3.5ms：只能靠合核压（对带宽型段）。
-6. ViT contract 提速 −0.6（已被 fast38 tile 吃掉大半）；expand+contract 合核 −0.3 其次。升采样投影三段 wave 化（proj56/62/66 = 0.13/0.31/0.56，标量核，估 −0.7；proj62 tile 试过反而慢）。
+6. ViT expand+contract 合核 −0.3。升采样投影输出改 f16（值本来就是 H()），下游 C32 首块 / 多头首块读 f16：估 −0.2（fast42 之后三段已是带宽型）。
+6b. **指令级 profiler**：装 AMD Radeon GPU Profiler（RGP）看 C32 pre/post（各 2.9）和多头块（0.44/块）的核内部——布局类的刀收完了，剩下 24ms 里钱在标量尾巴和延迟，没有 profiler 只能瞎猜。
 7. 显存与波动：PoolSize 6000→5000 或贴图降档；C512 16 块 result 共享 200MB；shared ffn/raw 已 f16；decoder entry+split8 331MB 里 entry 的 f32 权重。
 8. 网络约化/蒸馏（写作线，周级）：九块跳过版 36.5dB −2ms 等 Zero 看画面；蒸馏 = exact 链当老师、DLL 每帧 dump 当数据，难点是 71 块可反向传播 torch 模型 + FP8 假量化 + 算力。
 9. 浪人崛起验收（上面「当前状态」）；通用化正路是冒充 NGX 的 `nvngx_dlss.dll`（OptiScaler 那条），周级，另一个项目。
