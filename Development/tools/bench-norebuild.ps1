@@ -7,6 +7,9 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_c32_bias_tile_network.ps1
+# NULL RESULT (kept off): C32 attention softmax bias as one accumulator-layout load per tile — the driver emits the same 32 per-lane scattered loads (identical ISA, spill unchanged), so no gain.
+$env:DLSS5_BUILD_C32_BIAS_TILE='0'
 # ---- run_decoder_fast_network.ps1
 # FAST PATH: decoder entry / upsample projection epilogue: LDS-staged tile, float4 coalesced writes, bit-level F (no log2/exp2). Bit-exact.
 $env:DLSS5_BUILD_DECODER_FAST='1'

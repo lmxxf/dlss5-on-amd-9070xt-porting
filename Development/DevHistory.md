@@ -294,6 +294,10 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 19:10 **停电重启后测试台 24.4ms（中位，min 23.8）**，同一条 fast42 链下午是 36、昨天 fast38 是 34。驱动仍是预览版。也就是说这台机 GPU 之前几天一直处在降频态（RGP 锁峰值时的 27.4 也是这个方向的旁证），此前记录的整帧绝对值全部偏大约 9ms，只有同批相对比较可信。**纪律：每次量之前先跑一遍基线，不在 24 档（>30）就先查时钟再量。** 游戏内是否同样受影响待 Zero 看。
 
+- 20:10 C32 softmax 偏置改矩阵 Load（`NATIVE_C32_BIAS_TILE`）：逐位相同但**零收益**——新 profile 里 p87 的 ISA 逐条一样（累加器布局的 Load 在硬件上就是每 lane 8 个散读，和逐元素 W_BIAS 一回事），scratch 896 仍在。溢出要消得动结构（偏置表进 LDS：+16KB 占用率减半，未试）。代码留着默认关。
+- 20:00 黑帧探针（`DLSS5_BLACK_PROBE=1`，DLL fast42p）：每帧统计网络输出（非有限值数 / |v|>1.5 数 / 最大 / 均值），异步读回不 Flush，输出两帧环形副本，异常时自动 dump 到 `logs\black-<帧>-*`。1.8 万帧没触发；顺带学到：网络输出均值 0.33、最大 1.0，**是完整画面不是残差**，黑帧的触发条件该是"均值骤降"（待改）。Zero 决定这游戏抓不到就先放下，换游戏再说。
+- 19:30 显存之争实锤：掉到 25fps 时专用显存 14.7GB 顶满、693MB 被挤到系统内存；贴图"非常高"→"高"立刻回 36。包的说明改成硬要求。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
@@ -419,7 +423,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 ## 5. 当前状态（截至 2026-09-10 12:10）
 
-- **剑星游戏里装的**：fast42 = fast40 + build 宏 C32_MERGE4 + DECODER_FAST（cso 来自 `decfast`），DLL `681801b2…`（fast40 的）、flag 文件 `native-game-flags-fast40.txt`；回退 fast40（`stream8` 目录）。Zero 实测 fast40 静止 36fps。跳块 {42,43,46} 在链里（40.66dB）。
+- **剑星游戏里装的**：fast42p = fast42 + 黑帧探针，DLL `f56b9eef…`、flag 文件 `native-game-flags-fast42-blackprobe.txt`，cso 来自 `decfast`（D 盘只剩这一个链目录）；回退：`native-game-fast40.addon64` + `native-game-flags-fast40.txt`。Zero 实测 fast40 静止 36fps。跳块 {42,43,46} 在链里（40.66dB）。
 - **帧率**：fast33 实测 29fps（网络 GPU 约 30.7ms + 游戏 6～7ms，GPU 满载）；fast38 Zero 实测 33～34fps，一般场景 35 上下。换区/下车仍会掉几秒（显存之争）。
 - **测试台**（`decfast`，fast42）：09-10 19:10 停电重启后整帧中位 24.4 / min 23.8；之前几天的 33～37 是机器降频态的数字；单核隔离合计约 23.6 之后再减 fast38 的 2.4；PSNR 对 exact 41.96（fast36 起，fast37/38 逐位不变）；网络显存 3.75GB。
 - **0.07 发布包** = fast36 已发（网盘）。
@@ -439,7 +443,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 4. ~~post merge fold 4 通道 Load~~（fast41，−0.1；post 段 2.90 vs pre 2.81 基本持平了）。
 5. dispatch 之间空转约 3.5ms：只能靠合核压（对带宽型段）。
 6. ViT expand+contract 合核 −0.3。升采样投影输出改 f16（值本来就是 H()），下游 C32 首块 / 多头首块读 f16：估 −0.2（fast42 之后三段已是带宽型）。
-6b. ~~指令级 profiler~~ 已打通（09-10 18:00）。待做：(a) C32 合核消溢出（VGPR 峰值 128→<96）；(b) 查游戏内 GPU 时钟（RGP 锁峰值时 27.4 vs 36）；(c) 让 Zero 用 RGP 界面看一次事件时间线，把 pipeline hash 和耗时对上。
+6b. ~~指令级 profiler~~ 已打通（09-10 18:00）。待做：(a) C32 合核消溢出——换写法无效（20:10），要动结构（偏置表进 LDS / 减少同时在飞的 s[4] 累加器）；(b) ~~时钟~~ 是降频态，重启后 24.4，游戏里也回 36；(c) 让 Zero 用 RGP 界面看一次事件时间线，把 pipeline hash 和耗时对上（Zero 说等某个游戏从头到尾出问题再说，不急）。
 7. 显存与波动：PoolSize 6000→5000 或贴图降档；C512 16 块 result 共享 200MB；shared ffn/raw 已 f16；decoder entry+split8 331MB 里 entry 的 f32 权重。
 8. 网络约化/蒸馏（写作线，周级）：九块跳过版 36.5dB −2ms 等 Zero 看画面；蒸馏 = exact 链当老师、DLL 每帧 dump 当数据，难点是 71 块可反向传播 torch 模型 + FP8 假量化 + 算力。
 9. 浪人崛起验收（上面「当前状态」）；通用化正路是冒充 NGX 的 `nvngx_dlss.dll`（OptiScaler 那条），周级，另一个项目。
