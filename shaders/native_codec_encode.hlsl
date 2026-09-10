@@ -13,9 +13,22 @@ cbuffer CodecConstants : register(b0) {
     uint HdrMode;
     float4 Padding;
 };
+#ifndef NATIVE_CODEC_SRGB_IO
+#define NATIVE_CODEC_SRGB_IO 0
+#endif
 [numthreads(16,16,1)]
 void main(uint3 id : SV_DispatchThreadID) {
     if (any(id.xy >= Size)) return;
+#if NATIVE_CODEC_SRGB_IO
+    // DLSS5_CODEC_SRGB (Magpie): the source is already a display-referred sRGB picture, i.e. already in the network's working
+    // surface encoding; no paper-white scale, shoulder or transfer curve (applying them again double-encodes: the "whiter" look).
+    {
+        uint2 extent = max(SourceSize, uint2(1,1));
+        uint2 p = SourceBase + min(uint2((float2(id.xy)+0.5)*float2(extent)/float2(Size)), extent-1);
+        Output[id.xy] = float4(saturate(Original.Load(int3(p,0)).rgb),1);
+        return;
+    }
+#endif
     // Only the captured mode1 contract is implemented here. Host must reject
     // other modes before dispatch; zero output makes accidental misuse visible.
     if (HdrMode != 1 || PaperWhiteScale <= 0) {

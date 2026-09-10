@@ -40,7 +40,8 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 已知
 ----
   - 每帧约 33~36 ms（网络 24 ms + Magpie 捕获/呈现），30 fps 上下；游戏本身可以照常 60 fps。
-  - 输入是显示用的 8 位 sRGB 图（不是游戏内钩子那种线性 HDR 场景色），画面会比游戏内版本更白、更"处理感"。
+  - 输入是显示用的 8 位 sRGB 图（不是游戏内钩子那种线性 HDR 场景色）；插件按 sRGB 直通处理（DLSS5_CODEC_SRGB=1），
+    亮度和原图一致。偶尔会在暗部皮肤上出现 8 像素的方块闪一下（网络时序分支的毛病，DLSS5_HISTORY_GUARD 压掉了大部分）。
   - 运动向量来自 Magpie 的光流估计（效果参数 Optical Flow Method 选 AMDOF）；光流在平坦暗部会给出几万像素的垃圾向量，
     插件把超过 64 像素的向量当静止处理（DLSS5-AMD\native-game-flags.txt 的 DLSS5_MOTION_MAX_PX），否则会出现黑色/粉色的方块闪烁。
   - 停止缩放再激活，插件会重新接管（再等 20 秒）。

@@ -6,6 +6,9 @@ Texture2D<float4> OutputOriginal : register(t3);
 #ifndef NATIVE_CODEC_UINT_OUT
 #define NATIVE_CODEC_UINT_OUT 0
 #endif
+#ifndef NATIVE_CODEC_SRGB_IO
+#define NATIVE_CODEC_SRGB_IO 0
+#endif
 #ifndef NATIVE_CODEC_UNORM8_OUT
 #define NATIVE_CODEC_UNORM8_OUT 0
 #endif
@@ -90,10 +93,20 @@ void main(uint3 id:SV_DispatchThreadID) {
  uint2 extent=max(ProxySize,uint2(1,1));
  uint2 p=min(uint2((float2(id.xy)+0.5)*float2(extent)/float2(Size)),extent-1);
  float4 source=OutputOriginal.Load(int3(id.xy,0));
+#if NATIVE_CODEC_SRGB_IO
+ /* DLSS5_CODEC_SRGB (Magpie): the source is display-referred sRGB; linearize it for the blend and re-encode the result */
+ float3 original=Decode(saturate(source.rgb));
+#else
  float3 original=max(source.rgb,0)/PaperWhiteScale;
+#endif
  float3 upgraded=Upgrade(original,Decode(Proxy.Load(int3(p,0)).rgb),Decode(Neural.Load(int3(id.xy,0)).rgb));
  float oy=Luminance(original),uy=Luminance(upgraded);
  float ratio=oy==0?1:clamp(uy/oy,0,4);
  float3 result=lerp(original*ratio,upgraded,ColorStrength);
+#if NATIVE_CODEC_SRGB_IO
+ result=saturate(result);result=result<=0.0031308?result*12.92:1.055*pow(result,1.0/2.4)-0.055;
+ Store(id.xy,float4(result,source.a));
+#else
  Store(id.xy,float4(result*PaperWhiteScale,source.a));
+#endif
 }

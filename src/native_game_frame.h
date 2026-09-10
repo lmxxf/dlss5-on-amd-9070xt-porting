@@ -16,6 +16,32 @@
 // Rebind rotating same-size source only after completed frames; recreate on resize.
 // FAST/QUALITY PATH (DLSS5_OUTPUT_SMOOTH="t,s"): output-side temporal smoothing toward the warped previous output where the
 // difference is below t/255 (blend weight s at zero difference, fading to 0 at t). In place on the network RGB buffer.
+/* DLSS5_HISTORY_GUARD=<dark/255>,<bright/255> (Magpie): a warped-history pixel darker than `dark` whose current input is brighter than
+   `bright` is replaced by the current input before the network reads it -- the network's own no-history convention (preblock_input_mix
+   fills the history features with the input colour), applied per pixel. Breaks the self-sustaining black tiles: the temporal branch
+   reproduces a black history tile as a black output tile, which becomes the next history. */
+class NativeHistoryGuard {
+ ID3D12Resource*warped{},*base{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};float dark{},bright{};
+public:
+ bool enabled{};
+ ~NativeHistoryGuard(){if(warped)warped->Release();if(base)base->Release();if(root)root->Release();if(pso)pso->Release();}
+ void Create(ID3D12Device*d,ID3D12Resource*warped_history,ID3D12Resource*network_base,const std::wstring&dir){
+  const wchar_t*g=_wgetenv(L"DLSS5_HISTORY_GUARD");if(!g||!*g)return;
+  wchar_t*end=nullptr;dark=float(wcstod(g,&end))/255.f;if(!end||*end!=L','||dark<=0)throw std::runtime_error("invalid history guard flag (dark,bright)");bright=float(wcstod(end+1,nullptr))/255.f;if(bright<=dark)throw std::runtime_error("history guard bright must exceed dark");
+  warped=warped_history;warped->AddRef();base=network_base;base->AddRef();
+  D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
+  D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("history guard root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("history guard root signature");blob->Release();blob=nullptr;error=nullptr;
+  auto hr=CompileNativeShader(dir+L"\\native_history_guard.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"history guard compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("history guard pipeline");blob->Release();enabled=true;
+ }
+ // after the sampler (warped in SRV state): transition to UAV, patch in place, back to SRV
+ void Record(ID3D12GraphicsCommandList*c){
+  if(!enabled)return;const UINT pixels=1920*1152;UINT words[4];std::memcpy(words,&dark,4);std::memcpy(words+1,&bright,4);words[2]=pixels;words[3]=0;
+  D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={warped,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS};c->ResourceBarrier(1,&b);
+  c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,base->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(1,warped->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,4,words,0);c->Dispatch((pixels+63)/64,1,1);
+  std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
+ }
+};
 class NativeOutputSmooth {
  ID3D12Resource*rgb{};ID3D12Resource*warped{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};float threshold{},strength{};
 public:
@@ -97,7 +123,7 @@ class NativeGameFrame {
   NativeGameCodec encode;
   NativeGameRgbInput input;
   NativeActualNetwork70 network;
-  NativeRgbTexture neural;NativeOutputSmooth smooth;NativeBlackProbe black;
+  NativeRgbTexture neural;NativeOutputSmooth smooth;NativeHistoryGuard history_guard;NativeBlackProbe black;
   NativeGameCodec decode;
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
@@ -151,6 +177,7 @@ public:
    NativeGameFrameStep("network",d);resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
    NativeGameFrameStep("neural",d);resources->neural.Create(d,resources->network.Output(),directory);
    if(resources->temporal)resources->smooth.Create(d,resources->network.Output(),resources->sampler.Output(),directory);
+   if(resources->temporal)resources->history_guard.Create(d,resources->sampler.Output(),resources->input.PostBase(),directory);
    resources->black.Create(d,resources->network.Output(),1920*1080,directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
    NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);NativeGameFrameStep("ready",d);ready=true;
@@ -216,7 +243,7 @@ public:
      r.black.CountDump();dump_prefix=prefix;}}
    const auto cpu_start=std::chrono::steady_clock::now();if(r.probe_on)r.probe.Reset();
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-    if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
+    if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);r.history_guard.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
    if(!dump_prefix.empty()&&(use_history||(r.temporal&&r.black.enabled))){r.submit.Flush();DumpTemporalNow(dump_prefix);{char line[160];snprintf(line,sizeof line,"black_probe dumped history=%u reset=%u motion=%u",use_history?1u:0u,reset?1u:0u,motion_texture?1u:0u);if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu %s\n",GetCurrentProcessId(),line);fclose(f);}}dump_prefix.clear();}
    r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
