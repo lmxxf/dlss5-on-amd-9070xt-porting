@@ -8,6 +8,8 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 
 本包内容
 --------
+  Magpie.exe 及其文件            Magpie 实验分支 0.6.6（SAOG0721/Magpie，GPL-3，许可见 LICENSE-Magpie.txt；A 卡用不到的 NVIDIA 运行库已去掉）
+  config\config.json             Magpie 便携模式配置（预设好的效果组和选项）
   dxgi.dll                       ReShade 6.8 加载器（原版，未修改；放在 Magpie.exe 旁边就会被加载）
   dlss5-amd.addon64              本移植的 DLL（.addon64 是 ReShade 的扩展名，不要改名）
   DLSS5-D3D12-721\               微软 DirectX 12 Agility SDK 1.721 预览运行时，Shader Model 6.10 需要它
@@ -17,23 +19,17 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 需要
 ----
   1. RX 9070 / 9070 XT（RDNA4）+ AMD 26.10.07.02 预览驱动（正式驱动没有 Shader Model 6.10 的 wave matrix）。
-  2. Magpie 的实验分支（带 FSR3/FSR4 效果的那个）：https://github.com/SAOG0721/Magpie 的 Release，
-     解压出 Magpie.exe 所在目录。本包不含 Magpie。
+  2. 本包已含 Magpie 实验分支（https://github.com/SAOG0721/Magpie）。
   3. 显示器分辨率不限，但游戏窗口必须是 1920x1080 无边框，Magpie 缩放选"原始尺寸"（不放大）。
      网络只认 1920x1080 进、1920x1080 出。
 
-安装
+安装（整包版：Magpie 本体已经在里面，解压即用）
 ----
-  1. 把本包的四项（dxgi.dll、dlss5-amd.addon64、DLSS5-D3D12-721、DLSS5-AMD）复制进 Magpie.exe 所在目录。
-     如果那里已有 dxgi.dll（别的 ReShade/mod），先备份。
-  2. 启动 Magpie 一次再退出，编辑 %LOCALAPPDATA%\Magpie\config\v4\config.json：
-     "duplicateFrameDetectionMode": 1  改成  "duplicateFrameDetectionMode": 2
-     （重复帧检测开着时 Magpie 会跳过没变化的帧，插件就收不到帧。）
-  3. 再启动 Magpie：
-     - 效果组：新建一组，只加 FSR3 -> FSR3_SR 一个效果，参数 Optical Flow Method 选 AMDOF。
-     - 缩放模式：缩放选"原始尺寸"。
-     - 游戏：显示模式无边框窗口，1920x1080。
-  4. 在游戏里按 Magpie 的缩放热键激活。前 20~30 秒是网络初始化（读 600MB 权重、建 179 个着色器），
+  1. 解压到任意目录（路径别带中文），运行 Magpie.exe。配置是便携模式（config\config.json 随包），已经预设好：
+     效果组 "DLSS5-AMD"（只有 FSR3_SR，光流 AMDOF）、缩放"原始尺寸"、重复帧检测已关。
+     如果你自己改了配置，要保证：效果组只放 FSR3 -> FSR3_SR、缩放选"原始尺寸"、设置里重复帧检测选"从不"。
+  2. 游戏：显示模式无边框窗口，1920x1080。
+  3. 在游戏里按 Magpie 的缩放热键（默认 Win+Shift+A）激活。前 20~30 秒是网络初始化（读 600MB 权重、建 179 个着色器），
      这段时间画面是 Magpie 自己的 FSR3；初始化完成后帧率会掉到 30 左右，那就是 DLSS 5 接管了。
      再按一次热键停止缩放就是对比。
 
@@ -50,7 +46,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 
 卸载
 ----
-  删除 Magpie 目录里的 dxgi.dll、dlss5-amd.addon64、DLSS5-D3D12-721、DLSS5-AMD 四项。
+  整个目录删掉即可，不写注册表、不碰 AppData。
 
 来源
 ----
