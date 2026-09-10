@@ -23,7 +23,7 @@ public:
   auto desc=texture->GetDesc();
   if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||(desc.Flags&D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE))throw std::runtime_error("game RGB texture geometry");
   // Initially accept only explicit float formats; other game formats need proof.
-  if(NativeViewFormat(desc.Format)!=DXGI_FORMAT_R32G32B32A32_FLOAT&&!NativeIsRgba16Float(desc.Format))throw std::runtime_error("unverified game RGB format");
+  if(NativeViewFormat(desc.Format)!=DXGI_FORMAT_R32G32B32A32_FLOAT&&!NativeIsGameColor(desc.Format))throw std::runtime_error("unverified game RGB format");
   ID3D12Device*owner=nullptr;ck(texture->GetDevice(IID_PPV_ARGS(&owner)));bool same=NativeSameDevice(owner,d);owner->Release();if(!same)throw std::runtime_error("game RGB device mismatch");
   source=texture;source->AddRef();
   D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC bd{};

@@ -10,7 +10,7 @@
 inline std::vector<unsigned char> NativeReadSubmittedFrame(ID3D12CommandQueue*q,ID3D12Resource*source,D3D12_RESOURCE_STATES before){
  if(!q||!source||q->GetDesc().Type!=D3D12_COMMAND_LIST_TYPE_DIRECT)throw std::runtime_error("readback queue/source contract");
  auto desc=source->GetDesc();
- if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||!NativeIsRgba16Float(desc.Format)||desc.MipLevels!=1||desc.DepthOrArraySize!=1||desc.SampleDesc.Count!=1)throw std::runtime_error("readback geometry/format");
+ if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||!NativeIsGameColor(desc.Format)||desc.MipLevels!=1||desc.DepthOrArraySize!=1||desc.SampleDesc.Count!=1)throw std::runtime_error("readback geometry/format");
  auto check=[](HRESULT hr){if(FAILED(hr))throw std::runtime_error("readback HRESULT="+std::to_string(unsigned(hr)));};
  ID3D12Device*d=nullptr,*owner=nullptr;check(q->GetDevice(IID_PPV_ARGS(&d)));
  auto hr=source->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr)){d->Release();check(hr);}
