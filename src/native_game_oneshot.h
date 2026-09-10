@@ -102,7 +102,19 @@ public:
   }
   return phase.load()==2&&armed_request!=0;
  }
+ unsigned Phase()const{return phase.load(std::memory_order_acquire);}
+ /* A new upscaler session (Magpie: scaling stopped and started again -> new FSR context, queue and textures; or a failed initialization)
+    drops the frame and goes back to idle, so the next snapshot initializes again on the new queue. Bounded: at most 8 restarts per process. */
+ unsigned restarts{};
+ bool ResetForNewSession(const char*why){
+  unsigned state=phase.load();if(state==1||state==3)return false;if(restarts>=8)return false;
+  std::lock_guard<std::mutex>guard(request_mutex);
+  delete frame;frame=nullptr;if(queue){queue->Release();queue=nullptr;}
+  armed_request=0;last_request=0;every_frame=false;every_frame_count=0;next_poll=0;restarts++;
+  Log("session_reset",why);phase.store(0,std::memory_order_release);return true;
+ }
  void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0){
+  {const unsigned state=phase.load();if(state==5||((state==2||state==4)&&queue&&q!=queue)){if(!ResetForNewSession(state==5?"previous initialization/render failed":"upscaler queue changed"))return;}}
   unsigned expected=0;
   if(phase.compare_exchange_strong(expected,1)){
    if(!q||!source||q->GetDesc().Type!=D3D12_COMMAND_LIST_TYPE_DIRECT){Log("initialization_failed","queue/source");phase=5;return;}
@@ -118,7 +130,7 @@ public:
   {std::lock_guard<std::mutex>guard(request_mutex);request=armed_request;armed_request=0;}
   if(!request){phase=2;return;}
   try{
-   if(q!=queue)throw std::runtime_error("one-shot queue changed");
+   if(q!=queue)throw std::runtime_error("one-shot queue changed"); /* caught below -> phase 5 -> ResetForNewSession on the next dispatch */
    if(every_frame&&request>1){
     // Steady state: no readback, no files; one log line per 100 frames with the average interval.
     // Temporal alignment probe: dump history/motion/color/warped at frames 300 and 600 while the user pans the camera.

@@ -19,7 +19,7 @@ public:
   mw=motion_w;mh=motion_h;scale[0]=pixel_scale_x;scale[1]=pixel_scale_y;
   motion=Buffer(d,UINT64(mw)*mh*16);history=Buffer(d,1920ull*1080*16);
   D3D12_DESCRIPTOR_HEAP_DESC hd{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,1,D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,0};ck(d->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&heap)));
-  {D3D12_DESCRIPTOR_RANGE range{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,1,0,0,0};D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;p[0].DescriptorTable={1,&range};p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=3;desc.pParameters=p;ID3DBlob*b=nullptr,*e=nullptr;ck(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&b,&e));ck(d->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&motion_root)));b->Release();if(e)e->Release();}
+  {D3D12_DESCRIPTOR_RANGE range{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,1,0,0,0};D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;p[0].DescriptorTable={1,&range};p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,5};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=3;desc.pParameters=p;ID3DBlob*b=nullptr,*e=nullptr;ck(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&b,&e));ck(d->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&motion_root)));b->Release();if(e)e->Release();}
   {D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=3;desc.pParameters=p;ID3DBlob*b=nullptr,*e=nullptr;ck(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&b,&e));ck(d->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&history_root)));b->Release();if(e)e->Release();}
   for(UINT i=0;i<2;i++){D3D_SHADER_MACRO macros[]={{"FEED_MOTION",i?"0":"1"},{nullptr,nullptr}};ID3DBlob*code=nullptr,*error=nullptr;auto hr=CompileNativeShader(dir+L"\\native_temporal_feed.hlsl",macros,i?"history_main":"motion_main",&code,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"temporal feed compile";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=i?history_root:motion_root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(i?&history_pso:&motion_pso)));code->Release();}
  }
@@ -33,8 +33,10 @@ public:
    texture->AddRef();if(bound_texture)bound_texture->Release();bound_texture=texture;
   }
   if(motion_recorded)Transition(c,motion,true);
-  UINT words[4]={mw,mh,0,0};std::memcpy(words+2,scale,8);
-  c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(motion_root);c->SetComputeRootDescriptorTable(0,heap->GetGPUDescriptorHandleForHeapStart());c->SetComputeRootUnorderedAccessView(1,motion->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,4,words,0);c->SetPipelineState(motion_pso);c->Dispatch((mw+15)/16,(mh+15)/16,1);
+  /* DLSS5_MOTION_MAX_PX (Magpie): vectors longer than this many output pixels are treated as static (the AMD optical flow returns tens of thousands of pixels on flat dark areas). 0 = off. */
+  static const float max_px=[]{const wchar_t*v=_wgetenv(L"DLSS5_MOTION_MAX_PX");return v?float(wcstod(v,nullptr)):0.f;}();
+  UINT words[5]={mw,mh,0,0,0};std::memcpy(words+2,scale,8);std::memcpy(words+4,&max_px,4);
+  c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(motion_root);c->SetComputeRootDescriptorTable(0,heap->GetGPUDescriptorHandleForHeapStart());c->SetComputeRootUnorderedAccessView(1,motion->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,5,words,0);c->SetPipelineState(motion_pso);c->Dispatch((mw+15)/16,(mh+15)/16,1);
   Transition(c,motion,false);motion_recorded=true;
  }
  void RecordHistory(ID3D12GraphicsCommandList*c){

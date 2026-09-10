@@ -27,7 +27,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
   1. 把本包的四项（dxgi.dll、dlss5-amd.addon64、DLSS5-D3D12-721、DLSS5-AMD）复制进 Magpie.exe 所在目录。
      如果那里已有 dxgi.dll（别的 ReShade/mod），先备份。
   2. 启动 Magpie 一次再退出，编辑 %LOCALAPPDATA%\Magpie\config\v4\config.json：
-     "duplicateFrameDetectionMode": 1  改成  "duplicateFrameDetectionMode": 0
+     "duplicateFrameDetectionMode": 1  改成  "duplicateFrameDetectionMode": 2
      （重复帧检测开着时 Magpie 会跳过没变化的帧，插件就收不到帧。）
   3. 再启动 Magpie：
      - 效果组：新建一组，只加 FSR3 -> FSR3_SR 一个效果，参数 Optical Flow Method 选 AMDOF。
@@ -41,7 +41,9 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 ----
   - 每帧约 33~36 ms（网络 24 ms + Magpie 捕获/呈现），30 fps 上下；游戏本身可以照常 60 fps。
   - 输入是显示用的 8 位 sRGB 图（不是游戏内钩子那种线性 HDR 场景色），画面会比游戏内版本更白、更"处理感"。
-  - 运动向量来自 Magpie 的光流估计，快速运动会有块状闪烁。
+  - 运动向量来自 Magpie 的光流估计（效果参数 Optical Flow Method 选 AMDOF）；光流在平坦暗部会给出几万像素的垃圾向量，
+    插件把超过 64 像素的向量当静止处理（DLSS5-AMD\native-game-flags.txt 的 DLSS5_MOTION_MAX_PX），否则会出现黑色/粉色的方块闪烁。
+  - 停止缩放再激活，插件会重新接管（再等 20 秒）。
   - 日志：DLSS5-AMD\logs\native-game-oneshot.txt（初始化）、native-submission-order.txt（每帧观察）。
   - F6 是本插件的开关键（全局）；如果同一台机器上游戏里也装了本插件的游戏版，两边会一起切。
 

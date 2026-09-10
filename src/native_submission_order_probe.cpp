@@ -146,7 +146,8 @@ static uint32_t dispatch(void**context,const Header*h){
  static const unsigned snapshot_frame=[]{unsigned v=120;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_SNAPSHOT_FRAME=%u",&x)==1&&x>=1)v=x;}fclose(f);}return v;}();
  bool request=n==snapshot_frame;
 #ifdef NATIVE_ORDER_NEURAL
- request=request||neural_oneshot.WantsFrame();
+ /* idle (first time, or after a session reset) and failed states re-arm from the snapshot frame on; the first arming is still exactly snapshot_frame */
+ request=neural_oneshot.WantsFrame()||(n>=snapshot_frame&&(neural_oneshot.Phase()==0||neural_oneshot.Phase()==5));
 #endif
  if(request&&result==0&&output_bytes==sizeof(output)&&output.resource&&output.width==1920&&output.height==1080&&output.state==2&&list){
   ID3D12GraphicsCommandList*native=nullptr;
@@ -154,7 +155,7 @@ static uint32_t dispatch(void**context,const Header*h){
    std::lock_guard<std::mutex>guard(snapshot_mutex);
    bool eligible=!snapshot_taken;
 #ifdef NATIVE_ORDER_NEURAL
-   eligible=eligible||neural_oneshot.WantsFrame();
+   eligible=eligible||neural_oneshot.WantsFrame()||neural_oneshot.Phase()==0||neural_oneshot.Phase()==5;
 #endif
    if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset};++armed_frames;}
    else native->Release();
@@ -226,7 +227,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
    uintptr_t items[64]{};if(lists&&count<=64)for(UINT i=0;i<count;i++)items[i]=reinterpret_cast<uintptr_t>(lists[i]);
    bool eligible=!snapshot_taken;
 #ifdef NATIVE_ORDER_NEURAL
-   eligible=eligible||neural_oneshot.WantsFrame();
+   eligible=eligible||neural_oneshot.WantsFrame()||neural_oneshot.Phase()==0||neural_oneshot.Phase()==5; /* idle/failed: a new snapshot (re)initializes */
 #endif
    if(eligible&&NativeSnapshotBatchMatch(cross_thread_submit?GetCurrentThreadId():pending_snapshot.thread,GetCurrentThreadId(),reinterpret_cast<uintptr_t>(pending_snapshot.list),lists?items:nullptr,count)){ /* XeSS titles record on the render thread and submit from another: match by list identity only */
     job=pending_snapshot;pending_snapshot={};snapshot_taken=true;
