@@ -57,7 +57,15 @@ int wmain(int argc,wchar_t**argv){try{
  }
  // Keep the whole network alive on failure: timeout is not GPU cancellation.
  auto*network=new NativeActualNetwork70;network->Create(d,reflect->Output(),base,noise,dir,sampler?sampler->Output():nullptr,post_shift);
- ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));NativeGameSubmission submit;submit.Create(q);q->Release();
+ ID3D12CommandQueue*q=nullptr;D3D12_COMMAND_QUEUE_DESC qd{};ck(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&q)));NativeGameSubmission submit;submit.Create(q);
+ /* DLSS5_TEST_PRESENT=1 (profiling only): a hidden 64x64 window with a swapchain on the same queue, Present() once per frame, so that
+    frame-boundary profilers (Radeon GPU Profiler in frame capture mode) see the whole network as one frame. No effect on the network. */
+ IDXGISwapChain3*present_chain=nullptr;
+ if(const wchar_t*pr=_wgetenv(L"DLSS5_TEST_PRESENT")){if(wcscmp(pr,L"0")&&wcscmp(pr,L"1"))throw std::runtime_error("invalid present flag");if(!wcscmp(pr,L"1")){
+  /* composition swapchain: no window needed (the bench usually runs from an SSH session without an interactive desktop) */
+  DXGI_SWAP_CHAIN_DESC1 sd{};sd.Width=64;sd.Height=64;sd.Format=DXGI_FORMAT_R8G8B8A8_UNORM;sd.SampleDesc.Count=1;sd.BufferUsage=DXGI_USAGE_RENDER_TARGET_OUTPUT;sd.BufferCount=2;sd.SwapEffect=DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;sd.AlphaMode=DXGI_ALPHA_MODE_PREMULTIPLIED;
+  IDXGISwapChain1*sc1=nullptr;HRESULT sh=f->CreateSwapChainForComposition(q,&sd,nullptr,&sc1);if(FAILED(sh))throw std::runtime_error("present swapchain HRESULT="+std::to_string(unsigned(sh)));ck(sc1->QueryInterface(IID_PPV_ARGS(&present_chain)));sc1->Release();std::printf("present_chain=1\n");}}
+ q->Release();
  auto*rb=buf(d,oracle.size()*4,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
  UINT frames=temporal?5:3;
  if(const wchar_t*s=_wgetenv(L"DLSS5_TEST_FRAME_COUNT")){wchar_t*end=nullptr;auto n=wcstoul(s,&end,10);if(!*s||*end||n<5||n>30)throw std::runtime_error("frame count must be 5..30");frames=UINT(n);}
@@ -75,7 +83,7 @@ int wmain(int argc,wchar_t**argv){try{
   submit.Submit([&](ID3D12GraphicsCommandList*c){reflect->Record(c);if(enabled){coordinates->Record(c);sampler->Record(c);}if(single_list)network->RecordUnsubmitted(c,0,enabled);});
   if(!single_list)network->Run(submit,0,enabled);
   const double recorded_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-started).count();
-  submit.Flush();
+  submit.Flush();if(present_chain)ck(present_chain->Present(0,0));
   std::printf("network70 frame=%u single_list=%u deferred=%u submit_wait_ms=%.3f flushed_ms=%.3f\n",frame,single_list,submit.Deferred(),recorded_ms,std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-started).count());std::fflush(stdout);
   submit.Submit([&](ID3D12GraphicsCommandList*c){D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={network->Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};c->ResourceBarrier(1,&b);c->CopyBufferRegion(rb,0,network->Output(),0,oracle.size()*4);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);});
   submit.Flush();
@@ -92,5 +100,5 @@ int wmain(int argc,wchar_t**argv){try{
    void*p4=nullptr;D3D12_RANGE r4{0,size_t(bytes)},none4{};ck(rb4->Map(0,&r4,&p4));std::ofstream o4((dir+(b69?L"\\block69-main8.bin":pd?L"\\pre-down.f32":pm?L"\\pre-main8.bin":sf?L"\\sharedffn.f32":sr?L"\\sharedraw.f32":hd?L"\\head.f32":dec?L"\\decoder69.f32":down4?L"\\block4-down.f32":p66?L"\\project66.f32":network->Block4Main8()?L"\\block4-main8.bin":L"\\block4-main.f32")).c_str(),std::ios::binary);o4.write(static_cast<const char*>(p4),std::streamsize(bytes));rb4->Unmap(0,&none4);rb4->Release();std::printf("block4_dump bytes=%llu main8=%u\n",(unsigned long long)bytes,network->Block4Main8()?1u:0u);std::fflush(stdout);
   }
  }
- if(memory_adapter)memory_adapter->Release();delete network;delete sampler;delete coordinates;delete reflect;std::printf("extracted_network70=exact frames=%u; controlled history; game integration pending\n",frames);return 0;
+ if(present_chain){std::printf("present linger 30s (profiler transfer)\n");std::fflush(stdout);for(int i=0;i<300;i++){ck(present_chain->Present(0,0));Sleep(100);}present_chain->Release();}if(memory_adapter)memory_adapter->Release();delete network;delete sampler;delete coordinates;delete reflect;std::printf("extracted_network70=exact frames=%u; controlled history; game integration pending\n",frames);return 0;
 }catch(const std::exception&e){std::fprintf(stderr,"%s\n",e.what());return 1;}}
