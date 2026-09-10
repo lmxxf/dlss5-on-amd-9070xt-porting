@@ -320,7 +320,10 @@ static void on_init_device(reshade::api::device*device){
 BOOL WINAPI DllMain(HINSTANCE h,DWORD reason,LPVOID){
  if(reason==DLL_PROCESS_ATTACH){
   DisableThreadLibraryCalls(h);wchar_t path[MAX_PATH]{};GetModuleFileNameW(nullptr,path,MAX_PATH);
-  if((!wcsstr(path,L"SB-Win64-Shipping.exe")&&!wcsstr(path,L"\\Ronin.exe"))||!reshade::register_addon(h))return FALSE;
+  /* Optional process filter: DLSS5_ONLY_EXE=<substring of the host exe path> makes every other process refuse the add-on (the old
+     hard-coded SB-Win64-Shipping.exe / Ronin.exe list returned FALSE here = ReShade error 1114 in any other game). */
+  if(const wchar_t*only=_wgetenv(L"DLSS5_ONLY_EXE"))if(*only&&!wcsstr(path,only))return FALSE;
+  if(!reshade::register_addon(h))return FALSE;
   reshade::register_event<reshade::addon_event::create_device>(on_create_device);
   reshade::register_event<reshade::addon_event::init_device>(on_init_device);
   reshade::register_event<reshade::addon_event::close_command_list>(close_list);
