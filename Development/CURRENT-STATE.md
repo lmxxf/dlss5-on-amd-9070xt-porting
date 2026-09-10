@@ -1,3 +1,14 @@
+## 2026-09-10 12:10 fast38：2 的幂步长 = 内存通道撞车，ViT / C512 / decoder entry 改 512B 连续 tile（光之朱雀）
+
+- 起因：多头 FFN+proj0 合核零收益后回头看 ViT contract（0.152 vs expand 0.078，FLOP 相同）。量出 contract = reduce 0.13 + combine 0.03（`DLSS5_TEST_VIT_LINEAR_PART` 门）。reduce 的 A（hidden [640][4096] E4M3）和 B（权重 [1024][4096]）行步长都是 4096 字节——一个 16 行的 wave-matrix tile 全落在同一条内存通道上（channel camping）；expand 的 1024 步长也不干净。
+- 配方（纯数据搬运，全部逐位相同）：权重 host 端重排成 512B（E4M3）/1KB（f16）的 `[k 32][j 16]` 连续 tile，`B::Load(...,tile*512,16,RowMajor,16)`；激活由生产者按 tile 写出、消费者按 tile 读。
+  - `DLSS5_VIT_TILED=1`（build `DLSS5_BUILD_VIT_TILED`，`run_vit_tiled_network.ps1`）：expand/reduce 权重、hidden（expand 写 tile）、pack8/pack16 输出、QKV f16 权重、1024 投影权重。**每层 0.486→0.288，8 层 −1.6ms**（expand 0.126→0.086，contract 0.156→0.078，qkv 0.081→0.049，proj 0.071→0.022；注意力不变）。
+  - `DLSS5_SPLIT_TILED=1`（`run_split_tiled_network.ps1`）：C512 的 QKV/投影权重（核早就支持 `NATIVE_TILED_WEIGHTS`，只差 host 打包和编译宏；**FFN 投影用的是 `native_wave_project_c512.cso` 不是 fp8act 那份，漏了一条编译行 PSNR 直接 31**）。**每块 0.249→0.196，16 块 −0.85ms**。
+  - `DLSS5_DECODER_TILED=1`（`run_decoder_tiled_network.ps1`）：只 entry（1024→512）−0.01；proj62 用 tile 反而 +0.045，所以升采样投影不动。
+- 整帧三轮 fast37 vs fast38：min-of-means 37.0→34.0，sum-of-mins 36.7→33.6。加上早上的 C32 合核，今天测试台约 −5ms。
+- **还没做的同类：C512 家族所有 f32 激活 [token][512] 步长 2048（FFN 的标量 staging、投影残差 gather、f32 输出、decoder entry 的输入）**——要改成 tile 布局得动 C512 全部核 + head/bridge/decoder entry 的读法，是下一刀的候选（估还能 −0.5～1）。多头段的 E4M3 流步长 64～256B 没这个问题。
+- 游戏：fast38 = fast37 + VIT_TILED + SPLIT_TILED + DECODER_TILED，DLL `90cb6c9b…`，源目录 `tiled`；回退 fast37（`native-game-fast37.addon64` + `ffn-fused`）。
+
 ## 2026-09-10 10:40 多头 FFN+proj0 合核：做了，逐位相同，但没收益（光之朱雀）
 
 - `DLSS5_FUSED_FFN_PROJ0=1`（build `DLSS5_BUILD_FUSED_FFN_PROJ0`，`run_fused_ffn_proj0_network.ps1`，核 `shaders/native_wave_ffn_proj0_fused.hlsl`，cso 在 run_fp8_activations 里编，f32/E4M3 特征两种）：expand+contract 后 contract tile Cast 成 E4M3 存回 hidden 区（多一次 sync，LDS 不涨），每 wave 再算 16 列投影；残差 gather 提到核最前面跟 expand 重叠。root 加了 t3（投影权重）。对参考链（native_wave_ffn_fused 也按 `NATIVE_PRECISE_CHAIN` 编）**逐位相同**。
