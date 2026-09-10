@@ -38,7 +38,10 @@ Direct3D 12 从零重写成 Shader Model 6.10 wave-matrix（`dx::linalg`）+ FP8
 tier 10）的驱动；Shader Model 6.10 预览版 `dxc`（带 `dx/linalg.h`）；ReShade 6.8 插件头文件；MinHook 源码。
 
 ```bash
-bash scripts/build-addon.sh <minhook-src> <reshade-include> native-game.addon64 --tiled
+# 一键（Ubuntu / WSL）：sudo apt install g++-mingw-w64-x86-64 git；自动把 MinHook 和 ReShade 头文件拉到 third_party/
+bash scripts/build-addon-oneclick.sh            # 产出 native-game.addon64
+# 或者手动
+bash scripts/build-addon.sh <minhook源码目录> <reshade的include目录> native-game.addon64 --tiled
 bash scripts/build-bench.sh native-network70-temporal.exe
 ```
 

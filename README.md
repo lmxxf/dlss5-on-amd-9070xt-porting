@@ -48,6 +48,9 @@ D3D12 wave matrices (linalg tier 10), the Shader Model 6.10 preview `dxc` (with 
 headers, MinHook sources.
 
 ```bash
+# one click (Ubuntu / WSL): sudo apt install g++-mingw-w64-x86-64 git; fetches MinHook + ReShade headers into third_party/
+bash scripts/build-addon-oneclick.sh            # -> native-game.addon64
+# or by hand
 bash scripts/build-addon.sh <minhook-src> <reshade-include> native-game.addon64 --tiled
 bash scripts/build-bench.sh native-network70-temporal.exe
 ```
