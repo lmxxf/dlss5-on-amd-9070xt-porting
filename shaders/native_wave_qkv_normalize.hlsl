@@ -11,6 +11,9 @@
 #define HEADS (MATRIX_CHANNELS/32)
 #define SCALE_OFFSET (4*MATRIX_CHANNELS*MATRIX_CHANNELS+HEADS*4096)
 #include <dx/linalg.h>
+#ifndef NATIVE_INPUT_TILED
+#define NATIVE_INPUT_TILED 0
+#endif
 ByteAddressBuffer input:register(t0),weights:register(t1);
 StructuredBuffer<float> attention_weights:register(t2);
 RWByteAddressBuffer packed:register(u0);
@@ -45,7 +48,12 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  if(gid.x*16>=width*height)return;
  C acc[4];
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
+#if NATIVE_INPUT_TILED
+  /* FAST PATH (split stream8): the projection stored its E4M3 output as 512-byte [token 16][k 32] tiles; no pack dispatch */
+  A a=A::Load(input,(gid.x*(MATRIX_CHANNELS/32)+g)*512,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   A a=A::Load(input,gid.x*16*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
   [unroll]for(uint n=0;n<4;n++){
    uint col=(gid.y*4+n)*16; // 0..3C-1, weights row-major [3C][C] in part order
 #if NATIVE_TILED_WEIGHTS

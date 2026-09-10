@@ -2,10 +2,30 @@
 // Dispatch Y selects one of eight independent 64-channel FFN groups.
 // Compute only that group's mix rows; all 512 input channels remain dependencies.
 // The original full-group fused candidate remains in native_wave_split_ffwd.hlsl.
+#ifndef NATIVE_SPLIT_MAPPED
+#define NATIVE_SPLIT_MAPPED 0
+#endif
+#ifndef NATIVE_SPLIT_IN8
+#define NATIVE_SPLIT_IN8 0
+#endif
+#if NATIVE_SPLIT_IN8
+/* FAST PATH (DLSS5_SPLIT_STREAM8): the block input is the previous block's E4M3 raster ([pixel][512] bytes) */
+ByteAddressBuffer input:register(t0);
+#else
 StructuredBuffer<float> input:register(t0);
+#endif
 ByteAddressBuffer weights:register(t1);
 RWByteAddressBuffer output:register(u0);
-cbuffer Geometry:register(b0){uint width;uint height;}
+cbuffer Geometry:register(b0){uint width;uint height;uint raster_width;uint raster_height;uint pad_x;uint pad_y;}
+#if NATIVE_SPLIT_MAPPED
+/* FAST PATH (DLSS5_SPLIT_STREAM8): no window pack dispatch; padded work token -> raster element index (or -1 on the border, staged as zero) */
+int raster_index(uint p){int x=int(p%width)-int(pad_x),y=int(p/width)-int(pad_y);if(x<0||y<0||x>=int(raster_width)||y>=int(raster_height))return -1;return int((uint(y)*raster_width+uint(x))*512);}
+#if NATIVE_SPLIT_IN8
+float SourceAt(int src,uint c){uint a=uint(src)+c;uint b=(input.Load(a&~3u)>>((a&3u)*8u))&255u;uint e=(b>>3)&15u,m=b&7u;float v=e?asfloat(((e+120u)<<23)|(m<<20)):float(m)*0.001953125;return (b&0x80u)?-v:v;}
+#else
+float SourceAt(int src,uint c){return input[uint(src)+c];}
+#endif
+#endif
 groupshared float16_t mixed[16*80],hidden[16*272],tile[512];
 groupshared float temp[256];
 #ifndef NATIVE_HW_H
@@ -49,8 +69,15 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  const uint group=gid.y,wave=t/32;
  {
   C acc=C::Splat(0.0f);
+#if NATIVE_SPLIT_MAPPED
+  int rows[4];[unroll]for(uint j=0;j<4;j++)rows[j]=raster_index(first+(t+j*128)/32);
+#endif
   for(uint k=0;k<16;k++){
+#if NATIVE_SPLIT_MAPPED
+   [unroll]for(uint j=0;j<4;j++){const uint i=t+j*128;const int src=rows[j];tile[i]=float16_t(src<0?0.0:SourceAt(src,k*32+i%32));}
+#else
    for(uint i=t;i<512;i+=128)tile[i]=float16_t(input[(first+i/32)*512+k*32+i%32]);
+#endif
    GroupMemoryBarrierWithGroupSync();
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
 #if NATIVE_SPLIT_FFWD_TILED

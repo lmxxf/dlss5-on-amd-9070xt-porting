@@ -7,6 +7,11 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_split_stream8_network.ps1
+# FAST PATH: C512 blocks without window pack/crop and QKV pack: kernels read the block input by raster index and write the cropped raster; the first
+# projection's E4M3 output (tiles) is the QKV input; between blocks the raster is E4M3 bytes (first input / last output stay f32). Bit-exact.
+$env:DLSS5_BUILD_SPLIT_STREAM8='1'
+$env:DLSS5_SPLIT_STREAM8='1'
 # ---- run_split_ffwd8_network.ps1
 # FAST PATH: C512 FFWD output stored as E4M3 bytes (it is already F(H())-quantized) and the following projection loads its A tiles directly. Build-only, bit-exact.
 $env:DLSS5_BUILD_SPLIT_FFWD8='1'
@@ -584,6 +589,23 @@ if($env:DLSS5_FP8_OPERANDS -eq '1'){foreach($Channels in 256,128,64){$Suffix=if(
 [Environment]::SetEnvironmentVariable('DLSS5_TEST_MATRIX_C64',$(if($IncludeC64){'1'}else{'0'}),'Process')
 foreach($Name in 'TILED_C64','SPLIT_PROJECTION','SPLIT_FFWD','TILED_QKV','SHARED_C32','RESIDENT_NOISE','CACHE_C32_INPUT','PAD_C32_LDS','PAD_MULTIHEAD_LDS','MATRIX_C256','MATRIX_C128'){
  [Environment]::SetEnvironmentVariable("DLSS5_TEST_$Name",'1','Process')
+}
+# ---- run_split_stream8_network.ps1 (compiles after every env of the lower runners is set)
+if($env:DLSS5_BUILD_SPLIT_STREAM8 -eq '1'){
+ if($env:DLSS5_BUILD_SPLIT_FFWD8 -ne '1'){throw 'split stream8 needs DLSS5_BUILD_SPLIT_FFWD8'}
+ $FfwdBase=@('-D',"NATIVE_SPLIT_FFWD_BLOCKED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_BLOCKED -eq '1'){1}else{0})",'-D',"NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})",'-D',"NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})",'-D',"NATIVE_SPLIT_FFWD_WAVES4=$(if($env:DLSS5_BUILD_SPLIT_FFWD_WAVES4 -eq '1'){1}else{0})",'-D',"NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})",'-D',"NATIVE_SPLIT_FFWD_TILED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_TILED -eq '1'){1}else{0})",'-D','NATIVE_SPLIT_FFWD8=1','-D','NATIVE_SPLIT_MAPPED=1')
+ foreach($In8 in 0,1){
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 @FfwdBase -D "NATIVE_SPLIT_IN8=$In8" native_wave_split_ffwd_parallel.hlsl -Fo "native_wave_split_ffwd_parallel_stream$(if($In8){'8'}else{'f'}).cso"
+  if($LASTEXITCODE -ne 0){throw "split stream FFWD in8=$In8 compilation failed"}
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D RAW=0 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" -D NATIVE_FP8_INPUT=1 -D NATIVE_FP8_INPUT_TILED=1 -D MAP_FEATURE=1 -D "NATIVE_FP8_FEATURE=$In8" -D NATIVE_FP8_STORE=1 -D NATIVE_FP8_STORE_TILED=1 native_wave_project.hlsl -Fo "native_wave_project_stream0$(if($In8){'8'}else{'f'})_c512.cso"
+  if($LASTEXITCODE -ne 0){throw "split stream projection 0 in8=$In8 compilation failed"}
+ }
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D NATIVE_FP8_QKV_OUT=1 -D "NATIVE_QKV_FAST2=$(if($env:DLSS5_BUILD_QKV_FAST2 -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" -D NATIVE_INPUT_TILED=1 native_wave_qkv_normalize.hlsl -Fo native_wave_qkv_normalize_fp8qkv_stream_c512.cso
+ if($LASTEXITCODE -ne 0){throw 'split stream QKV compilation failed'}
+ foreach($Out in '8','f','raw'){
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$(if($Out -eq 'raw'){1}else{0})" -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FP8_OPERANDS=1 -D NATIVE_FP8_INPUT=1 -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" -D NATIVE_FP8_FEATURE=1 -D NATIVE_FP8_FEATURE_TILED=1 -D MAP_OUTPUT=1 -D "NATIVE_FP8_STORE=$(if($Out -eq '8'){1}else{0})" native_wave_project.hlsl -Fo "native_wave_project_stream1${Out}_c512.cso"
+  if($LASTEXITCODE -ne 0){throw "split stream projection 1 out=$Out compilation failed"}
+ }
 }
 # ---- run_native_temporal_network70.ps1
 $PostShift=3

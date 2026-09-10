@@ -281,6 +281,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 15:20 fast39：C512 FFWD 两刀，逐位相同。(a) FFWD 三个 f16 权重矩阵 1KB tile（`DLSS5_SPLIT_FFWD_TILED`）：单独量零收益；(b) FFWD 输出本来就是 F(H()) 在 E4M3 格点上，直接存 E4M3 的 512B `[token 16][k 32]` tile，投影 0 直读 A（build 宏 `DLSS5_BUILD_SPLIT_FFWD8`），不再逐元素重量化进 LDS：第一版按 `[token][512]` 存反而慢 0.08（16 行 × 32B 散在 512B 步长上），改 tile 后 16 块每块 −0.06，整帧 sum-of-mins −0.8（37.49→36.71）。今天机器整体比昨天慢约 4ms（每帧 31～55 晃，隔离法同目录两次差 50%），只信 60 帧取每段最小的同批比较。
 
+- 17:10 fast40：C512「mapped + FP8 stream」（`DLSS5_SPLIT_STREAM8`），把多头段 09-08 的做法搬到 C512：FFWD 按 raster 索引直接读块输入（边界补零）、投影 1 直接写裁剪后的 raster（窗口 pack/crop 两个 dispatch 没了）；投影 0 的输出 F(H()) 本来就在 E4M3 格点，存成 E4M3 tile 兼作 QKV 的 A（QKV pack dispatch 没了）；块与块之间 raster 走 E4M3 字节（链首输入 / 链尾输出留 f32，跳块拷贝进出同大小）。每块 8→5 个 dispatch，逐位相同；每块 −0.02，16 块 sum-of-mins −0.32（36.84→36.52）；**显存 3510→3129MB（−380MB）**，这一项对换区掉帧更有用。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
@@ -332,6 +334,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 | 多头 FFN+proj0 合核 | 逐位相同 | 0（不进游戏） | |
 | tile 布局（ViT / C512 / entry） | | −1.6 / −0.85 / −0.01 | fast38，min-of-means 34.0 |
 | C512 FFWD 权重 tile / 输出 E4M3 tile 直读 | 0 / 每块 −0.06 | ≈−0.8 | fast39 |
+| C512 mapped + FP8 stream（去 pack/crop/QKV pack） | 每块 −0.02 | ≈−0.3，显存 −380MB | fast40 |
 
 ---
 
@@ -403,9 +406,9 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 ## 5. 当前状态（截至 2026-09-10 12:10）
 
-- **剑星游戏里装的**：fast39 = fast38 + `DLSS5_SPLIT_FFWD_TILED`（+ build 宏 SPLIT_FFWD8），DLL `cddae9ee…`，源目录 `ffwd8t`；回退 fast38（`native-game-fast38.addon64` + `tiled`）。flag 文件 `native-game-flags-fast39.txt`。跳块 {42,43,46} 在链里（40.66dB）。
+- **剑星游戏里装的**：fast40 = fast39 + `DLSS5_SPLIT_STREAM8`，DLL `681801b2…`，源目录 `stream8`；回退 fast39（`native-game-fast39.addon64` + `ffwd8t`）。flag 文件 `native-game-flags-fast40.txt`。跳块 {42,43,46} 在链里（40.66dB）。
 - **帧率**：fast33 实测 29fps（网络 GPU 约 30.7ms + 游戏 6～7ms，GPU 满载）；fast38 Zero 实测 33～34fps，一般场景 35 上下。换区/下车仍会掉几秒（显存之争）。
-- **测试台**（`tiled`，fast38 flag）：整帧 min-of-means 34.0 / sum-of-mins 33.6；单核隔离合计约 23.6 之后再减 fast38 的 2.4；PSNR 对 exact 41.96（fast36 起，fast37/38 逐位不变）；网络显存 3.75GB。
+- **测试台**（`stream8`，fast40 flag）：09-10 下午机器整体比上午慢约 4ms、原因未明（GPU 空闲、驱动仍是预览版、无 Splashtop），sum-of-mins 36.5（同批 fast38 基线 37.5）；上午 fast38 是 min-of-means 34.0 / sum-of-mins 33.6；单核隔离合计约 23.6 之后再减 fast38 的 2.4；PSNR 对 exact 41.96（fast36 起，fast37/38 逐位不变）；网络显存 3.75GB。
 - **0.07 发布包** = fast36 已发（网盘）。
 - **浪人崛起**：出图、颜色对；未验运动向量符号（拖影）、LDR 亮度是否与训练域一致、帧率、进游戏颜色骤变/黑帧是否同样出现。
 - **已知瞬态问题**（09-10 09:55 Zero 报告，暂不处理）：fast37 刚进游戏颜色骤变几秒后稳定；偶发整帧变黑。
@@ -419,7 +422,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 1. ~~C32 家族 FFN 并进注意力核~~（fast37 已做：隔离 −1.2 / 整帧 −1.9）。
 2. ~~多头 26 块 FFN+proj0 合核~~（做了，零收益，代码留默认关）。
-3. **C512 家族 f32 激活 tile 化**：FFWD→投影 0 这一段已做（fast39，−0.8）。剩下：残差流 f32 `[token][512]`（块输入 / result[1] / result[3]，被 FFWD 输入 staging、两个投影的残差 gather、下一块、head/bridge/decoder entry 读）——改 f16 或 tile；packed/result[2] 的 E4M3 512B 步长（QKV pack、注意力、投影 1）。估再 −0.5。
+3. ~~C512 家族激活~~：fast39（FFWD→投影 0 E4M3 tile，−0.8）+ fast40（mapped + FP8 stream，−0.3，显存 −380MB）已做。剩下的小尾巴：注意力输出 result[2] 仍是 `[token][512]` E4M3（512B 步长），投影 1 的 A 直读；FFWD 每个 group 都重新 stage 一遍 16×512 输入（8 倍冗余读）。估 −0.1～0.2，先不动。
 4. post 的 FFN 仍 1.2 vs pre 0.63：merge fold 里 e4m3 解码 ×2 + 4 次 f16 往返，改 4 字节一次 Load 出 4 通道。估 −0.3。
 5. dispatch 之间空转约 3.5ms：只能靠合核压（对带宽型段）。
 6. ViT contract 提速 −0.6（已被 fast38 tile 吃掉大半）；expand+contract 合核 −0.3 其次。升采样投影三段 wave 化（proj56/62/66 = 0.13/0.31/0.56，标量核，估 −0.7；proj62 tile 试过反而慢）。

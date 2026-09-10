@@ -43,11 +43,22 @@ ByteAddressBuffer weights:register(t1);
 #if NATIVE_TILED_WEIGHTS && !NATIVE_FP8_OPERANDS
 #error tiled weights are packed as E4M3 bytes
 #endif
+#ifndef NATIVE_FP8_FEATURE_TILED
+#define NATIVE_FP8_FEATURE_TILED 0
+#endif
+#ifndef NATIVE_FP8_STORE_TILED
+#define NATIVE_FP8_STORE_TILED 0
+#endif
 #if NATIVE_FP8_FEATURE
 // FAST PATH: residual stream stored as E4M3 bytes.
 ByteAddressBuffer feature8:register(t2);
 float FromE4M3(uint b){uint e=(b>>3)&15u,m=b&7u;float v=e?asfloat(((e+120u)<<23)|(m<<20)):float(m)*0.001953125;return (b&0x80u)?-v:v;}
+#if NATIVE_FP8_FEATURE_TILED
+/* FAST PATH (split stream8): the residual (previous projection output) is stored as 512-byte [token 16][k 32] tiles */
+float FeatureAt(uint index){uint tok=index/MATRIX_CHANNELS,ch=index%MATRIX_CHANNELS;uint a=((tok/16)*(MATRIX_CHANNELS/32)+ch/32)*512+(tok%16)*32+ch%32;return FromE4M3((feature8.Load(a&~3u)>>((a&3u)*8u))&255u);}
+#else
 float FeatureAt(uint index){return FromE4M3((feature8.Load(index&~3u)>>((index&3u)*8u))&255u);}
+#endif
 #else
 StructuredBuffer<float> feature:register(t2);
 float FeatureAt(uint index){return feature[index];}
@@ -186,6 +197,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #if NATIVE_FP8_STORE && MAP_OUTPUT
   // E4M3 tile staged in LDS (16 rows x 16 bytes = 4 uints per row), then 4-channel stores into the cropped raster.
   acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,n*64,4,dx::linalg::MatrixLayout::RowMajor);
+#elif NATIVE_FP8_STORE && NATIVE_FP8_STORE_TILED
+  /* FAST PATH (split stream8): 512-byte [token 16][k 32] tiles; this 16-column block is the low or high half of each 32-byte row */
+  {const uint col=(gid.y*BLOCK_N+n)*16;acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,((first/16)*(MATRIX_CHANNELS/32)+col/32)*512+col%32,32,dx::linalg::MatrixLayout::RowMajor,16);}
 #elif NATIVE_FP8_STORE
   acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #elif MAP_OUTPUT

@@ -7,6 +7,11 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_split_stream8_network.ps1
+# FAST PATH: C512 blocks without window pack/crop and QKV pack: kernels read the block input by raster index and write the cropped raster; the first
+# projection's E4M3 output (tiles) is the QKV input; between blocks the raster is E4M3 bytes (first input / last output stay f32). Bit-exact.
+$env:DLSS5_BUILD_SPLIT_STREAM8='1'
+$env:DLSS5_SPLIT_STREAM8='1'
 # ---- run_split_ffwd8_network.ps1
 # FAST PATH: C512 FFWD output stored as E4M3 bytes (it is already F(H())-quantized) and the following projection loads its A tiles directly. Build-only, bit-exact.
 $env:DLSS5_BUILD_SPLIT_FFWD8='1'
@@ -445,6 +450,15 @@ foreach($Channels in $(if($IncludeC64){128,64}else{128})){foreach($Name in 'pack
 [Environment]::SetEnvironmentVariable('DLSS5_TEST_MATRIX_C64',$(if($IncludeC64){'1'}else{'0'}),'Process')
 foreach($Name in 'TILED_C64','SPLIT_PROJECTION','SPLIT_FFWD','TILED_QKV','SHARED_C32','RESIDENT_NOISE','CACHE_C32_INPUT','PAD_C32_LDS','PAD_MULTIHEAD_LDS','MATRIX_C256','MATRIX_C128'){
  [Environment]::SetEnvironmentVariable("DLSS5_TEST_$Name",'1','Process')
+}
+# ---- run_split_stream8_network.ps1 (compiles after every env of the lower runners is set)
+if($env:DLSS5_BUILD_SPLIT_STREAM8 -eq '1'){
+ if($env:DLSS5_BUILD_SPLIT_FFWD8 -ne '1'){throw 'split stream8 needs DLSS5_BUILD_SPLIT_FFWD8'}
+ $FfwdBase=@('-D',"NATIVE_SPLIT_FFWD_BLOCKED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_BLOCKED -eq '1'){1}else{0})",'-D',"NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})",'-D',"NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})",'-D',"NATIVE_SPLIT_FFWD_WAVES4=$(if($env:DLSS5_BUILD_SPLIT_FFWD_WAVES4 -eq '1'){1}else{0})",'-D',"NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})",'-D',"NATIVE_SPLIT_FFWD_TILED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_TILED -eq '1'){1}else{0})",'-D','NATIVE_SPLIT_FFWD8=1','-D','NATIVE_SPLIT_MAPPED=1')
+ foreach($In8 in 0,1){
+ }
+ foreach($Out in '8','f','raw'){
+ }
 }
 # ---- run_native_temporal_network70.ps1
 $PostShift=3
