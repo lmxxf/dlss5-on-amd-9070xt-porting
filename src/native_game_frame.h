@@ -38,6 +38,57 @@ public:
   std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
  }
 };
+/* Diagnostic (DLSS5_BLACK_PROBE=1): per-frame statistics of the network RGB residual (native_black_probe.hlsl), read back asynchronously
+   through a ring of fence-tagged slots (no Flush). The network output is also copied into a two-slot ring each frame; when a frame's
+   statistics are abnormal (non-finite values, or |v|>1.5 in more than 1% of the values) the frame's residual is dumped from the ring together
+   with the current history/motion/color (DumpTemporalNow) to logs\black-<frame>-*, at most 3 times per run, and a line goes to
+   native-submission-order.txt. A summary line every 300 frames. Costs one small dispatch and a 25MB copy per frame. */
+class NativeBlackProbe {
+ ID3D12Resource*rgb{};ID3D12Resource*stats{};ID3D12Resource*zero{};ID3D12Resource*readback{};ID3D12Resource*ring[2]{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};
+ UINT values{};UINT64 slot_fence[8]{};UINT slot_frame[8]{};bool slot_valid[8]{};UINT frame{},next_read{},dumps{};double sum_mean{},sum_max{};UINT summary_n{};
+ static ID3D12Resource*Buffer(ID3D12Device*d,UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state,bool uav=false){D3D12_HEAP_PROPERTIES hp{};hp.Type=type;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=uav?D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS:D3D12_RESOURCE_FLAG_NONE;ID3D12Resource*r=nullptr;if(FAILED(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&rd,state,nullptr,IID_PPV_ARGS(&r))))throw std::runtime_error("black probe buffer");return r;}
+ static void Log(const char*line){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu %s\n",GetCurrentProcessId(),GetTickCount64(),line);fclose(f);}}
+public:
+ bool enabled{};
+ ~NativeBlackProbe(){for(auto*r:ring)if(r)r->Release();if(readback)readback->Release();if(zero)zero->Release();if(stats)stats->Release();if(rgb)rgb->Release();if(root)root->Release();if(pso)pso->Release();}
+ void Create(ID3D12Device*d,ID3D12Resource*network_rgb,UINT pixels,const std::wstring&dir){
+  const wchar_t*v=_wgetenv(L"DLSS5_BLACK_PROBE");if(!v||wcscmp(v,L"1"))return;
+  rgb=network_rgb;rgb->AddRef();values=pixels*3;
+  stats=Buffer(d,16,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,true);readback=Buffer(d,16*8,D3D12_HEAP_TYPE_READBACK,D3D12_RESOURCE_STATE_COPY_DEST);
+  zero=Buffer(d,16,D3D12_HEAP_TYPE_UPLOAD,D3D12_RESOURCE_STATE_GENERIC_READ);{void*p=nullptr;D3D12_RANGE none{};if(FAILED(zero->Map(0,&none,&p)))throw std::runtime_error("black probe zero");std::memset(p,0,16);zero->Unmap(0,nullptr);}
+  for(auto&r:ring)r=Buffer(d,UINT64(values)*4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_COPY_DEST);
+  D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
+  D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("black probe root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("black probe root signature");blob->Release();blob=nullptr;error=nullptr;
+  auto hr=CompileNativeShader(dir+L"\\native_black_probe.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"black probe compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("black probe pipeline");blob->Release();enabled=true;Log("black_probe enabled");
+ }
+ /* after the network (rgb in SRV state): stats dispatch, copy stats to the frame's readback slot, copy the residual into the ring */
+ void Record(ID3D12GraphicsCommandList*c){
+  if(!enabled)return;const UINT slot=frame%8;
+  D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+  b.Transition={stats,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_DEST};c->ResourceBarrier(1,&b);c->CopyBufferRegion(stats,0,zero,0,16);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
+  UINT words[4]={values,0,0,0};c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,rgb->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(1,stats->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,4,words,0);c->Dispatch(256,1,1);
+  b.Transition={stats,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE};c->ResourceBarrier(1,&b);c->CopyBufferRegion(readback,slot*16,stats,0,16);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
+  b.Transition={rgb,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};c->ResourceBarrier(1,&b);c->CopyBufferRegion(ring[frame%2],0,rgb,0,UINT64(values)*4);std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
+ }
+ /* after the Submit that recorded this frame: remember the fence value the slot completes with */
+ void Submitted(UINT64 fence_value){if(!enabled)return;const UINT slot=frame%8;slot_fence[slot]=fence_value;slot_frame[slot]=frame;slot_valid[slot]=true;frame++;}
+ /* at the start of the next frame (before anything of it is recorded): read every completed slot in order; returns the frame index of an
+    abnormal frame whose residual is still in the ring (or UINT_MAX) so the caller can dump it, and clears that slot */
+ UINT Poll(UINT64 completed){
+  if(!enabled)return UINT_MAX;UINT bad=UINT_MAX;
+  while(slot_valid[next_read%8]&&completed>=slot_fence[next_read%8]){
+   const UINT slot=next_read%8;slot_valid[slot]=false;next_read++;
+   UINT s[4]{};{void*p=nullptr;D3D12_RANGE range{slot*16,slot*16+16},none{};if(FAILED(readback->Map(0,&range,&p)))continue;std::memcpy(s,(const char*)p+slot*16,16);readback->Unmap(0,&none);}
+   float mx;std::memcpy(&mx,&s[2],4);const double mean=double(s[3])/64.0/values;sum_mean+=mean;sum_max+=mx;
+   if(++summary_n%300==0){char line[256];snprintf(line,sizeof line,"black_probe summary frames=%u mean_abs=%.4f max_abs=%.3f",slot_frame[slot],sum_mean/300,sum_max/300);Log(line);sum_mean=sum_max=0;}
+   const bool abnormal=s[0]>0||s[1]>values/100;
+   if(abnormal){char line[256];snprintf(line,sizeof line,"black_probe abnormal frame=%u nonfinite=%u big=%u max_abs=%.3f mean_abs=%.4f ring_has_frame=%u",slot_frame[slot],s[0],s[1],mx,mean,frame-slot_frame[slot]<=2?1u:0u);Log(line);if(bad==UINT_MAX&&frame-slot_frame[slot]<=2&&dumps<3)bad=slot_frame[slot];}
+  }
+  return bad;
+ }
+ ID3D12Resource*RingSlot(UINT f)const{return ring[f%2];}UINT64 RingBytes()const{return UINT64(values)*4;}void CountDump(){dumps++;}
+};
 inline void NativeGameFrameStep(const char*step,ID3D12Device*d=nullptr){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=frame_create_step detail=%s removed=%08x\n",GetCurrentProcessId(),GetTickCount64(),step,d?unsigned(d->GetDeviceRemovedReason()):0u);fclose(f);}}
 class NativeGameFrame {
  struct Resources {
@@ -46,7 +97,7 @@ class NativeGameFrame {
   NativeGameCodec encode;
   NativeGameRgbInput input;
   NativeActualNetwork70 network;
-  NativeRgbTexture neural;NativeOutputSmooth smooth;
+  NativeRgbTexture neural;NativeOutputSmooth smooth;NativeBlackProbe black;
   NativeGameCodec decode;
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
@@ -97,6 +148,7 @@ public:
    NativeGameFrameStep("network",d);resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
    NativeGameFrameStep("neural",d);resources->neural.Create(d,resources->network.Output(),directory);
    if(resources->temporal)resources->smooth.Create(d,resources->network.Output(),resources->sampler.Output(),directory);
+   resources->black.Create(d,resources->network.Output(),1920*1080,directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
    NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);NativeGameFrameStep("ready",d);ready=true;
   }catch(...){failed=true;throw;}
@@ -155,13 +207,17 @@ public:
    const bool use_history=r.temporal&&motion_texture&&!reset&&r.feed.HasHistory();
    {static unsigned every=[]{const wchar_t*v=_wgetenv(L"DLSS5_MAKE_RESIDENT_EVERY");return v?unsigned(wcstoul(v,nullptr,10)):0u;}();static unsigned frames=0;static unsigned fails=0;
     if(every&&++frames%every==0){HRESULT mr=NativeMakeAllResident(r.submit.Device());if(FAILED(mr)&&++fails<=5)if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu make_resident_failed hr=%08x tracked=%u\n",GetCurrentProcessId(),unsigned(mr),unsigned(NativeTrackedResources().size()));fclose(f);}}}
+   if(r.black.enabled){const UINT bad=r.black.Poll(r.submit.Completed());if(bad!=UINT_MAX){r.submit.Flush();const std::wstring prefix=NativeLabPath((L"logs\\black-"+std::to_wstring(bad)).c_str());
+     auto*dev=r.submit.Device();D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_READBACK;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=r.black.RingBytes();rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+     ID3D12Resource*rb=nullptr;if(SUCCEEDED(NativeCreateCommittedResource(dev,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&rb)))){r.submit.Submit([&](ID3D12GraphicsCommandList*c){c->CopyBufferRegion(rb,0,r.black.RingSlot(bad),0,r.black.RingBytes());});r.submit.Flush();void*p=nullptr;D3D12_RANGE range{0,SIZE_T(r.black.RingBytes())},none{};if(SUCCEEDED(rb->Map(0,&range,&p))){if(FILE*f=_wfopen((prefix+L"-residual.f32").c_str(),L"wb")){fwrite(p,1,size_t(r.black.RingBytes()),f);fclose(f);}rb->Unmap(0,&none);}rb->Release();}
+     r.black.CountDump();dump_prefix=prefix;}}
    const auto cpu_start=std::chrono::steady_clock::now();if(r.probe_on)r.probe.Reset();
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.encode.Record(c,{source_state});r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);r.sampler.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
-   if(!dump_prefix.empty()&&use_history){r.submit.Flush();DumpTemporalNow(dump_prefix);dump_prefix.clear();}
+   if(!dump_prefix.empty()&&(use_history||(r.temporal&&r.black.enabled))){r.submit.Flush();DumpTemporalNow(dump_prefix);{char line[160];snprintf(line,sizeof line,"black_probe dumped history=%u reset=%u motion=%u",use_history?1u:0u,reset?1u:0u,motion_texture?1u:0u);if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu %s\n",GetCurrentProcessId(),line);fclose(f);}}dump_prefix.clear();}
    r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
-    if(use_history)r.smooth.Record(c);
+    if(use_history)r.smooth.Record(c);r.black.Record(c);
     if(r.temporal)r.feed.RecordHistory(c);
     r.neural.Record(c);r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,source_state});
     D3D12_RESOURCE_BARRIER b[2]{};for(auto&v:b)v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -173,7 +229,7 @@ public:
     for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
     if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}
-   });
+   });r.black.Submitted(r.submit.LastValue());
    if(r.probe_on){r.submit.Flush();std::vector<double>iv;if(r.probe.Intervals(r.submit.TimestampFrequency(),iv)&&iv.size()==3){for(int i=0;i<3;i++)r.probe_sum[i]+=iv[i];}
     r.probe_cpu+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-cpu_start).count();
     if(use_history)r.probe_history++;if(reset)r.probe_reset++;if(!motion_texture)r.probe_nomotion++;

@@ -65,6 +65,8 @@ public:
    ck(NativeCreateCommittedResource(device,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&timing_readback)));ck(queue->GetTimestampFrequency(&timing_frequency));if(!timing_frequency)throw std::runtime_error("zero GPU clock");
   }
  }
+ /* fence bookkeeping for asynchronous readbacks (black probe): the value signalled by the latest Submit and the GPU's completed value */
+ UINT64 LastValue()const{return value;}UINT64 Completed()const{return fence?fence->GetCompletedValue():0;}
  template<class Record>void Submit(Record record,DWORD timeout_ms=30000){
   std::lock_guard<std::mutex>guard(mutex);
   if(!event||poisoned||!timeout_ms)throw std::runtime_error("submission unavailable");
