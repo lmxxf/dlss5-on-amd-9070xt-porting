@@ -1,4 +1,4 @@
-# Builds every shader of the fast chain into $Folder (flattened from the 85 nested run_*_network.ps1 runners in
+# Builds every shader of the fast chain into $Folder (flattened from the 86 nested run_*_network.ps1 runners in
 # Development/, in the same order, so the compiled set and the DLSS5_* runtime flags are identical to the game build)
 # and then runs the bench executable (native-network70-temporal.exe, see build-bench.sh). Needs the SM6.10 preview dxc.
 param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview')
@@ -7,6 +7,10 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_split_tiled_network.ps1
+# FAST PATH: C512 blocks' QKV and projection weights as contiguous 512-byte tiles (kernels already supported it; host packing + build flag). Bit-exact.
+$env:DLSS5_BUILD_SPLIT_TILED='1'
+$env:DLSS5_SPLIT_TILED='1'
 # ---- run_vit_tiled_network.ps1
 # FAST PATH: ViT expand/reduce weights and the hidden layer as 512-byte contiguous tiles (no power-of-two row strides). Pure data movement, bit-exact.
 $env:DLSS5_BUILD_VIT_TILED='1'
@@ -118,13 +122,13 @@ $env:DLSS5_BUILD_DIRECT_CAST='1'
 # FAST PATH: C512 attention through the direct path (FP8 pack, fused QKV+normalize, FP8 Q/K/V attention with FP8 output, FP8-input projection).
 & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D PACKED_INPUT=1 -D NATIVE_FP8_OPERANDS=1 -D MAPPED_INPUT=0 native_matrix_pack.hlsl -Fo native_matrix_pack_fp8_c512.cso
 if($LASTEXITCODE -ne 0){throw 'FP8 pack C512 compilation failed'}
-& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D NATIVE_FP8_QKV_OUT=1 -D "NATIVE_QKV_FAST2=$(if($env:DLSS5_BUILD_QKV_FAST2 -eq '1'){1}else{0})" native_wave_qkv_normalize.hlsl -Fo native_wave_qkv_normalize_fp8qkv_c512.cso
+& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D NATIVE_FP8_QKV_OUT=1 -D "NATIVE_QKV_FAST2=$(if($env:DLSS5_BUILD_QKV_FAST2 -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" native_wave_qkv_normalize.hlsl -Fo native_wave_qkv_normalize_fp8qkv_c512.cso
 if($LASTEXITCODE -ne 0){throw 'fused QKV C512 compilation failed'}
 & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D CHANNELS=512 -D DIRECT_NORMALIZE=0 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_FP8_OUTPUT=1 -D NATIVE_FP8_QKV=1 -D "NATIVE_ATTN_FAST2=$(if($env:DLSS5_BUILD_ATTN_FAST2 -eq '1'){1}else{0})" native_wave_attention_direct.hlsl -Fo native_wave_attention_direct_fp8qkv_fp8act_c512.cso
 if($LASTEXITCODE -ne 0){throw 'direct attention C512 compilation failed'}
 foreach($Raw in 0,1){
  $Name=if($Raw){'native_wave_project_raw_fp8act_c512.cso'}else{'native_wave_project_fp8act_c512.cso'}
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FP8_OPERANDS=1 -D NATIVE_FP8_INPUT=1 native_wave_project.hlsl -Fo $Name
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FP8_OPERANDS=1 -D NATIVE_FP8_INPUT=1 -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
  if($LASTEXITCODE -ne 0){throw "FP8-input projection C512 raw=$Raw compilation failed"}
 }
 $env:DLSS5_SPLIT_DIRECT_ATTENTION='1'
@@ -369,7 +373,7 @@ $env:DLSS5_TEST_DIRECT_ATTENTION='1'
 # Wave-matrix FFWD/attention projections for the 512-channel split blocks.
 foreach($Raw in 0,1){
  $Name=if($Raw){'native_wave_project_raw_c512.cso'}else{'native_wave_project_c512.cso'}
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
  if($LASTEXITCODE -ne 0){throw "Wave split projection raw=$Raw compilation failed"}
 }
 $env:DLSS5_TEST_WAVE_SPLIT_PROJECT='1'

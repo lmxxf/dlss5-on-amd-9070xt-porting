@@ -9,7 +9,7 @@
 class NativeSplit {
  NativeMatrixWorkspace*workspace{};ID3D12Resource*qkv_weights{};ID3D12PipelineState*aux_pso[2]{};ID3D12PipelineState*direct_pso[3]{};ID3D12Resource*qkv_weights8{};bool direct_attention{};bool matrix_attention{},wave_ffwd{},parallel_ffwd{};
  ID3D12Resource*input{};ID3D12Resource*weights[3]{};ID3D12Resource*result[4]{};ID3D12Resource*project_weights[2]{};bool wave_project{},copy8{};
- ID3D12RootSignature*root{};ID3D12PipelineState*pso[4]{};UINT geometry[2]{};bool recorded{},tiled_projection{},shared_ffwd{};
+ ID3D12RootSignature*root{};ID3D12PipelineState*pso[4]{};UINT geometry[2]{};bool recorded{},tiled_projection{},shared_ffwd{},split_tiled{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("C64 HRESULT="+std::to_string(unsigned(hr)));}
  static ID3D12Resource* Buffer(ID3D12Device*d,UINT64 bytes,const std::vector<float>*data=nullptr){
   D3D12_HEAP_PROPERTIES hp{};hp.Type=data?D3D12_HEAP_TYPE_UPLOAD:D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=data?D3D12_RESOURCE_FLAG_NONE:D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -50,9 +50,13 @@ public:
   }
   // FAST PATH: direct attention path for C512 (FP8 pack -> fused QKV+normalize -> direct attention with FP8 Q/K/V and FP8 output -> projection with direct FP8 A loads).
   if(const wchar_t*da=_wgetenv(L"DLSS5_SPLIT_DIRECT_ATTENTION")){if(wcscmp(da,L"0")&&wcscmp(da,L"1"))throw std::runtime_error("invalid split direct attention flag");const wchar_t*f8=_wgetenv(L"DLSS5_FP8_OPERANDS");direct_attention=!wcscmp(da,L"1")&&matrix_attention&&f8&&!wcscmp(f8,L"1");}
+  /* FAST PATH (DLSS5_SPLIT_TILED): C512 QKV and projection weights as contiguous 512-byte [k 32][j 16] tiles (kernels built with NATIVE_TILED_WEIGHTS=1); no 512-byte row strides. */
+  {const wchar_t*st=_wgetenv(L"DLSS5_SPLIT_TILED");if(st&&wcscmp(st,L"0")&&wcscmp(st,L"1"))throw std::runtime_error("invalid split tiled flag");split_tiled=st&&!wcscmp(st,L"1");}
+  auto tile512=[](unsigned char*o8,size_t rows){std::vector<unsigned char>t(rows*512);for(size_t n=0;n<rows/16;n++)for(size_t g=0;g<16;g++)for(size_t kk=0;kk<32;kk++)for(size_t j=0;j<16;j++)t[(n*16+g)*512+kk*16+j]=o8[(n*16+j)*512+g*32+kk];std::memcpy(o8,t.data(),t.size());};
   if(direct_attention){
    std::vector<float>packed8(3ull*512*512/4);unsigned char*out8=reinterpret_cast<unsigned char*>(packed8.data());
    for(size_t i=0;i<3ull*512*512;i++){float v=aw[i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){out8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("split QKV weight not FP8-representable");out8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("split QKV weight not FP8-representable");out8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}
+   if(split_tiled)tile512(out8,3*512);
    auto*upload=Buffer(d,packed8.size()*4,&packed8);qkv_weights8=NativeResidentTable(d,upload);upload->Release();
    const wchar_t*names[]={L"native_matrix_pack_fp8_c512.cso",L"native_wave_qkv_normalize_fp8qkv_c512.cso",L"native_wave_attention_direct_fp8qkv_fp8act_c512.cso"};
    for(UINT i=0;i<3;i++){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&direct_pso[i]));blob->Release();Check(hr);}
@@ -66,7 +70,7 @@ public:
    for(UINT k=0;k<2;k++){
     const wchar_t*f8=_wgetenv(L"DLSS5_FP8_OPERANDS");const bool fp8=f8&&!wcscmp(f8,L"1");
     std::vector<float>packed(fp8?matrix/4+512:matrix/2+512);
-    if(fp8){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data());for(size_t i=0;i<matrix;i++){float v=sources[k][i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}std::memcpy(packed.data()+matrix/4,scales[k],512*4);}
+    if(fp8){unsigned char*o8=reinterpret_cast<unsigned char*>(packed.data());for(size_t i=0;i<matrix;i++){float v=sources[k][i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){o8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("split projection weight not FP8-representable");o8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}std::memcpy(packed.data()+matrix/4,scales[k],512*4);if(split_tiled)tile512(o8,512);}
     else{for(size_t i=0;i<matrix;i++){uint32_t bits;std::memcpy(&bits,sources[k]+i,4);uint32_t mag=bits&0x7fffffffu;uint16_t half=uint16_t((bits>>16)&0x8000);if(mag){int e=int(mag>>23)-112;if(e<=0||e>=31||(mag&0x1fff))throw std::runtime_error("split projection weight not exact half");half|=uint16_t((e<<10)|((mag&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&half,2);}
     std::memcpy(packed.data()+matrix/2,scales[k],512*4);}
     project_weights[k]=Buffer(d,packed.size()*4,&packed);
