@@ -132,7 +132,10 @@ public:
     // Motion vectors arrive in UV units of the render grid; the coordinate pass uses the captured
     // NGX contract (subrect 0,0..render extent over the motion texture; displacement scale 1/1920,1/1080).
     auto&t=*temporal_config;auto&r=*resources;
-    r.feed.Create(d,t.motion_width,t.motion_height,1920.f*NativeMotionSign(),1080.f*NativeMotionSign(),directory);r.motion_w=t.motion_width;r.motion_h=t.motion_height;
+    /* raster motion -> pixels of the 1080p output: value * mvscale = render-grid pixels (FFX contract), * 1920/render_w = output pixels. Stellar Blade declares
+       mvscale = render size (UV units) -> 1920 exactly as before; Magpie declares (1,1) with a 1920 render grid (pixel units) -> 1. No declaration (XeSS): UV units. */
+    const float*mvs=NativeMotionVectorScale();const float sx=(mvs[0]!=0.f&&t.render_width)?mvs[0]*1920.f/float(t.render_width):1920.f,sy=(mvs[1]!=0.f&&t.render_height)?mvs[1]*1080.f/float(t.render_height):1080.f;
+    r.feed.Create(d,t.motion_width,t.motion_height,sx*NativeMotionSign(),sy*NativeMotionSign(),directory);r.motion_w=t.motion_width;r.motion_h=t.motion_height;
     const float transform[6]={0,0,float(t.render_width),float(t.render_height),1.f/1920.f,1.f/1080.f};
     r.coordinates.Create(d,r.feed.Motion(),1920,1080,1920,1152,t.motion_width,t.motion_height,transform,directory,true);
     std::ifstream f((directory+L"\\normalized-output.f32").c_str(),std::ios::binary|std::ios::ate);if(!f||f.tellg()!=33554432)throw std::runtime_error("reciprocal table missing");

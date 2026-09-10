@@ -128,7 +128,7 @@ static uint32_t dispatch(void**context,const Header*h){
   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+360,mvscale,16,&b);
   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+376,sizes,16,&c);
   ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+408,&reset,1,&d);
-  if(a==sizeof(motion)&&c==16&&motion.resource&&!observed_motion_w.load()){observed_motion_w=motion.width;observed_motion_h=motion.height;observed_render_w=sizes[0];observed_render_h=sizes[1];}
+  if(a==sizeof(motion)&&c==16&&motion.resource&&!observed_motion_w.load()){observed_motion_w=motion.width;observed_motion_h=motion.height;observed_render_w=sizes[0];observed_render_h=sizes[1];if(b==16){NativeMotionVectorScale()[0]=mvscale[0];NativeMotionVectorScale()[1]=mvscale[1];}}
   frame_motion=(a==sizeof(motion)&&motion.width==observed_motion_w.load()&&motion.height==observed_motion_h.load()&&sizes[0]==observed_render_w.load()&&sizes[1]==observed_render_h.load())?static_cast<ID3D12Resource*>(motion.resource):nullptr;
   frame_reset=reset!=0;
   if(n<=8){
@@ -141,7 +141,10 @@ static uint32_t dispatch(void**context,const Header*h){
  if(output.resource)install_native_barriers(list);
  auto result=original(context,h);log("ffx_end",list,nullptr,result);
 #ifdef NATIVE_ORDER_SNAPSHOT
- bool request=n==120;
+ /* DLSS5_SNAPSHOT_FRAME=<n> in native-game-flags.txt (read here directly: the flag file is applied to the environment only when the network
+    initializes, which is what this frame triggers): the upscaler frame that arms the network. Default 120 (the game build); 1 for Magpie. */
+ static const unsigned snapshot_frame=[]{unsigned v=120;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_SNAPSHOT_FRAME=%u",&x)==1&&x>=1)v=x;}fclose(f);}return v;}();
+ bool request=n==snapshot_frame;
 #ifdef NATIVE_ORDER_NEURAL
  request=request||neural_oneshot.WantsFrame();
 #endif

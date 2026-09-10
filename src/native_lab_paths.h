@@ -9,6 +9,9 @@ inline bool NativeIsRgba8Unorm(DXGI_FORMAT f){DXGI_FORMAT v=NativeViewFormat(f);
 inline bool NativeIsGameColor(DXGI_FORMAT f){return NativeIsRgba16Float(f)||NativeIsRgba8Unorm(f);}
 /* Motion-vector sign relative to the FSR contract (+1: FSR/Stellar Blade UV units; -1: XeSS titles whose velocity scale is (-w,-h)). Set by the hook before the frame is created. */
 inline float&NativeMotionSign(){static float s=1.f;return s;}
+/* Motion-vector unit as declared by the upscaler dispatch (FFX motionVectorScale): raster value * scale = pixels of the render grid. Set by the hook
+   from the first dispatch; {0,0} = not declared (XeSS path), the frame then assumes UV units of the render grid. */
+inline float*NativeMotionVectorScale(){static float s[2]={0.f,0.f};return s;}
 /* Lab root and weight loading for the game addon.
    Root: the folder DLSS5-AMD next to this DLL when it holds native-game-flags.txt (the distributed package),
    otherwise D:\DLSSNR-Lab (the development machine). Every lab path in the addon goes through NativeLabPath().
