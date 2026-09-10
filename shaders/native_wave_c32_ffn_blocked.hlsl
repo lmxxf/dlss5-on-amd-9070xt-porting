@@ -109,7 +109,15 @@ groupshared uint hidden8[512];
 #if NATIVE_C32_FFN_FAST3
 groupshared uint prefix8[128];
 #endif
+#ifndef NATIVE_C32_PRECISE_CHAIN
+#define NATIVE_C32_PRECISE_CHAIN 0
+#endif
+#if NATIVE_C32_PRECISE_CHAIN
+// FAST PATH (DLSS5_BUILD_C32_PRECISE_CHAIN): no FMA contraction in the scalar tails, so the fused-FFN attention kernel (native_c32_ffn_fused.hlsli) matches bit for bit.
+float ActivatePoly(float v){float g=clamp(v,-4.0,4.0);precise float q=abs(g)*(-.055908203125)+.447265625;precise float p=g*q+.89453125;return v*p;}
+#else
 float ActivatePoly(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return v*p;}
+#endif
 #endif
 float H(float v){uint b=asuint(v),sg=b&0x80000000u,a=b&0x7fffffffu;if(a>=0x7f800000u)return v;if(a<0x38800000u)return (sg?-1:1)*round(abs(v)*16777216.0)*5.9604644775390625e-8;uint r=(a+0xfffu+((a>>13)&1u))&0xffffe000u;return asfloat(sg|(r>=0x47800000u?0x7f800000u:r));}
 #if NATIVE_FAST_F
@@ -169,7 +177,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    [branch]if(map_mode==4||map_mode==6||map_mode==7||map_mode==8||map_mode==9){
     const float w0=asfloat(merge_w.Load(t*4)),w1=asfloat(merge_w.Load((32+t)*4));const int mine_skip=(map_mode==6&&t<16)?skip_index(first+t):0;const int mine_low=t<16?low_index(mine):0;
     [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);int ssrc=WaveReadLaneAt(mine_skip,j);float v=0;
-     if(src>=0){uint low=uint(WaveReadLaneAt(mine_low,j))+t;float sk;if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(NATIVE_C32_HALF_STREAM?skip_h(uint(ssrc)+t):asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(NATIVE_C32_HALF_STREAM?input_h(low):input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
+     if(src>=0){uint low=uint(WaveReadLaneAt(mine_low,j))+t;float sk;if(map_mode>=7){uint a=uint(src)+t;sk=e4m3_to_float((skip_bytes.Load(a&~3u)>>((a&3u)*8))&255u);}else sk=map_mode==6?Ffast(NATIVE_C32_HALF_STREAM?skip_h(uint(ssrc)+t):asfloat(skip_bytes.Load((uint(ssrc)+t)*4))):asfloat(skip_bytes.Load((uint(src)+t)*4));float lo=map_mode==8?Ffast(NATIVE_C32_HALF_STREAM?input_h(low):input_at(low)):map_mode==9?e4m3_to_float((input_bytes.Load(low&~3u)>>((low&3u)*8))&255u):input_at(low);if(NATIVE_C32_PRECISE_CHAIN){precise float m=f16tof32(f32tof16(lo*w0))+sk*w1;v=f16tof32(f32tof16(m));}else v=f16tof32(f32tof16(f16tof32(f32tof16(lo*w0))+sk*w1));}
      raw[j*32+t]=v;}
    }else{
    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);raw[j*32+t]=src<0?0:((NATIVE_C32_HALF_STREAM&&map_mode==3)?input_h(uint(src)+t):input_at(uint(src)+t));}

@@ -22,8 +22,9 @@ class NativePreblockRuntime {
  static ID3D12Resource*&SharedFfn(){static ID3D12Resource*r=nullptr;return r;}
  static ID3D12Resource*&SharedRaw(){static ID3D12Resource*r=nullptr;return r;}
  static UINT64&SharedBytes(){static UINT64 b=0;return b;}
- static bool&SharedFfnReadable(){static bool v=false;return v;}
- static bool&SharedRawReadable(){static bool v=false;return v;}
+ /* Readable state of the shared pair, per buffer: with DLSS5_C32_FUSED_FFN the instances alternate which one is their raw. */
+ static bool&Readable(ID3D12Resource*r){static bool a=false,b=false;return r==SharedFfn()?b:a;}
+ static UINT&SharedParity(){static UINT n=0;return n;}
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
@@ -64,6 +65,9 @@ public:
   // FAST PATH (DLSS5_C32_HALF_STREAM): ffn/raw scratch as f16 (exact); halves the C32 blocks' dominant memory traffic. Needs the blocked raw-store FFN + fast4 attention builds.
   {const wchar_t*ep=_wgetenv(L"DLSS5_C32_EPILOGUE");if(ep&&wcscmp(ep,L"0")&&wcscmp(ep,L"1"))throw std::runtime_error("invalid C32 epilogue flag");epilogue=ep&&!wcscmp(ep,L"1");}
   {const wchar_t*hs=_wgetenv(L"DLSS5_C32_HALF_STREAM");if(hs&&wcscmp(hs,L"0")&&wcscmp(hs,L"1"))throw std::runtime_error("invalid C32 half stream flag");half_stream=hs&&!wcscmp(hs,L"1");}
+  /* FAST PATH (DLSS5_C32_FUSED_FFN): the FFN runs inside the fast4 attention dispatch (native_c32_ffn_fused.hlsli); the ffn scratch is idle and
+     becomes the second raw buffer, since that dispatch reads the previous stage's raw and writes its own. Prerequisites checked below. */
+  {const wchar_t*ff=_wgetenv(L"DLSS5_C32_FUSED_FFN");if(ff&&wcscmp(ff,L"0")&&wcscmp(ff,L"1"))throw std::runtime_error("invalid C32 fused FFN flag");fused_ffn=ff&&!wcscmp(ff,L"1");}
   // FAST PATH (DLSS5_POST70_OUT8): the post70 body (live profile, no noise table) also stores its attention output as E4M3 into main8 for the rgb head.
   {const wchar_t*o8=_wgetenv(L"DLSS5_POST70_OUT8");if(o8&&wcscmp(o8,L"0")&&wcscmp(o8,L"1"))throw std::runtime_error("invalid post70 out8 flag");attn_out8=PendingOut8()&&o8&&!wcscmp(o8,L"1");PendingOut8()=false;}
   const wchar_t*prefix_flag=_wgetenv(L"DLSS5_TEST_SPLIT_PREBLOCK_FFN");if(prefix_flag&&wcscmp(prefix_flag,L"0")&&wcscmp(prefix_flag,L"1"))throw std::runtime_error("invalid split preblock flag");prefix_wave=!raw_features&&noise_table&&prefix_flag&&!wcscmp(prefix_flag,L"1");
@@ -78,7 +82,8 @@ public:
    if(!SharedFfn()){UINT64 cap=UINT64(w+8)*(h+8)*32*(half_stream?2:4);SharedFfn()=Buffer(cap,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRaw()=Buffer(cap,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedBytes()=cap;}
    if(stream_bytes>SharedBytes())throw std::runtime_error("shared C32 scratch smaller than this instance; create the largest instance first");
    // Down-only preblock: post70 reads this instance's raw tiles at the end of the frame, so they must not live in the shared scratch.
-   ffn=SharedFfn();ffn->AddRef();if(down_only){private_raw=true;raw=Buffer(stream_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}else{raw=SharedRaw();raw->AddRef();}
+   const bool odd=fused_ffn&&(SharedParity()++&1u); /* fused FFN: consecutive instances alternate raw between the pair */
+   ffn=odd?SharedRaw():SharedFfn();ffn->AddRef();if(down_only){private_raw=true;raw=Buffer(stream_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}else{raw=odd?SharedFfn():SharedRaw();raw->AddRef();}
   }else{ffn=Buffer(stream_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);raw=Buffer(stream_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}buffer_bytes=bytes;if(main8_mode||attn_out8)main8=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);down=Buffer(bytes/4,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(epilogue&&main8_mode&&!down_only){epilogue_mode=2u;if(const wchar_t*em=_wgetenv(L"DLSS5_TEST_EPILOGUE_MODE"))if(em[0]==L'1')epilogue_mode=1;else if(noise_table&&_wgetenv(L"DLSS5_TEST_EPILOGUE_PRE_PROBE"))epilogue_mode=UINT(wcstoul(em,nullptr,10));/* test: 1 keeps the raw write; PRE_PROBE routes pre through the rgb probes */skip_finish=!_wgetenv(L"DLSS5_TEST_EPILOGUE_KEEP_FINISH");/* test: finish overwrites main8/down */} /* main8 stages (pre, blocks 4/69): nothing reads their raw, so the epilogue writes main8+down only */
   const std::vector<float>* values[]={&fw,&aw};
@@ -157,12 +162,15 @@ public:
     D3D12_ROOT_PARAMETER rp[10]{};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].Descriptor={0,0};rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[1].Descriptor={1,0};rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[2].Descriptor={0,0};rp[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[3].Descriptor={1,0};rp[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;rp[4].Constants={0,0,epilogue?11u:5u};
     /* DLSS5_C32_EPILOGUE: t2 color, t3 head weights, u2 main8, u3 down, u4 rgb */
     rp[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[5].Descriptor={2,0};rp[6].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[6].Descriptor={3,0};rp[7].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[7].Descriptor={2,0};rp[8].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[8].Descriptor={3,0};rp[9].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;rp[9].Descriptor={4,0};
-    D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=epilogue?10u:5u;rd.pParameters=rp;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&split_root)));rb->Release();if(re)re->Release();
+    /* DLSS5_C32_FUSED_FFN: t4 FFN weights, t5 FFN input, t6 skip, t7 coefficients/temporal; 19 constants (+ the 8 mapping values) */
+    D3D12_ROOT_PARAMETER rf[14]{};for(UINT k=0;k<10;k++)rf[k]=rp[k];for(UINT k=0;k<4;k++){rf[10+k].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rf[10+k].Descriptor={4+k,0};}rf[4].Constants={0,0,19};
+    if(fused_ffn){if(!(epilogue&&half_stream&&attn_fast4&&ffn_fast3&&(blocked_ffn_raw_store||prefix_wave)&&shared_c32&&!down_only))throw std::runtime_error("C32 fused FFN needs epilogue + half stream + attention fast4 + FFN fast3 + raw-store FFN + shared scratch");}
+    D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=fused_ffn?14u:epilogue?10u:5u;rd.pParameters=fused_ffn?rf:rp;ID3DBlob*rb=nullptr,*re=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&rb,&re));Check(device->CreateRootSignature(0,rb->GetBufferPointer(),rb->GetBufferSize(),IID_PPV_ARGS(&split_root)));rb->Release();if(re)re->Release();
     // FAST PATH: qkv+normalize and attention+projection fused (two dispatches instead of four).
     if(const wchar_t*fz=_wgetenv(L"DLSS5_C32_FUSED_ATTENTION")){if(wcscmp(fz,L"0")&&wcscmp(fz,L"1"))throw std::runtime_error("invalid fused C32 attention flag");fused_attention=!wcscmp(fz,L"1");}
     const wchar_t*wa=_wgetenv(L"DLSS5_C32_WAVE_ATTENTION");if(wa&&wcscmp(wa,L"0")&&wcscmp(wa,L"1"))throw std::runtime_error("invalid C32 wave attention flag");wave_attention=fused_attention&&wa&&!wcscmp(wa,L"1");
     const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?(attn_out8?L"\\native_wave_c32_fused_attention_out8.cso":L"\\native_wave_c32_fused_attention.cso"):L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
-    for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+names[i]).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
+    for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+(i==2&&fused_ffn?L"\\native_wave_c32_fused_attention_ffn.cso":names[i])).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
    }
   }if(main8_mode)Heap(2,raw,bytes,main8,bytes/4,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");
@@ -196,10 +204,10 @@ public:
  void Record(ID3D12GraphicsCommandList*c,UINT seed,bool local_oracle=false,bool temporal_enabled=false,NativeNetworkTimestamps*timer=nullptr,const char*label="c32_probe"){
   if(!device||!c)throw std::runtime_error("native preblock not created");
   if(shared_c32){
-   if(SharedFfnReadable()){Barrier(c,ffn,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedFfnReadable()=false;}
+   if(!fused_ffn&&Readable(ffn)){Barrier(c,ffn,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Readable(ffn)=false;}
    // Mode 3 mapping reads the (shared) raw tiles of the previous stage in the FFN; keep them readable until the attention stage.
    if(private_raw){if(recorded)Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}
-   else if(SharedRawReadable()&&!((mapping[0]==3||mapping[0]==8)&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   else if(Readable(raw)&&!((mapping[0]==3||mapping[0]==8)&&mapped_source==raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Readable(raw)=false;}
    if(recorded)for(auto*r:{(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   }else if(recorded)for(auto*r:{ffn,raw,(main8_mode||attn_out8)?main8:main,down})if(r)Barrier(c,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   if(temporal_enabled&&!temporal)throw std::runtime_error("temporal input not bound");
@@ -207,9 +215,14 @@ public:
   for(UINT stage=0;stage<3;stage++){
    if(isolate_stage&&isolate_stage!=stage+1)continue; /* DLSS5_TEST_ISOLATE part: timing only, other stages skipped (barriers included) */
    if(stage==2&&skip_finish){if(timer)timer->Mark(c,std::string(label)+"_stage2");continue;}
-   if(stage==1&&shared_c32&&!private_raw&&SharedRawReadable()){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);SharedRawReadable()=false;}
+   if(stage==0&&fused_ffn){if(mapping[0]==4||mapping[0]==6||mapping[0]==7||mapping[0]==8)throw std::runtime_error("C32 fused FFN: unsupported input mapping");if(timer)timer->Mark(c,std::string(label)+"_stage0");continue;} /* the FFN runs in the attention dispatch */
+   if(stage==1&&shared_c32&&!private_raw&&Readable(raw)){Barrier(c,raw,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Readable(raw)=false;}
    if(stage==1&&split_attention){
-    c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,(attn_out8?main8:attn_fast3?raw:Main())->GetGPUVirtualAddress());if(epilogue){const UINT ec[]={constants[0],constants[1],constants[2],constants[3],constants[4],epilogue_mode,epi_scale_bits,epi_rgb_w,epi_rgb_h,epi_rgb_sx,epi_rgb_sy};c->SetComputeRoot32BitConstants(4,11,ec,0);ID3D12Resource*stand=attention_local;c->SetComputeRootShaderResourceView(5,(epi_color?epi_color:stand)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(6,(epi_head?epi_head:stand)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(7,(main8?main8:raw)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(8,down->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(9,(epi_rgb?epi_rgb:raw)->GetGPUVirtualAddress());}else c->SetComputeRoot32BitConstants(4,5,constants,0);
+    c->SetComputeRootSignature(split_root);c->SetComputeRootShaderResourceView(0,attention_local->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(1,ffn->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,raw->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,(attn_out8?main8:attn_fast3?raw:Main())->GetGPUVirtualAddress());if(epilogue){const UINT ec[]={constants[0],constants[1],constants[2],constants[3],constants[4],epilogue_mode,epi_scale_bits,epi_rgb_w,epi_rgb_h,epi_rgb_sx,epi_rgb_sy};c->SetComputeRoot32BitConstants(4,11,ec,0);ID3D12Resource*stand=attention_local;c->SetComputeRootShaderResourceView(5,(epi_color?epi_color:stand)->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(6,(epi_head?epi_head:stand)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(7,(main8?main8:raw)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(8,down->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(9,(epi_rgb?epi_rgb:raw)->GetGPUVirtualAddress());
+     if(fused_ffn){const UINT fc[]={constants[0],constants[1],constants[2],constants[3],constants[4],epilogue_mode,epi_scale_bits,epi_rgb_w,epi_rgb_h,epi_rgb_sx,epi_rgb_sy,mapping[0],mapping[1],mapping[2],mapping[3],mapping[4],mapping[5],mapping[6],mapping[7]};c->SetComputeRoot32BitConstants(4,19,fc,0);
+      const bool merge=mapping[0]==9;ID3D12Resource*fw=prefix_wave?prefix_ffn_weights:weights[0],*fin=prefix_wave?stage_input:(mapped_source?mapped_source:stage_input),*fskip=merge?merge_skip:stand,*fcoeff=merge?merge_coeff:(prefix_wave&&temporal)?temporal:stand;
+      c->SetComputeRootShaderResourceView(10,fw->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(11,fin->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(12,fskip->GetGPUVirtualAddress());c->SetComputeRootShaderResourceView(13,fcoeff->GetGPUVirtualAddress());}
+    }else c->SetComputeRoot32BitConstants(4,5,constants,0);
     D3D12_RESOURCE_BARRIER uav[2]{};for(UINT k=0;k<2;k++){uav[k].Type=D3D12_RESOURCE_BARRIER_TYPE_UAV;uav[k].UAV.pResource=k?(attn_out8?main8:attn_fast3?raw:main):raw;}
     const UINT tokens=width*height;const UINT g16=tokens/16;
     if(!attn_fast3){c->SetPipelineState(split_pso[0]);c->Dispatch(g16<65535?g16:65535,(g16+65534)/65535,1);c->ResourceBarrier(2,uav);}if(timer)timer->Mark(c,std::string(label)+"_qkv");
@@ -234,7 +247,7 @@ public:
    }else if(stage<2)Barrier(c,stage?raw:ffn,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
    if(timer)timer->Mark(c,std::string(label)+"_stage"+std::to_string(stage));
   }
-  if((main8_mode||attn_out8)?main8:main)Barrier(c,(main8_mode||attn_out8)?main8:main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){SharedFfnReadable()=true;if(!private_raw)SharedRawReadable()=true;}
+  if((main8_mode||attn_out8)?main8:main)Barrier(c,(main8_mode||attn_out8)?main8:main,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);Barrier(c,down,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);recorded=true;if(shared_c32){if(!fused_ffn)Readable(ffn)=true;if(!private_raw)Readable(raw)=true;}
  }
  void CapturePrefixForTest(ID3D12Resource*r){if(!prefix_wave||test_prefix_readback||!r||r->GetDesc().Width<4096)throw std::runtime_error("prefix capture test contract");D3D12_HEAP_PROPERTIES hp{};D3D12_HEAP_FLAGS flags{};Check(r->GetHeapProperties(&hp,&flags));if(hp.Type!=D3D12_HEAP_TYPE_READBACK)throw std::runtime_error("prefix capture requires readback");test_prefix_readback=r;r->AddRef();}
  ID3D12Resource* FfnTilesForTest()const{return ffn;}
@@ -246,7 +259,7 @@ public:
  // FAST PATH: consumers that only read RawTiles() (post70) skip the finish stage.
  /* DLSS5_C32_SKIP8: the next C32 stage created (block 4) also takes the main8 finish; set/cleared by the network around its Create. */
  static bool&PendingMain8(){static bool v=false;return v;}
- bool half_stream{};UINT64 stream_bytes{};
+ bool half_stream{},fused_ffn{};UINT64 stream_bytes{};
  /* DLSS5_C32_EPILOGUE: finish (main8+down) or the post70 rgb head fused into the attention epilogue; see native_wave_c32_split_attention.hlsl */
  bool epilogue{};UINT epilogue_mode{};ID3D12Resource*epi_color{},*epi_head{},*epi_rgb{};UINT epi_scale_bits{},epi_rgb_w{},epi_rgb_h{},epi_rgb_sx{},epi_rgb_sy{};
  void SetRgbEpilogue(ID3D12Resource*color,ID3D12Resource*head,ID3D12Resource*rgb,float scale,UINT out_w,UINT out_h,UINT sx,UINT sy){epi_rgb_w=out_w;epi_rgb_h=out_h;epi_rgb_sx=sx;epi_rgb_sy=sy;if(!epilogue)throw std::runtime_error("rgb epilogue needs DLSS5_C32_EPILOGUE");epilogue_mode=3;if(const wchar_t*em=_wgetenv(L"DLSS5_TEST_EPILOGUE_MODE"))epilogue_mode=UINT(wcstoul(em,nullptr,10));epi_color=color;epi_head=head;epi_rgb=rgb;std::memcpy(&epi_scale_bits,&scale,4);skip_finish=true;}

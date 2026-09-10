@@ -8,3 +8,7 @@
 - `bench-norebuild.ps1`：scripts/bench.ps1 去掉全部 dxc 编译的版本（只设 env + 跑 exe），25 秒一轮，做跳块扫描/显存统计用。要与已编好 cso 的目录配套。
 - `sweep.sh`：`DLSS5_SKIP_BLOCKS` 逐块跳过扫描，写 sweep.log。
 - `gpu.ps1 / vram.ps1 / shared.ps1 / benchvram.ps1`：远端现场探针——各进程 GPU 引擎占用、显存、被挤到系统内存的量（Shared Usage）、测试台进程显存峰值。掉帧时先跑这三个。
+matrix-probe\matrix_probe.exe + D3D12\D3D12Core.dll rebuilt 09-10 from Development/d3d12_shader_model_probe.cpp (-DDLSS5_AGILITY_PROBE -DDLSS5_AGILITY_VERSION=721) after the cleanup deleted them
+- `dump.sh <name> <runner> <DUMP_BLOCK4 code> <file> [extra env]`：跑一次（3 帧）取一份中间量 dump（配合 `DLSS5_TEST_ISOLATE=<stage>&& set DLSS5_TEST_ISOLATE_REPEAT=1` 抓某一段的 scratch）。
+- `isolate.sh <name> x <isolate list> [repeat]`：不重编（目录里要有 bench-norebuild.ps1），打印各段隔离 ms。
+- `make-norebuild.sh`：从 scripts/bench.ps1 重新生成 bench-norebuild.ps1（去掉全部 dxc 行）；bench.ps1 改了就重跑一次。

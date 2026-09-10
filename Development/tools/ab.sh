@@ -1,9 +1,9 @@
 #!/bin/bash
-# usage: ab.sh <name> <runner.ps1> [files to push...]
+# usage: ab.sh <name> <runner.ps1> [files to push...]   (clones D:\DLSSNR-Lab\$AB_BASE, default epi, when <name> does not exist)
 set -e
 NAME=$1;RUNNER=$2;shift 2
 R="D:\\DLSSNR-Lab\\$NAME"
-ssh amd9070 "if not exist $R robocopy D:\\DLSSNR-Lab\\split-direct $R /E /XF network.*.log run.json gpu-network70*.f32 /NFL /NDL /NJH >nul" || true
+ssh amd9070 "if not exist $R robocopy D:\\DLSSNR-Lab\\${AB_BASE:-epi} $R /E /XF network.*.log run.json gpu-network70*.f32 /NFL /NDL /NJH >nul" || true
 for f in "$@"; do scp -q "$f" amd9070:"D:/DLSSNR-Lab/$NAME/"; done
 ssh amd9070 "set DLSS5_TEST_FRAME_COUNT=15&& powershell -ExecutionPolicy Bypass -File $R\\$RUNNER -Folder $R > $R\\driver.log 2>&1"
 mkdir -p release/$NAME

@@ -1,4 +1,4 @@
-# Builds every shader of the fast chain into $Folder (flattened from the 77 nested run_*_network.ps1 runners in
+# Builds every shader of the fast chain into $Folder (flattened from the 83 nested run_*_network.ps1 runners in
 # Development/, in the same order, so the compiled set and the DLSS5_* runtime flags are identical to the game build)
 # and then runs the bench executable (native-network70-temporal.exe, see build-bench.sh). Needs the SM6.10 preview dxc.
 param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview')
@@ -7,6 +7,28 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_c32_fused_ffn_network.ps1
+# FAST PATH: the C32 FFN runs inside the fast4 attention dispatch (pre, blocks 1-4, 67-69, post); the ffn scratch becomes the second raw buffer. Exact.
+$env:DLSS5_BUILD_C32_FUSED_FFN='1'
+$env:DLSS5_C32_FUSED_FFN='1'
+# ---- run_c32_precise_chain_network.ps1
+# Build-only reference: no FMA contraction in the C32 scalar tails (context dependent on this driver); the fused-FFN kernel is bit-exact against it.
+$env:DLSS5_BUILD_C32_PRECISE_CHAIN='1'
+# ---- run_c32_epilogue_network.ps1
+# FAST PATH: the C32 finish (main8 + pooled down) and the post70 rgb head run in the attention epilogue; pre/post/blocks 4,69 no longer write raw. Exact.
+$env:DLSS5_BUILD_C32_EPILOGUE='1'
+$env:DLSS5_C32_EPILOGUE='1'
+# ---- run_c32_half_stream_network.ps1
+# FAST PATH: C32 ffn/raw scratch as f16 (every value on them is H()-rounded, so exact); halves the C32 blocks' memory traffic.
+$env:DLSS5_BUILD_C32_HALF_STREAM='1'
+$env:DLSS5_C32_HALF_STREAM='1'
+# ---- run_post70_low_main8_network.ps1
+# FAST PATH: block 69 finish writes E4M3 main8 (no f32 main, no crop); post70's merge fold reads the bytes as the low-res input (mode 9). Exact.
+$env:DLSS5_POST70_LOW_RAW='2'
+# ---- run_c32_skip8_network.ps1
+# FAST PATH: block 4 finish writes E4M3 main8 (no f32 main, no crop); the block 66 upsample projection reads it as the skip residual. Exact.
+$env:DLSS5_BUILD_C32_SKIP8='1'
+$env:DLSS5_C32_SKIP8='1'
 # ---- run_preblock_main8_network.ps1
 # FAST PATH: preblock finish writes Main as E4M3 bytes; post70 merge fold reads them (mode 7). Exact (Main was F()-quantized).
 $env:DLSS5_PREBLOCK_MAIN8='1'
@@ -193,8 +215,13 @@ $env:DLSS5_BUILD_C32_FFN_FAST2='1'
 # ---- run_c32_fused_attention_network.ps1
 # FAST PATH: C32 attention as two dispatches (qkv+normalize, attention+projection).
 foreach($Pass in @(@(0,'qkv'),@(2,'attention'))){
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Pass[1] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$($Pass[0])" -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D "NATIVE_C32_FP8_QKV=$(if($env:DLSS5_BUILD_C32_FP8_QKV -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST2=$(if($env:DLSS5_BUILD_C32_ATTN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST3=$(if($env:DLSS5_BUILD_C32_ATTN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST4=$(if($env:DLSS5_BUILD_C32_ATTN_FAST4 -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_fused_$($Pass[1]).cso"
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Pass[1] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$($Pass[0])" -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D "NATIVE_C32_FP8_QKV=$(if($env:DLSS5_BUILD_C32_FP8_QKV -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST2=$(if($env:DLSS5_BUILD_C32_ATTN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST3=$(if($env:DLSS5_BUILD_C32_ATTN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST4=$(if($env:DLSS5_BUILD_C32_ATTN_FAST4 -eq '1'){1}else{0})" -D "NATIVE_C32_PRECISE_CHAIN=$(if($env:DLSS5_BUILD_C32_PRECISE_CHAIN -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_fused_$($Pass[1]).cso"
  if($LASTEXITCODE -ne 0){throw "Fused C32 attention $($Pass[1]) compilation failed"}
+}
+if($env:DLSS5_BUILD_C32_FUSED_FFN -eq '1'){
+ # FAST PATH (DLSS5_C32_FUSED_FFN): fast4 attention with the C32 FFN in its prologue (native_c32_ffn_fused.hlsli).
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D NATIVE_C32_EPILOGUE=1 -D NATIVE_C32_HALF_STREAM=1 -D PASS=2 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D NATIVE_C32_ATTN_FAST2=1 -D NATIVE_C32_ATTN_FAST3=1 -D NATIVE_C32_ATTN_FAST4=1 -D NATIVE_C32_FUSED_FFN=1 native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_ffn.cso
+ if($LASTEXITCODE -ne 0){throw 'Fused C32 attention+FFN compilation failed'}
 }
 if($env:DLSS5_BUILD_C32_WAVE_ATTENTION -eq '1'){
  & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention_wave -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D PASS=4 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_wave.cso
@@ -336,6 +363,11 @@ foreach($Pair in @(@(1024,512),@(512,256),@(256,128),@(128,64),@(64,32))){
  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=$($Pair[0])" -D "OUTPUT_CHANNELS=$($Pair[1])" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" native_wave_decoder_entry.hlsl -Fo "native_wave_decoder_$($Pair[0])_$($Pair[1]).cso"
  if($LASTEXITCODE -ne 0){throw "Wave decoder $($Pair[0])->$($Pair[1]) compilation failed"}
 }
+# FAST PATH (DLSS5_BUILD_C32_SKIP8): block 66 projection variant reading block 4's E4M3 main8 as the skip residual.
+if($env:DLSS5_BUILD_C32_SKIP8 -eq '1'){
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=64" -D "OUTPUT_CHANNELS=32" -D "SKIP8=1" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" native_wave_decoder_entry.hlsl -Fo native_wave_decoder_64_32_skip8.cso
+ if($LASTEXITCODE -ne 0){throw "Wave decoder 64->32 skip8 compilation failed"}
+}
 $env:DLSS5_TEST_WAVE_DECODER_LINEAR='1'
 # ---- run_local_c32_attention_network.ps1
 # C32 attention reads packed f16 weights directly with wave loads instead of staging them into LDS per window.
@@ -366,7 +398,7 @@ $env:DLSS5_TEST_WAVE_VIT_ATTENTION_HALF='1'
 # Multihead attention without the f32 score array: exp written from QK registers into the f16 Q/K slots.
 $env:DLSS5_BUILD_FUSED_EXP='1'
 # ---- run_blocked_c32_ffn_network.ps1
-& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "NATIVE_FAST_F=$(if($env:DLSS5_BUILD_FAST_F -eq '1'){1}else{0})" -D "NATIVE_STATIC_LENGTH=$(if($env:DLSS5_BUILD_STATIC_LENGTH -eq '1'){1}else{0})" -D "NATIVE_RAW_OUTPUT_STORE=$(if($env:DLSS5_TEST_C32_FFN_RAW_STORE -eq '1'){1}else{0})" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FAST2=$(if($env:DLSS5_BUILD_C32_FFN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FP8=$(if($env:DLSS5_BUILD_C32_FFN_FP8 -eq '1'){1}else{0})" -D "NATIVE_C32_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_C32_TILED_WEIGHTS -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FAST3=$(if($env:DLSS5_BUILD_C32_FFN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_MAPPED_INPUT=$(if($env:DLSS5_BUILD_C32_MAPPED_INPUT -eq '1'){1}else{0})" native_wave_c32_ffn_blocked.hlsl -Fo native_wave_c32_ffn_blocked.cso
+& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "NATIVE_FAST_F=$(if($env:DLSS5_BUILD_FAST_F -eq '1'){1}else{0})" -D "NATIVE_STATIC_LENGTH=$(if($env:DLSS5_BUILD_STATIC_LENGTH -eq '1'){1}else{0})" -D "NATIVE_RAW_OUTPUT_STORE=$(if($env:DLSS5_TEST_C32_FFN_RAW_STORE -eq '1'){1}else{0})" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FAST2=$(if($env:DLSS5_BUILD_C32_FFN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FP8=$(if($env:DLSS5_BUILD_C32_FFN_FP8 -eq '1'){1}else{0})" -D "NATIVE_C32_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_C32_TILED_WEIGHTS -eq '1'){1}else{0})" -D "NATIVE_C32_FFN_FAST3=$(if($env:DLSS5_BUILD_C32_FFN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_MAPPED_INPUT=$(if($env:DLSS5_BUILD_C32_MAPPED_INPUT -eq '1'){1}else{0})" -D "NATIVE_C32_PRECISE_CHAIN=$(if($env:DLSS5_BUILD_C32_PRECISE_CHAIN -eq '1'){1}else{0})" native_wave_c32_ffn_blocked.hlsl -Fo native_wave_c32_ffn_blocked.cso
 if($LASTEXITCODE -ne 0){throw 'Blocked C32 FFN compilation failed'}
 $env:DLSS5_TEST_BLOCKED_C32_FFN='1'
 # ---- run_split_ffwd_blocked_network.ps1

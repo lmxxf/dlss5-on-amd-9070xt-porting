@@ -51,7 +51,16 @@ RWByteAddressBuffer aux:register(u1);
 // FAST PATH (DLSS5_C32_EPILOGUE): the finish stage (main8 + 2x2 pooled down) or the post70 rgb head runs in the attention epilogue
 // on the block output while it is still in registers. epilogue_mode: 0 raw only; 1 raw + main8 + down; 2 main8 + down (no raw);
 // 3 rgb head (no raw). A wave's 16 tokens are two full rows of one 8x8 window, so the 2x2 pooling never leaves the wave.
+#ifndef NATIVE_C32_FUSED_FFN
+#define NATIVE_C32_FUSED_FFN 0
+#endif
+#if NATIVE_C32_FUSED_FFN
+/* FAST PATH (DLSS5_C32_FUSED_FFN): + the FFN input mapping of native_wave_c32_ffn_blocked.hlsl (19 root constants) */
+cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;uint epilogue_mode;uint rgb_scale_bits;uint rgb_width;uint rgb_height;uint rgb_shift_x;uint rgb_shift_y;
+ uint map_mode;uint src_width;uint src_height;uint shift_x;uint shift_y;uint prev_shift_x;uint prev_shift_y;uint prev_work_width;}
+#else
 cbuffer RuntimeGeometry:register(b0){uint runtime_seed;uint runtime_width;uint runtime_height;uint local_oracle;uint temporal_enabled;uint epilogue_mode;uint rgb_scale_bits;uint rgb_width;uint rgb_height;uint rgb_shift_x;uint rgb_shift_y;}
+#endif
 StructuredBuffer<float> color:register(t2);      /* rgb head: HWC color [pixel][4] */
 StructuredBuffer<float> head_w:register(t3);     /* rgb head: 3 x 32 weights */
 RWByteAddressBuffer main8_out:register(u2);      /* E4M3 main, raster over the work grid */
@@ -279,14 +288,37 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 groupshared uint qkv8[128*24];
 groupshared uint pw8[8*256];
 groupshared float16_t ones16[512];
+#if NATIVE_C32_FUSED_FFN
+#if !(NATIVE_C32_EPILOGUE&&NATIVE_C32_HALF_STREAM)
+#error NATIVE_C32_FUSED_FFN needs the epilogue constants and the half-stream C16 loads
+#endif
+#include "native_c32_ffn_fused.hlsli"
+#endif
 [WaveSize(32)]
 [numthreads(256,1,1)]void attention(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  const uint t=tid.x,wave=t/32,window=gid.x*2+wave/4,windows=runtime_width*runtime_height/64;
  const bool live=window<windows;const uint qfirst=window*64+(wave&3)*16,lfirst=wave*16,lwin=(wave/4)*64,pbase=wave*256,ebase=wave*512;
  for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
  C z[6];
+#if NATIVE_C32_FUSED_FFN
+ C ffn_out[2]; /* the FFN output tile: QKV input and projection residual, never leaves the registers */
+#endif
  if(live){
+#if NATIVE_C32_FUSED_FFN
+  ffn_fused(qfirst,t&31,ebase,pbase,lfirst*24,ffn_out[0],ffn_out[1]);
+#if NATIVE_C32_FUSED_FFN_PROBE
+  /* test build: the FFN output goes to aux (= raw) in the ffn-buffer layout for a CPU comparison with the standalone FFN; 1 = skip the attention, 2 = continue (a stage whose epilogue writes no raw keeps it) */
+  ffn_out[0].Cast<dx::linalg::ComponentType::F16>().Store(aux,(qfirst*32)*2,64,dx::linalg::MatrixLayout::RowMajor,16);ffn_out[1].Cast<dx::linalg::ComponentType::F16>().Store(aux,(qfirst*32+16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
+#if NATIVE_C32_FUSED_FFN_PROBE==1
+ }
+ return;
+ if(live){
+#endif
+#endif
+  C in0=ffn_out[0],in1=ffn_out[1];
+#else
   C in0=LOAD_IN(qfirst),in1=LOAD_IN1(qfirst);
+#endif
   in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+4,8,dx::linalg::MatrixLayout::RowMajor);
  }
@@ -354,7 +386,13 @@ groupshared float16_t ones16[512];
    C zp=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(aa,bb);
    for(uint i=0;i<zp.Length();i++){
     uint2 rc=zp.GetCoordinate(i);uint p=qfirst+rc.x,c=cr*16+rc.y;
+#if NATIVE_C32_FUSED_FFN
+    precise float prod=ffn_out[cr].Get(i)*W_RESIDUAL(c);precise float sum=zp.Get(i)+prod;float result=H(sum); /* same accumulator layout as zp: element i is (p, c); precise as below */
+#elif NATIVE_C32_PRECISE_CHAIN
+    precise float prod=INPUT_AT(p*32+c)*W_RESIDUAL(c);precise float sum=zp.Get(i)+prod;float result=H(sum); /* no FMA contraction: matches the fused-FFN kernel */
+#else
     float result=H(zp.Get(i)+INPUT_AT(p*32+c)*W_RESIDUAL(c));
+#endif
     zp.Set(i,RAW_OUTPUT?result:F(result));
    }
 #if NATIVE_C32_EPILOGUE
