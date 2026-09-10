@@ -271,8 +271,13 @@ static void barrier(reshade::api::command_list*c,uint32_t count,const reshade::a
  }
 }
 static DWORD WINAPI worker(void*){
- // Whichever upscaler dll the title loads first: the FFX SDK (Stellar Blade) or XeSS (Rise of the Ronin; its FSR is linked into the exe).
- HMODULE module=nullptr,xess=nullptr;for(unsigned i=0;i<6000&&!module&&!xess;i++){module=GetModuleHandleW(L"amd_fidelityfx_dx12.dll");xess=GetModuleHandleW(L"libxess.dll");if(!module&&!xess)Sleep(100);}if(!module&&!xess)return 1;
+ // Whichever upscaler dll the title loads first: the FFX SDK 1.x single dll (Stellar Blade), the FSR 4 SDK loader (Magpie's FSR3/FSR4
+ // effects: amd_fidelityfx_loader_dx12.dll exports ffxDispatch and forwards to the provider dll) or XeSS (Rise of the Ronin; its FSR is linked into the exe).
+ // A host that ships an FFX dll next to its exe (Magpie: libxess.dll is loaded at startup, the FFX loader only when the FSR3/FSR4 effect
+ // starts) waits for the FFX one; XeSS is taken only when no FFX dll file is present (Rise of the Ronin). DLSS5_UPSCALER=ffx|xess overrides.
+ bool wait_ffx=false;{wchar_t exe[MAX_PATH]{};GetModuleFileNameW(nullptr,exe,MAX_PATH);if(wchar_t*slash=wcsrchr(exe,L'\\'))slash[1]=0;std::wstring dir=exe;wait_ffx=GetFileAttributesW((dir+L"amd_fidelityfx_dx12.dll").c_str())!=INVALID_FILE_ATTRIBUTES||GetFileAttributesW((dir+L"amd_fidelityfx_loader_dx12.dll").c_str())!=INVALID_FILE_ATTRIBUTES;}
+ if(const wchar_t*u=_wgetenv(L"DLSS5_UPSCALER")){if(!wcscmp(u,L"ffx"))wait_ffx=true;else if(!wcscmp(u,L"xess"))wait_ffx=false;}
+ HMODULE module=nullptr,xess=nullptr;for(unsigned i=0;i<6000&&!module&&!xess;i++){module=GetModuleHandleW(L"amd_fidelityfx_dx12.dll");if(!module)module=GetModuleHandleW(L"amd_fidelityfx_loader_dx12.dll");if(!wait_ffx)xess=GetModuleHandleW(L"libxess.dll");if(!module&&!xess)Sleep(100);}if(!module&&!xess)return 1;
  auto target=module?GetProcAddress(module,"ffxDispatch"):GetProcAddress(xess,"xessD3D12Execute");if(!target)return 2;
  auto s=MH_Initialize();if(s!=MH_OK&&s!=MH_ERROR_ALREADY_INITIALIZED)return 3;
 #ifdef NATIVE_ORDER_NEURAL
