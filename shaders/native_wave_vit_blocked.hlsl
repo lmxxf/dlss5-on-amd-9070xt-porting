@@ -36,6 +36,13 @@ cbuffer Geometry:register(b0){uint tokens;uint output_base;}
 #ifndef NATIVE_FP8_HIDDEN
 #define NATIVE_FP8_HIDDEN NATIVE_FP8_OPERANDS
 #endif
+#ifndef NATIVE_VIT_TILED
+#define NATIVE_VIT_TILED 0
+#endif
+/* FAST PATH (DLSS5_VIT_TILED): 512-byte contiguous tiles instead of power-of-two row strides (4096-byte strides put the 16 rows
+   of every tile on one memory channel). Weights [n out][k in] as tiles (n/16, k/32) of [k 32][j 16] bytes at ((n/16)*(K/32)+k/32)*512;
+   the hidden layer [token][4096] as tiles (token/16, k/32) of [16][32] at ((token/16)*128+k/32)*512*HELEM. Pure data movement. */
+#define HID_TILE(tok,k) ((((tok)/16)*128+(k)/32)*512*HELEM+((k)%32)*HELEM)
 #if NATIVE_FP8_HIDDEN
 #define HIDDEN_TYPE dx::linalg::ComponentType::F8_E4M3FN
 #define HELEM 1
@@ -82,7 +89,13 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  C acc[BLOCK_M][BLOCK_N];
  [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
  [loop]for(uint g=0;g<32;g++){
-  B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;b[n]=B::Load(weights,(col*1024+g*32)*ELEM,1024*ELEM,dx::linalg::MatrixLayout::ColMajor,16);}
+  B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;
+#if NATIVE_VIT_TILED
+   b[n]=B::Load(weights,((col/16)*32+g)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+   b[n]=B::Load(weights,(col*1024+g*32)*ELEM,1024*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
+  }
   [unroll]for(uint m=0;m<BLOCK_M;m++){
    A a=A::Load(input8,(first+m*16)*1024+g*32,1024,dx::linalg::MatrixLayout::RowMajor,16);
    [unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n].MultiplyAccumulate(a,b[n]);
@@ -91,7 +104,11 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
  [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++){
   uint col=(gid.y*BLOCK_N+n)*16;
   for(uint i=0;i<acc[m][n].Length();i++)acc[m][n].Set(i,Activate(acc[m][n].Get(i)));
+#if NATIVE_VIT_TILED
+  acc[m][n].Cast<HIDDEN_TYPE>().Store(output,HID_TILE(first+m*16,col),32*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   acc[m][n].Cast<HIDDEN_TYPE>().Store(output,((first+m*16)*4096+col)*HELEM,4096*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
  }
 }
 #else
@@ -171,9 +188,17 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   C acc[BLOCK_M][BLOCK_N];
   [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
   [loop]for(uint k=part*(INPUT_CHANNELS/4);k<(part+1)*(INPUT_CHANNELS/4);k+=32){
-   B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;b[n]=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);}
+   B b[BLOCK_N];[unroll]for(uint n=0;n<BLOCK_N;n++){uint col=(gid.y*BLOCK_N+n)*16;
+#if NATIVE_VIT_TILED&&INPUT_CHANNELS==4096
+    b[n]=B::Load(weights,((col/16)*128+k/32)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+#else
+    b[n]=B::Load(weights,(col*INPUT_CHANNELS+k)*ELEM,INPUT_CHANNELS*ELEM,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
+   }
    [unroll]for(uint m=0;m<BLOCK_M;m++){
-#if INPUT_CHANNELS==4096
+#if INPUT_CHANNELS==4096&&NATIVE_VIT_TILED
+    A a=A::Load(hidden_f16,HID_TILE(first+m*16,k),32*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
+#elif INPUT_CHANNELS==4096
     A a=A::Load(hidden_f16,((first+m*16)*INPUT_CHANNELS+k)*HELEM,INPUT_CHANNELS*HELEM,dx::linalg::MatrixLayout::RowMajor,16);
 #elif NATIVE_PACKED_INPUT
     A a=A::Load(input8,(first+m*16)*INPUT_CHANNELS+k,INPUT_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
