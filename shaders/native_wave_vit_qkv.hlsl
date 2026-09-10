@@ -36,6 +36,9 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 groupshared float16_t sq16[512];
 groupshared float16_t ones16[512];
 [WaveSize(32)]
+#ifndef NATIVE_VIT_TILED
+#define NATIVE_VIT_TILED 0
+#endif
 [numthreads(32,1,1)]void project_fused(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
  uint first=gid.x*16*BLOCK_M;if(first>=tokens)return;
  uint col0=gid.y*BLOCK_N*16,part=col0/1024,row0=col0%1024;
@@ -43,9 +46,16 @@ groupshared float16_t ones16[512];
  C acc[BLOCK_M][BLOCK_N];
  [unroll]for(uint m=0;m<BLOCK_M;m++)[unroll]for(uint n=0;n<BLOCK_N;n++)acc[m][n]=C::Splat(0.0f);
  [loop]for(uint k=0;k<1024;k+=32){
+#if NATIVE_VIT_TILED
+  /* FAST PATH (DLSS5_VIT_TILED): pack16 output and the f16 weights as 1KB [16|k 32][32|j 16] tiles (no 2048-byte row strides). */
+  A a[BLOCK_M];[unroll]for(uint m=0;m<BLOCK_M;m++)a[m]=A::Load(input16,(((first+m*16)/16)*32+k/32)*1024+(k%32)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint n=0;n<BLOCK_N;n++){
+   B b=B::Load(weights,part*2097152+(((row0+n*16)/16)*32+k/32)*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   A a[BLOCK_M];[unroll]for(uint m=0;m<BLOCK_M;m++)a[m]=A::Load(input16,((first+m*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::RowMajor,16);
   [unroll]for(uint n=0;n<BLOCK_N;n++){
    B b=B::Load(weights,(part*1048576+(row0+n*16)*1024+k)*2,2048,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    [unroll]for(uint m=0;m<BLOCK_M;m++)acc[m][n].MultiplyAccumulate(a[m],b);
   }
  }
