@@ -401,7 +401,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 - 测试台：`bash scripts/build-bench.sh <exe>` 交叉编译（MinGW）；scp 到链目录；`Development/run_<top>_network.ps1 -Folder D:\DLSSNR-Lab\<dir>` 或 `scripts/bench.ps1`（76 层 runner 拍平）；取回 `network.stdout.log gpu-network70*.f32`；`python3 tools/compare_fast_output.py --root release/<dir>`。不重编只跑 `Development/tools/bench-norebuild.ps1`（25 秒，`make-norebuild.sh` 生成）。A/B：`tools/abn.sh` 交替 3 轮 + `cmpmin.py`；单核 `DLSS5_TEST_ISOLATE=<kind>[:index[:part]]`（`isolate.sh`），隔离后输出是垃圾。
 - 游戏 DLL：`bash scripts/build-addon.sh <minhook repo> <reshade 6.8 include> <out>.addon64 --tiled`；部署 `deploy_fast.ps1 -Source <链目录> -Dll <dll> -Flags <flags.txt>`（游戏运行中拒绝）；运行时编译的 hlsl（`native_post70` / `native_split_window` / `native_output_smooth` / `preblock_finish`）改了要 `update-manifest.ps1 -Names <一个文件名>`。**host 打包改动在 DLL 里，只换 cso 不换 DLL 会算错。**
 - 发包：`scripts/package-release.py` + `scripts/package-README.txt`，权重转 f16（都精确），`noise.f32` 192MB 保持 f32，zip 约 220MB。0.07 包 = fast36。
-- 打 tag 时统一刷新根目录公开集（`scripts/game-flags.txt`、README 状态行、`bench.ps1` 重新拍平）；过程文件只进 `Development/`。
+- 打 tag 时统一刷新根目录公开集（`scripts/game-flags.txt`、README 状态行、`bench.ps1` 重新拍平）；过程文件只进 `Development/`。打 tag 前先跑 `scripts/release-check.sh`（09-10 加：仓库编译的 179 个 cso 逐个对游戏资产哈希、game-flags 对游戏 flag 文件（去 CRLF）、add-on 哈希仅供参考——mingw 每次编译嵌时间戳，本地两次都不同），再由 Zero 在笔记本上拉下来亲手编一遍。已知未清项：`native_matrix_pack.cso` 游戏资产里是旧源码编的，新的在测试台验过逐位一致，未覆盖。
 
 ### 证据目录（`release/`，git 忽略，不入库）
 
