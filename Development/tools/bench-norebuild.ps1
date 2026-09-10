@@ -7,6 +7,13 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_split_ffwd8_network.ps1
+# FAST PATH: C512 FFWD output stored as E4M3 bytes (it is already F(H())-quantized) and the following projection loads its A tiles directly. Build-only, bit-exact.
+$env:DLSS5_BUILD_SPLIT_FFWD8='1'
+# ---- run_split_ffwd_tiled_network.ps1
+# FAST PATH: C512 FFWD f16 weights (mix/expand/contract) as contiguous 1KB tiles (no 1024/256/512-byte row strides). Bit-exact.
+$env:DLSS5_BUILD_SPLIT_FFWD_TILED='1'
+$env:DLSS5_SPLIT_FFWD_TILED='1'
 # ---- run_decoder_tiled_network.ps1
 # FAST PATH: decoder entry (1024->512) f16 weights as contiguous 1KB tiles (-0.01ms; the small upsample projections got slower with tiles, so they stay). Bit-exact.
 $env:DLSS5_BUILD_DECODER_TILED='1'

@@ -7,6 +7,13 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_split_ffwd8_network.ps1
+# FAST PATH: C512 FFWD output stored as E4M3 bytes (it is already F(H())-quantized) and the following projection loads its A tiles directly. Build-only, bit-exact.
+$env:DLSS5_BUILD_SPLIT_FFWD8='1'
+# ---- run_split_ffwd_tiled_network.ps1
+# FAST PATH: C512 FFWD f16 weights (mix/expand/contract) as contiguous 1KB tiles (no 1024/256/512-byte row strides). Bit-exact.
+$env:DLSS5_BUILD_SPLIT_FFWD_TILED='1'
+$env:DLSS5_SPLIT_FFWD_TILED='1'
 # ---- run_decoder_tiled_network.ps1
 # FAST PATH: decoder entry (1024->512) f16 weights as contiguous 1KB tiles (-0.01ms; the small upsample projections got slower with tiles, so they stay). Bit-exact.
 $env:DLSS5_BUILD_DECODER_TILED='1'
@@ -377,7 +384,7 @@ $env:DLSS5_TEST_DIRECT_ATTENTION='1'
 # Wave-matrix FFWD/attention projections for the 512-channel split blocks.
 foreach($Raw in 0,1){
  $Name=if($Raw){'native_wave_project_raw_c512.cso'}else{'native_wave_project_c512.cso'}
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D "RAW=$Raw" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" -D "NATIVE_FP8_INPUT=$(if($env:DLSS5_BUILD_SPLIT_FFWD8 -eq '1'){1}else{0})" -D "NATIVE_FP8_INPUT_TILED=$(if($env:DLSS5_BUILD_SPLIT_FFWD8 -eq '1'){1}else{0})" native_wave_project.hlsl -Fo $Name
  if($LASTEXITCODE -ne 0){throw "Wave split projection raw=$Raw compilation failed"}
 }
 $env:DLSS5_TEST_WAVE_SPLIT_PROJECT='1'
@@ -521,7 +528,7 @@ foreach($Channels in 64,128,256){
 }
 $env:DLSS5_TEST_WAVE_MULTIHEAD_AV='1'
 # ---- run_parallel_split_network.ps1
-& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "NATIVE_SPLIT_FFWD_BLOCKED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_BLOCKED -eq '1'){1}else{0})" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_SPLIT_FFWD_WAVES4=$(if($env:DLSS5_BUILD_SPLIT_FFWD_WAVES4 -eq '1'){1}else{0})" -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" native_wave_split_ffwd_parallel.hlsl -Fo native_wave_split_ffwd_parallel.cso
+& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "NATIVE_SPLIT_FFWD_BLOCKED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_BLOCKED -eq '1'){1}else{0})" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_EPILOGUE=$(if($env:DLSS5_FAST_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_SPLIT_FFWD_WAVES4=$(if($env:DLSS5_BUILD_SPLIT_FFWD_WAVES4 -eq '1'){1}else{0})" -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D "NATIVE_SPLIT_FFWD_TILED=$(if($env:DLSS5_BUILD_SPLIT_FFWD_TILED -eq '1'){1}else{0})" -D "NATIVE_SPLIT_FFWD8=$(if($env:DLSS5_BUILD_SPLIT_FFWD8 -eq '1'){1}else{0})" native_wave_split_ffwd_parallel.hlsl -Fo native_wave_split_ffwd_parallel.cso
 if($LASTEXITCODE -ne 0){throw 'Parallel split FFWD compilation failed'}
 $env:DLSS5_TEST_PARALLEL_SPLIT_FFWD='1'
 # ---- run_wave_vit_attention_network.ps1

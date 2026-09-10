@@ -15,6 +15,9 @@
 #ifndef NATIVE_FP8_INPUT
 #define NATIVE_FP8_INPUT 0
 #endif
+#ifndef NATIVE_FP8_INPUT_TILED
+#define NATIVE_FP8_INPUT_TILED 0
+#endif
 #if NATIVE_FP8_INPUT
 // FAST PATH step 3: the producer (fused FFN contract / attention) already stored E4M3 bytes; load A tiles directly.
 ByteAddressBuffer input:register(t0);
@@ -140,7 +143,10 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
  }
 #endif
  [loop]for(uint g=0;g<MATRIX_CHANNELS/32;g++){
-#if NATIVE_FP8_INPUT
+#if NATIVE_FP8_INPUT && NATIVE_FP8_INPUT_TILED
+  /* FAST PATH (split ffwd8): producer stored 512-byte [token 16][k 32] tiles */
+  A a=A::Load(input,((first/16)*(MATRIX_CHANNELS/32)+g)*512,32,dx::linalg::MatrixLayout::RowMajor,16);
+#elif NATIVE_FP8_INPUT
   A a=A::Load(input,first*MATRIX_CHANNELS+g*32,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #elif NATIVE_FP8_OPERANDS
   for(uint u=tid.x;u<128;u+=32){uint i0=u*4;uint row=(first+i0/32)*MATRIX_CHANNELS+g*32+i0%32;tile8[u]=E4M3(input[row])|(E4M3(input[row+1])<<8)|(E4M3(input[row+2])<<16)|(E4M3(input[row+3])<<24);}

@@ -9,7 +9,7 @@
 class NativeSplit {
  NativeMatrixWorkspace*workspace{};ID3D12Resource*qkv_weights{};ID3D12PipelineState*aux_pso[2]{};ID3D12PipelineState*direct_pso[3]{};ID3D12Resource*qkv_weights8{};bool direct_attention{};bool matrix_attention{},wave_ffwd{},parallel_ffwd{};
  ID3D12Resource*input{};ID3D12Resource*weights[3]{};ID3D12Resource*result[4]{};ID3D12Resource*project_weights[2]{};bool wave_project{},copy8{};
- ID3D12RootSignature*root{};ID3D12PipelineState*pso[4]{};UINT geometry[2]{};bool recorded{},tiled_projection{},shared_ffwd{},split_tiled{};
+ ID3D12RootSignature*root{};ID3D12PipelineState*pso[4]{};UINT geometry[2]{};bool recorded{},tiled_projection{},shared_ffwd{},split_tiled{},ffwd_tiled{};
  static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("C64 HRESULT="+std::to_string(unsigned(hr)));}
  static ID3D12Resource* Buffer(ID3D12Device*d,UINT64 bytes,const std::vector<float>*data=nullptr){
   D3D12_HEAP_PROPERTIES hp{};hp.Type=data?D3D12_HEAP_TYPE_UPLOAD:D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=data?D3D12_RESOURCE_FLAG_NONE:D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -32,6 +32,10 @@ public:
   if(wave_ffwd){
    if(UINT64(width)*height/16>65535)throw std::runtime_error("wave split FFWD extent");
    std::vector<float>packed(fw.size()/2);for(size_t i=0;i<fw.size();i++){uint32_t bits;std::memcpy(&bits,&fw[i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m){int e=int(m>>23)-112;if(e<=0||e>=31||(m&0x1fff))throw std::runtime_error("split FFWD weights not exact half");h|=uint16_t((e<<10)|((m&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
+   /* FAST PATH (DLSS5_SPLIT_FFWD_TILED): mix [512][512], expand [8][256][64], contract [8][64][256] f16 as 1KB [k 32][j 16] tiles (kernel built with NATIVE_SPLIT_FFWD_TILED=1). */
+   {const wchar_t*ft=_wgetenv(L"DLSS5_SPLIT_FFWD_TILED");if(ft&&wcscmp(ft,L"0")&&wcscmp(ft,L"1"))throw std::runtime_error("invalid split ffwd tiled flag");ffwd_tiled=ft&&!wcscmp(ft,L"1");if(ffwd_tiled&&!parallel_ffwd)throw std::runtime_error("split ffwd tiled needs the parallel FFWD kernel");}
+   if(ffwd_tiled){uint16_t*h16=reinterpret_cast<uint16_t*>(packed.data());auto tile=[&](size_t base,size_t n_rows,size_t k_cols){std::vector<uint16_t>t(n_rows*k_cols);for(size_t n=0;n<n_rows;n++)for(size_t k=0;k<k_cols;k++)t[((n/16)*(k_cols/32)+k/32)*512+(k%32)*16+n%16]=h16[base+n*k_cols+k];std::memcpy(h16+base,t.data(),t.size()*2);};
+    tile(0,512,512);for(size_t g=0;g<8;g++){tile(262144+g*16384,256,64);tile(393216+g*16384,64,256);}}
    auto*u=Buffer(d,packed.size()*4,&packed);auto*local=NativeResidentTable(d,u);u->Release();weights[0]->Release();weights[0]=local;
   }
   D3D12_ROOT_PARAMETER params[6]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}params[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[4].Constants={0,0,2};params[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[5].Descriptor.ShaderRegister=1;D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=6;desc.pParameters=params;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();

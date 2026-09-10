@@ -23,6 +23,16 @@ float F(float v){float a=abs(v),sg=v<0?-1:1;if(a<.015625)return sg*round(a*512)/
 float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)return v;float sg=v<0?-1:1;if(a<0x3c800000u)return sg*round(abs(v)*512)/512;if(a>=0x43e00000u)return sg*448;uint r=(a+0x7ffffu+((a>>20)&1u))&0xfff00000u;return sg*min(asfloat(r),448);}
 float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return Ffast(v*p);}
 #endif
+#ifndef NATIVE_SPLIT_FFWD_TILED
+#define NATIVE_SPLIT_FFWD_TILED 0
+#endif
+#ifndef NATIVE_SPLIT_FFWD8
+#define NATIVE_SPLIT_FFWD8 0
+#endif
+/* FAST PATH (DLSS5_SPLIT_FFWD_TILED): the three f16 weight matrices are stored as contiguous 1KB [k 32][j 16] tiles
+   (tile index = (n/16)*(K/32)+k/32, packed by the host); no 1024/256/512-byte row strides. Bit-exact.
+   FAST PATH (DLSS5_SPLIT_FFWD8): the output is already F(H()) i.e. on the E4M3 grid, so it is stored as E4M3 bytes
+   in 512-byte [token 16][k 32] tiles and the projection reads its A tiles directly (NATIVE_FP8_INPUT_TILED) instead of re-quantizing f32. Bit-exact. */
 #ifndef NATIVE_SPLIT_FFWD_WAVES4
 #define NATIVE_SPLIT_FFWD_WAVES4 0
 #endif
@@ -43,7 +53,11 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    for(uint i=t;i<512;i+=128)tile[i]=float16_t(input[(first+i/32)*512+k*32+i%32]);
    GroupMemoryBarrierWithGroupSync();
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_SPLIT_FFWD_TILED
+   B b=B::Load(weights,((group*4+wave)*16+k)*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,((group*64+wave*16)*512+k*32)*2,1024,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    acc.MultiplyAccumulate(a,b);
    GroupMemoryBarrierWithGroupSync();
   }
@@ -57,7 +71,11 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    C acc=C::Splat(0.0f);
    [unroll]for(uint k=0;k<2;k++){
     A a=A::Load(mixed,k*32,80,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_SPLIT_FFWD_TILED
+    B b=B::Load(weights,262144*2+group*16384*2+(block*2+k)*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
     B b=B::Load(weights,(262144+group*16384+block*16*64+k*32)*2,128,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
     acc.MultiplyAccumulate(a,b);
    }
    for(uint i=0;i<acc.Length();i++)acc.Set(i,Activate(H(acc.Get(i))));
@@ -69,11 +87,20 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
   C acc=C::Splat(0.0f);
   for(uint k=0;k<8;k++){
    A a=A::Load(hidden,k*32,272,dx::linalg::MatrixLayout::RowMajor);
+#if NATIVE_SPLIT_FFWD_TILED
+   B b=B::Load(weights,393216*2+group*16384*2+(wave*8+k)*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
    B b=B::Load(weights,(393216+group*16384+wave*16*256+k*32)*2,512,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
    acc.MultiplyAccumulate(a,b);
   }
   for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+#if NATIVE_SPLIT_FFWD8
+  /* 512-byte [k 32][16 tokens] tiles: tile (first/16)*16 + col/32, this wave's 16 columns are the low or high half of each 32-byte row */
+  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,((first/16)*16+(group*64+wave*16)/32)*512+((group*64+wave*16)%32),32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
   acc.Store(output,(first*512+group*64+wave*16)*4,512*4,dx::linalg::MatrixLayout::RowMajor,16);
+#endif
  }
 }
 #else
