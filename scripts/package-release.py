@@ -3,6 +3,9 @@
 
 usage: package-release.py <assets dir (copy of native-game-tiled-assets)> <addon64> <d3d12.dll (ReShade)> <D3D12Core dir> <flags.txt> <noise.f32> <out dir> <version>
 
+Magpie edition: pass scripts/magpie-flags.txt as the flags (DLSS5_SNAPSHOT_FRAME=1, no black probe), then rename d3d12.dll to dxgi.dll
+and replace README.txt with scripts/package-README-magpie.txt (Magpie is a D3D11 host; ReShade is loaded as its dxgi.dll).
+
 Layout (drop the whole folder's contents into SB\\Binaries\\Win64):
   d3d12.dll                      ReShade loader
   dlss5-amd.addon64              the addon (finds DLSS5-AMD\\ next to itself)
