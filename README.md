@@ -8,9 +8,12 @@ block by block, re-written as HLSL compute shaders using Shader Model 6.10 wave-
 FP8 (E4M3) operands, and wired into a game through a ReShade add-on that hooks the FSR dispatch and post-processes the
 1080p frame.
 
-**Status (2026-09-09, tag `0.06`)**: Stellar Blade at 1920×1080 runs at **27–28 fps** on an RX 9070 XT with the full
-network in the loop (GPU network time ≈ 30 ms per frame). Image output matches the bit-exact reference chain at
-≈ 42 dB PSNR. This is a research project, not a product: no tuning UI, one game, one resolution.
+**Status (2026-09-10, tag `0.08`)**: Stellar Blade at 1920×1080 runs at **36–37 fps** on an RX 9070 XT with the full
+network in the loop (bench: 24.4 ms per frame for the network alone, 3.1 GB of VRAM). Image output matches the bit-exact
+reference chain at ≈ 42 dB PSNR. Texture quality must be "High" or lower: at "Very High" the game plus the network
+exceed 16 GB and the frame rate collapses. This is a research project, not a product: no tuning UI, one game, one
+resolution. `scripts/game-flags.txt` is the exact runtime flag set of this tag; `scripts/bench.ps1` compiles the
+matching shader set.
 
 ## What is in this repository
 
