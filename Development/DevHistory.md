@@ -298,6 +298,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 - 20:00 黑帧探针（`DLSS5_BLACK_PROBE=1`，DLL fast42p）：每帧统计网络输出（非有限值数 / |v|>1.5 数 / 最大 / 均值），异步读回不 Flush，输出两帧环形副本，异常时自动 dump 到 `logs\black-<帧>-*`。1.8 万帧没触发；顺带学到：网络输出均值 0.33、最大 1.0，**是完整画面不是残差**，黑帧的触发条件该是"均值骤降"（待改）。Zero 决定这游戏抓不到就先放下，换游戏再说。
 - 19:30 显存之争实锤：掉到 25fps 时专用显存 14.7GB 顶满、693MB 被挤到系统内存；贴图"非常高"→"高"立刻回 36。包的说明改成硬要求。
 
+- 21:30 **一键编译收口**（Zero 在 22.04 的 WSL 上亲手编，暴露了一串）：`build-addon-oneclick.sh` 自动拉 MinHook / ReShade 头文件；老 mingw（gcc 10 win32 线程模型）没有 std::mutex → 自动切 posix 变体；老 `d3d12.h` 没有 `ID3D12SDKConfiguration` → 从 mingw-w64 v11 拉头文件；`d3d12sdklayers.h` 可选。shader 侧新增 `compile-shaders.ps1`（任意 Windows 机 + 预览版 dxc，不需要显卡/权重）；发现仓库 `shaders/` 缺 10 个 bench.ps1 要编的源（在 Development/，已搬回）和 3 个从没进 runner 的手工 cso（head 512 的 pool/project、C256 f16 pack，已补进 bench.ps1）。从零编出的 179 个 cso 跑测试台与现链逐位相同。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |

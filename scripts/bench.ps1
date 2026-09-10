@@ -551,6 +551,13 @@ if($LASTEXITCODE -ne 0){throw 'Wave ViT attention compilation failed'}
 $env:DLSS5_TEST_WAVE_VIT_ATTENTION='1'
 # ---- run_coalesced_finish_network.ps1
 $env:DLSS5_TEST_COALESCED_FINISH='1'
+# ---- (never in a runner; the head (block 30, 512 channels) pool/projection and the C256 f16 pack the matrix-attention host loads)
+foreach($Name in 'native_head_pool','native_wave_head_project'){
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 "$Name.hlsl" -Fo "$Name.cso"
+ if($LASTEXITCODE -ne 0){throw "Compile failed: $Name 512"}
+}
+& $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=256 -D PACKED_INPUT=1 -D MAPPED_INPUT=0 native_matrix_pack.hlsl -Fo native_matrix_pack.cso
+if($LASTEXITCODE -ne 0){throw 'Compile failed: native_matrix_pack 256'}
 # ---- run_wave_downsample_network.ps1
 foreach($Channels in 64,128,256){foreach($Name in 'native_head_pool','native_wave_head_project'){
  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" "$Name.hlsl" -Fo "${Name}_c$Channels.cso"

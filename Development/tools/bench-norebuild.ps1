@@ -425,6 +425,9 @@ $env:DLSS5_TEST_PARALLEL_SPLIT_FFWD='1'
 $env:DLSS5_TEST_WAVE_VIT_ATTENTION='1'
 # ---- run_coalesced_finish_network.ps1
 $env:DLSS5_TEST_COALESCED_FINISH='1'
+# ---- (never in a runner; the head (block 30, 512 channels) pool/projection and the C256 f16 pack the matrix-attention host loads)
+foreach($Name in 'native_head_pool','native_wave_head_project'){
+}
 # ---- run_wave_downsample_network.ps1
 foreach($Channels in 64,128,256){foreach($Name in 'native_head_pool','native_wave_head_project'){
 }}

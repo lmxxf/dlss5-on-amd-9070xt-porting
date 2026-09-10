@@ -9,4 +9,7 @@ if(-not (Test-Path (Join-Path $DxcRoot 'bin\x64\dxc.exe'))){throw "dxc.exe not f
 New-Item -ItemType Directory -Force $Folder | Out-Null
 Copy-Item (Join-Path $Repo 'shaders\*') $Folder -Force
 Copy-Item (Join-Path $Repo 'scripts\bench.ps1') $Folder -Force
+# bench.ps1 refreshes hashes in shader-manifest.json (name + sha256 of every runtime-compiled source): generate it from the copies
+$Manifest=@(Get-ChildItem $Folder -Include *.hlsl,*.hlsli -Recurse | ForEach-Object { @{name=$_.Name;sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()} })
+ConvertTo-Json $Manifest | Set-Content (Join-Path $Folder 'shader-manifest.json') -Encoding Ascii
 & (Join-Path $Folder 'bench.ps1') -Folder $Folder -DxcRoot $DxcRoot -CompileOnly
