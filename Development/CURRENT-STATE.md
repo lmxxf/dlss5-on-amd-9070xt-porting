@@ -1,3 +1,16 @@
+## 2026-09-10 12:10 浪人崛起（XeSS 路径）跑通（光之朱雀）
+
+- 浪人崛起没有 FFX dll（FSR 编进 exe），走 XeSS：addon 同时等 `amd_fidelityfx_dx12.dll` 或 `libxess.dll`，后者攔 `xessD3D12Execute`（结构按 XeSS 1.x/2.x SDK），从参数表拿输出贴图（1920×1080）、速度贴图（1280×720）、reset；XeSS 先跑，网络在提交后精修它的输出，机制和 FSR 路径一样。exe 门加了 `Ronin.exe`。游戏目录只放 d3d12.dll + dlss5-amd.addon64 + DLSS5-D3D12-721\，资产/flags/日志走 D:\DLSSNR-Lab。
+- 探针 `Development/xess_probe.cpp`（只读 addon，记 XeSS 初始化/每帧参数）：1080p 要选 XeSS **超高质量**（quality=104，1.5×，输入 1280×720）；性能档 840×472 不接。
+- 三个约定：速度贴图 R16G16_TYPELESS，游戏 `SetVelocityScale(-w,-h)` → 运动向量符号和 FSR 相反（`NativeMotionSign()=-1`）；输出 R16G16B16A16_TYPELESS，游戏当 **UNORM16** 用（dump 验证：UNORM 解出场景、FLOAT 解出噪声）；颜色 LDR，曝光 1。
+- 跨线程提交：渲染线程调 XeSS、另一个线程 ExecuteCommandLists（劍星同线程）。批匹配放宽为只按命令列表身份（`cross_thread_submit`），过期判定放宽到落后 2 帧。
+- typeless 处理（`NativeViewFormat`）：读游戏贴图用 UNORM SRV；中间纹理一律 FP16；写回：decode 把 UNORM 位写进 raw buffer，`CopyTextureRegion` 拷进游戏贴图（这块预览驱动对 RGBA16 非 FLOAT 的带类型 UAV 会 device removed——存疑，最终真凶见坑 1，但 buffer 路径留着更稳）。
+- 坑：
+  1. **七次 device removed（887a0001）真凶是自己的 bug**：decode 建三个输入 SRV 用的格式变量被后面改输出描述时覆盖成 UNKNOWN。第一版能跑纯属输入输出同格式。教训：每个输入按自己的 desc 建视图；`codec_step`/`frame_create_step` 打点 + `GetDeviceRemovedReason` 留着。
+  2. DRED 在 721 预览运行时返回 UNSUPPORTED；D3D12 调试层要在 `SetSDKVersion` 之后取，而且这台机器仍报 SDK_COMPONENT_MISSING（没装 Graphics Tools）。两个诊断入口都留着（`enable-dred.txt` / `enable-d3d12-debug.txt`）。
+  3. 探针初始化触发靠"第 120 帧强制起一次"，抄 FSR 路径时漏了。
+- 状态：出图了，颜色对。**还没验**：运动向量符号是否真的对（看拖影）、LDR 亮度是否和网络训练域一致、帧率。Zero 说"多测几个游戏才知道有什么问题"——对，浪人崛起就是第二个样本。
+
 ## 2026-09-10 12:10 fast38：2 的幂步长 = 内存通道撞车，ViT / C512 / decoder entry 改 512B 连续 tile（光之朱雀）
 
 - 起因：多头 FFN+proj0 合核零收益后回头看 ViT contract（0.152 vs expand 0.078，FLOP 相同）。量出 contract = reduce 0.13 + combine 0.03（`DLSS5_TEST_VIT_LINEAR_PART` 门）。reduce 的 A（hidden [640][4096] E4M3）和 B（权重 [1024][4096]）行步长都是 4096 字节——一个 16 行的 wave-matrix tile 全落在同一条内存通道上（channel camping）；expand 的 1024 步长也不干净。

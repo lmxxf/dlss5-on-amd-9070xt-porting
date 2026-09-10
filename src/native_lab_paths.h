@@ -1,4 +1,10 @@
 #pragma once
+#include <dxgi.h>
+/* Typeless game textures (Rise of the Ronin's XeSS output is R16G16B16A16_TYPELESS, its velocity R16G16_TYPELESS): views use the float format. */
+inline DXGI_FORMAT NativeViewFormat(DXGI_FORMAT f){switch(f){case DXGI_FORMAT_R16G16B16A16_TYPELESS:return DXGI_FORMAT_R16G16B16A16_UNORM;/* Ronin: LDR output, the game views it as UNORM (verified from a dump: UNORM decodes to the scene, FLOAT to noise) */case DXGI_FORMAT_R16G16_TYPELESS:return DXGI_FORMAT_R16G16_FLOAT;case DXGI_FORMAT_R32G32_TYPELESS:return DXGI_FORMAT_R32G32_FLOAT;case DXGI_FORMAT_R32G32B32A32_TYPELESS:return DXGI_FORMAT_R32G32B32A32_FLOAT;default:return f;}}
+inline bool NativeIsRgba16Float(DXGI_FORMAT f){DXGI_FORMAT v=NativeViewFormat(f);return v==DXGI_FORMAT_R16G16B16A16_FLOAT||v==DXGI_FORMAT_R16G16B16A16_UNORM;}
+/* Motion-vector sign relative to the FSR contract (+1: FSR/Stellar Blade UV units; -1: XeSS titles whose velocity scale is (-w,-h)). Set by the hook before the frame is created. */
+inline float&NativeMotionSign(){static float s=1.f;return s;}
 /* Lab root and weight loading for the game addon.
    Root: the folder DLSS5-AMD next to this DLL when it holds native-game-flags.txt (the distributed package),
    otherwise D:\DLSSNR-Lab (the development machine). Every lab path in the addon goes through NativeLabPath().

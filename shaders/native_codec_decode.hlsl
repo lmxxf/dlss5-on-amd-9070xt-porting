@@ -3,7 +3,18 @@
 Texture2D<float4> Proxy : register(t1);
 Texture2D<float4> Neural : register(t2);
 Texture2D<float4> OutputOriginal : register(t3);
+#ifndef NATIVE_CODEC_UINT_OUT
+#define NATIVE_CODEC_UINT_OUT 0
+#endif
+#if NATIVE_CODEC_UINT_OUT
+// Typeless UNORM16 game textures (Rise of the Ronin): this driver device-removes on any non-float RGBA16 typed UAV, so the
+// UNORM bits go into a raw buffer (row pitch 1920*8) that the frame copies into the game texture with CopyTextureRegion.
+RWByteAddressBuffer OutputBits : register(u0);
+void Store(uint2 p,float4 v){uint4 q=uint4(round(saturate(v)*65535.0));OutputBits.Store2((p.y*1920+p.x)*8,uint2(q.x|(q.y<<16),q.z|(q.w<<16)));}
+#else
 RWTexture2D<float4> Output : register(u0);
+void Store(uint2 p,float4 v){Output[p]=v;}
+#endif
 cbuffer CodecConstants : register(b0) {
  uint2 Size; uint2 SourceSize; uint2 SourceBase; uint2 ProxySize;
  float PaperWhiteScale; float TransferStrength; float ColorStrength; uint HdrMode;
@@ -52,7 +63,7 @@ float3 Upgrade(float3 original,float3 proxy,float3 neural) {
 [numthreads(16,16,1)]
 void main(uint3 id:SV_DispatchThreadID) {
  if(any(id.xy>=Size))return;
- if(HdrMode!=1||PaperWhiteScale<=0){Output[id.xy]=0;return;}
+ if(HdrMode!=1||PaperWhiteScale<=0){Store(id.xy,0);return;}
  uint2 extent=max(ProxySize,uint2(1,1));
  uint2 p=min(uint2((float2(id.xy)+0.5)*float2(extent)/float2(Size)),extent-1);
  float4 source=OutputOriginal.Load(int3(id.xy,0));
@@ -61,5 +72,5 @@ void main(uint3 id:SV_DispatchThreadID) {
  float oy=Luminance(original),uy=Luminance(upgraded);
  float ratio=oy==0?1:clamp(uy/oy,0,4);
  float3 result=lerp(original*ratio,upgraded,ColorStrength);
- Output[id.xy]=float4(result*PaperWhiteScale,source.a);
+ Store(id.xy,float4(result*PaperWhiteScale,source.a));
 }

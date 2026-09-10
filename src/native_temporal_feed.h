@@ -1,4 +1,5 @@
 #pragma once
+#include "native_lab_paths.h"
 #include "native_pinned_resource.h"
 #include "native_split.h"
 // Motion-vector texture -> motion buffer, and network output -> history buffer.
@@ -28,7 +29,7 @@ public:
   if(!texture)throw std::runtime_error("motion texture missing");
   if(texture!=bound_texture){
    auto desc=texture->GetDesc();if(desc.Width!=mw||desc.Height!=mh)throw std::runtime_error("motion texture size changed");
-   ID3D12Device*d=nullptr;ck(heap->GetDevice(IID_PPV_ARGS(&d)));D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.Format=desc.Format;sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Texture2D.MipLevels=1;d->CreateShaderResourceView(texture,&sv,heap->GetCPUDescriptorHandleForHeapStart());d->Release();
+   ID3D12Device*d=nullptr;ck(heap->GetDevice(IID_PPV_ARGS(&d)));D3D12_SHADER_RESOURCE_VIEW_DESC sv{};sv.Format=NativeViewFormat(desc.Format);sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;sv.Texture2D.MipLevels=1;d->CreateShaderResourceView(texture,&sv,heap->GetCPUDescriptorHandleForHeapStart());d->Release();
    texture->AddRef();if(bound_texture)bound_texture->Release();bound_texture=texture;
   }
   if(motion_recorded)Transition(c,motion,true);

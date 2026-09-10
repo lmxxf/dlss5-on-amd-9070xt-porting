@@ -38,6 +38,7 @@ public:
   std::swap(b.Transition.StateBefore,b.Transition.StateAfter);c->ResourceBarrier(1,&b);
  }
 };
+inline void NativeGameFrameStep(const char*step,ID3D12Device*d=nullptr){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=frame_create_step detail=%s removed=%08x\n",GetCurrentProcessId(),GetTickCount64(),step,d?unsigned(d->GetDeviceRemovedReason()):0u);fclose(f);}}
 class NativeGameFrame {
  struct Resources {
   ID3D12Resource*original{}; // Kept alive by encode/decode resource references.
@@ -73,14 +74,14 @@ public:
   try{
    resources->submit.Create(queue);auto*d=resources->submit.Device();resources->queue=queue;
    {const wchar_t*pf=_wgetenv(L"DLSS5_GAME_PROBE");resources->probe_on=pf&&!wcscmp(pf,L"1");if(resources->probe_on)resources->probe.Create(d);}
-   resources->encode.Create(d,{source},directory);
+   NativeGameFrameStep("encode",d);resources->encode.Create(d,{source},directory);
    resources->original=source;
-   resources->input.Create(d,resources->encode.Output(),directory);
+   NativeGameFrameStep("input",d);resources->input.Create(d,resources->encode.Output(),directory);
    if(temporal_config&&!temporal_rgb){
     // Motion vectors arrive in UV units of the render grid; the coordinate pass uses the captured
     // NGX contract (subrect 0,0..render extent over the motion texture; displacement scale 1/1920,1/1080).
     auto&t=*temporal_config;auto&r=*resources;
-    r.feed.Create(d,t.motion_width,t.motion_height,1920.f,1080.f,directory);r.motion_w=t.motion_width;r.motion_h=t.motion_height;
+    r.feed.Create(d,t.motion_width,t.motion_height,1920.f*NativeMotionSign(),1080.f*NativeMotionSign(),directory);r.motion_w=t.motion_width;r.motion_h=t.motion_height;
     const float transform[6]={0,0,float(t.render_width),float(t.render_height),1.f/1920.f,1.f/1080.f};
     r.coordinates.Create(d,r.feed.Motion(),1920,1080,1920,1152,t.motion_width,t.motion_height,transform,directory,true);
     std::ifstream f((directory+L"\\normalized-output.f32").c_str(),std::ios::binary|std::ios::ate);if(!f||f.tellg()!=33554432)throw std::runtime_error("reciprocal table missing");
@@ -93,11 +94,11 @@ public:
     temporal_rgb=r.sampler.Output();r.temporal=true;
    }
    // Captured original post origin(-4,-4) corresponds to shift3.
-   resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
-   resources->neural.Create(d,resources->network.Output(),directory);
+   NativeGameFrameStep("network",d);resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
+   NativeGameFrameStep("neural",d);resources->neural.Create(d,resources->network.Output(),directory);
    if(resources->temporal)resources->smooth.Create(d,resources->network.Output(),resources->sampler.Output(),directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
-   resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);ready=true;
+   NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);NativeGameFrameStep("ready",d);ready=true;
   }catch(...){failed=true;throw;}
  }
  void RebindSourceAfterCompletion(ID3D12Resource*source){
@@ -147,7 +148,7 @@ public:
   if(!ready||failed||!target)throw std::runtime_error("frame unavailable");
   if(target==resources->original&&source_state!=target_state)throw std::runtime_error("aliased frame texture states disagree");
   auto desc=target->GetDesc();
-  if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||desc.Format!=DXGI_FORMAT_R16G16B16A16_FLOAT)throw std::runtime_error("frame target must be1080p FP16");
+  if(desc.Dimension!=D3D12_RESOURCE_DIMENSION_TEXTURE2D||desc.Width!=1920||desc.Height!=1080||desc.DepthOrArraySize!=1||desc.MipLevels!=1||desc.SampleDesc.Count!=1||!NativeIsRgba16Float(desc.Format))throw std::runtime_error("frame target must be1080p FP16");
   ID3D12Device*owner=nullptr;auto hr=target->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("frame target device query");bool same=NativeSameDevice(owner,resources->submit.Device());owner->Release();if(!same)throw std::runtime_error("frame target device mismatch");
   try{
    auto&r=*resources;
@@ -167,7 +168,8 @@ public:
     b[0].Transition={r.decode.Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
     b[1].Transition={target,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,target_state,D3D12_RESOURCE_STATE_COPY_DEST};
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
-    c->CopyResource(target,r.decode.Output());
+    if(r.decode.BufferOutput()){D3D12_TEXTURE_COPY_LOCATION dst{},src{};dst.pResource=target;dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;src.pResource=r.decode.Output();src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint.Footprint={DXGI_FORMAT_R16G16B16A16_UNORM,1920,1080,1,1920*8};c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
+    else c->CopyResource(target,r.decode.Output());
     for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
     if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}

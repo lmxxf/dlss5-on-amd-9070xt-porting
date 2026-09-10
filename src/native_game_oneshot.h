@@ -1,4 +1,5 @@
 #pragma once
+#include <d3d12sdklayers.h>
 #include "native_lab_paths.h"
 #include "native_game_frame.h"
 void NativeReleaseReservedVram();
@@ -10,6 +11,13 @@ void NativeReleaseReservedVram();
 #include <cstdio>
 // Diagnostic milestone: one real game frame with explicit history reset.
 // Not the final temporal renderer. Failed initialization/render is never retried.
+/* DRED data interface (mingw's d3d12.h lacks it; layout from the Agility SDK header, IID 98931D33-5AE8-4791-AA3C-1A73A2934E71). Diagnostic only. */
+struct NativeDredBreadcrumbNode{const char*a;const wchar_t*list_name;const char*b;const wchar_t*queue_name;ID3D12GraphicsCommandList*list;ID3D12CommandQueue*queue;UINT32 count;const UINT32*last;const UINT32*history;const NativeDredBreadcrumbNode*next;};
+struct NativeDredAllocationNode{const char*a;const wchar_t*name;UINT32 type;const NativeDredAllocationNode*next;};
+struct NativeDredBreadcrumbsOutput{const NativeDredBreadcrumbNode*head;};
+struct NativeDredPageFaultOutput{D3D12_GPU_VIRTUAL_ADDRESS va;const NativeDredAllocationNode*existing;const NativeDredAllocationNode*freed;};
+struct NativeDredData:public IUnknown{virtual HRESULT STDMETHODCALLTYPE GetAutoBreadcrumbsOutput(NativeDredBreadcrumbsOutput*)=0;virtual HRESULT STDMETHODCALLTYPE GetPageFaultAllocationOutput(NativeDredPageFaultOutput*)=0;};
+static constexpr GUID NativeDredIid={0x98931D33,0x5AE8,0x4791,{0xAA,0x3C,0x1A,0x73,0xA2,0x93,0x4E,0x71}};
 class NativeGameOneShot {
  std::atomic<unsigned>phase{0}; // idle, initializing, ready, rendering, done, failed
  NativeGameFrame*frame{};ID3D12CommandQueue*queue{};
@@ -48,7 +56,14 @@ class NativeGameOneShot {
 #endif
    Log("ready","await explicit PID/request-id; history_reset=1; not temporal acceptance");
    self->phase.store(2,std::memory_order_release);
-  }catch(const std::exception&e){Log("initialization_failed",e.what());self->phase.store(5);}
+  }catch(const std::exception&e){Log("initialization_failed",e.what());{ID3D12Device*d=nullptr;if(self->queue&&SUCCEEDED(self->queue->GetDevice(IID_PPV_ARGS(&d)))){char t[64];snprintf(t,sizeof t,"%08x",unsigned(d->GetDeviceRemovedReason()));Log("device_removed_reason",t);
+     {ID3D12InfoQueue*q=nullptr;if(SUCCEEDED(d->QueryInterface(IID_PPV_ARGS(&q)))&&q){UINT64 n=q->GetNumStoredMessages();if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-d3d12-debug.txt").c_str(),L"ab")){fprintf(f,"pid=%lu stored_messages=%llu\n",GetCurrentProcessId(),(unsigned long long)n);for(UINT64 i=n>40?n-40:0;i<n;i++){SIZE_T len=0;q->GetMessage(i,nullptr,&len);std::vector<char>buf(len+1);auto*m=reinterpret_cast<D3D12_MESSAGE*>(buf.data());if(len&&SUCCEEDED(q->GetMessage(i,m,&len)))fprintf(f,"  [%u/%u] %s\n",unsigned(m->Severity),unsigned(m->ID),m->pDescription?m->pDescription:"");}fclose(f);}q->Release();}}
+     NativeDredData*dred=nullptr;if(SUCCEEDED(d->QueryInterface(NativeDredIid,reinterpret_cast<void**>(&dred)))&&dred){NativeDredBreadcrumbsOutput bc{};NativeDredPageFaultOutput pf{};HRESULT h1=dred->GetAutoBreadcrumbsOutput(&bc),h2=dred->GetPageFaultAllocationOutput(&pf);
+      if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-dred.txt").c_str(),L"ab")){fprintf(f,"pid=%lu breadcrumbs_hr=%08x pagefault_hr=%08x fault_va=%llx\n",GetCurrentProcessId(),unsigned(h1),unsigned(h2),(unsigned long long)pf.va);
+       if(SUCCEEDED(h2)){for(auto*n=pf.existing;n;n=n->next)fprintf(f,"  existing alloc type=%u name=%ls\n",unsigned(n->type),n->name?n->name:L"");for(auto*n=pf.freed;n;n=n->next)fprintf(f,"  freed alloc type=%u name=%ls\n",unsigned(n->type),n->name?n->name:L"");}
+       if(SUCCEEDED(h1)){unsigned lists=0;for(auto*n=bc.head;n&&lists<256;n=n->next,lists++){unsigned done=n->last?*n->last:0;if(done==n->count)continue;fprintf(f,"  list=%p (%ls) queue=%p (%ls) count=%u completed=%u ops:",n->list,n->list_name?n->list_name:L"",n->queue,n->queue_name?n->queue_name:L"",n->count,done);for(unsigned i=done>6?done-6:0;i<n->count&&i<done+6;i++)fprintf(f," %u%s",unsigned(n->history[i]),i==done?"<":"");fputc('\n',f);}}
+       fclose(f);}dred->Release();}
+     d->Release();}}self->phase.store(5);}
   task->source->Release();delete task;return 0;
  }
 public:

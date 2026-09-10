@@ -2,6 +2,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <d3d12.h>
+#include <d3d12sdklayers.h>
 #include <atomic>
 #include <cstdio>
 #include "reshade.hpp"
@@ -21,6 +22,7 @@ static PendingSnapshot pending_snapshot;
 static std::mutex snapshot_mutex;
 static bool snapshot_taken{};
 static thread_local bool snapshot_active{};
+static bool cross_thread_submit{}; /* set for the XeSS path (Rise of the Ronin submits from a different thread than the one recording the upscaler) */
 #endif
 #ifdef NATIVE_ORDER_NEURAL
 extern "C" __declspec(dllexport) const char*NAME="DLSS5 AMD single-frame verification";
@@ -162,6 +164,41 @@ static uint32_t dispatch(void**context,const Header*h){
 #endif
  return result;
 }
+#ifdef NATIVE_ORDER_NEURAL
+// XeSS titles (Rise of the Ronin): the same contract read from xessD3D12Execute's parameters (XeSS 1.x/2.x SDK layout)
+// instead of the FFX dispatch description. XeSS runs first; the network then refines its 1080p output after submission,
+// exactly as with FSR. Velocity is XeSS-scaled by (-w,-h) in this title, so the feed's motion sign is flipped.
+struct XessExecuteParams{ID3D12Resource*color,*velocity,*depth,*exposure,*responsive,*output;float jitter_x,jitter_y,exposure_scale;uint32_t reset,input_w,input_h;int32_t bases[10];ID3D12DescriptorHeap*heap;uint32_t heap_offset;};
+using XessExecute=int(*)(void*,ID3D12GraphicsCommandList*,const XessExecuteParams*);
+static XessExecute original_xess{};
+static int xess_execute(void*ctx,ID3D12GraphicsCommandList*list,const XessExecuteParams*p){
+ if(!p||!p->output)return original_xess(ctx,list,p);
+ unsigned n=++frames;log("xess_begin",list,nullptr,n);
+ auto*out=p->output;auto od=out->GetDesc();tracked_output.store(reinterpret_cast<uint64_t>(out));
+ D3D12_RESOURCE_DESC md{};if(p->velocity)md=p->velocity->GetDesc();
+ if(p->velocity&&!observed_motion_w.load()){observed_motion_w=unsigned(md.Width);observed_motion_h=md.Height;observed_render_w=p->input_w;observed_render_h=p->input_h;}
+ ID3D12Resource*frame_motion=(p->velocity&&unsigned(md.Width)==observed_motion_w.load()&&md.Height==observed_motion_h.load()&&p->input_w==observed_render_w.load()&&p->input_h==observed_render_h.load())?p->velocity:nullptr;
+ const bool frame_reset=p->reset!=0;
+ if(n<=8){AcquireSRWLockExclusive(&lock);
+  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){
+   fprintf(f,"pid=%lu kind=xess_execute frame=%u list=%p output=%p format=%u size=%llux%u flags=%u velocity=%p vformat=%u vsize=%llux%u input=%ux%u jitter=%g,%g exposure=%g reset=%u\n",GetCurrentProcessId(),n,list,out,unsigned(od.Format),(unsigned long long)od.Width,od.Height,unsigned(od.Flags),p->velocity,unsigned(md.Format),(unsigned long long)md.Width,md.Height,p->input_w,p->input_h,p->jitter_x,p->jitter_y,p->exposure_scale,p->reset);fclose(f);
+  }ReleaseSRWLockExclusive(&lock);}
+ install_native_barriers(list);
+ int result=original_xess(ctx,list,p);log("xess_end",list,nullptr,unsigned(result));
+ if(result==0&&od.Width==1920&&od.Height==1080&&list&&(n==120||neural_oneshot.WantsFrame())){ /* frame 120 starts the background initialization, as on the FFX path */
+  ID3D12GraphicsCommandList*native=nullptr;
+  if(SUCCEEDED(static_cast<IUnknown*>(list)->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&native)))&&native){
+   std::lock_guard<std::mutex>guard(snapshot_mutex);
+   if(!pending_snapshot.list){out->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,out,GetCurrentThreadId(),n,frame_motion,frame_reset};++armed_frames;}
+   else native->Release();
+  }
+ }
+ if(n%100==0){AcquireSRWLockExclusive(&lock);
+  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu kind=neural_coverage xess_frames=%u armed=%u ran=%u dropped_pending=%u\n",GetCurrentProcessId(),n,armed_frames.load(),neural_jobs.load(),dropped_pending.load());fclose(f);}
+  ReleaseSRWLockExclusive(&lock);}
+ return result;
+}
+#endif
 static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3D12CommandList*const*lists){
  const unsigned batch=++native_batches;
  if(q&&batch<=8){
@@ -181,7 +218,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
  if(!snapshot_active){
   PendingSnapshot job{};
   {std::lock_guard<std::mutex>guard(snapshot_mutex);
-   if(pending_snapshot.list&&pending_snapshot.frame!=frames.load()){
+   if(pending_snapshot.list&&(cross_thread_submit?frames.load()-pending_snapshot.frame>2:pending_snapshot.frame!=frames.load())){ /* cross-thread: the render thread may be one or two upscaler calls ahead of the submit */
     pending_snapshot.list->Release();pending_snapshot.source->Release();if(pending_snapshot.motion)pending_snapshot.motion->Release();pending_snapshot={};++dropped_pending;
    }
    uintptr_t items[64]{};if(lists&&count<=64)for(UINT i=0;i<count;i++)items[i]=reinterpret_cast<uintptr_t>(lists[i]);
@@ -189,7 +226,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
 #ifdef NATIVE_ORDER_NEURAL
    eligible=eligible||neural_oneshot.WantsFrame();
 #endif
-   if(eligible&&NativeSnapshotBatchMatch(pending_snapshot.thread,GetCurrentThreadId(),reinterpret_cast<uintptr_t>(pending_snapshot.list),lists?items:nullptr,count)){
+   if(eligible&&NativeSnapshotBatchMatch(cross_thread_submit?GetCurrentThreadId():pending_snapshot.thread,GetCurrentThreadId(),reinterpret_cast<uintptr_t>(pending_snapshot.list),lists?items:nullptr,count)){ /* XeSS titles record on the render thread and submit from another: match by list identity only */
     job=pending_snapshot;pending_snapshot={};snapshot_taken=true;
    }
   }
@@ -235,12 +272,16 @@ static void barrier(reshade::api::command_list*c,uint32_t count,const reshade::a
  }
 }
 static DWORD WINAPI worker(void*){
- HMODULE module=nullptr;for(unsigned i=0;i<600&&!module;i++){module=GetModuleHandleW(L"amd_fidelityfx_dx12.dll");if(!module)Sleep(100);}if(!module)return 1;
- auto target=GetProcAddress(module,"ffxDispatch");if(!target)return 2;
+ // Whichever upscaler dll the title loads first: the FFX SDK (Stellar Blade) or XeSS (Rise of the Ronin; its FSR is linked into the exe).
+ HMODULE module=nullptr,xess=nullptr;for(unsigned i=0;i<6000&&!module&&!xess;i++){module=GetModuleHandleW(L"amd_fidelityfx_dx12.dll");xess=GetModuleHandleW(L"libxess.dll");if(!module&&!xess)Sleep(100);}if(!module&&!xess)return 1;
+ auto target=module?GetProcAddress(module,"ffxDispatch"):GetProcAddress(xess,"xessD3D12Execute");if(!target)return 2;
  auto s=MH_Initialize();if(s!=MH_OK&&s!=MH_ERROR_ALREADY_INITIALIZED)return 3;
+#ifdef NATIVE_ORDER_NEURAL
+ if(!module){NativeMotionSign()=-1.f;cross_thread_submit=true;s=MH_CreateHook(reinterpret_cast<void*>(target),reinterpret_cast<void*>(&xess_execute),reinterpret_cast<void**>(&original_xess));}else
+#endif
  s=MH_CreateHook(reinterpret_cast<void*>(target),reinterpret_cast<void*>(&dispatch),reinterpret_cast<void**>(&original));if(s==MH_OK)s=MH_EnableHook(reinterpret_cast<void*>(target));
  // Do not retry an existing-hook conflict or modify another addon's hook.
- if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu hook_status=%u\n",GetCurrentProcessId(),unsigned(s));fclose(f);}return s==MH_OK?0:4;
+ if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu hook_status=%u upscaler=%s\n",GetCurrentProcessId(),unsigned(s),module?"ffx":"xess");fclose(f);}return s==MH_OK?0:4;
 }
 // Before the game creates its D3D12 device: select the private Agility 721 runtime shipped in
 // the game folder and enable the experimental shader-model feature so SM6.10 wave-matrix PSOs
@@ -248,10 +289,16 @@ static DWORD WINAPI worker(void*){
 static bool on_create_device(reshade::api::device_api api,uint32_t&){
  if(api!=reshade::api::device_api::d3d12||GetFileAttributesW(NativeLabPath(L"enable-game-sdk721.txt").c_str())==INVALID_FILE_ATTRIBUTES)return false;
  static std::atomic<bool>attempted{false};if(attempted.exchange(true))return false;
+ /* Diagnostic (D:\DLSSNR-Lab\enable-dred.txt): Device Removed Extended Data, breadcrumbs + page faults, dumped by the frame when initialization fails. */
+ if(GetFileAttributesW(NativeLabPath(L"enable-dred.txt").c_str())!=INVALID_FILE_ATTRIBUTES){ID3D12DeviceRemovedExtendedDataSettings*dred=nullptr;HRESULT dh=D3D12GetDebugInterface(IID_PPV_ARGS(&dred));if(SUCCEEDED(dh)&&dred){dred->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);dred->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);dred->Release();}
+  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu dred_enable hr=%08x\n",GetCurrentProcessId(),unsigned(dh));fclose(f);}}
  const GUID clsid={0x7cda6aca,0xa03e,0x49c8,{0x94,0x58,0x03,0x34,0xd2,0x0e,0x07,0xce}};
  using GetInterfaceFn=HRESULT(WINAPI*)(REFCLSID,REFIID,void**);HMODULE d3d=GetModuleHandleW(L"d3d12.dll");auto get_interface=d3d?reinterpret_cast<GetInterfaceFn>(GetProcAddress(d3d,"D3D12GetInterface")):nullptr;
  ID3D12SDKConfiguration*configuration=nullptr;HRESULT get=get_interface?get_interface(clsid,IID_PPV_ARGS(&configuration)):HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND),set=E_ABORT,experimental=E_ABORT;
  if(SUCCEEDED(get)){set=configuration->SetSDKVersion(721,".\\DLSS5-D3D12-721\\");configuration->Release();}
+ /* (after SetSDKVersion so the Agility folder's d3d12SDKLayers.dll is used) Diagnostic (D:\DLSSNR-Lab\enable-d3d12-debug.txt): the D3D12 debug layer (d3d12SDKLayers.dll from the Agility folder); its messages are dumped when initialization fails. */
+ if(GetFileAttributesW(NativeLabPath(L"enable-d3d12-debug.txt").c_str())!=INVALID_FILE_ATTRIBUTES){ID3D12Debug*dbg=nullptr;HRESULT bh=D3D12GetDebugInterface(IID_PPV_ARGS(&dbg));if(SUCCEEDED(bh)&&dbg){dbg->EnableDebugLayer();dbg->Release();}
+  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu debug_layer hr=%08x\n",GetCurrentProcessId(),unsigned(bh));fclose(f);}}
  if(SUCCEEDED(set)){const GUID feature={0x76f5573e,0xf13a,0x40f5,{0xb2,0x97,0x81,0xce,0x9e,0x18,0x93,0x3f}};experimental=D3D12EnableExperimentalFeatures(1,&feature,nullptr,nullptr);}
  if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu sdk721_before_device get=%08x set=%08x experimental=%08x\n",GetCurrentProcessId(),unsigned(get),unsigned(set),unsigned(experimental));fclose(f);}
  return false;
@@ -272,7 +319,7 @@ static void on_init_device(reshade::api::device*device){
 BOOL WINAPI DllMain(HINSTANCE h,DWORD reason,LPVOID){
  if(reason==DLL_PROCESS_ATTACH){
   DisableThreadLibraryCalls(h);wchar_t path[MAX_PATH]{};GetModuleFileNameW(nullptr,path,MAX_PATH);
-  if(!wcsstr(path,L"SB-Win64-Shipping.exe")||!reshade::register_addon(h))return FALSE;
+  if((!wcsstr(path,L"SB-Win64-Shipping.exe")&&!wcsstr(path,L"\\Ronin.exe"))||!reshade::register_addon(h))return FALSE;
   reshade::register_event<reshade::addon_event::create_device>(on_create_device);
   reshade::register_event<reshade::addon_event::init_device>(on_init_device);
   reshade::register_event<reshade::addon_event::close_command_list>(close_list);
