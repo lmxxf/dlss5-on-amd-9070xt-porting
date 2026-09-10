@@ -10,6 +10,9 @@ ByteAddressBuffer ffn_weights:register(t4);  /* packed FFN weights of native_pre
 ByteAddressBuffer ffn_input:register(t5);    /* mapped source: mode 1/2 f32 raster or Main(), 3 f16 raw tiles, 5 rgb f32 [pixel][4], 9 low main8 bytes */
 ByteAddressBuffer ffn_skip:register(t6);     /* mode 9: skip main8 bytes (raster over the pre-block work grid) */
 ByteAddressBuffer ffn_coeff:register(t7);    /* mode 9: 64 merge coefficients; mode 5: temporal history, float4 per raster pixel */
+#ifndef NATIVE_C32_MERGE4
+#define NATIVE_C32_MERGE4 0
+#endif
 uint ffn_pcg(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return (w>>22)^w;}
 float ffn_uniform24(uint s){uint w=((s>>((s>>28)+4))^s)*0x108ef2d9;return float(((w>>30)^(w>>8))+1)*5.9604644775390625e-8;}
 float ffn_half_round(float v){return f16tof32(f32tof16(v));}
@@ -58,10 +61,19 @@ void ffn_fused(uint first,uint t,uint ebase,uint pbase,uint hbase,out C out0,out
   for(uint i=0;i<in0.Length();i++){in0.Set(i,ffn_half_round(in0.Get(i)));in1.Set(i,ffn_half_round(in1.Get(i)));}
  }else{
   [branch]if(map_mode==9){
+#if NATIVE_C32_MERGE4
+   /* FAST PATH (DLSS5_C32_MERGE4): one 4-byte load per source gives 4 channels; lane t handles token it*4+t/8, channels (t%8)*4..+3 (4 passes instead of 16; same per-element arithmetic). */
+   const uint c0=(t%8)*4;const float4 w0=asfloat(ffn_coeff.Load4(c0*4)),w1=asfloat(ffn_coeff.Load4((32+c0)*4));const int mine_low=t<16?ffn_low_index(mine):0;
+   [unroll]for(uint it=0;it<4;it++){const uint j=it*4+t/8;int src=WaveReadLaneAt(mine,j);float4 v=0;
+    if(src>=0){uint sk4=ffn_skip.Load(uint(src)+c0),lo4=ffn_input.Load(uint(WaveReadLaneAt(mine_low,j))+c0);
+     [unroll]for(uint q=0;q<4;q++){float sk=ffn_e4m3((sk4>>(q*8))&255u),lo=ffn_e4m3((lo4>>(q*8))&255u);precise float m=f16tof32(f32tof16(lo*w0[q]))+sk*w1[q];v[q]=f16tof32(f32tof16(m));}}
+    ex[ebase+j*32+c0]=float16_t(v.x);ex[ebase+j*32+c0+1]=float16_t(v.y);ex[ebase+j*32+c0+2]=float16_t(v.z);ex[ebase+j*32+c0+3]=float16_t(v.w);}
+#else
    const float w0=asfloat(ffn_coeff.Load(t*4)),w1=asfloat(ffn_coeff.Load((32+t)*4));const int mine_low=t<16?ffn_low_index(mine):0;
    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=0;
     if(src>=0){uint low=uint(WaveReadLaneAt(mine_low,j))+t;uint a=uint(src)+t;float sk=ffn_e4m3((ffn_skip.Load(a&~3u)>>((a&3u)*8))&255u);float lo=ffn_e4m3((ffn_input.Load(low&~3u)>>((low&3u)*8))&255u);precise float m=f16tof32(f32tof16(lo*w0))+sk*w1;v=f16tof32(f32tof16(m));}
     ex[ebase+j*32+t]=float16_t(v);}
+#endif
   }else{
    [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=src<0?0:(map_mode==3?float(ffn_input.Load<float16_t>((uint(src)+t)*2)):asfloat(ffn_input.Load((uint(src)+t)*4)));ex[ebase+j*32+t]=float16_t(v);}
   }

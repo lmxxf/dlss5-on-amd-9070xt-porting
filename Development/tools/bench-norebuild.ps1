@@ -7,6 +7,9 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_c32_merge4_network.ps1
+# FAST PATH: post70 merge fold in the fused C32 FFN prologue reads 4 channels per 4-byte load (4 passes instead of 16). Build-only, bit-exact.
+$env:DLSS5_BUILD_C32_MERGE4='1'
 # ---- run_split_stream8_network.ps1
 # FAST PATH: C512 blocks without window pack/crop and QKV pack: kernels read the block input by raster index and write the cropped raster; the first
 # projection's E4M3 output (tiles) is the QKV input; between blocks the raster is E4M3 bytes (first input / last output stay f32). Bit-exact.

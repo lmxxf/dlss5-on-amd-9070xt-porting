@@ -7,6 +7,9 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_c32_merge4_network.ps1
+# FAST PATH: post70 merge fold in the fused C32 FFN prologue reads 4 channels per 4-byte load (4 passes instead of 16). Build-only, bit-exact.
+$env:DLSS5_BUILD_C32_MERGE4='1'
 # ---- run_split_stream8_network.ps1
 # FAST PATH: C512 blocks without window pack/crop and QKV pack: kernels read the block input by raster index and write the cropped raster; the first
 # projection's E4M3 output (tiles) is the QKV input; between blocks the raster is E4M3 bytes (first input / last output stay f32). Bit-exact.
@@ -248,7 +251,7 @@ foreach($Pass in @(@(0,'qkv'),@(2,'attention'))){
 }
 if($env:DLSS5_BUILD_C32_FUSED_FFN -eq '1'){
  # FAST PATH (DLSS5_C32_FUSED_FFN): fast4 attention with the C32 FFN in its prologue (native_c32_ffn_fused.hlsli).
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D NATIVE_C32_EPILOGUE=1 -D NATIVE_C32_HALF_STREAM=1 -D PASS=2 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D NATIVE_C32_ATTN_FAST2=1 -D NATIVE_C32_ATTN_FAST3=1 -D NATIVE_C32_ATTN_FAST4=1 -D NATIVE_C32_FUSED_FFN=1 native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_ffn.cso
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D NATIVE_C32_EPILOGUE=1 -D NATIVE_C32_HALF_STREAM=1 -D PASS=2 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D NATIVE_C32_ATTN_FAST2=1 -D NATIVE_C32_ATTN_FAST3=1 -D NATIVE_C32_ATTN_FAST4=1 -D NATIVE_C32_FUSED_FFN=1 -D "NATIVE_C32_MERGE4=$(if($env:DLSS5_BUILD_C32_MERGE4 -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_ffn.cso
  if($LASTEXITCODE -ne 0){throw 'Fused C32 attention+FFN compilation failed'}
 }
 if($env:DLSS5_BUILD_C32_WAVE_ATTENTION -eq '1'){
