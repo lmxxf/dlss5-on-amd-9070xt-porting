@@ -300,6 +300,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 21:30 **一键编译收口**（Zero 在 22.04 的 WSL 上亲手编，暴露了一串）：`build-addon-oneclick.sh` 自动拉 MinHook / ReShade 头文件；老 mingw（gcc 10 win32 线程模型）没有 std::mutex → 自动切 posix 变体；老 `d3d12.h` 没有 `ID3D12SDKConfiguration` → 从 mingw-w64 v11 拉头文件；`d3d12sdklayers.h` 可选。shader 侧新增 `compile-shaders.ps1`（任意 Windows 机 + 预览版 dxc，不需要显卡/权重）；发现仓库 `shaders/` 缺 10 个 bench.ps1 要编的源（在 Development/，已搬回）和 3 个从没进 runner 的手工 cso（head 512 的 pool/project、C256 f16 pack，已补进 bench.ps1）。从零编出的 179 个 cso 跑测试台与现链逐位相同。
 - 23:40 fast43：升采样投影 56/62/66 的输出光栅改 f16（`DLSS5_DECODER_OUT16`，kernel `NATIVE_DECODER_OUT16`，值本来就是 H()/F() 在 f16 格点上，f32tof16 截断也精确），下游首块读 f16：块 66 的 C32 合核加 map mode 10（mode 1 的布局、半精度值）；块 56/62 的多头首块加 `native_matrix_pack_fp8_mapped_src16_c{128,64}` 和 `native_wave_project_mapfeature_fp8act_f16in_f8out_c{128,64}`（`FuseShift` 的 `f16_input`）。15 帧对 fast42 逐位相同。机器整晚在 33ms 降频态（Zero 从 A 卡机 ssh 过来，不能重启），两轮 abn 只看方向：tail66_project −0.07～−0.11、tail66_body −0.06、tail62_body −0.04、tail62_project −0.03，合计约 −0.15～−0.2，符合估计；干净数等重启后再量。已装进游戏：`native-game-fast43.addon64`（sha 7da2b88c…）+ `native-game-flags-fast43.txt`（= fast42-blackprobe + OUT16），cso 来自新链目录 `decout16`（`decfast` 暂留作 A/B 基线，量完删）。测试 exe 的 `DLSS5_TEST_DUMP_BLOCK4=2` 转储 proj66 输出时现在是 f16 字节，读它的脚本没改。
+- 09-11 00:10 **ViT expand+contract 合核：null**（`DLSS5_VIT_FUSED_FFN`，`native_wave_vit_ffn_fused.hlsl`，保留关 0）。一组 16 token / 16 wave，hidden 按 1024 通道四份进 LDS（E4M3，行距 1040B 防 bank 冲突），expand 四份→contract 四个 K 分区，MMA 顺序、激活、分区求和顺序照抄，逐位相同。但每块 0.35～0.39ms，原来 expand m4 0.08 + split-K contract 0.10：慢一倍。32 token 一组、hidden 八份（权重流量减半，分区累加器跨两份持续）数字纹丝不动 → 不是带宽，是延迟：20～40 组×16 wave 摊到 256 个 SIMD 每个不到两条 wave，每个 K 步都是依赖链 MMA，遮不住；原来 expand 每 wave 16 个独立累加器、contract 四倍分区并发。教训：640 token 的层没有足够并行度撑 LDS 合核，"省 13MB 中间量 + 两个 dispatch 缝"的账抵不过并行度损失。待办第 6 条划掉。
+- 09-11 00:10 **网友 1114**：网友在别的游戏里装 0.08 报 ReShade 加载 addon 错误 1114（豆包猜"DllMain 里做 DX 查询"，不对）。真因是 `DllMain` 里写死的进程白名单——不是 `SB-Win64-Shipping.exe` / `Ronin.exe` 就 `return FALSE`，ReShade 就报 1114。已去掉（可选 `DLSS5_ONLY_EXE=<exe 子串>` 环境变量恢复过滤）；别的游戏现在能加载，但只钩 FSR `ffxDispatch` / XeSS `xessD3D12Execute`、只做过 1080p，其他游戏能不能出图没验证。进下一个 tag。Zero 的方向：做成 Magpie 那种窗口捕获 + 光流 MV 的形态（社区 DLSS5-Feeder 同型），等优化线收口后立项。
 
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
@@ -445,7 +447,7 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 3. ~~C512 家族激活~~：fast39（FFWD→投影 0 E4M3 tile，−0.8）+ fast40（mapped + FP8 stream，−0.3，显存 −380MB）已做。剩下的小尾巴：注意力输出 result[2] 仍是 `[token][512]` E4M3（512B 步长），投影 1 的 A 直读；FFWD 每个 group 都重新 stage 一遍 16×512 输入（8 倍冗余读）。估 −0.1～0.2，先不动。
 4. ~~post merge fold 4 通道 Load~~（fast41，−0.1；post 段 2.90 vs pre 2.81 基本持平了）。
 5. dispatch 之间空转约 3.5ms：只能靠合核压（对带宽型段）。
-6. ViT expand+contract 合核 −0.3。~~升采样投影输出改 f16~~：fast43 已做（−0.15～−0.2，降频态粗量）。
+6. ~~ViT expand+contract 合核 −0.3~~：09-11 试过，慢一倍，null（并行度不够）。~~升采样投影输出改 f16~~：fast43 已做（−0.15～−0.2，降频态粗量）。
 6b. ~~指令级 profiler~~ 已打通（09-10 18:00）。待做：(a) C32 合核消溢出——换写法无效（20:10），要动结构（偏置表进 LDS / 减少同时在飞的 s[4] 累加器）；(b) ~~时钟~~ 是降频态，重启后 24.4，游戏里也回 36；(c) 让 Zero 用 RGP 界面看一次事件时间线，把 pipeline hash 和耗时对上（Zero 说等某个游戏从头到尾出问题再说，不急）。
 7. 显存与波动：PoolSize 6000→5000 或贴图降档；C512 16 块 result 共享 200MB；shared ffn/raw 已 f16；decoder entry+split8 331MB 里 entry 的 f32 权重。
 8. 网络约化/蒸馏（写作线，周级）：九块跳过版 36.5dB −2ms 等 Zero 看画面；蒸馏 = exact 链当老师、DLL 每帧 dump 当数据，难点是 71 块可反向传播 torch 模型 + FP8 假量化 + 算力。
