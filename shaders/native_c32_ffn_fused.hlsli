@@ -5,9 +5,9 @@
    Wave-private LDS: ex slice = staged f16 input tile (all mapped sources are H()-rounded, so f16 is exact) / mode 5 features;
    pw8 slice = E4M3 input tile (prefix8); the wave's own qkv8 rows = the hidden layer, two halves of 64 channels (the QKV rows
    are written only after the FFN). Supported map modes: 1 raster f32, 2 previous Main(), 3 previous raw tiles f16,
-   5 pre-block inline prefix, 9 post70 merge fold (main8 low + main8 skip). */
+   5 pre-block inline prefix, 9 post70 merge fold (main8 low + main8 skip), 10 raster f16 (mode 1 layout, half values; DLSS5_DECODER_OUT16). */
 ByteAddressBuffer ffn_weights:register(t4);  /* packed FFN weights of native_preblock_runtime (expand E4M3 @20608, contract E4M3 @16512, scales @16384, diagonals @24704, prefix B tiles @27776) */
-ByteAddressBuffer ffn_input:register(t5);    /* mapped source: mode 1/2 f32 raster or Main(), 3 f16 raw tiles, 5 rgb f32 [pixel][4], 9 low main8 bytes */
+ByteAddressBuffer ffn_input:register(t5);    /* mapped source: mode 1/2 f32 raster or Main(), 3 f16 raw tiles, 5 rgb f32 [pixel][4], 9 low main8 bytes, 10 f16 raster */
 ByteAddressBuffer ffn_skip:register(t6);     /* mode 9: skip main8 bytes (raster over the pre-block work grid) */
 ByteAddressBuffer ffn_coeff:register(t7);    /* mode 9: 64 merge coefficients; mode 5: temporal history, float4 per raster pixel */
 #ifndef NATIVE_C32_MERGE4
@@ -23,7 +23,7 @@ int ffn_source_index(uint p){
  uint tile=p/64,x=(tile%(runtime_width/8))*8+p%8,y=(tile/(runtime_width/8))*8+(p%64)/8;
  int sx=int(x)-int(shift_x),sy=int(y)-int(shift_y);
  if(sx<0||sy<0||sx>=int(src_width)||sy>=int(src_height))return -1;
- if(map_mode==1||map_mode==9)return int((uint(sy)*src_width+uint(sx))*32);
+ if(map_mode==1||map_mode==9||map_mode==10)return int((uint(sy)*src_width+uint(sx))*32);
  uint px=uint(sx)+prev_shift_x,py=uint(sy)+prev_shift_y;
  if(map_mode==2)return int((py*prev_work_width+px)*32);
  uint ptile=(py/8)*(prev_work_width/8)+px/8;return int((ptile*64+(py%8)*8+px%8)*32);
@@ -75,7 +75,7 @@ void ffn_fused(uint first,uint t,uint ebase,uint pbase,uint hbase,out C out0,out
     ex[ebase+j*32+t]=float16_t(v);}
 #endif
   }else{
-   [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=src<0?0:(map_mode==3?float(ffn_input.Load<float16_t>((uint(src)+t)*2)):asfloat(ffn_input.Load((uint(src)+t)*4)));ex[ebase+j*32+t]=float16_t(v);}
+   [unroll]for(uint j=0;j<16;j++){int src=WaveReadLaneAt(mine,j);float v=src<0?0:((map_mode==3||map_mode==10)?float(ffn_input.Load<float16_t>((uint(src)+t)*2)):asfloat(ffn_input.Load((uint(src)+t)*4)));ex[ebase+j*32+t]=float16_t(v);}
   }
   GroupMemoryBarrier();
   in0=C16::Load(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor).Cast<dx::linalg::ComponentType::F32>();in1=C16::Load(ex,ebase+16,32,dx::linalg::MatrixLayout::RowMajor).Cast<dx::linalg::ComponentType::F32>();

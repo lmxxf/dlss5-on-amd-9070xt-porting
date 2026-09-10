@@ -4,9 +4,15 @@
 #ifndef NATIVE_FP8_SOURCE
 #define NATIVE_FP8_SOURCE 0
 #endif
+#ifndef NATIVE_F16_SOURCE
+#define NATIVE_F16_SOURCE 0
+#endif
 #if NATIVE_FP8_SOURCE
 // FAST PATH: the source raster is already E4M3 bytes; the mapped pack is a byte gather.
 ByteAddressBuffer input8:register(t0);
+#elif NATIVE_F16_SOURCE
+// FAST PATH (DLSS5_DECODER_OUT16): the source raster (an upsample projection output) is f16.
+ByteAddressBuffer input16:register(t0);
 #else
 StructuredBuffer<float> input:register(t0);
 #endif
@@ -28,6 +34,8 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #endif
 #if NATIVE_FP8_SOURCE
  output.Store(q*4,input8.Load(src*4));
+#elif NATIVE_F16_SOURCE
+ {uint2 h=input16.Load2(src*8);output.Store(q*4,E4M3(f16tof32(h.x&65535u))|(E4M3(f16tof32(h.x>>16))<<8)|(E4M3(f16tof32(h.y&65535u))<<16)|(E4M3(f16tof32(h.y>>16))<<24));}
 #else
  output.Store(q*4,E4M3(input[src*4])|(E4M3(input[src*4+1])<<8)|(E4M3(input[src*4+2])<<16)|(E4M3(input[src*4+3])<<24));
 #endif

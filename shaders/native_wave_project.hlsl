@@ -28,6 +28,9 @@ ByteAddressBuffer weights:register(t1);
 #ifndef NATIVE_FP8_FEATURE
 #define NATIVE_FP8_FEATURE 0
 #endif
+#ifndef NATIVE_F16_FEATURE
+#define NATIVE_F16_FEATURE 0
+#endif
 #ifndef NATIVE_FP8_STORE
 #define NATIVE_FP8_STORE 0
 #endif
@@ -59,6 +62,10 @@ float FeatureAt(uint index){uint tok=index/MATRIX_CHANNELS,ch=index%MATRIX_CHANN
 #else
 float FeatureAt(uint index){return FromE4M3((feature8.Load(index&~3u)>>((index&3u)*8u))&255u);}
 #endif
+#elif NATIVE_F16_FEATURE
+// FAST PATH (DLSS5_DECODER_OUT16): the first-block residual (an upsample projection output) is stored as f16.
+ByteAddressBuffer feature16:register(t2);
+float FeatureAt(uint index){return float(feature16.Load<float16_t>(index*2));}
 #else
 StructuredBuffer<float> feature:register(t2);
 float FeatureAt(uint index){return feature[index];}

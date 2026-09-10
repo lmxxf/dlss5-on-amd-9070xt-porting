@@ -7,6 +7,10 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_decoder_out16_network.ps1
+# FAST PATH: the block 66 upsample projection writes its raster as f16 (values are on the f16 grid); block 66's C32 body reads it as f16 (map mode 10). Bit-exact.
+$env:DLSS5_BUILD_DECODER_OUT16='1'
+$env:DLSS5_DECODER_OUT16='1'
 # ---- run_c32_bias_tile_network.ps1
 # NULL RESULT (kept off): C32 attention softmax bias as one accumulator-layout load per tile — the driver emits the same 32 per-lane scattered loads (identical ISA, spill unchanged), so no gain.
 $env:DLSS5_BUILD_C32_BIAS_TILE='0'
@@ -412,6 +416,23 @@ foreach($Pair in @(@(1024,512),@(512,256),@(256,128),@(128,64),@(64,32))){
 if($env:DLSS5_BUILD_C32_SKIP8 -eq '1'){
  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=64" -D "OUTPUT_CHANNELS=32" -D "SKIP8=1" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_DECODER_FAST=$(if($env:DLSS5_BUILD_DECODER_FAST -eq '1'){1}else{0})" -D "NATIVE_DECODER_HW_H=$(if($env:DLSS5_BUILD_DECODER_HW_H -eq '1'){1}else{0})" native_wave_decoder_entry.hlsl -Fo native_wave_decoder_64_32_skip8.cso
  if($LASTEXITCODE -ne 0){throw "Wave decoder 64->32 skip8 compilation failed"}
+}
+# FAST PATH (DLSS5_BUILD_DECODER_OUT16): upsample projections 56/62/66 writing an f16 raster (66 also as skip8), plus the
+# first-block readers of the multihead stages: f16-source mapped pack and f16-feature mapped projection for C128/C64.
+if($env:DLSS5_BUILD_DECODER_OUT16 -eq '1'){
+ if($env:DLSS5_BUILD_DECODER_FAST -ne '1'){throw "decoder out16 needs DLSS5_BUILD_DECODER_FAST"}
+ foreach($Var in @(@(256,128,0),@(128,64,0),@(64,32,0),@(64,32,1))){
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=$($Var[0])" -D "OUTPUT_CHANNELS=$($Var[1])" -D "SKIP8=$($Var[2])" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_DECODER_FAST=1" -D "NATIVE_DECODER_OUT16=1" -D "NATIVE_DECODER_HW_H=$(if($env:DLSS5_BUILD_DECODER_HW_H -eq '1'){1}else{0})" native_wave_decoder_entry.hlsl -Fo "native_wave_decoder_$($Var[0])_$($Var[1])$(if($Var[2] -eq 1){'_skip8'})_out16.cso"
+  if($LASTEXITCODE -ne 0){throw "Wave decoder $($Var[0])->$($Var[1]) out16 (skip8=$($Var[2])) compilation failed"}
+ }
+ foreach($Channels in 128,64){
+  $Suffix="_c$Channels"
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "MATRIX_CHANNELS=$Channels" -D PACKED_INPUT=1 -D NATIVE_FP8_OPERANDS=1 -D MAPPED_INPUT=1 -D NATIVE_F16_SOURCE=1 native_matrix_pack.hlsl -Fo "native_matrix_pack_fp8_mapped_src16$Suffix.cso"
+  if($LASTEXITCODE -ne 0){throw "f16-source mapped pack C$Channels compilation failed"}
+  # same build flags as native_wave_project_mapfeature_fp8act_f8out (run_fp8_stream_network.ps1) plus the f16 feature
+  & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FP8_OPERANDS=1 -D NATIVE_FP8_INPUT=1 -D "NATIVE_DIRECT_CAST=$(if($env:DLSS5_BUILD_DIRECT_CAST -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_TILED_PQ -eq '1'){1}else{0})" -D "MATRIX_CHANNELS=$Channels" -D MAP_FEATURE=1 -D NATIVE_F16_FEATURE=1 -D NATIVE_FP8_STORE=1 native_wave_project.hlsl -Fo "native_wave_project_mapfeature_fp8act_f16in_f8out$Suffix.cso"
+  if($LASTEXITCODE -ne 0){throw "Projection mapfeature f16in C$Channels compilation failed"}
+ }
 }
 $env:DLSS5_TEST_WAVE_DECODER_LINEAR='1'
 # ---- run_local_c32_attention_network.ps1

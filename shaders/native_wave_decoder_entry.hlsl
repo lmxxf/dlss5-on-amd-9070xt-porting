@@ -26,10 +26,17 @@
 #ifndef NATIVE_DECODER_RESIDUAL_GRID
 #define NATIVE_DECODER_RESIDUAL_GRID 0
 #endif
+#ifndef NATIVE_DECODER_OUT16
+#define NATIVE_DECODER_OUT16 0
+#endif
+#if NATIVE_DECODER_OUT16&&!NATIVE_DECODER_FAST
+#error NATIVE_DECODER_OUT16 needs NATIVE_DECODER_FAST
+#endif
 /* FAST PATH (DLSS5_BUILD_DECODER_FAST): the epilogue stages each 16x16 tile in LDS and writes the 2x2 upsampled outputs as float4 runs
    (lane order = token, dx, 4-channel quad, so a wave writes contiguous 64-byte pieces), residual/scale read as float4, F() as the bit-level
    RNE quantizer (no log2/exp2). NATIVE_DECODER_HW_H: H() through the hardware f32<->f16 pair. NATIVE_DECODER_RESIDUAL_GRID: the residual
-   is already on the E4M3 grid (F(residual)=residual). */
+   is already on the E4M3 grid (F(residual)=residual). NATIVE_DECODER_OUT16 (DLSS5_DECODER_OUT16): the output raster is f16 (every output
+   is H() or F(), both on the f16 grid, so the truncating f32tof16 is exact); the consumer reads it as f16 (C32 map mode 10). */
 StructuredBuffer<float> input:register(t0);
 ByteAddressBuffer weights:register(t1);
 #if NATIVE_DECODER_FAST
@@ -132,7 +139,11 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    [unroll]for(uint c=0;c<4;c++)merged[c]=H(t4[c]+res[c]*scale[c]);
 #endif
    if(OUTPUT_CHANNELS!=32){[unroll]for(uint c=0;c<4;c++)merged[c]=F(merged[c]);}
+#if NATIVE_DECODER_OUT16
+   output.Store2(index*2,uint2(f32tof16(merged.x)|(f32tof16(merged.y)<<16),f32tof16(merged.z)|(f32tof16(merged.w)<<16)));
+#else
    output.Store4(index*4,asuint(merged));
+#endif
   }
   GroupMemoryBarrierWithGroupSync();
  }

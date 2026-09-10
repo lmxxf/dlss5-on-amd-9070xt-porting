@@ -7,6 +7,10 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_decoder_out16_network.ps1
+# FAST PATH: the block 66 upsample projection writes its raster as f16 (values are on the f16 grid); block 66's C32 body reads it as f16 (map mode 10). Bit-exact.
+$env:DLSS5_BUILD_DECODER_OUT16='1'
+$env:DLSS5_DECODER_OUT16='1'
 # ---- run_c32_bias_tile_network.ps1
 # NULL RESULT (kept off): C32 attention softmax bias as one accumulator-layout load per tile — the driver emits the same 32 per-lane scattered loads (identical ISA, spill unchanged), so no gain.
 $env:DLSS5_BUILD_C32_BIAS_TILE='0'
@@ -314,6 +318,17 @@ foreach($Pair in @(@(1024,512),@(512,256),@(256,128),@(128,64),@(64,32))){
 }
 # FAST PATH (DLSS5_BUILD_C32_SKIP8): block 66 projection variant reading block 4's E4M3 main8 as the skip residual.
 if($env:DLSS5_BUILD_C32_SKIP8 -eq '1'){
+}
+# FAST PATH (DLSS5_BUILD_DECODER_OUT16): upsample projections 56/62/66 writing an f16 raster (66 also as skip8), plus the
+# first-block readers of the multihead stages: f16-source mapped pack and f16-feature mapped projection for C128/C64.
+if($env:DLSS5_BUILD_DECODER_OUT16 -eq '1'){
+ if($env:DLSS5_BUILD_DECODER_FAST -ne '1'){throw "decoder out16 needs DLSS5_BUILD_DECODER_FAST"}
+ foreach($Var in @(@(256,128,0),@(128,64,0),@(64,32,0),@(64,32,1))){
+ }
+ foreach($Channels in 128,64){
+  $Suffix="_c$Channels"
+  # same build flags as native_wave_project_mapfeature_fp8act_f8out (run_fp8_stream_network.ps1) plus the f16 feature
+ }
 }
 $env:DLSS5_TEST_WAVE_DECODER_LINEAR='1'
 # ---- run_local_c32_attention_network.ps1

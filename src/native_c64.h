@@ -9,7 +9,7 @@
 class NativeC64 {
  NativeMatrixWorkspace*workspace{};
  ID3D12Resource*qkv_weights{},*qkv_raw{};ID3D12PipelineState*qkv_pso{};bool matrix_qkv{},wave_scores{};
- ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{},ffn_tiled_weights{},tiled_weights{},attn_fused_qkv{},fp8_ffn{},fp8_qkv{},fused_qkv_normalize{},fused_ffn{},fp8_activations{},fp8_qkv_norm{},fp8_stream{},input_fp8{},output_fp8{};ID3D12PipelineState*fp8_pack_mapped_src8_pso{};ID3D12PipelineState*fp8_pack_pso{},*fp8_pack_mapped_pso{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
+ ID3D12Resource*matrix_weights{},*matrix_input{};ID3D12PipelineState*pack_pso{};bool matrix_expand{},pack_matrix{},wave_expand{},wave_contract{},blocked_ffn{},wave_project{};ID3D12Resource*project_weights[2]{};ID3D12Resource*qkv_norm{};ID3D12PipelineState*normalize_pso{};bool direct_attention{};ID3D12Resource*raster_input{},*raster_output{};UINT raster[4]{};bool fused_shift{};bool shared_scratch{},ffn_tiled_weights{},tiled_weights{},attn_fused_qkv{},fp8_ffn{},fp8_qkv{},fused_qkv_normalize{},fused_ffn{},fp8_activations{},fp8_qkv_norm{},fp8_stream{},input_fp8{},output_fp8{},input_f16{};ID3D12PipelineState*fp8_pack_mapped_src8_pso{};ID3D12PipelineState*fp8_pack_pso{},*fp8_pack_mapped_pso{};ID3D12PipelineState*mapped_pack_pso{},*mapped_project_pso[2]{};
  ID3D12Resource*input{};ID3D12Resource*weights[2]{};ID3D12Resource*result[3]{};
  ID3D12RootSignature*root{};ID3D12PipelineState*pso[3]{};UINT geometry[2]{},channel_count{64};bool recorded{};
  ID3D12Resource*scratch[2]{};ID3D12PipelineState*split_pso[3]{};bool split_ffn{},tiled_contract{},tiled_expand{},tiled_projection{};
@@ -146,18 +146,19 @@ public:
  }
  // Fold the shift pack/crop copies into the body: the FFN pack and residual read the
  // unpadded raster (zero border), the attention projection writes the cropped raster.
- void FuseShift(ID3D12Device*d,ID3D12Resource*in,ID3D12Resource*out,UINT w,UINT h,UINT px,UINT py,bool raw_output,const std::wstring&dir,bool fp8_input=false,bool fp8_output=false){
+ /* f16_input (DLSS5_DECODER_OUT16): the raster input is f16 (an upsample projection output); the mapped pack reads f16 and the mapped projection feature is f16. */
+ void FuseShift(ID3D12Device*d,ID3D12Resource*in,ID3D12Resource*out,UINT w,UINT h,UINT px,UINT py,bool raw_output,const std::wstring&dir,bool fp8_input=false,bool fp8_output=false,bool f16_input=false){
   if(!pack_matrix||!wave_project||!wave_contract)throw std::runtime_error("fused shift requires packed wave FFN and wave projections");
   // FAST PATH: E4M3 residual stream. result[0] and the non-raw raster output are stored as bytes; the QKV pack disappears
   // (the fused QKV kernel reads result[0] directly) and the mapped FFN pack becomes a byte gather when the input is FP8.
-  input_fp8=fp8_stream&&fp8_input;output_fp8=fp8_stream&&fp8_output&&!raw_output;
+  input_fp8=fp8_stream&&fp8_input;output_fp8=fp8_stream&&fp8_output&&!raw_output;if(f16_input&&(input_fp8||!fp8_ffn||!fp8_stream||fused_proj0))throw std::runtime_error("f16 raster input needs the FP8 stream chain without fused proj0");input_f16=f16_input;
   raster_input=in;raster_input->AddRef();raster_output=out;raster_output->AddRef();raster[0]=w;raster[1]=h;raster[2]=px;raster[3]=py;fused_shift=true;
   auto matrix_file=[&](const wchar_t*stem){return dir+L"\\"+stem+(channel_count==256?L"":L"_c"+std::to_wstring(channel_count))+L".cso";};
-  const std::wstring act=fp8_activations?L"_fp8act":L"";const std::wstring mf=L"native_wave_project_mapfeature"+act+(input_fp8?L"_f8in":L"")+(fp8_stream?L"_f8out":L""),mo=(raw_output?L"native_wave_project_raw_mapoutput":L"native_wave_project_mapoutput")+act+(fp8_stream?L"_f8in":L"")+(output_fp8?L"_f8out":L"");const wchar_t*names[]={L"native_matrix_pack_mapped",mf.c_str(),mo.c_str()};
+  const std::wstring act=fp8_activations?L"_fp8act":L"";const std::wstring mf=L"native_wave_project_mapfeature"+act+(input_fp8?L"_f8in":input_f16?L"_f16in":L"")+(fp8_stream?L"_f8out":L""),mo=(raw_output?L"native_wave_project_raw_mapoutput":L"native_wave_project_mapoutput")+act+(fp8_stream?L"_f8in":L"")+(output_fp8?L"_f8out":L"");const wchar_t*names[]={L"native_matrix_pack_mapped",mf.c_str(),mo.c_str()};
   ID3D12PipelineState**targets[]={&mapped_pack_pso,&mapped_project_pso[0],&mapped_project_pso[1]};
   for(UINT i=0;i<3;i++){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob(matrix_file(names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(targets[i]));blob->Release();Check(hr);}
   if(fused_proj0){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob(matrix_file(input_fp8?L"native_wave_ffn_proj0_fused_f8in":L"native_wave_ffn_proj0_fused").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&proj0_fused_pso));blob->Release();Check(hr);}
-  if(input_fp8){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob(matrix_file(L"native_matrix_pack_fp8_mapped_src8").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&fp8_pack_mapped_src8_pso));blob->Release();Check(hr);}
+  if(input_fp8||input_f16){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob(matrix_file(input_fp8?L"native_matrix_pack_fp8_mapped_src8":L"native_matrix_pack_fp8_mapped_src16").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&fp8_pack_mapped_src8_pso));blob->Release();Check(hr);}
  }
  /* DLSS5_TEST_ISOLATE sub-stage gate: isolate_part 0 = record everything; otherwise only the dispatches of that part
     (1 input pack, 2 expand, 3 contract, 4 projection0, 5 qkv pack+matrix, 6 normalize, 7 attention, 8 projection1). Barriers stay. */
@@ -170,7 +171,7 @@ public:
    for(UINT k=fused_ffn?1:0;k<(fused_proj0?1u:2u);k++)if(shared_scratch?workspace->scratch_readable[k]:recorded){Barrier(c,scratch[k],true);if(shared_scratch)workspace->scratch_readable[k]=false;}
    if(pack_matrix){part=1;
     if(workspace?workspace->packed_readable:recorded)Barrier(c,matrix_input,true);
-    c->SetComputeRootSignature(root);c->SetPipelineState(fp8_ffn?(fused_shift?(input_fp8?fp8_pack_mapped_src8_pso:fp8_pack_mapped_pso):fp8_pack_pso):(fused_shift?mapped_pack_pso:pack_pso));c->SetComputeRootShaderResourceView(0,(fused_shift?raster_input:input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,matrix_input->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(fused_shift)c->SetComputeRoot32BitConstants(4,4,raster,2);
+    c->SetComputeRootSignature(root);c->SetPipelineState(fp8_ffn?(fused_shift?((input_fp8||input_f16)?fp8_pack_mapped_src8_pso:fp8_pack_mapped_pso):fp8_pack_pso):(fused_shift?mapped_pack_pso:pack_pso));c->SetComputeRootShaderResourceView(0,(fused_shift?raster_input:input)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(3,matrix_input->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(4,2,geometry,0);if(fused_shift)c->SetComputeRoot32BitConstants(4,4,raster,2);
     UINT n=geometry[0]*geometry[1]*channel_count/(fp8_ffn?256:128);Dispatch(c,std::min(n,65535u),(n+65534)/65535,1);Barrier(c,matrix_input,false);if(workspace)workspace->packed_readable=true;
     if(timer)timer->Mark(c,std::string(label)+"_input_pack");
    }

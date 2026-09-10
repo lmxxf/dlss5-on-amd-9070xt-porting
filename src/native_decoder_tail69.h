@@ -24,18 +24,19 @@ public:
   auto*source=input48;
   for(UINT i=0;i<7;i++){c256[i].Create(d,source,w,h,NativeDecoderShift(49+i),read(49+i,L"ffn"),read(49+i,L"attention"),dir,false,256,false,workspace,i>0,i<6);source=c256[i].Output();}
   NativeVramLog(d,"tail c256x7");project56.Create(d,source,skip14,w*h,256,128,false,read(56,L"weights"),dir,true);
-  body56.Create(d,project56.Output(),w*2,h*2,NativeDecoderShift(56),read(56,L"ffn"),read(56,L"attention"),dir,false,128,false,workspace,false,true);source=body56.Output();
+  body56.Create(d,project56.Output(),w*2,h*2,NativeDecoderShift(56),read(56,L"ffn"),read(56,L"attention"),dir,false,128,false,workspace,false,true,project56.Output16());source=body56.Output();
   for(UINT i=0;i<5;i++){c128[i].Create(d,source,w*2,h*2,NativeDecoderShift(57+i),read(57+i,L"ffn"),read(57+i,L"attention"),dir,false,128,false,workspace,true,i<4);source=c128[i].Output();}
   NativeVramLog(d,"tail 56+c128x5");project62.Create(d,source,skip8,w*h*4,128,64,false,read(62,L"weights"),dir,true);
-  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace,false,true);source=body62.Output();
+  body62.Create(d,project62.Output(),w*4,h*4,0,read(62,L"ffn"),read(62,L"attention"),dir,false,64,false,workspace,false,true,project62.Output16());source=body62.Output();
   for(UINT i=0;i<3;i++){c64[i].Create(d,source,w*4,h*4,NativeDecoderShift(63+i),read(63+i,L"ffn"),read(63+i,L"attention"),dir,false,64,false,workspace,true,i<2);source=c64[i].Output();}
   NativeVramLog(d,"tail 62+c64x3");project66.Create(d,source,skip4,w*h*16,64,32,false,read(66,L"weights"),dir,true);
   const wchar_t*c32_mapped=_wgetenv(L"DLSS5_C32_MAPPED_INPUT");const bool chain=c32_mapped&&!wcscmp(c32_mapped,L"1");
+  if(project66.Output16()&&!chain)throw std::runtime_error("DLSS5_DECODER_OUT16 needs DLSS5_C32_MAPPED_INPUT");
   const wchar_t*cr=_wgetenv(L"DLSS5_C32_CHAIN_RAW");if(cr&&wcscmp(cr,L"0")&&wcscmp(cr,L"1"))throw std::runtime_error("invalid C32 chain raw flag");const bool chain_raw=chain&&cr&&!wcscmp(cr,L"1");
   for(UINT i=0;i<4;i++){NativeC32Stage&stage=i?c32[i-1]:body66;const NativeC32Stage*prev=i>1?&c32[i-2]:i==1?&body66:nullptr;
    NativePreblockRuntime::PendingMain8()=NativeDecoderTail69::PendingLastMain8()&&i==3; /* DLSS5_POST70_LOW_RAW=2: block 69 takes the main8 finish */
    if(i)stage.Create(d,source,w*8,h*8,NativeDecoderShift(66+i),read(66+i,L"ffn"),read(66+i,L"attention"),dir,false,chain);else stage.Create(d,project66.Output(),w*8,h*8,0,read(66,L"ffn"),read(66,L"attention"),dir,false,chain);
-   if(chain){if(prev){if(chain_raw){stage.ChainFromRaw(*prev);const_cast<NativeC32Stage*>(prev)->SetSkipFinish(true);}else stage.ChainFrom(*prev);const_cast<NativeC32Stage*>(prev)->SetCropNeeded(false);}else stage.MapFromRaster(project66.Output());}
+   if(chain){if(prev){if(chain_raw){stage.ChainFromRaw(*prev);const_cast<NativeC32Stage*>(prev)->SetSkipFinish(true);}else stage.ChainFrom(*prev);const_cast<NativeC32Stage*>(prev)->SetCropNeeded(false);}else stage.MapFromRaster(project66.Output(),project66.Output16());}
    source=(chain_raw&&i<3)?stage.RawWork():stage.Output();}
   NativePreblockRuntime::PendingMain8()=false;PendingLastMain8()=false;NativeVramLog(d,"tail 66+c32x3");output=source;
  }
