@@ -30,8 +30,17 @@ float Ffast(float v){uint bits=asuint(v),a=bits&0x7fffffffu;if(a>=0x7f800000u)re
 #ifndef NATIVE_HW_QUANTIZE
 #define NATIVE_HW_QUANTIZE 0
 #endif
+#ifndef NATIVE_PRECISE_CHAIN
+#define NATIVE_PRECISE_CHAIN 0
+#endif
+#if NATIVE_PRECISE_CHAIN
+// FAST PATH (DLSS5_BUILD_C32_PRECISE_CHAIN): no FMA contraction in the polynomial (context dependent on this driver), so native_wave_ffn_proj0_fused.hlsl matches bit for bit.
+float ActivatePoly(float v){float g=clamp(v,-4.0,4.0);precise float q=abs(g)*(-.055908203125)+.447265625;precise float p=g*q+.89453125;return v*p;}
+float Activate(float v){return Ffast(ActivatePoly(v));}
+#else
 float ActivatePoly(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return v*p;}
 float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.447265625)+.89453125;return Ffast(v*p);}
+#endif
 using A=dx::linalg::Matrix<OPERAND,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
 using B=dx::linalg::Matrix<OPERAND,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
 using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;

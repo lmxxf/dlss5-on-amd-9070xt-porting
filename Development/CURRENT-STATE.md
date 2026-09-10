@@ -1,3 +1,10 @@
+## 2026-09-10 10:40 多头 FFN+proj0 合核：做了，逐位相同，但没收益（光之朱雀）
+
+- `DLSS5_FUSED_FFN_PROJ0=1`（build `DLSS5_BUILD_FUSED_FFN_PROJ0`，`run_fused_ffn_proj0_network.ps1`，核 `shaders/native_wave_ffn_proj0_fused.hlsl`，cso 在 run_fp8_activations 里编，f32/E4M3 特征两种）：expand+contract 后 contract tile Cast 成 E4M3 存回 hidden 区（多一次 sync，LDS 不涨），每 wave 再算 16 列投影；残差 gather 提到核最前面跟 expand 重叠。root 加了 t3（投影权重）。对参考链（native_wave_ffn_fused 也按 `NATIVE_PRECISE_CHAIN` 编）**逐位相同**。
+- 量（隔离，contract+proj0 → 合核）：C64 0.180→0.177，C128 0.153→0.134，C256 0.167→0.191（16 wave 一组、每 CU 只放两组，三段串行掩不住）。整帧三轮：min-of-means 34.49→34.75、sum-of-mins 34.3→33.64、中位数和 20.78→20.55——**噪声级，没有净收益**。
+- 读数：proj0 是算力型——C×C 的 MMA 正好是 contract（C×4C）的 1/4，0.03ms 就是它的 FLOP 时间，没有带宽可省；26 次 dispatch 的"空转"在多头段也量不出来（barrier 之间本来就有重叠）。**C32 家族合核赚钱是因为它是带宽型；多头段是算力型，合核不赚。**PLAN 原估的 −1.3 作废。
+- 处置：代码留着（默认关、逐位验证过），**不进游戏**。`bench.ps1` 顶层带了它的 env（要复现游戏链把那两行删掉或设 0——待办：换成 `if(-not $env:...)` 形式）。
+
 ## 2026-09-10 09:05 fast37：C32 家族的 FFN 并进注意力核（光之朱雀）
 
 - `DLSS5_C32_FUSED_FFN=1`（build `DLSS5_BUILD_C32_FUSED_FFN`，`run_c32_fused_ffn_network.ps1`，核在 `shaders/native_c32_ffn_fused.hlsli`，由 fast4 注意力 `NATIVE_C32_FUSED_FFN` 包进来）：pre、块 1–4、67–69、post 共 9 个 stage 的 FFN 在注意力 dispatch 的第一段算——每 wave 正好 16 token = FFN 的一组，输出两个 16×16 累加器直接 Cast 成 QKV 的 A 操作数，同时留在寄存器当投影残差（和 zp 的元素布局一致，`ffn_out[cr].Get(i)`）。ffn 缓冲不写不读，每 stage 少一次 dispatch。
