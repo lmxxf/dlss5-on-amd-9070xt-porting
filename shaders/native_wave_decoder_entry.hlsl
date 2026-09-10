@@ -14,6 +14,9 @@
 #ifndef SKIP8
 #define SKIP8 0
 #endif
+#ifndef NATIVE_DECODER_TILED
+#define NATIVE_DECODER_TILED 0
+#endif
 StructuredBuffer<float> input:register(t0);
 ByteAddressBuffer weights:register(t1);
 RWStructuredBuffer<float> output:register(u0);
@@ -45,7 +48,12 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
    A a=A::Load(tile,0,32,dx::linalg::MatrixLayout::RowMajor);
    [unroll]for(uint n=0;n<BLOCK_N;n++){
     uint col=(gid.y*BLOCK_N+n)*16;
+#if NATIVE_DECODER_TILED
+    /* FAST PATH (DLSS5_DECODER_TILED): f16 weight tiles (col/16, k/32) of [k 32][j 16] at ((col/16)*(K/32)+k/32)*1024 (no power-of-two row strides). */
+    B b=B::Load(weights,((col/16)*(INPUT_CHANNELS/32)+k/32)*1024,32,dx::linalg::MatrixLayout::RowMajor,16);
+#else
     B b=B::Load(weights,(col*INPUT_CHANNELS+k)*2,INPUT_CHANNELS*2,dx::linalg::MatrixLayout::ColMajor,16);
+#endif
 #if NATIVE_FAST_ACCUMULATE
     acc[n].MultiplyAccumulate(a,b);
 #else

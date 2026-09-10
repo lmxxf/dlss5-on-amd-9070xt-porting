@@ -42,6 +42,8 @@ public:
    size_t matrix_values=size_t(inputs)*out;std::vector<float>packed(matrix_values/2+out);
    for(size_t i=0;i<matrix_values;i++){uint32_t bits;std::memcpy(&bits,&coefficients[i],4);uint32_t m=bits&0x7fffffffu;uint16_t h=uint16_t((bits>>16)&0x8000);if(m){int e=int(m>>23)-112;if(e<=0||e>=31||(m&0x1fff))throw std::runtime_error("decoder weight not exact half");h|=uint16_t((e<<10)|((m&0x7fffff)>>13));}std::memcpy(reinterpret_cast<unsigned char*>(packed.data())+i*2,&h,2);}
    std::memcpy(packed.data()+matrix_values/2,coefficients.data()+matrix_values,out*4);
+   /* FAST PATH (DLSS5_DECODER_TILED): f16 weight tiles (n/16, k/32) of [k 32][j 16] at ((n/16)*(inputs/32)+k/32)*1024; kernels built with NATIVE_DECODER_TILED=1. */
+   if(const wchar_t*dt=_wgetenv(L"DLSS5_DECODER_TILED")){if(wcscmp(dt,L"0")&&wcscmp(dt,L"1"))throw std::runtime_error("invalid decoder tiled flag");if(!wcscmp(dt,L"1")&&inputs==1024){/* only the entry: the tiled B load is slower for the small upsample projections (proj62 +0.045ms) */unsigned char*b=reinterpret_cast<unsigned char*>(packed.data());std::vector<unsigned char>t(matrix_values*2);for(size_t n=0;n<out/16;n++)for(size_t g=0;g<inputs/32;g++)for(size_t kk=0;kk<32;kk++)for(size_t j=0;j<16;j++)std::memcpy(t.data()+((n*(inputs/32)+g)*512+kk*16+j)*2,b+((n*16+j)*inputs+g*32+kk)*2,2);std::memcpy(b,t.data(),t.size());}}
    weights->Release();weights=buffer(d,packed.size()*4,&packed);
    blocked=true;chunk_values=tokens*out;
   }

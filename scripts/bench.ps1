@@ -1,4 +1,4 @@
-# Builds every shader of the fast chain into $Folder (flattened from the 86 nested run_*_network.ps1 runners in
+# Builds every shader of the fast chain into $Folder (flattened from the 87 nested run_*_network.ps1 runners in
 # Development/, in the same order, so the compiled set and the DLSS5_* runtime flags are identical to the game build)
 # and then runs the bench executable (native-network70-temporal.exe, see build-bench.sh). Needs the SM6.10 preview dxc.
 param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview')
@@ -7,6 +7,10 @@ Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
 $Inc=Join-Path $DxcRoot 'inc\hlsl'
 
+# ---- run_decoder_tiled_network.ps1
+# FAST PATH: decoder entry (1024->512) f16 weights as contiguous 1KB tiles (-0.01ms; the small upsample projections got slower with tiles, so they stay). Bit-exact.
+$env:DLSS5_BUILD_DECODER_TILED='1'
+$env:DLSS5_DECODER_TILED='1'
 # ---- run_split_tiled_network.ps1
 # FAST PATH: C512 blocks' QKV and projection weights as contiguous 512-byte tiles (kernels already supported it; host packing + build flag). Bit-exact.
 $env:DLSS5_BUILD_SPLIT_TILED='1'
@@ -380,7 +384,7 @@ $env:DLSS5_TEST_WAVE_SPLIT_PROJECT='1'
 # ---- run_wave_decoder_network.ps1
 # Wave-matrix decoder entry (1024->512) and the four 2x upsample projections.
 foreach($Pair in @(@(1024,512),@(512,256),@(256,128),@(128,64),@(64,32))){
- & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=$($Pair[0])" -D "OUTPUT_CHANNELS=$($Pair[1])" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" native_wave_decoder_entry.hlsl -Fo "native_wave_decoder_$($Pair[0])_$($Pair[1]).cso"
+ & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D "INPUT_CHANNELS=$($Pair[0])" -D "OUTPUT_CHANNELS=$($Pair[1])" -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_DECODER_TILED=$(if($env:DLSS5_BUILD_DECODER_TILED -eq '1' -and $Pair[0] -eq 1024){1}else{0})" native_wave_decoder_entry.hlsl -Fo "native_wave_decoder_$($Pair[0])_$($Pair[1]).cso"
  if($LASTEXITCODE -ne 0){throw "Wave decoder $($Pair[0])->$($Pair[1]) compilation failed"}
 }
 # FAST PATH (DLSS5_BUILD_C32_SKIP8): block 66 projection variant reading block 4's E4M3 main8 as the skip residual.
