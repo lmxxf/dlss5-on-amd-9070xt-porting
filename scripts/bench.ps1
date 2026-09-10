@@ -1,7 +1,7 @@
 # Builds every shader of the fast chain into $Folder (flattened from the 87 nested run_*_network.ps1 runners in
 # Development/, in the same order, so the compiled set and the DLSS5_* runtime flags are identical to the game build)
 # and then runs the bench executable (native-network70-temporal.exe, see build-bench.sh). Needs the SM6.10 preview dxc.
-param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview')
+param([Parameter(Mandatory=$true)][string]$Folder,[string]$DxcRoot='D:\DLSSNR-Lab\matrix-probe\dxc-preview',[switch]$CompileOnly)
 $ErrorActionPreference='Stop'
 Set-Location $Folder
 $Dxc=Join-Path $DxcRoot 'bin\x64\dxc.exe'
@@ -622,6 +622,7 @@ $SingleList=[switch]$false
 $GpuProfile=[switch]$true
 if($SingleList -and $GpuProfile){throw 'Timestamp reporting requires completed segmented submissions'}
 if($GpuProfile){$env:DLSS5_NETWORK_GPU_PROFILE='1'}else{Remove-Item Env:DLSS5_NETWORK_GPU_PROFILE -ErrorAction SilentlyContinue}
+if($CompileOnly){Write-Output "compiled $((Get-ChildItem $Folder -Filter *.cso).Count) shaders into $Folder (compile only)";exit 0}
 $Exe=Join-Path $Folder 'native-network70-temporal.exe'
 foreach($Map in 'hwc-to-vit.i32','vit-to-hwc.i32'){
  if(!(Test-Path (Join-Path $Folder $Map) -PathType Leaf)){throw "Missing layout map: $Map"}

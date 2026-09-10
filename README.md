@@ -56,7 +56,9 @@ bash scripts/build-bench.sh native-network70-temporal.exe
 ```
 
 ```powershell
-# on the Windows machine: <lab> holds the shaders, the weights and the bench exe
+# shaders only, any Windows x64 machine (needs the SM 6.10 preview dxc package; no GPU, no weights)
+powershell -File scripts\compile-shaders.ps1 -Folder D:\dlss5-shaders -DxcRoot <dxc-preview>
+# shaders + bench on the RX 9070 XT machine: <lab> holds the shaders, the weights and the bench exe
 powershell -File scripts\bench.ps1 -Folder <lab> -DxcRoot <dxc-preview>
 powershell -File scripts\deploy_fast.ps1 -Source <lab> -Dll native-game.addon64 -Flags scripts\game-flags.txt
 ```

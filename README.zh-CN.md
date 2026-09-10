@@ -46,6 +46,8 @@ bash scripts/build-bench.sh native-network70-temporal.exe
 ```
 
 ```powershell
+# 只编 shader，任意 Windows x64 机器（需要 SM 6.10 预览版 dxc 包；不需要显卡和权重）
+powershell -File scripts\compile-shaders.ps1 -Folder D:\dlss5-shaders -DxcRoot <dxc-preview>
 # Windows 侧：<lab> 目录放着色器、权重和测试台 exe
 powershell -File scripts\bench.ps1 -Folder <lab> -DxcRoot <dxc-preview>
 powershell -File scripts\deploy_fast.ps1 -Source <lab> -Dll native-game.addon64 -Flags scripts\game-flags.txt
