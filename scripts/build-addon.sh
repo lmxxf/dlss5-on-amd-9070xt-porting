@@ -22,8 +22,13 @@ for probe_unit in hook trampoline buffer hde/hde64; do
 done
 # ReShade's Windows SDK include spelling is case-sensitive on Linux.
 ln -s /usr/x86_64-w64-mingw32/include/windows.h "$probe_build_dir/Windows.h"
-x86_64-w64-mingw32-g++ -w -std=c++17 -O2 -shared -static -DNATIVE_ORDER_NEURAL "${probe_defines[@]}" \
-  -I"$probe_build_dir" -I"$probe_minhook_dir/include" -I"$probe_reshade_include" \
+# Older mingw-w64 (Ubuntu 22.04: gcc 10, win32 thread model, mingw-w64 8): std::mutex needs the -posix variant of the compiler,
+# GetTickCount64 / SRW locks need _WIN32_WINNT >= Vista, and d3d12.h lacks ID3D12SDKConfiguration (build-addon-oneclick.sh drops
+# newer headers into $DLSS5_EXTRA_INCLUDE, searched first).
+probe_cxx=x86_64-w64-mingw32-g++;if "$probe_cxx" -v 2>&1 | grep -q "Thread model: win32" && command -v x86_64-w64-mingw32-g++-posix >/dev/null; then probe_cxx=x86_64-w64-mingw32-g++-posix; fi
+probe_extra_include=();[ -n "${DLSS5_EXTRA_INCLUDE:-}" ] && probe_extra_include=(-I"$DLSS5_EXTRA_INCLUDE")
+"$probe_cxx" -w -std=c++17 -O2 -shared -static -D_WIN32_WINNT=0x0A00 -DNATIVE_ORDER_NEURAL "${probe_defines[@]}" \
+  "${probe_extra_include[@]}" -I"$probe_build_dir" -I"$probe_minhook_dir/include" -I"$probe_reshade_include" \
   "$probe_source_dir/../src/native_submission_order_probe.cpp" "${probe_objects[@]}" \
   -o "$probe_output" -ld3d12 -ldxgi -ld3dcompiler -ldxguid
 sha256sum "$probe_output"
