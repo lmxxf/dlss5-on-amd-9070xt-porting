@@ -273,6 +273,9 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 #ifndef NATIVE_C32_ATTN_FAST4
 #define NATIVE_C32_ATTN_FAST4 0
 #endif
+#ifndef NATIVE_C32_BIAS_TILE
+#define NATIVE_C32_BIAS_TILE 0
+#endif
 #ifndef NATIVE_C32_OUT8
 #define NATIVE_C32_OUT8 0
 #endif
@@ -348,7 +351,13 @@ groupshared float16_t ones16[512];
   [unroll]for(uint kr=0;kr<4;kr++){
    B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
    s[kr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+#if NATIVE_C32_BIAS_TILE
+   /* FAST PATH (DLSS5_BUILD_C32_BIAS_TILE): the 16x16 block of the [64][64] f32 bias table as one accumulator-layout load instead of
+      32 per-element scalar loads with 64-bit address arithmetic (those held ~100 VGPRs in flight and made the kernel spill). Same values. */
+   {const C bias=C::Load(weights,8192+(((wave&3)*16)*64+kr*16)*4,256,dx::linalg::MatrixLayout::RowMajor,16);for(uint i=0;i<s[kr].Length();i++)s[kr].Set(i,fast_exp_raw(s[kr].Get(i)+bias.Get(i)));}
+#else
    for(uint i=0;i<s[kr].Length();i++){uint2 rc=s[kr].GetCoordinate(i);s[kr].Set(i,fast_exp_raw(s[kr].Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y)));}
+#endif
   }
  }
  C rs=C::Splat(0.0f);
