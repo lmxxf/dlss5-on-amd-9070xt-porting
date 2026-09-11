@@ -14,6 +14,12 @@ $Inc=Join-Path $DxcRoot 'inc\hlsl'
 $env:DLSS5_BUILD_VIT_FUSED_FFN='0'
 $env:DLSS5_BUILD_VIT_FUSED_TOK32='0'
 $env:DLSS5_VIT_FUSED_FFN='0'
+# ---- run_c32_two_pass_network.ps1
+# NULL RESULT (kept off): C32 fused attention softmax in two passes (recompute QK for the P tile), one score accumulator live instead
+# of four. Bit-exact, but the compiled kernel grew (VGPR 112 -> 118, 7321 -> 7627 instructions) -- and the 896-byte scratch it was aimed
+# at belongs to an unused pipeline (the software-H split attention PSO that is created but never dispatched), the fused kernel itself
+# has no scratch. See DevHistory 09-11 14:30.
+$env:DLSS5_BUILD_C32_TWO_PASS='0'
 # ---- run_c32_sat_cast_network.ps1
 # FIX: saturate to +-448 before the hardware E4M3 casts of the fused C32 block (FFN input, hidden, attention input, AV output). The
 # hardware cast turns out-of-range values into NaN; the NaN token spreads over its 8x8 window and the rgb head clamps it to 0 -- the
@@ -274,16 +280,16 @@ $env:DLSS5_BUILD_C32_FFN_FAST2='1'
 # ---- run_c32_fused_attention_network.ps1
 # FAST PATH: C32 attention as two dispatches (qkv+normalize, attention+projection).
 foreach($Pass in @(@(0,'qkv'),@(2,'attention'))){
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Pass[1] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$($Pass[0])" -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D "NATIVE_C32_FP8_QKV=$(if($env:DLSS5_BUILD_C32_FP8_QKV -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST2=$(if($env:DLSS5_BUILD_C32_ATTN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST3=$(if($env:DLSS5_BUILD_C32_ATTN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_BIAS_TILE=$(if($env:DLSS5_BUILD_C32_BIAS_TILE -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST4=$(if($env:DLSS5_BUILD_C32_ATTN_FAST4 -eq '1'){1}else{0})" -D "NATIVE_C32_PRECISE_CHAIN=$(if($env:DLSS5_BUILD_C32_PRECISE_CHAIN -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_fused_$($Pass[1]).cso"
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Pass[1] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$($Pass[0])" -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D "NATIVE_HW_H=$(if($env:DLSS5_BUILD_HW_H -eq '1'){1}else{0})" -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D "NATIVE_C32_FP8_QKV=$(if($env:DLSS5_BUILD_C32_FP8_QKV -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST2=$(if($env:DLSS5_BUILD_C32_ATTN_FAST2 -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST3=$(if($env:DLSS5_BUILD_C32_ATTN_FAST3 -eq '1'){1}else{0})" -D "NATIVE_C32_BIAS_TILE=$(if($env:DLSS5_BUILD_C32_BIAS_TILE -eq '1'){1}else{0})" -D "NATIVE_C32_ATTN_FAST4=$(if($env:DLSS5_BUILD_C32_ATTN_FAST4 -eq '1'){1}else{0})" -D "NATIVE_C32_PRECISE_CHAIN=$(if($env:DLSS5_BUILD_C32_PRECISE_CHAIN -eq '1'){1}else{0})" -D "NATIVE_C32_TWO_PASS_SOFTMAX=$(if($env:DLSS5_BUILD_C32_TWO_PASS -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_fused_$($Pass[1]).cso"
  if($LASTEXITCODE -ne 0){throw "Fused C32 attention $($Pass[1]) compilation failed"}
 }
 if($env:DLSS5_BUILD_C32_FUSED_FFN -eq '1'){
  # FAST PATH (DLSS5_C32_FUSED_FFN): fast4 attention with the C32 FFN in its prologue (native_c32_ffn_fused.hlsli).
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D NATIVE_C32_EPILOGUE=1 -D NATIVE_C32_HALF_STREAM=1 -D PASS=2 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D NATIVE_C32_ATTN_FAST2=1 -D NATIVE_C32_ATTN_FAST3=1 -D NATIVE_C32_ATTN_FAST4=1 -D NATIVE_C32_FUSED_FFN=1 -D "NATIVE_C32_BIAS_TILE=$(if($env:DLSS5_BUILD_C32_BIAS_TILE -eq '1'){1}else{0})" -D "NATIVE_C32_MERGE4=$(if($env:DLSS5_BUILD_C32_MERGE4 -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_ffn.cso
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention -HV 2021 -enable-16bit-types -O3 -D NATIVE_C32_EPILOGUE=1 -D NATIVE_C32_HALF_STREAM=1 -D PASS=2 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D NATIVE_C32_ATTN_FAST2=1 -D NATIVE_C32_ATTN_FAST3=1 -D NATIVE_C32_ATTN_FAST4=1 -D NATIVE_C32_FUSED_FFN=1 -D "NATIVE_C32_BIAS_TILE=$(if($env:DLSS5_BUILD_C32_BIAS_TILE -eq '1'){1}else{0})" -D "NATIVE_C32_MERGE4=$(if($env:DLSS5_BUILD_C32_MERGE4 -eq '1'){1}else{0})" -D "NATIVE_C32_TWO_PASS_SOFTMAX=$(if($env:DLSS5_BUILD_C32_TWO_PASS -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_ffn.cso
  if($LASTEXITCODE -ne 0){throw 'Fused C32 attention+FFN compilation failed'}
 }
 if($env:DLSS5_BUILD_C32_WAVE_ATTENTION -eq '1'){
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention_wave -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D PASS=4 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_wave.cso
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E attention_wave -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D PASS=4 -D RAW_OUTPUT=1 -D NATIVE_FAST_ACCUMULATE=1 -D NATIVE_HW_H=1 -D NATIVE_FAST_ATTENTION=1 -D NATIVE_C32_FUSED=1 -D NATIVE_C32_FP8_QKV=1 -D "NATIVE_C32_TWO_PASS_SOFTMAX=$(if($env:DLSS5_BUILD_C32_TWO_PASS -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo native_wave_c32_fused_attention_wave.cso
  if($LASTEXITCODE -ne 0){throw 'C32 wave attention compilation failed'}
  $env:DLSS5_C32_WAVE_ATTENTION='1'
 }
@@ -402,7 +408,7 @@ $env:DLSS5_TEST_FUSED_SHIFT='1'
 # Four-pass C32 attention: qkv / normalize / attention / projection, Q/K/V read by wave loads.
 $Entries=@('qkv','normalize','attention','projection')
 for($i=0;$i -lt 4;$i++){
- & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Entries[$i] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$i" -D RAW_OUTPUT=1 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_ATTENTION=$(if($env:DLSS5_FAST_ATTENTION -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_split_$($Entries[$i]).cso"
+ & $Dxc -I $Inc -I $Folder -T cs_6_10 -E $Entries[$i] -HV 2021 -enable-16bit-types -O3 -D "NATIVE_C32_EPILOGUE=$(if($env:DLSS5_BUILD_C32_EPILOGUE -eq '1'){1}else{0})" -D "NATIVE_C32_HALF_STREAM=$(if($env:DLSS5_BUILD_C32_HALF_STREAM -eq '1'){1}else{0})" -D "PASS=$i" -D RAW_OUTPUT=1 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FAST_ATTENTION=$(if($env:DLSS5_FAST_ATTENTION -eq '1'){1}else{0})" -D "NATIVE_C32_TWO_PASS_SOFTMAX=$(if($env:DLSS5_BUILD_C32_TWO_PASS -eq '1'){1}else{0})" -D "NATIVE_C32_SAT_CAST=$(if($env:DLSS5_BUILD_C32_SAT_CAST -eq '1'){1}else{0})" native_wave_c32_split_attention.hlsl -Fo "native_wave_c32_split_$($Entries[$i]).cso"
  if($LASTEXITCODE -ne 0){throw "Split C32 attention pass $i compilation failed"}
 }
 $env:DLSS5_TEST_SPLIT_C32_ATTENTION='1'

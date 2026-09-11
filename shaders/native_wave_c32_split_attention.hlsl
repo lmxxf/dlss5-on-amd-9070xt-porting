@@ -45,6 +45,9 @@ RWByteAddressBuffer aux:register(u1);
 #ifndef NATIVE_C32_EPILOGUE
 #define NATIVE_C32_EPILOGUE 0
 #endif
+#ifndef NATIVE_C32_TWO_PASS_SOFTMAX
+#define NATIVE_C32_TWO_PASS_SOFTMAX 0
+#endif
 #ifndef NATIVE_C32_SAT_CAST
 #define NATIVE_C32_SAT_CAST 0 /* saturate before hardware E4M3 casts (see native_c32_ffn_fused.hlsli) */
 #endif
@@ -352,6 +355,35 @@ groupshared float16_t ones16[512];
  }
  GroupMemoryBarrierWithGroupSync();
  if(!live)return;
+#if NATIVE_C32_TWO_PASS_SOFTMAX
+ /* FAST PATH (DLSS5_BUILD_C32_TWO_PASS): the softmax in two passes so that only one 16x16 score accumulator is live at a time instead
+    of four. Pass 1: QK -> exp -> f16 into LDS -> row sums (MMA against ones). Pass 2: QK again (4 small MMAs, the K tiles are still in
+    LDS) -> exp -> x 1/sum -> E4M3 P tile. The exp values are recomputed bit for bit, so the output is identical; the four live s[]
+    accumulators (32 VGPRs) were what pushed the fused kernel to 128 VGPRs and 896 bytes of scratch (DevHistory 09-10 18:00). */
+ C rs=C::Splat(0.0f);
+ {
+  A8 qa=A8::Load(qkv8,lfirst*24,24,dx::linalg::MatrixLayout::RowMajor);
+  B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint g=0;g<2;g++){
+   [unroll]for(uint j=0;j<2;j++){const uint kr=g*2+j;
+    B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+    C sc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+    for(uint i=0;i<sc.Length();i++){uint2 rc=sc.GetCoordinate(i);sc.Set(i,fast_exp_raw(sc.Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y)));}
+    sc.Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase+j*16,32,dx::linalg::MatrixLayout::RowMajor);
+   }
+   GroupMemoryBarrier();
+   A et=A::Load(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor);
+   rs.MultiplyAccumulate(et,ones);
+   GroupMemoryBarrier();
+  }
+  [unroll]for(uint kr=0;kr<4;kr++){
+   B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+   C sc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
+   for(uint i=0;i<sc.Length();i++){uint2 rc=sc.GetCoordinate(i);sc.Set(i,fast_exp_raw(sc.Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y))*(1/rs.Get(i)));}
+   sc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+#else
  C s[4];
  {
   A8 qa=A8::Load(qkv8,lfirst*24,24,dx::linalg::MatrixLayout::RowMajor);
@@ -383,6 +415,7 @@ groupshared float16_t ones16[512];
   for(uint i=0;i<s[kr].Length();i++)s[kr].Set(i,s[kr].Get(i)*(1/rs.Get(i)));
   s[kr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
  }
+#endif
  GroupMemoryBarrier();
  C acc[2];acc[0]=C::Splat(0.0f);acc[1]=C::Splat(0.0f);
  [unroll]for(uint g=0;g<2;g++){
