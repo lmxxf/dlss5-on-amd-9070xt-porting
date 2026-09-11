@@ -11,6 +11,7 @@
 #define HEADS (MATRIX_CHANNELS/32)
 #define SCALE_OFFSET (4*MATRIX_CHANNELS*MATRIX_CHANNELS+HEADS*4096)
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 #ifndef NATIVE_INPUT_TILED
 #define NATIVE_INPUT_TILED 0
 #endif
@@ -100,7 +101,7 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #if NATIVE_FP8_QKV_OUT
   // Scale rows, hardware-cast to E4M3 into an LDS [16 token][64 byte] tile, then copy out 16-byte chunks.
   if(part<2)for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);acc[n].Set(i,acc[n].Get(i)*inv[(n/2)*16+rc.x]);}
-  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(tile8,n*4,16,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc[n]);acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(tile8,n*4,16,dx::linalg::MatrixLayout::RowMajor);
 #else
   for(uint i=0;i<acc[n].Length();i++){
    uint2 rc=acc[n].GetCoordinate(i);

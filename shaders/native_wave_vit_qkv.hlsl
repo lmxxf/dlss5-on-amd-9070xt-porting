@@ -5,6 +5,7 @@
 #define BLOCK_N 4
 #endif
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 #ifndef NATIVE_PACKED_INPUT
 #define NATIVE_PACKED_INPUT 0
 #endif
@@ -71,7 +72,7 @@ groupshared float16_t ones16[512];
    [unroll]for(uint j=0;j<2;j++)for(uint i=0;i<rs.Length();i++)acc[m][hp*2+j].Set(i,acc[m][hp*2+j].Get(i)*(rsqrt(max(rs.Get(i),6.198883056640625e-5))*head_scale));
    GroupMemoryBarrier();
   }
-  [unroll]for(uint j=0;j<2;j++)acc[m][hp*2+j].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,(part*tokens+first+m*16)*1024+row0+(hp*2+j)*16,1024,dx::linalg::MatrixLayout::RowMajor,16);
+  [unroll]for(uint j=0;j<2;j++){SAT8(acc[m][hp*2+j]);acc[m][hp*2+j].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,(part*tokens+first+m*16)*1024+row0+(hp*2+j)*16,1024,dx::linalg::MatrixLayout::RowMajor,16);}
  }
 }
 #elif BLOCK_M>1

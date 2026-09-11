@@ -4,6 +4,7 @@
 // round trips are removed: expand keeps 8 accumulators and writes the f16
 // hidden tile once; contract keeps 2 accumulators over 4 K steps.
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 #if NATIVE_STATIC_LENGTH
 // 16x16 f32 accumulator on wave32 = 8 elements per lane; static trip count lets Get/Set index registers statically.
 #define ELEM_LOOP(m) [unroll]for(uint i=0;i<8;i++)
@@ -187,7 +188,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    }
   }
 #endif
-  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(in0);SAT8(in1);in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,0,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(prefix8,4,8,dx::linalg::MatrixLayout::RowMajor);
   GroupMemoryBarrierWithGroupSync();
   {
@@ -200,7 +201,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #endif
     C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
     ELEM_LOOP(h)h.Set(i,ActivatePoly(h.Get(i)));
-    h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,32,dx::linalg::MatrixLayout::RowMajor);
+    SAT8(h);h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,32,dx::linalg::MatrixLayout::RowMajor);
    }
   }
   GroupMemoryBarrierWithGroupSync();
@@ -256,7 +257,7 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
    C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
 #if NATIVE_C32_FFN_FP8
    ELEM_LOOP(h)h.Set(i,ActivatePoly(h.Get(i)));
-   h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,32,dx::linalg::MatrixLayout::RowMajor);
+   SAT8(h);h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,32,dx::linalg::MatrixLayout::RowMajor);
 #elif NATIVE_C32_FFN_FAST2
    ELEM_LOOP(h)h.Set(i,Activate(h.Get(i)));
    h.Cast<dx::linalg::ComponentType::F16>().Store(hidden,block*16,128,dx::linalg::MatrixLayout::RowMajor);

@@ -16,6 +16,7 @@
 #define SCALE_OFFSET (4*MATRIX+HEADS*4096)
 #define STRIDE (3*CHANNELS)
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 StructuredBuffer<float> feature:register(t0),weights:register(t1);
 ByteAddressBuffer qkv:register(t2);
 cbuffer Geometry:register(b0){uint width;uint height;}
@@ -159,7 +160,7 @@ groupshared float16_t ones16[512];
   vb=B::Load(qkv,(base+32*STRIDE+2*CHANNELS+col)*QELEM,STRIDE*QELEM,dx::linalg::MatrixLayout::RowMajor,16);
   acc.MultiplyAccumulate(pa,vb);
   // E4M3 tile staged by the hardware cast: 16 rows x 4 uints per wave (otile reused as [wave][64] uints).
-  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,wave*64,4,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc);acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,wave*64,4,dx::linalg::MatrixLayout::RowMajor);
   GroupMemoryBarrierWithGroupSync();
   [unroll]for(uint k=0;k<2;k++){
    uint slot=lane*2+k,row=slot/4,q=slot%4;

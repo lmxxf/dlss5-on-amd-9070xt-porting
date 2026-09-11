@@ -13,6 +13,7 @@
 #define RAW_OUTPUT 1
 #endif
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 ByteAddressBuffer weights:register(t0);
 #ifndef NATIVE_C32_ATTN_FAST2
 #define NATIVE_C32_ATTN_FAST2 0
@@ -164,7 +165,7 @@ using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linal
  uint first=(gid.x+gid.y*65535u)*16;if(first>=runtime_width*runtime_height)return;
  for(uint i=tid.x;i<512;i+=32)ones16[i]=float16_t(1.0);
  {C in0=C::Load(input,first*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,first*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
-  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(in8,0,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(in0);SAT8(in1);in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(in8,0,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(in8,4,8,dx::linalg::MatrixLayout::RowMajor);}
  GroupMemoryBarrierWithGroupSync();
  A8 a=A8::Load(in8,0,8,dx::linalg::MatrixLayout::RowMajor);
@@ -184,7 +185,7 @@ using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linal
  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
   C t=z[part*2+cr];
   if(part<2)for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,t.Get(i)*inv[part*16+rc.x]);}
-  t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
+  SAT8(t);t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
  }
 }
 #else
@@ -209,7 +210,7 @@ using B8=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linal
 #if NATIVE_C32_FP8_QKV
   // Q/K/V as E4M3 bytes in aux [token][96] (q 32, k 32, v 32) through the hardware cast; qk buffer is left for the output.
   if(part<2)for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,t.Get(i)*inv[part*16+rc.x]);}
-  t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
+  SAT8(t);t.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(aux,first*96+part*32+cr*16,96,dx::linalg::MatrixLayout::RowMajor,16);
 #else
   if(part<2){for(uint i=0;i<t.Length();i++){uint2 rc=t.GetCoordinate(i);t.Set(i,Ffast(t.Get(i)*inv[part*16+rc.x]));}t.Cast<dx::linalg::ComponentType::F16>().Store(qk,(first*64+part*32+cr*16)*2,128,dx::linalg::MatrixLayout::RowMajor,16);}
   else{for(uint i=0;i<t.Length();i++)t.Set(i,Ffast(H(t.Get(i))));t.Cast<dx::linalg::ComponentType::F16>().Store(aux,(first*32+cr*16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);}
@@ -328,7 +329,7 @@ groupshared float16_t ones16[512];
 #else
   C in0=LOAD_IN(qfirst),in1=LOAD_IN1(qfirst);
 #endif
-  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(in0);SAT8(in1);in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+4,8,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
@@ -347,7 +348,7 @@ groupshared float16_t ones16[512];
    [unroll]for(uint cr=0;cr<2;cr++){for(uint i=0;i<rs.Length();i++)z[h*2+cr].Set(i,z[h*2+cr].Get(i)*(rsqrt(max(rs.Get(i),6.198883056640625e-5))*(h==0?W_SCALE:1)));}
    GroupMemoryBarrier();
   }
-  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++)z[part*2+cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,lfirst*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);
+  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){SAT8(z[part*2+cr]);z[part*2+cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,lfirst*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);}
  }
  GroupMemoryBarrierWithGroupSync();
  if(!live)return;
@@ -486,7 +487,7 @@ groupshared float16_t ones16[512];
  for(uint i=t;i<512;i+=256)ones16[i]=float16_t(1.0);
  const bool qwave=wave<4;const uint qfirst=base+wave*16;
  if(qwave){C in0=C::Load(input,qfirst*128,128,dx::linalg::MatrixLayout::RowMajor,16),in1=C::Load(input,qfirst*128+64,128,dx::linalg::MatrixLayout::RowMajor,16);
-  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,wave*128,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(in0);SAT8(in1);in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,wave*128,8,dx::linalg::MatrixLayout::RowMajor);
   in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(p8,wave*128+4,8,dx::linalg::MatrixLayout::RowMajor);}
  GroupMemoryBarrierWithGroupSync();
  C z[6];
@@ -549,7 +550,7 @@ groupshared float16_t ones16[512];
    B8 vb=B8::Load(qkv8,(g*32)*24+16+col/4,24,dx::linalg::MatrixLayout::RowMajor);
    acc.MultiplyAccumulate(pa,vb);
   }
-  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(attn8,qr*16*8+col/4,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc);acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(attn8,qr*16*8+col/4,8,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
  {
@@ -612,7 +613,7 @@ groupshared float16_t ones16[512];
    B8 vb=B8::Load(aux,(base+g*32)*96+64+col,96,dx::linalg::MatrixLayout::RowMajor,16);
    acc.MultiplyAccumulate(pa,vb);
   }
-  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(attn8,qr*16*8+col/4,8,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc);acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(attn8,qr*16*8+col/4,8,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
  {

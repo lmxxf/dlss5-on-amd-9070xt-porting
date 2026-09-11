@@ -13,6 +13,7 @@
 #define MATRIX (CHANNELS*CHANNELS)
 #define SCALE_OFFSET (4*MATRIX+HEADS*4096)
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 ByteAddressBuffer qkvw:register(t0);
 StructuredBuffer<float> weights:register(t1);
 ByteAddressBuffer input8:register(t2);
@@ -75,7 +76,7 @@ B8 LoadW(uint col,uint g){
  [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){
   C tt=z[part*2+cr];
   if(part<2)for(uint i=0;i<tt.Length();i++){uint2 rc=tt.GetCoordinate(i);tt.Set(i,tt.Get(i)*inv4[(wave&3)*32+part*16+rc.x]);}
-  if(qwave)tt.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,(wave*16)*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(tt);if(qwave)tt.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,(wave*16)*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);
  }
  GroupMemoryBarrierWithGroupSync();
  // ---- attention (register exp, MMA row sums, hardware E4M3 P) ----
@@ -112,7 +113,7 @@ B8 LoadW(uint col,uint g){
    B8 vb=B8::Load(qkv8,(g*32)*24+16+col/4,24,dx::linalg::MatrixLayout::RowMajor);
    acc.MultiplyAccumulate(pa,vb);
   }
-  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,wave*64,4,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc);acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,wave*64,4,dx::linalg::MatrixLayout::RowMajor);
   GroupMemoryBarrierWithGroupSync();
   [unroll]for(uint k=0;k<2;k++){
    uint slot=lane*2+k,row=slot/4,q=slot%4;

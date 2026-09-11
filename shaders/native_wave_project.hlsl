@@ -12,6 +12,7 @@
 #define RAW 0
 #endif
 #include <dx/linalg.h>
+#include "native_sat_cast.hlsli"
 #ifndef NATIVE_FP8_INPUT
 #define NATIVE_FP8_INPUT 0
 #endif
@@ -203,19 +204,19 @@ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::Matr
 #endif
 #if NATIVE_FP8_STORE && MAP_OUTPUT
   // E4M3 tile staged in LDS (16 rows x 16 bytes = 4 uints per row), then 4-channel stores into the cropped raster.
-  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,n*64,4,dx::linalg::MatrixLayout::RowMajor);
+  SAT8(acc[n]);acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(otile,n*64,4,dx::linalg::MatrixLayout::RowMajor);
 #elif NATIVE_FP8_STORE && NATIVE_FP8_STORE_TILED
   /* FAST PATH (split stream8): 512-byte [token 16][k 32] tiles; this 16-column block is the low or high half of each 32-byte row */
-  {const uint col=(gid.y*BLOCK_N+n)*16;acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,((first/16)*(MATRIX_CHANNELS/32)+col/32)*512+col%32,32,dx::linalg::MatrixLayout::RowMajor,16);}
+  {const uint col=(gid.y*BLOCK_N+n)*16;SAT8(acc[n]);acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,((first/16)*(MATRIX_CHANNELS/32)+col/32)*512+col%32,32,dx::linalg::MatrixLayout::RowMajor,16);}
 #elif NATIVE_FP8_STORE
-  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+  SAT8(acc[n]);acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #elif MAP_OUTPUT
   // Write the cropped raster directly; border tokens are dropped (the crop never read them).
   for(uint i=0;i<acc[n].Length();i++){uint2 rc=acc[n].GetCoordinate(i);int dst=raster_index(first+rc.x);if(dst>=0)output.Store(uint(dst+int((gid.y*BLOCK_N+n)*16+rc.y))*4,asuint(acc[n].Get(i)));}
 #else
   acc[n].Store(output,(first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16)*4,MATRIX_CHANNELS*4,dx::linalg::MatrixLayout::RowMajor,16);
 #if NATIVE_FP8_COPY
-  acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(copy8,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
+  SAT8(acc[n]);acc[n].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(copy8,first*MATRIX_CHANNELS+(gid.y*BLOCK_N+n)*16,MATRIX_CHANNELS,dx::linalg::MatrixLayout::RowMajor,16);
 #endif
 #endif
  }
