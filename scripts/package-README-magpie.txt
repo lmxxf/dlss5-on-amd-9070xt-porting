@@ -19,6 +19,10 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 需要
 ----
   1. RX 9070 / 9070 XT（RDNA4）+ AMD 26.10.07.02 预览驱动（正式驱动没有 Shader Model 6.10 的 wave matrix）。
+  1b. Windows 开发人员模式必须打开（设置 -> 系统 -> 开发者选项 -> 开发人员模式）。插件靠 D3D12EnableExperimentalFeatures
+      打开实验性着色器模型，这个调用只在开发人员模式下成功；关着的话插件初始化就停在第一步，画面永远是 Magpie 自己的 FSR3。
+      判断：DLSS5-AMD\logs\native-submission-order.txt 里 "sdk721_before_device ... experimental=" 后面不是 00000000 就是它。
+      不需要装 SM 6.10 编译器、HIP、任何 SDK：着色器已经编好在包里。
   2. 本包已含 Magpie 实验分支（https://github.com/SAOG0721/Magpie）。
   3. 显示器分辨率不限，但游戏窗口必须是 1920x1080 无边框，Magpie 缩放选"原始尺寸"（不放大）。
      网络只认 1920x1080 进、1920x1080 出。
