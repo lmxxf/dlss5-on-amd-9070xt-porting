@@ -19,3 +19,5 @@ matrix-probe\matrix_probe.exe + D3D12\D3D12Core.dll rebuilt 09-10 from Developme
 - `isa-stats.py <x.rgp> <workdir>`：从 .rgp 里切出全部 pipeline 的 PAL ELF，用 RDTS 的 `rga.exe -s bin` 反汇编成 gfx1201 ISA，打印每个核的 scratch（溢出）/VGPR/LDS/指令数/wmma/LDS 访问/访存/s_wait/转换指令数，并按代码里的常量给核打标签（cso 的 DXBC hash 是占位符，对不回名字）。`rga.exe -s dx12` 走不通（不认 SM6.10 的 DXIL，也没法带 Agility 721）。
 - `Development/pso_blob_dump.cpp`：`GetCachedBlob()` 只有 954 字节的钥匙，驱动缓存 `%LOCALAPPDATA%\AMD\DxcCache\*.parc` 是自有压缩格式——两条都走不通，留作记录。
 - 看 .rgp 的时间线要 RGP 图形界面（`RadeonGPUProfiler.exe`）：事件耗时、每条指令的延迟（开 `-Instr` 抓）。
+
+- **cso 签名（09-11）**：预览 dxc 不签名，所有 cso 的 DXBC 哈希是 0x02×16 占位符，驱动按哈希缓存 pipeline 二进制，RGP 里嵌的 ELF 会是旧货（GPU 跑的仍是新代码）。抓 RGP 前先 `python3 dxilhash.py <x.cso>` 生成 `<x>_h.cso`（DxilHash.cpp 的 MD5 变体，实验模式下运行时接受）放进测试目录，再抓；`isa-stats.py` 的远端 rga 目录不清旧文件，比对前先看 elf 的 md5 是否真变了。
