@@ -324,6 +324,13 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 - 09-11 14:30 **C32 "合核溢出"是认错了流水线；两遍 softmax 为 null**。为验证两遍 softmax（`NATIVE_C32_TWO_PASS_SOFTMAX`：先 QK→exp→f16 行和，再重算 QK+exp 直接写归一化的 P，只留一个分数累加器）有没有消掉 09-10 记的 896 字节 scratch，重抓 RGP：抓出来的 p0087 与 09-10 逐字节相同。原因两层：① 预览 dxc 不签名，所有 cso 的 DXBC 哈希都是 0x02×16 占位符，驱动的 pipeline 二进制按哈希缓存，.rgp 里嵌的 ELF 是缓存里的旧货（GPU 跑的是新代码——把 P 乘 2 的探针确认输出变了，只是 RGP 报的二进制不对）。解法：按 DxilHash.cpp 的算法（MD5 变体，末块 = [bitlen][数据][0x80 填充][1|(n<<1)]，两行版同理）自己给 cso 签名（`scratchpad/dxilhash.py`，运行时接受，实验模式下不校验签名来源），驱动缓存就按真哈希分开了。② 签名后再抓：随源码变化的是 **p0006**（isa 42KB、7321 条、VGPR 112、LDS 29696、wmma 88、**scratch 0**）——这才是 `native_wave_c32_fused_attention_ffn.cso`；p0087（140KB、26341 条、scratch 896、wmma 8、满是 65520/512/448 的软件 H()/F() 常量）是 `native_wave_c32_full_attention.cso`（bench.ps1 第 573 行编的老单派发注意力，无 NATIVE_HW_H）：`DLSS5_TEST_WAVE_C32_PROJECTION=1` 时每段都建成 `split_pso[1]`，但 `Record` 里 `fused_attention` 分支只派发 `split_pso[2]`（融合核），`split_pso[1]` 只在非融合分支用——建了从不派发，RGP 把所有创建过的流水线都嵌进去了。**结论：真正跑的 C32 合核没有溢出；09-10 清单上"C32 消溢出 → 40fps"这条作废。** 两遍 softmax 逐位相同但核变大（VGPR 112→118、7627 条），关掉留档。剩下能动的是占用率：p0006 VGPR 112 在 4 wave/SIMD 档，压到 ≤96 才升 5 档，得看逐指令活跃度（RGP 图形界面 -Instr）再定。附带：`isa-stats.py` 的 rga 输出目录不清旧文件，同名 pipeline 会拿到上次的 .isa——这次是拿 ELF 的 md5 对出来的。
 - 09-11 15:10 **0.11**：接管优化（预读/合批/磁盘 shader 缓存/多线程展开）打进 Magpie 整包 `Magpie-DLSS5-AMD-0.11.zip`（341MB，sha256 8BFC9EA7…，add-on sha256 0129F7F4…），包内 README 改 3～5 秒；README 两份加 0.11 行；tag 0.11（shader 与 0.10 相同，release-check 绿）。游戏侧 add-on 仍是 0.10 的（游戏整个周末开着，Zero 回来关了再换）。GPU 被游戏占着，计时类的活（p0006 占用率、C512 尾巴、九块跳过、重叠）等周一。
 - 09-11 18:20 Zero 远程试九块跳过：37～38fps、看不出区别；但 +5% 换 PSNR 41.9→36.5（误差能量 3.5 倍）、别的游戏暗场景没验过，定为不做默认，flag 改回 {42,43,46}（九块版留作文档里的"性能档"）。问"风格可调"：捕获的输出合成里 TransferStrength/ColorStrength 两个混合系数一直写死 1,1，现在 `DLSS5_STRENGTH=<transfer>,<color>` 可调（即 NVIDIA 面板的强度；风格预设 = DLL 里别的网络描述符，没提取，只有一套权重）。add-on 已装进 Magpie 包，游戏侧等关游戏。
+- **下一步（压缩上下文前的清单，09-11 18:20）**：
+  1. Magpie 每帧 33～36ms 里网络 24 之外的 ~10ms：量捕获 / AMD 光流 / 呈现各占多少，光流占大头就换便宜的运动估计或降分辨率算。网友主要用这个形态。
+  2. 游戏鉤子版：游戏 6～7ms 与网络 24ms 重叠（多一帧延迟），改提交结构，Zero 远程看帧率。
+  3. 游戏侧 add-on 换成当前源码（0.10 的还在游戏里；含 prefetch/合批/shader 缓存/STRENGTH），等 Zero 关游戏；换完 release-check。
+  4. 小刀：p0006 VGPR 112→≤96（占用率，收益不定）、C512 尾巴 −0.1～0.2。
+  5. 2K 屏：网络先跑 1080p 再让 FSR 放大（结构改动，Zero 拍板）。
+  6. 不做：跳块维持 {42,43,46}，九块版只作文档"性能档"；风格预设不做（只有 Natural 那套权重），强度用 `DLSS5_STRENGTH`。
 
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
