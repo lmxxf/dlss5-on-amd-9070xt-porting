@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_lab_paths.h"
 #include "native_pinned_resource.h"
 #include <chrono>
@@ -32,7 +33,7 @@ public:
   D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("history guard root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("history guard root signature");blob->Release();blob=nullptr;error=nullptr;
   auto hr=CompileNativeShader(dir+L"\\native_history_guard.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"history guard compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
-  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("history guard pipeline");blob->Release();enabled=true;
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("history guard pipeline");blob->Release();enabled=true;
  }
  // after the sampler (warped in SRV state): transition to UAV, patch in place, back to SRV
  void Record(ID3D12GraphicsCommandList*c){
@@ -54,7 +55,7 @@ public:
   D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("output smooth root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("output smooth root signature");blob->Release();blob=nullptr;error=nullptr;
   auto hr=CompileNativeShader(dir+L"\\native_output_smooth.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"output smooth compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
-  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("output smooth pipeline");blob->Release();enabled=true;
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("output smooth pipeline");blob->Release();enabled=true;
  }
  // rgb is in SRV state after post70; transitioned to UAV for the pass and back. warped must be SRV-readable.
  void Record(ID3D12GraphicsCommandList*c){
@@ -86,7 +87,7 @@ public:
   D3D12_ROOT_PARAMETER p[3]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[2].Constants={0,0,4};
   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;if(FAILED(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error)))throw std::runtime_error("black probe root");if(error)error->Release();if(FAILED(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root))))throw std::runtime_error("black probe root signature");blob->Release();blob=nullptr;error=nullptr;
   auto hr=CompileNativeShader(dir+L"\\native_black_probe.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string m=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"black probe compilation";if(error)error->Release();throw std::runtime_error(m);}if(error)error->Release();
-  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("black probe pipeline");blob->Release();enabled=true;Log("black_probe enabled");
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};if(FAILED(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso))))throw std::runtime_error("black probe pipeline");blob->Release();enabled=true;Log("black_probe enabled");
  }
  /* after the network (rgb in SRV state): stats dispatch, copy stats to the frame's readback slot, copy the residual into the ring */
  void Record(ID3D12GraphicsCommandList*c){

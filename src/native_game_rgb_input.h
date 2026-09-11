@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_lab_paths.h"
 #include "native_pinned_resource.h"
 #include "native_device_identity.h"
@@ -37,7 +38,7 @@ public:
   D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=3;rd.pParameters=p;ID3DBlob*blob=nullptr,*error=nullptr;
   auto hr=D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error);if(error)error->Release();ck(hr);ck(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();blob=nullptr;error=nullptr;
   hr=CompileNativeShader(dir+L"\\native_game_rgb_input.hlsl",nullptr,"main",&blob,&error);if(error)error->Release();ck(hr);
-  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));blob->Release();
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso)));blob->Release();
  }
  // before is supplied by the owner; the source returns to exactly that state.
  void Record(ID3D12GraphicsCommandList*c,D3D12_RESOURCE_STATES before){

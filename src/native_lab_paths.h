@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include <dxgi.h>
 /* Typeless game textures (Rise of the Ronin's XeSS output is R16G16B16A16_TYPELESS, its velocity R16G16_TYPELESS): views use the float format. */
 inline DXGI_FORMAT NativeViewFormat(DXGI_FORMAT f){switch(f){case DXGI_FORMAT_R16G16B16A16_TYPELESS:return DXGI_FORMAT_R16G16B16A16_UNORM;/* Ronin: LDR output, the game views it as UNORM (verified from a dump: UNORM decodes to the scene, FLOAT to noise) */case DXGI_FORMAT_R16G16_TYPELESS:return DXGI_FORMAT_R16G16_FLOAT;case DXGI_FORMAT_R32G32_TYPELESS:return DXGI_FORMAT_R32G32_FLOAT;case DXGI_FORMAT_R32G32B32A32_TYPELESS:return DXGI_FORMAT_R32G32B32A32_FLOAT;case DXGI_FORMAT_R8G8B8A8_TYPELESS:return DXGI_FORMAT_R8G8B8A8_UNORM;case DXGI_FORMAT_B8G8R8A8_TYPELESS:return DXGI_FORMAT_B8G8R8A8_UNORM;default:return f;}}
@@ -35,11 +36,12 @@ inline const std::wstring&NativeLabRoot(){
 inline std::wstring NativeLabPath(const wchar_t*relative){std::wstring p=NativeLabRoot();p+=L"\\";p+=relative;return p;}
 inline float NativeHalfToFloat(uint16_t h){uint32_t s=(h&0x8000u)<<16,e=(h>>10)&31u,m=h&1023u;uint32_t b;if(e==0){if(m==0)b=s;else{int sh=0;while(!(m&0x400u)){m<<=1;sh++;}m&=0x3ffu;b=s|((113u-sh)<<23)|(m<<13);}}else if(e==31)b=s|0x7f800000u|(m<<13);else b=s|((e+112u)<<23)|(m<<13);float f;std::memcpy(&f,&b,4);return f;}
 inline std::vector<float>NativeReadF32(const std::wstring&path,const char*what){
+ NativeInitTick("    read: enter");
  std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);
- if(f){auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error(std::string(what)+" size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error(std::string(what)+" truncated");return v;}
+ if(f){auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error(std::string(what)+" size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error(std::string(what)+" truncated");NativeInitTick("    read: f32 file");return v;}
  if(path.size()>4&&path.compare(path.size()-4,4,L".f32")==0){
   std::wstring half=path.substr(0,path.size()-4)+L".f16";std::ifstream g(half.c_str(),std::ios::binary|std::ios::ate);
-  if(g){auto n=g.tellg();if(n<=0||size_t(n)%2)throw std::runtime_error(std::string(what)+" half size");std::vector<uint16_t>h(size_t(n)/2);g.seekg(0);if(!g.read(reinterpret_cast<char*>(h.data()),n))throw std::runtime_error(std::string(what)+" half truncated");std::vector<float>v(h.size());for(size_t i=0;i<h.size();i++)v[i]=NativeHalfToFloat(h[i]);return v;}
+  if(g){auto n=g.tellg();if(n<=0||size_t(n)%2)throw std::runtime_error(std::string(what)+" half size");std::vector<uint16_t>h(size_t(n)/2);g.seekg(0);if(!g.read(reinterpret_cast<char*>(h.data()),n))throw std::runtime_error(std::string(what)+" half truncated");NativeInitTick("    read: f16 file");std::vector<float>v(h.size());for(size_t i=0;i<h.size();i++)v[i]=NativeHalfToFloat(h[i]);NativeInitTick("    read: f16 expand");return v;}
  }
  throw std::runtime_error(std::string(what)+" missing");
 }

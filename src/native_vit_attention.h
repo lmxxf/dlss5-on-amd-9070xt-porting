@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_split.h"
 class NativeVitAttention {
@@ -22,9 +23,9 @@ public:
    if(prepacked){if(!fp8_attention)throw std::runtime_error("prepacked ViT Q/K/V needs the FP8 attention");packed=input;packed->AddRef();}
    else{rd.Width=UINT64(tokens)*3072*2;ck(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,nullptr,IID_PPV_ARGS(&packed)));}
    // FAST PATH (DLSS5_VIT_ATTN_FP8): E4M3 Q/K/V copy + FP8 attention kernel (native_wave_vit_attention_fp8.cso / pack8).
-   if(!prepacked){ck(D3DReadFileToBlob((dir+(fp8_attention?L"\\native_wave_vit_attention_pack8.cso":L"\\native_wave_vit_attention_pack.cso")).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pk{};pk.pRootSignature=root;pk.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pk,IID_PPV_ARGS(&pack_pso)));blob->Release();blob=nullptr;}
+   if(!prepacked){ck(D3DReadFileToBlob((dir+(fp8_attention?L"\\native_wave_vit_attention_pack8.cso":L"\\native_wave_vit_attention_pack.cso")).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pk{};pk.pRootSignature=root;pk.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(NativeCreateComputePipelineState(d,&pk,IID_PPV_ARGS(&pack_pso)));blob->Release();blob=nullptr;}
   }
-  auto hr=half_input?D3DReadFileToBlob((dir+(fp8_attention?L"\\native_wave_vit_attention_fp8.cso":L"\\native_wave_vit_attention_half.cso")).c_str(),&blob):wave?D3DReadFileToBlob((dir+L"\\native_wave_vit_attention.cso").c_str(),&blob):CompileNativeShader(dir+L"\\native_vit_attention.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string message=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"attention compilation";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));blob->Release();
+  auto hr=half_input?D3DReadFileToBlob((dir+(fp8_attention?L"\\native_wave_vit_attention_fp8.cso":L"\\native_wave_vit_attention_half.cso")).c_str(),&blob):wave?D3DReadFileToBlob((dir+L"\\native_wave_vit_attention.cso").c_str(),&blob):CompileNativeShader(dir+L"\\native_vit_attention.hlsl",nullptr,"main",&blob,&error);if(FAILED(hr)){std::string message=error?std::string((const char*)error->GetBufferPointer(),error->GetBufferSize()):"attention compilation";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso)));blob->Release();
  }
  void Record(ID3D12GraphicsCommandList*c){if(recorded)barrier(c,true);
   if(half_input&&!prepacked){

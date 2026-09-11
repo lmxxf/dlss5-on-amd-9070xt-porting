@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include <d3d12.h>
 #include <d3dcompiler.h>
@@ -170,7 +171,7 @@ public:
     if(const wchar_t*fz=_wgetenv(L"DLSS5_C32_FUSED_ATTENTION")){if(wcscmp(fz,L"0")&&wcscmp(fz,L"1"))throw std::runtime_error("invalid fused C32 attention flag");fused_attention=!wcscmp(fz,L"1");}
     const wchar_t*wa=_wgetenv(L"DLSS5_C32_WAVE_ATTENTION");if(wa&&wcscmp(wa,L"0")&&wcscmp(wa,L"1"))throw std::runtime_error("invalid C32 wave attention flag");wave_attention=fused_attention&&wa&&!wcscmp(wa,L"1");
     const wchar_t*names[]={fused_attention?L"\\native_wave_c32_fused_qkv.cso":L"\\native_wave_c32_split_qkv.cso",L"\\native_wave_c32_split_normalize.cso",wave_attention?L"\\native_wave_c32_fused_attention_wave.cso":fused_attention?(attn_out8?L"\\native_wave_c32_fused_attention_out8.cso":L"\\native_wave_c32_fused_attention.cso"):L"\\native_wave_c32_split_attention.cso",L"\\native_wave_c32_split_projection.cso"};
-    for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+(i==2&&fused_ffn?L"\\native_wave_c32_fused_attention_ffn.cso":names[i])).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
+    for(UINT i=0;i<4;i++){if(fused_attention&&(i&1))continue;ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+(i==2&&fused_ffn?L"\\native_wave_c32_fused_attention_ffn.cso":names[i])).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=split_root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=NativeCreateComputePipelineState(device,&p,IID_PPV_ARGS(&split_pso[i]));code->Release();Check(hr);}
    }
   }if(main8_mode)Heap(2,raw,bytes,main8,bytes/4,down,bytes/4,true);
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SHARED_C32");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid shared C32 flag");shared_raw=raw_features&&flag&&!wcscmp(flag,L"1");
@@ -194,11 +195,11 @@ public:
   if(wave_qkv)for(size_t i=0;i<(wave_projection?4096:3072);i++){uint32_t b;std::memcpy(&b,&aw[i],4);uint32_t m=b&0x7fffffffu;if(m&&((m&0x1fffu)||(m>>23)<113||(m>>23)>142))throw std::runtime_error("C32 QKV weights not exact normal half");}
   const wchar_t*blocked_flag=_wgetenv(L"DLSS5_TEST_BLOCKED_C32_FFN");if(blocked_flag&&wcscmp(blocked_flag,L"0")&&wcscmp(blocked_flag,L"1"))throw std::runtime_error("invalid blocked C32 FFN flag");const bool blocked_ffn=blocked_flag&&!wcscmp(blocked_flag,L"1");
   const wchar_t*local_ffn_file=blocked_ffn?L"\\native_wave_c32_ffn_blocked.cso":L"\\native_wave_c32_ffn_local.cso";
-  if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+local_ffn_file).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=blocked_ffn_raw_store?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
+  if(prefix_wave){ID3DBlob*code=nullptr;Check(D3DReadFileToBlob((shader_dir+local_ffn_file).c_str(),&code));D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=blocked_ffn_raw_store?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};auto hr=NativeCreateComputePipelineState(device,&p,IID_PPV_ARGS(&pso[3]));code->Release();Check(hr);}
   for(UINT i=0;i<3;i++){
    ID3DBlob*code=nullptr,*error=nullptr;auto path=shader_dir+L"\\"+names[i];HRESULT hr=(i==0&&wave_prefix)?D3DReadFileToBlob((shader_dir+L"\\native_wave_prefix.cso").c_str(),&code):(i==0&&wave_ffn)?D3DReadFileToBlob((shader_dir+(wave_ffn_local?local_ffn_file:L"\\native_wave_c32_ffn.cso")).c_str(),&code):(i==1&&wave_flag&&!wcscmp(wave_flag,L"1"))?D3DReadFileToBlob((shader_dir+(wave_projection?L"\\native_wave_c32_full_attention.cso":wave_av?L"\\native_wave_c32_av.cso":wave_qkv?L"\\native_wave_c32_qkv.cso":L"\\native_wave_c32_scores.cso")).c_str(),&code):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,(i==2&&coalesced_finish)?(down_only?"finish_down":main8_mode?"finish_main8":"finish_coalesced"):(i==0&&shared_raw)?"raw_ffn_shared":"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);
    if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"compile failed";if(error)error->Release();throw std::runtime_error(message);}
-   if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:(i==0&&blocked_ffn_raw_store&&!prefix_wave)?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&p,IID_PPV_ARGS(&pso[i])));code->Release();
+   if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC p{};p.pRootSignature=i==2?finish_root:(i==0&&blocked_ffn_raw_store&&!prefix_wave)?ffn_root:root;p.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(NativeCreateComputePipelineState(device,&p,IID_PPV_ARGS(&pso[i])));code->Release();
   }
  }
  void Record(ID3D12GraphicsCommandList*c,UINT seed,bool local_oracle=false,bool temporal_enabled=false,NativeNetworkTimestamps*timer=nullptr,const char*label="c32_probe"){

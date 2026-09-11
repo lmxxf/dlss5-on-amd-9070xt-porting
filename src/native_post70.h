@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_resident_table.h"
 #include "native_c32_stage.h"
@@ -54,7 +55,7 @@ const char*diagnostic=std::getenv("DLSS5_POST_BASE_ONLY");
   const char*entries[]={"merge",fast_rgb?"finish_fast":"finish"};
     if(diagnostic&&std::strcmp(diagnostic,"1")&&std::strcmp(diagnostic,"2"))throw std::runtime_error("post diagnostic mode must be1 or2");
   D3D_SHADER_MACRO macros[]={{"POST_BASE_ONLY",diagnostic?diagnostic:"0"},{"POST_TILED_INPUT",direct?"1":"0"},{"POST_FAST_RGB",fast_rgb?"1":"0"},{"POST_INPUT8",body.AttnOut8()?"1":"0"},{"POST_INPUT_HALF",body.HalfStream()?"1":"0"},{nullptr,nullptr}};
-  for(UINT i=0;i<2;i++){if(i==0&&merge_fold)continue;blob=nullptr;error=nullptr;auto hr=CompileNativeShader(dir+L"\\native_post70.hlsl",macros,entries[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string((char*)error->GetBufferPointer(),error->GetBufferSize()):"post70 compile";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<2;i++){if(i==0&&merge_fold)continue;blob=nullptr;error=nullptr;auto hr=CompileNativeShader(dir+L"\\native_post70.hlsl",macros,entries[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string((char*)error->GetBufferPointer(),error->GetBufferSize()):"post70 compile";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};ck(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
  bool head_in_epilogue{}; UINT isolate_part{};void SetIsolatePart(UINT p){isolate_part=p;body.SetIsolateStage(p<4?p:0);} /* 1..3 body stages, 4 = rgb head only */
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){

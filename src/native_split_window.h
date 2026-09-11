@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_split.h"
 class NativeSplitWindow {
@@ -18,7 +19,7 @@ public:
   padded=Buffer(d,UINT64(geometry[2])*geometry[3]*512*4);output=Buffer(d,UINT64(width)*height*512*4);body.Create(d,padded,geometry[2],geometry[3],fw,fp,aw,dir,raw_output,workspace);
   D3D12_ROOT_PARAMETER params[3]{};params[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[2].Constants={0,0,6};D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=3;desc.pParameters=params;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();
   const char*entry[]={"pack","crop"};auto path=dir+L"\\native_split_window.hlsl";
-  for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=CompileNativeShader(path,nullptr,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split window shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=CompileNativeShader(path,nullptr,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split window shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(stream8){if(timer)timer->Mark(c,"split_probe_begin");body.Record(c,timer);recorded=true;return;}

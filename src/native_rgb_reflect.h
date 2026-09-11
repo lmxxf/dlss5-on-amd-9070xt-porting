@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_split.h"
 // GPU HWC float4 -> reflected8x8 tile-major float4. No neural features injected.
@@ -20,7 +21,7 @@ public:
   auto hr=D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error);if(error)error->Release();ck(hr);ck(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();blob=nullptr;error=nullptr;
   hr=CompileNativeShader(dir+L"\\native_rgb_reflect.hlsl",nullptr,"main",&blob,&error);
   if(FAILED(hr)){std::string msg=error?std::string((char*)error->GetBufferPointer(),error->GetBufferSize()):"RGB reflect compile";if(error)error->Release();throw std::runtime_error(msg);}if(error)error->Release();
-  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso));blob->Release();ck(hr);
+  D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};hr=NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso));blob->Release();ck(hr);
  }
  void Record(ID3D12GraphicsCommandList*c){if(!output||!c)throw std::runtime_error("RGB reflect not created");if(recorded)barrier(c,true);c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootShaderResourceView(0,input->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(1,output->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(2,4,geometry,0);c->Dispatch(geometry[2]/8,geometry[3]/8,1);barrier(c,false);recorded=true;}
  ID3D12Resource*Output()const{return output;}

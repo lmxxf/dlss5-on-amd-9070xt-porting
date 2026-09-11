@@ -4,6 +4,7 @@
 #include "native_vit_block.h"
 #include "native_actual_decoder69.h"
 #include "native_post70.h"
+#include "native_resident_table.h"
 #include "native_block_skip.h"
 #include "native_vram_log.h"
 #include "native_game_submission.h"
@@ -72,12 +73,14 @@ public:
   {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1")&&wcscmp(bs,L"2"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs?UINT(bs[0]-L'0'):0u;}
   auto&last=decoder.Tail().Last();if(low_raw==1){last.SetSkipFinish(true);last.SetCropNeeded(false);}if(low_raw==2){if(!last.Main8())throw std::runtime_error("post70 low raw 2: block 69 has no main8 finish");last.SetCropNeeded(false);}
   NativeVramLog(d,"decoder");post.Create(d,low_raw==1?last.RawWork():low_raw==2?last.Main8():decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u,low_raw?last.WorkWidth():0u,low_raw?last.ShiftX():0u,low_raw?last.ShiftY():0u,low_raw==2?9u:8u);NativeVramLog(d,"post70");ready=true;
+  NativeResidentFlush();
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
  // This includes temporal_rgb's sampler producer when temporal_enabled is true.
  // Binding storage does not imply a valid history frame; reset callers pass false.
  template<class Submission> void Run(Submission&submit,UINT seed,bool temporal_enabled=false){
+  NativeResidentFlush();
   if(!ready||failed||!NativeSameDevice(submit.Device(),device))throw std::runtime_error("network unavailable/device mismatch");
   if(temporal_enabled&&!temporal_bound)throw std::runtime_error("network temporal RGB not bound");
   try{
@@ -109,6 +112,7 @@ public:
  // This batches the same stages as Run; single-list GPU safety is not implied
  // by the separately submitted/chunked tests and must be verified separately.
  void RecordUnsubmitted(ID3D12GraphicsCommandList*c,UINT seed,bool temporal_enabled=false){
+  NativeResidentFlush();
   // Whole-network batching produced DXGI_ERROR_DEVICE_HUNG on9070XT.
   // Keep only as an explicit diagnostic; never silently enable in game code.
   const wchar_t*permit=_wgetenv(L"DLSS5_TEST_SINGLE_LIST");

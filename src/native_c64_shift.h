@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_c64.h"
 class NativeC64Shift {
@@ -35,7 +36,7 @@ public:
   if(fused)body.FuseShift(d,input,output,width,height,geometry[4],geometry[5],raw_output,dir,fp8_input,fp8_output,f16_input);
   const wchar_t*copy_flag=_wgetenv(L"DLSS5_TEST_COALESCED_MULTIHEAD_SHIFT");if(copy_flag&&wcscmp(copy_flag,L"0")&&wcscmp(copy_flag,L"1"))throw std::runtime_error("invalid coalesced shift flag");coalesced=copy_flag&&!wcscmp(copy_flag,L"1");channel_count=channels;
   const char*entry[]={coalesced?"pack_coalesced":"pack",coalesced?"crop_coalesced":"crop"};auto path=dir+L"\\native_c64_shift.hlsl";auto channel_text=std::to_string(channels);D3D_SHADER_MACRO macros[]={{"CHANNELS",channel_text.c_str()},{"PLAIN_SHORT_Y",plain_short_y?"1":"0"},{nullptr,nullptr}};
-  for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C64 shift shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<2;i++){blob=nullptr;error=nullptr;auto hr=D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C64 shift shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(recorded){if(!fused)Barrier(c,padded,true);Barrier(c,output,true);}

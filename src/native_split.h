@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include <cmath>
 #include "native_resident_table.h"
@@ -33,7 +34,7 @@ public:
   weights[0]=Buffer(d,fw.size()*4,&fw);weights[1]=Buffer(d,fp.size()*4,&fp);weights[2]=Buffer(d,aw.size()*4,&aw);
   for(auto&r:result)r=Buffer(d,UINT64(width)*height*512*4);
   if(stream8){for(UINT i=0;i<3;i++){result[i]->Release();result[i]=Buffer(d,UINT64(width)*height*512);}result[3]->Release();result[3]=Buffer(d,UINT64(geometry6[2])*geometry6[3]*512*(out8?1:4));}
-  const wchar_t*wave_flag=_wgetenv(L"DLSS5_TEST_WAVE_SPLIT_FFWD");if(wave_flag&&wcscmp(wave_flag,L"0")&&wcscmp(wave_flag,L"1"))throw std::runtime_error("invalid wave split FFWD flag");wave_ffwd=wave_flag&&!wcscmp(wave_flag,L"1");
+ NativeInitTick("split: enter"); const wchar_t*wave_flag=_wgetenv(L"DLSS5_TEST_WAVE_SPLIT_FFWD");if(wave_flag&&wcscmp(wave_flag,L"0")&&wcscmp(wave_flag,L"1"))throw std::runtime_error("invalid wave split FFWD flag");wave_ffwd=wave_flag&&!wcscmp(wave_flag,L"1");
   const wchar_t*parallel_flag=_wgetenv(L"DLSS5_TEST_PARALLEL_SPLIT_FFWD");if(parallel_flag&&wcscmp(parallel_flag,L"0")&&wcscmp(parallel_flag,L"1"))throw std::runtime_error("invalid parallel split FFWD flag");parallel_ffwd=parallel_flag&&!wcscmp(parallel_flag,L"1");wave_ffwd=wave_ffwd||parallel_ffwd;
   if(wave_ffwd){
    if(UINT64(width)*height/16>65535)throw std::runtime_error("wave split FFWD extent");
@@ -42,9 +43,9 @@ public:
    {const wchar_t*ft=_wgetenv(L"DLSS5_SPLIT_FFWD_TILED");if(ft&&wcscmp(ft,L"0")&&wcscmp(ft,L"1"))throw std::runtime_error("invalid split ffwd tiled flag");ffwd_tiled=ft&&!wcscmp(ft,L"1");if(ffwd_tiled&&!parallel_ffwd)throw std::runtime_error("split ffwd tiled needs the parallel FFWD kernel");}
    if(ffwd_tiled){uint16_t*h16=reinterpret_cast<uint16_t*>(packed.data());auto tile=[&](size_t base,size_t n_rows,size_t k_cols){std::vector<uint16_t>t(n_rows*k_cols);for(size_t n=0;n<n_rows;n++)for(size_t k=0;k<k_cols;k++)t[((n/16)*(k_cols/32)+k/32)*512+(k%32)*16+n%16]=h16[base+n*k_cols+k];std::memcpy(h16+base,t.data(),t.size()*2);};
     tile(0,512,512);for(size_t g=0;g<8;g++){tile(262144+g*16384,256,64);tile(393216+g*16384,64,256);}}
-   auto*u=Buffer(d,packed.size()*4,&packed);auto*local=NativeResidentTable(d,u);u->Release();weights[0]->Release();weights[0]=local;
+NativeInitTick("split: ffwd pack cpu");   auto*u=Buffer(d,packed.size()*4,&packed);auto*local=NativeResidentTable(d,u);u->Release();weights[0]->Release();weights[0]=local;
   }
-  D3D12_ROOT_PARAMETER params[6]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}params[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[4].Constants={0,0,6};params[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[5].Descriptor.ShaderRegister=1;D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=6;desc.pParameters=params;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();
+NativeInitTick("split: ffwd upload+resident");  D3D12_ROOT_PARAMETER params[6]{};for(UINT i=0;i<3;i++){params[i].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;params[i].Descriptor.ShaderRegister=i;}params[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;params[4].Constants={0,0,6};params[5].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;params[5].Descriptor.ShaderRegister=1;D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=6;desc.pParameters=params;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();
   const wchar_t*matrix_flag=_wgetenv(L"DLSS5_TEST_MATRIX_SPLIT_ATTENTION");if(matrix_flag&&wcscmp(matrix_flag,L"0")&&wcscmp(matrix_flag,L"1"))throw std::runtime_error("invalid split matrix attention flag");
   matrix_attention=matrix_flag&&!wcscmp(matrix_flag,L"1");
   if(matrix_attention){
@@ -56,7 +57,7 @@ public:
    }
    auto*upload=Buffer(d,packed.size()*4,&packed);qkv_weights=NativeResidentTable(d,upload);upload->Release();
    const wchar_t*names[]={L"native_matrix_pack_c512.cso",L"native_matrix_qkv_c512.cso"};
-   for(UINT i=0;i<2;i++){blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&aux_pso[i]));blob->Release();Check(hr);}
+   for(UINT i=0;i<2;i++){blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&aux_pso[i]));blob->Release();Check(hr);}
   }
   // FAST PATH: direct attention path for C512 (FP8 pack -> fused QKV+normalize -> direct attention with FP8 Q/K/V and FP8 output -> projection with direct FP8 A loads).
   if(const wchar_t*da=_wgetenv(L"DLSS5_SPLIT_DIRECT_ATTENTION")){if(wcscmp(da,L"0")&&wcscmp(da,L"1"))throw std::runtime_error("invalid split direct attention flag");const wchar_t*f8=_wgetenv(L"DLSS5_FP8_OPERANDS");direct_attention=!wcscmp(da,L"1")&&matrix_attention&&f8&&!wcscmp(f8,L"1");}
@@ -66,12 +67,12 @@ public:
   if(direct_attention){
    std::vector<float>packed8(3ull*512*512/4);unsigned char*out8=reinterpret_cast<unsigned char*>(packed8.data());
    for(size_t i=0;i<3ull*512*512;i++){float v=aw[i];uint32_t b;std::memcpy(&b,&v,4);uint32_t a=b&0x7fffffffu;uint8_t sg=uint8_t((b>>24)&0x80u);if(!a){out8[i]=sg;continue;}float m=std::fabs(v);if(m<0.015625f){float q=m*512.f;if(q!=std::floor(q)||q>7)throw std::runtime_error("split QKV weight not FP8-representable");out8[i]=uint8_t(sg|uint8_t(q));continue;}int e=int(a>>23)-127+7;if(e<1||e>15||(a&0xfffff)||(e==15&&((a>>20)&7)==7))throw std::runtime_error("split QKV weight not FP8-representable");out8[i]=uint8_t(sg|(e<<3)|((a>>20)&7));}
-   if(split_tiled)tile512(out8,3*512);
+NativeInitTick("split: qkv fp8 pack cpu");   if(split_tiled)tile512(out8,3*512);
    auto*upload=Buffer(d,packed8.size()*4,&packed8);qkv_weights8=NativeResidentTable(d,upload);upload->Release();
-   const wchar_t*names[]={L"native_matrix_pack_fp8_c512.cso",stream8?L"native_wave_qkv_normalize_fp8qkv_stream_c512.cso":L"native_wave_qkv_normalize_fp8qkv_c512.cso",L"native_wave_attention_direct_fp8qkv_fp8act_c512.cso"};
-   for(UINT i=0;i<3;i++){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&direct_pso[i]));blob->Release();Check(hr);}
+NativeInitTick("split: qkv upload+resident");   const wchar_t*names[]={L"native_matrix_pack_fp8_c512.cso",stream8?L"native_wave_qkv_normalize_fp8qkv_stream_c512.cso":L"native_wave_qkv_normalize_fp8qkv_c512.cso",L"native_wave_attention_direct_fp8qkv_fp8act_c512.cso"};
+   for(UINT i=0;i<3;i++){ID3DBlob*blob=nullptr;Check(D3DReadFileToBlob((dir+L"\\"+names[i]).c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&direct_pso[i]));blob->Release();Check(hr);}
   }
-  // Wave-matrix FFWD/attention projections: [0]=fp (matrix 0, scale 262144), [1]=aw (matrix 3*MATRIX, scale 4*MATRIX+16*4096+16).
+NativeInitTick("split: qkv pso");  // Wave-matrix FFWD/attention projections: [0]=fp (matrix 0, scale 262144), [1]=aw (matrix 3*MATRIX, scale 4*MATRIX+16*4096+16).
   if(const wchar_t*wp=_wgetenv(L"DLSS5_TEST_WAVE_SPLIT_PROJECT")){if(wcscmp(wp,L"0")&&wcscmp(wp,L"1"))throw std::runtime_error("invalid wave split project flag");wave_project=!wcscmp(wp,L"1");}
   // FAST PATH (DLSS5_SPLIT_COPY8): the stage-1 projection also writes the E4M3 copy the attention path reads; the pack dispatch is skipped.
   {const wchar_t*c8=_wgetenv(L"DLSS5_SPLIT_COPY8");if(c8&&wcscmp(c8,L"0")&&wcscmp(c8,L"1"))throw std::runtime_error("invalid split copy8 flag");copy8=wave_project&&c8&&!wcscmp(c8,L"1");}
@@ -88,10 +89,11 @@ public:
     if(k==0){weights[1]->Release();weights[1]=Buffer(d,16);} // the f32 ffwd-projection copy is only read by the non-wave path
    }
   }
-  const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
+NativeInitTick("split: project packs+upload");  const wchar_t*pad=_wgetenv(L"DLSS5_TEST_PAD_MULTIHEAD_LDS");if(pad&&wcscmp(pad,L"0")&&wcscmp(pad,L"1"))throw std::runtime_error("invalid multihead LDS flag");
   const char*entry[]={shared_ffwd?"ffwd_shared":"ffwd",tiled_projection?"tiled_split_project":"ffwd_projection","attention",tiled_projection?"tiled_attention_project":"projection"};D3D_SHADER_MACRO macros[]={{"RAW_OUTPUT","0"},{"CHANNELS","512"},{"NATIVE_PAD_MULTIHEAD_LDS",pad&&!wcscmp(pad,L"1")?"1":"0"},{nullptr,nullptr}};
-  for(UINT i=0;i<4;i++){macros[0].Definition=raw_output&&i==3?"1":"0";auto path=dir+((i==0||(i==1&&!tiled_projection))?L"\\native_split.hlsl":L"\\native_c64.hlsl");blob=nullptr;error=nullptr;HRESULT hr=stream8&&i!=2?D3DReadFileToBlob((dir+(i==0?(in8?L"\\native_wave_split_ffwd_parallel_stream8.cso":L"\\native_wave_split_ffwd_parallel_streamf.cso"):i==1?(in8?L"\\native_wave_project_stream08_c512.cso":L"\\native_wave_project_stream0f_c512.cso"):(out8?L"\\native_wave_project_stream18_c512.cso":raw_output?L"\\native_wave_project_stream1raw_c512.cso":L"\\native_wave_project_stream1f_c512.cso"))).c_str(),&blob):((i==1||i==3)&&wave_project)?D3DReadFileToBlob((dir+((i==3&&raw_output)?(direct_attention?L"\\native_wave_project_raw_fp8act_c512.cso":L"\\native_wave_project_raw_c512.cso"):(i==3&&direct_attention)?L"\\native_wave_project_fp8act_c512.cso":(i==1&&copy8)?L"\\native_wave_project_copy8_c512.cso":L"\\native_wave_project_c512.cso")).c_str(),&blob):(i==0&&wave_ffwd)?D3DReadFileToBlob((dir+(parallel_ffwd?L"\\native_wave_split_ffwd_parallel.cso":L"\\native_wave_split_ffwd.cso")).c_str(),&blob):(i==2&&matrix_attention)?D3DReadFileToBlob((dir+L"\\native_wave_split_attention.cso").c_str(),&blob):CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
+  for(UINT i=0;i<4;i++){macros[0].Definition=raw_output&&i==3?"1":"0";auto path=dir+((i==0||(i==1&&!tiled_projection))?L"\\native_split.hlsl":L"\\native_c64.hlsl");blob=nullptr;error=nullptr;HRESULT hr=stream8&&i!=2?D3DReadFileToBlob((dir+(i==0?(in8?L"\\native_wave_split_ffwd_parallel_stream8.cso":L"\\native_wave_split_ffwd_parallel_streamf.cso"):i==1?(in8?L"\\native_wave_project_stream08_c512.cso":L"\\native_wave_project_stream0f_c512.cso"):(out8?L"\\native_wave_project_stream18_c512.cso":raw_output?L"\\native_wave_project_stream1raw_c512.cso":L"\\native_wave_project_stream1f_c512.cso"))).c_str(),&blob):((i==1||i==3)&&wave_project)?D3DReadFileToBlob((dir+((i==3&&raw_output)?(direct_attention?L"\\native_wave_project_raw_fp8act_c512.cso":L"\\native_wave_project_raw_c512.cso"):(i==3&&direct_attention)?L"\\native_wave_project_fp8act_c512.cso":(i==1&&copy8)?L"\\native_wave_project_copy8_c512.cso":L"\\native_wave_project_c512.cso")).c_str(),&blob):(i==0&&wave_ffwd)?D3DReadFileToBlob((dir+(parallel_ffwd?L"\\native_wave_split_ffwd_parallel.cso":L"\\native_wave_split_ffwd.cso")).c_str(),&blob):(i==2&&matrix_attention)?D3DReadFileToBlob((dir+L"\\native_wave_split_attention.cso").c_str(),&blob):CompileNativeShader(path,macros,entry[i],&blob,&error);if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"split shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso[i])));blob->Release();}
 
+ NativeInitTick("split: end");
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr){
   if(recorded)for(auto*r:result)Barrier(c,r,true);

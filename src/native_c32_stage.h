@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_preblock_runtime.h"
 // Ordinary C32 stage: zero-pad shifted windows, native FP8 body, crop to HWC.
@@ -22,7 +23,7 @@ public:
   body.Create(device,packed,geometry[2],geometry[3],fw,aw,dir,false,true);
   D3D12_DESCRIPTOR_RANGE ranges[]={{D3D12_DESCRIPTOR_RANGE_TYPE_SRV,1,0,0,0},{D3D12_DESCRIPTOR_RANGE_TYPE_UAV,1,0,0,1}};D3D12_ROOT_PARAMETER p[2]{};p[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;p[0].DescriptorTable={2,ranges};p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[1].Constants={0,0,6};D3D12_ROOT_SIGNATURE_DESC rd{};rd.NumParameters=2;rd.pParameters=p;ID3DBlob*b=nullptr,*err=nullptr;Check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&b,&err));Check(device->CreateRootSignature(0,b->GetBufferPointer(),b->GetBufferSize(),IID_PPV_ARGS(&root)));b->Release();if(err)err->Release();
   Heap(0,source,n,packed,work); // the crop heap (and Output()) are built on first use: chained stages never crop
-  const char*entry[]={"pack",raw_output?"crop_raw":"crop"};for(UINT i=0;i<2;i++){ID3DBlob*code=nullptr,*error=nullptr;auto path=dir+L"\\native_c32_reframe.hlsl";auto hr=D3DCompileFromFile(path.c_str(),nullptr,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);if(FAILED(hr)){std::string msg=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C32 shader failed";if(error)error->Release();throw std::runtime_error(msg);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(device->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso[i])));code->Release();}
+  const char*entry[]={"pack",raw_output?"crop_raw":"crop"};for(UINT i=0;i<2;i++){ID3DBlob*code=nullptr,*error=nullptr;auto path=dir+L"\\native_c32_reframe.hlsl";auto hr=D3DCompileFromFile(path.c_str(),nullptr,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry[i],"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&code,&error);if(FAILED(hr)){std::string msg=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"C32 shader failed";if(error)error->Release();throw std::runtime_error(msg);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};Check(NativeCreateComputePipelineState(device,&pd,IID_PPV_ARGS(&pso[i])));code->Release();}
  }
  void Record(ID3D12GraphicsCommandList*c,NativeNetworkTimestamps*timer=nullptr,const char*label="c32_probe"){
   if(recorded){if(!mapped)Barrier(c,packed,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);if(crop_needed)Barrier(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}

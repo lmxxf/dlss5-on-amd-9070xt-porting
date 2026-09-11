@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_device_identity.h"
 #include "native_rgb_reflect.h"
@@ -32,7 +33,7 @@ public:
   D3D12_ROOT_PARAMETER p[5]{};p[0].ParameterType=p[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[1].Descriptor.ShaderRegister=1;p[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;p[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;p[3].Constants={0,0,5};p[4].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;p[4].Descriptor.ShaderRegister=2;D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=reciprocals?5:4;desc.pParameters=p;
   ID3DBlob*code=nullptr,*error=nullptr;auto hr=D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&code,&error);if(error)error->Release();ck(hr);ck(d->CreateRootSignature(0,code->GetBufferPointer(),code->GetBufferSize(),IID_PPV_ARGS(&root)));code->Release();code=nullptr;error=nullptr;
   const bool fast=NativeFastTemporal();
-  D3D_SHADER_MACRO macros[]={{"NORMALIZED_COORDINATES",normalized_coordinates?"1":"0"},{"TEMPORAL_RECIPROCAL_TABLE",reciprocals&&!fast?"1":"0"},{"NATIVE_FAST_TEMPORAL",fast?"1":"0"},{nullptr,nullptr}};hr=CompileNativeShader(dir+L"\\native_temporal_sample.hlsl",macros,"main",&code,&error);if(error)error->Release();ck(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};ck(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));code->Release();
+  D3D_SHADER_MACRO macros[]={{"NORMALIZED_COORDINATES",normalized_coordinates?"1":"0"},{"TEMPORAL_RECIPROCAL_TABLE",reciprocals&&!fast?"1":"0"},{"NATIVE_FAST_TEMPORAL",fast?"1":"0"},{nullptr,nullptr}};hr=CompileNativeShader(dir+L"\\native_temporal_sample.hlsl",macros,"main",&code,&error);if(error)error->Release();ck(hr);D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={code->GetBufferPointer(),code->GetBufferSize()};ck(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso)));code->Release();
  }
  void Record(ID3D12GraphicsCommandList*c){
   if(!pso||!c)throw std::runtime_error("temporal sampler not created");if(recorded)transition(c,true);

@@ -1,4 +1,5 @@
 #pragma once
+#include "native_pso.h"
 #include "native_pinned_resource.h"
 #include "native_resident_table.h"
 #include "native_preblock_runtime.h"
@@ -48,10 +49,10 @@ public:
   }
   D3D12_ROOT_PARAMETER parameters[4]{};parameters[0].ParameterType=parameters[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;parameters[1].Descriptor.ShaderRegister=1;parameters[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_UAV;parameters[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;parameters[3].Constants={0,0,5};
   D3D12_ROOT_SIGNATURE_DESC desc{};desc.NumParameters=4;desc.pParameters=parameters;ID3DBlob*blob=nullptr,*error=nullptr;Check(D3D12SerializeRootSignature(&desc,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&error));Check(d->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));blob->Release();if(error)error->Release();error=nullptr;
-  if(wave_head){blob=nullptr;Check(D3DReadFileToBlob(wave_file(L"native_head_pool").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pool_pso));blob->Release();Check(hr);}
+  if(wave_head){blob=nullptr;Check(D3DReadFileToBlob(wave_file(L"native_head_pool").c_str(),&blob));D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};auto hr=NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pool_pso));blob->Release();Check(hr);}
   auto channel_text=std::to_string(channels);D3D_SHADER_MACRO macros[]={{"CHANNELS",channel_text.c_str()},{nullptr,nullptr}};
   auto path=dir+(c64_raw?L"\\native_c64_ds.hlsl":L"\\native_c32_ds.hlsl");auto hr=wave_head?D3DReadFileToBlob(wave_file(L"native_wave_head_project").c_str(),&blob):wave_c32?D3DReadFileToBlob((dir+L"\\native_wave_c32_ds.cso").c_str(),&blob):D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,"main","cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,&blob,&error);
-  if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"DS shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(d->CreateComputePipelineState(&pd,IID_PPV_ARGS(&pso)));blob->Release();
+  if(FAILED(hr)){std::string message=error?std::string(static_cast<const char*>(error->GetBufferPointer()),error->GetBufferSize()):"DS shader failed";if(error)error->Release();throw std::runtime_error(message);}if(error)error->Release();D3D12_COMPUTE_PIPELINE_STATE_DESC pd{};pd.pRootSignature=root;pd.CS={blob->GetBufferPointer(),blob->GetBufferSize()};Check(NativeCreateComputePipelineState(d,&pd,IID_PPV_ARGS(&pso)));blob->Release();
  }
  void Record(ID3D12GraphicsCommandList*c){if(recorded)Barrier(c,true);
  if(wave_head){

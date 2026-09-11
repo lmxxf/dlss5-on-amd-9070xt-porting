@@ -1,4 +1,5 @@
 #pragma once
+#include <windows.h>
 #include <d3dcompiler.h>
 #include <fstream>
 #include <iterator>
@@ -56,6 +57,20 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
   HRESULT hr=D3DCreateBlob(found->second.size(),code);if(FAILED(hr))return hr;
   std::memcpy((*code)->GetBufferPointer(),found->second.data(),found->second.size());state.hits++;return S_OK;
  }
+ /* On-disk copy of the process cache (DLSS5_SHADER_DISK_CACHE=0 disables): <shader dir>\shader-cache\<fnv1a-64 of the key>.dxbc.
+    The key is the full source + entry + macros (+ the snapshotted include), so an edited source never hits a stale blob. The ViT
+    QKV "normalize" entry alone costs fxc 2.5 s per process; with the cache the six runtime compiles are file reads (DevHistory 09-11). */
+ const wchar_t*disk_flag=_wgetenv(L"DLSS5_SHADER_DISK_CACHE");const bool disk=!(disk_flag&&!wcscmp(disk_flag,L"0"));
+ std::wstring disk_path;
+ if(disk){
+  unsigned long long h=1469598103934665603ull;for(unsigned char c:key){h^=c;h*=1099511628211ull;}
+  auto slash=path.find_last_of(L"/\\");std::wstring cache_dir=(slash==std::wstring::npos?L"":path.substr(0,slash+1))+L"shader-cache";
+  CreateDirectoryW(cache_dir.c_str(),nullptr);wchar_t name[32];swprintf(name,32,L"\\%016llx.dxbc",h);disk_path=cache_dir+name;
+  std::ifstream cached(disk_path.c_str(),std::ios::binary|std::ios::ate);
+  if(cached){auto n=cached.tellg();if(n>0){std::vector<unsigned char>bytes;bytes.resize((size_t)n);cached.seekg(0);if(cached.read(reinterpret_cast<char*>(bytes.data()),n)){
+   HRESULT hr=D3DCreateBlob(bytes.size(),code);if(FAILED(hr))return hr;std::memcpy((*code)->GetBufferPointer(),bytes.data(),bytes.size());
+   state.entries.emplace(key,std::move(bytes));state.hits++;return S_OK;}}}
+ }
  const bool progress=_wgetenv(L"DLSS5_SHADER_PROGRESS")!=nullptr;
  auto started=std::chrono::steady_clock::now();
  if(progress){std::fprintf(stderr,"shader_compile_begin index=%zu entry=%s path=%ls\n",state.compiles+1,entry,path.c_str());std::fflush(stderr);}
@@ -65,6 +80,8 @@ inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACR
   return D3DCompileFromFile(path.c_str(),macros,D3D_COMPILE_STANDARD_FILE_INCLUDE,entry,"cs_5_1",D3DCOMPILE_OPTIMIZATION_LEVEL3,0,code,errors);
  }
  if(progress){auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();std::fprintf(stderr,"shader_compile_end index=%zu ms=%lld hr=0x%08x\n",state.compiles,(long long)ms,unsigned(hr));std::fflush(stderr);}
- if(SUCCEEDED(hr)){auto*begin=static_cast<const unsigned char*>((*code)->GetBufferPointer());state.entries.emplace(std::move(key),std::vector<unsigned char>(begin,begin+(*code)->GetBufferSize()));}
+ if(SUCCEEDED(hr)){auto*begin=static_cast<const unsigned char*>((*code)->GetBufferPointer());std::vector<unsigned char>bytes(begin,begin+(*code)->GetBufferSize());
+  if(disk&&!dependency.unknown){std::ofstream out(disk_path.c_str(),std::ios::binary);if(out)out.write(reinterpret_cast<const char*>(bytes.data()),std::streamsize(bytes.size()));}
+  state.entries.emplace(std::move(key),std::move(bytes));}
  return hr;
 }
