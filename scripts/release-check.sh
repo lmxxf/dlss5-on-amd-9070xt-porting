@@ -21,8 +21,8 @@ ssh "$host" "powershell -Command \"Get-ChildItem '$work-cso' -Filter *.cso | % {
 n=$(grep -c . "$tmp/cso.txt" || true);total=$(grep -c "^compiled" "$tmp/compile.log" || true)
 if [ "$n" = "0" ]; then echo "shaders: every compiled .cso matches the game assets"; else echo "shaders: $n differ from the game assets:"; cat "$tmp/cso.txt"; fail=1; fi
 echo "== 2. flags"
-ssh "$host" "type $lab\\native-game-flags.txt" | tr -d "\r" | sed "s/[[:space:]]*$//" | grep -v '^DLSS5_DEBUG_DUMPS\|^DLSS5_RESERVE_VRAM_MB\|^DLSS5_BLACK_PROBE\|^DLSS5_GAME_PROBE\|^$' | sort >"$tmp/game.txt"
-sed "s/[[:space:]]*$//" "$root/scripts/game-flags.txt" | grep -v '^DLSS5_DEBUG_DUMPS\|^DLSS5_RESERVE_VRAM_MB\|^DLSS5_BLACK_PROBE\|^DLSS5_GAME_PROBE\|^$' | sort >"$tmp/repo.txt"
+ssh "$host" "type $lab\\native-game-flags.txt" | tr -d "\r" | sed "s/[[:space:]]*$//" | grep -v '^DLSS5_DEBUG_DUMPS\|^DLSS5_RESERVE_VRAM_MB\|^DLSS5_BLACK_PROBE\|^DLSS5_GAME_PROBE\|^DLSS5_DEBUG_TINT\|^$' | sort >"$tmp/game.txt"
+sed "s/[[:space:]]*$//" "$root/scripts/game-flags.txt" | grep -v '^DLSS5_DEBUG_DUMPS\|^DLSS5_RESERVE_VRAM_MB\|^DLSS5_BLACK_PROBE\|^DLSS5_GAME_PROBE\|^DLSS5_DEBUG_TINT\|^$' | sort >"$tmp/repo.txt"
 if diff -q "$tmp/repo.txt" "$tmp/game.txt" >/dev/null; then echo "flags: scripts/game-flags.txt == the flag file the game reads"; else echo "flags: DIFFER (< repo, > game):"; diff "$tmp/repo.txt" "$tmp/game.txt"; fail=1; fi
 echo "== 3. add-on"
 bash "$here/build-addon-oneclick.sh" "$tmp/check.addon64" >"$tmp/addon.log" 2>&1 || { echo "add-on build FAILED"; tail -3 "$tmp/addon.log"; fail=1; }
