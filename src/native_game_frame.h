@@ -157,10 +157,11 @@ public:
   try{
    resources->submit.Create(queue);auto*d=resources->submit.Device();resources->queue=queue;
    {const wchar_t*pf=_wgetenv(L"DLSS5_GAME_PROBE");resources->probe_on=pf&&!wcscmp(pf,L"1");if(resources->probe_on)resources->probe.Create(d);}
-   {const wchar_t*ov=_wgetenv(L"DLSS5_OVERLAP");if(ov&&wcscmp(ov,L"0")&&wcscmp(ov,L"1"))throw std::runtime_error("invalid overlap flag");resources->overlap=ov&&!wcscmp(ov,L"1");
+   {const wchar_t*ov=_wgetenv(L"DLSS5_OVERLAP");if(ov&&wcscmp(ov,L"0")&&wcscmp(ov,L"1")&&wcscmp(ov,L"2"))throw std::runtime_error("invalid overlap flag");resources->overlap=ov&&wcscmp(ov,L"0");
     if(resources->overlap){
      if(!resources->submit.Deferred())throw std::runtime_error("overlap needs DLSS5_TEST_ASYNC_SUBMIT=1");
-     D3D12_COMMAND_QUEUE_DESC qd{};qd.Type=D3D12_COMMAND_LIST_TYPE_COMPUTE;if(FAILED(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&resources->compute_queue))))throw std::runtime_error("overlap compute queue");
+     /* 2 = the compute queue at HIGH priority (the network first, the game's graphics fill the gaps) */
+     D3D12_COMMAND_QUEUE_DESC qd{};qd.Type=D3D12_COMMAND_LIST_TYPE_COMPUTE;qd.Priority=!wcscmp(ov,L"2")?D3D12_COMMAND_QUEUE_PRIORITY_HIGH:D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;if(FAILED(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&resources->compute_queue))))throw std::runtime_error("overlap compute queue");
      resources->compute.Create(resources->compute_queue);
      auto cd=source->GetDesc();cd.Flags=D3D12_RESOURCE_FLAG_NONE;D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;
      if(FAILED(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&cd,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,nullptr,IID_PPV_ARGS(&resources->original_copy))))throw std::runtime_error("overlap original copy");
