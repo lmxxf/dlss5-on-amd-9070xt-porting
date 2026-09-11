@@ -44,8 +44,8 @@ class NativeGameOneShot {
   auto*task=static_cast<Init*>(data);auto*self=task->self;
   try{
    std::wstring noise_file=NativeLabPath(L"native-game-tiled-assets\\noise.f32");if(GetFileAttributesW(noise_file.c_str())==INVALID_FILE_ATTRIBUTES)noise_file=NativeLabPath(L"matrix-probe\\native-runtime-rgb512\\functions.f32");const wchar_t*noise_path=noise_file.c_str();
-   std::ifstream f(noise_path,std::ios::binary|std::ios::ate);if(!f||f.tellg()!=201326592)throw std::runtime_error("one-shot noise size");
-   std::vector<float>noise(201326592/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(noise.data()),201326592))throw std::runtime_error("one-shot noise read");
+   std::vector<char>noise_bytes;if(!NativeReadFile(noise_file,noise_bytes)||noise_bytes.size()!=201326592)throw std::runtime_error("one-shot noise size");
+   std::vector<float>noise(201326592/4);std::memcpy(noise.data(),noise_bytes.data(),201326592);noise_bytes.clear();noise_bytes.shrink_to_fit();
    self->frame=new NativeGameFrame;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
    Log("build_mode","tiled verification; separate assets; reset-history only");

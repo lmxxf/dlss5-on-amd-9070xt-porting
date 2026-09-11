@@ -1,4 +1,9 @@
 #pragma once
+#include <cwctype>
+#include <algorithm>
+#include <thread>
+#include <mutex>
+#include <map>
 #include "native_pso.h"
 #include <dxgi.h>
 /* Typeless game textures (Rise of the Ronin's XeSS output is R16G16B16A16_TYPELESS, its velocity R16G16_TYPELESS): views use the float format. */
@@ -35,13 +40,45 @@ inline const std::wstring&NativeLabRoot(){
 }
 inline std::wstring NativeLabPath(const wchar_t*relative){std::wstring p=NativeLabRoot();p+=L"\\";p+=relative;return p;}
 inline float NativeHalfToFloat(uint16_t h){uint32_t s=(h&0x8000u)<<16,e=(h>>10)&31u,m=h&1023u;uint32_t b;if(e==0){if(m==0)b=s;else{int sh=0;while(!(m&0x400u)){m<<=1;sh++;}m&=0x3ffu;b=s|((113u-sh)<<23)|(m<<13);}}else if(e==31)b=s|0x7f800000u|(m<<13);else b=s|((e+112u)<<23)|(m<<13);float f;std::memcpy(&f,&b,4);return f;}
+/* Weight prefetch: the add-on's worker starts NativePrefetchWeights(assets dir) as soon as it is loaded, so the ~750MB of weight and
+   noise files are already in memory when the user activates the network minutes later (Magpie) -- the file reads were ~4.5 s of the
+   10 s take-over on a cold cache (DevHistory 09-11). NativeReadFile takes a prefetched file out of the cache (no double memory) or
+   reads it from disk when it was not prefetched. A read that races the prefetch thread on the same file simply reads the disk. */
+struct NativePrefetchState{std::mutex mutex;std::map<std::wstring,std::vector<char>>files;bool running{};};
+inline NativePrefetchState&NativePrefetch(){static NativePrefetchState state;return state;}
+inline std::wstring NativePrefetchKey(const std::wstring&path){std::wstring k=path;for(auto&c:k)c=towlower(c);return k;}
+inline bool NativeReadFile(const std::wstring&path,std::vector<char>&out){
+ {auto&p=NativePrefetch();std::lock_guard<std::mutex>lock(p.mutex);auto it=p.files.find(NativePrefetchKey(path));if(it!=p.files.end()){out=std::move(it->second);p.files.erase(it);NativeInitTick("    read: prefetch hit");return true;}}
+ NativeInitTick("    read: prefetch miss");
+ std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)return false;auto n=f.tellg();if(n<0)return false;out.resize(size_t(n));f.seekg(0);
+ return n==0||bool(f.read(out.data(),n));
+}
+inline void NativePrefetchWeights(const std::wstring&dir){
+ auto&p=NativePrefetch();{std::lock_guard<std::mutex>lock(p.mutex);if(p.running)return;p.running=true;}
+ std::thread([dir]{
+  auto&p=NativePrefetch();WIN32_FIND_DATAW fd{};HANDLE h=FindFirstFileW((dir+L"\\*").c_str(),&fd);
+  if(h!=INVALID_HANDLE_VALUE){do{
+   if(fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)continue;std::wstring name=fd.cFileName;auto dot=name.find_last_of(L'.');std::wstring ext=dot==std::wstring::npos?L"":name.substr(dot);for(auto&c:ext)c=towlower(c);
+   if(ext!=L".f32"&&ext!=L".f16"&&ext!=L".i32")continue;
+   std::wstring path=dir+L"\\"+name;std::vector<char>bytes;std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);if(!f)continue;auto n=f.tellg();if(n<=0)continue;bytes.resize(size_t(n));f.seekg(0);if(!f.read(bytes.data(),n))continue;
+   std::lock_guard<std::mutex>lock(p.mutex);p.files.emplace(NativePrefetchKey(path),std::move(bytes));
+  }while(FindNextFileW(h,&fd));FindClose(h);}
+  std::lock_guard<std::mutex>lock(p.mutex);p.running=false;
+ }).detach();
+}
+inline void NativePrefetchRelease(){auto&p=NativePrefetch();std::lock_guard<std::mutex>lock(p.mutex);p.files.clear();}
 inline std::vector<float>NativeReadF32(const std::wstring&path,const char*what){
  NativeInitTick("    read: enter");
- std::ifstream f(path.c_str(),std::ios::binary|std::ios::ate);
- if(f){auto n=f.tellg();if(n<=0||size_t(n)%4)throw std::runtime_error(std::string(what)+" size");std::vector<float>v(size_t(n)/4);f.seekg(0);if(!f.read(reinterpret_cast<char*>(v.data()),n))throw std::runtime_error(std::string(what)+" truncated");NativeInitTick("    read: f32 file");return v;}
+ std::vector<char>bytes;
+ if(NativeReadFile(path,bytes)){if(bytes.empty()||bytes.size()%4)throw std::runtime_error(std::string(what)+" size");std::vector<float>v(bytes.size()/4);std::memcpy(v.data(),bytes.data(),bytes.size());NativeInitTick("    read: f32 file");return v;}
  if(path.size()>4&&path.compare(path.size()-4,4,L".f32")==0){
-  std::wstring half=path.substr(0,path.size()-4)+L".f16";std::ifstream g(half.c_str(),std::ios::binary|std::ios::ate);
-  if(g){auto n=g.tellg();if(n<=0||size_t(n)%2)throw std::runtime_error(std::string(what)+" half size");std::vector<uint16_t>h(size_t(n)/2);g.seekg(0);if(!g.read(reinterpret_cast<char*>(h.data()),n))throw std::runtime_error(std::string(what)+" half truncated");NativeInitTick("    read: f16 file");std::vector<float>v(h.size());for(size_t i=0;i<h.size();i++)v[i]=NativeHalfToFloat(h[i]);NativeInitTick("    read: f16 expand");return v;}
+  std::wstring half=path.substr(0,path.size()-4)+L".f16";
+  if(NativeReadFile(half,bytes)){if(bytes.empty()||bytes.size()%2)throw std::runtime_error(std::string(what)+" half size");NativeInitTick("    read: f16 file");
+   const size_t n=bytes.size()/2;const uint16_t*h=reinterpret_cast<const uint16_t*>(bytes.data());std::vector<float>v(n);
+   /* expand on several threads: 150M halves single-threaded were ~0.9 s of the take-over */
+   const unsigned workers=n<(1u<<20)?1u:std::min(8u,std::max(1u,std::thread::hardware_concurrency()/2));std::vector<std::thread>pool;
+   for(unsigned w=0;w<workers;w++)pool.emplace_back([&,w]{const size_t a=n*w/workers,b=n*(w+1)/workers;for(size_t i=a;i<b;i++)v[i]=NativeHalfToFloat(h[i]);});
+   for(auto&t:pool)t.join();NativeInitTick("    read: f16 expand");return v;}
  }
  throw std::runtime_error(std::string(what)+" missing");
 }

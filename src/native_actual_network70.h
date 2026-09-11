@@ -73,7 +73,7 @@ public:
   {const wchar_t*bs=_wgetenv(L"DLSS5_BATCH_SUBMITS");if(bs&&wcscmp(bs,L"0")&&wcscmp(bs,L"1")&&wcscmp(bs,L"2"))throw std::runtime_error("invalid batch submits flag");batch_submits=bs?UINT(bs[0]-L'0'):0u;}
   auto&last=decoder.Tail().Last();if(low_raw==1){last.SetSkipFinish(true);last.SetCropNeeded(false);}if(low_raw==2){if(!last.Main8())throw std::runtime_error("post70 low raw 2: block 69 has no main8 finish");last.SetCropNeeded(false);}
   NativeVramLog(d,"decoder");post.Create(d,low_raw==1?last.RawWork():low_raw==2?last.Main8():decoder.Output(),pre.DownOnly()?pre.RawTiles():pre.Main8Mode()?pre.Main8():pre.Main(),rgb_hwc,1920,1152,read(L"post70-scales.f32"),read(L"post70-ffn.f32"),read(L"post70-attention.f32"),read(L"post70-head.f32"),dir,.03125f,post_shift,pre.DownOnly()?6u:pre.Main8Mode()?7u:4u,pre.DownOnly()?pre.WorkWidth():0u,low_raw?last.WorkWidth():0u,low_raw?last.ShiftX():0u,low_raw?last.ShiftY():0u,low_raw==2?9u:8u);NativeVramLog(d,"post70");ready=true;
-  NativeResidentFlush();
+  NativeResidentFlush();NativePrefetchRelease();
  }
  // Caller serializes whole frames and must retain this object after GPU timeout.
  // Input producer MUST already have been submitted to the same queue.
