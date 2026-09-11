@@ -45,6 +45,9 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
     亮度和原图一致。0.09 里暗部皮肤上偶尔闪的 8 像素方块在 0.10 修掉了（硬件 FP8 转换对超范围值不饱和、出 NaN，现在进矩阵前夹到 ±448）。
   - 运动向量来自 Magpie 的光流估计（效果参数 Optical Flow Method 选 AMDOF）；光流在平坦暗部会给出几万像素的垃圾向量，
     插件把超过 64 像素的向量当静止处理（DLSS5-AMD\native-game-flags.txt 的 DLSS5_MOTION_MAX_PX），否则会出现黑色/粉色的方块闪烁。
+  - 强度：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_STRENGTH=<细节>,<颜色>（各 0～1，默认 1,1 = 网络结果全用；
+    0.5,1 就是细节一半原图一半、颜色修正全用）。这是 NVIDIA 面板里"强度"那个滑杆对应的两个混合系数；改完重启 Magpie 生效。
+    风格预设没有：DLL 里的其他网络预设没有提取，本包只有捕获时那一套权重。
   - 停止缩放再激活，插件会重新接管（再等 20 秒）。
   - 日志：DLSS5-AMD\logs\native-game-oneshot.txt（初始化）、native-submission-order.txt（每帧观察）。
   - F6 是本插件的开关键（全局）；如果同一台机器上游戏里也装了本插件的游戏版，两边会一起切。

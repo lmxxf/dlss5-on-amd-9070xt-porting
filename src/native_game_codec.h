@@ -72,7 +72,11 @@ public:
   if(!c||!pso||before.size()!=count||(paper_white!=1.f&&paper_white!=.5f&&paper_white!=2.f))throw std::runtime_error("codec unverified record contract");
   if(recorded)transition(c,output,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
   for(UINT i=0;i<count;i++)transition(c,source[i],before[i],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-  uint32_t words[16]={1920,1080,1920,1080,0,0,1920,1080,0,0x3f800000,0x3f800000,1};std::memcpy(words+8,&paper_white,4);
+  /* DLSS5_STRENGTH=<transfer>,<color> (0..1 each, default 1,1): the two blend factors of the captured output composition -- the network
+     result is lerped against the original frame (TransferStrength: luminance/detail) and its OkLab colour correction (ColorStrength).
+     This is the "intensity" of the NVIDIA app; a lower value keeps more of the original picture. Unset = the captured 1,1. */
+  static const std::array<float,2>strength=[]{std::array<float,2>v{1.f,1.f};if(const wchar_t*e=_wgetenv(L"DLSS5_STRENGTH")){float a=1.f,b=1.f;if(swscanf(e,L"%f,%f",&a,&b)==2&&a>=0.f&&a<=1.f&&b>=0.f&&b<=1.f){v[0]=a;v[1]=b;}}return v;}();
+  uint32_t words[16]={1920,1080,1920,1080,0,0,1920,1080,0,0x3f800000,0x3f800000,1};std::memcpy(words+8,&paper_white,4);std::memcpy(words+9,&strength[0],4);std::memcpy(words+10,&strength[1],4);
   c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootDescriptorTable(0,heap->GetGPUDescriptorHandleForHeapStart());c->SetComputeRoot32BitConstants(1,16,words,0);c->Dispatch(120,68,1);
   transition(c,output,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
   for(UINT i=0;i<count;i++)transition(c,source[i],D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,before[i]);recorded=true;
