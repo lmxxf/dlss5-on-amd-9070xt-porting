@@ -1,3 +1,7 @@
+#include "native_text_overlay.h"
+#include <mutex>
+#include <string>
+#include "native_game_submission.h"
 #include "native_lab_paths.h"
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -45,6 +49,22 @@ static ExecuteLists original_execute{};
 static std::atomic<bool>execute_install_attempted{};
 static std::atomic<unsigned>native_batches{};
 static constexpr GUID UnwrappedObject={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,0x9c,0xd3,0x7a,0x1b,0x42}};
+#ifdef NATIVE_ORDER_NEURAL
+/* on-screen notice (native_text_overlay.h): the upscaler hook decides the text per frame; the notice is drawn from the ExecuteCommandLists hook
+   on our own command list right after the game's batch (never recorded into the game's list: doing that crashed D3D12Core in Magpie). */
+static NativeTextOverlay text_overlay;static std::mutex notice_mutex;static std::string notice_text;static ID3D12Resource*notice_target=nullptr;static unsigned notice_frame=0;
+static void draw_pending_notice(ID3D12CommandQueue*q){
+ std::string text;ID3D12Resource*target=nullptr;
+ {std::lock_guard<std::mutex>g(notice_mutex);if(notice_frame&&notice_frame==frames.load()&&notice_target){text=notice_text;target=notice_target;target->AddRef();}notice_frame=0;}
+ if(!target)return;
+ static NativeGameSubmission*submit=nullptr;static ID3D12CommandQueue*submit_queue=nullptr;
+ try{
+  if(submit_queue!=q){delete submit;submit=nullptr;submit_queue=nullptr;submit=new NativeGameSubmission;submit->Create(q,false);submit_queue=q;}
+  submit->Submit([&](ID3D12GraphicsCommandList*c){text_overlay.Draw(c,target,text.c_str(),24,96);});
+ }catch(const std::exception&e){static std::atomic<bool>logged{false};if(!logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu notice_submit_failed error=%s\n",GetCurrentProcessId(),e.what());fclose(f);}}
+ target->Release();
+}
+#endif
 using Barriers=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,UINT,const D3D12_RESOURCE_BARRIER*);
 static Barriers original_barriers{};
 static std::atomic<bool>barrier_install_attempted{};
@@ -140,6 +160,19 @@ static uint32_t dispatch(void**context,const Header*h){
  }
  if(output.resource)install_native_barriers(list);
  auto result=original(context,h);log("ffx_end",list,nullptr,result);
+#ifdef NATIVE_ORDER_NEURAL
+ /* on-screen notice (native_text_overlay.h): why the picture is not changing -- the input is not 1920x1080 (the network only knows that
+    size; the hook never arms), the network is still initializing, or its initialization failed (developer mode off, wrong driver...) */
+ static const unsigned notice_mode=[]{unsigned v=2;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_NOTICE=%u",&x)==1)v=x;}fclose(f);}return v;}(); /* DLSS5_NOTICE: 0 off, 2 on (1 = pipeline only, test) */
+ if(notice_mode&&output_bytes==sizeof(output)&&output.resource&&output.state==2&&list){
+  static std::atomic<bool>size_logged{false};char notice[80]{};
+  if(output.width!=1920||output.height!=1080){snprintf(notice,sizeof notice,"DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW %uX%u)",output.width,output.height);
+   if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=input_size_unsupported detail=upscaler runs at %ux%u, the network only supports 1920x1080: set the game window to 1920x1080 (Magpie: scale mode = original size)\n",GetCurrentProcessId(),GetTickCount64(),output.width,output.height);fclose(f);}}
+  else{const unsigned ph=neural_oneshot.Phase();if(ph==0)text_overlay.Prepare(static_cast<ID3D12Resource*>(output.resource)); /* pipeline built before the initializer thread starts (same frame arms it) */
+   if(ph==1&&text_overlay.Ready())snprintf(notice,sizeof notice,"DLSS5-AMD: INITIALIZING...");else if(ph==5)snprintf(notice,sizeof notice,"DLSS5-AMD: INIT FAILED - SEE DLSS5-AMD\\LOGS");}
+  if(notice[0]&&notice_mode>=2){std::lock_guard<std::mutex>g(notice_mutex);notice_text=notice;auto*r=static_cast<ID3D12Resource*>(output.resource);if(notice_target!=r){if(notice_target)notice_target->Release();notice_target=r;notice_target->AddRef();}notice_frame=n;}
+ }
+#endif
 #ifdef NATIVE_ORDER_SNAPSHOT
  /* DLSS5_SNAPSHOT_FRAME=<n> in native-game-flags.txt (read here directly: the flag file is applied to the environment only when the network
     initializes, which is what this frame triggers): the upscaler frame that arms the network. Default 120 (the game build); 1 for Magpie. */
@@ -217,6 +250,9 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
  original_execute(q,count,lists);
  // This proves CPU submission returned, NOT GPU completion. No fence is added.
  log("execute_native_return",nullptr,q,count);
+#ifdef NATIVE_ORDER_NEURAL
+ draw_pending_notice(q);
+#endif
 #ifdef NATIVE_ORDER_SNAPSHOT
  if(!snapshot_active){
   PendingSnapshot job{};

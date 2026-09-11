@@ -1,4 +1,4 @@
-DLSS5-AMD 0.11 · Magpie 版
+DLSS5-AMD 0.12 · Magpie 版
 ============================
 
 把 DLSS 5 的神经网络（DLSSNR）跑在 AMD RX 9070 XT（RDNA4）上，以 Magpie 窗口缩放器为载体：
@@ -25,7 +25,8 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
       不需要装 SM 6.10 编译器、HIP、任何 SDK：着色器已经编好在包里。
   2. 本包已含 Magpie 实验分支（https://github.com/SAOG0721/Magpie）。
   3. 显示器分辨率不限，但游戏窗口必须是 1920x1080 无边框，Magpie 缩放选"原始尺寸"（不放大）。
-     网络只认 1920x1080 进、1920x1080 出。
+     网络只认 1920x1080 进、1920x1080 出。尺寸不对时画面左上角会写一行
+     "DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW 2560X1440)" 之类的提示（0.12 起），看到它就去改游戏窗口 / Magpie 缩放模式。
 
 安装（整包版：Magpie 本体已经在里面，解压即用）
 ----
@@ -34,8 +35,9 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
      如果你自己改了配置，要保证：效果组只放 FSR3 -> FSR3_SR、缩放选"原始尺寸"、设置里重复帧检测选"从不"。
   2. 游戏：显示模式无边框窗口，1920x1080。
   3. 在游戏里按 Magpie 的缩放热键（默认 Win+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
-     着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3；
-     初始化完成后帧率会掉到 30 左右，那就是 DLSS 5 接管了。
+     着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3，
+     左上角写着 "DLSS5-AMD: INITIALIZING..."；提示消失、帧率掉到 30 左右，那就是 DLSS 5 接管了。
+     如果提示变成 "INIT FAILED - SEE DLSS5-AMD\LOGS"，八成是开发人员模式没开或驱动不对，看上面"需要"一节。
      再按一次热键停止缩放就是对比。
 
 已知
@@ -50,6 +52,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
     风格预设没有：DLL 里的其他网络预设没有提取，本包只有捕获时那一套权重。
   - 停止缩放再激活，插件会重新接管（再等 20 秒）。
   - 日志：DLSS5-AMD\logs\native-game-oneshot.txt（初始化）、native-submission-order.txt（每帧观察）。
+  - 屏幕提示不想要：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_NOTICE=0。
   - F6 是本插件的开关键（全局）；如果同一台机器上游戏里也装了本插件的游戏版，两边会一起切。
 
 卸载
