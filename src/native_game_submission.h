@@ -44,11 +44,13 @@ public:
   if(event)CloseHandle(event);if(queue)queue->Release();if(device)device->Release();
  }
  // allow_deferred=false: initialization-only users (resident weight copies) stay synchronous and skip the 64-slot ring.
+ // The queue is DIRECT (the game's) or COMPUTE (the frame's own async queue, DLSS5_OVERLAP=1); the lists take the queue's type.
  void Create(ID3D12CommandQueue*q,bool allow_deferred=true){
-  if(queue||!q||q->GetDesc().Type!=D3D12_COMMAND_LIST_TYPE_DIRECT)throw std::runtime_error("DIRECT queue required");
+  if(queue||!q)throw std::runtime_error("queue required");
+  const D3D12_COMMAND_LIST_TYPE type=q->GetDesc().Type;if(type!=D3D12_COMMAND_LIST_TYPE_DIRECT&&type!=D3D12_COMMAND_LIST_TYPE_COMPUTE)throw std::runtime_error("DIRECT or COMPUTE queue required");
   queue=q;queue->AddRef();ck(q->GetDevice(IID_PPV_ARGS(&device)));
-  ck(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));
-  ck(device->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,allocator,nullptr,IID_PPV_ARGS(&commands)));
+  ck(device->CreateCommandAllocator(type,IID_PPV_ARGS(&allocator)));
+  ck(device->CreateCommandList(0,type,allocator,nullptr,IID_PPV_ARGS(&commands)));
   ck(device->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));
   event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("submission event failed");
   const wchar_t*flag=_wgetenv(L"DLSS5_TEST_SUBMISSION_TIMING");if(flag&&wcscmp(flag,L"0")&&wcscmp(flag,L"1"))throw std::runtime_error("invalid submission timing flag");
@@ -56,8 +58,8 @@ public:
   deferred=allow_deferred&&async_flag&&!wcscmp(async_flag,L"1");
   if(deferred&&flag&&!wcscmp(flag,L"1"))throw std::runtime_error("per-submission timing requires synchronous submission");
   if(deferred)for(UINT i=0;i<ring_slots;i++){
-   ck(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&ring_allocators[i])));
-   ck(device->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,ring_allocators[i],nullptr,IID_PPV_ARGS(&ring_lists[i])));
+   ck(device->CreateCommandAllocator(type,IID_PPV_ARGS(&ring_allocators[i])));
+   ck(device->CreateCommandList(0,type,ring_allocators[i],nullptr,IID_PPV_ARGS(&ring_lists[i])));
    ck(ring_lists[i]->Close());
   }
   if(flag&&!wcscmp(flag,L"1")){
@@ -109,5 +111,8 @@ public:
  }
  bool Deferred()const{return deferred;}
  ID3D12Device*Device()const{return device;}
+ /* cross-queue ordering (DLSS5_OVERLAP): this queue waits on the GPU for another submission's fence value before its next Submit */
+ ID3D12Fence*Fence()const{return fence;}
+ void WaitOn(ID3D12Fence*other,UINT64 target){std::lock_guard<std::mutex>guard(mutex);if(!queue||!other||!target)return;ck(queue->Wait(other,target));}
  UINT64 TimestampFrequency()const{UINT64 f=0;ck(queue->GetTimestampFrequency(&f));return f;}
 };

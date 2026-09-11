@@ -130,8 +130,13 @@ class NativeGameFrame {
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
   NativeNetworkTimestamps probe;bool probe_on{};double probe_sum[3]{};double probe_cpu{};unsigned probe_frames{},probe_history{},probe_reset{},probe_nomotion{};
   NativeTemporalFeed feed;NativeTemporalCoordinates coordinates;NativeTemporalSample sampler;ID3D12Resource*reciprocals{};bool temporal{};UINT motion_w{},motion_h{};ID3D12CommandQueue*queue{};
+  /* FAST PATH (DLSS5_OVERLAP=1): the network runs on its own COMPUTE queue, one frame behind. Per frame the game queue delivers the
+     previous frame's result (decode + copy into this frame's target), then captures this frame (original copy, encode, motion) and
+     signals; the compute queue waits for that and runs input -> network -> history -> neural. The game's next frame renders while the
+     network runs. Costs one frame of latency and a 16MB copy of the original (decode composes against the frame the network saw). */
+  NativeGameSubmission compute;ID3D12CommandQueue*compute_queue{};ID3D12Resource*original_copy{};bool overlap{},have_result{};UINT64 net_value{};
   UINT feed_motion_width()const{return motion_w;}UINT feed_motion_height()const{return motion_h;}ID3D12CommandQueue*submit_queue()const{return queue;}
-  ~Resources(){if(reciprocals)reciprocals->Release();}
+  ~Resources(){if(reciprocals)reciprocals->Release();if(original_copy)original_copy->Release();if(compute_queue)compute_queue->Release();}
  };
 public:
  struct TemporalConfig {UINT motion_width{},motion_height{},render_width{},render_height{};};
@@ -152,6 +157,15 @@ public:
   try{
    resources->submit.Create(queue);auto*d=resources->submit.Device();resources->queue=queue;
    {const wchar_t*pf=_wgetenv(L"DLSS5_GAME_PROBE");resources->probe_on=pf&&!wcscmp(pf,L"1");if(resources->probe_on)resources->probe.Create(d);}
+   {const wchar_t*ov=_wgetenv(L"DLSS5_OVERLAP");if(ov&&wcscmp(ov,L"0")&&wcscmp(ov,L"1"))throw std::runtime_error("invalid overlap flag");resources->overlap=ov&&!wcscmp(ov,L"1");
+    if(resources->overlap){
+     if(!resources->submit.Deferred())throw std::runtime_error("overlap needs DLSS5_TEST_ASYNC_SUBMIT=1");
+     D3D12_COMMAND_QUEUE_DESC qd{};qd.Type=D3D12_COMMAND_LIST_TYPE_COMPUTE;if(FAILED(d->CreateCommandQueue(&qd,IID_PPV_ARGS(&resources->compute_queue))))throw std::runtime_error("overlap compute queue");
+     resources->compute.Create(resources->compute_queue);
+     auto cd=source->GetDesc();cd.Flags=D3D12_RESOURCE_FLAG_NONE;D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;
+     if(FAILED(NativeCreateCommittedResource(d,&hp,D3D12_HEAP_FLAG_NONE,&cd,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,nullptr,IID_PPV_ARGS(&resources->original_copy))))throw std::runtime_error("overlap original copy");
+     NativeGameFrameStep("overlap",d);
+    }}
    NativeGameFrameStep("encode",d);resources->encode.Create(d,{source},directory);
    resources->original=source;
    NativeGameFrameStep("input",d);resources->input.Create(d,resources->encode.Output(),directory);
@@ -181,7 +195,7 @@ public:
    if(resources->temporal)resources->history_guard.Create(d,resources->sampler.Output(),resources->input.PostBase(),directory);
    resources->black.Create(d,resources->network.Output(),1920*1080,directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
-   NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),source},directory);NativeGameFrameStep("ready",d);ready=true;
+   NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),resources->overlap?resources->original_copy:source},directory);NativeGameFrameStep("ready",d);ready=true;
   }catch(...){failed=true;throw;}
  }
  void RebindSourceAfterCompletion(ID3D12Resource*source){
@@ -190,7 +204,7 @@ public:
   std::lock_guard<std::mutex>guard(mutex);
   if(!ready||failed||!source)throw std::runtime_error("frame rebind unavailable");
   if(source==resources->original)return;
-  try{resources->encode.RebindInputAfterCompletion(0,source);resources->decode.RebindInputAfterCompletion(2,source);resources->original=source;}
+  try{resources->encode.RebindInputAfterCompletion(0,source);if(!resources->overlap)resources->decode.RebindInputAfterCompletion(2,source);resources->original=source;}
   catch(...){failed=true;throw;}
  }
  // Synchronizes encode -> network -> FP16 bridge -> decode -> FP16 copy on the
@@ -222,6 +236,56 @@ private:
   auto color=NativeReadSubmittedFrame(r.submit_queue(),r.encode.Output(),D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
   FILE*f=_wfopen((prefix+L"-color.rgba16f").c_str(),L"wb");if(f){fwrite(color.data(),1,color.size(),f);fclose(f);}
  }
+ /* DLSS5_OVERLAP=1 frame (see Resources): game queue = deliver previous result + capture this frame; compute queue = the network.
+    Hand-offs are in NON_PIXEL_SHADER_RESOURCE on both sides; encode/motion/original_copy are rewritten only after the compute queue
+    finished the previous frame (game queue waits on net_value), and the compute queue reads them only after the capture (waits on
+    the game queue's fence). Dumps and the black-probe dump are not supported here (the flag is diagnostic); the probe measures the
+    compute part (pre = input/sampler, network, post = history/neural) and, like the synchronous probe, waits every frame. */
+ void ProcessOverlap(Resources&r,ID3D12Resource*target,D3D12_RESOURCE_STATES source_state,D3D12_RESOURCE_STATES target_state,UINT seed,bool temporal_enabled,ID3D12Resource*motion_texture,bool reset,bool use_history){
+  dump_prefix.clear();
+  if(r.black.enabled)r.black.Poll(r.compute.Completed());
+  const auto cpu_start=std::chrono::steady_clock::now();
+  r.submit.WaitOn(r.compute.Fence(),r.net_value);
+  r.submit.Submit([&](ID3D12GraphicsCommandList*c){
+   D3D12_RESOURCE_BARRIER b[2]{};for(auto&v:b)v.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+   /* 1. decode the previous frame's result into our buffer (reads proxy/neural/original of that frame, all still intact) */
+   if(r.have_result)r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE});
+   /* 2. capture this frame from the untouched target: the original for its later decode, the encoded proxy, this frame's motion */
+   b[0].Transition={target,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,source_state,D3D12_RESOURCE_STATE_COPY_SOURCE};
+   b[1].Transition={r.original_copy,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_DEST};
+   if(source_state!=D3D12_RESOURCE_STATE_COPY_SOURCE)c->ResourceBarrier(1,b);c->ResourceBarrier(1,b+1);
+   c->CopyResource(r.original_copy,target);
+   for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
+   if(source_state!=D3D12_RESOURCE_STATE_COPY_SOURCE)c->ResourceBarrier(1,b);c->ResourceBarrier(1,b+1);
+   r.encode.Record(c,{source_state});
+   if(use_history)r.feed.RecordMotion(c,motion_texture);
+   /* 3. deliver the previous frame's result into the target */
+   if(r.have_result){
+    b[0].Transition={r.decode.Output(),D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE};
+    b[1].Transition={target,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,target_state,D3D12_RESOURCE_STATE_COPY_DEST};
+    c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
+    if(r.decode.BufferOutput()){D3D12_TEXTURE_COPY_LOCATION dst{},src{};dst.pResource=target;dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;src.pResource=r.decode.Output();src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint.Footprint=r.decode.BufferFootprint();c->CopyTextureRegion(&dst,0,0,0,&src,nullptr);}
+    else c->CopyResource(target,r.decode.Output());
+    for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
+    c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
+   }
+  });
+  const UINT64 captured=r.submit.LastValue();
+  r.compute.WaitOn(r.submit.Fence(),captured);
+  if(r.probe_on)r.probe.Reset();
+  r.compute.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+   if(use_history){r.coordinates.Record(c);r.sampler.Record(c);r.history_guard.Record(c);}if(r.probe_on)r.probe.Mark(c,"t1");});
+  r.network.Run(r.compute,seed,r.temporal?use_history:temporal_enabled);
+  r.compute.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
+   if(use_history)r.smooth.Record(c);r.black.Record(c);
+   if(r.temporal)r.feed.RecordHistory(c);
+   r.neural.Record(c);if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}});
+  r.net_value=r.compute.LastValue();r.have_result=true;r.black.Submitted(r.net_value);
+  if(r.probe_on){r.compute.Flush();std::vector<double>iv;if(r.probe.Intervals(r.compute.TimestampFrequency(),iv)&&iv.size()==3){for(int i=0;i<3;i++)r.probe_sum[i]+=iv[i];}
+   r.probe_cpu+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-cpu_start).count();
+   if(use_history)r.probe_history++;if(reset)r.probe_reset++;if(!motion_texture)r.probe_nomotion++;
+   if(++r.probe_frames%100==0){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-probe.txt").c_str(),L"ab")){fprintf(f,"frames=%u avg_ms pre=%.2f network=%.2f post=%.2f gpu_total=%.2f cpu_frame=%.2f history=%u reset=%u nomotion=%u overlap=1\n",r.probe_frames,r.probe_sum[0]/100,r.probe_sum[1]/100,r.probe_sum[2]/100,(r.probe_sum[0]+r.probe_sum[1]+r.probe_sum[2])/100,r.probe_cpu/100,r.probe_history,r.probe_reset,r.probe_nomotion);fclose(f);}for(auto&v:r.probe_sum)v=0;r.probe_cpu=0;r.probe_history=r.probe_reset=r.probe_nomotion=0;}}
+ }
 public:
  // motion_texture: this frame's FSR motion vectors (compute-read state). reset: FFX reset flag.
  // History is the previous processed frame's network output; the first frame and reset frames run without it.
@@ -238,6 +302,7 @@ public:
    const bool use_history=r.temporal&&motion_texture&&!reset&&r.feed.HasHistory();
    {static unsigned every=[]{const wchar_t*v=_wgetenv(L"DLSS5_MAKE_RESIDENT_EVERY");return v?unsigned(wcstoul(v,nullptr,10)):0u;}();static unsigned frames=0;static unsigned fails=0;
     if(every&&++frames%every==0){HRESULT mr=NativeMakeAllResident(r.submit.Device());if(FAILED(mr)&&++fails<=5)if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu make_resident_failed hr=%08x tracked=%u\n",GetCurrentProcessId(),unsigned(mr),unsigned(NativeTrackedResources().size()));fclose(f);}}}
+   if(r.overlap){ProcessOverlap(r,target,source_state,target_state,seed,temporal_enabled,motion_texture,reset,use_history);return;}
    if(r.black.enabled){const UINT bad=r.black.Poll(r.submit.Completed());if(bad!=UINT_MAX){r.submit.Flush();const std::wstring prefix=NativeLabPath((L"logs\\black-"+std::to_wstring(bad)).c_str());
      auto*dev=r.submit.Device();D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_READBACK;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=r.black.RingBytes();rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
      ID3D12Resource*rb=nullptr;if(SUCCEEDED(NativeCreateCommittedResource(dev,&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_COPY_DEST,nullptr,IID_PPV_ARGS(&rb)))){r.submit.Submit([&](ID3D12GraphicsCommandList*c){c->CopyBufferRegion(rb,0,r.black.RingSlot(bad),0,r.black.RingBytes());});r.submit.Flush();void*p=nullptr;D3D12_RANGE range{0,SIZE_T(r.black.RingBytes())},none{};if(SUCCEEDED(rb->Map(0,&range,&p))){if(FILE*f=_wfopen((prefix+L"-residual.f32").c_str(),L"wb")){fwrite(p,1,size_t(r.black.RingBytes()),f);fclose(f);}rb->Unmap(0,&none);}rb->Release();}
