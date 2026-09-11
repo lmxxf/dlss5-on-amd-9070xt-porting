@@ -80,6 +80,12 @@ void ffn_fused(uint first,uint t,uint ebase,uint pbase,uint hbase,out C out0,out
   GroupMemoryBarrier();
   in0=C16::Load(ex,ebase,32,dx::linalg::MatrixLayout::RowMajor).Cast<dx::linalg::ComponentType::F32>();in1=C16::Load(ex,ebase+16,32,dx::linalg::MatrixLayout::RowMajor).Cast<dx::linalg::ComponentType::F32>();
  }
+#if NATIVE_C32_SAT_CAST
+ /* FIX (DLSS5_C32_SAT_CAST): the hardware E4M3 cast does not saturate -- a residual value beyond +-448 becomes NaN, the NaN token
+    spreads over its 8x8 attention window and the head clamps it to 0 (the black blocks on bright flat skin under Magpie). The exact
+    chain saturates in F(); clamp before every hardware cast of an unbounded value. Bit-identical on the reference fixture. */
+ for(uint si=0;si<in0.Length();si++){in0.Set(si,clamp(in0.Get(si),-448.0,448.0));in1.Set(si,clamp(in1.Get(si),-448.0,448.0));}
+#endif
  in0.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
  in1.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+4,8,dx::linalg::MatrixLayout::RowMajor);
  GroupMemoryBarrier();
@@ -89,7 +95,11 @@ void ffn_fused(uint first,uint t,uint ebase,uint pbase,uint hbase,out C out0,out
   [unroll]for(uint block=half*4;block<half*4+4;block++){
    B8 b=B8::Load(ffn_weights,20608+block*16*32,32,dx::linalg::MatrixLayout::ColMajor,16);
    C h=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(a,b);
+#if NATIVE_C32_SAT_CAST
+   for(uint i=0;i<h.Length();i++)h.Set(i,clamp(ffn_activate(h.Get(i)),-448.0,448.0));
+#else
    for(uint i=0;i<h.Length();i++)h.Set(i,ffn_activate(h.Get(i)));
+#endif
    h.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,hbase+(block%4)*4,16,dx::linalg::MatrixLayout::RowMajor);
   }
   GroupMemoryBarrier();

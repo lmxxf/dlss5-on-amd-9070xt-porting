@@ -44,6 +44,9 @@ RWByteAddressBuffer aux:register(u1);
 #ifndef NATIVE_C32_EPILOGUE
 #define NATIVE_C32_EPILOGUE 0
 #endif
+#ifndef NATIVE_C32_SAT_CAST
+#define NATIVE_C32_SAT_CAST 0 /* saturate before hardware E4M3 casts (see native_c32_ffn_fused.hlsli) */
+#endif
 #ifndef NATIVE_C32_EPILOGUE_EXACT_HEAD
 #define NATIVE_C32_EPILOGUE_EXACT_HEAD 0
 #endif
@@ -319,6 +322,9 @@ groupshared float16_t ones16[512];
 #endif
 #endif
   C in0=ffn_out[0],in1=ffn_out[1];
+#if NATIVE_C32_SAT_CAST
+  for(uint si=0;si<in0.Length();si++){in0.Set(si,clamp(in0.Get(si),-448.0,448.0));in1.Set(si,clamp(in1.Get(si),-448.0,448.0));}
+#endif
 #else
   C in0=LOAD_IN(qfirst),in1=LOAD_IN1(qfirst);
 #endif
@@ -386,6 +392,9 @@ groupshared float16_t ones16[512];
   }
  }
  GroupMemoryBarrier();
+#if NATIVE_C32_SAT_CAST
+ [unroll]for(uint cc=0;cc<2;cc++)for(uint si=0;si<acc[cc].Length();si++)acc[cc].Set(si,clamp(acc[cc].Get(si),-448.0,448.0)); /* AV output can exceed 448 (P rounds to slightly above 1) */
+#endif
  [unroll]for(uint cc=0;cc<2;cc++)acc[cc].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+cc*4,8,dx::linalg::MatrixLayout::RowMajor);
  GroupMemoryBarrier();
  {
