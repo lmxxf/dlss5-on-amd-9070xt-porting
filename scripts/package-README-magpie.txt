@@ -1,4 +1,4 @@
-DLSS5-AMD 0.10 · Magpie 版
+DLSS5-AMD 0.11 · Magpie 版
 ============================
 
 把 DLSS 5 的神经网络（DLSSNR）跑在 AMD RX 9070 XT（RDNA4）上，以 Magpie 窗口缩放器为载体：
