@@ -295,7 +295,23 @@ uint E4M3(float v){uint b=asuint(v),a=b&0x7fffffffu,sg=(b>>24)&0x80u;if(a==0)ret
 // sums never leave the wave (no partial_sum, no group sync after the Q/K/V store). Scratch is wave-private: ex holds the
 // squares and then the exp tiles (1KB per wave), pw8 holds the input tile, then P, then the E4M3 attention output (1KB per
 // wave). Two group syncs in total: ones16 ready, Q/K/V ready. Numerics as fast3 (row sum accumulated over two K32 MMAs).
-groupshared uint qkv8[128*24];
+/* FAST PATH (DLSS5_BUILD_C32_LDS_SLIM): the wave's Q rows go to its own pw8 slice (free between the input tile and the P tile) instead of
+   qkv8, so qkv8 holds only K and V: 16 uints per token instead of 24. LDS 29696 -> 25600 bytes = 6 groups per 160KB WGP instead of 5
+   (12 waves/SIMD instead of 10). Same values, same instructions otherwise. The fused FFN's hidden-layer scratch (the wave's own qkv8
+   rows) needs exactly 16 uints per token, so it fits the slim layout. */
+#ifndef NATIVE_C32_LDS_SLIM
+#define NATIVE_C32_LDS_SLIM 0
+#endif
+#if NATIVE_C32_LDS_SLIM
+#define QKV_STRIDE 16
+#define QKV_K 0
+#define QKV_V 8
+#else
+#define QKV_STRIDE 24
+#define QKV_K 8
+#define QKV_V 16
+#endif
+groupshared uint qkv8[128*QKV_STRIDE];
 groupshared uint pw8[8*256];
 groupshared float16_t ones16[512];
 #if NATIVE_C32_FUSED_FFN
@@ -315,7 +331,7 @@ groupshared float16_t ones16[512];
 #endif
  if(live){
 #if NATIVE_C32_FUSED_FFN
-  ffn_fused(qfirst,t&31,ebase,pbase,lfirst*24,ffn_out[0],ffn_out[1]);
+  ffn_fused(qfirst,t&31,ebase,pbase,lfirst*QKV_STRIDE,ffn_out[0],ffn_out[1]);
 #if NATIVE_C32_FUSED_FFN_PROBE
   /* test build: the FFN output goes to aux (= raw) in the ffn-buffer layout for a CPU comparison with the standalone FFN; 1 = skip the attention, 2 = continue (a stage whose epilogue writes no raw keeps it) */
   ffn_out[0].Cast<dx::linalg::ComponentType::F16>().Store(aux,(qfirst*32)*2,64,dx::linalg::MatrixLayout::RowMajor,16);ffn_out[1].Cast<dx::linalg::ComponentType::F16>().Store(aux,(qfirst*32+16)*2,64,dx::linalg::MatrixLayout::RowMajor,16);
@@ -351,7 +367,12 @@ groupshared float16_t ones16[512];
    [unroll]for(uint cr=0;cr<2;cr++){for(uint i=0;i<rs.Length();i++)z[h*2+cr].Set(i,z[h*2+cr].Get(i)*(rsqrt(max(rs.Get(i),6.198883056640625e-5))*(h==0?W_SCALE:1)));}
    GroupMemoryBarrier();
   }
+#if NATIVE_C32_LDS_SLIM
+  [unroll]for(uint cr=0;cr<2;cr++){SAT8(z[cr]);z[cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+cr*4,8,dx::linalg::MatrixLayout::RowMajor);} /* Q: the wave's own pw8 slice */
+  [unroll]for(uint part=1;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){SAT8(z[part*2+cr]);z[part*2+cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,lfirst*QKV_STRIDE+(part-1)*8+cr*4,QKV_STRIDE,dx::linalg::MatrixLayout::RowMajor);}
+#else
   [unroll]for(uint part=0;part<3;part++)[unroll]for(uint cr=0;cr<2;cr++){SAT8(z[part*2+cr]);z[part*2+cr].Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(qkv8,lfirst*24+part*8+cr*4,24,dx::linalg::MatrixLayout::RowMajor);}
+#endif
  }
  GroupMemoryBarrierWithGroupSync();
  if(!live)return;
@@ -362,11 +383,15 @@ groupshared float16_t ones16[512];
     accumulators (32 VGPRs) were what pushed the fused kernel to 128 VGPRs and 896 bytes of scratch (DevHistory 09-10 18:00). */
  C rs=C::Splat(0.0f);
  {
+#if NATIVE_C32_LDS_SLIM
+  A8 qa=A8::Load(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+#else
   A8 qa=A8::Load(qkv8,lfirst*24,24,dx::linalg::MatrixLayout::RowMajor);
+#endif
   B ones=B::Load(ones16,0,16,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint g=0;g<2;g++){
    [unroll]for(uint j=0;j<2;j++){const uint kr=g*2+j;
-    B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+    B8 kb=B8::Load(qkv8,(lwin+kr*16)*QKV_STRIDE+QKV_K,QKV_STRIDE,dx::linalg::MatrixLayout::ColMajor);
     C sc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
     for(uint i=0;i<sc.Length();i++){uint2 rc=sc.GetCoordinate(i);sc.Set(i,fast_exp_raw(sc.Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y)));}
     sc.Cast<dx::linalg::ComponentType::F16>().Store(ex,ebase+j*16,32,dx::linalg::MatrixLayout::RowMajor);
@@ -377,7 +402,7 @@ groupshared float16_t ones16[512];
    GroupMemoryBarrier();
   }
   [unroll]for(uint kr=0;kr<4;kr++){
-   B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+   B8 kb=B8::Load(qkv8,(lwin+kr*16)*QKV_STRIDE+QKV_K,QKV_STRIDE,dx::linalg::MatrixLayout::ColMajor);
    C sc=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
    for(uint i=0;i<sc.Length();i++){uint2 rc=sc.GetCoordinate(i);sc.Set(i,fast_exp_raw(sc.Get(i)+W_BIAS(((wave&3)*16+rc.x)*64+kr*16+rc.y))*(1/rs.Get(i)));}
    sc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(pw8,pbase+kr*4,16,dx::linalg::MatrixLayout::RowMajor);
@@ -386,9 +411,13 @@ groupshared float16_t ones16[512];
 #else
  C s[4];
  {
+#if NATIVE_C32_LDS_SLIM
+  A8 qa=A8::Load(pw8,pbase,8,dx::linalg::MatrixLayout::RowMajor);
+#else
   A8 qa=A8::Load(qkv8,lfirst*24,24,dx::linalg::MatrixLayout::RowMajor);
+#endif
   [unroll]for(uint kr=0;kr<4;kr++){
-   B8 kb=B8::Load(qkv8,(lwin+kr*16)*24+8,24,dx::linalg::MatrixLayout::ColMajor);
+   B8 kb=B8::Load(qkv8,(lwin+kr*16)*QKV_STRIDE+QKV_K,QKV_STRIDE,dx::linalg::MatrixLayout::ColMajor);
    s[kr]=dx::linalg::Multiply<dx::linalg::ComponentType::F32>(qa,kb);
 #if NATIVE_C32_BIAS_TILE
    /* FAST PATH (DLSS5_BUILD_C32_BIAS_TILE): the 16x16 block of the [64][64] f32 bias table as one accumulator-layout load instead of
@@ -421,7 +450,7 @@ groupshared float16_t ones16[512];
  [unroll]for(uint g=0;g<2;g++){
   A8 pa=A8::Load(pw8,pbase+g*8,16,dx::linalg::MatrixLayout::RowMajor);
   [unroll]for(uint cc=0;cc<2;cc++){
-   B8 vb=B8::Load(qkv8,(lwin+g*32)*24+16+cc*4,24,dx::linalg::MatrixLayout::RowMajor);
+   B8 vb=B8::Load(qkv8,(lwin+g*32)*QKV_STRIDE+QKV_V+cc*4,QKV_STRIDE,dx::linalg::MatrixLayout::RowMajor);
    acc[cc].MultiplyAccumulate(pa,vb);
   }
  }
