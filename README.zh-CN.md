@@ -2,6 +2,8 @@
 
 [English](README.md)
 
+**下载（Magpie 整包，解压即用，RX 9070/9070 XT）**：0.12 https://pan.quark.cn/s/a5bafe0e2050 （342MB，sha256 160DBD31…）。安装步骤见包内 README，或公众号教程。
+
 把 NVIDIA DLSS 5 的神经渲染器（`nvngx_dlssnr.dll` 里那张 71 块的 Swin/ViT 网络，"DLSSNR"）逐块逆向，用
 Direct3D 12 从零重写成 Shader Model 6.10 wave-matrix（`dx::linalg`）+ FP8（E4M3）的 HLSL 计算着色器，在 AMD RDNA 4
 显卡上跑起来，并通过 ReShade 插件钩住游戏的 FSR dispatch，对 1080p 画面做后处理。

@@ -2,6 +2,8 @@
 
 [中文说明](README.zh-CN.md)
 
+**Download (Magpie bundle, unzip and run, RX 9070 / 9070 XT)**: 0.12 https://pan.quark.cn/s/a5bafe0e2050 (342 MB, sha256 160DBD31…). Setup steps are in the bundle's README.
+
 A from-scratch Direct3D 12 re-implementation of NVIDIA's DLSS 5 neural renderer ("DLSSNR", the 71-block
 Swin/ViT network shipped in `nvngx_dlssnr.dll`) that runs on an AMD RDNA 4 GPU. The network was reverse-engineered
 block by block, re-written as HLSL compute shaders using Shader Model 6.10 wave-matrix (`dx::linalg`) intrinsics with
