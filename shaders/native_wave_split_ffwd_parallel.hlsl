@@ -26,8 +26,13 @@ float SourceAt(int src,uint c){uint a=uint(src)+c;uint b=(input.Load(a&~3u)>>((a
 float SourceAt(int src,uint c){return input[uint(src)+c];}
 #endif
 #endif
+#ifndef NATIVE_SPLIT_FFWD_FP8
+#define NATIVE_SPLIT_FFWD_FP8 0
+#endif
+#if !NATIVE_SPLIT_FFWD_FP8
 groupshared float16_t mixed[16*80],hidden[16*272],tile[512];
 groupshared float temp[256];
+#endif
 #ifndef NATIVE_HW_H
 #define NATIVE_HW_H 0
 #endif
@@ -56,7 +61,64 @@ float Activate(float v){float g=clamp(v,-4.0,4.0),p=g*(abs(g)*(-.055908203125)+.
 #ifndef NATIVE_SPLIT_FFWD_WAVES4
 #define NATIVE_SPLIT_FFWD_WAVES4 0
 #endif
-#if NATIVE_SPLIT_FFWD_WAVES4
+#if NATIVE_SPLIT_FFWD_FP8
+/* FAST PATH (DLSS5_SPLIT_FFWD_FP8): the waves4 kernel with the three matrices on the FP8 wave-matrix path. Every operand already sits
+   on the E4M3 grid (block input = previous block's E4M3 raster, mix/expand outputs = F(H()) / Activate(), weights checked E4M3-exact
+   by the host), so the products are the same; only the accumulation order inside the hardware instruction may differ. Weights are
+   512-byte [k 32][j 16] E4M3 tiles (tile index = (n/16)*(K/32)+k/32); LDS holds E4M3 bytes (row strides 32 / 80 / 272 bytes). */
+#if !(NATIVE_SPLIT_FFWD_WAVES4&&NATIVE_SPLIT_FFWD_TILED&&NATIVE_SPLIT_FFWD8&&NATIVE_SPLIT_MAPPED&&NATIVE_SPLIT_IN8&&NATIVE_FAST_EPILOGUE)
+#error NATIVE_SPLIT_FFWD_FP8 needs the waves4 + tiled + ffwd8 + mapped + in8 fast path
+#endif
+groupshared uint tile8[128],mixed8[16*20],hidden8[16*68];
+[WaveSize(32)]
+[numthreads(128,1,1)]void main(uint3 gid:SV_GroupID,uint3 tid:SV_GroupThreadID){
+ uint first=gid.x*16,t=tid.x;if(first>=width*height)return;
+ using A=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,16,32,dx::linalg::MatrixUse::A,dx::linalg::MatrixScope::Wave>;
+ using B=dx::linalg::Matrix<dx::linalg::ComponentType::F8_E4M3FN,32,16,dx::linalg::MatrixUse::B,dx::linalg::MatrixScope::Wave>;
+ using C=dx::linalg::Matrix<dx::linalg::ComponentType::F32,16,16,dx::linalg::MatrixUse::Accumulator,dx::linalg::MatrixScope::Wave>;
+ const uint group=gid.y,wave=t/32;
+ {
+  C acc=C::Splat(0.0f);
+  /* one uint (4 channels) of one token per thread and K step: token t/8, channels k*32+(t%8)*4 .. +3 */
+  const int row=raster_index(first+t/8);
+  for(uint k=0;k<16;k++){
+   tile8[t]=row<0?0u:input.Load(uint(row)+k*32+(t%8)*4);
+   GroupMemoryBarrierWithGroupSync();
+   A a=A::Load(tile8,0,8,dx::linalg::MatrixLayout::RowMajor);
+   B b=B::Load(weights,((group*4+wave)*16+k)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+   acc.MultiplyAccumulate(a,b);
+   GroupMemoryBarrierWithGroupSync();
+  }
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(mixed8,wave*4,20,dx::linalg::MatrixLayout::RowMajor);
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  [unroll]for(uint j=0;j<4;j++){
+   const uint block=wave*4+j;
+   C acc=C::Splat(0.0f);
+   [unroll]for(uint k=0;k<2;k++){
+    A a=A::Load(mixed8,k*8,20,dx::linalg::MatrixLayout::RowMajor);
+    B b=B::Load(weights,262144+group*16384+(block*2+k)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+    acc.MultiplyAccumulate(a,b);
+   }
+   for(uint i=0;i<acc.Length();i++)acc.Set(i,Activate(H(acc.Get(i))));
+   acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(hidden8,block*4,68,dx::linalg::MatrixLayout::RowMajor);
+  }
+ }
+ GroupMemoryBarrierWithGroupSync();
+ {
+  C acc=C::Splat(0.0f);
+  for(uint k=0;k<8;k++){
+   A a=A::Load(hidden8,k*8,68,dx::linalg::MatrixLayout::RowMajor);
+   B b=B::Load(weights,393216+group*16384+(wave*8+k)*512,16,dx::linalg::MatrixLayout::RowMajor,16);
+   acc.MultiplyAccumulate(a,b);
+  }
+  for(uint i=0;i<acc.Length();i++)acc.Set(i,F(H(acc.Get(i))));
+  acc.Cast<dx::linalg::ComponentType::F8_E4M3FN>().Store(output,((first/16)*16+(group*64+wave*16)/32)*512+((group*64+wave*16)%32),32,dx::linalg::MatrixLayout::RowMajor,16);
+ }
+}
+#elif NATIVE_SPLIT_FFWD_WAVES4
 // FAST PATH: four waves per 16-token group. mix: one 16-column block per wave (all 16 K steps, input tile
 // staged once per K step by the whole group); expand: four hidden blocks per wave; contract: one output block per wave.
 // Same arithmetic as the blocked fast path; only the work split changes (2160-token layers are latency-bound).

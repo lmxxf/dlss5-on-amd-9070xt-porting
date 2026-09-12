@@ -658,6 +658,10 @@ if($env:DLSS5_BUILD_SPLIT_STREAM8 -eq '1'){
  foreach($In8 in 0,1){
   & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 @FfwdBase -D "NATIVE_SPLIT_IN8=$In8" native_wave_split_ffwd_parallel.hlsl -Fo "native_wave_split_ffwd_parallel_stream$(if($In8){'8'}else{'f'}).cso"
   if($LASTEXITCODE -ne 0){throw "split stream FFWD in8=$In8 compilation failed"}
+  if($In8 -and $env:DLSS5_BUILD_SPLIT_FFWD_FP8 -eq '1'){ # DLSS5_SPLIT_FFWD_FP8 (opt-in, measured null 09-12): the same kernel with the three matrices on the FP8 wave-matrix path (E4M3 weight tiles)
+   & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 @FfwdBase -D NATIVE_SPLIT_IN8=1 -D NATIVE_SPLIT_FFWD_FP8=1 native_wave_split_ffwd_parallel.hlsl -Fo native_wave_split_ffwd_parallel_stream8_fp8.cso
+   if($LASTEXITCODE -ne 0){throw 'split stream FFWD fp8 compilation failed'}
+  }
   & $Dxc -I $Inc -T cs_6_10 -E main -HV 2021 -enable-16bit-types -O3 -D MATRIX_CHANNELS=512 -D RAW=0 -D "NATIVE_FAST_ACCUMULATE=$(if($env:DLSS5_FAST_ACCUMULATE -eq '1'){1}else{0})" -D "NATIVE_FP8_OPERANDS=$(if($env:DLSS5_FP8_OPERANDS -eq '1'){1}else{0})" -D "NATIVE_TILED_WEIGHTS=$(if($env:DLSS5_BUILD_SPLIT_TILED -eq '1'){1}else{0})" -D NATIVE_FP8_INPUT=1 -D NATIVE_FP8_INPUT_TILED=1 -D MAP_FEATURE=1 -D "NATIVE_FP8_FEATURE=$In8" -D NATIVE_FP8_STORE=1 -D NATIVE_FP8_STORE_TILED=1 native_wave_project.hlsl -Fo "native_wave_project_stream0$(if($In8){'8'}else{'f'})_c512.cso"
   if($LASTEXITCODE -ne 0){throw "split stream projection 0 in8=$In8 compilation failed"}
  }
