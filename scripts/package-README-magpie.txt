@@ -1,4 +1,4 @@
-DLSS5-AMD 0.13 · Magpie 版
+DLSS5-AMD 0.14 · Magpie 版
 ============================
 
 把 DLSS 5 的神经网络（DLSSNR）跑在 AMD RX 9070 XT（RDNA4）上，以 Magpie 窗口缩放器为载体：
@@ -43,13 +43,13 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
   3. 在游戏里按 Magpie 的缩放热键（默认 Alt+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
      着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3，
      左上角写着 "DLSS5-AMD: INITIALIZING..."；接管后左上角变成 "DLSS5-AMD 37 FPS (26.9 MS)"，就是网络自己的帧率
-     （每 100 帧刷新；不想看就把 native-game-flags.txt 里的 DLSS5_SHOW_FPS=1 删掉）。
+     （数字至少间隔 3 秒刷新；字条复用并随网络输出提交；不想看就把 native-game-flags.txt 里的 DLSS5_SHOW_FPS=1 删掉）。
      如果提示变成 "INIT FAILED - SEE DLSS5-AMD\LOGS"，八成是开发人员模式没开或驱动不对，看上面"需要"一节。
      再按一次热键停止缩放就是对比。
 
 已知
 ----
-  - 每帧约 33~36 ms（网络 24 ms + Magpie 捕获/呈现），30 fps 上下；游戏本身可以照常 60 fps。
+  - 实际帧率随游戏和场景变化；网络一般约 30 fps，启用插帧后显示帧率约为两倍。
   - 输入是显示用的 8 位 sRGB 图（不是游戏内钩子那种线性 HDR 场景色）；插件按 sRGB 直通处理（DLSS5_CODEC_SRGB=1），
     亮度和原图一致。0.09 里暗部皮肤上偶尔闪的 8 像素方块在 0.10 修掉了（硬件 FP8 转换对超范围值不饱和、出 NaN，现在进矩阵前夹到 ±448）。
   - 运动向量来自 Magpie 的光流估计（效果参数 Optical Flow Method 选 AMDOF）；光流在平坦暗部会给出几万像素的垃圾向量，
@@ -57,7 +57,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
   - 强度：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_STRENGTH=<细节>,<颜色>（各 0～1，默认 1,1 = 网络结果全用；
     0.5,1 就是细节一半原图一半、颜色修正全用）。这是 NVIDIA 面板里"强度"那个滑杆对应的两个混合系数；改完重启 Magpie 生效。
     风格预设没有：DLL 里的其他网络预设没有提取，本包只有捕获时那一套权重。
-  - 停止缩放再激活，插件会重新接管（再等 20 秒）。
+  - 停止缩放再激活，插件会重新接管（需要重新初始化）。
   - 日志：DLSS5-AMD\logs\native-game-oneshot.txt（初始化）、native-submission-order.txt（每帧观察）。
   - 屏幕提示不想要：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_NOTICE=0；帧率不想看：删掉 DLSS5_SHOW_FPS=1。
   - F6 是本插件的开关键（全局）；如果同一台机器上游戏里也装了本插件的游戏版，两边会一起切。

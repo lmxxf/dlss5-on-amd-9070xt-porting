@@ -349,6 +349,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 09-12 **0.13 后 FPS 显示优化（待实机验收）**：Zero 定数字三秒更新一次。`NativeGameFrame` 在已有 decode/copy 输出列表末尾叠字，去掉稳态 FPS 专属 `NativeGameSubmission::Create(q,false)` 的提交与 CPU 等待；数字仍取 every_frame 的 100 帧均值，显示更新间隔至少 3000ms。`NativeTextOverlay` 缓存字条内容（文字/缩放/像素格式/行距），不变就只拷贝，不重新 Dispatch；字条放在输出末尾，网络输入及 history 不含 FPS。初始化/失败/尺寸提示仍走原提示提交路径。overlap 路径在交付上一帧结果后叠字；新 session 清空 FPS 均值。开关沿用 `DLSS5_SHOW_FPS` 和 `DLSS5_NOTICE`。验证：MinGW tiled add-on 编译通过、git diff --check 通过；候选 `Development/fps-cached.addon64`，未部署，未测实际收益，不把旧记录的约 0.5ms 当本次实测收益。闇之朱雀。
 
+- 09-12 **Magpie 0.14 整包**（闇）：已部署的 FPS 优化构建（`529a0e7`，DLL SHA256 `B4AA401DE728288033A27B586E31DC0B1BB3EF0EE84385CB1CF894F611C49B8F`）打进 `D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.14.zip`，358004639 字节，SHA256 `14CCDE3C752B40821CB9F30024579304627A2499E087E06E9AEC399BFE734EED`。沿用 0.13 的 Magpie 本体/资产及 XeSS FG ZeroMV 便携预设，FPS 默认开；说明改三秒刷新，清理备份 DLL、日志和 shader 缓存，重新生成全包 SHA256SUMS.txt。压缩包内 671 个文件逐个解压计算哈希通过。脚本 `Development/tools/package-magpie-fps.ps1`（`-VerifyOnly` 只校验现成包）；旁置 `.zip.sha256`。未打新 tag、未上传网盘；FPS 性能收益尚无实测数字。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
