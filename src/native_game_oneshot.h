@@ -113,7 +113,8 @@ public:
   armed_request=0;last_request=0;every_frame=false;every_frame_count=0;next_poll=0;restarts++;
   Log("session_reset",why);phase.store(0,std::memory_order_release);return true;
  }
- void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0){
+ /* state: the D3D12 state the upscaler declared for its output (the frame transitions from it and back to it) */
+ void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0,D3D12_RESOURCE_STATES state=D3D12_RESOURCE_STATE_UNORDERED_ACCESS){
   {const unsigned state=phase.load();if(state==5||((state==2||state==4)&&queue&&q!=queue)){if(!ResetForNewSession(state==5?"previous initialization/render failed":"upscaler queue changed"))return;}}
   unsigned expected=0;
   if(phase.compare_exchange_strong(expected,1)){
@@ -141,19 +142,19 @@ public:
      if(flicker_first>0&&index>=flicker_first&&index<flicker_first+5){wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,NativeLabPath(L"logs\\flicker-%lu-%ld").c_str(),GetCurrentProcessId(),index);frame->RequestTemporalDump(prefix);Log("flicker_dump_requested",std::to_string(index).c_str());}}
     if((every_frame_count==299||every_frame_count==599)&&_wgetenv(L"DLSS5_DEBUG_DUMPS")){ /* diagnostic only (233MB); DLSS5_DEBUG_DUMPS=1 in native-game-flags.txt */wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,NativeLabPath(L"logs\\temporal-probe-%lu-%lu").c_str(),GetCurrentProcessId(),every_frame_count+1);frame->RequestTemporalDump(prefix);Log("temporal_dump_requested",std::to_string(every_frame_count+1).c_str());}
     frame->RebindSourceAfterCompletion(source);
-    frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
+    frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset);
     // Temporal alignment probe: dump history/motion/color at frames 300 and 600 while the user pans the camera.
     auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);every_frame_tick=now;}
     if(every_frame_count==1)every_frame_tick=now;
     phase=4;return;
    }
-   auto before=NativeReadSubmittedFrame(q,source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Save(request,L"before",before);
+   auto before=NativeReadSubmittedFrame(q,source,state);Save(request,L"before",before);
    auto input_check=CheckNativeFrameInput(before);
    if(input_check!=NativeFrameInputCheck::valid){Log("input_rejected",input_check==NativeFrameInputCheck::black?"black RGB; no neural write; new request required":"invalid input; no neural write; new request required");phase=2;return;}
    frame->RebindSourceAfterCompletion(source);
    Log("render_begin",frame->TemporalReady()?"seed=0 temporal path armed (history from previous processed frame)":"seed=0 history=0 explicit diagnostic reset");
-   frame->ProcessSubmittedFrame(source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,0,false,motion,reset);
-   auto after=NativeReadSubmittedFrame(q,source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);Save(request,L"after",after);
+   frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset);
+   auto after=NativeReadSubmittedFrame(q,source,state);Save(request,L"after",after);
    Log("render_complete",before==after?"pixels_identical; investigate":"pixels_changed; independent verification pending");phase=4;
   }catch(const std::exception&e){Log("render_failed",e.what());phase=5;}
  }

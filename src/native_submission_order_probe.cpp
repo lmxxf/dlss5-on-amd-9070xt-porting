@@ -18,7 +18,7 @@ static NativeGameOneShot neural_oneshot;
 #ifdef NATIVE_ORDER_SNAPSHOT
 #include "native_submitted_readback.h"
 #include "native_snapshot_gate.h"
-struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};unsigned frame{};ID3D12Resource*motion{};bool reset{};};
+struct PendingSnapshot {ID3D12GraphicsCommandList*list{};ID3D12Resource*source{};DWORD thread{};unsigned frame{};ID3D12Resource*motion{};bool reset{};D3D12_RESOURCE_STATES state{D3D12_RESOURCE_STATE_UNORDERED_ACCESS};};
 // Temporal contract observed on the first FFX dispatch (motion texture size, render size); zero until seen.
 static std::atomic<unsigned>observed_motion_w{0},observed_motion_h{0},observed_render_w{0},observed_render_h{0};
 static PendingSnapshot pending_snapshot;
@@ -177,12 +177,11 @@ static uint32_t dispatch(void**context,const Header*h){
     size; the hook never arms), the network is still initializing, or its initialization failed (developer mode off, wrong driver...) */
  static const unsigned notice_mode=[]{unsigned v=2;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_NOTICE=%u",&x)==1)v=x;}fclose(f);}return v;}(); /* DLSS5_NOTICE: 0 off, 2 on (1 = pipeline only, test) */
  D3D12_RESOURCE_STATES declared_state{};const bool state_known=output_bytes==sizeof(output)&&ffx_state_to_d3d12(output.state,declared_state);
+ if(output_bytes==sizeof(output)&&!state_known){static std::atomic<bool>logged{false};if(!logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=output_state_unknown detail=the upscaler declares its output in ffx state %u, which the hook cannot map to a D3D12 state; please report this line\n",GetCurrentProcessId(),GetTickCount64(),output.state);fclose(f);}}
  if(notice_mode&&output_bytes==sizeof(output)&&output.resource&&state_known&&list){
   static std::atomic<bool>size_logged{false};char notice[80]{};
   if(output.width!=1920||output.height!=1080){snprintf(notice,sizeof notice,"DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW %uX%u)",output.width,output.height);
    if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=input_size_unsupported detail=upscaler runs at %ux%u, the network only supports 1920x1080: set the game window to 1920x1080 (Magpie: scale mode = original size)\n",GetCurrentProcessId(),GetTickCount64(),output.width,output.height);fclose(f);}}
-  else if(output.state!=2){snprintf(notice,sizeof notice,"DLSS5-AMD: OUTPUT STATE %u NOT SUPPORTED YET",output.state); /* the take-over assumes the FFX output is handed over in the UAV state (Stellar Blade, Magpie); other titles: report it */
-   if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=output_state_unsupported detail=the upscaler declares its output in ffx state %u (2 = unordered access is what the hook takes over); please report this line\n",GetCurrentProcessId(),GetTickCount64(),output.state);fclose(f);}}
   else{const unsigned ph=neural_oneshot.Phase();if(ph==0)text_overlay.Prepare(static_cast<ID3D12Resource*>(output.resource)); /* pipeline built before the initializer thread starts (same frame arms it) */
    if(ph==1&&text_overlay.Ready())snprintf(notice,sizeof notice,"DLSS5-AMD: INITIALIZING...");else if(ph==5)snprintf(notice,sizeof notice,"DLSS5-AMD: INIT FAILED - SEE DLSS5-AMD\\LOGS");}
   if(notice[0]&&notice_mode>=2){std::lock_guard<std::mutex>g(notice_mutex);notice_text=notice;notice_state=declared_state;auto*r=static_cast<ID3D12Resource*>(output.resource);if(notice_target!=r){if(notice_target)notice_target->Release();notice_target=r;notice_target->AddRef();}notice_frame=n;}
@@ -197,7 +196,8 @@ static uint32_t dispatch(void**context,const Header*h){
  /* idle (first time, or after a session reset) and failed states re-arm from the snapshot frame on; the first arming is still exactly snapshot_frame */
  request=neural_oneshot.WantsFrame()||(n>=snapshot_frame&&(neural_oneshot.Phase()==0||neural_oneshot.Phase()==5));
 #endif
- if(request&&result==0&&output_bytes==sizeof(output)&&output.resource&&output.width==1920&&output.height==1080&&output.state==2&&list){
+ /* any declared output state we can map is taken over (the frame transitions from / back to it); 2 = UAV is what Stellar Blade and Magpie declare */
+ if(request&&result==0&&output_bytes==sizeof(output)&&output.resource&&output.width==1920&&output.height==1080&&state_known&&list){
   ID3D12GraphicsCommandList*native=nullptr;
   if(SUCCEEDED(static_cast<IUnknown*>(list)->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&native)))&&native){
    std::lock_guard<std::mutex>guard(snapshot_mutex);
@@ -205,7 +205,7 @@ static uint32_t dispatch(void**context,const Header*h){
 #ifdef NATIVE_ORDER_NEURAL
    eligible=eligible||neural_oneshot.WantsFrame()||neural_oneshot.Phase()==0||neural_oneshot.Phase()==5;
 #endif
-   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset};++armed_frames;}
+   if(eligible&&!pending_snapshot.list){auto*r=static_cast<ID3D12Resource*>(output.resource);r->AddRef();if(frame_motion)frame_motion->AddRef();pending_snapshot={native,r,GetCurrentThreadId(),n,frame_motion,frame_reset,declared_state};++armed_frames;}
    else native->Release();
   }
  }
@@ -287,7 +287,7 @@ static void STDMETHODCALLTYPE execute_native(ID3D12CommandQueue*q,UINT count,ID3
   if(job.list){
    snapshot_active=true;
 #ifdef NATIVE_ORDER_NEURAL
-   ++neural_jobs;neural_oneshot.OnSubmitted(q,job.source,job.motion,job.reset,observed_motion_w.load(),observed_motion_h.load(),observed_render_w.load(),observed_render_h.load());if(job.motion)job.motion->Release();
+   ++neural_jobs;neural_oneshot.OnSubmitted(q,job.source,job.motion,job.reset,observed_motion_w.load(),observed_motion_h.load(),observed_render_w.load(),observed_render_h.load(),job.state);if(job.motion)job.motion->Release();
 #else
    try{
     auto pixels=NativeReadSubmittedFrame(q,job.source,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
