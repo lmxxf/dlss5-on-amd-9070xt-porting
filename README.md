@@ -8,12 +8,11 @@ block by block, re-written as HLSL compute shaders using Shader Model 6.10 wave-
 FP8 (E4M3) operands, and wired into a game through a ReShade add-on that hooks the FSR dispatch and post-processes the
 1080p frame.
 
-**Status (2026-09-10, tag `0.08`)**: Stellar Blade at 1920×1080 runs at **36–37 fps** on an RX 9070 XT with the full
-network in the loop (bench: 24.4 ms per frame for the network alone, 3.1 GB of VRAM). Image output matches the bit-exact
-reference chain at ≈ 42 dB PSNR. Texture quality must be "High" or lower: at "Very High" the game plus the network
-exceed 16 GB and the frame rate collapses. This is a research project, not a product: no tuning UI, one game, one
-resolution. `scripts/game-flags.txt` is the exact runtime flag set of this tag; `scripts/bench.ps1` compiles the
-matching shader set.
+**Status (2026-09-12, Magpie bundle `0.14`)**: the Magpie edition processes 1920×1080 game windows on RX 9070 XT, with XeSS Frame Generation (ZeroMV) enabled in the bundled preset. In recent gameplay the network generally runs around **30 fps**, with occasional dips; presented frame rate varies with the game and scene (one measured example: 28 real / 55 presented fps). The game does not need native FSR/DLSS support for this capture path.
+
+Version **0.14** updates the FPS number no more often than every three seconds, caches the text strip, and records its copy in the existing network-output submission, removing the separate FPS submission and CPU wait. The bundle is built and its 671 files have passed archive hash verification; a performance delta has not yet been measured. The 0.14 download link is pending; the 0.13 link in the changelog still refers to 0.13.
+
+The network requires 1080p output, Windows Developer Mode and AMD's 26.10.07.02 preview driver. VRAM pressure can cause frame-rate drops; for the Stellar Blade hook, use texture quality "High" or lower. `scripts/game-flags.txt` and `scripts/magpie-flags.txt` hold the two runtime configurations; `scripts/bench.ps1` compiles the shader set. See the [Magpie package instructions](scripts/package-README-magpie.txt) (Chinese).
 
 ## What is in this repository
 
@@ -76,11 +75,11 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy_fast.ps1 -Source <lab> -
 
 ## Changelog
 
-Frame rates are Stellar Blade at 1920×1080 on an RX 9070 XT; "bench" is the offline test bench (network only). Every tag
+Unless a Magpie scenario is specified, frame rates are Stellar Blade at 1920×1080 on an RX 9070 XT; "bench" is the offline test bench (network only). Every tag
 after 0.01 keeps the bit-exact reference chain as its judge (≈ 42 dB PSNR against it); "bit-exact" below means the fast
 chain's own output did not change by a single bit.
 
-| Tag | Date | What changed | Result |
+| Version | Date | What changed | Result |
 |---|---|---|---|
 | `0.01` | 09-08 | End of the exact port: all 71 blocks on wave-matrix kernels, bit-for-bit equal to the original network for 15 frames; weights resident in VRAM (no per-frame PCIe traffic); scratch shared between blocks (14.7 → 7.3 GB) | bench 186 ms, ~5 fps in game |
 | `0.02` | 09-08 | Fast chain begins (exact chain frozen as the judge): FP32 hardware accumulation, E4M3 operands, activation epilogue and attention without intermediate f16 roundings; temporal path (motion vectors + previous output) hooked up in game | bench 112 ms, ~8 fps |
@@ -95,6 +94,7 @@ chain's own output did not change by a single bit.
 | `0.11` | 09-11 | Take-over time 20-30 s → ~3.5 s: weight files prefetched into memory when the add-on loads (`NativePrefetchWeights`), the ~1000 resident weight copies batched into one GPU wait instead of one queue+wait per table (`NativeResidentBatch`; the first version released a copy destination early and hung the GPU — both ends are now held until the flush), the six runtime-compiled shaders cached on disk (`shader-cache\`), f16 weight expansion on 8 threads. Numerically unchanged (reference fixture bit-identical). Init timing probes (`DLSS5_VRAM_LOG=1` / `DLSS5_INIT_LOG=<file>`). Two-pass C32 softmax tried and kept off (null: the 896-byte scratch belonged to a PSO that is never dispatched; the fused kernel has none). Magpie bundle `Magpie-DLSS5-AMD-0.11.zip` | unchanged |
 | `0.12` | 09-12 | On-screen notice (`native_text_overlay.h` / `.hlsl`): when the upscaler's output is not 1920×1080 (a 2K/4K screen with Magpie set to fit the screen, or a non-1080p game window) the add-on writes "DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW WxH)" into the picture instead of silently watching; "INITIALIZING..." during the 3-5 s take-over and "INIT FAILED - SEE DLSS5-AMD\LOGS" when initialization fails (developer mode off, wrong driver). A 5×7 bitmap font drawn into our own buffer and copied into the host texture on our own command list after the game's batch (a UAV on the host texture or recording into the game's list crashes D3D12Core in Magpie). `DLSS5_NOTICE=0` in the flags file turns it off. Also: `DLSS5_OVERLAP` (network on its own compute queue, one frame behind; null on this GPU, default off) and `DLSS5_BUILD_C32_LDS_SLIM` (fused C32 kernel with 4 KB less LDS; bit-identical, no gain, default off). Numerically unchanged. Magpie bundle `Magpie-DLSS5-AMD-0.12.zip` | unchanged |
 | `0.13` | 09-12 | `DLSS5_SHOW_FPS=1` (on in the Magpie bundle): the network's own frame rate drawn in the corner with the notice font. The hook now takes over the upscaler output in whatever state the game declares for it (mapped ffx_api state bits), not only UAV. Pre-block errors carry the source line. Found the hard way: Windows Update silently replaces the preview driver with the release one (SM 6.10 gone, every PSO fails with E_INVALIDARG, the screen says INIT FAILED) -- reinstall 26.10.07.02 and set `ExcludeWUDriversInQualityUpdate=1`. The Magpie bundle's effect group now has XeSS Frame Generation (ZeroMV, vendor-agnostic) after FSR3_SR: 28 real → 55 presented fps on the 9070 XT, one frame of latency, the network itself ~20% slower next to the optical flow. Numerically unchanged. Magpie bundle `Magpie-DLSS5-AMD-0.13.zip` (https://pan.quark.cn/s/7097bd16dc10 , sha256 9104C48D…) | unchanged |
+| `0.14` (bundle) | 09-12 | FPS display: update at intervals of at least three seconds, reuse the unchanged text strip, and copy it at the end of the existing output submission instead of a separate synchronous submission. XeSS FG ZeroMV remains enabled in the preset. Remove backup DLLs, logs and shader caches from the bundle; regenerate file checksums. `Magpie-DLSS5-AMD-0.14.zip`, 358,004,639 bytes; SHA256 `14ccde3c752b40821cb9f30024579304627a2499e087e06e9aec399bfe734eed`. Download pending; no 0.14 tag yet. | Build passed; 671 archive files verified; FPS gain not measured |
 
 ## Weights
 
