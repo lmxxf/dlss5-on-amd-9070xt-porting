@@ -351,6 +351,8 @@ decoder 实际移位序列（09-06 从 5090 launch 参数直接解码，取代�
 
 - 09-12 **Magpie 0.14 整包**（闇）：已部署的 FPS 优化构建（`529a0e7`，DLL SHA256 `B4AA401DE728288033A27B586E31DC0B1BB3EF0EE84385CB1CF894F611C49B8F`）打进 `D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.14.zip`，358004639 字节，SHA256 `14CCDE3C752B40821CB9F30024579304627A2499E087E06E9AEC399BFE734EED`。沿用 0.13 的 Magpie 本体/资产及 XeSS FG ZeroMV 便携预设，FPS 默认开；说明改三秒刷新，清理备份 DLL、日志和 shader 缓存，重新生成全包 SHA256SUMS.txt。压缩包内 671 个文件逐个解压计算哈希通过。脚本 `Development/tools/package-magpie-fps.ps1`（`-VerifyOnly` 只校验现成包）；旁置 `.zip.sha256`。未打新 tag、未上传网盘；FPS 性能收益尚无实测数字。
 
+- 09-12 18:25 Zero 已上传 0.14 整包，夸克分享：https://pan.quark.cn/s/8bbc3033181d 。中英文 README 下载入口已更新为 0.14。
+
 ### fast 链每刀收益表（测试台，ms；同批 A/B，噪声 ±1～2）
 
 | 刀 | 内容 | 前→后 / 收益 | 游戏部署 |
