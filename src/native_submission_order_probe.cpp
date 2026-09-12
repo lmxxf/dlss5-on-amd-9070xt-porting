@@ -175,7 +175,8 @@ static uint32_t dispatch(void**context,const Header*h){
 #ifdef NATIVE_ORDER_NEURAL
  /* on-screen notice (native_text_overlay.h): why the picture is not changing -- the input is not 1920x1080 (the network only knows that
     size; the hook never arms), the network is still initializing, or its initialization failed (developer mode off, wrong driver...) */
- static const unsigned notice_mode=[]{unsigned v=2;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_NOTICE=%u",&x)==1)v=x;}fclose(f);}return v;}(); /* DLSS5_NOTICE: 0 off, 2 on (1 = pipeline only, test) */
+ static const unsigned notice_mode=[]{unsigned v=2;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_NOTICE=%u",&x)==1)v=x;}fclose(f);}return v;}();
+ static const bool show_fps=[]{bool v=false;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_SHOW_FPS=%u",&x)==1)v=x!=0;}fclose(f);}return v;}(); /* DLSS5_SHOW_FPS=1: the network's own frame rate in the corner while it runs */ /* DLSS5_NOTICE: 0 off, 2 on (1 = pipeline only, test) */
  D3D12_RESOURCE_STATES declared_state{};const bool state_known=output_bytes==sizeof(output)&&ffx_state_to_d3d12(output.state,declared_state);
  if(output_bytes==sizeof(output)&&!state_known){static std::atomic<bool>logged{false};if(!logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=output_state_unknown detail=the upscaler declares its output in ffx state %u, which the hook cannot map to a D3D12 state; please report this line\n",GetCurrentProcessId(),GetTickCount64(),output.state);fclose(f);}}
  if(notice_mode&&output_bytes==sizeof(output)&&output.resource&&state_known&&list){
@@ -183,7 +184,8 @@ static uint32_t dispatch(void**context,const Header*h){
   if(output.width!=1920||output.height!=1080){snprintf(notice,sizeof notice,"DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW %uX%u)",output.width,output.height);
    if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=input_size_unsupported detail=upscaler runs at %ux%u, the network only supports 1920x1080: set the game window to 1920x1080 (Magpie: scale mode = original size)\n",GetCurrentProcessId(),GetTickCount64(),output.width,output.height);fclose(f);}}
   else{const unsigned ph=neural_oneshot.Phase();if(ph==0)text_overlay.Prepare(static_cast<ID3D12Resource*>(output.resource)); /* pipeline built before the initializer thread starts (same frame arms it) */
-   if(ph==1&&text_overlay.Ready())snprintf(notice,sizeof notice,"DLSS5-AMD: INITIALIZING...");else if(ph==5)snprintf(notice,sizeof notice,"DLSS5-AMD: INIT FAILED - SEE DLSS5-AMD\\LOGS");}
+   if(ph==1&&text_overlay.Ready())snprintf(notice,sizeof notice,"DLSS5-AMD: INITIALIZING...");else if(ph==5)snprintf(notice,sizeof notice,"DLSS5-AMD: INIT FAILED - SEE DLSS5-AMD\\LOGS");
+   else if(show_fps&&(ph==2||ph==4)&&neural_oneshot.AvgMs()>0){snprintf(notice,sizeof notice,"DLSS5-AMD %.0f FPS (%.1f MS)",1000.0/neural_oneshot.AvgMs(),neural_oneshot.AvgMs());}}
   if(notice[0]&&notice_mode>=2){std::lock_guard<std::mutex>g(notice_mutex);notice_text=notice;notice_state=declared_state;auto*r=static_cast<ID3D12Resource*>(output.resource);if(notice_target!=r){if(notice_target)notice_target->Release();notice_target=r;notice_target->AddRef();}notice_frame=n;}
  }
 #endif

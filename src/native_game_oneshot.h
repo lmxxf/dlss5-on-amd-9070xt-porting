@@ -103,6 +103,8 @@ public:
   return phase.load()==2&&armed_request!=0;
  }
  unsigned Phase()const{return phase.load(std::memory_order_acquire);}
+ /* steady-state frame interval (ms, average of the last 100 frames; 0 until then) for the on-screen fps (DLSS5_SHOW_FPS) */
+ std::atomic<double>avg_ms{0.0};double AvgMs()const{return avg_ms.load();}
  /* A new upscaler session (Magpie: scaling stopped and started again -> new FSR context, queue and textures; or a failed initialization)
     drops the frame and goes back to idle, so the next snapshot initializes again on the new queue. Bounded: at most 8 restarts per process. */
  unsigned restarts{};
@@ -144,7 +146,7 @@ public:
     frame->RebindSourceAfterCompletion(source);
     frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset);
     // Temporal alignment probe: dump history/motion/color at frames 300 and 600 while the user pans the camera.
-    auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);every_frame_tick=now;}
+    auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);avg_ms.store(double(now-every_frame_tick)/100.0);every_frame_tick=now;}
     if(every_frame_count==1)every_frame_tick=now;
     phase=4;return;
    }
