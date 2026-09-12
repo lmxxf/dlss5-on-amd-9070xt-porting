@@ -9,13 +9,11 @@
 #include <cstring>
 #include <cctype>
 #include <mutex>
-/* On-screen notice for the user (native_text_overlay.hlsl): a 5x7 bitmap font drawn by one compute dispatch straight into the
-   upscaler's output texture, recorded on the game's own command list right after the upscaler ran. Used by the hook to say why
-   nothing happens (input not 1920x1080, network initializing, initialization failed) without the user opening a log. The texture
-   must be in the UAV state (the FFX output contract, state 2) and have a UAV-capable view format; anything else is skipped silently.
-   Created lazily on first use per device; a failure disables the overlay for the process (never lets a notice break the game). */
+/* Draw into a private strip, then copy to the host texture without creating a host UAV.
+   Callers serialize recording and submit on one queue; unchanged text reuses the GPU strip. */
 class NativeTextOverlay {
  std::mutex create_mutex;ID3D12Device*device{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};ID3D12Resource*strip{};bool failed{};
+ UINT cached_words[24]{};bool cached{};
  static constexpr UINT strip_w=1280,strip_h=32,strip_pitch=1280*8; /* widest box: 64 chars x 6 px x scale 3 */
  /* host format -> (copy footprint format, shader pixel mode, bytes per pixel); DXGI_FORMAT_UNKNOWN = unsupported */
  static DXGI_FORMAT CopyFormat(DXGI_FORMAT f,UINT&mode,UINT&bpp){
@@ -60,8 +58,11 @@ public:
   const UINT pitch=((w*bpp)+255)/256*256;words[16]=scale;words[17]=n;words[18]=mode;words[19]=pitch;
   D3D12_RESOURCE_BARRIER b[2]{};b[0].Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b[0].Transition={strip,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_COPY_SOURCE};
   b[1].Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b[1].Transition={texture,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,state,D3D12_RESOURCE_STATE_COPY_DEST};
-  c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootUnorderedAccessView(0,strip->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(1,24,words,0);
-  c->Dispatch((w+7)/8,(h+7)/8,1);
+  if(!cached||std::memcmp(cached_words,words,sizeof words)){
+   c->SetComputeRootSignature(root);c->SetPipelineState(pso);c->SetComputeRootUnorderedAccessView(0,strip->GetGPUVirtualAddress());c->SetComputeRoot32BitConstants(1,24,words,0);
+   c->Dispatch((w+7)/8,(h+7)/8,1);
+   std::memcpy(cached_words,words,sizeof words);cached=true;
+  }
   c->ResourceBarrier(1,b);if(state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
   D3D12_TEXTURE_COPY_LOCATION dst{},src{};dst.pResource=texture;dst.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;src.pResource=strip;src.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;src.PlacedFootprint.Footprint={cf,w,h,1,pitch};
   c->CopyTextureRegion(&dst,x,y,0,&src,nullptr);

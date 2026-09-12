@@ -1,5 +1,6 @@
 #pragma once
 #include "native_pso.h"
+#include "native_text_overlay.h"
 #include "native_lab_paths.h"
 #include "native_pinned_resource.h"
 #include <chrono>
@@ -126,6 +127,7 @@ class NativeGameFrame {
   NativeActualNetwork70 network;
   NativeRgbTexture neural;NativeOutputSmooth smooth;NativeHistoryGuard history_guard;NativeBlackProbe black;
   NativeGameCodec decode;
+  NativeTextOverlay fps_overlay;bool show_fps{};char fps_text[80]{};ULONGLONG fps_tick{};
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
   NativeNetworkTimestamps probe;bool probe_on{};double probe_sum[3]{};double probe_cpu{};unsigned probe_frames{},probe_history{},probe_reset{},probe_nomotion{};
@@ -196,6 +198,7 @@ public:
    if(resources->temporal)resources->history_guard.Create(d,resources->sampler.Output(),resources->input.PostBase(),directory);
    resources->black.Create(d,resources->network.Output(),1920*1080,directory);
    if(resources->temporal)resources->feed.BindNetworkOutput(resources->network.Output());
+   {const wchar_t*v=_wgetenv(L"DLSS5_SHOW_FPS");const wchar_t*n=_wgetenv(L"DLSS5_NOTICE");resources->show_fps=v&&wcstoul(v,nullptr,10)!=0&&(!n||wcstoul(n,nullptr,10)>=2);if(resources->show_fps)resources->fps_overlay.Prepare(source);}
    NativeGameFrameStep("decode",d);resources->decode.Create(d,{resources->encode.Output(),resources->neural.Output(),resources->overlap?resources->original_copy:source},directory);NativeGameFrameStep("ready",d);ready=true;
   }catch(...){failed=true;throw;}
  }
@@ -214,6 +217,12 @@ public:
  // This is NOT a swapchain present hook. Target is the game's float16 NR result.
  // Temporal sampler producer, if enabled, must already be submitted on this queue;
  // history provenance/reset policy remain the caller's responsibility.
+ /* Keep the displayed number stable for at least three seconds. No GPU work here. */
+ void UpdateFps(double ms){
+  std::lock_guard<std::mutex>guard(mutex);if(!resources||!resources->show_fps||ms<=0)return;
+  auto&r=*resources;const auto now=GetTickCount64();if(r.fps_text[0]&&now-r.fps_tick<3000)return;
+  snprintf(r.fps_text,sizeof r.fps_text,"DLSS5-AMD %.0f FPS (%.1f MS)",1000.0/ms,ms);r.fps_tick=now;
+ }
  bool TemporalReady()const{return resources&&resources->temporal;}
  // Diagnostic: write the previous-output history buffer, the motion buffer and the current
  // encoded color (RGBA16F) to files so motion-vector sign/units can be checked offline.
@@ -270,6 +279,7 @@ private:
     for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
    }
+   if(r.have_result&&r.fps_text[0])r.fps_overlay.Draw(c,target,r.fps_text,24,96,3,target_state);
   });
   const UINT64 captured=r.submit.LastValue();
   r.compute.WaitOn(r.submit.Fence(),captured);
@@ -325,6 +335,7 @@ public:
     else c->CopyResource(target,r.decode.Output());
     for(auto&v:b)std::swap(v.Transition.StateBefore,v.Transition.StateAfter);
     c->ResourceBarrier(1,b);if(target_state!=D3D12_RESOURCE_STATE_COPY_DEST)c->ResourceBarrier(1,b+1);
+    if(r.fps_text[0])r.fps_overlay.Draw(c,target,r.fps_text,24,96,3,target_state);
     if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}
    });r.black.Submitted(r.submit.LastValue());
    if(r.probe_on){r.submit.Flush();std::vector<double>iv;if(r.probe.Intervals(r.submit.TimestampFrequency(),iv)&&iv.size()==3){for(int i=0;i<3;i++)r.probe_sum[i]+=iv[i];}
