@@ -26,7 +26,8 @@ class NativePreblockRuntime {
  /* Readable state of the shared pair, per buffer: with DLSS5_C32_FUSED_FFN the instances alternate which one is their raw. */
  static bool&Readable(ID3D12Resource*r){static bool a=false,b=false;return r==SharedFfn()?b:a;}
  static UINT&SharedParity(){static UINT n=0;return n;}
- static void Check(HRESULT hr){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr)));}
+ static void CheckAt(HRESULT hr,int line){if(FAILED(hr))throw std::runtime_error("native preblock HRESULT="+std::to_string(unsigned(hr))+" line "+std::to_string(line));}
+#define Check(h) CheckAt((h),__LINE__)
  ID3D12Resource* Buffer(UINT64 bytes,D3D12_HEAP_TYPE type,D3D12_RESOURCE_STATES state){
   D3D12_HEAP_PROPERTIES h{};h.Type=type;h.CreationNodeMask=h.VisibleNodeMask=1;
   D3D12_RESOURCE_DESC d{};d.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;d.Width=bytes;d.Height=1;d.DepthOrArraySize=d.MipLevels=1;d.SampleDesc.Count=1;d.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;d.Flags=type==D3D12_HEAP_TYPE_DEFAULT?D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS:D3D12_RESOURCE_FLAG_NONE;
@@ -268,3 +269,5 @@ public:
  // Main() is allocated on first use: with MAIN8, chain-raw or skip-finish nobody reads it (saves one full f32 raster per stage).
  ID3D12Resource* Main()const{if(!main){auto*self=const_cast<NativePreblockRuntime*>(this);self->main=self->Buffer(buffer_bytes,D3D12_HEAP_TYPE_DEFAULT,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);}return main;}bool DownOnly()const{return down_only;}bool HalfStream()const{return half_stream;}bool Main8Mode()const{return main8_mode;}bool AttnOut8()const{return attn_out8;}ID3D12Resource* Main8()const{return main8;}UINT WorkWidth()const{return width;}ID3D12Resource* Downsample()const{return down;}ID3D12Resource* RawTiles()const{return raw;}
 };
+
+#undef Check
