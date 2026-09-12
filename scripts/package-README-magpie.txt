@@ -34,7 +34,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
      效果组 "DLSS5-AMD"（只有 FSR3_SR，光流 AMDOF）、缩放"原始尺寸"、重复帧检测已关。
      如果你自己改了配置，要保证：效果组只放 FSR3 -> FSR3_SR、缩放选"原始尺寸"、设置里重复帧检测选"从不"。
   2. 游戏：显示模式无边框窗口，1920x1080。
-  3. 在游戏里按 Magpie 的缩放热键（默认 Win+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
+  3. 在游戏里按 Magpie 的缩放热键（默认 Alt+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
      着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3，
      左上角写着 "DLSS5-AMD: INITIALIZING..."；提示消失、帧率掉到 30 左右，那就是 DLSS 5 接管了。
      如果提示变成 "INIT FAILED - SEE DLSS5-AMD\LOGS"，八成是开发人员模式没开或驱动不对，看上面"需要"一节。
