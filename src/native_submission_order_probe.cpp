@@ -53,6 +53,18 @@ static constexpr GUID UnwrappedObject={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,
 /* on-screen notice (native_text_overlay.h): the upscaler hook decides the text per frame; the notice is drawn from the ExecuteCommandLists hook
    on our own command list right after the game's batch (never recorded into the game's list: doing that crashed D3D12Core in Magpie). */
 static NativeTextOverlay text_overlay;static std::mutex notice_mutex;static std::string notice_text;static ID3D12Resource*notice_target=nullptr;static unsigned notice_frame=0;
+/* FSR 3.1 ffx_api resource state bits (FfxApiResourceState) -> D3D12 state; false = a combination we do not know */
+static bool ffx_state_to_d3d12(uint32_t s,D3D12_RESOURCE_STATES&out){
+ switch(s){
+  case 1:out=D3D12_RESOURCE_STATE_COMMON;return true;case 2:out=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;return true;
+  case 4:out=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;return true;case 8:out=D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;return true;
+  case 12:out=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE|D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;return true;
+  case 16:out=D3D12_RESOURCE_STATE_COPY_SOURCE;return true;case 32:out=D3D12_RESOURCE_STATE_COPY_DEST;return true;
+  case 20:out=D3D12_RESOURCE_STATE_GENERIC_READ;return true;case 128:out=D3D12_RESOURCE_STATE_PRESENT;return true;case 256:out=D3D12_RESOURCE_STATE_RENDER_TARGET;return true;
+  default:return false;
+ }
+}
+static D3D12_RESOURCE_STATES notice_state=D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 static void draw_pending_notice(ID3D12CommandQueue*q){
  std::string text;ID3D12Resource*target=nullptr;
  {std::lock_guard<std::mutex>g(notice_mutex);if(notice_frame&&notice_frame==frames.load()&&notice_target){text=notice_text;target=notice_target;target->AddRef();}notice_frame=0;}
@@ -60,7 +72,7 @@ static void draw_pending_notice(ID3D12CommandQueue*q){
  static NativeGameSubmission*submit=nullptr;static ID3D12CommandQueue*submit_queue=nullptr;
  try{
   if(submit_queue!=q){delete submit;submit=nullptr;submit_queue=nullptr;submit=new NativeGameSubmission;submit->Create(q,false);submit_queue=q;}
-  submit->Submit([&](ID3D12GraphicsCommandList*c){text_overlay.Draw(c,target,text.c_str(),24,96);});
+  const D3D12_RESOURCE_STATES st=notice_state;submit->Submit([&](ID3D12GraphicsCommandList*c){text_overlay.Draw(c,target,text.c_str(),24,96,3,st);});
  }catch(const std::exception&e){static std::atomic<bool>logged{false};if(!logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu notice_submit_failed error=%s\n",GetCurrentProcessId(),e.what());fclose(f);}}
  target->Release();
 }
@@ -164,13 +176,16 @@ static uint32_t dispatch(void**context,const Header*h){
  /* on-screen notice (native_text_overlay.h): why the picture is not changing -- the input is not 1920x1080 (the network only knows that
     size; the hook never arms), the network is still initializing, or its initialization failed (developer mode off, wrong driver...) */
  static const unsigned notice_mode=[]{unsigned v=2;if(FILE*f=_wfopen(NativeLabPath(L"native-game-flags.txt").c_str(),L"rb")){char line[256];while(fgets(line,sizeof line,f)){unsigned x;if(sscanf(line,"DLSS5_NOTICE=%u",&x)==1)v=x;}fclose(f);}return v;}(); /* DLSS5_NOTICE: 0 off, 2 on (1 = pipeline only, test) */
- if(notice_mode&&output_bytes==sizeof(output)&&output.resource&&output.state==2&&list){
+ D3D12_RESOURCE_STATES declared_state{};const bool state_known=output_bytes==sizeof(output)&&ffx_state_to_d3d12(output.state,declared_state);
+ if(notice_mode&&output_bytes==sizeof(output)&&output.resource&&state_known&&list){
   static std::atomic<bool>size_logged{false};char notice[80]{};
   if(output.width!=1920||output.height!=1080){snprintf(notice,sizeof notice,"DLSS5-AMD: INPUT MUST BE 1920X1080 (NOW %uX%u)",output.width,output.height);
    if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=input_size_unsupported detail=upscaler runs at %ux%u, the network only supports 1920x1080: set the game window to 1920x1080 (Magpie: scale mode = original size)\n",GetCurrentProcessId(),GetTickCount64(),output.width,output.height);fclose(f);}}
+  else if(output.state!=2){snprintf(notice,sizeof notice,"DLSS5-AMD: OUTPUT STATE %u NOT SUPPORTED YET",output.state); /* the take-over assumes the FFX output is handed over in the UAV state (Stellar Blade, Magpie); other titles: report it */
+   if(!size_logged.exchange(true))if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=output_state_unsupported detail=the upscaler declares its output in ffx state %u (2 = unordered access is what the hook takes over); please report this line\n",GetCurrentProcessId(),GetTickCount64(),output.state);fclose(f);}}
   else{const unsigned ph=neural_oneshot.Phase();if(ph==0)text_overlay.Prepare(static_cast<ID3D12Resource*>(output.resource)); /* pipeline built before the initializer thread starts (same frame arms it) */
    if(ph==1&&text_overlay.Ready())snprintf(notice,sizeof notice,"DLSS5-AMD: INITIALIZING...");else if(ph==5)snprintf(notice,sizeof notice,"DLSS5-AMD: INIT FAILED - SEE DLSS5-AMD\\LOGS");}
-  if(notice[0]&&notice_mode>=2){std::lock_guard<std::mutex>g(notice_mutex);notice_text=notice;auto*r=static_cast<ID3D12Resource*>(output.resource);if(notice_target!=r){if(notice_target)notice_target->Release();notice_target=r;notice_target->AddRef();}notice_frame=n;}
+  if(notice[0]&&notice_mode>=2){std::lock_guard<std::mutex>g(notice_mutex);notice_text=notice;notice_state=declared_state;auto*r=static_cast<ID3D12Resource*>(output.resource);if(notice_target!=r){if(notice_target)notice_target->Release();notice_target=r;notice_target->AddRef();}notice_frame=n;}
  }
 #endif
 #ifdef NATIVE_ORDER_SNAPSHOT
