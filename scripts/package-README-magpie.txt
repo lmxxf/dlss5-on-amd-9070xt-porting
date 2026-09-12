@@ -34,8 +34,11 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 安装（整包版：Magpie 本体已经在里面，解压即用）
 ----
   1. 解压到任意目录（路径别带中文），运行 Magpie.exe。配置是便携模式（config\config.json 随包），已经预设好：
-     效果组 "DLSS5-AMD"（只有 FSR3_SR，光流 AMDOF）、缩放"原始尺寸"、重复帧检测已关。
-     如果你自己改了配置，要保证：效果组只放 FSR3 -> FSR3_SR、缩放选"原始尺寸"、设置里重复帧检测选"从不"。
+     效果组 "DLSS5-AMD"（FSR3_SR + XeSS 帧生成 ZeroMV，光流 AMDOF）、缩放"原始尺寸"、重复帧检测已关。
+     0.13 起效果组里挂了 XeSS 帧生成（Intel 的跨厂商 FG，不需要游戏给运动向量）：网络出 28～30 帧，
+     插到 55～60 显示。代价是多一帧延迟、网络本身慢 20% 左右（光流和 FG 抢 GPU）。不想要就在效果组里把
+     XeSS_FrameGeneration_x2_ZeroMV 删掉。Magpie 效能分析器（快捷键见设置）里"帧率（总/真实）"两个数就是插帧后/网络真实。
+     如果你自己改了配置，要保证：效果组里 FSR3 -> FSR3_SR 在第一个、缩放选"原始尺寸"、设置里重复帧检测选"从不"。
   2. 游戏：显示模式无边框窗口，1920x1080。
   3. 在游戏里按 Magpie 的缩放热键（默认 Alt+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
      着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3，
