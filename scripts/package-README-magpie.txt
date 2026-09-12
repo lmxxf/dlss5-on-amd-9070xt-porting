@@ -19,6 +19,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 需要
 ----
   1. RX 9070 / 9070 XT（RDNA4）+ AMD 26.10.07.02 预览驱动（正式驱动没有 Shader Model 6.10 的 wave matrix）。
+     AMD 官方下载：https://drivers.amd.com/drivers/amd-software-adrenalin-edition-26.10.07.02-win11-rc7-agility-sdk.exe
      注意：Windows Update 会悄悄把预览驱动换成正式驱动（带在系统更新里），之后画面会写 "INIT FAILED"。
      重装预览驱动即可；要防再犯，组策略里禁止 Windows Update 带驱动（注册表
      HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate 建 DWORD ExcludeWUDriversInQualityUpdate=1）。

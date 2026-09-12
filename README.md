@@ -51,7 +51,7 @@ Where the preview pieces come from (all linked from Microsoft's post
 the preview DXC is a *preview* release of [microsoft/DirectXShaderCompiler](https://github.com/microsoft/DirectXShaderCompiler/releases)
 (we use v1.10.2605.24, `dxc_preview_2026_05_22.zip`; unzip anywhere and pass the folder as `-DxcRoot`); the Agility SDK
 runtime (`D3D12Core.dll`, folder `DLSS5-D3D12-721` in the package) is NuGet `Microsoft.Direct3D.D3D12` 1.721.3-preview;
-the AMD driver is the RC "Agility SDK" build 26.10.07.02 (32.0.31007.2048) from the same announcement, not a release driver.
+the AMD driver is the RC "Agility SDK" build 26.10.07.02 (32.0.31007.2048), not a release driver: [download from AMD](https://drivers.amd.com/drivers/amd-software-adrenalin-edition-26.10.07.02-win11-rc7-agility-sdk.exe).
 **Windows Developer Mode must be on** (Settings → System → For developers): the add-on enables the experimental shader models with
 `D3D12EnableExperimentalFeatures`, which only succeeds in developer mode; without it the initialisation stops at its first step
 (`sdk721_before_device ... experimental=` in `logs\native-submission-order.txt` is not `00000000`). Nothing else has to be installed
