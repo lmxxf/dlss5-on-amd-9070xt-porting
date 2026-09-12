@@ -1,4 +1,4 @@
-DLSS5-AMD 0.12 · Magpie 版
+DLSS5-AMD 0.13 · Magpie 版
 ============================
 
 把 DLSS 5 的神经网络（DLSSNR）跑在 AMD RX 9070 XT（RDNA4）上，以 Magpie 窗口缩放器为载体：
@@ -19,6 +19,9 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
 需要
 ----
   1. RX 9070 / 9070 XT（RDNA4）+ AMD 26.10.07.02 预览驱动（正式驱动没有 Shader Model 6.10 的 wave matrix）。
+     注意：Windows Update 会悄悄把预览驱动换成正式驱动（带在系统更新里），之后画面会写 "INIT FAILED"。
+     重装预览驱动即可；要防再犯，组策略里禁止 Windows Update 带驱动（注册表
+     HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate 建 DWORD ExcludeWUDriversInQualityUpdate=1）。
   1b. Windows 开发人员模式必须打开（设置 -> 系统 -> 开发者选项 -> 开发人员模式）。插件靠 D3D12EnableExperimentalFeatures
       打开实验性着色器模型，这个调用只在开发人员模式下成功；关着的话插件初始化就停在第一步，画面永远是 Magpie 自己的 FSR3。
       判断：DLSS5-AMD\logs\native-submission-order.txt 里 "sdk721_before_device ... experimental=" 后面不是 00000000 就是它。
@@ -36,7 +39,8 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
   2. 游戏：显示模式无边框窗口，1920x1080。
   3. 在游戏里按 Magpie 的缩放热键（默认 Alt+Shift+A）激活。前 3~5 秒是网络初始化（权重在 Magpie 启动时已经预读进内存，
      着色器编译结果缓存在 DLSS5-AMD\native-game-tiled-assets\shader-cache\，第一次启动会多几秒），这段时间画面是 Magpie 自己的 FSR3，
-     左上角写着 "DLSS5-AMD: INITIALIZING..."；提示消失、帧率掉到 30 左右，那就是 DLSS 5 接管了。
+     左上角写着 "DLSS5-AMD: INITIALIZING..."；接管后左上角变成 "DLSS5-AMD 37 FPS (26.9 MS)"，就是网络自己的帧率
+     （每 100 帧刷新；不想看就把 native-game-flags.txt 里的 DLSS5_SHOW_FPS=1 删掉）。
      如果提示变成 "INIT FAILED - SEE DLSS5-AMD\LOGS"，八成是开发人员模式没开或驱动不对，看上面"需要"一节。
      再按一次热键停止缩放就是对比。
 
@@ -52,7 +56,7 @@ ffxDispatch 调用，换成 DLSS 5 网络 -> Magpie 显示。
     风格预设没有：DLL 里的其他网络预设没有提取，本包只有捕获时那一套权重。
   - 停止缩放再激活，插件会重新接管（再等 20 秒）。
   - 日志：DLSS5-AMD\logs\native-game-oneshot.txt（初始化）、native-submission-order.txt（每帧观察）。
-  - 屏幕提示不想要：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_NOTICE=0。
+  - 屏幕提示不想要：DLSS5-AMD\native-game-flags.txt 里加一行 DLSS5_NOTICE=0；帧率不想看：删掉 DLSS5_SHOW_FPS=1。
   - F6 是本插件的开关键（全局）；如果同一台机器上游戏里也装了本插件的游戏版，两边会一起切。
 
 卸载
