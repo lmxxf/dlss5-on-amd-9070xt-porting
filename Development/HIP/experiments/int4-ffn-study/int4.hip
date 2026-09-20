@@ -24,14 +24,14 @@ KERNEL __attribute__((amdgpu_flat_work_group_size(256,256))) void q4_row(const f
  store_pair(out,m*512+w*32,l,qi(a,inv),qi(b,inv));store_pair(out,m*512+w*32+256,l,qi(c,inv),qi(d,inv));
 }
 DEV u8 activation(float v){float g=v<-4?-4:v>4?4:v;float poly=__builtin_fmaf(g,ab(g)*(-.055908203125f)+.447265625f,.89453125f);float z=v*poly;z=z<-448?-448:z>448?448:z;if((bits(z)&0x7fffffffu)==0)z=0;return u8(__builtin_amdgcn_cvt_pk_fp8_f32(z,0.f,0,false));}
-template<bool Grouped> DEV void int4_expand_body(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M){
- uint block=__builtin_amdgcn_workgroup_id_x(),lane=__builtin_amdgcn_workitem_id_x(),rc=lane%16,gr=lane/16,first=block/64*16,col=block%64*64;if(first>=M)return;
- i8 acc[4]{};f8 total[4]{};
+template<bool Grouped,uint Tiles=4> DEV void int4_expand_body(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M){
+ uint block=__builtin_amdgcn_workgroup_id_x(),lane=__builtin_amdgcn_workitem_id_x(),rc=lane%16,gr=lane/16,first=block/(4096/(16*Tiles))*16,col=block%(4096/(16*Tiles))*(16*Tiles);if(first>=M)return;
+ i8 acc[Tiles]{};f8 total[Tiles]{};
  for(uint k=0;k<1024;k+=32){i2 a;__builtin_memcpy(&a,x+(first+rc)*512+k/2+gr*8,8);
-  for(uint j=0;j<4;j++){i2 b;uint row=col+j*16+rc;__builtin_memcpy(&b,w+((row/16)*16+k/64)*512+(((k%64)/32*2+gr)*16+row%16)*8,8);acc[j]=__builtin_amdgcn_wmma_i32_16x16x32_iu4_w32_gfx12(true,a,true,b,acc[j],false);}
-  if constexpr(Grouped){if(k%64==32){uint g=k/64;for(uint j=0;j<4;j++){float sw=ws[g*4096+col+j*16+rc];for(uint e=0;e<8;e++)total[j][e]+=float(acc[j][e])*xs[g*M+first+gr*8+e]*sw;acc[j]=i8{};}}}
+  for(uint j=0;j<Tiles;j++){i2 b;uint row=col+j*16+rc;__builtin_memcpy(&b,w+((row/16)*16+k/64)*512+(((k%64)/32*2+gr)*16+row%16)*8,8);acc[j]=__builtin_amdgcn_wmma_i32_16x16x32_iu4_w32_gfx12(true,a,true,b,acc[j],false);}
+  if constexpr(Grouped){if(k%64==32){uint g=k/64;for(uint j=0;j<Tiles;j++){float sw=ws[g*4096+col+j*16+rc];for(uint e=0;e<8;e++)total[j][e]+=float(acc[j][e])*xs[g*M+first+gr*8+e]*sw;acc[j]=i8{};}}}
  }
- for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint row=first+gr*8+e,cc=col+j*16+rc,at=row*4096+cc;float v;if constexpr(Grouped)v=total[j][e];else v=float(acc[j][e])*xs[row]*ws[cc];if(pre)pre[at]=v;out[at]=activation(v);}
+ for(uint j=0;j<Tiles;j++)for(uint e=0;e<8;e++){uint row=first+gr*8+e,cc=col+j*16+rc,at=row*4096+cc;float v;if constexpr(Grouped)v=total[j][e];else v=float(acc[j][e])*xs[row]*ws[cc];if(pre)pre[at]=v;out[at]=activation(v);}
 }
 
 WAVE void int4_expand_row(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<false>(x,w,xs,ws,out,pre,M);}
@@ -45,3 +45,5 @@ WAVE void q4_row_wave(const float*x,const float*s,u8*out,float*sc,uint M,uint ro
  #pragma unroll
  for(uint g=0;g<16;g++)store_pair(out,m*512+g*32,l,qi(v[2*g],inv),qi(v[2*g+1],inv));
 }
+
+WAVE void int4_expand_group_n32(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,2>(x,w,xs,ws,out,pre,M);}

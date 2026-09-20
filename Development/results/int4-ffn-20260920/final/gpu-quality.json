@@ -1,0 +1,136 @@
+{
+  "fp8_cpu_control": {
+    "relative_l1": 0.0,
+    "relative_rmse": 0.0,
+    "abs_p99": 0.0,
+    "max_abs": 0.0,
+    "cosine": 1.0000870619071622
+  },
+  "variants": [
+    {
+      "method": 1,
+      "name": "plain",
+      "matmul_oracle": {
+        "relative_l1": 1.4097551822426571e-07,
+        "relative_rmse": 1.626546320561346e-07,
+        "abs_p99": 1.430511474609375e-06,
+        "max_abs": 7.62939453125e-06,
+        "cosine": 1.0000101093884743
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 0.0,
+        "relative_rmse": 0.0,
+        "abs_p99": 0.0,
+        "max_abs": 0.0,
+        "cosine": 1.0000706769122707
+      },
+      "post_activation": {
+        "relative_l1": 0.3239068915565,
+        "relative_rmse": 0.28424324274659984,
+        "abs_p99": 1.515625,
+        "max_abs": 6.5625,
+        "cosine": 0.9627560798061755
+      }
+    },
+    {
+      "method": 2,
+      "name": "rotrow",
+      "matmul_oracle": {
+        "relative_l1": 1.723812375831446e-07,
+        "relative_rmse": 1.943745348229573e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 7.62939453125e-06,
+        "cosine": 1.0000134660407143
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 1.574873720358884e-08,
+        "relative_rmse": 4.2853279810223357e-08,
+        "abs_p99": 5.960464477539063e-08,
+        "max_abs": 2.384185791015625e-07,
+        "cosine": 1.000005123036907
+      },
+      "post_activation": {
+        "relative_l1": 0.1784208414419936,
+        "relative_rmse": 0.15895519299316613,
+        "abs_p99": 1.0,
+        "max_abs": 2.75,
+        "cosine": 0.9875660133371157
+      }
+    },
+    {
+      "method": 3,
+      "name": "rotgroup",
+      "matmul_oracle": {
+        "relative_l1": 1.8434364669602387e-07,
+        "relative_rmse": 2.0298868443574018e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 8.58306884765625e-06,
+        "cosine": 1.0000174530351684
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 2.435828170291346e-08,
+        "relative_rmse": 5.490667296086679e-08,
+        "abs_p99": 5.960464477539063e-08,
+        "max_abs": 2.384185791015625e-07,
+        "cosine": 1.000001333920696
+      },
+      "post_activation": {
+        "relative_l1": 0.13576430797871844,
+        "relative_rmse": 0.12273848445105724,
+        "abs_p99": 0.6875,
+        "max_abs": 2.25,
+        "cosine": 0.9926440520757361
+      }
+    },
+    {
+      "method": 4,
+      "name": "balanced",
+      "matmul_oracle": {
+        "relative_l1": 1.6934226375750962e-07,
+        "relative_rmse": 1.8968643802291282e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 6.67572021484375e-06,
+        "cosine": 1.00001521771245
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 4.276512680123944e-05,
+        "relative_rmse": 0.0039014061656942947,
+        "abs_p99": 5.960464477539063e-08,
+        "max_abs": 0.1584663987159729,
+        "cosine": 0.9999968783692517
+      },
+      "post_activation": {
+        "relative_l1": 0.205193862919177,
+        "relative_rmse": 0.18192790310904003,
+        "abs_p99": 1.0,
+        "max_abs": 4.0,
+        "cosine": 0.9834004170273444
+      }
+    },
+    {
+      "method": 5,
+      "name": "rotgroup",
+      "matmul_oracle": {
+        "relative_l1": 1.8434364669602387e-07,
+        "relative_rmse": 2.0298868443574018e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 8.58306884765625e-06,
+        "cosine": 1.0000174530351684
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 2.435828170291346e-08,
+        "relative_rmse": 5.490667296086679e-08,
+        "abs_p99": 5.960464477539063e-08,
+        "max_abs": 2.384185791015625e-07,
+        "cosine": 1.000001333920696
+      },
+      "post_activation": {
+        "relative_l1": 0.13576430797871844,
+        "relative_rmse": 0.12273848445105724,
+        "abs_p99": 0.6875,
+        "max_abs": 2.25,
+        "cosine": 0.9926440520757361
+      }
+    }
+  ]
+}
