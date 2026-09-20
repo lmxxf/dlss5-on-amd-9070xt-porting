@@ -2742,3 +2742,9 @@ TeaCache固定提交91dff8e31684ca70a5fda309611484402d8fa192，读nodes.py和REA
 下一轮研究优先comfy-kitchen HIP的选择性精算来改善本轮KV均值误差；TeaCache式便宜变化检测/残差复用另列跨帧方向，先用动态捕获验证相关性再跳算。本轮仅源码调研并记在AttExp，未改核/跑GPU或部署。
 
 来源：https://github.com/0xDELUXA/comfy-kitchen_win-rocm/tree/amd/hip-sol-attn ，https://github.com/0xDELUXA/comfy-kitchen_win-rocm/tree/amd/hip-sol-token-aug ，https://github.com/welltop-cn/ComfyUI-TeaCache/blob/91dff8e31684ca70a5fda309611484402d8fa192/nodes.py 。
+
+## 2026-09-20 13:01起：AttExp后续计划及选择性精算启动
+
+用户确认先记计划再动手。阶段A：用HIP预处理一次统计K/V差异并生成可合并标记，避免每个Q块重复算相似度；空间跨行/不完整组和本地Q组保留精算，低差异组才用成对摘要，混合组正确计入2倍权重。先跑全精算控制（含预处理但不近似）确认黄金输出，再扫门槛、记录合并比例、完整回放耗时/误差；只在质量收益合理时继续考虑更接近Sol的Q相关路由/重要token补救。阶段B：静态正确后采动态游戏帧，查局部闪烁、转镜/遮挡/切场景，并把预处理/选择/同步成本全部计入。阶段C：TeaCache式块残差复用先测变化量与输出误差的相关性，建立强制重算规则，再实现跳算；不照搬扩散步系数、不直接用整屏平均判变化。全部在AttExp，生产/游戏/发布包不自动替换。
+
+当前从阶段A开始，针对ViT400/640token做隔离候选和自有benchmark；沿用无条件KV均值实验作速度/误差参照。每完成可复现阶段更新此记录并commit，拒绝把静态不黑屏当动态质量通过。
