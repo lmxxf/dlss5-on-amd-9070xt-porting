@@ -1,0 +1,42 @@
+{
+  "first": {
+    "byte_equal": {
+      ".fp8": true,
+      "-pre.f32": true,
+      "-input.i4": true,
+      "-scale.f32": true
+    },
+    "candidate_abba": [
+      {
+        "control_ms": 0.0356153,
+        "candidate_ms": 0.061839950000000005,
+        "reduction_percent": -73.63310150412885
+      },
+      {
+        "control_ms": 0.03556785,
+        "candidate_ms": 0.06036565000000001,
+        "reduction_percent": -69.7197047333477
+      }
+    ]
+  },
+  "direct": {
+    "byte_equal": {
+      ".fp8": true,
+      "-pre.f32": true,
+      "-input.i4": true,
+      "-scale.f32": true
+    },
+    "candidate_abba": [
+      {
+        "control_ms": 0.07142155,
+        "candidate_ms": 0.06738944999999999,
+        "reduction_percent": 5.645494952153807
+      },
+      {
+        "control_ms": 0.07213975,
+        "candidate_ms": 0.06666495,
+        "reduction_percent": 7.589158542966956
+      }
+    ]
+  }
+}

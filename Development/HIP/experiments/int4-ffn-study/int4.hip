@@ -51,3 +51,23 @@ WAVE void int4_expand_group_n32(const u8*x,const u8*w,const float*xs,const float
 WAVE void int4_expand_group_n128(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,8>(x,w,xs,ws,out,pre,M);}
 
 WAVE void int4_expand_group_n16(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,1>(x,w,xs,ws,out,pre,M);}
+
+// Explicit K64 groups: two integer MMAs, one shared vector of activation scales.
+WAVE void int4_expand_group_cached(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){
+ uint block=__builtin_amdgcn_workgroup_id_x(),lane=__builtin_amdgcn_workitem_id_x(),rc=lane%16,gr=lane/16,first=block/64*16,col=block%64*64;if(first>=M)return;
+ f8 total[4]{};
+ for(uint g=0;g<16;g++){
+  i2 a0,a1;const u8*xp=x+(first+rc)*512+g*32+gr*8;
+  __builtin_memcpy(&a0,xp,8);__builtin_memcpy(&a1,xp+16,8);
+  f8 sx;for(uint e=0;e<8;e++)sx[e]=xs[g*M+first+gr*8+e];
+  #pragma unroll
+  for(uint j=0;j<4;j++){
+   uint cc=col+j*16+rc;const u8*wp=w+((cc/16)*16+g)*512+(gr*16+rc)*8;
+   i2 b0,b1;__builtin_memcpy(&b0,wp,8);__builtin_memcpy(&b1,wp+256,8);
+   i8 acc{};acc=__builtin_amdgcn_wmma_i32_16x16x32_iu4_w32_gfx12(true,a0,true,b0,acc,false);
+   acc=__builtin_amdgcn_wmma_i32_16x16x32_iu4_w32_gfx12(true,a1,true,b1,acc,false);
+   float sw=ws[g*4096+cc];for(uint e=0;e<8;e++)total[j][e]+=float(acc[e])*sx[e]*sw;
+  }
+ }
+ for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint at=(first+gr*8+e)*4096+col+j*16+rc;float v=total[j][e];if(pre)pre[at]=v;out[at]=activation(v);}
+}
