@@ -3,3 +3,8 @@ WAVE void vit_residual_apply(const float*current,const float*anchor_in,const flo
  uint at=bid()*256+__builtin_amdgcn_workitem_id_x();
  for(uint j=0;j<8;j++,at+=32)if(at<count){float x=current[at],a=anchor_in[at],b=anchor_out[at];out[at]=x==a?b:F(H(x+(b-a)));}
 }
+// Use the original network's per-channel direct skip-path gain, not a fitted new network.
+WAVE void vit_residual_apply_gain(const float*current,const float*anchor_in,const float*anchor_out,const float*gain,float*out,uint count){
+ uint at=bid()*256+__builtin_amdgcn_workitem_id_x();
+ for(uint j=0;j<8;j++,at+=32)if(at<count){float x=current[at],a=anchor_in[at],b=anchor_out[at];out[at]=x==a?b:F(H(__builtin_fmaf(gain[at%1024],x-a,b)));}
+}

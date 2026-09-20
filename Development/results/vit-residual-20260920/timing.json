@@ -1,0 +1,142 @@
+{
+  "summary": [
+    {
+      "height": 900,
+      "baseline_ms": 13.2495703125,
+      "candidate_ms": 12.25709375,
+      "saved_ms": 0.9924765625000003,
+      "reduction_percent": 7.490632066488008,
+      "baseline_drift_ms": 0.02206250000000054
+    },
+    {
+      "height": 1080,
+      "baseline_ms": 18.7669765625,
+      "candidate_ms": 17.069207031250002,
+      "saved_ms": 1.697769531249996,
+      "reduction_percent": 9.046579909107276,
+      "baseline_drift_ms": 0.00043750000000031264
+    }
+  ],
+  "runs": [
+    {
+      "height": "900",
+      "label": "timing-4-base-0",
+      "period": "0",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "13.2385390625",
+      "median_ms": "13.241",
+      "full_frames": "128",
+      "reuse_frames": "0",
+      "full_mean_ms": "13.2385390625",
+      "reuse_mean_ms": "",
+      "hash": "75AABA5EF94368353F3F17C034B53918151AA2EBC98FF870B2A057D08AE910AB"
+    },
+    {
+      "height": "900",
+      "label": "timing-4-reuse-1",
+      "period": "4",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "12.250640625",
+      "median_ms": "11.945",
+      "full_frames": "32",
+      "reuse_frames": "96",
+      "full_mean_ms": "13.30446875",
+      "reuse_mean_ms": "11.8993645833333",
+      "hash": "75AABA5EF94368353F3F17C034B53918151AA2EBC98FF870B2A057D08AE910AB"
+    },
+    {
+      "height": "900",
+      "label": "timing-4-reuse-2",
+      "period": "4",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "12.263546875",
+      "median_ms": "11.9415",
+      "full_frames": "32",
+      "reuse_frames": "96",
+      "full_mean_ms": "13.32159375",
+      "reuse_mean_ms": "11.9108645833333",
+      "hash": "75AABA5EF94368353F3F17C034B53918151AA2EBC98FF870B2A057D08AE910AB"
+    },
+    {
+      "height": "900",
+      "label": "timing-4-base-3",
+      "period": "0",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "13.2606015625",
+      "median_ms": "13.264",
+      "full_frames": "128",
+      "reuse_frames": "0",
+      "full_mean_ms": "13.2606015625",
+      "reuse_mean_ms": "",
+      "hash": "75AABA5EF94368353F3F17C034B53918151AA2EBC98FF870B2A057D08AE910AB"
+    },
+    {
+      "height": "1080",
+      "label": "timing-4-base-0",
+      "period": "0",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "18.7667578125",
+      "median_ms": "18.759",
+      "full_frames": "128",
+      "reuse_frames": "0",
+      "full_mean_ms": "18.7667578125",
+      "reuse_mean_ms": "",
+      "hash": "1DE20C219105CC281CBA1364A0A21D0DDC4510A95458EC0CA3B8C893EA54F23A"
+    },
+    {
+      "height": "1080",
+      "label": "timing-4-reuse-1",
+      "period": "4",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "17.0702421875",
+      "median_ms": "16.5265",
+      "full_frames": "32",
+      "reuse_frames": "96",
+      "full_mean_ms": "18.78709375",
+      "reuse_mean_ms": "16.4979583333333",
+      "hash": "1DE20C219105CC281CBA1364A0A21D0DDC4510A95458EC0CA3B8C893EA54F23A"
+    },
+    {
+      "height": "1080",
+      "label": "timing-4-reuse-2",
+      "period": "4",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "17.068171875",
+      "median_ms": "16.535",
+      "full_frames": "32",
+      "reuse_frames": "96",
+      "full_mean_ms": "18.80075",
+      "reuse_mean_ms": "16.4906458333333",
+      "hash": "1DE20C219105CC281CBA1364A0A21D0DDC4510A95458EC0CA3B8C893EA54F23A"
+    },
+    {
+      "height": "1080",
+      "label": "timing-4-base-3",
+      "period": "0",
+      "sequence": "0",
+      "frames": "160",
+      "capture": "False",
+      "mean_ms": "18.7671953125",
+      "median_ms": "18.766",
+      "full_frames": "128",
+      "reuse_frames": "0",
+      "full_mean_ms": "18.7671953125",
+      "reuse_mean_ms": "",
+      "hash": "1DE20C219105CC281CBA1364A0A21D0DDC4510A95458EC0CA3B8C893EA54F23A"
+    }
+  ]
+}

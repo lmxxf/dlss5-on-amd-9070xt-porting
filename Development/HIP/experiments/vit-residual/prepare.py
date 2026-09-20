@@ -6,7 +6,7 @@ subprocess.run([sys.executable,str(here.parent/'vit-stream-exact/prepare.py')],c
 for p in ['src','Development/HIP']:shutil.copytree(root/p,out/p,dirs_exist_ok=True)
 (out/'kernel').mkdir(exist_ok=True);(out/'kernel/deep_fast.hip').write_text(Path('/tmp/vit-stream-exact-src/deep_fast.hip').read_text()+'\n'+(here/'reuse.hip').read_text())
 p=out/'Development/HIP/hip_reference_network.h';old=p.read_text();s=old
-method=r''' Tensor residual_anchor_in,residual_anchor_out;U residual_frame{},residual_n{},residual_anchor_frame{};
+method=r''' Tensor residual_anchor_in,residual_anchor_out,residual_gain;U residual_frame{},residual_n{},residual_anchor_frame{};
  void ResidualDump(const char*dir,const char*part,Tensor t){
   Synchronize();std::vector<char>bytes(t->bytes);api.Check(api.hipMemcpy(bytes.data(),P(t),bytes.size(),2),"residual capture");
   auto name=std::string(dir)+"/"+std::to_string(residual_frame)+"-"+part+".f32";FILE*f=fopen(name.c_str(),"wb");if(!f)throw std::runtime_error("residual dump open");bool ok=fwrite(bytes.data(),1,bytes.size(),f)==bytes.size();fclose(f);if(!ok)throw std::runtime_error("residual dump write");
@@ -19,7 +19,9 @@ method=r''' Tensor residual_anchor_in,residual_anchor_out;U residual_frame{},res
   bool reuse=period>1&&residual_anchor_in&&residual_n==n&&((residual_frame-1)%period)!=0;
   if(dump&&*dump)ResidualDump(dump,"input",input);
   Tensor result;
-  if(reuse){result=New(size_t(n)*1024);Run("deep","vit_residual_apply",size_t(n)*1024,P(input),P(residual_anchor_in),P(residual_anchor_out),P(result),U(n*1024));}
+  if(reuse){result=New(size_t(n)*1024);const char*gpath=std::getenv("DLSS5_VIT_REUSE_GAIN");
+   if(gpath&&*gpath){if(!residual_gain){auto bytes=ReadBytes(gpath);if(bytes.size()!=4096)throw std::runtime_error("skip gain shape");residual_gain=Upload(bytes.data(),bytes.size(),true);}Run("deep","vit_residual_apply_gain",size_t(n)*1024,P(input),P(residual_anchor_in),P(residual_anchor_out),P(residual_gain),P(result),U(n*1024));}
+   else Run("deep","vit_residual_apply",size_t(n)*1024,P(input),P(residual_anchor_in),P(residual_anchor_out),P(result),U(n*1024));}
   else{result=input;for(U block=31;block<=38;block++)result=Vit(result,n,block);
    if(period>1){residual_anchor_in=input;residual_anchor_out=result;residual_n=n;residual_anchor_frame=residual_frame;}}
   if(dump&&*dump)ResidualDump(dump,"output",result);
@@ -31,7 +33,7 @@ needle='for(U b=31;b<=38;b++)source=Vit(source,n,b);';assert s.count(needle)==1
 s=s.replace(needle,'source=ResidualVitGroup(source,n);')
 s=s.replace(' Tensor Vit(Tensor input,U n,U block){',method+' Tensor Vit(Tensor input,U n,U block){',1)
 # Explicitly release persistent anchors before destroying the stream.
-s=s.replace('device_noise.reset();gather_maps[0].clear();','residual_anchor_in.reset();residual_anchor_out.reset();device_noise.reset();gather_maps[0].clear();')
+s=s.replace('device_noise.reset();gather_maps[0].clear();','residual_gain.reset();residual_anchor_in.reset();residual_anchor_out.reset();device_noise.reset();gather_maps[0].clear();')
 p.write_text(s);(here/'host.patch').write_text(''.join(difflib.unified_diff(old.splitlines(True),s.splitlines(True),fromfile='a/Development/HIP/hip_reference_network.h',tofile='b/Development/HIP/hip_reference_network.h')))
 p=out/'Development/HIP/benchmark_live_capture.cpp';s=p.read_text()
 s=s.replace(' std::ifstream source(argv[3]',r''' const char*seq_str=std::getenv("DLSS5_RESIDUAL_SEQUENCE");const UINT sequence=seq_str?UINT(std::stoul(seq_str)):0;
