@@ -2730,3 +2730,15 @@ Spectrum forecast.py/runtime.py：沿扩散采样时间，用Chebyshev基+ridge�
 报告Development/results/vit-kv-pair-20260920/report.md、summary.json和对比图；工具Development/HIP/experiments/vit-kv-pair，原始输出Windows hip-backend/profile1080/vitpair-*。游戏DLL、发布包和生产内核未改。
 
 12:33用户指定后续注意力近似实验统一放AttExp分支。从首轮实验提交084f8df创建并切换AttExp；该分支保留已有实验与生产基线，后续实验提交在此继续。
+
+## 2026-09-20 12:37起：comfy-kitchen Windows HIP分支与TeaCache调研
+
+用户提供0xDELUXA/comfy-kitchen_win-rocm/branches与welltop-cn/ComfyUI-TeaCache。GitHub API限额，改用git ls-remote/fetch核对分支并读真实源码：amd/hip-sol-attn=d9630b8c6524c791671138520c84afa358ef08b3；amd/hip-sol-token-aug=b99d2207b0865a3cc660ffb8265eadde3f891ead；amd/hip-rdna4-wmma=31e4bfef6d67e0cf141d7d2751baea32ff4f6d7d；amd/hip-gemm-tile-selection=9192c77751175c67ee76c7ef7ebb1327642320d9，另有hip-int8-attention等。确有原生HIP后端，不只是Triton：mma.h针对gfx11/gfx12的wave32片段排列、FP8/INT8 WMMA；gemm_wmma.h字节LDS、8-byte padding及提前预取下一K tile的软件流水；README显式列gfx1200/gfx1201，不调用hipBLAS/hipBLASLt。库整体仍是Comfy/PyTorch接口，不能把它直接当我们DLL的替换件。
+
+hip-sol-attn分支sage_attention下preprocess/producer/vtranspose/route/exact齐全：一次workspace分配，先量化/块摘要/阈值，再选择精算块和摘要尾部，最后恢复在线softmax精算；producer融合RMSNorm/RoPE/量化/布局，避免完整bf16 QKV落地。hip-sol-token-aug新增sol_attn_token.hip：对未选块内token再打分，用直方图门槛和预算挑重要token补入精算列表，排序/合并保持确定性。比刚才无条件K/V两两平均更有针对性，优先参考“粗筛块→补救重要token”及预处理/精算拆分。当前Sol接口B,T,H,128/bf16，块64；本项目head32、短窗与自定义指数/舍入不匹配，需自己缩小分块与保留公式，不直接移植标准softmax；节点摘要/路由开销对400/640token可能显著。硬件后端支持声明不等于本机已做性能验证。
+
+TeaCache固定提交91dff8e31684ca70a5fda309611484402d8fa192，读nodes.py和README。以FLUX实现为例：取首块调制输入，计算相对L1变化，经模型专用多项式校准并累计；未过门槛时跳过blocks，将缓存的previous_residual加到当前输入；需要重算则更新residual=block_output-block_input。它不是冻结上一张RGB，也不是Spectrum那种直接预测未来特征曲线。源码有各模型独立系数/采样范围；README宣称的“lossless”速度不等于数值逐位等价。DLSS5没有相同扩散时间步，若借鉴需改成相邻游戏帧/块级残差缓存，测输入变化是否能预测输出误差、运动/遮挡/切镜重算条件与缓存成本，不能照搬系数或2x数字。
+
+下一轮研究优先comfy-kitchen HIP的选择性精算来改善本轮KV均值误差；TeaCache式便宜变化检测/残差复用另列跨帧方向，先用动态捕获验证相关性再跳算。本轮仅源码调研并记在AttExp，未改核/跑GPU或部署。
+
+来源：https://github.com/0xDELUXA/comfy-kitchen_win-rocm/tree/amd/hip-sol-attn ，https://github.com/0xDELUXA/comfy-kitchen_win-rocm/tree/amd/hip-sol-token-aug ，https://github.com/welltop-cn/ComfyUI-TeaCache/blob/91dff8e31684ca70a5fda309611484402d8fa192/nodes.py 。
