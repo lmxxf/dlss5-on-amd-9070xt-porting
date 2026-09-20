@@ -23,6 +23,11 @@ if(!(Test-Path -LiteralPath "$GameDir\dlss5-amd.addon64") -or !(Test-Path -Liter
 $manifest=Get-Content "$preview\manifest.json" -Raw|ConvertFrom-Json
 if($manifest.Count -ne 50){throw 'Expected DLL + gain + 48 architecture modules'}
 foreach($f in $manifest){if((Hash "$preview\payload\$($f.name)") -ne $f.sha256){throw "Preview hash mismatch: $($f.name)"}}
+if(Test-Path $state){$prior=(Get-Content $state -Raw).Trim();$record=Get-Content "$prior\backup.json" -Raw|ConvertFrom-Json
+ if($record.game -eq $GameDir -and (Hash "$GameDir\dlss5-amd.addon64") -eq ($manifest|Where-Object{$_.name -eq 'dlss5-amd.addon64'}).sha256){
+  foreach($f in $manifest){if((Hash (Join-Path $GameDir $f.name)) -ne $f.sha256){throw 'Existing preview payload modified; restore before reinstalling'}}
+  Write-Output "ALREADY INSTALLED; original backup retained: $prior";exit
+ }}
 $backup=Join-Path $preview ('backups\'+(Get-Date -Format 'yyyyMMdd-HHmmss-fff'));New-Item -ItemType Directory -Path "$backup\files" -Force|Out-Null
 $names=@($manifest|ForEach-Object{$_.name})+@('DLSS5-AMD\native-game-flags.txt');$saved=@();$createdDirs=@{}
 foreach($name in $names){$dir=Split-Path (Join-Path $GameDir $name);while($dir -and $dir -ne $GameDir){if(!(Test-Path -LiteralPath $dir)){$createdDirs[$dir.Substring($GameDir.Length+1)]=$true};$dir=Split-Path $dir}}

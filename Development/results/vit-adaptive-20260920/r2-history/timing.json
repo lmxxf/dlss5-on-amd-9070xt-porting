@@ -1,0 +1,104 @@
+[
+  {
+    "height": 1080,
+    "sequence": 1,
+    "base_ms": 19.267214843749997,
+    "candidate_ms": 18.08420703125,
+    "saved_ms": 1.1830078124999979,
+    "reduction_percent": 6.140004261611004,
+    "baseline_drift_ms": 0.0012421875000008242,
+    "runs": [
+      {
+        "height": "1080",
+        "sequence": "1",
+        "label": "timing-0",
+        "mode": "0",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "19.2678359375",
+        "hash": "C594CDE75D4FF03EF34C1CF18E3A1688A04E45E044E9E765000F7D8144F03D27"
+      },
+      {
+        "height": "1080",
+        "sequence": "1",
+        "label": "timing-1",
+        "mode": "1",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "18.096765625",
+        "hash": "FA697E5506271A997C645E8DB808DF567F7DBAC79C4BDB36C705F6C66A0C7A11"
+      },
+      {
+        "height": "1080",
+        "sequence": "1",
+        "label": "timing-2",
+        "mode": "1",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "18.0716484375",
+        "hash": "FA697E5506271A997C645E8DB808DF567F7DBAC79C4BDB36C705F6C66A0C7A11"
+      },
+      {
+        "height": "1080",
+        "sequence": "1",
+        "label": "timing-3",
+        "mode": "0",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "19.26659375",
+        "hash": "C594CDE75D4FF03EF34C1CF18E3A1688A04E45E044E9E765000F7D8144F03D27"
+      }
+    ]
+  },
+  {
+    "height": 900,
+    "sequence": 1,
+    "base_ms": 13.451003906250001,
+    "candidate_ms": 12.7756171875,
+    "saved_ms": 0.6753867187500013,
+    "reduction_percent": 5.021087819595259,
+    "baseline_drift_ms": 0.0192265625000001,
+    "runs": [
+      {
+        "height": "900",
+        "sequence": "1",
+        "label": "timing-0",
+        "mode": "0",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "13.441390625",
+        "hash": "E2D86DB528E75A22B1CEBF65BE39E543758CD42333B9530430156892BD82CB8C"
+      },
+      {
+        "height": "900",
+        "sequence": "1",
+        "label": "timing-1",
+        "mode": "1",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "12.7845703125",
+        "hash": "203B53AB8C0E50341B8E671B680D6CD28E784355212AD2146D2776C167E1F256"
+      },
+      {
+        "height": "900",
+        "sequence": "1",
+        "label": "timing-2",
+        "mode": "1",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "12.7666640625",
+        "hash": "203B53AB8C0E50341B8E671B680D6CD28E784355212AD2146D2776C167E1F256"
+      },
+      {
+        "height": "900",
+        "sequence": "1",
+        "label": "timing-3",
+        "mode": "0",
+        "frames": "160",
+        "diagnostic": "False",
+        "mean_ms": "13.4606171875",
+        "hash": "E2D86DB528E75A22B1CEBF65BE39E543758CD42333B9530430156892BD82CB8C"
+      }
+    ]
+  }
+]

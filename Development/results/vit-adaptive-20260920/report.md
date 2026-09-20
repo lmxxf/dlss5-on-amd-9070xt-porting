@@ -45,3 +45,20 @@ Raw captures remain on the Windows lab / local temporary data directories. JSON 
 |repeated mirrored cuts|7/12|0|0|
 
 The small patch now forces refresh at appearance frame4 and disappearance frame9. In the synthetic history-enabled shift/reset test,4/12 frames reuse; mean MAE0.202, worst0.520. Full frames in a temporal run may differ because previous approximate output was fed into history; the strict full-frame identity check applies to no-history runs, while forced-full history control matches throughout. Smaller/subtile changes can still escape image gating. Subjective quality and actual motion vectors remain for gameplay testing.
+
+## Final R2 timing
+
+160-frame ABBA per case, first32 excluded; full ProcessSubmittedFrame mean including decision/commit kernels, bridge and postprocessing. Graph off; no diagnostic dumps, compression or transfers during timing. Controlled input prepared before the loop. Reference is exact-stream, not old production; no game rendering/upscaler/frame-generation cost included.
+
+| Tier | Input/history | Baseline ms | Candidate ms | Saved ms | Reduction | Baseline drift ms |
+|---|---|---:|---:|---:|---:|---:|
+|900|frozen / no history|13.24228|12.35397|0.88830|6.71%|0.03007|
+|900|horizontal shift / no history|13.20843|12.44792|0.76050|5.76%|0.02459|
+|900|vertical shift + exposure / no history|13.22533|13.00567|0.21966|1.66%|0.00566|
+|1080|frozen / no history|18.75687|17.23364|1.52323|8.12%|0.01687|
+|1080|horizontal shift / no history|18.73945|17.40502|1.33443|7.12%|0.03658|
+|1080|vertical shift + exposure / no history|18.77112|18.56855|0.20257|1.08%|0.01783|
+|900|horizontal shift / history|13.45100|12.77562|0.67539|5.02%|0.01923|
+|1080|horizontal shift / history|19.26721|18.08421|1.18301|6.14%|0.00124|
+
+All eight measured cases improved; none establishes a guarantee for other scenes. Larger-change inputs trigger more full evaluations and have smaller gains. The history timing run has no periodic resets; the separate12-frame history quality test resets every4 frames, so their reuse percentages are not interchangeable. Final staged gfx1201 modules match all24 benchmark module hashes; manifest.json records the complete50-file preview. Install/reinstall/restore tested in an isolated directory, retaining the original backup on duplicate installs.
