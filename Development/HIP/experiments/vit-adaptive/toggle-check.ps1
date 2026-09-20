@@ -1,4 +1,5 @@
-$ErrorActionPreference='Stop';$r='D:\DLSSNR-Lab\hip-backend';$b='D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD';$d="$r\vit-adaptive-r2-toggle-results"
+param([string]$Tag='r2-toggle')
+$ErrorActionPreference='Stop';$r='D:\DLSSNR-Lab\hip-backend';$b='D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD';$d="$r\vit-adaptive-$Tag-results"
 if(Get-Process re9,SB-Win64-Shipping,LOP-Win64-Shipping,Magpie -ErrorAction SilentlyContinue){throw 'Game/Magpie running'}
 New-Item -ItemType Directory -Force $d|Out-Null
 $flags=@(Get-Content "$r\vit-adaptive-r2-results\adaptive-900-s2\flags.txt")+@('DLSS5_VIT_ADAPTIVE_LOG=')
