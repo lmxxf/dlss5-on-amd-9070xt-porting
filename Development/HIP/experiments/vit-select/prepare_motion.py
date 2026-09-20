@@ -2,7 +2,7 @@
 from pathlib import Path
 import subprocess,sys
 here=Path(__file__).resolve().parent
-subprocess.run([sys.executable,str(here/'prepare_packed.py'),'--fragments'],check=True)
+subprocess.run([sys.executable,str(here/'prepare_packed.py'),'--spatial'],check=True)
 out=Path('/tmp/vit-select-src')
 p=out/'Development/HIP/benchmark_live_capture.cpp';s=p.read_text()
 s=s.replace(' std::ifstream source(argv[3]', ' const bool translate_frames=std::getenv("DLSS5_TEST_TRANSLATE")&&std::strcmp(std::getenv("DLSS5_TEST_TRANSLATE"),"0");if(translate_frames&&N>32)throw std::runtime_error("motion diagnostic limited to 32 frames");\n std::ifstream source(argv[3]',1)
