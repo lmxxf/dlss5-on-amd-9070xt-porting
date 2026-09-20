@@ -2728,3 +2728,5 @@ Spectrum forecast.py/runtime.py：沿扩散采样时间，用Chebyshev基+ridge�
 两档×真实画面/合成HDR/近黑×AB各12帧，144帧全有限且每组冻输入输出一致；不是动态时序测试。真实画面clip到SDR再转sRGB的MAE约2.63/255，两档PSNR35.79/35.22dB；raw相对RMSE11.97%/13.30%，最大分量差0.1546/0.2437，人物/高光差异集中。1080合成HDR的显示MAE5.27/255；暗部绝对误差小但相对误差大，均归档，不把“没黑屏”当画质等价。首轮结论：近似能跑且完整回放有收益，但无条件合并偏粗，保留实验不部署；后续考虑相似性/空间分组保留重要项并计入预处理成本、测动态输入。
 
 报告Development/results/vit-kv-pair-20260920/report.md、summary.json和对比图；工具Development/HIP/experiments/vit-kv-pair，原始输出Windows hip-backend/profile1080/vitpair-*。游戏DLL、发布包和生产内核未改。
+
+12:33用户指定后续注意力近似实验统一放AttExp分支。从首轮实验提交084f8df创建并切换AttExp；该分支保留已有实验与生产基线，后续实验提交在此继续。
