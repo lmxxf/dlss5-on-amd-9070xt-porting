@@ -1,12 +1,12 @@
-param([ValidateSet('Control','Sweep','Timing')][string]$Phase='Control',[string]$Threshold='0.5',[string]$Duplicate='',[string]$Tag='stream')
+param([ValidateSet('Control','Sweep','Timing')][string]$Phase='Control',[string]$Threshold='0.5',[string]$Duplicate='',[string]$Tag='stream',[string]$Runner='benchmark_vit_select.exe',[string]$BaselineModules='', [string]$CandidateModules='')
 $ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$r="$lab\hip-backend";$work="$r\vit-select-$Tag-results";$b="$lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD";New-Item -ItemType Directory -Force $work|Out-Null
 function Idle {if(Get-Process re9,SB-Win64-Shipping,LOP-Win64-Shipping,Magpie -ErrorAction SilentlyContinue){throw 'Game/Magpie running'}}
 $flags=@(Get-Content "$b\native-game-flags.txt")+@('DLSS5_HIP_MH_FEATURE_BYTE=1','DLSS5_HIP_MH_PROJ_DIAG_FB=1','DLSS5_HIP_MH_BYTE_STREAM=1','DLSS5_HIP_DECODER_BYTE=1','DLSS5_HIP_VIT_BYTE_STREAM=0','DLSS5_HIP_MH_FFN_FRAG256=1','DLSS5_HIP_GRAPH=0','DLSS5_SHOW_FPS=0','DLSS5_PRE_UPSCALE=0',"DLSS5_HIP_DUP_PREFIX=$Duplicate",'DLSS5_HIP_DUP_COUNT=2')
 function RunOne($height,$label,$threshold,$pattern,$frames,$diag,$base){
- Idle;$m=if($base){"$lab\c256-frag-production-modules\gfx1201"}else{"$r\vit-select-modules"};$prefix="$work\$label-$height-p$pattern";$f="$work\flags.txt"
+ Idle;$m=if($base){if($BaselineModules){$BaselineModules}else{"$lab\c256-frag-production-modules\gfx1201"}}else{if($CandidateModules){$CandidateModules}else{"$r\vit-select-modules"}};$prefix="$work\$label-$height-p$pattern";$f="$work\flags.txt"
  $route=if($diag){"$prefix-route.csv"}else{''};if($diag -and (Test-Path $route)){Remove-Item $route}
  [IO.File]::WriteAllLines($f,($flags+@("DLSS5_NETWORK_HEIGHT=$height","DLSS5_VIT_SELECT_THRESHOLD=$threshold","DLSS5_VIT_SELECT_DIAG=$route")))
- & "$r\benchmark_vit_select.exe" "$b\native-game-tiled-assets" $f "$r\live-menu-before.f16" $prefix $frames 0 $m 0 $(if($frames -ge 100){1}else{0}) 0 $pattern > "$prefix.log"
+ & "$r\$Runner" "$b\native-game-tiled-assets" $f "$r\live-menu-before.f16" $prefix $frames 0 $m 0 $(if($frames -ge 100){1}else{0}) 0 $pattern > "$prefix.log"
  if($LASTEXITCODE){throw "Replay failed $label $height"};Idle
  $rows=@(Import-Csv "$prefix.csv");if($rows.Count -ne $frames -or @($rows|Where-Object{[int]$_.invalid -ne 0}).Count){throw 'Bad frame count/finite'}
  $t=@($rows|Where-Object{[int]$_.frame -ge $(if($frames -ge 100){32}else{1})}|ForEach-Object{[double]$_.wall_ms}|Sort-Object);$median=($t[[int][Math]::Floor(($t.Count-1)/2)]+$t[[int][Math]::Floor($t.Count/2)])/2

@@ -1,0 +1,11 @@
+--- a/select-host.h
++++ b/select-host.h
+@@ -302,7 +302,7 @@
+   const char*setting=std::getenv("DLSS5_VIT_SELECT_THRESHOLD");
+   if(!setting||!*setting){Run("deep",fused.c_str(),size_t(n)*512,P(norm),P(av),n);return;}
+   if(!opt.vit_qkv_fp8||opt.vit_byte_stream||(n!=400&&n!=640))throw std::runtime_error("select experiment needs FP8 QKV, f32 output, 900/1080");
+-  float threshold=std::stof(setting);U groups=(n+31)/32;auto pool=New(size_t(n)*256),route=New(size_t(groups)*64);
++  float threshold=std::stof(setting);U groups=(n+31)/32;auto pool=New(size_t(2*n+2*((n/2+15)&~15u))*256),route=New(size_t(groups)*64);
+   Run("deep","vit_select_prep",size_t(groups)*32*256,P(norm),P(pool),P(route),n,threshold);
+   Run("deep",n==400?"vit_attention_select_400":"vit_attention_select_640",size_t(n)*512,P(norm),P(pool),P(route),P(av),n);
+   if(const char*path=std::getenv("DLSS5_VIT_SELECT_DIAG");path&&*path&&!select_logged.count(block)){
