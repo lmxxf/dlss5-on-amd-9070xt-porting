@@ -20,11 +20,10 @@ WAVE void vit_select_prep(const unsigned char*in,unsigned char*pool,uint*route,u
 }
 template<uint MAXT>DEV void vit_select_body(const unsigned char*in,const unsigned char*pool,const uint*route,float*out,uint tokens){
  uint head=bid()%32,first=bid()/32*16;if(first>=tokens)return;
- __attribute__((shared)) unsigned char p8[16*(MAXT+16)];
  __attribute__((shared)) unsigned short t16[2*16*24];
  const uint S=tokens+16,G=(tokens+31)/32,KT=tokens/2;
  i2 q[2]{};for(uint k=0;k<32;k+=16)__builtin_memcpy(&q[k/16],in+(first+rc())*1024+head*32+k+gr()*8,8);
- f8 sum{};uint tile=0;
+ f8 sum{},acc[2]{};uint tile=0;
  for(uint key=0;key<tokens;){uint group=key;bool pooled=(key&31u)==0&&route[(head*G+key/32)*2]&&first/32!=key/32;f8 a{};
    const unsigned char*ks=(pooled?pool:in)+(pooled?key/2:tokens+key)*1024+rc()*1024+head*32;
    for(uint k=0;k<32;k+=16){i2 y{};__builtin_memcpy(&y,ks+k+gr()*8,8);a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(q[k/16],y,a);}
@@ -33,17 +32,12 @@ template<uint MAXT>DEV void vit_select_body(const unsigned char*in,const unsigne
    __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
    h8 x{};i2 xb{};for(uint e=0;e<8;e++){unsigned short u=t[rc()*24+gr()*8+e];union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;pack(xb,e,from_half(u));}
    h8 multiplier{};for(uint e=0;e<8;e++)multiplier[e]=(_Float16)(pooled?2.f:1.f);sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,multiplier,sum);
-   __builtin_memcpy(p8+rc()*S+key+gr()*8,&xb,8);
+   const unsigned char*vs=(pooled?pool:in)+(pooled?KT+key/2:2*tokens+key)*1024+head*32;
+   for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint b=vs[(gr()*8+e)*1024+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(xb,y,acc[c]);}
    key+=pooled?32:16;tile^=1u;
  }
  float inv[8];for(uint e=0;e<8;e++)inv[e]=1.f/sum[e];
  __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
- f8 acc[2]{};
- for(uint k=0;k<tokens;){bool pooled=(k&31u)==0&&route[(head*G+k/32)*2]&&first/32!=k/32;i2 x;__builtin_memcpy(&x,p8+rc()*S+k+gr()*8,8);
-   const unsigned char*vs=(pooled?pool:in)+(pooled?KT+k/2:2*tokens+k)*1024+head*32;
-   for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint b=vs[(gr()*8+e)*1024+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(x,y,acc[c]);}
-   k+=pooled?32:16;
- }
  for(uint c=0;c<2;c++)for(uint e=0;e<8;e++)out[(first+gr()*8+e)*1024+head*32+c*16+rc()]=F(Hrtz(acc[c][e]*inv[e]));
 }
 WAVE void vit_attention_select_400(const unsigned char*in,const unsigned char*pool,const uint*route,float*out,uint tokens){vit_select_body<400>(in,pool,route,out,tokens);}

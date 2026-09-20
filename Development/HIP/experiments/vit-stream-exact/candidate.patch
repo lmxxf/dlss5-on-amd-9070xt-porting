@@ -1,0 +1,33 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -154,12 +154,11 @@
+ template<uint MAXT,bool ByteInput=false,bool ByteOut=false>
+ DEV void vit_attention_fused_body(const float*in,float*out,uint tokens){
+  uint head=bid()%32,first=bid()/32*16;if(first>=tokens)return;
+- __attribute__((shared)) unsigned char p8[16*(MAXT+16)];
+  __attribute__((shared)) unsigned short t16[2*16*24];
+- const uint S=tokens+16;const unsigned char*in8=reinterpret_cast<const unsigned char*>(in);
++ const unsigned char*in8=reinterpret_cast<const unsigned char*>(in);
+  i2 q[2]{};for(uint k=0;k<32;k+=16){if constexpr(ByteInput)__builtin_memcpy(&q[k/16],in8+(first+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(q[k/16],e,in[(first+rc())*1024+head*32+j]);}}
+  h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
+- f8 sum{};
++ f8 sum{},acc[2]{};
+  for(uint key=0,tile=0;key<tokens;key+=16,tile^=1u){f8 a{};
+   for(uint k=0;k<32;k+=16){i2 y{};if constexpr(ByteInput)__builtin_memcpy(&y,in8+(tokens+key+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(y,e,in[(tokens+key+rc())*1024+head*32+j]);}a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(q[k/16],y,a);}
+   unsigned short*t=t16+tile*16*24;
+@@ -167,14 +166,10 @@
+   __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
+   h8 x{};i2 xb{};for(uint e=0;e<8;e++){unsigned short u=t[rc()*24+gr()*8+e];union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;pack(xb,e,from_half(u));}
+   sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);
+-  __builtin_memcpy(p8+rc()*S+key+gr()*8,&xb,8);
++  for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+vkey)*1024+head*32+c*16+rc()]);}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(xb,y,acc[c]);}
+  }
+  float inv[8];for(uint e=0;e<8;e++)inv[e]=1.f/sum[e];
+  __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
+- f8 acc[2]{};
+- for(uint k=0;k<tokens;k+=16){i2 x;__builtin_memcpy(&x,p8+rc()*S+k+gr()*8,8);
+-  for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint key=k+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+key)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+key)*1024+head*32+c*16+rc()]);}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(x,y,acc[c]);}
+- }
+  for(uint c=0;c<2;c++)for(uint e=0;e<8;e++){if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[(first+gr()*8+e)*1024+head*32+c*16+rc()]=byte_F(Hrtz(acc[c][e]*inv[e]));else out[(first+gr()*8+e)*1024+head*32+c*16+rc()]=F(Hrtz(acc[c][e]*inv[e]));}
+ }
+ // Byte-stream twins: byte Q/K/V in, attention output stored as its E4M3 byte for vit_project_bytein_bout.
