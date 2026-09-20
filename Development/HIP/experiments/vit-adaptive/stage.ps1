@@ -1,8 +1,10 @@
-$ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$dest="$lab\AttExp-preview";$payload="$dest\payload";New-Item -ItemType Directory -Force "$payload\DLSS5-AMD\HIP"|Out-Null
+$ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$dest="$lab\AttExp-preview";$payload="$dest\payload";New-Item -ItemType Directory -Force "$payload\DLSS5-AMD\native-game-tiled-assets\HIP"|Out-Null
+# Remove only the obsolete staging directory made by the previous installer.
+if(Test-Path "$payload\DLSS5-AMD\HIP"){Remove-Item "$payload\DLSS5-AMD\HIP" -Recurse -Force}
 Copy-Item "$lab\hip-backend\native-vit-adaptive.addon64" "$payload\dlss5-amd.addon64" -Force
 Copy-Item "$lab\hip-backend\vit-residual-scales\gain.f32" "$payload\DLSS5-AMD\vit-reuse-gain.f32" -Force
 foreach($arch in 'gfx1200','gfx1201'){
- $out="$payload\DLSS5-AMD\HIP\$arch";New-Item -ItemType Directory -Force $out|Out-Null
+ $out="$payload\DLSS5-AMD\native-game-tiled-assets\HIP\$arch";New-Item -ItemType Directory -Force $out|Out-Null
  Copy-Item "$lab\c256-frag-production-modules\$arch\*.hsaco" $out -Force
  Copy-Item "$lab\vit-residual-adaptive-build\$arch\deep_fast-packed.hsaco" $out -Force
  if(@(Get-ChildItem $out -Filter *.hsaco).Count -ne 24){throw 'Architecture module count'}

@@ -2848,3 +2848,9 @@ R3编译gfx1200 c909d8c1…/gfx1201 09b03f12…，DLL fd451efb…；静态900/10
 ## 2026-09-20 18:25：《剑星》部署R3整体试玩候选
 
 用户明确要求安装，先确认SB-Win64-Shipping未运行，再执行AttExp-preview/install-preview.ps1 -Action Install。实际目标Steam/StellarBlade/SB/Binaries/Win64/dlss5-amd.addon64已更新为R3 fd451efb4aa566795f17ca6d9e1b2166f4c99f68e9e5fd6e63b75a0590cef696；DLL/gain/双架构48模块共50文件独立复核SHA全部通过。备份D:\DLSSNR-Lab\AttExp-preview\backups\20260920-182609-930，可用同脚本-Action Restore恢复（退出游戏后）。默认adaptive=1、period4、阈值0.22/1.0/0.35、F8切换实验/完整计算，Graph及ViT byte-stream关闭。保留用户NETWORK_HEIGHT=auto、SHOW_FPS=0及decoder skip42/43/46；可看Steam/AMD帧率。没有装被否决的多stream实验，没有启动游戏，等待用户实测。
+
+## 2026-09-20 18:39：《剑星》首次部署路径错误修复
+
+用户启动后DLSS5 ERROR。pid31440日志明确render_failed reuse_image_stats: hipErrorNotFound(500)，实际加载native-game-tiled-assets/HIP/gfx1201旧模块；此前安装器错把新模块放在DLSS5-AMD/HIP。是部署错误：50文件hash验证只证实写入位置的文件，mock测试也沿用了同一错误假设，测试台又显式传HIP_MODULES因此没覆盖真实默认加载路径。
+
+用户18:41退出后，先用182609-930备份恢复第一次错误部署（移除错误root/HIP），再修正stage/manifest/install检查与mock目录为DLSS5-AMD/native-game-tiled-assets/HIP，重跑隔离Install/Install/Restore通过，再实际安装。DLL仍fd451efb…，48模块/gain不改算子；新真实备份D:\DLSSNR-Lab\AttExp-preview\backups\20260920-184121-974。新增check-installed-runtime.ps1直接读游戏安装的assets/flags、不传HIP_MODULES参数且清除继承override，900档完整/自适应各12帧有限且冻结不变，两者SHA同为0996a49677e47af7b94cb96ed0463a84ed861979cd845d662fac3af093ebf8c0。实际新路径50文件逐hash通过，错误root/HIP不存在。修正manifest保存results/vit-adaptive-r3-20260920/preview-manifest-installed-fix.json；旧manifest保留作历史错误证据。已告知用户可重启实测，未自行启动游戏。

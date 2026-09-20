@@ -35,3 +35,9 @@ Static R3 saves an additional0.339/0.563ms versus R2. Movement is effectively un
 ## Final preview
 
 R3 promoted only into lab staging `D:\DLSSNR-Lab\AttExp-preview`. Current50-file manifest attached; gfx1201 payload matches all24 tested modules. R2 runner/modules, build and DLL retained under frozen/r2 names. Mode off/on, history reset/force-full and isolated Install/Install/Restore all passed again after promotion. No real game directory modified. Physical F8/overlay delivery, actual motion vectors and subjective quality are the next whole-game test.
+
+## Deployment correction,18:39–18:42
+
+The first real-game deployment failed with `reuse_image_stats: hipErrorNotFound (500)`: the old preview manifest placed modules in DLSS5-AMD/HIP, but NativeHipNetwork defaults to the **asset directory's** HIP folder, DLSS5-AMD/native-game-tiled-assets/HIP. Earlier copy/hash and mock rollback checks did not prove runtime path selection. The old manifest remains historical evidence, not the current deployment recipe.
+
+After the user exited, restored the erroneous install, corrected stage/installer/mock layout, and reinstalled. New backup:AttExp-preview/backups/20260920-184121-974. All50 files match preview-manifest-installed-fix.json; obsolete root/HIP absent. Actual installed assets were replayed **without an explicit module argument**, both exact/adaptive900 at12 frozen frames: finite, stable, identical SHA0996a49677e47af7b94cb96ed0463a84ed861979cd845d662fac3af093ebf8c0. DLL/kernel math unchanged. In-game restart/visual validation remains with the user.

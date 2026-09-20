@@ -36,3 +36,7 @@ After installation: **F8 toggles adaptive/exact computation**, leaving DLSS5 act
 ## R3 exact-input extension
 
 `r3-check.ps1` selects an isolated `vit-residual-adaptive-r3-modules` / `benchmark_vit_adaptive_r3.exe` pair. Compare uses the frozen R2 executable **and** modules (do not mix the host/kernel ABIs); Timing uses exact-stream baseline. `r3-match.ps1` verifies168 per-frame reference/candidate hashes against R2 across seven sequences. `gate-check.cpp` directly tests GPU equality including padding, signed zero, forced modes, saturated age, nonfinite values and fused image commit on400/640 tokens. Build with MinGW and `-IDevelopment/HIP`; pass the gfx1201 deep_fast-packed.hsaco path when running on9070XT.
+
+## Installation path correction (2026-09-20 18:39)
+
+NativeHipNetwork receives `DLSS5-AMD/native-game-tiled-assets` as its asset directory and defaults to **that directory's HIP subfolder**, not `DLSS5-AMD/HIP`. The first installer wrote the latter, so the game loaded older kernels and reported `reuse_image_stats: hipErrorNotFound (500)`. Payload/module-path checks now enforce `DLSS5-AMD/native-game-tiled-assets/HIP/gfx1200|gfx1201`. The earlier50-file hashes proved copy integrity only, not actual runtime selection. The fake install/restore test now uses the real layout, and check-installed-runtime.ps1 runs against actual installed assets **without a HIP_MODULES argument**, validating both exact and adaptive frozen output. Restore the erroneous installation before reinstalling the corrected layout.

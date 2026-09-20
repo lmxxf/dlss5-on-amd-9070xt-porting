@@ -22,6 +22,10 @@ if($Action -eq 'Restore'){if(!(Test-Path $state)){throw 'No preview backup recor
 if(!(Test-Path -LiteralPath "$GameDir\dlss5-amd.addon64") -or !(Test-Path -LiteralPath "$root\native-game-flags.txt")){throw 'Existing OptiScaler DLSS5 install not found'}
 $manifest=Get-Content "$preview\manifest.json" -Raw|ConvertFrom-Json
 if($manifest.Count -ne 50){throw 'Expected DLL + gain + 48 architecture modules'}
+$moduleRoot='DLSS5-AMD\native-game-tiled-assets\HIP\'
+$modules=@($manifest|Where-Object{$_.name.EndsWith('.hsaco')})
+if($modules.Count -ne 48 -or @($modules|Where-Object{!$_.name.StartsWith($moduleRoot)}).Count){throw 'Modules must match NativeHipNetwork default: assets/HIP'}
+if(!(Test-Path "$root\native-game-tiled-assets" -PathType Container)){throw 'Runtime assets directory missing'}
 foreach($f in $manifest){if((Hash "$preview\payload\$($f.name)") -ne $f.sha256){throw "Preview hash mismatch: $($f.name)"}}
 if(Test-Path $state){$prior=(Get-Content $state -Raw).Trim();$record=Get-Content "$prior\backup.json" -Raw|ConvertFrom-Json
  if($record.game -eq $GameDir -and (Hash "$GameDir\dlss5-amd.addon64") -eq ($manifest|Where-Object{$_.name -eq 'dlss5-amd.addon64'}).sha256){
