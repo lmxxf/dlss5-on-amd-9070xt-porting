@@ -8,7 +8,7 @@ def display(x):
  x=np.clip(x,0,1);return np.where(x<=.0031308,x*12.92,1.055*x**(1/2.4)-.055)
 result=[]
 for h in [900,1080]:
- for t in ['0','0.5','1']:
+ for t in ['0','0.15','0.5','1']:
   for p in [0,1,2]:
    path=source/f'select-{t}-{h}-p{p}.f16'
    if not path.exists():continue

@@ -4,7 +4,19 @@ here=Path(__file__).resolve().parent;root=here.parents[3]
 subprocess.run([sys.executable,str(here/'prepare.py')],check=True)
 s=(here/'select.hip').read_text();a=s.index('WAVE void vit_select_prep');b=s.index('template<uint MAXT>',a)
 prep=(here/'packed_prep.hip').read_text()
-if '--fragments' in sys.argv:
+if '--spatial' in sys.argv:
+ # Gather maps logical t to raster r by rotating its low four bits right by one.
+ # The pairing above is in raster coordinates; map its two indices back to logical layout.
+ prep=prep.replace('float kd=0,kn=0,vd=0,vn=0,unsafe=0;', 'bool valid_pairs=full;float kd=0,kn=0,vd=0,vn=0,unsafe=0;')
+ needle='  float k0=__builtin_amdgcn_cvt_f32_fp8(sk[u*36+c],0)'
+ repl='''  uint ru=first+u,rv=first+v,realcols=tokens==400?25:30,realrows=tokens==400?15:18;
+  bool liveu=ru/cols<realrows&&ru%cols<realcols,livev=rv/cols<realrows&&rv%cols<realcols;
+  valid_pairs=valid_pairs&&(liveu==livev);
+  u=(u&~15u)|((u&7u)<<1)|((u&8u)>>3);v=(v&~15u)|((v&7u)<<1)|((v&8u)>>3);
+  float k0=__builtin_amdgcn_cvt_f32_fp8(sk[u*36+c],0)'''
+ assert needle in prep;prep=prep.replace(needle,repl).replace('=full&&unsafe==0.f&&distance<=threshold','=valid_pairs&&unsafe==0.f&&distance<=threshold')
+fragments='--fragments' in sys.argv or '--spatial' in sys.argv
+if fragments:
  prep=prep.replace('sk[32*36],sv[32*36],spv[16*36]','sk[32*36],sv[32*36],spk[16*36],spv[16*36]')
  prep=prep.replace('pool[(h*tokens+first+j)*32+c]=k;','')
  prep=prep.replace('for(uint j=0;j<16&&first+2*j+1<tokens;j++){','for(uint j=0;j<16;j++){if(first+2*j+1>=tokens){spk[j*36+c]=0;spv[j*36+c]=0;continue;}')
@@ -18,7 +30,7 @@ s=s.replace('const unsigned char*vs=(pooled?pool:in)+(pooled?KT+key/2:2*tokens+k
 old='for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint b=vs[(gr()*8+e)*1024+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(xb,y,acc[c]);}'
 assert old in s
 s=s.replace(old,'for(uint c=0;c<2;c++){i2 y{};__builtin_memcpy(&y,vs+(c*16+rc())*stride+gr()*8,8);acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(xb,y,acc[c]);}')
-if '--fragments' in sys.argv:
+if fragments:
  old='const unsigned char*ks=pooled?pool+2*tokens*1024+(head*PT+key/2+rc())*32:pool+(head*tokens+key+rc())*32;'
  new='uint nt=pooled?PT/16:tokens/16,ki=pooled?key/32:key/16;const unsigned char*ks=pool+(pooled?2*tokens*1024:0)+(head*nt+ki)*512+__builtin_amdgcn_workitem_id_x()*8;'
  assert old in s;s=s.replace(old,new).replace('ks+k+gr()*8','ks+(k/16)*256')

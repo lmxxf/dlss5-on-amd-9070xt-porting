@@ -1,4 +1,4 @@
-param([ValidateSet('packed','fragment')][string]$Variant='packed')
+param([ValidateSet('packed','fragment','spatial')][string]$Variant='packed')
 $ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$r="$lab\hip-backend";$src="$lab\vit-$Variant-src"
 New-Item -ItemType Directory -Force $src|Out-Null;Copy-Item "$r\vit-$Variant.hip" "$src\deep_fast.hip" -Force
 & "$r\build-vIT-experiment.ps1" -SourceDir $src -OutputDir "$lab\vit-$Variant-build" -Compiler "$lab\dual-arch-src\rtc_compile.exe" -Only deep_fast-packed
