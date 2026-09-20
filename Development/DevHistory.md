@@ -2844,3 +2844,7 @@ R3编译gfx1200 c909d8c1…/gfx1201 09b03f12…，DLL fd451efb…；静态900/10
 原图调度实验初步收束：两种排法各3类输入×12帧，共72对逐帧输出同R3。正式160帧ABBA不带诊断读回/写盘：同stream提前基本无收益；aux并行900/1080均多约0.43ms（约3.34%/2.37%）。不以多队列等同更快，不把诊断回放里额外放大的耗时当正式开销；两种方案均不纳入试玩候选，保留R3。追加短span诊断区分CPU enqueue与GPU时间，随后保存报告。
 
 最终结果保存results/vit-image-overlap-20260920/report.md及完整ABBA/72对SHA。提前同stream900/1080仅+0.00743/+0.02438ms，无收益；aux +0.42578/+0.42702ms，明确否决。短span诊断CPU enqueue均值0.519→0.533/0.535ms，没有显示提交端的大幅增加；GPU event elapsed在原排法/提前同stream出现负值和近零异常，保留原始日志并标为不可用，不能据此拆解GPU等待/竞争或断言驱动根因。以干净wall计时做决定。R3试玩候选fd451efb…保持不动，实际游戏未改。后续动态优化转向更大计算块的敏感性/局部复用，不继续给这项小检查堆多stream。
+
+## 2026-09-20 18:25：《剑星》部署R3整体试玩候选
+
+用户明确要求安装，先确认SB-Win64-Shipping未运行，再执行AttExp-preview/install-preview.ps1 -Action Install。实际目标Steam/StellarBlade/SB/Binaries/Win64/dlss5-amd.addon64已更新为R3 fd451efb4aa566795f17ca6d9e1b2166f4c99f68e9e5fd6e63b75a0590cef696；DLL/gain/双架构48模块共50文件独立复核SHA全部通过。备份D:\DLSSNR-Lab\AttExp-preview\backups\20260920-182609-930，可用同脚本-Action Restore恢复（退出游戏后）。默认adaptive=1、period4、阈值0.22/1.0/0.35、F8切换实验/完整计算，Graph及ViT byte-stream关闭。保留用户NETWORK_HEIGHT=auto、SHOW_FPS=0及decoder skip42/43/46；可看Steam/AMD帧率。没有装被否决的多stream实验，没有启动游戏，等待用户实测。
