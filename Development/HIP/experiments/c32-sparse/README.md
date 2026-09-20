@@ -1,0 +1,11 @@
+# C32 sparse FFN expansion experiment
+
+This tests only C32 32→128 expansion inside the existing fused FFN/attention kernel, across outer C32 blocks. It does not test128→32 contraction or C64. Offline magnitude2:4 pruning retains original effective FP8 values. No extra GPU dispatch/input conversion.
+
+First generate the R3 source using ../vit-adaptive/build-host.sh. prepare.py copies /tmp/vit-adaptive-src to /tmp/c32-sparse-src, appends packed sparse expansion weights/indices after residual diagonals, and replaces expansion in the fused kernel. Root production sources remain unchanged. The current candidate is compile-specialized sparse; selecting the original module is required to disable it. This is not a ready game configuration toggle.
+
+Host weights: DLSS5_C32_SPARSE=0 packs sparse side data but leaves original weights;1 selects the experimental flag;2 zeros the matching original expansion weights for a dense-pruned arithmetic control. Current specialized kernel always uses sparse data regardless of flag, so mode2 reference must use original modules. run.ps1 sets this correctly. Initial dynamic-branch build additionally read fw[11040] to switch inside the fused kernel; its disabled control matched original exactly, but it was slower.
+
+Build runner with the command used by ../vit-adaptive/build-host.sh, replacing source root with /tmp/c32-sparse-src and output with benchmark_c32_sparse.exe. Upload generated kernel and build.ps1 to D:/DLSSNR-Lab/hip-backend/c32-sparse. build.ps1 compiles gfx1200/gfx1201 with packed/half macros and creates c32-sparse-modules from R3 modules plus the new C32 module. run.ps1 Check tests original/dense-pruned/sparse; Timing runs160-frame whole-network ABBA900P with ViT reuse disabled and no temporal history. Archive c32-sparse-results before repeating, since tags overwrite. Game/Magpie guards run before/after.
+
+No benefit yet: dynamic branch +0.167ms; specialized sparse essentially tied with original (~13.25ms). Frozen RGB MAE1.708/255 versus original, despite identical output to dense-pruned control. Do not deploy this candidate as a performance improvement. Next candidate should target C32 contraction K128, preserving existing residual/rounding semantics and measuring any additional LDS transposition/barrier costs.
