@@ -1,0 +1,111 @@
+{
+  "fp8_cpu_control": {
+    "relative_l1": 0.0,
+    "relative_rmse": 0.0,
+    "abs_p99": 0.0,
+    "max_abs": 0.0,
+    "cosine": 1.0000870619071622
+  },
+  "variants": [
+    {
+      "method": 1,
+      "name": "plain",
+      "matmul_oracle": {
+        "relative_l1": 1.4097551822426571e-07,
+        "relative_rmse": 1.626546320561346e-07,
+        "abs_p99": 1.430511474609375e-06,
+        "max_abs": 7.62939453125e-06,
+        "cosine": 1.0000101093884743
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 0.0,
+        "relative_rmse": 0.0,
+        "abs_p99": 0.0,
+        "max_abs": 0.0,
+        "cosine": 1.0000706769122707
+      },
+      "post_activation": {
+        "relative_l1": 0.3239068915565,
+        "relative_rmse": 0.28424324274659984,
+        "abs_p99": 1.515625,
+        "max_abs": 6.5625,
+        "cosine": 0.9627560798061755
+      }
+    },
+    {
+      "method": 2,
+      "name": "rotrow",
+      "matmul_oracle": {
+        "relative_l1": 1.723359764910683e-07,
+        "relative_rmse": 1.9438404764531942e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 7.62939453125e-06,
+        "cosine": 1.0000134742944027
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 0.0,
+        "relative_rmse": 0.0,
+        "abs_p99": 0.0,
+        "max_abs": 0.0,
+        "cosine": 1.000005126816515
+      },
+      "post_activation": {
+        "relative_l1": 0.1784208437729503,
+        "relative_rmse": 0.15895519404973843,
+        "abs_p99": 1.0,
+        "max_abs": 2.75,
+        "cosine": 0.9875660125928191
+      }
+    },
+    {
+      "method": 3,
+      "name": "rotgroup",
+      "matmul_oracle": {
+        "relative_l1": 1.8435454462672076e-07,
+        "relative_rmse": 2.0299307043436343e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 8.58306884765625e-06,
+        "cosine": 1.00001738494388
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 0.0,
+        "relative_rmse": 0.0,
+        "abs_p99": 0.0,
+        "max_abs": 0.0,
+        "cosine": 1.000001338476361
+      },
+      "post_activation": {
+        "relative_l1": 0.13576427068341104,
+        "relative_rmse": 0.12273848292138749,
+        "abs_p99": 0.6875,
+        "max_abs": 2.25,
+        "cosine": 0.9926440569192274
+      }
+    },
+    {
+      "method": 4,
+      "name": "balanced",
+      "matmul_oracle": {
+        "relative_l1": 1.6933078119894866e-07,
+        "relative_rmse": 1.897467163779913e-07,
+        "abs_p99": 1.9073486328125e-06,
+        "max_abs": 6.67572021484375e-06,
+        "cosine": 1.0000150537791543
+      },
+      "quantizer_cpu_comparison": {
+        "relative_l1": 0.0,
+        "relative_rmse": 0.0,
+        "abs_p99": 0.0,
+        "max_abs": 0.0,
+        "cosine": 1.0000044297752586
+      },
+      "post_activation": {
+        "relative_l1": 0.2052164172563187,
+        "relative_rmse": 0.18195988992407955,
+        "abs_p99": 1.0,
+        "max_abs": 4.0,
+        "cosine": 0.9833944594906834
+      }
+    }
+  ]
+}

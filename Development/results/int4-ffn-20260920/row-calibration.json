@@ -1,0 +1,138 @@
+{
+  "selected_clip": 0.75,
+  "calibration": [
+    {
+      "clip": 0.5,
+      "relative_l1": 0.3322799934199889,
+      "relative_rmse": 0.2875412451010897,
+      "abs_p99": 1.5625,
+      "max_abs": 7.0,
+      "cosine": 0.9601321507568203
+    },
+    {
+      "clip": 0.6,
+      "relative_l1": 0.25239157324091155,
+      "relative_rmse": 0.223520728232412,
+      "abs_p99": 1.25,
+      "max_abs": 6.0,
+      "cosine": 0.9752097664819649
+    },
+    {
+      "clip": 0.75,
+      "relative_l1": 0.20521602332463443,
+      "relative_rmse": 0.1819596821458028,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9833985521386728
+    },
+    {
+      "clip": 0.9,
+      "relative_l1": 0.21686480466923078,
+      "relative_rmse": 0.19104153853690373,
+      "abs_p99": 1.0,
+      "max_abs": 3.0,
+      "cosine": 0.9821455609766466
+    },
+    {
+      "clip": 1.0,
+      "relative_l1": 0.23804803577783593,
+      "relative_rmse": 0.20929199853471742,
+      "abs_p99": 1.15625,
+      "max_abs": 4.0,
+      "cosine": 0.9786852349091736
+    }
+  ],
+  "evaluation": [
+    {
+      "sequence": 1,
+      "frame": 1,
+      "relative_l1": 0.2041063524200974,
+      "relative_rmse": 0.18142685363899222,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.983433574974738
+    },
+    {
+      "sequence": 1,
+      "frame": 5,
+      "relative_l1": 0.20441650832245692,
+      "relative_rmse": 0.181532884999259,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9834169523634763
+    },
+    {
+      "sequence": 1,
+      "frame": 9,
+      "relative_l1": 0.20515775603178962,
+      "relative_rmse": 0.18109127769410907,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.983500404574548
+    },
+    {
+      "sequence": 2,
+      "frame": 1,
+      "relative_l1": 0.2038240362723622,
+      "relative_rmse": 0.1814664530498518,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9834263953692969
+    },
+    {
+      "sequence": 2,
+      "frame": 5,
+      "relative_l1": 0.20341330636280844,
+      "relative_rmse": 0.18088482995582533,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9835333758074882
+    },
+    {
+      "sequence": 2,
+      "frame": 9,
+      "relative_l1": 0.20371391296025076,
+      "relative_rmse": 0.18079498349775552,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9835486649851823
+    },
+    {
+      "sequence": 3,
+      "frame": 6,
+      "relative_l1": 0.20426001964841214,
+      "relative_rmse": 0.1817602805802292,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9833723323739186
+    },
+    {
+      "sequence": 3,
+      "frame": 9,
+      "relative_l1": 0.20426001964841214,
+      "relative_rmse": 0.1817602805802292,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9833723323739186
+    },
+    {
+      "sequence": 4,
+      "frame": 6,
+      "relative_l1": 0.20650308764710115,
+      "relative_rmse": 0.18353959187232816,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9830595546627796
+    },
+    {
+      "sequence": 4,
+      "frame": 9,
+      "relative_l1": 0.20650308764710115,
+      "relative_rmse": 0.18353959187232816,
+      "abs_p99": 1.0,
+      "max_abs": 4.0,
+      "cosine": 0.9830595546627796
+    }
+  ],
+  "selection": "min post-activation relative RMSE on sequence0 frame0, all375 valid tokens; transformations for evaluation only"
+}

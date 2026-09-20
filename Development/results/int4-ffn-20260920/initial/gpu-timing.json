@@ -1,0 +1,130 @@
+[
+  {
+    "method": 1,
+    "baseline_ms": 0.0351031,
+    "candidate_ms": 0.06443499999999999,
+    "change_percent": 83.55928678663706,
+    "runs": [
+      {
+        "candidate": "1",
+        "slot": "0",
+        "method": "0",
+        "mean_ms": "0.034889900"
+      },
+      {
+        "candidate": "1",
+        "slot": "1",
+        "method": "1",
+        "mean_ms": "0.053654600"
+      },
+      {
+        "candidate": "1",
+        "slot": "2",
+        "method": "1",
+        "mean_ms": "0.075215400"
+      },
+      {
+        "candidate": "1",
+        "slot": "3",
+        "method": "0",
+        "mean_ms": "0.035316300"
+      }
+    ]
+  },
+  {
+    "method": 2,
+    "baseline_ms": 0.0354007,
+    "candidate_ms": 0.0614146,
+    "change_percent": 73.48414014412144,
+    "runs": [
+      {
+        "candidate": "2",
+        "slot": "0",
+        "method": "0",
+        "mean_ms": "0.035484500"
+      },
+      {
+        "candidate": "2",
+        "slot": "1",
+        "method": "2",
+        "mean_ms": "0.053903300"
+      },
+      {
+        "candidate": "2",
+        "slot": "2",
+        "method": "2",
+        "mean_ms": "0.068925900"
+      },
+      {
+        "candidate": "2",
+        "slot": "3",
+        "method": "0",
+        "mean_ms": "0.035316900"
+      }
+    ]
+  },
+  {
+    "method": 3,
+    "baseline_ms": 0.03554405,
+    "candidate_ms": 0.03828525,
+    "change_percent": 7.712120594023469,
+    "runs": [
+      {
+        "candidate": "3",
+        "slot": "0",
+        "method": "0",
+        "mean_ms": "0.035537800"
+      },
+      {
+        "candidate": "3",
+        "slot": "1",
+        "method": "3",
+        "mean_ms": "0.038428300"
+      },
+      {
+        "candidate": "3",
+        "slot": "2",
+        "method": "3",
+        "mean_ms": "0.038142200"
+      },
+      {
+        "candidate": "3",
+        "slot": "3",
+        "method": "0",
+        "mean_ms": "0.035550300"
+      }
+    ]
+  },
+  {
+    "method": 4,
+    "baseline_ms": 0.0353493,
+    "candidate_ms": 0.06592785,
+    "change_percent": 86.50397603347166,
+    "runs": [
+      {
+        "candidate": "4",
+        "slot": "0",
+        "method": "0",
+        "mean_ms": "0.035332100"
+      },
+      {
+        "candidate": "4",
+        "slot": "1",
+        "method": "4",
+        "mean_ms": "0.056584100"
+      },
+      {
+        "candidate": "4",
+        "slot": "2",
+        "method": "4",
+        "mean_ms": "0.075271600"
+      },
+      {
+        "candidate": "4",
+        "slot": "3",
+        "method": "0",
+        "mean_ms": "0.035366500"
+      }
+    ]
+  }
+]
