@@ -1,9 +1,9 @@
 from pathlib import Path
 import csv,json,sys
 root=Path(sys.argv[1]);items=[]
-for variant in ['plain','fragment']:
+for variant in ['plain','fragment','spatial']:
  for h in [900,1080]:
-  for t in ['-1','0.5','1']:
+  for t in (['0.15','0.5','1'] if variant=='spatial' else ['-1','0.5','1']):
    ps=[root/variant/f'timing-{t}--{kind}-{i}-{h}-p0-summary.csv' for kind,i in [('base',0),('select',1),('select',2),('base',3)]]
    r=[next(csv.DictReader(p.open(encoding='utf-8-sig'))) for p in ps]
    assert r[0]['hash']==r[3]['hash'] and r[1]['hash']==r[2]['hash']

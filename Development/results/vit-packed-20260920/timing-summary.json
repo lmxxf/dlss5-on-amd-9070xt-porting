@@ -1,0 +1,182 @@
+[
+  {
+    "variant": "plain",
+    "height": 900,
+    "threshold": -1.0,
+    "baseline_ms": 13.20625,
+    "candidate_ms": 13.395,
+    "saved_ms": -0.18874999999999886,
+    "reduction_percent": -1.4292475153809663,
+    "baseline_drift_ms": 0.022499999999999076
+  },
+  {
+    "variant": "plain",
+    "height": 900,
+    "threshold": 0.5,
+    "baseline_ms": 13.27975,
+    "candidate_ms": 13.397,
+    "saved_ms": -0.1172500000000003,
+    "reduction_percent": -0.882923247802107,
+    "baseline_drift_ms": 0.0034999999999989484
+  },
+  {
+    "variant": "plain",
+    "height": 900,
+    "threshold": 1.0,
+    "baseline_ms": 13.288,
+    "candidate_ms": 13.302,
+    "saved_ms": -0.013999999999999346,
+    "reduction_percent": -0.10535821794099448,
+    "baseline_drift_ms": 0.021000000000000796
+  },
+  {
+    "variant": "plain",
+    "height": 1080,
+    "threshold": -1.0,
+    "baseline_ms": 18.744,
+    "candidate_ms": 18.95325,
+    "saved_ms": -0.20925000000000082,
+    "reduction_percent": -1.1163572343149852,
+    "baseline_drift_ms": 0.036000000000001364
+  },
+  {
+    "variant": "plain",
+    "height": 1080,
+    "threshold": 0.5,
+    "baseline_ms": 18.766750000000002,
+    "candidate_ms": 18.94625,
+    "saved_ms": -0.17949999999999733,
+    "reduction_percent": -0.9564788788681967,
+    "baseline_drift_ms": 0.0074999999999967315
+  },
+  {
+    "variant": "plain",
+    "height": 1080,
+    "threshold": 1.0,
+    "baseline_ms": 18.80175,
+    "candidate_ms": 18.825000000000003,
+    "saved_ms": -0.023250000000004434,
+    "reduction_percent": -0.12365870198255181,
+    "baseline_drift_ms": 0.019499999999997186
+  },
+  {
+    "variant": "fragment",
+    "height": 900,
+    "threshold": -1.0,
+    "baseline_ms": 13.2225,
+    "candidate_ms": 13.33075,
+    "saved_ms": -0.10824999999999996,
+    "reduction_percent": -0.8186802798260537,
+    "baseline_drift_ms": 0.013999999999999346
+  },
+  {
+    "variant": "fragment",
+    "height": 900,
+    "threshold": 0.5,
+    "baseline_ms": 13.275500000000001,
+    "candidate_ms": 13.327,
+    "saved_ms": -0.05149999999999899,
+    "reduction_percent": -0.3879326579036495,
+    "baseline_drift_ms": 0.005999999999998451
+  },
+  {
+    "variant": "fragment",
+    "height": 900,
+    "threshold": 1.0,
+    "baseline_ms": 13.2765,
+    "candidate_ms": 13.26125,
+    "saved_ms": 0.015249999999999986,
+    "reduction_percent": 0.11486461040183772,
+    "baseline_drift_ms": 0.028999999999999915
+  },
+  {
+    "variant": "fragment",
+    "height": 1080,
+    "threshold": -1.0,
+    "baseline_ms": 18.724,
+    "candidate_ms": 18.778,
+    "saved_ms": -0.053999999999998494,
+    "reduction_percent": -0.28839991454816544,
+    "baseline_drift_ms": 0.030999999999998806
+  },
+  {
+    "variant": "fragment",
+    "height": 1080,
+    "threshold": 0.5,
+    "baseline_ms": 18.77225,
+    "candidate_ms": 18.78275,
+    "saved_ms": -0.010500000000000398,
+    "reduction_percent": -0.05593362543115715,
+    "baseline_drift_ms": 0.0005000000000023874
+  },
+  {
+    "variant": "fragment",
+    "height": 1080,
+    "threshold": 1.0,
+    "baseline_ms": 18.807000000000002,
+    "candidate_ms": 18.74175,
+    "saved_ms": 0.06525000000000247,
+    "reduction_percent": 0.3469452863295713,
+    "baseline_drift_ms": 0.023999999999997357
+  },
+  {
+    "variant": "spatial",
+    "height": 900,
+    "threshold": 0.15,
+    "baseline_ms": 13.203,
+    "candidate_ms": 13.283,
+    "saved_ms": -0.08000000000000007,
+    "reduction_percent": -0.6059228963114449,
+    "baseline_drift_ms": 0.02200000000000024
+  },
+  {
+    "variant": "spatial",
+    "height": 900,
+    "threshold": 0.5,
+    "baseline_ms": 13.248000000000001,
+    "candidate_ms": 13.2605,
+    "saved_ms": -0.01249999999999929,
+    "reduction_percent": -0.09435386473429415,
+    "baseline_drift_ms": 0.011000000000001009
+  },
+  {
+    "variant": "spatial",
+    "height": 900,
+    "threshold": 1.0,
+    "baseline_ms": 13.29975,
+    "candidate_ms": 13.23825,
+    "saved_ms": 0.06149999999999878,
+    "reduction_percent": 0.4624147070433563,
+    "baseline_drift_ms": 0.01750000000000007
+  },
+  {
+    "variant": "spatial",
+    "height": 1080,
+    "threshold": 0.15,
+    "baseline_ms": 18.716,
+    "candidate_ms": 18.748,
+    "saved_ms": -0.03200000000000003,
+    "reduction_percent": -0.17097670442402238,
+    "baseline_drift_ms": 0.022000000000002018
+  },
+  {
+    "variant": "spatial",
+    "height": 1080,
+    "threshold": 0.5,
+    "baseline_ms": 18.76075,
+    "candidate_ms": 18.7155,
+    "saved_ms": 0.0452500000000029,
+    "reduction_percent": 0.2411950481723966,
+    "baseline_drift_ms": 0.02050000000000196
+  },
+  {
+    "variant": "spatial",
+    "height": 1080,
+    "threshold": 1.0,
+    "baseline_ms": 18.785249999999998,
+    "candidate_ms": 18.716,
+    "saved_ms": 0.0692499999999967,
+    "reduction_percent": 0.36864028958888867,
+    "baseline_drift_ms": 0.0034999999999989484
+  }
+]
