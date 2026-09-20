@@ -1,5 +1,5 @@
 param([ValidateSet('Check','Timing')][string]$Phase='Check')
-$ErrorActionPreference='Stop';$r='D:\DLSSNR-Lab\hip-backend';$d="$r\c32-sparse-results";$b='D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD'
+$ErrorActionPreference='Stop';$r='D:\DLSSNR-Lab\hip-backend';$d="$r\c32-contract-shuffle-results";$b='D:\DLSSNR-Lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD'
 function Idle {if(Get-Process SB-Win64-Shipping,Magpie,re9,LOP-Win64-Shipping -ErrorAction SilentlyContinue){throw 'Game/Magpie running'}}
 function One($tag,$mode,$old,$frames){
  Idle;New-Item -ItemType Directory -Force "$d\$tag"|Out-Null
