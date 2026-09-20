@@ -47,3 +47,7 @@ WAVE void q4_row_wave(const float*x,const float*s,u8*out,float*sc,uint M,uint ro
 }
 
 WAVE void int4_expand_group_n32(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,2>(x,w,xs,ws,out,pre,M);}
+
+WAVE void int4_expand_group_n128(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,8>(x,w,xs,ws,out,pre,M);}
+
+WAVE void int4_expand_group_n16(const u8*x,const u8*w,const float*xs,const float*ws,u8*out,float*pre,uint M,uint unused){int4_expand_body<true,1>(x,w,xs,ws,out,pre,M);}

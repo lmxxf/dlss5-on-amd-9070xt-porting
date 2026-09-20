@@ -1,0 +1,28 @@
+{
+  "16": {
+    "equal_to_n64": {
+      ".fp8": true,
+      "-pre.f32": true,
+      "-input.i4": true,
+      "-scale.f32": true
+    },
+    "mean_ms_by_method": {
+      "0": 0.0355187625,
+      "3": 0.0695295,
+      "5": 0.07297962499999999
+    }
+  },
+  "128": {
+    "equal_to_n64": {
+      ".fp8": true,
+      "-pre.f32": true,
+      "-input.i4": true,
+      "-scale.f32": true
+    },
+    "mean_ms_by_method": {
+      "0": 0.0354628875,
+      "3": 0.06859657499999999,
+      "5": 0.08679935
+    }
+  }
+}
