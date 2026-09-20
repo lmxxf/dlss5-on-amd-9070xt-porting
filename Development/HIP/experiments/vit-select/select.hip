@@ -24,28 +24,25 @@ template<uint MAXT>DEV void vit_select_body(const unsigned char*in,const unsigne
  __attribute__((shared)) unsigned short t16[2*16*24];
  const uint S=tokens+16,G=(tokens+31)/32,KT=tokens/2;
  i2 q[2]{};for(uint k=0;k<32;k+=16)__builtin_memcpy(&q[k/16],in+(first+rc())*1024+head*32+k+gr()*8,8);
- h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
  f8 sum{};uint tile=0;
- for(uint group=0;group<tokens;group+=32){bool pooled=route[(head*G+group/32)*2]&&first/32!=group/32;
-  uint steps=pooled?1:(group+32<=tokens?2:1);
-  for(uint pass=0;pass<steps;pass++,tile^=1u){uint key=group+pass*16;f8 a{};
-   for(uint k=0;k<32;k+=16){i2 y{};const unsigned char*p=pooled?pool+(group/2+rc())*1024+head*32+k+gr()*8:in+(tokens+key+rc())*1024+head*32+k+gr()*8;__builtin_memcpy(&y,p,8);a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(q[k/16],y,a);}
+ for(uint key=0;key<tokens;){uint group=key;bool pooled=(key&31u)==0&&route[(head*G+key/32)*2]&&first/32!=key/32;f8 a{};
+   const unsigned char*ks=(pooled?pool:in)+(pooled?key/2:tokens+key)*1024+rc()*1024+head*32;
+   for(uint k=0;k<32;k+=16){i2 y{};__builtin_memcpy(&y,ks+k+gr()*8,8);a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(q[k/16],y,a);}
    unsigned short*t=t16+tile*16*24;
-   for(uint e=0;e<8;e++){float af=clampf(a[e]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);uint hb=(bits(af)>>13)-0x1c000u;unsigned short u=(unsigned short)(((hb<<4)+0x4000u)&65535u);if(pooled){union{unsigned short u;_Float16 h;}cv;cv.h=(_Float16)(from_half(u)*2.f);u=cv.u;}t[(gr()*8+e)*24+rc()]=u;}
+   for(uint e=0;e<8;e++){float af=clampf(a[e]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);uint hb=(bits(af)>>13)-0x1c000u;unsigned short u=(unsigned short)(((hb<<4)+0x4000u)&65535u);t[(gr()*8+e)*24+rc()]=u;}
    __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
-   h8 x{};i2 xb{};for(uint e=0;e<8;e++){unsigned short u=t[rc()*24+gr()*8+e];union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;pack(xb,e,pooled?from_half(u)*.5f:from_half(u));}
-   sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);
+   h8 x{};i2 xb{};for(uint e=0;e<8;e++){unsigned short u=t[rc()*24+gr()*8+e];union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;pack(xb,e,from_half(u));}
+   h8 multiplier{};for(uint e=0;e<8;e++)multiplier[e]=(_Float16)(pooled?2.f:1.f);sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,multiplier,sum);
    __builtin_memcpy(p8+rc()*S+key+gr()*8,&xb,8);
-  }
+   key+=pooled?32:16;tile^=1u;
  }
  float inv[8];for(uint e=0;e<8;e++)inv[e]=1.f/sum[e];
  __builtin_amdgcn_fence(3,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(2,"workgroup");
  f8 acc[2]{};
- for(uint group=0;group<tokens;group+=32){bool pooled=route[(head*G+group/32)*2]&&first/32!=group/32;
-  uint steps=pooled?1:(group+32<=tokens?2:1);
-  for(uint pass=0;pass<steps;pass++){uint k=group+pass*16;i2 x;__builtin_memcpy(&x,p8+rc()*S+k+gr()*8,8);
-   for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint key=k+gr()*8+e;uint b=pooled?pool[(KT+group/2+gr()*8+e)*1024+head*32+c*16+rc()]:in[(2*tokens+key)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(x,y,acc[c]);}
-  }
+ for(uint k=0;k<tokens;){bool pooled=(k&31u)==0&&route[(head*G+k/32)*2]&&first/32!=k/32;i2 x;__builtin_memcpy(&x,p8+rc()*S+k+gr()*8,8);
+   const unsigned char*vs=(pooled?pool:in)+(pooled?KT+k/2:2*tokens+k)*1024+head*32;
+   for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint b=vs[(gr()*8+e)*1024+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(x,y,acc[c]);}
+   k+=pooled?32:16;
  }
  for(uint c=0;c<2;c++)for(uint e=0;e<8;e++)out[(first+gr()*8+e)*1024+head*32+c*16+rc()]=F(Hrtz(acc[c][e]*inv[e]));
 }

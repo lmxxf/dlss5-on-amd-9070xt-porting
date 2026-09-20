@@ -1,5 +1,5 @@
-param([ValidateSet('Control','Sweep','Timing')][string]$Phase='Control',[string]$Threshold='0.5',[string]$Duplicate='')
-$ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$r="$lab\hip-backend";$work="$r\vit-select-results";$b="$lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD";New-Item -ItemType Directory -Force $work|Out-Null
+param([ValidateSet('Control','Sweep','Timing')][string]$Phase='Control',[string]$Threshold='0.5',[string]$Duplicate='',[string]$Tag='flat')
+$ErrorActionPreference='Stop';$lab='D:\DLSSNR-Lab';$r="$lab\hip-backend";$work="$r\vit-select-$Tag-results";$b="$lab\Magpie-DLSS5-AMD-0.23\DLSS5-AMD";New-Item -ItemType Directory -Force $work|Out-Null
 function Idle {if(Get-Process re9,SB-Win64-Shipping,LOP-Win64-Shipping,Magpie -ErrorAction SilentlyContinue){throw 'Game/Magpie running'}}
 $flags=@(Get-Content "$b\native-game-flags.txt")+@('DLSS5_HIP_MH_FEATURE_BYTE=1','DLSS5_HIP_MH_PROJ_DIAG_FB=1','DLSS5_HIP_MH_BYTE_STREAM=1','DLSS5_HIP_DECODER_BYTE=1','DLSS5_HIP_VIT_BYTE_STREAM=0','DLSS5_HIP_MH_FFN_FRAG256=1','DLSS5_HIP_GRAPH=0','DLSS5_SHOW_FPS=0','DLSS5_PRE_UPSCALE=0',"DLSS5_HIP_DUP_PREFIX=$Duplicate",'DLSS5_HIP_DUP_COUNT=2')
 function RunOne($height,$label,$threshold,$pattern,$frames,$diag,$base){
