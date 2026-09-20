@@ -2856,3 +2856,11 @@ R3编译gfx1200 c909d8c1…/gfx1201 09b03f12…，DLL fd451efb…；静态900/10
 用户18:41退出后，先用182609-930备份恢复第一次错误部署（移除错误root/HIP），再修正stage/manifest/install检查与mock目录为DLSS5-AMD/native-game-tiled-assets/HIP，重跑隔离Install/Install/Restore通过，再实际安装。DLL仍fd451efb…，48模块/gain不改算子；新真实备份D:\DLSSNR-Lab\AttExp-preview\backups\20260920-184121-974。新增check-installed-runtime.ps1直接读游戏安装的assets/flags、不传HIP_MODULES参数且清除继承override，900档完整/自适应各12帧有限且冻结不变，两者SHA同为0996a49677e47af7b94cb96ed0463a84ed861979cd845d662fac3af093ebf8c0。实际新路径50文件逐hash通过，错误root/HIP不存在。修正manifest保存results/vit-adaptive-r3-20260920/preview-manifest-installed-fix.json；旧manifest保留作历史错误证据。已告知用户可重启实测，未自行启动游戏。
 
 18:55用户实玩反馈（明确为900P）：《剑星》R3约52–54FPS，主观感觉帧率和效果变化都不大。此次反馈没有给出同镜头F8两模式的分别读数，不与先前不同场景49/50FPS直接相减算收益；记录为已能实际游玩、暂未察觉明显画面变化，不能当作全面画质/稳定性验收。后续优先查实玩中的复用命中率及重算原因，再决定是否调整门槛或转向更大的计算块。
+
+## 2026-09-20 18:57起：回看Sol/TeaCache/Spectrum与HIP量化实现
+
+用户要求多关注所荐仓库思想。重新核对远端并读源码，comfy HIP Sol/token-aug、Spectrum5161f045…和Sol Triton26d816eb…仍是上午固定版本；这轮是深入发现，不是冒称新更新。新增重要线索：comfy HIP已有ops/svdquant_w4a4.hip、convrot_w4a4.hip实际实现，不止注意力。gfx12 INT4 WMMA为16×16×32，FP8/INT8为16×16×16；SVDQuant保留低秩高精分支、主体4bit，K64分组缩放，上投影合入写回，但量化/down投影另起kernel。tensor quantize明确要求离线DeepCompressor校准，不是现权重直接可用。计划先用已采输入的ViT block31 FFN展开验证W4A4/旋转/rank8或16纠错的误差与全部成本，再评估C256融合FFN；不把指令K翻倍等同整帧2倍。
+
+Spectrum值得借鉴的是实际anchor上的误差反馈、有限有符号系数与小矩阵求历史权重；离线双遍回放/扩散sigma坐标不能搬进实时游戏。TeaCache是连续变化经模型校准后累计，我们当前R3还只是相对anchor门槛，仍缺精算帧上的预测误差校准。Sol是Q相关路由+重要token从摘要尾部移除后精算，之前K/V相似合并并非完整Sol；短窗口/400–640token的路由开销很可能抵掉收益，优先级低于大矩阵/块复用。
+
+用已有特征做CPU因果小试（未占GPU/改游戏）：固定真anchor0/4/8，比较有两份历史的6个复用帧。平移latent相对L1：R3 hold17.56%、线性外推22.68%、两anchor均值16.98%；曝光15.44%/19.95%/14.02%。仅在精算8帧拟合、用于9–11的有界系数约−0.106，改善很小；说明这些样本上直接向前外推不合适，温和混合值得先验。不是Spectrum完整复现，也不是RGB/速度收益。下一试须在切镜时清空两份历史，并加“切镜后继续移动/转向/局部遮挡移动”，现有切镜后静止样本会掩盖旧历史污染。实玩命中率/重算原因要用不强制每帧同步的遥测统计。完整来源/优先级/CPU数据在results/cache-forecast-20260920/research.md、summary.json、frames.csv；工具experiments/cache-forecast-study。当前《剑星》R3不动。

@@ -1,0 +1,227 @@
+{
+  "summary": [
+    {
+      "sequence": 0,
+      "method": "r3_gain_hold",
+      "frames": 6,
+      "mean_relative_l1": 0.0,
+      "max_relative_l1": 0.0
+    },
+    {
+      "sequence": 0,
+      "method": "linear_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.0,
+      "max_relative_l1": 0.0
+    },
+    {
+      "sequence": 0,
+      "method": "damped_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.0,
+      "max_relative_l1": 0.0
+    },
+    {
+      "sequence": 0,
+      "method": "causal_bounded_fit",
+      "frames": 6,
+      "mean_relative_l1": 0.0,
+      "max_relative_l1": 0.0
+    },
+    {
+      "sequence": 0,
+      "method": "two_anchor_mean",
+      "frames": 6,
+      "mean_relative_l1": 0.0,
+      "max_relative_l1": 0.0
+    },
+    {
+      "sequence": 1,
+      "method": "r3_gain_hold",
+      "frames": 6,
+      "mean_relative_l1": 0.17558255754276741,
+      "max_relative_l1": 0.1899794653095716
+    },
+    {
+      "sequence": 1,
+      "method": "linear_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.22683976620942023,
+      "max_relative_l1": 0.2766100105758798
+    },
+    {
+      "sequence": 1,
+      "method": "damped_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.18312059771181244,
+      "max_relative_l1": 0.2037925756295391
+    },
+    {
+      "sequence": 1,
+      "method": "causal_bounded_fit",
+      "frames": 6,
+      "mean_relative_l1": 0.17476604085144223,
+      "max_relative_l1": 0.1899794653095716
+    },
+    {
+      "sequence": 1,
+      "method": "two_anchor_mean",
+      "frames": 6,
+      "mean_relative_l1": 0.16982675329850805,
+      "max_relative_l1": 0.17961899407442197
+    },
+    {
+      "sequence": 2,
+      "method": "r3_gain_hold",
+      "frames": 6,
+      "mean_relative_l1": 0.15440051351187145,
+      "max_relative_l1": 0.16108203117601902
+    },
+    {
+      "sequence": 2,
+      "method": "linear_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.1995155476660885,
+      "max_relative_l1": 0.23112942116352334
+    },
+    {
+      "sequence": 2,
+      "method": "damped_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.16125771650909493,
+      "max_relative_l1": 0.1721996803572611
+    },
+    {
+      "sequence": 2,
+      "method": "causal_bounded_fit",
+      "frames": 6,
+      "mean_relative_l1": 0.15345767268248725,
+      "max_relative_l1": 0.16108203117601902
+    },
+    {
+      "sequence": 2,
+      "method": "two_anchor_mean",
+      "frames": 6,
+      "mean_relative_l1": 0.14016876797117286,
+      "max_relative_l1": 0.14763829055140654
+    },
+    {
+      "sequence": 3,
+      "method": "r3_gain_hold",
+      "frames": 6,
+      "mean_relative_l1": 0.25882416600525304,
+      "max_relative_l1": 0.7764724980157591
+    },
+    {
+      "sequence": 3,
+      "method": "linear_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.25882416600525304,
+      "max_relative_l1": 0.7764724980157591
+    },
+    {
+      "sequence": 3,
+      "method": "damped_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.25882416600525304,
+      "max_relative_l1": 0.7764724980157591
+    },
+    {
+      "sequence": 3,
+      "method": "causal_bounded_fit",
+      "frames": 6,
+      "mean_relative_l1": 0.25882416600525304,
+      "max_relative_l1": 0.7764724980157591
+    },
+    {
+      "sequence": 3,
+      "method": "two_anchor_mean",
+      "frames": 6,
+      "mean_relative_l1": 0.25882416600525304,
+      "max_relative_l1": 0.7764724980157591
+    },
+    {
+      "sequence": 4,
+      "method": "r3_gain_hold",
+      "frames": 6,
+      "mean_relative_l1": 0.15129979499552262,
+      "max_relative_l1": 0.4538993849865679
+    },
+    {
+      "sequence": 4,
+      "method": "linear_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.15129979499552262,
+      "max_relative_l1": 0.4538993849865679
+    },
+    {
+      "sequence": 4,
+      "method": "damped_extrapolate",
+      "frames": 6,
+      "mean_relative_l1": 0.15129979499552262,
+      "max_relative_l1": 0.4538993849865679
+    },
+    {
+      "sequence": 4,
+      "method": "causal_bounded_fit",
+      "frames": 6,
+      "mean_relative_l1": 0.15129979499552262,
+      "max_relative_l1": 0.4538993849865679
+    },
+    {
+      "sequence": 4,
+      "method": "two_anchor_mean",
+      "frames": 6,
+      "mean_relative_l1": 0.15129979499552262,
+      "max_relative_l1": 0.4538993849865679
+    }
+  ],
+  "causal_fits": [
+    {
+      "sequence": 0,
+      "update_frame": 8,
+      "anchors": [
+        0,
+        4
+      ],
+      "beta": 0.0
+    },
+    {
+      "sequence": 1,
+      "update_frame": 8,
+      "anchors": [
+        0,
+        4
+      ],
+      "beta": -0.1056439717850863
+    },
+    {
+      "sequence": 2,
+      "update_frame": 8,
+      "anchors": [
+        0,
+        4
+      ],
+      "beta": -0.10585858341693047
+    },
+    {
+      "sequence": 3,
+      "update_frame": 8,
+      "anchors": [
+        0,
+        4
+      ],
+      "beta": 0.0
+    },
+    {
+      "sequence": 4,
+      "update_frame": 8,
+      "anchors": [
+        0,
+        4
+      ],
+      "beta": 0.0
+    }
+  ],
+  "scope": "900 tier, no history, fixed exact anchors0/4/8; six reused frames5/6/7/9/10/11; feature error only"
+}
