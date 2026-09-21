@@ -1,5 +1,7 @@
 #pragma once
 #include <chrono>
+#include <cstring>
+#include <cstdio>
 #include "hip_reference_network.h"
 #include "../../src/native_device_identity.h"
 #include <d3d12.h>
@@ -24,7 +26,6 @@ class D3D12Bridge {
  void Release(Shared&s){auto&api=network->Runtime();if(s.mapped)api.hipFree(s.mapped);if(s.imported)api.hipDestroyExternalMemory(s.imported);if(s.handle)CloseHandle(s.handle);if(s.resource)s.resource->Release();s={};}
  void InputContract(ID3D12Resource*r){if(!r||r->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||r->GetDesc().Width<pixels*16)throw std::runtime_error("bridge input capacity");ID3D12Device*owner{};Check(r->GetDevice(IID_PPV_ARGS(&owner)),"input device");bool same=NativeSameDevice(owner,device);owner->Release();if(!same)throw std::runtime_error("bridge input device mismatch");}
 public:
- std::string architecture,adapter_name,module_directory,device_match;int runtime_version{};
  D3D12Bridge()=default;D3D12Bridge(const D3D12Bridge&)=delete;D3D12Bridge&operator=(const D3D12Bridge&)=delete;
  ~D3D12Bridge(){
   // A failed GPU wait does not cancel queued commands. Keep backing storage alive.
@@ -36,20 +37,18 @@ public:
  void Create(ID3D12CommandQueue*q,Options options,const std::vector<float>&noise){
   if(network||queue||!q)throw std::runtime_error("bridge already initialized/invalid queue");queue=q;queue->AddRef();Check(q->GetDevice(IID_PPV_ARGS(&device)),"queue device");pixels=size_t(options.width)*options.height;
   options.pooled=true;options.profile=false;options.dump_dir.clear();
-  // Pick the HIP device that is the game's D3D12 adapter. Hosts with an iGPU or a second card expose several HIP devices
-  // Prefer the Windows adapter LUID; fall back to names only if HIP does not expose a LUID.
-  IDXGIFactory4*factory{};IDXGIAdapter1*adapter{};Check(CreateDXGIFactory1(IID_PPV_ARGS(&factory)),"factory");auto hr=factory->EnumAdapterByLuid(device->GetAdapterLuid(),IID_PPV_ARGS(&adapter));factory->Release();Check(hr,"D3D adapter");DXGI_ADAPTER_DESC1 desc{};adapter->GetDesc1(&desc);adapter->Release();char dname[256]{};WideCharToMultiByte(CP_UTF8,0,desc.Description,-1,dname,256,nullptr,nullptr);if(desc.VendorId!=0x1002)throw std::runtime_error(std::string("D3D12 adapter is not AMD: ")+dname);
-  {Api probe(options.runtime);probe.Check(probe.hipInit(0),"hipInit");probe.Check(probe.hipRuntimeGetVersion(&runtime_version),"runtime version");int count{};probe.Check(probe.hipGetDeviceCount(&count),"device count");int chosen=-1,name_match=-1;std::string seen;const LUID wanted=device->GetAdapterLuid();for(int i=0;i<count;i++){char hname[256]{};if(probe.hipDeviceGetName(hname,256,i))continue;auto prop=probe.Properties(i);bool has_luid=false;for(char c:prop.luid)has_luid|=c!=0;if(has_luid&&!memcmp(prop.luid,&wanted,sizeof wanted)){chosen=i;device_match="luid";}if(!has_luid&&name_match<0&&!strcmp(dname,hname))name_match=i;if(!seen.empty())seen+=" | ";seen+=std::to_string(i)+":"+hname+":"+prop.gcnArchName;}
-   if(chosen<0&&name_match>=0){chosen=name_match;device_match="name";}
-   if(chosen<0)throw std::runtime_error(std::string("no HIP device matches D3D12 adapter '")+dname+"' (HIP devices: "+(seen.empty()?"none":seen)+")");options.device=unsigned(chosen);hip_device=chosen;auto props=probe.Properties(chosen);architecture=std::string(props.gcnArchName,strnlen(props.gcnArchName,sizeof props.gcnArchName));architecture=architecture.substr(0,architecture.find(':'));adapter_name=dname;
-probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.hipMemGetInfo(&free_at_create,&total))free_at_create=0;}
-  if(architecture!="gfx1200"&&architecture!="gfx1201")throw std::runtime_error("unsupported HIP architecture: "+architecture);
-  auto root=std::filesystem::u8path(options.modules);
-  if(std::filesystem::is_directory(root/"gfx1200")||std::filesystem::is_directory(root/"gfx1201")){
-   root/=architecture;if(!std::filesystem::is_directory(root))throw std::runtime_error("missing module architecture directory: "+architecture);
-   options.modules=root.u8string();
-  }
-  module_directory=options.modules;
+  // Pick HIP by D3D12 adapter LUID. OptiScaler spoofs DXGI Description/VendorId to NVIDIA for DLSS, so VendorId==0x1002
+  // and strcmp(Description, hipDeviceGetName) both fail; host HipRuntimeLoad matches LUID via hipGetDevicePropertiesR0600@272.
+  IDXGIFactory4*factory{};IDXGIAdapter1*adapter{};Check(CreateDXGIFactory1(IID_PPV_ARGS(&factory)),"factory");auto hr=factory->EnumAdapterByLuid(device->GetAdapterLuid(),IID_PPV_ARGS(&adapter));factory->Release();Check(hr,"D3D adapter");DXGI_ADAPTER_DESC1 desc{};adapter->GetDesc1(&desc);adapter->Release();char dname[256]{};WideCharToMultiByte(CP_UTF8,0,desc.Description,-1,dname,256,nullptr,nullptr);
+  {Api probe(options.runtime);probe.Check(probe.hipInit(0),"hipInit");int count{};probe.Check(probe.hipGetDeviceCount(&count),"device count");
+   using PropsFn=int(*)(void*,int);auto props=reinterpret_cast<PropsFn>(GetProcAddress(probe.dll,"hipGetDevicePropertiesR0600"));
+   const LUID luid=device->GetAdapterLuid();int chosen=-1;std::string seen;
+   for(int i=0;i<count;i++){char hname[256]{};if(probe.hipDeviceGetName(hname,256,i))continue;if(!seen.empty())seen+=" | ";seen+=std::to_string(i)+":"+hname;
+    if(props){alignas(16) unsigned char properties[8192]{};if(props(properties,i)==0&&!std::memcmp(properties+272,&luid,sizeof(luid))){chosen=i;break;}}
+    else if(chosen<0&&!strcmp(dname,hname))chosen=i;}
+   if(chosen<0&&count==1)chosen=0;
+   if(chosen<0){char vend[32]{};std::snprintf(vend,sizeof vend,"0x%X",unsigned(desc.VendorId));throw std::runtime_error(std::string("no HIP device matches D3D12 LUID (DXGI desc='")+dname+"' VendorId="+vend+" HIP: "+(seen.empty()?"none":seen)+")");}
+   options.device=unsigned(chosen);hip_device=chosen;probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.hipMemGetInfo(&free_at_create,&total))free_at_create=0;}
   network=new Network(std::move(options));auto&api=network->Runtime();
   Share(input,pixels*16);Share(history,pixels*16);Share(output,pixels*12,true);Check(device->CreateFence(0,D3D12_FENCE_FLAG_SHARED,IID_PPV_ARGS(&fence)),"shared fence");Check(device->CreateSharedHandle(fence,nullptr,GENERIC_ALL,nullptr,&fence_handle),"fence handle");hip_probe::SemaphoreDesc sd{};sd.type=4;sd.handle.win32.handle=fence_handle;api.Check(api.hipImportExternalSemaphore(&semaphore,&sd),"import fence");event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("bridge completion event");if(const char*v=std::getenv("DLSS5_HIP_SPAN_PROBE"))span_probe=!strcmp(v,"1");if(span_probe){api.Check(api.hipEventCreate(&span_begin),"span begin event");api.Check(api.hipEventCreate(&span_end),"span end event");fprintf(stderr,"hip_span probe enabled\n");}network->SetNoise(noise);
  }
@@ -71,6 +70,26 @@ probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.
   hip_probe::SignalParams signal{};signal.params.fence.value=++value;api.Check(api.hipSignalExternalSemaphoresAsync(&semaphore,&signal,1,network->Stream()),"HIP output signal");Check(queue->Wait(fence,value),"D3D output wait");
   submit.Submit([&](ID3D12GraphicsCommandList*c){Barrier(c,output.resource,D3D12_RESOURCE_STATE_COMMON,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});readable=true;
   }catch(...){failed=true;throw;}
+ }
+ /* Composable host API: Record* do not Execute. EnqueueHip after the producer list is submitted. graph must stay off. */
+ void RecordInputCopy(ID3D12GraphicsCommandList*c,ID3D12Resource*rgba,ID3D12Resource*temporal){
+  if(!c||!network||failed)throw std::runtime_error("bridge unavailable");InputContract(rgba);if(temporal)InputContract(temporal);
+  auto copy=[&](ID3D12Resource*src,Shared&dst){Barrier(c,src,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);Barrier(c,dst.resource,D3D12_RESOURCE_STATE_COMMON,D3D12_RESOURCE_STATE_COPY_DEST);c->CopyBufferRegion(dst.resource,0,src,0,pixels*16);Barrier(c,dst.resource,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COMMON);Barrier(c,src,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);};
+  copy(rgba,input);if(temporal)copy(temporal,history);if(readable)Barrier(c,output.resource,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COMMON);
+ }
+ void EnqueueAfterProducer(U seed,bool temporal){
+  if(!network||failed)throw std::runtime_error("bridge unavailable");
+  if(network->GraphEnabled())throw std::runtime_error("EnqueueHip forbids HIP graph capture");
+  auto&api=network->Runtime();
+  pending=true;Check(queue->Signal(fence,++value),"D3D input signal");
+  hip_probe::WaitParams wait{};wait.params.fence.value=value;api.Check(api.hipWaitExternalSemaphoresAsync(&semaphore,&wait,1,network->Stream()),"HIP input wait");
+  network->Enqueue(input.mapped,temporal?history.mapped:nullptr,output.mapped,seed);
+  hip_probe::SignalParams signal{};signal.params.fence.value=++value;api.Check(api.hipSignalExternalSemaphoresAsync(&semaphore,&signal,1,network->Stream()),"HIP output signal");
+  Check(queue->Wait(fence,value),"D3D output wait");
+ }
+ void RecordOutputReadable(ID3D12GraphicsCommandList*c){
+  if(!c||!network||failed)throw std::runtime_error("bridge unavailable");
+  Barrier(c,output.resource,D3D12_RESOURCE_STATE_COMMON,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);readable=true;
  }
 };
 }
