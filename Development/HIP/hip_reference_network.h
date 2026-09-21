@@ -389,8 +389,13 @@ if(opt.fast_c32){const char*f[][2]={{"c32_fast_ffn","c32_fast.hsaco"},{"c32_fast
   wall_timings.clear();auto out=RunGraph(color,noisegpu,hist);std::vector<float>result(size_t(W)*H*3);api.Check(api.hipStreamSynchronize(stream),"before readback");api.Check(api.hipMemcpy(result.data(),P(out),result.size()*4,2),"final readback");if(opt.wall_profile){for(auto&m:wall_timings)std::printf("serialized_kernel_ms %s %.6f calls=%u\n",m.first.c_str(),m.second.first,m.second.second);}
   if(opt.profile){bool valid=true;std::map<std::string,double>ms;for(auto&t:timings){float elapsed;api.Check(api.hipEventElapsedTime(&elapsed,t.begin,t.end),"event elapsed");if(!std::isfinite(elapsed)||elapsed<0)valid=false;ms[t.name]+=elapsed;api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}timings.clear();double total=0;for(auto&m:ms){std::printf("kernel_ms %s %.6f\n",m.first.c_str(),m.second);total+=m.second;}if(valid)std::printf("kernel_ms TOTAL %.6f\n",total);else std::printf("PROFILE INVALID: negative/nonfinite HIP event intervals; discard this iteration\n");}return result;}
  // Device callers initialize once and use this stream for external fence waits/signals.
- void SetNoise(const std::vector<float>&noise){if(noise.size()!=50331648)throw std::runtime_error("noise size");api.Check(api.hipStreamSynchronize(stream),"set noise");ClearGraph();graph_warmed=false;device_noise=opt.fast_prefix?Tensor{}:Upload(noise.data(),noise.size()*4,true);}
+ void SetNoise(const std::vector<float>&noise){
+  if(opt.fast_prefix){device_noise=Tensor{};return;}
+  if(noise.size()!=50331648)throw std::runtime_error("noise size");
+  api.Check(api.hipStreamSynchronize(stream),"set noise");ClearGraph();graph_warmed=false;device_noise=Upload(noise.data(),noise.size()*4,true);
+ }
  Handle Stream()const{return stream;}
+ bool GraphEnabled()const{return opt.graph;}
  Api& Runtime(){return api;}
  void Synchronize(){api.Check(api.hipStreamSynchronize(stream),"network completion");}
  void Enqueue(void*rgba,void*history,void*rgb_output,U seed){if(adaptive_prev_history!=history||adaptive_prev_seed!=seed||adaptive_prev_input!=rgba){adaptive_dirty=true;adaptive_prev_history=history;adaptive_prev_seed=seed;adaptive_prev_input=rgba;}
