@@ -1,23 +1,33 @@
-# 当前工作计划（覆盖式，不续写；最后更新 2026-09-26，Yami（一头一wave扩展筛选））
-
-> **09-26 10:40 m32-sweep**：ViT project 16×64 逐位 −1.0/−1.9%，已进可选路径 `DLSS5_HIP_VIT_PROJ_N64`，待生产 host 千帧长测 + 装机（payload 在 D:\DLSSNR-Lab\vit-proj-n64-20260926）。C256 FFN 已近 FP8 峰值（加宽 null），ViT QKV/decoder 加宽 null（`results/m32-sweep-20260926`）。下一候选：ViT attention（边际 0.36/0.56，K/V 在 L0 内，先查瓶颈再动）。
-
-> **09-26 08:40 C512 FFN 链**：QKV+mix 32 token/wave 逐位 −1.0%/−1.3%，已进可选生产路径 `DLSS5_HIP_C512_M32`（payload 就绪未装，`results/c512-ffn-20260926`）。同法候选：其他「一 wave 16 token × 64 列、B 片段按 16 token 重读」的核（ViT/decoder 投影等）先查 M；投影 m32 为 null 需拆原因。另：现行生产基线历史模式出现一次偶发不一致，PDL 正确性核查升为优先。
-
-
-> **09-26 06:10 朱雀插入（优先于下文"当前主线"）**：Daniel 0.4.0 同场景实机 56～57fps 对我们 49～50，其网络跑渲染分辨率 1707×961、我们放大到 1920×1152；按像素折算内核效率持平（`results/daniel-040-ingame-20260926`）。下一主线 = **网络按渲染分辨率跑**：先算补齐倍数约束（下采样 ×16、窗口 8、ViT token、decoder 移位、900/1080 固定尺寸特化），再做 1707×961 级几何原型；追 Daniel 剩余 ViT/C512 寄存器结构降为后续。
-
+# 当前工作计划（覆盖式，不续写；最后更新 2026-09-26 19:45，朱雀）
 
 > 这里只记当前状态、下一步和等待事项；实验过程与完成记录进 DevHistory.md。开 session 先读这页。
 > 节奏：过日子式，没有 deadline。优先做有具体瓶颈证据、可逐位验证的小实验，够用就交。
 
-## 当前基线
+## 当前基线（09-26 晚）
 
-- **0.30 已发布**（09-25 08:08，夸克 + Google Drive，README 链接已填）：prod8 两架构 + 插件 `0211a78a`，模板 PDL=1 / ASYNC=auto / STRENGTH=auto，常规包 `EnableFfxInputs=false`。RE9 宿主/runtime 沿用 0.29，只更新内核。清单 `tools/release-030-results.json`。
-- **剑星 + 2077 已装 prod8**：剑星 900P→2K 简单场景 60～61fps、1080P→2K 47～48；2077 质量档 41、平衡 51～52（远程读数）。切超分档位后永久失效已修。部署/回滚入口 `deployments/stellar-prod8-20260925`，2077 用 `-Game cyberpunk`。
-- **RE9 已装 prod7 内核**：`deployments/re9-prod7-20260924`。抓帧确认网络改了细节；不能把“主观看起来像调亮”直接当成神经路径没跑。
-- **地平线 6 已试装 0.30**：前置被同列表后续 draw/dispatch 拒绝；`DLSS5_PRE_UPSCALE=0` 后置可用，记录约 44fps。首次启动黑屏一次未复现，`deployments/forza6-030-20260925/dump.ps1` 已备。黄字不显示，和 2077 一样暂低优先级。
-- **非逐位候选 6b 未装**：`HIP_FFN_WAVE_NORM`，约 −1.1%，12 帧 RGB PSNR 58dB、1.4% 像素差 >1/255、max 0.17，源里默认关。动态画质等 Zero 看。
+- **0.31 已发布**（09-26 11:19，夸克 + Google Drive，tag 0.29/0.30/0.31 已补推）：add-on 106ff3d0，模块每架构 29 个（+c32-wave1/c64-wave2/c512-m32-mh/-deep/vit-wide-deep），模板 WAVE_OWNED/C512_M32/VIT_PROJ_N64=1，常规包 VIT_ADAPTIVE=1，auto 分档（超出某档 ≤10% 往下缩）。RE9 包宿主/runtime 同 0.30。
+- **剑星已装（超出 0.31）**：C32 vec-input（c32-wave1 新版）+ 显存池 add-on 5950fe20（含 PR #9 合并后的共享头）。标准测试（1080P 窗口 + FSR 原生 AA + 主菜单，F8 切 EXACT）：简单场景晃动 49～50；2K 质量主菜单 57、2K AA 44/47。
+- **对照**：Daniel 0.4.0 同像素仍约快 6%（其关时序历史、LocalTone=0）；3z AMDNR 0.3.3.2 同设置比我们慢约 9%（`results/amdnr-0332-ingame-20260926`）。
+- **逐族账**（`results/family-ledger-wave-owned-20260926`，1080）：C32 34% / C512 14.5% / ViT 14.5% / C64·C128·C256 各约 12%；C32 单 wave 阶段账：FFN 38%、输入 25%（`results/c32-wave-phase-20260926`）。
+- 非逐位候选 6b 未装（约 −1.1%，PSNR 58dB，等 Zero 看画质）。
+
+## 下一步候选（09-26 晚，按"收益 × 把握"排）
+
+**A. 产品侧（收益确定，先做）**
+1. **RE9 runtime 接入新核**：RE9/C API 路径仍是 0.30 的核，没吃到 wave-owned / C512_M32 / VIT_PROJ_N64 / C32 vec（同尺寸约 9～10%）。给 runtime 的 Options 接上这几项（与 add-on 同配置、同逐位回归），并带上显存池与 PR #9。
+2. **0.32 合包**：C32 vec + 显存池 + PR #9 + RE9 runtime（上条）+ AE/EXACT 提示挪到黄字行（现在只附在 FPS 行，黄字看不到）。
+
+**B. 逐位小刀（每刀预期 0.1～0.3%，攒着合包）**
+3. **C512 FFN 链剩余两核**：`ffn_fused_t8`（900/1080 边际 0.23/0.29ms）、`projection_frag`（0.16/0.24；32 token 已 null，拆原因后换思路）。先读 ISA 定性再动（`results/c512-ffn-20260926`）。
+4. **C32 FFN 权重按 WMMA 片段预排**（下文"后续小刀"一节，计划仍有效）：c32-wave1 上 FFN 38%，其中权重读取部分；只改排列与寻址，不动算术。
+5. **decoder 投影**（0.34/0.46ms）：加宽 null 的原因是 2×2 上采样尾部串行化；试把上采样写出与矩阵段解耦（尾部独立展开），不改 WMMA 组织。
+6. **ViT QKV 归一化**（0.34/0.54ms）：FP16 WMMA 是原版 float 权重决定的（逐位约束），加宽 null 因 wave 不足；只查归一化段与 wave 数，别动乘法精度。
+7. host 侧 C256 宽权重片段约 −0.03ms（`mhfast-wide-frag-20260923`，见下文后备）。
+
+**C. 需要 Zero 拍板的**
+8. **有损**：6b（−1.1%）、ViT QKV 改 FP8（估整网 2～4%，Daniel 的做法）。按老规矩看 PSNR + Zero 游戏内看画质。
+9. **加档 1728×1024**：2K 质量档不再缩 6%，画质向，不提速；每加一档多一套特化核与黄金 hash。
+10. 不做：整网隔帧（3z 的 Model interleave，运动拖影）；RDNA3 后端（无卡可测）。
 
 ## 研究判断（09-25 晚校准）
 
