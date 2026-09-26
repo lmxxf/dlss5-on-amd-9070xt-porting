@@ -5,7 +5,7 @@ DLSS 5 (DLSSNR) on AMD RX 9070 XT / RDNA 4.
 [中文说明](README.zh-CN.md)
 
 A from-scratch re-implementation of NVIDIA's DLSS 5 neural renderer ("DLSSNR", the 71-block Swin/ViT network shipped in
-`nvngx_dlssnr.dll`) for AMD RDNA 4. The network was reverse-engineered block by block and now runs as 24 HIP kernels per
+`nvngx_dlssnr.dll`) for AMD RDNA 4. The network was reverse-engineered block by block and now runs as 29 HIP modules per
 architecture (gfx1201 = RX 9070 series, gfx1200 = RX 9060 series) on the HIP 7 runtime that ships with the AMD driver. The
 weights are NVIDIA's, extracted from the user's own copy of the DLL; nothing of NVIDIA's is distributed here.
 
@@ -32,10 +32,11 @@ below in Stellar Blade.
 
 **Configuration.** Each package ships the repository template as `DLSS5-AMD\native-game-flags.txt`
 ([regular](scripts/hip-game-flags.txt), [Magpie](scripts/hip-magpie-flags.txt), [RE9](scripts/hip-re9-flags.txt); keys are explained in
-[scripts/CONFIGURATION.md](scripts/CONFIGURATION.md)). The network tier follows the input (≤1280×720 → 720, ≤1600×900 → 900,
-else 1080; `DLSS5_NETWORK_HEIGHT` forces one). The regular add-on also has an optional lossy *adaptive ViT reuse*
-(`DLSS5_VIT_ADAPTIVE=1` plus the keys listed in [Development/HIP/VIT-REUSE.md](Development/HIP/VIT-REUSE.md), F8 toggles it);
-the RE9 runtime is configured through `OptiScaler.ini` `[DlssNr]` and reads only `DLSS5_FIT_LARGE` from the flags file.
+[scripts/CONFIGURATION.md](scripts/CONFIGURATION.md)). The network tier follows the input (an input within 110% of a tier on both axes uses it: 720 up to 1408×792,
+900 up to 1760×990, else 1080, so 2K Quality 1707×961 runs at 900; `DLSS5_NETWORK_HEIGHT` forces one). The regular package turns on a lossy *adaptive ViT reuse* by default
+(`DLSS5_VIT_ADAPTIVE=1`, keys in [Development/HIP/VIT-REUSE.md](Development/HIP/VIT-REUSE.md); F8 toggles it and EXACT, set 0 for
+bit-exact output; Magpie and RE9 ship it off). From 0.32 the RE9 runtime also reads `DLSS5_HIP_*`, `DLSS5_SKIP_BLOCKS`,
+`DLSS5_FIT_LARGE` and the related keys from the flags file; host-side options stay in `OptiScaler.ini` `[DlssNr]`.
 
 **Magpie notes.** The `FSR3_SR` item of the bundled effect group *is* the DLSS5 entry (its UI name stays FSR3); keep it at
 input size and let the following FSR4 item upscale. Use AMD optical flow only on that first item and set Optical Flow Method
@@ -104,7 +105,7 @@ The C host smoke test is `tools/lmxxf_zero_fallback_abi.c`. On Windows, build th
   accumulator, operands loaded straight from memory or LDS; row reductions (normalisation sums, softmax denominators) are
   WMMAs against an all-ones tile; quantisation uses the hardware FP8 casts. The C32 block runs FFN + attention + projection
   of one 8×8 window in a single 128-thread group with the hidden activations kept in registers; the C64–C256 attention keeps
-  its exponentials in registers; weights are prepacked into WMMA fragment order at initialisation. 24 kernels per architecture.
+  its exponentials in registers; weights are prepacked into WMMA fragment order at initialisation. 29 modules per architecture (from 0.31).
 - **Game side**: the host hands us the frame at render resolution; the codec (`shaders/native_codec_encode.hlsl`) encodes it onto
   the network surface (fitting any input size to the 720/900/1080 tier, reflected padding), the network runs on a D3D12↔HIP
   shared buffer with fences, and the decode shader composes the result with the original frame (the network steers luminance
@@ -118,19 +119,19 @@ The C host smoke test is `tools/lmxxf_zero_fallback_abi.c`. On Windows, build th
 
 ## Building
 
-### Building the current packages (0.29) — where every shipped file comes from
+### Building the current packages (0.32) — where every shipped file comes from
 
 | Shipped file | Source | Build |
 |---|---|---|
-| `dlss5-amd.addon64` (Magpie / OptiScaler packages) | `src/native_submission_order_probe.cpp` + `src/*.h`, `Development/HIP/*.h` (bridge) | `bash scripts/build-addon-oneclick.sh dlss5-amd.addon64 --hip` on Linux/WSL (fetches MinHook + ReShade 6.8 headers into `third_party/`; needs `g++-mingw-w64-x86-64`) |
+| `dlss5-amd.addon64` (Magpie / OptiScaler packages) | `src/native_submission_order_probe.cpp` + `src/*.h`, `Development/HIP/*.h` (bridge) | `bash scripts/build-addon-oneclick.sh dlss5-amd.addon64 --hip` on Linux/WSL (fetches MinHook + ReShade 6.8 headers into `third_party/`; needs `g++-mingw-w64-x86-64`). The build is not byte-reproducible; judge a rebuild by behaviour, not hash |
 | `DLSS5-AMD\native-game-tiled-assets\HIP\gfx1200\*.hsaco`, `...\gfx1201\*.hsaco` (29 modules each from 0.31) | `hip/*.hip`, `hip/wave_owned_*.inc`, recipe `hip/build-modules.ps1` | on any Windows box with an AMD driver that ships `amd_comgr_3.dll`: `x86_64-w64-mingw32-g++ -std=c++17 -O2 -static hip/rtc_compile.cpp -o rtc_compile.exe`, then `powershell -File hip\build-modules.ps1 -Compiler rtc_compile.exe -OutputDir <out>` (both targets by default; `-Only <name>` for one module). No GPU is needed to compile; the assembly lands next to each `.hsaco` as `.hsaco.s` |
 | the twelve `shaders/*.hlsl` (codec encode/decode, text overlay, RGB staging, temporal coordinates, frame checks) | `shaders/` (the historical DX12 network chain lives in `shaders/dx12-network/`) | copied as source; compiled at runtime by the system `d3dcompiler` (44 variants selected by `#define`s from the host) |
-| RE9 package: `dxgi.dll` (modified OptiScaler host) + `LmxxfNrRuntime.dll` | TheAutomatic's fork `release/1.9.0` @ `8f71f73` + our patches in `Development/RE9/presr/` | `python3 Development/RE9/presr/prepare-host.py` (needs the pinned clone at `/tmp/re9-upstream-bridge-review`; rewrites the host/runtime sources and copies `src/`, `shaders/`, `hip/` into `third_party/lmxxf/`), then `bash Development/RE9/presr/build-runtime.sh` (MinGW, runtime + smoke test) and `build-host.ps1` (MSVC v143 / MSBuild on Windows) — see `Development/RE9/presr/README.md`; the same sources are shipped as `sources/re9-presr-source.tar.gz` (`bundle-source.py`) |
-| standalone `LmxxfNrRuntime.dll` (API in `include/LmxxfNrApi.h`, contributed by TheAutomatic) | `src/LmxxfNrRuntime.cpp` | `bash scripts/build-runtime.sh` |
+| RE9 package: `dxgi.dll` (modified OptiScaler host) + `LmxxfNrRuntime.dll` | TheAutomatic's fork `release/1.9.0` @ `8f71f73` + our patches in `Development/RE9/presr/` | `python3 Development/RE9/presr/prepare-host.py` (needs the pinned host checkout: `git clone https://github.com/TheAutomatic/dlss-5-amd-project /tmp/re9-upstream-bridge-review && git -C /tmp/re9-upstream-bridge-review checkout 8f71f73`; rewrites the host/runtime sources and copies `src/`, `shaders/`, `hip/` into `third_party/lmxxf/`), then `bash Development/RE9/presr/build-runtime.sh` (MinGW, runtime + smoke test) and `build-host.ps1` (Visual Studio 2022 Build Tools, MSVC v143 + Windows SDK 10.0.26100, on Windows; `install-build-tools.ps1` installs them, pass your own paths if they differ from the maintainer's `D:\DLSSNR-Lab\build-tools`) — see `Development/RE9/presr/README.md`; the same sources are shipped as `sources/re9-presr-source.tar.gz` (`bundle-source.py`) |
+| standalone `LmxxfNrRuntime.dll` (API in `include/LmxxfNrApi.h`, contributed by TheAutomatic) | `src/LmxxfNrRuntime.cpp` | `bash scripts/build-runtime.sh` (Linux/WSL MinGW), or `scripts\build-runtime.cmd` on Windows (MSYS2 UCRT64 g++, `pacman -S mingw-w64-ucrt-x86_64-gcc`; set `LMXXF_GXX` to use another g++) |
 | `DLSS5-AMD\native-game-flags.txt` (a package also honours `DLSS5_HIP_MODULES=<dir>` to load modules from elsewhere; `Development/HIP/validate-modules.ps1` runs the bit-exact checks on a module set) | `scripts/hip-game-flags.txt` / `hip-magpie-flags.txt` / `hip-re9-flags.txt` (documented in `scripts/CONFIGURATION.md`) | copied |
 | weights (`*.f16` / `*.f32`), `noise.f32` | not in this repository (see *Weights*) | packages carry them; a fresh package is built from the previous full package |
 
-Packaging: `Development/tools/package-029.ps1` (Windows) unzips the previous full packages, verifies every file against their `SHA256SUMS.txt`, swaps in the changed files listed above (each hash-checked, the modules additionally against the copies installed on the test machine), compiles the fit shaders, writes `release.json`, `SHA256SUMS.txt` and the zip, and reads the zip back. Earlier versions: `package-028.ps1`, `package-0281-re9.ps1`.
+Packaging: `Development/tools/package-032.ps1` (Windows) unzips the previous full packages, verifies every file against their `SHA256SUMS.txt`, swaps in the changed files listed above (each hash-checked, the modules additionally against the copies installed on the test machine), compiles the fit shaders, writes `release.json`, `SHA256SUMS.txt` and the zip, and reads the zip back. Earlier versions: `package-031.ps1` … `package-026.ps1`, `package-0281-re9.ps1`.
 
 Validation before shipping kernels: `Development/HIP/validate-modules.ps1` (bit-exact checks of a module set against goldens) and the whole-network regression used for every production candidate (`Development/deployments/stellar-prod6-20260923/regression-prod6.ps1`: 12-frame RGB hashes on two input sequences, 1000-frame timing, extra controls) — every kernel change in this repository since 0.20 is bit-exact with the previous one unless its flag says otherwise (`HIP_FFN_WAVE_NORM`, off by default, is the only non-bit-exact switch).
 

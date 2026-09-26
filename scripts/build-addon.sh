@@ -38,4 +38,4 @@ probe_extra_include=();[ -n "${DLSS5_EXTRA_INCLUDE:-}" ] && probe_extra_include=
   "$probe_source_dir/../src/native_submission_order_probe.cpp" "${probe_objects[@]}" \
   -o "$probe_output" -ld3d12 -ldxgi -ld3dcompiler -ldxguid
 sha256sum "$probe_output"
-echo 'Diagnostic single-frame DLL built; not deployed or accepted as a temporal renderer.'
+echo "add-on built: $probe_output"

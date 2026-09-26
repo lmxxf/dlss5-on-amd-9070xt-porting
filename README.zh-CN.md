@@ -5,7 +5,7 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 [English](README.md)
 
 把 NVIDIA DLSS 5 的神经渲染器（`nvngx_dlssnr.dll` 里那张 71 块的 Swin/ViT 网络，"DLSSNR"）从零重做到 AMD RDNA 4 上。网络逐块逆向后，
-现在以每架构 24 个 HIP 内核的形式运行（gfx1201 = RX 9070 系，gfx1200 = RX 9060 系），跑在 AMD 驱动自带的 HIP 7 运行时上。权重是 NVIDIA 的，
+现在以每架构 29 个 HIP 模块的形式运行（gfx1201 = RX 9070 系，gfx1200 = RX 9060 系），跑在 AMD 驱动自带的 HIP 7 运行时上。权重是 NVIDIA 的，
 从用户自己那份 DLL 里提取；本仓库不分发任何 NVIDIA 的东西。
 
 现在每个包的流水线都是：**游戏按它的（低）渲染分辨率出一帧 → 我们的网络处理这一帧 → 宿主的超分（FSR）放大到显示分辨率。** 三个包是三种接到这个位置的方式：
@@ -23,10 +23,10 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 会把明细写进 `logs\native-hip.txt`）；显存被顶满会掉帧且不恢复，《剑星》里贴图质量开"高"或更低。
 
 **配置。** 每个包带的 `DLSS5-AMD\native-game-flags.txt` 就是仓库模板（[常规](scripts/hip-game-flags.txt)、[Magpie](scripts/hip-magpie-flags.txt)、
-[RE9](scripts/hip-re9-flags.txt)；键的说明在 [scripts/CONFIGURATION.md](scripts/CONFIGURATION.md)）。网络档位按输入自动选（≤1280×720 走 720，
-≤1600×900 走 900，其余 1080；`DLSS5_NETWORK_HEIGHT` 可强制）。常规插件还有一个可选的有损功能"ViT 自适应复用"（`DLSS5_VIT_ADAPTIVE=1`
-加 [Development/HIP/VIT-REUSE.md](Development/HIP/VIT-REUSE.md) 里列的几个键，F8 切换）；RE9 runtime 的配置在 `OptiScaler.ini` 的 `[DlssNr]`，
-flags 文件里它只读 `DLSS5_FIT_LARGE`。
+[RE9](scripts/hip-re9-flags.txt)；键的说明在 [scripts/CONFIGURATION.md](scripts/CONFIGURATION.md)）。网络档位按输入自动选（两个方向都不超过某档的 110% 就用那档：
+720 到 1408×792，900 到 1760×990，其余 1080，所以 2K 质量档 1707×961 走 900；`DLSS5_NETWORK_HEIGHT` 可强制）。常规包默认开着有损的"ViT 自适应复用"（`DLSS5_VIT_ADAPTIVE=1`，
+相关键见 [Development/HIP/VIT-REUSE.md](Development/HIP/VIT-REUSE.md)；F8 在它和 EXACT 之间切，要逐位输出就设 0；Magpie 和 RE9 包默认关）。
+0.32 起 RE9 runtime 也从 flags 文件读 `DLSS5_HIP_*`、`DLSS5_SKIP_BLOCKS`、`DLSS5_FIT_LARGE` 等键；宿主侧选项仍在 `OptiScaler.ini` 的 `[DlssNr]`。
 
 **Magpie 提示。** 包内效果组里的 `FSR3_SR` 就是 DLSS5 的入口（界面名字还是 FSR3）；这一项保持输入尺寸，后面的 FSR4 负责放大。
 AMD 光流只在第一项开，FSR4 和 XeSS 帧生成的 Optical Flow Method 选 None。`Alt+Shift+A` 启停缩放，`F6` 在所有包里都是开关网络。
@@ -65,7 +65,7 @@ AMD 光流只在第一项开，FSR4 和 XeSS 帧生成的 Optical Flow Method �
   残差流在块间以 E4M3 字节传递。
 - **核**（`hip/`）：所有 GEMM 都是 RDNA 4 的 WMMA 16×16×16 指令，FP8（E4M3）或 f16 操作数、f32 累加器，操作数直接从显存或 LDS 加载；
   行归约（归一化的平方和、softmax 分母）用对全 1 tile 的 WMMA 完成；量化用硬件 FP8 转换。C32 块把一个 8×8 窗口的 FFN + 注意力 + 投影
-  放在一个 128 线程组里做完，隐层激活留在寄存器；C64～C256 的注意力把指数留在寄存器；权重在初始化时预排成 WMMA 片段顺序。每架构 24 个核。
+  放在一个 128 线程组里做完，隐层激活留在寄存器；C64～C256 的注意力把指数留在寄存器；权重在初始化时预排成 WMMA 片段顺序。每架构 29 个模块（0.31 起）。
 - **游戏侧**：宿主把渲染分辨率的那一帧交给我们；codec（`shaders/native_codec_encode.hlsl`）把它编码到网络面上（任何尺寸的输入都适配到
   720/900/1080 档，镜像补边），网络在 D3D12↔HIP 共享缓冲上跑（用 fence 同步），decode 着色器把结果和原帧合成（网络只引导原分辨率画面的
   亮度和颜色）再交给宿主的超分。前置（渲染分辨率）路径里网络自己的时序历史每帧重置，时序工作由超分做；Magpie 路径没有游戏的运动向量。
@@ -75,19 +75,19 @@ AMD 光流只在第一项开，FSR4 和 XeSS 帧生成的 Optical Flow Method �
 
 ## 编译
 
-### 现在的包怎么编（0.29）——每个发布文件从哪来
+### 现在的包怎么编（0.32）——每个发布文件从哪来
 
 | 包里的文件 | 源码 | 编法 |
 |---|---|---|
-| `dlss5-amd.addon64`（Magpie / OptiScaler 包） | `src/native_submission_order_probe.cpp` + `src/*.h`、`Development/HIP/*.h`（桥） | Linux/WSL：`bash scripts/build-addon-oneclick.sh dlss5-amd.addon64 --hip`（自动把 MinHook 和 ReShade 6.8 头文件拉到 `third_party/`；需要 `g++-mingw-w64-x86-64`） |
+| `dlss5-amd.addon64`（Magpie / OptiScaler 包） | `src/native_submission_order_probe.cpp` + `src/*.h`、`Development/HIP/*.h`（桥） | Linux/WSL：`bash scripts/build-addon-oneclick.sh dlss5-amd.addon64 --hip`（自动把 MinHook 和 ReShade 6.8 头文件拉到 `third_party/`；需要 `g++-mingw-w64-x86-64`）。编译结果不是逐字节可复现的，重编后按游戏内表现验收，不比 hash |
 | `DLSS5-AMD\native-game-tiled-assets\HIP\gfx1200\*.hsaco`、`...\gfx1201\*.hsaco`（0.31 起各 29 个模块） | `hip/*.hip`，配方 `hip/build-modules.ps1` | 任意一台装着 AMD 驱动（System32 里有 `amd_comgr_3.dll`）的 Windows：`x86_64-w64-mingw32-g++ -std=c++17 -O2 -static hip/rtc_compile.cpp -o rtc_compile.exe`，然后 `powershell -File hip\build-modules.ps1 -Compiler rtc_compile.exe -OutputDir <out>`（默认两种架构都编；`-Only <名字>` 只编一个）。编译不需要显卡；每个 `.hsaco` 旁边会落 `.hsaco.s` 汇编 |
 | `shaders/*.hlsl` 那 12 个（编解码、屏幕文字、RGB 搬运、时序座标、帧检查） | `shaders/`（历史 DX12 网络链在 `shaders/dx12-network/`） | 直接以源码随包；运行时由系统 `d3dcompiler` 编（宿主按 `#define` 选 44 个变体） |
-| RE9 包：`dxgi.dll`（改过的 OptiScaler 宿主）+ `LmxxfNrRuntime.dll` | TheAutomatic 的 fork `release/1.9.0` @ `8f71f73` + 我们在 `Development/RE9/presr/` 的补丁 | `python3 Development/RE9/presr/prepare-host.py`（需要固定版本的克隆在 `/tmp/re9-upstream-bridge-review`；重写宿主/runtime 源码并把 `src/`、`shaders/`、`hip/` 拷进 `third_party/lmxxf/`），再 `bash Development/RE9/presr/build-runtime.sh`（MinGW，编 runtime 和冒烟测试）和 `build-host.ps1`（Windows 上 MSVC v143 / MSBuild）——见 `Development/RE9/presr/README.md`；同一套源码打成 `sources/re9-presr-source.tar.gz` 随包（`bundle-source.py`） |
-| 独立的 `LmxxfNrRuntime.dll`（接口 `include/LmxxfNrApi.h`，TheAutomatic 贡献） | `src/LmxxfNrRuntime.cpp` | `bash scripts/build-runtime.sh` |
+| RE9 包：`dxgi.dll`（改过的 OptiScaler 宿主）+ `LmxxfNrRuntime.dll` | TheAutomatic 的 fork `release/1.9.0` @ `8f71f73` + 我们在 `Development/RE9/presr/` 的补丁 | `python3 Development/RE9/presr/prepare-host.py`（需要锁定版本的宿主源码：`git clone https://github.com/TheAutomatic/dlss-5-amd-project /tmp/re9-upstream-bridge-review && git -C /tmp/re9-upstream-bridge-review checkout 8f71f73`；重写宿主/runtime 源码并把 `src/`、`shaders/`、`hip/` 拷进 `third_party/lmxxf/`），再 `bash Development/RE9/presr/build-runtime.sh`（MinGW，编 runtime 和冒烟测试）和 `build-host.ps1`（Windows 上 Visual Studio 2022 Build Tools：MSVC v143 + Windows SDK 10.0.26100，`install-build-tools.ps1` 可装；路径和维护机的 `D:\DLSSNR-Lab\build-tools` 不同就自己传）——见 `Development/RE9/presr/README.md`；同一套源码打成 `sources/re9-presr-source.tar.gz` 随包（`bundle-source.py`） |
+| 独立的 `LmxxfNrRuntime.dll`（接口 `include/LmxxfNrApi.h`，TheAutomatic 贡献） | `src/LmxxfNrRuntime.cpp` | Linux/WSL：`bash scripts/build-runtime.sh`；Windows：`scripts\build-runtime.cmd`（要 MSYS2 UCRT64 的 g++：`pacman -S mingw-w64-ucrt-x86_64-gcc`；用别的 g++ 就设 `LMXXF_GXX`） |
 | `DLSS5-AMD\native-game-flags.txt`（包也认 `DLSS5_HIP_MODULES=<目录>`，从别处加载模块；`Development/HIP/validate-modules.ps1` 对一套模块跑逐位校验） | `scripts/hip-game-flags.txt` / `hip-magpie-flags.txt` / `hip-re9-flags.txt`（说明在 `scripts/CONFIGURATION.md`） | 直接拷 |
 | 权重（`*.f16` / `*.f32`）、`noise.f32` | 不在仓库里（见"权重"） | 随包；新包从上一个完整包接着做 |
 
-打包：`Development/tools/package-029.ps1`（Windows）把上一版完整包解开、逐文件对 `SHA256SUMS.txt` 校验，换上表里变过的文件（每个都核 hash，模块还要和测试机上装着的那份相同），编一遍 fit shader，写 `release.json`、`SHA256SUMS.txt`，压 zip 再读回核对。之前的版本：`package-028.ps1`、`package-0281-re9.ps1`。
+打包：`Development/tools/package-032.ps1`（Windows）把上一版完整包解开、逐文件对 `SHA256SUMS.txt` 校验，换上表里变过的文件（每个都核 hash，模块还要和测试机上装着的那份相同），编一遍 fit shader，写 `release.json`、`SHA256SUMS.txt`，压 zip 再读回核对。之前的版本：`package-031.ps1` … `package-026.ps1`、`package-0281-re9.ps1`。
 
 内核出包前的验证：`Development/HIP/validate-modules.ps1`（一套模块对 golden 的逐位校验）和每个生产候选都要过的整网回归（`Development/deployments/stellar-prod6-20260923/regression-prod6.ps1`：两段输入各 12 帧 RGB hash、1000 帧计时、额外控制组）。0.20 以来仓库里每一次内核改动都和上一版逐位相同，除非它的开关自己说明不是（目前唯一的非逐位开关 `HIP_FFN_WAVE_NORM`，默认关）。
 
