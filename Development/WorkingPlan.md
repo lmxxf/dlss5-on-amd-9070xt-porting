@@ -27,6 +27,7 @@
 5. **decoder 投影**（0.34/0.46ms）：加宽 null 的原因是 2×2 上采样尾部串行化；试把上采样写出与矩阵段解耦（尾部独立展开），不改 WMMA 组织。
 6. **ViT QKV 归一化**（0.34/0.54ms）：FP16 WMMA 是原版 float 权重决定的（逐位约束），加宽 null 因 wave 不足；只查归一化段与 wave 数，别动乘法精度。
 7. host 侧 C256 宽权重片段约 −0.03ms（`mhfast-wide-frag-20260923`，见下文后备）。
+7b. **c32-wave1 clamp 改 fmed3**（`HIP_FP8_SAT_MODE 3`，逐位，900/1080 约 −0.03/−0.04ms，`results/fp8-sat-mode-20260927`）：下次重编 c32-wave1 时并入配方；同法看 C64～C256/deep 未折叠 clamp 数。MODE.FP16_OVFL 路线因 f16 溢出语义不逐位，已否决。
 
 **C. 需要 Zero 拍板的**
 8. **有损**：6b（−1.1%）、ViT QKV 改 FP8（估整网 2～4%，Daniel 的做法）。按老规矩看 PSNR + Zero 游戏内看画质。

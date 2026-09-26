@@ -133,7 +133,25 @@ DEV float H(float x){return from_half(half_bits(x));}
 #ifndef HIP_NATIVE_FP8_F
 #define HIP_NATIVE_FP8_F 1
 #endif
-#if HIP_NATIVE_FP8_F && HIP_C32_BRANCHLESS_F
+// HIP_FP8_SAT_MODE (experiment fp8-sat-mode, default 0): the kernel sets MODE.FP16_OVFL (hwreg MODE bit 23) at entry, which
+// makes v_cvt_pk_fp8_f32 saturate finite overflow to +-448 by itself, so the explicit clamp before each cast is dropped.
+// Measured on gfx1201: identical bytes for every finite input; +-Inf and NaN become the E4M3 NaN byte instead of +-448 /
+// -448; every f16 conversion in the kernel also saturates to +-65504 instead of +-Inf. 2 = MODE bit only, clamps kept (diagnostic).
+#ifndef HIP_FP8_SAT_MODE
+#define HIP_FP8_SAT_MODE 0
+#endif
+DEV void fp8_sat_mode(){
+#if HIP_FP8_SAT_MODE==1||HIP_FP8_SAT_MODE==2
+ __builtin_amdgcn_s_setreg(1|(23<<6),1);
+#endif
+}
+#if HIP_NATIVE_FP8_F && HIP_FP8_SAT_MODE==1
+DEV float F(float x){uint a=bits(x)&0x7fffffffu;float r=__builtin_amdgcn_cvt_f32_fp8(__builtin_amdgcn_cvt_pk_fp8_f32(x,0.f,0,false),0);return a==0?0.f:r;}
+#elif HIP_NATIVE_FP8_F && HIP_FP8_SAT_MODE==3
+// 3 = no MODE change, the clamp as one v_med3_f32 instead of v_max_num(x,x)+v_maxmin_num; probe: same byte as the
+// fminf/fmaxf form for every finite, infinite and NaN input (NaN -> -448).
+DEV float F(float x){uint a=bits(x)&0x7fffffffu;float r=__builtin_amdgcn_cvt_f32_fp8(__builtin_amdgcn_cvt_pk_fp8_f32(__builtin_amdgcn_fmed3f(x,-448.f,448.f),0.f,0,false),0);return a==0?0.f:r;}
+#elif HIP_NATIVE_FP8_F && HIP_C32_BRANCHLESS_F
 // Same values as the branchy form for every finite and infinite input (clamp to +-448 then RNE cast; +-448 converts exactly,
 // values in (447.75,448] already round to 448 in both), zero keeps the +0 result; a NaN input yields -448 instead of +-448.
 DEV float F(float x){uint a=bits(x)&0x7fffffffu;float c=__builtin_fminf(__builtin_fmaxf(x,-448.f),448.f);float r=__builtin_amdgcn_cvt_f32_fp8(__builtin_amdgcn_cvt_pk_fp8_f32(c,0.f,0,false),0);return a==0?0.f:r;}
@@ -181,7 +199,11 @@ DEV float Hrtz(float x){uint b=bits(x),a=b&0x7fffffffu,sg=(b>>16)&0x8000u;int e=
  return from_half(sg|((a>>13)-0x1c000u));
 }
 #endif
-#if HIP_C32_BRANCHLESS_F
+#if HIP_FP8_SAT_MODE==1
+DEV uint fp8(float f){return uint(__builtin_amdgcn_cvt_pk_fp8_f32(f,0.f,0,false))&255u;}
+#elif HIP_FP8_SAT_MODE==3
+DEV uint fp8(float f){return uint(__builtin_amdgcn_cvt_pk_fp8_f32(__builtin_amdgcn_fmed3f(f,-448.f,448.f),0.f,0,false))&255u;}
+#elif HIP_C32_BRANCHLESS_F
 DEV uint fp8(float f){return uint(__builtin_amdgcn_cvt_pk_fp8_f32(__builtin_fminf(__builtin_fmaxf(f,-448.f),448.f),0.f,0,false))&255u;}
 #else
 DEV uint fp8(float f){return uint(__builtin_amdgcn_cvt_pk_fp8_f32(clampf(f,-448.f,448.f),0.f,0,false))&255u;}

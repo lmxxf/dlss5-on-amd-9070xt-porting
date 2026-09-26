@@ -671,3 +671,7 @@ RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 �
 ## 2026-09-26 21:55：0.32 常规包全新安装验证通过
 
 剑星整包解压 0.32（DLSS5-AMD 目录全新、OptiScaler.ini 用包内模板）后用户进游戏：黄字正常、帧率与此前同；日志（全新 logs 目录，pid 29688）wave_owned/c512_m32/vit_proj_n64 均 requested=1 active=1。剑星现为 0.32 包原样安装（旧目录备份见上条）。
+
+## 2026-09-27 03:00：fp8-sat-mode——MODE 饱和路线不逐位，med3 写法逐位 −0.3%
+
+借鉴 mochizuki0323/DLSSNR-AMD（Vulkan）的"FP8 饱和转换用 MODE 位代替每值 clamp"。探针：gfx1201 上 MODE.FP16_OVFL（hwreg MODE bit 23）确使 `v_cvt_pk_fp8_f32` 对有限溢出饱和到 ±448，但 ±Inf/NaN 变 E4M3 NaN，且核内 f16 RNE 转换溢出改为 65504；gfx12 的 cvt 没有指令级 clamp 位。c32-wave1 入口设 OVFL + 去 clamp：指令 −8～−11%，900/1080 静态运动逐位，但 720-motion 输出变化；只设 OVFL 保留 clamp 同样变化 → 原因是 f16 溢出语义，不是去 clamp，**不采用**。改为不动 MODE、clamp 写成 `fmed3`（探针对 NaN/Inf 同字节）：指令 −2%，7 组 84 帧逐位，两批 ABBA 900 −0.037/−0.029ms、1080 −0.045/−0.035ms。宏 `HIP_FP8_SAT_MODE`（默认 0；3 = med3）在 `hip/c32_fused_ffn_attention.hip`，未改生产配方、未装游戏。详见 `results/fp8-sat-mode-20260927`。
