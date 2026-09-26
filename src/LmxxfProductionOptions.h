@@ -59,5 +59,8 @@ inline hip_reference::Options LmxxfProductionOptions(unsigned processing_w, unsi
     o.vit_qkv_frag = true;
     o.vit_contract_frag = true;
     o.prefix_inline = true;
+    // Byte-packed multihead / decoder paths. The addon route already turns these on through
+    // DLSS5_HIP_* in scripts/hip-game-flags.txt and scripts/hip-re9-flags.txt.
+    o.mh_feature_byte = o.mh_proj_diag_fb = o.mh_byte_stream = o.decoder_byte = o.mh_ffn_frag256 = true;
     return o;
 }

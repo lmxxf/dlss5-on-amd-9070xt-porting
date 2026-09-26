@@ -1,7 +1,6 @@
 #pragma once
 #include "native_pso.h"
 #include "native_pinned_resource.h"
-#include "native_split.h"
 // GPU HWC float4 -> reflected8x8 tile-major float4. No neural features injected.
 class NativeRgbReflect {
  ID3D12Resource *input{},*output{};ID3D12RootSignature*root{};ID3D12PipelineState*pso{};

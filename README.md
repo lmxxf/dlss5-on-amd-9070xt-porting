@@ -87,6 +87,16 @@ On the maintainer's machines, Linux holds this repository; Windows on the RX9070
 
 Integration: **Magpie / regular OptiScaler → dlss5-amd.addon64 → shared HIP kernels**; **RE9-specific OptiScaler → LmxxfNrRuntime.dll → the same HIP kernels**. The RE9 host and runtime must be used as a matched pair.
 
+### Optional Runtime recovery for D3D12 hosts
+
+The standalone `LmxxfNrRuntime.dll` C API in `include/LmxxfNrApi.h` can recover a frame when HIP enqueue fails or the submitted command queue differs from the session queue. Set `LmxxfNrCreateInfo.flags |= LMXXF_NR_CREATE_FLAG_ZERO_OUTPUT_FALLBACK` before `Create`. The default remains strict error reporting.
+
+With this flag, `EnqueueHip` returns `LMXXF_NR_OK` after a verified zero clear of its private neural output; the normal decoder view then uses the original Color. Debug views retain their own display behavior. `GetLastError` contains a recovery diagnostic for that call. The application must submit input and output work on the queue passed to `EnqueueHip`, and submit output-reading work before `Retire`, `Drain`, or `Destroy`. The Runtime waits for the supplied queue before it reuses or frees the output. It cannot discover output readers on other queues; the application must synchronize those queues before reuse or destruction. If clearing fails or completion is uncertain, `EnqueueHip` returns `LMXXF_NR_FAILED`; do not submit output-reading work or reuse the session.
+
+Direct C++ Bridge users may call `D3D12Bridge::ClearOutput(queue)` after submitting the producer and before submitting the consumer. They must drain prior users of the output on other queues before calling it, then drain a different consumer queue before bridge reuse or destruction. The Bridge creates D3D12 zero-clear resources only if this fallback is used. No model weights, shader assets, or HIP modules are changed by this feature.
+
+The C host smoke test is `tools/lmxxf_zero_fallback_abi.c`. On Windows, build the Runtime with `scripts/build-runtime.cmd bin`, then compile the test with `gcc -std=c11 -Wall -Wextra -Werror -I include tools/lmxxf_zero_fallback_abi.c -o bin/lmxxf_zero_fallback_abi.exe` and run it from `bin/`. This checks the exported API table and flag handling without a GPU.
+
 ## How it works, briefly
 
 - **Network**: pre-block (C32 @1920×1152) → encoder (C32 ×4, C64 ×4, C128 ×6, C256 ×8, C512 ×8) → 8 global ViT blocks

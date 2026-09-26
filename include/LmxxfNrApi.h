@@ -5,12 +5,26 @@
  * CRT-allocated objects cross this boundary. x64 stdcall is the Windows default. */
 
 #include <stdint.h>
+#include <stddef.h> /* wchar_t in C hosts */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define LMXXF_NR_ABI_VERSION 1u
+/* sizeof() of an ABI v1 LmxxfNrFrameInfo: it stopped at model_scale, before the exposure
+ * fields. A host talking to a runtime that predates them sends this as struct_size. */
+#define LMXXF_NR_FRAME_INFO_V1_SIZE 80u
+
+/* Optional recovery when HIP enqueue or the session queue contract fails.
+ * On recovery, EnqueueHip returns OK only after the private neural output was fully zeroed;
+ * GetLastError then contains a recovery diagnostic. Submit input and output work
+ * on the queue passed to EnqueueHip, and submit the output reader before Retire,
+ * Drain, or Destroy. The runtime waits for that supplied queue before output reuse
+ * or destruction. It cannot discover output readers on other queues; callers must
+ * synchronize those queues themselves before reuse or destruction. A failed or
+ * uncertain clear returns FAILED and the session must be rebuilt. */
+#define LMXXF_NR_CREATE_FLAG_ZERO_OUTPUT_FALLBACK (1u << 0)
 
 enum LmxxfNrStatus
 {
@@ -37,6 +51,9 @@ typedef struct LmxxfNrCapabilities
 {
     uint32_t struct_size;
     uint32_t abi_version;
+    /* The always-admitted box. Admission is by pixel budget, so a wider input (up to 2560, height
+     * still within max_input_height) is also accepted while width*height stays within
+     * max_input_width*max_input_height (ultrawide). */
     uint32_t max_input_width;
     uint32_t max_input_height;
     uint32_t history_supported; /* first product version: 0 */
@@ -52,7 +69,7 @@ typedef struct LmxxfNrCreateInfo
     void *device; /* ID3D12Device*; not dereferenced until HIP is wired */
     void *queue;  /* ID3D12CommandQueue*; must match device when HIP is wired */
     const wchar_t *assets_directory;
-    uint32_t flags; /* must be 0 in ABI v1 */
+    uint32_t flags; /* LMXXF_NR_CREATE_FLAG_*; unknown bits are rejected */
 } LmxxfNrCreateInfo;
 
 #define LMXXF_NR_FRAME_FLAG_STRENGTH          (1u << 0)
@@ -75,6 +92,14 @@ typedef struct LmxxfNrFrameInfo
     float color_strength;    /* Colour strength: 0..1, default 1.0 */
     uint32_t debug_view;     /* 0=normal, 1=proxy, 2=neural solo, 3=diff 20x, 4=tint */
     float model_scale;       /* 0.25..1.0, default 1.0 */
+    /* Optional exposure (ABI growth; LMXXF_NR_ABI_VERSION is unchanged because the function
+     * table is not). struct_size negotiates this: a host whose struct_size stops before these
+     * fields simply does not supply them, and the runtime falls back to no exposure and the
+     * scalars below at their defaults. */
+    void *exposure;    /* ID3D12Resource* 1x1 R16_FLOAT/R32_FLOAT, shader-readable; NULL = none */
+    uint32_t exposure_state; /* D3D12_RESOURCE_STATES of exposure at RecordInputs */
+    float pre_exposure;   /* game pre-exposure; finite and > 0, default 1 */
+    float exposure_scale; /* exposure scale; finite and > 0, default 1 */
 } LmxxfNrFrameInfo;
 
 typedef struct LmxxfNrJob

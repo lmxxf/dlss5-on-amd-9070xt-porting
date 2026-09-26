@@ -13,6 +13,7 @@
 #include "native_rgb_texture.h"
 #include "hip_d3d12_bridge.h"
 
+#include <atomic>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -23,6 +24,15 @@
 namespace
 {
 thread_local char g_lastError[256] = {};
+
+// LMXXF_NR_FRAME_INFO_V1_SIZE is what an ABI v1 host sends as struct_size. It must equal the
+// offset where the exposure fields start, or an old host's frames are rejected outright.
+static_assert(offsetof(LmxxfNrFrameInfo, exposure) == LMXXF_NR_FRAME_INFO_V1_SIZE,
+              "LMXXF_NR_FRAME_INFO_V1_SIZE must match the ABI v1 LmxxfNrFrameInfo size");
+
+// Bound each D3D12 queue wait during EnqueueHip recovery to limit stalls.
+// Teardown keeps its 30 s wait; HIP stream synchronization is not bounded here.
+constexpr DWORD kSubmissionWaitMs = 3000;
 
 void SetError(const char *text)
 {
@@ -235,6 +245,12 @@ struct Job
     float transfer_strength = 1.0f;
     float color_strength = 1.0f;
     uint32_t debug_view = 0;
+    float pre_exposure = 1.0f;
+    float exposure_scale = 1.0f;
+    /* The game's exposure texture and its state at RecordInputs: the source of the per-frame
+     * copy into Session::exposureCopy. Not bound to any codec. */
+    ID3D12Resource *sourceExposure = nullptr;
+    D3D12_RESOURCE_STATES sourceExposureState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
     bool codec_passthrough = false;
 };
 
@@ -242,6 +258,7 @@ struct Session
 {
     ID3D12Device *device = nullptr;
     ID3D12CommandQueue *queue = nullptr;
+    ID3D12CommandQueue *fallbackConsumerQueue = nullptr;
     std::wstring assetsDir;
     std::wstring modulesDir;
     std::wstring weightsDir;
@@ -250,6 +267,7 @@ struct Session
     bool modulesValidated = false;
     bool hipPrepared = false;
     bool queueBound = false;
+    bool zeroOutputFallback = false;
     bool failed = false; /* Fail-closed poisoning */
     hip_reference::D3D12Bridge *bridge = nullptr;
     NativeGameCodec *encode = nullptr;
@@ -259,13 +277,53 @@ struct Session
     ID3D12Resource *decodeDisplay = nullptr;
     Job job {};
     DXGI_FORMAT colorFormat = DXGI_FORMAT_UNKNOWN;
+    /* The codecs bind OUR stable 1x1 copy, never the game's texture. An engine may hand us a
+     * new allocation every frame, and the codec bakes the exposure SRV at Create, so binding the
+     * game's pointer would rebuild the whole chain (including a warm-up dispatch) every frame. A
+     * copy also pins the format - CopyTextureRegion needs matching formats - so only a change of
+     * the SOURCE's format recreates it and therefore rebuilds. */
+    ID3D12Resource *exposureCopy = nullptr;
+    DXGI_FORMAT exposureCopyFormat = DXGI_FORMAT_UNKNOWN;
+    /* What the live codecs were actually created with (exposureCopy, or null when running
+     * without exposure). */
+    ID3D12Resource *boundExposure = nullptr;
+    /* The Color texture's ALLOCATION size when the codecs were created. Deliberately separate
+     * from job.width/height, which holds the NGX subrect: the two are not interchangeable, and
+     * comparing one against the other rebuilds the chain every frame of any title whose render
+     * subrect is smaller than its buffer (UE5 at a non-native DLSS scale). */
+    UINT allocWidth = 0, allocHeight = 0;
+    /* Count of codec+HIP teardowns triggered by geoChanged (exposure/valid/format/alloc). */
+    uint32_t codecRecreates = 0;
+
+    // NativeGameCodec::Record wants one state per source plus one more for the exposure SRV.
+    // RecordInputs always leaves the copy in NON_PIXEL_SHADER_RESOURCE.
+    std::vector<D3D12_RESOURCE_STATES> CodecStates(std::vector<D3D12_RESOURCE_STATES> s) const
+    {
+        if (boundExposure)
+            s.push_back(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+        return s;
+    }
+
 
     void TeardownCodecChain()
     {
         if (bridge)
         {
-            bridge->CancelUnsubmitted();
-            bridge->NotifyOutputSubmittedIfRecorded(queue);
+            try
+            {
+                bridge->CancelUnsubmitted();
+                bridge->NotifyOutputSubmittedIfRecorded(queue);
+            }
+            catch (...)
+            {
+                AbandonSessionResources();
+                throw std::runtime_error("TeardownCodecChain: bridge acknowledgement failed");
+            }
+            if (!bridge->WaitForSubmittedWork())
+            {
+                AbandonSessionResources();
+                throw std::runtime_error("TeardownCodecChain: bridge work did not complete");
+            }
         }
         delete bridge;
         bridge = nullptr;
@@ -288,9 +346,9 @@ struct Session
 
     // Wait until queue work that may touch encode/rgb/bridge shared resources is done.
     // Returns S_OK only when completion is confirmed; callers must retain resources on failure.
-    HRESULT DrainGpu()
+    HRESULT DrainQueue(ID3D12CommandQueue *target, DWORD timeoutMs = 30000)
     {
-        if (!device || !queue)
+        if (!device || !target)
             return S_OK;
         if (FAILED(device->GetDeviceRemovedReason()))
             return DXGI_ERROR_DEVICE_REMOVED;
@@ -306,7 +364,7 @@ struct Session
             return HRESULT_FROM_WIN32(err ? err : ERROR_OUTOFMEMORY);
         }
         const UINT64 v = 1;
-        hr = queue->Signal(fence, v);
+        hr = target->Signal(fence, v);
         if (FAILED(hr))
         {
             CloseHandle(ev);
@@ -320,13 +378,34 @@ struct Session
             fence->Release();
             return hr;
         }
-        const DWORD wr = WaitForSingleObject(ev, 30000);
-        CloseHandle(ev);
+        const DWORD wr = WaitForSingleObject(ev, timeoutMs);
         const UINT64 completed = fence->GetCompletedValue();
-        fence->Release();
+        // A timeout can leave SetEventOnCompletion armed. Retain the event and
+        // fence until process exit instead of closing a future signal target.
+        if (wr == WAIT_OBJECT_0 && completed >= v)
+        {
+            CloseHandle(ev);
+            fence->Release();
+        }
         if (wr != WAIT_OBJECT_0 || completed < v)
             return wr == WAIT_TIMEOUT ? HRESULT_FROM_WIN32(ERROR_TIMEOUT) : E_FAIL;
         return S_OK;
+    }
+
+    HRESULT DrainGpu(DWORD timeoutMs = 30000)
+    {
+        const HRESULT sessionHr = DrainQueue(queue, timeoutMs);
+        if (FAILED(sessionHr))
+            return sessionHr;
+        if (!fallbackConsumerQueue)
+            return S_OK;
+        const HRESULT consumerHr = DrainQueue(fallbackConsumerQueue, timeoutMs);
+        if (SUCCEEDED(consumerHr))
+        {
+            fallbackConsumerQueue->Release();
+            fallbackConsumerQueue = nullptr;
+        }
+        return consumerHr;
     }
 
     void AbandonSessionResources()
@@ -338,6 +417,12 @@ struct Session
         rgbTex = nullptr;
         rgbInput = nullptr;
         encode = nullptr;
+        boundExposure = nullptr;
+        // Owned here rather than by a codec, but the same fail-closed rule applies: do not free
+        // what the GPU may still reference.
+        exposureCopy = nullptr;
+        // The queue may still own GPU work. Keep our reference on fail-closed teardown.
+        fallbackConsumerQueue = nullptr;
         if (queue)
         {
             queue->Release();
@@ -362,8 +447,21 @@ struct Session
         }
         if (bridge)
         {
-            bridge->CancelUnsubmitted();
-            bridge->NotifyOutputSubmittedIfRecorded(queue);
+            try
+            {
+                bridge->CancelUnsubmitted();
+                bridge->NotifyOutputSubmittedIfRecorded(queue);
+            }
+            catch (...)
+            {
+                AbandonSessionResources();
+                return;
+            }
+            if (!bridge->WaitForSubmittedWork())
+            {
+                AbandonSessionResources();
+                return;
+            }
         }
         // Bridge dtor also synchronizes HIP / pending fence, then frees shared buffers.
         delete bridge;
@@ -381,6 +479,9 @@ struct Session
         rgbInput = nullptr;
         delete encode;
         encode = nullptr;
+        if (exposureCopy)
+            exposureCopy->Release();
+        exposureCopy = nullptr;
         if (queue)
             queue->Release();
         queue = nullptr;
@@ -389,6 +490,30 @@ struct Session
         device = nullptr;
     }
 };
+
+// The codec's colour-input contract, checked here instead of letting the codec throw.
+// A game that simply uses a texture we cannot represent is a per-title limit, not a GPU
+// fault: it must not poison the session (which silently disables NR for the rest of the
+// process). The reason names the property; "codec unverified input format/geometry" alone
+// does not say which one failed.
+const char *ColorInputProblem(const D3D12_RESOURCE_DESC &desc)
+{
+    if (desc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D)
+        return "not TEXTURE2D";
+    if (!NativeInputGeometry::Supported(desc.Width, desc.Height, NativeFitLargeInput()))
+        return "outside admitted geometry";
+    if (desc.DepthOrArraySize != 1)
+        return "DepthOrArraySize != 1";
+    if (desc.MipLevels != 1)
+        return "MipLevels != 1";
+    if (desc.SampleDesc.Count != 1)
+        return "SampleDesc.Count != 1";
+    if (!(NativeIsGameColor(desc.Format) || desc.Format == DXGI_FORMAT_R9G9B9E5_SHAREDEXP))
+        return "unsupported DXGI format";
+    if (desc.Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE)
+        return "DENY_SHADER_RESOURCE";
+    return nullptr;
+}
 
 void RequireSession(Session *s)
 {
@@ -501,8 +626,8 @@ int32_t Create(const LmxxfNrCreateInfo *info, void **context)
         *context = nullptr;
         if (info->struct_size != sizeof(LmxxfNrCreateInfo))
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "Create: struct_size mismatch");
-        if (info->flags != 0)
-            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Create: flags must be 0");
+        if (info->flags & ~LMXXF_NR_CREATE_FLAG_ZERO_OUTPUT_FALLBACK)
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Create: unknown flags");
         if (!info->device || !info->queue)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "Create: device and queue required");
         if (!info->assets_directory || !info->assets_directory[0])
@@ -522,6 +647,7 @@ int32_t Create(const LmxxfNrCreateInfo *info, void **context)
             return st;
 
         auto *session = new Session;
+        session->zeroOutputFallback = (info->flags & LMXXF_NR_CREATE_FLAG_ZERO_OUTPUT_FALLBACK) != 0;
         session->assetsDir = assets;
         session->modulesDir = modulesDir;
         session->weightsDir = FindWeightsDir(assets);
@@ -590,12 +716,21 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         if (!session || !info || !job)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "PrepareFrame: null argument");
         RequireSession(session);
+        // Historical sizes: 64 ends at color_state/flags, LMXXF_NR_FRAME_INFO_V1_SIZE ends at
+        // model_scale. A host whose struct_size stops earlier simply has no later fields.
         const uint32_t legacySize = 64;
-        if ((info->struct_size != sizeof(LmxxfNrFrameInfo) && info->struct_size != legacySize) ||
+        const uint32_t v1Size = LMXXF_NR_FRAME_INFO_V1_SIZE;
+        if ((info->struct_size != sizeof(LmxxfNrFrameInfo) && info->struct_size != v1Size &&
+             info->struct_size != legacySize) ||
             job->struct_size != sizeof(LmxxfNrJob))
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "PrepareFrame: struct_size mismatch");
         job->handle = nullptr;
         job->private_output = nullptr;
+        if (session->fallbackConsumerQueue && FAILED(session->DrainGpu()))
+        {
+            session->failed = true;
+            return Fail(LMXXF_NR_FAILED, "PrepareFrame: fallback consumer queue did not drain");
+        }
         if (!session->queueBound && !session->hipPrepared)
             return Fail(LMXXF_NR_NOT_IMPLEMENTED, "PrepareFrame: call PrepareSession with a live D3D12 queue first");
         if (!info->color || !info->color_width || !info->color_height)
@@ -663,6 +798,11 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         if (!std::getenv("DLSS5_NETWORK_HEIGHT"))
             _putenv("DLSS5_NETWORK_HEIGHT=auto");
         NativeResolveNetworkGeometry(info->color_width, info->color_height);
+        // Set when PrepareFrame deliberately leaves a notice in the error slot for the host to
+        // log. Declared here, before the first HIP lazy-Create block, because BOTH of those
+        // blocks must skip SetError when a notice is already pending - otherwise the recreate
+        // reason is clobbered and a per-frame rebuild becomes invisible in the log.
+        bool keepLastError = false;
         if (!session->hipPrepared)
         {
             auto geo = NativeCurrentNetworkGeometry();
@@ -680,7 +820,8 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
                           geo.processing_width, geo.processing_height);
             OutputDebugStringA(geoMsg);
             OutputDebugStringA("\n");
-            SetError(geoMsg);
+            if (!keepLastError)
+                SetError(geoMsg);
         }
         auto *color = static_cast<ID3D12Resource *>(info->color);
         if (!color)
@@ -689,11 +830,154 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         const DXGI_FORMAT cfmt = cdesc.Format;
         const UINT cw = static_cast<UINT>(cdesc.Width);
         const UINT ch = cdesc.Height;
-        const bool geoChanged =
-            session->encode &&
-            (session->job.width != info->color_width || session->job.height != info->color_height ||
-             session->colorFormat != cfmt || (session->job.width && cw != session->job.width) ||
-             (session->job.height && ch != session->job.height));
+        if (const char *why = ColorInputProblem(cdesc))
+        {
+            char msg[224];
+            std::snprintf(msg, sizeof msg,
+                          "PrepareFrame: colour rejected (%s): fmt=%u %llux%llu arr=%u mips=%u "
+                          "samples=%u flags=0x%x fitLarge=%d",
+                          why, unsigned(cfmt), static_cast<unsigned long long>(cdesc.Width),
+                          static_cast<unsigned long long>(cdesc.Height), unsigned(cdesc.DepthOrArraySize),
+                          unsigned(cdesc.MipLevels), unsigned(cdesc.SampleDesc.Count), unsigned(cdesc.Flags),
+                          NativeFitLargeInput() ? 1 : 0);
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, msg);
+        }
+
+        // Exposure is optional and sits after model_scale, so only a host whose struct_size
+        // covers it supplies one. The scalars are clamped rather than trusted: a NaN or an
+        // infinity would otherwise fail NativeCodecParameters::Valid() at Record time, which
+        // throws and poisons the session.
+        ID3D12Resource *frameExposure = nullptr;
+        D3D12_RESOURCE_STATES frameExposureState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        float framePreExposure = 1.0f, frameExposureScale = 1.0f;
+        if (info->struct_size >= sizeof(LmxxfNrFrameInfo))
+        {
+            frameExposure = static_cast<ID3D12Resource *>(info->exposure);
+            frameExposureState = static_cast<D3D12_RESOURCE_STATES>(info->exposure_state);
+            if (info->pre_exposure > 0.0f && info->pre_exposure < 1.0e6f)
+                framePreExposure = info->pre_exposure;
+            if (info->exposure_scale > 0.0f && info->exposure_scale < 1.0e6f)
+                frameExposureScale = info->exposure_scale;
+        }
+        // Exposure is an enhancement, not a requirement. The codec samples Texture2D<float> at
+        // (0,0), so it can only use a 1x1 R16/R32 float; anything else must cost the game its
+        // exposure, not the whole frame.
+        if (frameExposure)
+        {
+            const D3D12_RESOURCE_DESC ed = frameExposure->GetDesc();
+            const bool exposureOk = ed.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D && ed.Width == 1 &&
+                                    ed.Height == 1 && ed.MipLevels == 1 && ed.DepthOrArraySize == 1 &&
+                                    ed.SampleDesc.Count == 1 &&
+                                    (ed.Format == DXGI_FORMAT_R16_FLOAT || ed.Format == DXGI_FORMAT_R32_FLOAT) &&
+                                    !(ed.Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+            if (!exposureOk)
+            {
+                // Atomic: sessions on different threads share it.
+                static std::atomic<unsigned> exposureNotices {0};
+                const unsigned notice = exposureNotices.fetch_add(1, std::memory_order_relaxed);
+                if (notice < 3 || (notice % 300) == 0)
+                {
+                    char msg[224];
+                    std::snprintf(msg, sizeof msg,
+                                  "PrepareFrame: exposure unusable, continuing without it "
+                                  "(fmt=%u %llux%llu arr=%u mips=%u samples=%u flags=0x%x)",
+                                  unsigned(ed.Format), static_cast<unsigned long long>(ed.Width),
+                                  static_cast<unsigned long long>(ed.Height), unsigned(ed.DepthOrArraySize),
+                                  unsigned(ed.MipLevels), unsigned(ed.SampleDesc.Count), unsigned(ed.Flags));
+                    OutputDebugStringA(msg);
+                    OutputDebugStringA("\n");
+                    SetError(msg);
+                    keepLastError = true;
+                }
+                frameExposure = nullptr;
+                frameExposureState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+            }
+        }
+        // Choose what the codecs will bind: our stable copy if this frame has a usable source,
+        // otherwise nothing. Rebuilding follows a change of THAT, not of the game's pointer.
+        ID3D12Resource *bindExposure = nullptr;
+        // A copy replaced below while the codecs are alive. The codecs hold an SRV to it and
+        // frames already submitted may still read it, so it is only released once the drain in
+        // the rebuild below has succeeded. Keeping it alive until then also keeps its address
+        // out of reuse: a new copy allocated at the same address would compare equal to
+        // boundExposure, skip the rebuild and leave the codecs reading a freed resource.
+        ID3D12Resource *retiredExposure = nullptr;
+        if (frameExposure)
+        {
+            const DXGI_FORMAT srcFormat = frameExposure->GetDesc().Format;
+            if (!session->exposureCopy || session->exposureCopyFormat != srcFormat)
+            {
+                if (session->exposureCopy)
+                {
+                    // Without codecs nothing references it: every path that tears the chain
+                    // down drains the GPU first.
+                    if (session->encode)
+                        retiredExposure = session->exposureCopy;
+                    else
+                        session->exposureCopy->Release();
+                    session->exposureCopy = nullptr;
+                }
+                D3D12_RESOURCE_DESC cd {};
+                cd.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+                cd.Width = cd.Height = 1;
+                cd.DepthOrArraySize = cd.MipLevels = 1;
+                cd.Format = srcFormat;
+                cd.SampleDesc.Count = 1;
+                D3D12_HEAP_PROPERTIES hp {};
+                hp.Type = D3D12_HEAP_TYPE_DEFAULT;
+                if (SUCCEEDED(session->device->CreateCommittedResource(
+                        &hp, D3D12_HEAP_FLAG_NONE, &cd, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+                        nullptr, IID_PPV_ARGS(&session->exposureCopy))))
+                {
+                    session->exposureCopyFormat = srcFormat;
+                }
+                else
+                {
+                    session->exposureCopy = nullptr;
+                    session->exposureCopyFormat = DXGI_FORMAT_UNKNOWN;
+                    frameExposure = nullptr;
+                }
+            }
+            bindExposure = session->exposureCopy;
+        }
+        // Compare like with like: the render subrect (info->color_width/height, remembered in
+        // job.width/height) against the previous subrect, and the Color texture allocation
+        // (cw/ch from GetDesc) against the previous allocation. Comparing the remembered
+        // SUBRECT against the ALLOCATION made any title whose buffer is larger than its render
+        // area rebuild the codec chain on every frame.
+        const bool exposureChanged = session->encode && session->boundExposure != bindExposure;
+        const bool validChanged =
+            session->encode && (session->job.width != info->color_width ||
+                                session->job.height != info->color_height);
+        const bool formatChanged = session->encode && session->colorFormat != cfmt;
+        const bool allocChanged = session->encode &&
+                                  ((session->allocWidth && cw != session->allocWidth) ||
+                                   (session->allocHeight && ch != session->allocHeight));
+        const bool geoChanged = exposureChanged || validChanged || formatChanged || allocChanged;
+        bool keepRecreateLog = false;
+        if (session->encode && geoChanged)
+        {
+            ++session->codecRecreates;
+            char reason[96] {};
+            std::snprintf(reason, sizeof reason, "%s%s%s%s", exposureChanged ? "exposure+" : "",
+                          validChanged ? "valid+" : "", formatChanged ? "format+" : "",
+                          allocChanged ? "alloc+" : "");
+            size_t rlen = std::strlen(reason);
+            if (rlen && reason[rlen - 1] == '+')
+                reason[rlen - 1] = 0;
+            if (!reason[0])
+                std::snprintf(reason, sizeof reason, "unknown");
+            char msg[320] {};
+            std::snprintf(msg, sizeof msg,
+                          "lmxxf: codec recreate #%u reason=%s valid=%ux%u->%ux%u alloc=%ux%u fmt=%u->%u",
+                          session->codecRecreates, reason, session->job.width, session->job.height,
+                          info->color_width, info->color_height, cw, ch,
+                          static_cast<unsigned>(session->colorFormat), static_cast<unsigned>(cfmt));
+            OutputDebugStringA(msg);
+            OutputDebugStringA("\n");
+            SetError(msg);
+            keepLastError = true;
+        }
         const bool pointerChanged = session->encode && color != session->job.color;
 
         if (session->encode && geoChanged)
@@ -704,6 +988,11 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             session->TeardownCodecChain();
             session->job = {};
         }
+        // Reached only after any drain above succeeded (a failed drain returns and leaks it,
+        // fail-closed). Without a rebuild the retired copy was never bound: a new copy cannot
+        // share its address while it lives, so no rebuild means both bindings were null.
+        if (retiredExposure)
+            retiredExposure->Release();
 
         if (!session->encode)
         {
@@ -724,8 +1013,13 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
                               geo.processing_width, geo.processing_height);
                 OutputDebugStringA(geoMsg);
                 OutputDebugStringA("\n");
-                SetError(geoMsg);
+                if (!keepLastError)
+                    SetError(geoMsg);
             }
+            // One warm-up dispatch before recording so lazy weight and module uploads cannot
+            // land inside the producer-wait callback later. Only reached after the colour
+            // contract passed, so a title we cannot serve never pays for it.
+            session->bridge->PrepareStagedKernels();
             NativeGameCodec *enc = nullptr;
             NativeGameRgbInput *rgbIn = nullptr;
             NativeRgbTexture *rgbOut = nullptr;
@@ -733,14 +1027,23 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             ID3D12Resource *disp = nullptr;
             try
             {
+                // RGB9E5 is only accepted when the codec keeps a private FP16 output: that
+                // format cannot be a UAV target and is never written, only read. Driven by the
+                // input format rather than game identity; every other format keeps its existing
+                // output route.
+                const bool privateFloatOutput = (cfmt == DXGI_FORMAT_R9G9B9E5_SHAREDEXP);
                 enc = new NativeGameCodec();
-                enc->Create(session->device, {color}, session->shaderDir);
+                session->boundExposure = bindExposure;
+                session->allocWidth = cw;
+                session->allocHeight = ch;
+                enc->Create(session->device, {color}, session->shaderDir, privateFloatOutput, bindExposure);
                 rgbIn = new NativeGameRgbInput();
                 rgbIn->Create(session->device, enc->Output(), session->shaderDir);
                 rgbOut = new NativeRgbTexture();
                 rgbOut->Create(session->device, session->bridge->Output(), session->shaderDir);
                 dec = new NativeGameCodec();
-                dec->Create(session->device, {enc->Output(), rgbOut->Output(), color}, session->shaderDir);
+                dec->Create(session->device, {enc->Output(), rgbOut->Output(), color}, session->shaderDir,
+                            privateFloatOutput, bindExposure);
                 if (dec->BufferOutput())
                 {
                     D3D12_RESOURCE_DESC td = cdesc;
@@ -803,6 +1106,10 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         session->job.transfer_strength = transfer_strength;
         session->job.color_strength = color_strength;
         session->job.debug_view = debug_view;
+        session->job.pre_exposure = framePreExposure;
+        session->job.exposure_scale = frameExposureScale;
+        session->job.sourceExposure = frameExposure;
+        session->job.sourceExposureState = frameExposureState;
         session->job.codec_passthrough = (info->flags & LMXXF_NR_FRAME_FLAG_CODEC_PASSTHROUGH) != 0;
         session->colorFormat = cfmt;
         session->job.seed = 1;
@@ -835,7 +1142,39 @@ int32_t RecordInputs(void *context, void *job, void *command_list)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "RecordInputs: job not in PREPARED state");
         ListContract(session, list);
 
-        session->encode->Record(list, {j->colorState}, 1.f);
+        // Refresh our stable exposure copy from the game's texture. Both textures share a format
+        // (CopyTextureRegion requires it), and we leave the copy in NON_PIXEL_SHADER_RESOURCE so
+        // the codec's own exposure transition is a no-op.
+        if (session->boundExposure && j->sourceExposure)
+        {
+            // A source already in COPY_SOURCE needs no transition, and a barrier whose before and
+            // after states are equal is invalid - so it only joins the batch when it moves.
+            const bool moveSource = j->sourceExposureState != D3D12_RESOURCE_STATE_COPY_SOURCE;
+            const UINT nb = moveSource ? 2u : 1u;
+            D3D12_RESOURCE_BARRIER b[2] {};
+            b[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            b[0].Transition = {session->exposureCopy, D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+                               D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST};
+            b[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            b[1].Transition = {j->sourceExposure, D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+                               j->sourceExposureState, D3D12_RESOURCE_STATE_COPY_SOURCE};
+            list->ResourceBarrier(nb, b);
+            D3D12_TEXTURE_COPY_LOCATION dst {}, src {};
+            dst.pResource = session->exposureCopy;
+            dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+            src.pResource = j->sourceExposure;
+            src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+            list->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+            b[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+            b[0].Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+            b[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+            b[1].Transition.StateAfter = j->sourceExposureState;
+            list->ResourceBarrier(nb, b);
+        }
+        NativeCodecParameters encParams = NativeGameCodec::LegacyParameters();
+        encParams.pre_exposure = j->pre_exposure;
+        encParams.exposure_scale = j->exposure_scale;
+        session->encode->Record(list, session->CodecStates({j->colorState}), 1.f, encParams);
         if (j->codec_passthrough)
         {
             // Bypass HIP: Copy encoder output directly to rgbTex output so decoder receives it as neural input.
@@ -892,12 +1231,79 @@ int32_t EnqueueHip(void *context, void *job, void *command_queue)
             return static_cast<int32_t>(LMXXF_NR_OK);
         }
         auto *targetQueue = static_cast<ID3D12CommandQueue *>(command_queue ? command_queue : session->queue);
+        const bool queueMatch = !session->queue || NativeSameDevice(targetQueue, session->queue);
+        if (!queueMatch)
+        {
+            if (!session->zeroOutputFallback)
+                throw std::runtime_error("EnqueueHip: command queue does not match session queue");
+            ID3D12Device *targetDevice = nullptr;
+            if (!targetQueue || FAILED(targetQueue->GetDevice(IID_PPV_ARGS(&targetDevice))) || !targetDevice)
+                throw std::runtime_error("EnqueueHip: cannot query fallback queue device");
+            const bool sameDevice = NativeSameDevice(targetDevice, session->device);
+            targetDevice->Release();
+            if (!sameDevice)
+                throw std::runtime_error("EnqueueHip: fallback queue device mismatch");
+            // Queue mismatch: cannot synchronize HIP with targetQueue on this session.
+            // Complete old readers and the target queue's submitted producer
+            // before a HIP zero write. A D3D12 zero copy is also ordered here.
+            if (FAILED(session->DrainGpu(kSubmissionWaitMs)) ||
+                FAILED(session->DrainQueue(targetQueue, kSubmissionWaitMs)))
+            {
+                session->failed = true;
+                return Fail(LMXXF_NR_FAILED, "EnqueueHip: producer or old session queue did not drain before fallback clear");
+            }
+            // A zero neural output makes the normal decoder view use original Color.
+            const bool cleared = session->bridge && session->bridge->ClearOutput(targetQueue);
+            if (cleared)
+            {
+                targetQueue->AddRef();
+                session->fallbackConsumerQueue = targetQueue;
+                if (j->state == LMXXF_NR_JOB_PRODUCER_SUBMITTED)
+                    j->state = LMXXF_NR_JOB_NR_COMPLETE;
+                SetError("EnqueueHip: queue mismatch; output zeroed; normal decoder view uses original Color");
+                return static_cast<int32_t>(LMXXF_NR_OK);
+            }
+            else
+            {
+                session->failed = true;
+                SetError("EnqueueHip: queue mismatch and output clear failed; cannot guarantee clean visual fallback");
+                return static_cast<int32_t>(LMXXF_NR_FAILED);
+            }
+        }
         QueueContract(session, targetQueue);
-        session->bridge->EnqueueAfterProducer(targetQueue, j->seed, false);
-        if (j->state == LMXXF_NR_JOB_PRODUCER_SUBMITTED)
-            j->state = LMXXF_NR_JOB_NR_COMPLETE;
-        SetError("");
-        return static_cast<int32_t>(LMXXF_NR_OK);
+        try
+        {
+            session->bridge->EnqueueAfterProducer(targetQueue, j->seed, false);
+            if (j->state == LMXXF_NR_JOB_PRODUCER_SUBMITTED)
+                j->state = LMXXF_NR_JOB_NR_COMPLETE;
+            SetError("");
+            return static_cast<int32_t>(LMXXF_NR_OK);
+        }
+        catch (const std::exception &ex)
+        {
+            if (!session->zeroOutputFallback)
+                throw;
+            const bool cleared = session->bridge && session->bridge->ClearOutput(targetQueue);
+            if (cleared)
+            {
+                if (j->state == LMXXF_NR_JOB_PRODUCER_SUBMITTED)
+                    j->state = LMXXF_NR_JOB_NR_COMPLETE;
+                std::string msg = "EnqueueHip: enqueue failed (";
+                msg += ex.what();
+                msg += "); output zeroed; normal decoder view uses original Color";
+                SetError(msg.c_str());
+                return static_cast<int32_t>(LMXXF_NR_OK);
+            }
+            else
+            {
+                session->failed = true;
+                std::string msg = "EnqueueHip: enqueue failed (";
+                msg += ex.what();
+                msg += ") and clear failed; cannot guarantee clean visual fallback";
+                SetError(msg.c_str());
+                return static_cast<int32_t>(LMXXF_NR_FAILED);
+            }
+        }
     });
 }
 
@@ -926,12 +1332,15 @@ int32_t RecordOutputs(void *context, void *job, void *command_list)
         if (!session->decode)
             return Fail(LMXXF_NR_FAILED, "RecordOutputs: decode missing");
         NativeCodecParameters codecParams;
+        codecParams.pre_exposure = j->pre_exposure;
+        codecParams.exposure_scale = j->exposure_scale;
         codecParams.transfer_strength = j->transfer_strength;
         codecParams.color_strength = j->color_strength;
         codecParams.debug_view = static_cast<NativeCodecDebugView>(j->debug_view);
         session->decode->Record(list,
-                                {D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-                                 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, j->colorState},
+                                session->CodecStates({D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+                                                      D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+                                                      j->colorState}),
                                 1.f, codecParams);
         if (session->decode->BufferOutput())
         {
@@ -1064,17 +1473,17 @@ int32_t GetStatus(void *context, char *buf, uint32_t buf_chars)
             {
                 auto geo = NativeCurrentNetworkGeometry();
                 std::snprintf(text, sizeof text,
-                              "lmxxf modules_ok=%u hip=1 net=%ux%u color_job=%ux%u weights=%u",
+                              "lmxxf modules_ok=%u hip=1 net=%ux%u color_job=%ux%u weights=%u recreates=%u",
                               static_cast<unsigned>(session->hsacoCount), geo.valid_width, geo.valid_height,
                               session->job.width, session->job.height,
-                              session->weightsDir.empty() ? 0u : 1u);
+                              session->weightsDir.empty() ? 0u : 1u, session->codecRecreates);
             }
             else
             {
-                std::snprintf(text, sizeof text, "lmxxf modules_ok=%u hip=0 prepared=%u queue=%u weights=%u",
+                std::snprintf(text, sizeof text, "lmxxf modules_ok=%u hip=0 prepared=%u queue=%u weights=%u recreates=%u",
                               static_cast<unsigned>(session->hsacoCount), session->hipPrepared ? 1u : 0u,
                               session->queueBound ? 1u : 0u,
-                              session->weightsDir.empty() ? 0u : 1u);
+                              session->weightsDir.empty() ? 0u : 1u, session->codecRecreates);
             }
         std::strncpy(buf, text, buf_chars - 1);
         buf[buf_chars - 1] = 0;
