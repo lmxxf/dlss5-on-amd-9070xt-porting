@@ -7,6 +7,11 @@ The runtime now reads these keys from DLSS5-AMD\native-game-flags.txt (other key
 A key already set in the environment wins. The effective state is in OptiScaler's lmxxf status line (wave_owned=requested/compatible ..., plus the flags file path and the number of keys applied).
 RX 9070 XT (standalone runtime driver, including D3D pre/post): 1920x1080 input 16.88 -> 14.93 ms (-11.5%), 1707x961 input 16.90 -> 10.77 ms (900 tier + new kernels); output bit-identical to the 0.31 runtime. VRAM growth per resolution change about a fifth of before.
 
+0.32 update
+1. Configurable: the runtime now reads DLSS5_HIP_*, DLSS5_SKIP_BLOCKS, DLSS5_FIT_LARGE and DLSS5_NETWORK_HEIGHT from DLSS5-AMD\native-game-flags.txt (other keys still have no effect), same key names as the regular package. The lmxxf status line in the OptiScaler menu/log shows requested/active for each group.
+2. The 0.31 kernels are on by default (DLSS5_HIP_WAVE_OWNED, DLSS5_HIP_C512_M32, DLSS5_HIP_VIT_PROJ_N64; 0 returns to the old path) with the new tier rule (2K Quality ~1707x960 -> 900 tier). Measured, medium settings: 2K DLSS Quality 51-52 -> 54, 2K native AA 36 -> 38.
+3. No VRAM leak on resolution switches (shared buffers reused); TheAutomatic's PR #9 merged (queue recovery, RGB9E5/exposure input, cleanup). Host dxgi.dll unchanged; the runtime stays compatible with it.
+
 0.31 update
 Shared HIP kernels follow the regular package (five new modules, 29 per gfx1200/gfx1201); this runtime does not read the new flags, so they are bundled but unused. Host dxgi.dll and runtime LmxxfNrRuntime.dll are identical to 0.30.
 
@@ -31,7 +36,7 @@ Select DLSS in game. Start with2K/Balanced and frame generation off; test frame 
 
 F6 toggles NR. Insert opens OptiScaler/REFramework (their default keys can overlap). Use the neural menu to adjust Detail strength/Colour strength, keeping both in0..1. Reducing Colour strength also suppresses coloured texture/material changes, not just saturation.
 
-Settings are in OptiScaler.ini [DlssNr]: NrBackend=lmxxf, Enabled=true, RunBeforeSR=true, LmxxfDiagnostic=off. Information overlays use OptiScaler controls. Old addon F7 and DLSS5_SHOW_FPS/NOTICE do not control this runtime. Only DLSS5_FIT_LARGE is read from DLSS5-AMD\native-game-flags.txt (other keys have no effect); no standard-addon F8 reuse control. Default skipped blocks42,43,46 remain; adaptive reuse is off.
+Settings are in OptiScaler.ini [DlssNr]: NrBackend=lmxxf, Enabled=true, RunBeforeSR=true, LmxxfDiagnostic=off. Information overlays use OptiScaler controls. Old addon F7 and DLSS5_SHOW_FPS/NOTICE do not control this runtime. DLSS5_HIP_*, DLSS5_SKIP_BLOCKS, DLSS5_FIT_LARGE and DLSS5_NETWORK_HEIGHT are read from DLSS5-AMD\native-game-flags.txt (see 0.32; other keys have no effect); no standard-addon F8 reuse control. Default skipped blocks42,43,46 remain; adaptive reuse is off.
 
 RX9070XT numerical/exposure tests, menu rendering and repeated startup have passed. Full gameplay, scene changes and frame generation still need further feedback. Previous0.27 Xbox Onimusha validation does NOT validate this new host. Other RE games/gfx1200 hardware/HDR display output remain unverified.
 

@@ -1,5 +1,10 @@
 Magpie-DLSS5-AMD @VERSION@ — full portable package
 
+0.32
+1. Switching resolution or DLSS preset no longer leaks VRAM: the AMD HIP driver never returns imported shared buffers, so each switch used to lose 70-90 MB (several GB after dozens of switches); buffers are now reused per network tier, capped around 200 MB.
+2. C32 input reads as whole-line vector loads (bit-identical, about -0.9%).
+0.31 -> 0.32 kernel output is bit-identical.
+
 1. Tier choice: an input at most 10% beyond a tier on both axes is fitted DOWN into it instead of UP into the next. 2K quality (1707x961) used to be upscaled into the 1080 tier (35% more interpolated pixels); it now takes a 6% downscale into 900. Stellar Blade 2K quality main menu about 47 -> 57 fps.
 2. One-head-per-wave kernels: C32/C64/C128 blocks and C256 attention keep a whole head's window in one wave's registers (DLSS5_HIP_WAVE_OWNED=1). Bit-identical, about -6% whole network.
 3. C512 QKV/mix at 32 tokens per wave (DLSS5_HIP_C512_M32=1, about -1.3%); ViT projection 64 columns per wave (DLSS5_HIP_VIT_PROJ_N64=1, about -1.8% at 1080). Bit-identical.

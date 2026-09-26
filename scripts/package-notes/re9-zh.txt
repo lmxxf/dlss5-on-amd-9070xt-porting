@@ -7,6 +7,11 @@ runtime 现在从 DLSS5-AMD\native-game-flags.txt 读取以下键（其余键仍
 环境变量里已设置的同名键优先。生效状态见 OptiScaler 的 lmxxf 状态行（wave_owned=请求/兼容 … 以及 flags 文件路径与应用的键数）。
 9070 XT 实测（独立 runtime 程序，含 D3D 前后处理）：1920×1080 输入 16.88→14.93ms（−11.5%），1707×961 输入 16.90→10.77ms（改走 900 档 + 新核），输出与 0.31 runtime 逐位一致。切分辨率的显存增长约为原来的五分之一。
 
+0.32 更新
+1. 可以配置了：runtime现在从DLSS5-AMD\native-game-flags.txt读取DLSS5_HIP_*、DLSS5_SKIP_BLOCKS、DLSS5_FIT_LARGE、DLSS5_NETWORK_HEIGHT（其余键仍不生效），键名与常规包相同。OptiScaler菜单/日志的lmxxf状态行显示每组开关“请求/生效”。
+2. 0.31的新核默认启用（DLSS5_HIP_WAVE_OWNED、DLSS5_HIP_C512_M32、DLSS5_HIP_VIT_PROJ_N64，设0退回旧路径），并采用新分档规则（2K高质量约1707×960→900档）。实测中画质：2K DLSS高质量51～52→54，2K原生AA 36→38。
+3. 切档不再漏显存（共享缓冲区复用）；合并TheAutomatic的PR #9（队列回退、RGB9E5/曝光输入、资源释放）。宿主dxgi.dll不变；runtime兼容该宿主。
+
 0.31 更新
 共享HIP核随常规包更新（新增5个模块，gfx1200/gfx1201各29个）；本runtime不读取新开关，新核随包但不启用。宿主dxgi.dll与runtime LmxxfNrRuntime.dll与0.30相同。
 
@@ -37,7 +42,7 @@ runtime 现在从 DLSS5-AMD\native-game-flags.txt 读取以下键（其余键仍
 控制与配置
 F6开关神经处理；Insert打开OptiScaler/REFramework菜单（两者默认键可能重叠）。Detail strength、Colour strength可在神经渲染菜单调节；保持0～1。调低颜色强度也会削弱彩色纹理/材质效果，不只是改变饱和度。
 配置在OptiScaler.ini的[DlssNr]，默认NrBackend=lmxxf、Enabled=true、RunBeforeSR=true、LmxxfDiagnostic=off。显示由OptiScaler菜单管理；旧addon的F7和DLSS5_SHOW_FPS/NOTICE不控制此版。
-此runtime只从DLSS5-AMD\native-game-flags.txt读取DLSS5_FIT_LARGE，其余键不生效；不提供普通addon的F8复用开关；默认保留42,43,46跳层、关闭跨帧自适应复用。不要用旧0.27配置说明调整新runtime。
+此runtime从DLSS5-AMD\native-game-flags.txt读取DLSS5_HIP_*、DLSS5_SKIP_BLOCKS、DLSS5_FIT_LARGE、DLSS5_NETWORK_HEIGHT（见0.32更新），其余键不生效；不提供普通addon的F8复用开关；默认保留42,43,46跳层、关闭跨帧自适应复用。不要用旧0.27配置说明调整新runtime。
 
 验证范围
 9070 XT数值回归、曝光倍率对照、主菜单连续运行和重启验证通过；完整游戏画质、切场景和帧生成仍需进一步实玩反馈。旧0.27曾在Xbox《鬼武者》验证，但不能据此认为本版新前置宿主也已验证该游戏。其他RE游戏/9060硬件未实测；HDR显示输出未完成验证。
