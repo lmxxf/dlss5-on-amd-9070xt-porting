@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 383" width="900" height="383">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0f14"/>
+      <stop offset="1" stop-color="#141b24"/>
+    </linearGradient>
+    <linearGradient id="net" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ed1c24"/>
+      <stop offset="1" stop-color="#ff7a3d"/>
+    </linearGradient>
+    <pattern id="px" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="#1d2733"/>
+      <rect width="5" height="5" fill="#2a3848"/>
+      <rect x="5" y="5" width="5" height="5" fill="#243140"/>
+    </pattern>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd27a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffd27a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="383" fill="url(#bg)"/>
+  <g stroke="#1c2530" stroke-width="1">
+    <path d="M0 60H900M0 120H900M0 180H900M0 240H900M0 300H900M0 360H900"/>
+    <path d="M90 0V383M180 0V383M270 0V383M360 0V383M450 0V383M540 0V383M630 0V383M720 0V383M810 0V383"/>
+  </g>
+
+  <text x="40" y="62" font-family="'WenQuanYi Micro Hei','Noto Sans CJK SC',sans-serif" font-size="34" font-weight="bold" fill="#f2f4f7">DLSS5@AMD 工程结构导读</text>
+  <text x="40" y="94" font-family="'WenQuanYi Micro Hei','Noto Sans CJK SC',sans-serif" font-size="17" fill="#8a97a8">5600 个文件里，真正进发布包的只有一两百个</text>
+
+  <!-- low-res frame -->
+  <g transform="translate(40,150)">
+    <rect width="150" height="96" fill="url(#px)" stroke="#4a5a6e" stroke-width="1.5"/>
+    <path d="M0 96 L45 50 L75 72 L110 30 L150 70 V96Z" fill="#2f4a5c" opacity="0.9"/>
+    <text x="75" y="122" text-anchor="middle" font-family="'WenQuanYi Micro Hei',sans-serif" font-size="14" fill="#8a97a8">游戏帧 1707×961</text>
+  </g>
+
+  <path d="M200 198 H242" stroke="#56657a" stroke-width="2"/>
+  <path d="M242 192 L252 198 L242 204Z" fill="#56657a"/>
+
+  <!-- network: encoder down, vit, decoder up -->
+  <g transform="translate(262,142)">
+    <g fill="url(#net)">
+      <rect x="0"   y="0"  width="16" height="112" rx="2"/>
+      <rect x="24"  y="12" width="16" height="88"  rx="2" opacity="0.92"/>
+      <rect x="48"  y="24" width="16" height="64"  rx="2" opacity="0.85"/>
+      <rect x="72"  y="34" width="16" height="44"  rx="2" opacity="0.8"/>
+      <rect x="96"  y="42" width="16" height="28"  rx="2" opacity="0.75"/>
+    </g>
+    <g fill="#ffb347">
+      <rect x="122" y="46" width="10" height="20" rx="1"/>
+      <rect x="136" y="46" width="10" height="20" rx="1"/>
+      <rect x="150" y="46" width="10" height="20" rx="1"/>
+      <rect x="164" y="46" width="10" height="20" rx="1"/>
+    </g>
+    <g fill="url(#net)">
+      <rect x="184" y="42" width="16" height="28"  rx="2" opacity="0.75"/>
+      <rect x="208" y="34" width="16" height="44"  rx="2" opacity="0.8"/>
+      <rect x="232" y="24" width="16" height="64"  rx="2" opacity="0.85"/>
+      <rect x="256" y="12" width="16" height="88"  rx="2" opacity="0.92"/>
+      <rect x="280" y="0"  width="16" height="112" rx="2"/>
+    </g>
+    <path d="M8 -8 Q148 -40 288 -8" fill="none" stroke="#ed1c24" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.7"/>
+    <path d="M56 16 Q148 -6 240 16" fill="none" stroke="#ff7a3d" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.6"/>
+    <text x="148" y="136" text-anchor="middle" font-family="'WenQuanYi Micro Hei',sans-serif" font-size="14" fill="#8a97a8">71 块网络 · 29 个 HIP 模块 · RX 9070 XT</text>
+  </g>
+
+  <path d="M570 198 H612" stroke="#56657a" stroke-width="2"/>
+  <path d="M612 192 L622 198 L612 204Z" fill="#56657a"/>
+
+  <!-- FSR + screen -->
+  <g transform="translate(632,126)">
+    <circle cx="114" cy="72" r="110" fill="url(#glow)"/>
+    <rect x="0" y="0" width="228" height="144" fill="#1b2a38" stroke="#ffd27a" stroke-width="1.5"/>
+    <path d="M0 144 L68 72 L112 104 L166 40 L228 98 V144Z" fill="#3f6f8c"/>
+    <circle cx="186" cy="30" r="12" fill="#ffe3a3"/>
+    <text x="114" y="170" text-anchor="middle" font-family="'WenQuanYi Micro Hei',sans-serif" font-size="14" fill="#8a97a8">FSR 放大 → 屏幕</text>
+  </g>
+
+  <g font-family="'DejaVu Sans Mono',monospace" font-size="13" fill="#5f6e82">
+    <text x="40" y="352">src/  hip/  shaders/  scripts/  include/  tools/  Development/</text>
+  </g>
+  <text x="860" y="352" text-anchor="end" font-family="'WenQuanYi Micro Hei',sans-serif" font-size="13" fill="#5f6e82">给自己看的地图 · 2026-09-26</text>
+</svg>
