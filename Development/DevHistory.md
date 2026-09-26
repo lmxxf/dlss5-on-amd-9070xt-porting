@@ -637,3 +637,7 @@ c512-ffn 回归里那次"基线第 8～11 帧不一致"：回归的 `extra-900-h
 ## 2026-09-26 17:00～18:10：3zwr1 AMDNR 0.3.3.2（c32w）实机对照——我们快约 9%
 
 网友（Zero 转）：3z 称改了我们的代码、1080p 网络 17.8→15.3ms。静态看：OptiScaler 分支 + 我们 RE9 runtime（MIT 署名在）+ 加密 pak；c32w 为其声明的自有单 wave C32 核。runtime C API 计时对照卡在其 EnqueueHip 崩溃，改游戏内：其日志 `net=1920x1080 color_job=1705x960 c32w=on hist=on`，网络固定 1080 档、无复用。剑星 1080P 原生 AA 简单场景：3z 45～46，我们（晃动使复用失效）49～50；2K 质量主菜单 3z 40～41、我们 57。详见 `results/amdnr-0332-ingame-20260926`。
+
+## 2026-09-26 18:30～18:45：HIP 导入的共享缓冲区永不归还——桥接层按档位池化
+
+受 3z 更新日志启发实测：裸探针按桥接顺序导入/映射/释放 40 次，显存与私有内存各漏 ~3 GB，整套缓冲区一字节不还；真实 `D3D12Bridge` 40 会话切档旧行为约 73 MiB/次（1080 档 ≈93）。add-on（native_game_oneshot 每会话新帧）与 RE9 runtime（每会话 new D3D12Bridge）共用 `hip_d3d12_bridge.h`，一处修：进程级池（设备+字节+UAV），`Release` 归还不销毁，上限 ≈200 MiB；`DLSS5_HIP_SHARED_POOL=0` 回退。池化后第一轮三档后平台期（显存 ≈2530、私有 ≈310 MiB 不再涨）；fresh/复用输出哈希全同；NativeGameFrame 回归 112 个 f16 与此前逐字节同。add-on 5950fe20 部署包 `deployments/vram-pool-20260926`（未装）；RE9 runtime 可按 build-runtime.sh 重编。详见 `results/vram-leak-20260926`。

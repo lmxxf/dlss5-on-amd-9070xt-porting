@@ -2,6 +2,9 @@
 #include <chrono>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
+#include <mutex>
+#include <vector>
 #include <filesystem>
 #include "hip_reference_network.h"
 #include "../../src/native_device_identity.h"
@@ -24,12 +27,28 @@ private:
  Handle span_begin{},span_end{};bool span_probe{},span_pending{};double span_cpu{};
  static void Check(HRESULT h,const char*what){if(FAILED(h))throw std::runtime_error(std::string(what)+" HRESULT="+std::to_string(unsigned(h)));}
  static void Barrier(ID3D12GraphicsCommandList*c,ID3D12Resource*r,D3D12_RESOURCE_STATES before,D3D12_RESOURCE_STATES after){if(before==after)return;D3D12_RESOURCE_BARRIER b{};b.Type=D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;b.Transition={r,D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,before,after};c->ResourceBarrier(1,&b);}
+ /* 2026-09-26: the AMD HIP driver never returns a D3D12 buffer that was imported (hipImportExternalMemory) and mapped, even after
+    hipFree + hipDestroyExternalMemory + CloseHandle + Release (results/vram-leak-20260926: 40 cycles leak the whole set, ~3 GB of
+    VRAM and as much private memory). Every session/geometry change builds a new bridge, so the shared buffers are pooled per process,
+    keyed by device + size + UAV, and handed back instead of destroyed. Sizes follow the network tier (3 buffers x at most 3 tiers).
+    Buffers decay to COMMON after execution, matching what a fresh bridge assumes. DLSS5_HIP_SHARED_POOL=0 restores create/destroy. */
+ struct PoolEntry{ID3D12Device*device{};size_t bytes{};bool uav{},busy{};Shared shared;};
+ static std::mutex&PoolMutex(){static std::mutex m;return m;}
+ static std::vector<PoolEntry>&Pool(){static std::vector<PoolEntry> v;return v;}
+ static bool PoolEnabled(){const char*v=std::getenv("DLSS5_HIP_SHARED_POOL");return !(v&&!strcmp(v,"0"));}
  void Share(Shared&s,size_t bytes,bool uav=false){
+  if(PoolEnabled()){std::lock_guard<std::mutex> lock(PoolMutex());for(auto&e:Pool())if(!e.busy&&e.device==device&&e.bytes==bytes&&e.uav==uav){e.busy=true;s=e.shared;return;}}
+  ShareNew(s,bytes,uav);
+  if(PoolEnabled()){std::lock_guard<std::mutex> lock(PoolMutex());Pool().push_back({device,bytes,uav,true,s});}
+ }
+ void ShareNew(Shared&s,size_t bytes,bool uav){
   auto&api=network->Runtime();D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_DEFAULT;D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=bytes;rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;rd.Flags=uav?D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS:D3D12_RESOURCE_FLAG_NONE;
   Check(device->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_SHARED,&rd,D3D12_RESOURCE_STATE_COMMON,nullptr,IID_PPV_ARGS(&s.resource)),"shared buffer");Check(device->CreateSharedHandle(s.resource,nullptr,GENERIC_ALL,nullptr,&s.handle),"buffer handle");
   hip_probe::MemoryDesc md{};md.type=5;md.handle.win32.handle=s.handle;md.size=device->GetResourceAllocationInfo(0,1,&rd).SizeInBytes;md.flags=1;api.Check(api.hipImportExternalMemory(&s.imported,&md),"import D3D12 resource");hip_probe::BufferDesc bd{};bd.size=bytes;api.Check(api.hipExternalMemoryGetMappedBuffer(&s.mapped,s.imported,&bd),"map shared resource");
  }
- void Release(Shared&s){auto&api=network->Runtime();if(s.mapped)api.hipFree(s.mapped);if(s.imported)api.hipDestroyExternalMemory(s.imported);if(s.handle)CloseHandle(s.handle);if(s.resource)s.resource->Release();s={};}
+ void Release(Shared&s){
+  if(s.resource&&PoolEnabled()){std::lock_guard<std::mutex> lock(PoolMutex());for(auto&e:Pool())if(e.shared.resource==s.resource){e.busy=false;s={};return;}}
+  auto&api=network->Runtime();if(s.mapped)api.hipFree(s.mapped);if(s.imported)api.hipDestroyExternalMemory(s.imported);if(s.handle)CloseHandle(s.handle);if(s.resource)s.resource->Release();s={};}
  void InputContract(ID3D12Resource*r){if(!r||r->GetDesc().Dimension!=D3D12_RESOURCE_DIMENSION_BUFFER||r->GetDesc().Width<pixels*16)throw std::runtime_error("bridge input capacity");ID3D12Device*owner{};Check(r->GetDevice(IID_PPV_ARGS(&owner)),"input device");bool same=NativeSameDevice(owner,device);owner->Release();if(!same)throw std::runtime_error("bridge input device mismatch");}
 public:
  std::string architecture,adapter_name,module_directory,device_match;int runtime_version{};
