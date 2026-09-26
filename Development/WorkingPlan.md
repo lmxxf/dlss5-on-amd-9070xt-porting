@@ -27,6 +27,7 @@
 5. **decoder 投影**（0.34/0.46ms）：加宽 null 的原因是 2×2 上采样尾部串行化；试把上采样写出与矩阵段解耦（尾部独立展开），不改 WMMA 组织。
 6. **ViT QKV 归一化**（0.34/0.54ms）：FP16 WMMA 是原版 float 权重决定的（逐位约束），加宽 null 因 wave 不足；只查归一化段与 wave 数，别动乘法精度。
 7. host 侧 C256 宽权重片段约 −0.03ms（`mhfast-wide-frag-20260923`，见下文后备）。
+7a. **W2_PACK8 进发包 + 推广**（`results/c64-block-fused-20260927`，逐位，整网 900 −0.40、1080 −0.61ms，约 −4%）：下次发包 c64-wave2 配方加 `W2_PACK8 1`。同一打包法（两值一条 cvt_pk 直写片段 + clamp 后 +0.f 代替 ±0 选择）推广到 C32（`fp8()`/`F()`，份额 34%，先做）、C256 FFN/QKV、C512/ViT。之后的大活：转置排布去 LDS 往返（探针已证 WMMA 交换参数逐位对称，难点是复刻 `w2_serial_norm` 等归约顺序），再是持久化单派发（与 PDL 同源，收益主要在 C256）。
 7b. **c32-wave1 clamp 改 fmed3**（`HIP_FP8_SAT_MODE 3`，逐位，900/1080 约 −0.03/−0.04ms，`results/fp8-sat-mode-20260927`）：下次重编 c32-wave1 时并入配方；同法看 C64～C256/deep 未折叠 clamp 数。MODE.FP16_OVFL 路线因 f16 溢出语义不逐位，已否决。
 
 **C. 需要 Zero 拍板的**

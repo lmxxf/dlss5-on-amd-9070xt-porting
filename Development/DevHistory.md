@@ -675,3 +675,11 @@ RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 �
 ## 2026-09-27 03:00：fp8-sat-mode——MODE 饱和路线不逐位，med3 写法逐位 −0.3%
 
 借鉴 mochizuki0323/DLSSNR-AMD（Vulkan）的"FP8 饱和转换用 MODE 位代替每值 clamp"。探针：gfx1201 上 MODE.FP16_OVFL（hwreg MODE bit 23）确使 `v_cvt_pk_fp8_f32` 对有限溢出饱和到 ±448，但 ±Inf/NaN 变 E4M3 NaN，且核内 f16 RNE 转换溢出改为 65504；gfx12 的 cvt 没有指令级 clamp 位。c32-wave1 入口设 OVFL + 去 clamp：指令 −8～−11%，900/1080 静态运动逐位，但 720-motion 输出变化；只设 OVFL 保留 clamp 同样变化 → 原因是 f16 溢出语义，不是去 clamp，**不采用**。改为不动 MODE、clamp 写成 `fmed3`（探针对 NaN/Inf 同字节）：指令 −2%，7 组 84 帧逐位，两批 ABBA 900 −0.037/−0.029ms、1080 −0.045/−0.035ms。宏 `HIP_FP8_SAT_MODE`（默认 0；3 = med3）在 `hip/c32_fused_ffn_attention.hip`，未改生产配方、未装游戏。详见 `results/fp8-sat-mode-20260927`。
+
+## 2026-09-27 03:20～04:10：c64-block-fused——整块融合已有，差距在 VALU；W2_PACK8 逐位整网 −4%
+
+对照 mochizuki0323/DLSSNR-AMD（整网 1080p Linux 6.0 / Windows 9.4 ms，其注释给出各宽度内核总时 C64/C128/C256 = 0.71/0.85/0.99 ms，我们 1.83/1.79/1.86）。**C64/C128 在 0.31 wave-owned 里本来就是一块一派发的整块融合**，C256 两派发，所以"融不融"不是差距来源。它单层快在：转置排布（[特征][token]，累加器即下一步 B 操作数，不走 LDS）、删 VALU（RDNA4 上 FP8 WMMA 与 VALU 不重叠）、同级多层持久化单派发（原子领 (layer,window)，只等 4 个生产者窗口；其实测收益主要在 C256）。
+
+探针 `wmma_transpose_probe`：gfx12 fp8/f16 WMMA 交换参数与结果转置 2000 组 × 256 值 0 差异，转置排布逐位可行（难点在复刻 `w2_serial_norm` 等归约顺序）。
+
+我们 `c64_wave2` 静态 ISA：WMMA 150 对 VALU ~3900；每个 E4M3 字节约 6 条 VALU（med3、只用一半的 `cvt_pk_fp8 v,x,x`、移位、and、cmp_neq+cndmask 做 ±0→+0、or）。`W2_PACK8`（`hip/wave_owned_mh.inc`，默认 0）：两值一条 cvt_pk 直写片段字，clamp 后 `+0.f` 代替 ±0 选择（NaN/Inf/下溢 -0 语义不变，放在 clamp 后避免与乘法收缩）。8 个量化点，C256 注意力体从同文件抽取一并生效。静态指令 −25%、VALU −30%，VGPR 不变；默认值 gfx1201/gfx1200 与 0.32 模块代码段相同。7 组 × 12 帧逐位；两批 ABBA 千帧 900 10.693→10.277 / 10.774→10.377，1080 14.995→14.385 / 15.032→14.426（约 −4%）。未装游戏、未发包。下一步：发包时配方加 `W2_PACK8 1`；同法推广 C32/C256 FFN/deep。结果 `results/c64-block-fused-20260927`。
