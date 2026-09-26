@@ -654,3 +654,8 @@ c512-ffn 回归里那次"基线第 8～11 帧不一致"：回归的 `extra-900-h
 
 TheAutomatic/ouco 反馈 RE9 包无法配置开关。以仓内 `src/LmxxfNrRuntime.cpp` 为唯一源：Create 时读一次 flags（白名单 DLSS5_HIP_*/SKIP_BLOCKS/FIT_LARGE/NETWORK_HEIGHT，环境优先），add-on 的 getenv 覆盖段原样搬进 `src/native_hip_env_options.h` 两边共用，默认值=0.31 模板，缺模块自动降级，状态行报告生效开关。兼容 RE9 包宿主：GetApi 收 ABI 1/2，ABI 2 给两参数 EnqueueHip 包装（PR #9 改三参数，老宿主会传垃圾队列指针）；shader/权重补 RE9 包目录布局。顺带修 PR #9 删 include 导致的 add-on 编译失败（`native_preblock_runtime.h` 补 `<cmath>`）；`hip-re9-flags.txt` NETWORK_HEIGHT 900→auto + 四新键。
 验证（rt_bench 直调 C API）：旧/新/新关四组尺寸末帧哈希全同；ABBA 1920×1080 16.88→14.93 ms（−11.5%），1707×961 16.90→10.77 ms（900 档 + 新核）；24 次切档显存旧 +180/次、新 +35/次；runtime-smoke 过；部署脚本安装→回滚验证。部署包 `deployments/re9-runtime-flags-20260926`（AMD 同名 `\deploy`），未装、不发包。详见 `results/re9-runtime-flags-20260926`。
+
+## 2026-09-26 21:00～21:17：可配置 RE9 runtime 装进 RE9 并实测
+
+RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 模块。先把 HIP 升到 0.31 RE9 包（每架构 29、SUMS 58 全核对；旧 HIP 备份 `D:\DLSSNR-Lab\re9-runtime-flags-20260926\pre-031-hip-backup`），再 `deploy\install.ps1 -GameDir <RE9>`（备份 `deploy\backups\20260926-210057`）。OptiScaler.log：`modules_ok=58 hip=1 ... wave_owned=1/1 c512_m32=1/1 vit_proj_n64=1/1 pdl=1 skip=3 | flags: ...`，老宿主两参数 EnqueueHip 兼容生效。缺陷：runtime 只在首帧打几何行，改设置后不再打印（下次补"尺寸变化即打印"）。
+用户中画质 A/B（flags 三开关 1/0，同分档规则）：2K DLSS 高质量（≈1707×960→900 档）54 对 51～52；2K 原生 AA（→1080 档）38 对 36。新核约 +5%。flags 已改回 1。
