@@ -8,4 +8,7 @@ AGENTS.md
 .claude
 bin/
 # local COMGR host tool built from rtc_compile.cpp
-hip/rtc_compile.exe
+hip/rtc_compile.exe# deployment binaries (hashes live in each deployment's payload.json / README)
+Development/deployments/**/*.addon64
+Development/deployments/**/*.hsaco
+Development/deployments/**/*.dll
