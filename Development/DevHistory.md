@@ -633,3 +633,7 @@ c512-ffn 回归里那次"基线第 8～11 帧不一致"：回归的 `extra-900-h
 ## 2026-09-26 12:05～12:20：C32 finish/prefix 尾部合并遍历——null
 
 `CW_TAIL_QUAD`（`hip/wave_owned_c32.inc`，默认 0）：2×2 块一遍遍历，4 次 LDS 读同时供 main 与 down（原 64+64 次），写地址改 32 位偏移；ISA finish 2333→1777 行、64 位地址移位 18→0、零 scratch。两档各 3 组 200 帧 ABBA（对照 = 当前生产 c32-wave1 7AC34418；另设同源对照测噪声）：900/1080 均 −0.010ms（−0.10%/−0.07%），同源对照噪声带 −0.013～+0.024ms，**不采用**；动态历史 64 帧 bitdiff=0。尾部主体是写出量（每窗口 main 8KB + down 2KB，lane=通道 128B 连续已最优）。与 §7"转置尾部并宽"不同（那次改 lane 映射）。结果 `results/c32-tail-20260926`，实验 `HIP/experiments/c32-tail`。生产/游戏/发布包未改。
+
+## 2026-09-26 17:00～18:10：3zwr1 AMDNR 0.3.3.2（c32w）实机对照——我们快约 9%
+
+网友（Zero 转）：3z 称改了我们的代码、1080p 网络 17.8→15.3ms。静态看：OptiScaler 分支 + 我们 RE9 runtime（MIT 署名在）+ 加密 pak；c32w 为其声明的自有单 wave C32 核。runtime C API 计时对照卡在其 EnqueueHip 崩溃，改游戏内：其日志 `net=1920x1080 color_job=1705x960 c32w=on hist=on`，网络固定 1080 档、无复用。剑星 1080P 原生 AA 简单场景：3z 45～46，我们（晃动使复用失效）49～50；2K 质量主菜单 3z 40～41、我们 57。详见 `results/amdnr-0332-ingame-20260926`。
