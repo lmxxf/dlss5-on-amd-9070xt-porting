@@ -1,21 +1,24 @@
-# 当前工作计划（覆盖式，不续写；最后更新 2026-09-26 19:45，朱雀）
+# 当前工作计划（覆盖式，不续写；最后更新 2026-09-26 22:00，朱雀）
 
 > 这里只记当前状态、下一步和等待事项；实验过程与完成记录进 DevHistory.md。开 session 先读这页。
 > 节奏：过日子式，没有 deadline。优先做有具体瓶颈证据、可逐位验证的小实验，够用就交。
 
 ## 当前基线（09-26 晚）
 
-- **0.31 已发布**（09-26 11:19，夸克 + Google Drive，tag 0.29/0.30/0.31 已补推）：add-on 106ff3d0，模块每架构 29 个（+c32-wave1/c64-wave2/c512-m32-mh/-deep/vit-wide-deep），模板 WAVE_OWNED/C512_M32/VIT_PROJ_N64=1，常规包 VIT_ADAPTIVE=1，auto 分档（超出某档 ≤10% 往下缩）。RE9 包宿主/runtime 同 0.30。
-- **剑星已装（超出 0.31）**：C32 vec-input（c32-wave1 新版）+ 显存池 add-on 5950fe20（含 PR #9 合并后的共享头）。标准测试（1080P 窗口 + FSR 原生 AA + 主菜单，F8 切 EXACT）：简单场景晃动 49～50；2K 质量主菜单 57、2K AA 44/47。
-- **对照**：Daniel 0.4.0 同像素仍约快 6%（其关时序历史、LocalTone=0）；3z AMDNR 0.3.3.2 同设置比我们慢约 9%（`results/amdnr-0332-ingame-20260926`）。
-- **逐族账**（`results/family-ledger-wave-owned-20260926`，1080）：C32 34% / C512 14.5% / ViT 14.5% / C64·C128·C256 各约 12%；C32 单 wave 阶段账：FFN 38%、输入 25%（`results/c32-wave-phase-20260926`）。
+- **0.32 已发布**（09-26 21:51，夸克 + **Gofile 镜像**，tag 0.32 = e1d9bd3）：常规 add-on 5950fe20（显存池 + PR #9 共享头），c32-wave1 宽读版，每架构 29 模块；RE9 runtime 2aedb521（读 flags、0.31 新核默认开、显存池、PR #9、兼容老宿主两参数 EnqueueHip）+ 新 hip-re9-flags 模板。清单 `tools/release-032-results.json`，脚本 `tools/package-032.ps1`（下次复制改版本/哈希）。
+- **剑星 = 0.32 常规包原样全新安装**（旧目录备份 `D:\DLSSNR-Lab\stellar-fresh-032\backup-20260926-213704`）。标准测试（1080P 窗口 + FSR 原生 AA + 主菜单，F8 切 EXACT）：简单场景晃动 49～50；2K 质量主菜单 57、2K AA 44/47。
+- **RE9 = 0.31 HIP + 0.32 runtime**（中画质：2K 高质量 54、2K 原生 AA 38；新核开/关 A/B 约 +5%）。旧 HIP 备份 `D:\DLSSNR-Lab\re9-runtime-flags-20260926\pre-031-hip-backup`。
+- **对照**：Daniel 0.4.0 同像素约快 6%（关时序历史、LocalTone=0）；3z AMDNR 0.3.3.2 同设置慢约 9%，其"Model interleave"（整网隔帧）默认关、不跟进。
+- **逐族账**（1080）：C32 34% / C512 14.5% / ViT 14.5% / C64·C128·C256 各约 12%；C32 单 wave 阶段账：FFN 38%、输入 25%。逐位路线进入收益递减：剩余大块卡在 exp 映射 + FP8 打包的 VALU 串行链。
 - 非逐位候选 6b 未装（约 −1.1%，PSNR 58dB，等 Zero 看画质）。
 
 ## 下一步候选（09-26 晚，按"收益 × 把握"排）
 
-**A. 产品侧（收益确定，先做）**
-1. ~~**RE9 runtime 接入新核**~~ **09-26 20:30 完成（部署包就绪，未游戏实测，`results/re9-runtime-flags-20260926`）；遗留：切档约 35MiB/次残余显存增长**。原述：RE9/C API 路径仍是 0.30 的核，没吃到 wave-owned / C512_M32 / VIT_PROJ_N64 / C32 vec（同尺寸约 9～10%）。给 runtime 的 Options 接上这几项（与 add-on 同配置、同逐位回归），并带上显存池与 PR #9。
-2. **0.32 合包**：C32 vec + 显存池 + PR #9 + RE9 runtime（上条）+ AE/EXACT 提示挪到黄字行（现在只附在 FPS 行，黄字看不到）。
+**A. 遗留尾巴（下次发包前必须处理）**
+1. **仓库 HEAD 的 add-on 未回归**：RE9 那次把 add-on 的 env 选项解析搬进 `src/native_hip_env_options.h`（行为应不变），并补了 PR #9 删掉的 `<cmath>`。0.32 发的是搬家前的 5950fe20。下次重编 add-on 前先跑 NativeGameFrame 回归 + 千帧长测，确认与 5950fe20 同输出同速度。
+2. **RE9 runtime 只在首帧打几何行**：改设置后不再打印，补"尺寸/档位变化即打印"（含 net=、color_job=、四组开关状态）。
+3. **RE9 runtime 切档仍约 +35MB/次**（显存池后，旧版约 180MB/次），来源未查（候选：共享栅栏信号量导入、codec/曝光资源重建）。
+4. AE/EXACT 提示只附在 FPS 行、黄字行看不到，挪到黄字行（常规 add-on）。
 
 **B. 逐位小刀（每刀预期 0.1～0.3%，攒着合包）**
 3. **C512 FFN 链剩余两核**：`ffn_fused_t8`（900/1080 边际 0.23/0.29ms）、`projection_frag`（0.16/0.24；32 token 已 null，拆原因后换思路）。先读 ISA 定性再动（`results/c512-ffn-20260926`）。
@@ -160,4 +163,4 @@
 
 **git（09-24 用户定）：只 commit/push 本仓（297），不再往外层 ai-theorys-study 提指针提交。**
 
-9070 机器 `amd9070`，工作根 `D:\DLSSNR-Lab\hip-backend\`；编译 `dual-arch-src\rtc_compile.exe <out> <src> comgr gfx1201`（输出旁自带 .hsaco.s）；跑前 `check-idle.ps1`；长 ssh 用后台任务。实验模板：kernel 后缀 ABBA（c32-lds-alias）、模块集 ABBA（mhfast-vgpr-cap；容忍 bitdiff 的 host 在 mhfast-tail-ablate）、核内打点（launch-occupancy）。候选流程 deployments/stellar-prod6-20260923（build → regression → payload → install）；发包 Development/tools/package-030.ps1（下次以此复制改版本号和 hash）；**发布 = 夸克 + Google Drive 双上传**（09-24 起，Google 给没有中国手机号的用户），README 两处链接都要写。生产配方：c32 = ISA_HALF+PREPACKED+C32_DIAG，mh_fused = ISA_HALF+MH_RTZ_ISA，mh_fast = ISA_HALF+PREPACKED+FFN_HOIST_RES 2，deep_fast = ISA_HALF+PREPACKED+BRANCHLESS_F。
+9070 机器 `amd9070`，工作根 `D:\DLSSNR-Lab\hip-backend\`；编译 `dual-arch-src\rtc_compile.exe <out> <src> comgr gfx1201`（输出旁自带 .hsaco.s）；跑前 `check-idle.ps1`；长 ssh 用后台任务。实验模板：kernel 后缀 ABBA（c32-lds-alias）、模块集 ABBA（mhfast-vgpr-cap；容忍 bitdiff 的 host 在 mhfast-tail-ablate）、核内打点（launch-occupancy）。候选流程 deployments/stellar-prod6-20260923（build → regression → payload → install）；发包 Development/tools/package-030.ps1（下次以此复制改版本号和 hash）；**发布 = 夸克 + 一个海外镜像**（09-24 起给没有中国手机号的用户；0.29～0.31 用 Google Drive，0.32 用 Gofile，以 Zero 给的为准），README 中英两处链接都要写，发布后按打包源码提交补 tag。生产配方：c32 = ISA_HALF+PREPACKED+C32_DIAG，mh_fused = ISA_HALF+MH_RTZ_ISA，mh_fast = ISA_HALF+PREPACKED+FFN_HOIST_RES 2，deep_fast = ISA_HALF+PREPACKED+BRANCHLESS_F。
