@@ -14,7 +14,7 @@
 ## 下一步候选（09-26 晚，按"收益 × 把握"排）
 
 **A. 产品侧（收益确定，先做）**
-1. **RE9 runtime 接入新核**：RE9/C API 路径仍是 0.30 的核，没吃到 wave-owned / C512_M32 / VIT_PROJ_N64 / C32 vec（同尺寸约 9～10%）。给 runtime 的 Options 接上这几项（与 add-on 同配置、同逐位回归），并带上显存池与 PR #9。
+1. ~~**RE9 runtime 接入新核**~~ **09-26 20:30 完成（部署包就绪，未游戏实测，`results/re9-runtime-flags-20260926`）；遗留：切档约 35MiB/次残余显存增长**。原述：RE9/C API 路径仍是 0.30 的核，没吃到 wave-owned / C512_M32 / VIT_PROJ_N64 / C32 vec（同尺寸约 9～10%）。给 runtime 的 Options 接上这几项（与 add-on 同配置、同逐位回归），并带上显存池与 PR #9。
 2. **0.32 合包**：C32 vec + 显存池 + PR #9 + RE9 runtime（上条）+ AE/EXACT 提示挪到黄字行（现在只附在 FPS 行，黄字看不到）。
 
 **B. 逐位小刀（每刀预期 0.1～0.3%，攒着合包）**

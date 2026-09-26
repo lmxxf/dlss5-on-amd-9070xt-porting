@@ -1,5 +1,12 @@
 OptiScaler-REFramework-DLSS5-AMD @VERSION@ — RE9特殊前置完整包
 
+0.32 更新（可配置）
+runtime 现在从 DLSS5-AMD\native-game-flags.txt 读取以下键（其余键仍只属于常规包，对本 runtime 无效）：
+- DLSS5_HIP_*：内核开关，与常规包同名同含义。新核默认开：DLSS5_HIP_WAVE_OWNED=1（一头一 wave）、DLSS5_HIP_C512_M32=1、DLSS5_HIP_VIT_PROJ_N64=1、DLSS5_HIP_PDL=1；设 0 回到 0.30 的核。所需模块缺失时自动关掉该组，不影响 NR 运行。
+- DLSS5_SKIP_BLOCKS（默认 42,43,46）、DLSS5_FIT_LARGE（默认 1）、DLSS5_NETWORK_HEIGHT（默认 auto：输入超出某档 10% 以内往下缩进该档）。
+环境变量里已设置的同名键优先。生效状态见 OptiScaler 的 lmxxf 状态行（wave_owned=请求/兼容 … 以及 flags 文件路径与应用的键数）。
+9070 XT 实测（独立 runtime 程序，含 D3D 前后处理）：1920×1080 输入 16.88→14.93ms（−11.5%），1707×961 输入 16.90→10.77ms（改走 900 档 + 新核），输出与 0.31 runtime 逐位一致。切分辨率的显存增长约为原来的五分之一。
+
 0.31 更新
 共享HIP核随常规包更新（新增5个模块，gfx1200/gfx1201各29个）；本runtime不读取新开关，新核随包但不启用。宿主dxgi.dll与runtime LmxxfNrRuntime.dll与0.30相同。
 

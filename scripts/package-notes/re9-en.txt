@@ -1,5 +1,12 @@
 OptiScaler-REFramework-DLSS5-AMD @VERSION@ — special RE9 pre-SR full package
 
+0.32 update (configurable)
+The runtime now reads these keys from DLSS5-AMD\native-game-flags.txt (other keys still belong to the regular package and have no effect here):
+- DLSS5_HIP_*: kernel switches, same names and meaning as the regular package. New kernels on by default: DLSS5_HIP_WAVE_OWNED=1 (one head per wave), DLSS5_HIP_C512_M32=1, DLSS5_HIP_VIT_PROJ_N64=1, DLSS5_HIP_PDL=1; 0 returns to the 0.30 kernels. A group whose modules are missing switches itself off; NR keeps running.
+- DLSS5_SKIP_BLOCKS (default 42,43,46), DLSS5_FIT_LARGE (default 1), DLSS5_NETWORK_HEIGHT (default auto: an input at most 10% beyond a tier is fitted down into it).
+A key already set in the environment wins. The effective state is in OptiScaler's lmxxf status line (wave_owned=requested/compatible ..., plus the flags file path and the number of keys applied).
+RX 9070 XT (standalone runtime driver, including D3D pre/post): 1920x1080 input 16.88 -> 14.93 ms (-11.5%), 1707x961 input 16.90 -> 10.77 ms (900 tier + new kernels); output bit-identical to the 0.31 runtime. VRAM growth per resolution change about a fifth of before.
+
 0.31 update
 Shared HIP kernels follow the regular package (five new modules, 29 per gfx1200/gfx1201); this runtime does not read the new flags, so they are bundled but unused. Host dxgi.dll and runtime LmxxfNrRuntime.dll are identical to 0.30.
 

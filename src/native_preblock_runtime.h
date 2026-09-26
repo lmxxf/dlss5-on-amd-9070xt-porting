@@ -7,6 +7,7 @@
 #include <string>
 #include <stdexcept>
 #include <cstring>
+#include <cmath>
 #include "native_resident_table.h"
 #include "native_network_timestamps.h"
 

@@ -1,8 +1,12 @@
 #pragma once
 #include "hip_reference_network.h"
+#include "native_hip_env_options.h"
 #include <string>
 
-/* First-version production HIP flags (HIP_FAST=1, graph off, skip 42,43,46). Instance, not getenv. */
+/* Production HIP flags (HIP_FAST=1, graph off, skip 42,43,46) = the 0.31 regular package template. Since 2026-09-26 the
+   DLSS5_* lines of DLSS5-AMD\native-game-flags.txt are applied to the environment once (LmxxfNrRuntime.cpp,
+   LoadFlagsFileOnce) and DLSS5_SKIP_BLOCKS / DLSS5_HIP_* override these defaults with the add-on's own parser
+   (NativeApplyHipEnvironment), so the RE9 package is configurable the same way as the regular one. */
 inline hip_reference::Options LmxxfProductionOptions(unsigned processing_w, unsigned processing_h,
                                                      const std::string &modules, const std::string &assets)
 {
@@ -62,5 +66,10 @@ inline hip_reference::Options LmxxfProductionOptions(unsigned processing_w, unsi
     // Byte-packed multihead / decoder paths. The addon route already turns these on through
     // DLSS5_HIP_* in scripts/hip-game-flags.txt and scripts/hip-re9-flags.txt.
     o.mh_feature_byte = o.mh_proj_diag_fb = o.mh_byte_stream = o.decoder_byte = o.mh_ffn_frag256 = true;
+    // 0.31 template defaults (hip-game-flags.txt): one-head-per-wave, C512 32 tokens, ViT projection 64 columns, chain flags.
+    o.wave_owned = o.c512_m32 = o.vit_proj_n64 = o.pdl = true;
+    if (const char *skip = std::getenv("DLSS5_SKIP_BLOCKS"))
+        o.skip_blocks = hip_reference::ParseSkipBlocks(skip);
+    NativeApplyHipEnvironment(o, true);
     return o;
 }

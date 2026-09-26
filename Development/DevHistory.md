@@ -649,3 +649,8 @@ c512-ffn 回归里那次"基线第 8～11 帧不一致"：回归的 `extra-900-h
 ## 2026-09-26 19:27：显存池剑星实测通过
 
 同进程（pid 6804）网络会话 3→6（新增 3 次均 1080 档），性能计数器专用显存 11,203→11,240 MiB（+37，游戏自身波动），私有内存反降；修复前应漏 ≈280 MiB。池化在游戏内生效。
+
+## 2026-09-26 19:50～20:30：RE9 runtime 可配置 + 接入 0.31 新核（A1）
+
+TheAutomatic/ouco 反馈 RE9 包无法配置开关。以仓内 `src/LmxxfNrRuntime.cpp` 为唯一源：Create 时读一次 flags（白名单 DLSS5_HIP_*/SKIP_BLOCKS/FIT_LARGE/NETWORK_HEIGHT，环境优先），add-on 的 getenv 覆盖段原样搬进 `src/native_hip_env_options.h` 两边共用，默认值=0.31 模板，缺模块自动降级，状态行报告生效开关。兼容 RE9 包宿主：GetApi 收 ABI 1/2，ABI 2 给两参数 EnqueueHip 包装（PR #9 改三参数，老宿主会传垃圾队列指针）；shader/权重补 RE9 包目录布局。顺带修 PR #9 删 include 导致的 add-on 编译失败（`native_preblock_runtime.h` 补 `<cmath>`）；`hip-re9-flags.txt` NETWORK_HEIGHT 900→auto + 四新键。
+验证（rt_bench 直调 C API）：旧/新/新关四组尺寸末帧哈希全同；ABBA 1920×1080 16.88→14.93 ms（−11.5%），1707×961 16.90→10.77 ms（900 档 + 新核）；24 次切档显存旧 +180/次、新 +35/次；runtime-smoke 过；部署脚本安装→回滚验证。部署包 `deployments/re9-runtime-flags-20260926`（AMD 同名 `\deploy`），未装、不发包。详见 `results/re9-runtime-flags-20260926`。

@@ -14,6 +14,7 @@
 #include "hip_d3d12_bridge.h"
 
 #include <atomic>
+#include <mutex>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -103,6 +104,11 @@ std::wstring FindShaderDir(const std::wstring &assets = {})
         JoinPath(dll, L"shaders"),
         L"shaders",
         L"third_party\\lmxxf\\shaders", // dev fallback
+        // RE9 package layout (0.27+): codec HLSL sit in the tiled-assets folder beside the DLL; assets may be its HIP\.
+        JoinPath(dll, L"DLSS5-AMD\\native-game-tiled-assets"),
+        JoinPath(dll, L"..\\DLSS5-AMD\\native-game-tiled-assets"),
+        assets,
+        assets.empty() ? std::wstring() : JoinPath(assets, L".."),
     };
     for (const auto &c : candidates)
     {
@@ -123,6 +129,13 @@ std::wstring FindWeightsDir(const std::wstring &assets)
     const std::wstring sub = JoinPath(assets, L"weights");
     if (FileExists(JoinPath(sub, L"block0-ffn.f16")) || FileExists(JoinPath(sub, L"block0-ffn.f32")))
         return sub;
+    {
+        // RE9 package layout: assets_directory is ...\native-game-tiled-assets\HIP and the weights sit one level up.
+        wchar_t full[MAX_PATH] {};
+        GetFullPathNameW(JoinPath(assets, L"..").c_str(), MAX_PATH, full, nullptr);
+        if (FileExists(JoinPath(full, L"block0-ffn.f16")) || FileExists(JoinPath(full, L"block0-ffn.f32")))
+            return full;
+    }
     wchar_t env[MAX_PATH] {};
     if (GetEnvironmentVariableW(L"LMXXF_WEIGHTS_DIR", env, MAX_PATH) && env[0])
     {
@@ -254,6 +267,110 @@ struct Job
     bool codec_passthrough = false;
 };
 
+/* 2026-09-26: the RE9 package used to read only DLSS5_FIT_LARGE from native-game-flags.txt, so users could not
+   switch the optimised kernels (TheAutomatic/ouco report). Now the network/kernel lines (DLSS5_HIP_*, DLSS5_SKIP_BLOCKS,
+   DLSS5_FIT_LARGE, DLSS5_NETWORK_HEIGHT) are put into the process environment once (a key already present in the
+   environment wins), as the regular add-on does before creating its network; LmxxfProductionOptions then applies the
+   same DLSS5_HIP_* parser. The file is searched next to the DLL
+   (DLSS5-AMD\native-game-flags.txt) and upwards from the assets directory. */
+std::string &FlagsInfo()
+{
+    static std::string info = "flags: none";
+    return info;
+}
+void LoadFlagsFileOnce(const std::wstring &assets)
+{
+    static std::once_flag once;
+    std::call_once(once, [&] {
+        std::vector<std::wstring> candidates{JoinPath(DllDirectory(), L"DLSS5-AMD\\native-game-flags.txt")};
+        std::wstring dir = assets;
+        for (int up = 0; up < 4 && !dir.empty(); ++up)
+        {
+            candidates.push_back(JoinPath(dir, L"native-game-flags.txt"));
+            const size_t cut = dir.find_last_of(L"\\/");
+            if (cut == std::wstring::npos)
+                break;
+            dir = dir.substr(0, cut);
+        }
+        for (const auto &path : candidates)
+        {
+            FILE *f = _wfopen(path.c_str(), L"rb");
+            if (!f)
+                continue;
+            unsigned applied = 0, kept = 0;
+            char line[512];
+            while (fgets(line, sizeof line, f))
+            {
+                size_t n = std::strlen(line);
+                while (n && (line[n - 1] == '\n' || line[n - 1] == '\r' || line[n - 1] == ' '))
+                    line[--n] = 0;
+                const char *eq = std::strchr(line, '=');
+                if (n < 8 || std::strncmp(line, "DLSS5_", 6) || !eq)
+                    continue;
+                const std::string key(line, size_t(eq - line));
+                // Only the network/kernel keys: codec, present and pre-upscale keys of the add-on templates
+                // (DLSS5_CODEC_SRGB, DLSS5_PRE_UPSCALE, ...) do not apply to this runtime and stay ignored.
+                const bool allowed = !key.compare(0, 10, "DLSS5_HIP_") || key == "DLSS5_SKIP_BLOCKS" ||
+                                     key == "DLSS5_FIT_LARGE" || key == "DLSS5_NETWORK_HEIGHT";
+                if (!allowed)
+                    continue;
+                if (std::getenv(key.c_str()))
+                {
+                    ++kept;
+                    continue;
+                }
+                if (!_putenv(line))
+                    ++applied;
+            }
+            std::fclose(f);
+            FlagsInfo() = "flags: " + Utf8(path) + " applied=" + std::to_string(applied) +
+                          " env_kept=" + std::to_string(kept);
+            break;
+        }
+        OutputDebugStringA(("lmxxf " + FlagsInfo() + "\n").c_str());
+    });
+}
+/* Production options for this session's network size, with the optional kernel groups switched off when their
+   modules are missing (an older HIP folder), so NR keeps running on the previous kernels instead of failing. */
+hip_reference::Options RuntimeOptions(unsigned w, unsigned h, const std::wstring &modulesDir,
+                                      const std::wstring &weightsDir, std::string *note)
+{
+    auto opt = LmxxfProductionOptions(w, h, Utf8(modulesDir), Utf8(weightsDir));
+    // The bridge picks HIP\gfx1200 or HIP\gfx1201 by device when those folders exist; require the module in every
+    // architecture folder present (conservative: off rather than a load failure), else in the folder itself.
+    auto has = [&](const wchar_t *f) {
+        bool any = false;
+        for (const wchar_t *arch : {L"gfx1200", L"gfx1201"})
+        {
+            const std::wstring sub = JoinPath(modulesDir, arch);
+            if (!IsDirectory(sub))
+                continue;
+            any = true;
+            if (!FileExists(JoinPath(sub, f)))
+                return false;
+        }
+        return any || FileExists(JoinPath(modulesDir, f));
+    };
+    std::string gates;
+    if (opt.wave_owned && !(has(L"c32-wave1.hsaco") && has(L"c64-wave2.hsaco")))
+        opt.wave_owned = false, gates += " wave_owned:nomodule";
+    if (opt.c512_m32 && !(has(L"c512-m32-mh.hsaco") && has(L"c512-m32-deep.hsaco")))
+        opt.c512_m32 = false, gates += " c512_m32:nomodule";
+    if (opt.vit_proj_n64 && !has(L"vit-wide-deep.hsaco"))
+        opt.vit_proj_n64 = false, gates += " vit_proj_n64:nomodule";
+    if (note)
+    {
+        char t[256];
+        std::snprintf(t, sizeof t, "wave_owned=%u/%u c512_m32=%u/%u vit_proj_n64=%u/%u pdl=%u skip=%zu",
+                      unsigned(opt.wave_owned), unsigned(hip_reference::WaveOwnedCompatible(opt)),
+                      unsigned(opt.c512_m32), unsigned(hip_reference::C512M32Compatible(opt)),
+                      unsigned(opt.vit_proj_n64), unsigned(hip_reference::VitProjN64Compatible(opt)),
+                      unsigned(opt.pdl), opt.skip_blocks.size());
+        *note = t + gates;
+    }
+    return opt;
+}
+
 struct Session
 {
     ID3D12Device *device = nullptr;
@@ -294,6 +411,7 @@ struct Session
     UINT allocWidth = 0, allocHeight = 0;
     /* Count of codec+HIP teardowns triggered by geoChanged (exposure/valid/format/alloc). */
     uint32_t codecRecreates = 0;
+    std::string optionsNote;
 
     // NativeGameCodec::Record wants one state per source plus one more for the exposure SRV.
     // RecordInputs always leaves the copy in NON_PIXEL_SHADER_RESOURCE.
@@ -646,6 +764,7 @@ int32_t Create(const LmxxfNrCreateInfo *info, void **context)
         if (st != LMXXF_NR_OK)
             return st;
 
+        LoadFlagsFileOnce(assets);
         auto *session = new Session;
         session->zeroOutputFallback = (info->flags & LMXXF_NR_CREATE_FLAG_ZERO_OUTPUT_FALLBACK) != 0;
         session->assetsDir = assets;
@@ -806,8 +925,8 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         if (!session->hipPrepared)
         {
             auto geo = NativeCurrentNetworkGeometry();
-            auto opt = LmxxfProductionOptions(geo.processing_width, geo.processing_height,
-                                              Utf8(session->modulesDir), Utf8(session->weightsDir));
+            auto opt = RuntimeOptions(geo.processing_width, geo.processing_height, session->modulesDir,
+                                      session->weightsDir, &session->optionsNote);
             if (opt.graph)
                 return Fail(LMXXF_NR_FAILED, "PrepareFrame: graph must stay off");
             session->bridge = new hip_reference::D3D12Bridge();
@@ -999,8 +1118,8 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             if (!session->bridge)
             {
                 auto geo = NativeCurrentNetworkGeometry();
-                auto opt = LmxxfProductionOptions(geo.processing_width, geo.processing_height,
-                                                  Utf8(session->modulesDir), Utf8(session->weightsDir));
+                auto opt = RuntimeOptions(geo.processing_width, geo.processing_height, session->modulesDir,
+                                          session->weightsDir, &session->optionsNote);
                 if (opt.graph)
                     return Fail(LMXXF_NR_FAILED, "PrepareFrame: graph must stay off");
                 session->bridge = new hip_reference::D3D12Bridge();
@@ -1461,7 +1580,7 @@ int32_t GetStatus(void *context, char *buf, uint32_t buf_chars)
         if (!buf || buf_chars == 0)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "GetStatus: empty buffer");
         auto *session = static_cast<Session *>(context);
-        char text[256] {};
+        char text[640] {};
         if (!session)
             std::snprintf(text, sizeof text, "no session");
         else if (session->failed)
@@ -1473,10 +1592,11 @@ int32_t GetStatus(void *context, char *buf, uint32_t buf_chars)
             {
                 auto geo = NativeCurrentNetworkGeometry();
                 std::snprintf(text, sizeof text,
-                              "lmxxf modules_ok=%u hip=1 net=%ux%u color_job=%ux%u weights=%u recreates=%u",
+                              "lmxxf modules_ok=%u hip=1 net=%ux%u color_job=%ux%u weights=%u recreates=%u %s | %s",
                               static_cast<unsigned>(session->hsacoCount), geo.valid_width, geo.valid_height,
                               session->job.width, session->job.height,
-                              session->weightsDir.empty() ? 0u : 1u, session->codecRecreates);
+                              session->weightsDir.empty() ? 0u : 1u, session->codecRecreates,
+                              session->optionsNote.c_str(), FlagsInfo().c_str());
             }
             else
             {
@@ -1504,6 +1624,16 @@ int32_t GetLastError(char *buf, uint32_t buf_chars)
 }
 } // namespace
 
+namespace
+{
+/* ABI 2 hosts (the RE9 package's dxgi.dll, built from the pre-PR #9 header) call EnqueueHip(context, job) with two
+   arguments; the third register would be garbage and be taken for a queue. They get this wrapper instead. */
+int32_t EnqueueHipTwoArgument(void *context, void *job)
+{
+    return EnqueueHip(context, job, nullptr);
+}
+} // namespace
+
 extern "C" int32_t LmxxfNrGetApi(uint32_t abi_version, LmxxfNrApi *out)
 {
     return Guard([&] {
@@ -1511,11 +1641,13 @@ extern "C" int32_t LmxxfNrGetApi(uint32_t abi_version, LmxxfNrApi *out)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "GetApi: null out");
         if (out->struct_size != sizeof(LmxxfNrApi))
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "GetApi: struct_size mismatch");
-        if (abi_version != LMXXF_NR_ABI_VERSION)
+        /* 2 = the RE9 package host (Development/RE9/presr patch bumped the header when it appended the exposure
+           fields); the function table is identical and PrepareFrame accepts every FrameInfo size, so both hosts work. */
+        if (abi_version != LMXXF_NR_ABI_VERSION && abi_version != 2u)
             return Fail(LMXXF_NR_UNSUPPORTED_ABI, "GetApi: unsupported abi_version");
         std::memset(out, 0, sizeof(*out));
         out->struct_size = sizeof(LmxxfNrApi);
-        out->abi_version = LMXXF_NR_ABI_VERSION;
+        out->abi_version = abi_version;
         out->QueryCapabilities = QueryCapabilities;
         out->Create = Create;
         out->Destroy = Destroy;
@@ -1523,6 +1655,8 @@ extern "C" int32_t LmxxfNrGetApi(uint32_t abi_version, LmxxfNrApi *out)
         out->PrepareFrame = PrepareFrame;
         out->RecordInputs = RecordInputs;
         out->EnqueueHip = EnqueueHip;
+        if (abi_version == 2u)
+            out->EnqueueHip = reinterpret_cast<int32_t (*)(void *, void *, void *)>(&EnqueueHipTwoArgument);
         out->RecordOutputs = RecordOutputs;
         out->ExecuteAfterProducer = ExecuteAfterProducer;
         out->CancelUnsubmitted = CancelUnsubmitted;
