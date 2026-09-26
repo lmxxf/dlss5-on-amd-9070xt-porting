@@ -2,7 +2,7 @@
 from pathlib import Path
 import tarfile,io,subprocess
 root=Path(__file__).resolve().parents[3]
-host=Path('/tmp/re9-upstream-bridge-review')
+host=Path(__import__('os').environ.get('RE9_UPSTREAM','/tmp/re9-upstream-bridge-review'))
 out=Path('/tmp/re9-presr-source.tar.gz')
 # Refresh HIP source/build recipes too: the runtime uses the current common kernels.
 import shutil
@@ -44,5 +44,5 @@ with tarfile.open(out,'w:gz') as tar:
   if str(rel) in extra:continue
   tar.add(p,arcname=str(rel),recursive=False)
  for name,value in extra.items():
-  data=value.encode();info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o755 if name.endswith('.sh') else 0o644;tar.addfile(info,io.BytesIO(data))
+  data=value.encode();info=tarfile.TarInfo(name);info.size=len(data);info.mtime=int(__import__('time').time());info.mode=0o755 if name.endswith('.sh') else 0o644;tar.addfile(info,io.BytesIO(data))
 print(out,out.stat().st_size)

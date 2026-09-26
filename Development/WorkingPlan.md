@@ -19,6 +19,7 @@
 2. **RE9 runtime 只在首帧打几何行**：改设置后不再打印，补"尺寸/档位变化即打印"（含 net=、color_job=、四组开关状态）。
 3. **RE9 runtime 切档仍约 +35MB/次**（显存池后，旧版约 180MB/次），来源未查（候选：共享栅栏信号量导入、codec/曝光资源重建）。
 4. AE/EXACT 提示只附在 FPS 行、黄字行看不到，挪到黄字行（常规 add-on）。
+5. **3 个后备模块与源码不符**（09-26 按 README 在 9070 全新 clone 重编验证，`hip/compare-modules.py`）：58 个里 52 个代码段一致；`c32_fused_ffn_attention`、`deep_fast`、`multihead-fast-padded-wave`（非 packed，默认不加载）是历次包原样沿用的旧编译。下次发包从源码重编这 3 个（两架构 6 个），过一次 validate-modules，让包能从源码完整复现。
 
 **B. 逐位小刀（每刀预期 0.1～0.3%，攒着合包）**
 3. **C512 FFN 链剩余两核**：`ffn_fused_t8`（900/1080 边际 0.23/0.29ms）、`projection_frag`（0.16/0.24；32 token 已 null，拆原因后换思路）。先读 ISA 定性再动（`results/c512-ffn-20260926`）。

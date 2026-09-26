@@ -1,7 +1,7 @@
 from pathlib import Path
 import subprocess,shutil,difflib,json
 root=Path(__file__).resolve().parents[3];here=Path(__file__).resolve().parent
-host=Path('/tmp/re9-upstream-bridge-review');rev='8f71f73bfc836a37936e7cee6701750ad4e8bfec'
+host=Path(__import__('os').environ.get('RE9_UPSTREAM','/tmp/re9-upstream-bridge-review'));rev='8f71f73bfc836a37936e7cee6701750ad4e8bfec'
 assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=host,text=True).strip()==rev
 prefix='OptiScaler-DLSSNR-PreSR-Multipass-main/OptiScaler/'
 def original(name):return subprocess.check_output(['git','show',rev+':'+prefix+name],cwd=host,text=True)
