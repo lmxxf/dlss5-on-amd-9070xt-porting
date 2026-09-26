@@ -659,3 +659,7 @@ TheAutomatic/ouco 反馈 RE9 包无法配置开关。以仓内 `src/LmxxfNrRunti
 
 RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 模块。先把 HIP 升到 0.31 RE9 包（每架构 29、SUMS 58 全核对；旧 HIP 备份 `D:\DLSSNR-Lab\re9-runtime-flags-20260926\pre-031-hip-backup`），再 `deploy\install.ps1 -GameDir <RE9>`（备份 `deploy\backups\20260926-210057`）。OptiScaler.log：`modules_ok=58 hip=1 ... wave_owned=1/1 c512_m32=1/1 vit_proj_n64=1/1 pdl=1 skip=3 | flags: ...`，老宿主两参数 EnqueueHip 兼容生效。缺陷：runtime 只在首帧打几何行，改设置后不再打印（下次补"尺寸变化即打印"）。
 用户中画质 A/B（flags 三开关 1/0，同分档规则）：2K DLSS 高质量（≈1707×960→900 档）54 对 51～52；2K 原生 AA（→1080 档）38 对 36。新核约 +5%。flags 已改回 1。
+
+## 2026-09-26 21:20～21:27：0.32 三包打完（待上传）
+
+`Development/tools/package-032.ps1`（0.31 底包，取自 history；源码提交 e1d9bd3）：常规 add-on 5950fe20（显存池 + PR #9 共享头，剑星装机验证）；c32-wave1 宽读版双架构（剑星/RE9 装机同哈希 128bb82c/7ac34418）；RE9 runtime 2aedb521（读 flags、0.31 新核默认开、显存池、PR #9、老宿主 ABI-2 兼容，RE9 装机实测）+ 新 hip-re9-flags 模板；SOURCE-README 追加 runtime 源码提交。产物：Magpie 339,076,857 B `87eeae8e…`、OptiScaler 369,274,773 B `a26d1fab…`、REFramework 423,734,964 B `567b8ef9…`；底包逐文件、44 shader、ZIP 回读、RE9 runtime 冒烟通过。仓库 HEAD 的"env 选项搬家"版 add-on 未入包（待回归）。README 0.32 条目已写好（本地），待链接。
