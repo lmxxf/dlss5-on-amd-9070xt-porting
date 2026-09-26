@@ -1,0 +1,46 @@
+#include <windows.h>
+#include <cstdio>
+#include <sstream>
+#include "Development/HIP/hip_reference_network.h"
+std::vector<float> read(const char*p){auto b=hip_reference::ReadBytes(p);if(b.size()%4)throw std::runtime_error("alignment");std::vector<float>v(b.size()/4);memcpy(v.data(),b.data(),b.size());return v;}
+std::vector<std::string> split(const char*e){std::vector<std::string>r;if(!e)return r;std::stringstream ss(e);std::string t;while(std::getline(ss,t,','))if(!t.empty())r.push_back(t);return r;}
+int main(int argc,char**argv){try{
+ if(argc!=10)throw std::runtime_error("assets modules flags input expected width height frames repeats");
+ unsigned W=std::stoul(argv[6]),H=std::stoul(argv[7]),frames=std::stoul(argv[8]),repeats=std::stoul(argv[9]);
+ std::ifstream flags(argv[3]);if(!flags)throw std::runtime_error("flags");std::string line;
+ while(std::getline(flags,line)){if(!line.empty()&&line.back()=='\r')line.pop_back();auto q=line.find('=');if(line.rfind("DLSS5_",0)==0&&q!=std::string::npos)_putenv_s(line.substr(0,q).c_str(),line.substr(q+1).c_str());}
+ _putenv_s("DLSS5_HIP_FAST","1");_putenv_s("DLSS5_HIP_GRAPH","0");_putenv_s("DLSS5_VIT_ADAPTIVE","0");_putenv_s("DLSS5_VIT_REUSE_HOTKEY","0");_putenv_s("DLSS5_HIP_DUP_PREFIX","");
+ /* OPTIONS */
+ o.modules=argv[2];hip_reference::Network net(o);auto&api=net.Runtime();
+ printf("CONFIG wave_owned_active=%u c512_m32_active=%u pdl=%u\n",net.WaveOwnedActive()?1u:0u,net.C512M32Active()?1u:0u,o.pdl?1u:0u);
+ if(!net.WaveOwnedActive()||!net.C512M32Active())throw std::runtime_error("baseline must be wave-owned + C512 M32 production");
+ auto input=read(argv[4]),expected=read(argv[5]);if(input.size()!=size_t(W)*H*4||expected.size()!=size_t(W)*H*3)throw std::runtime_error("shape");
+ void*x{},*y{};api.Check(api.hipMalloc(&x,input.size()*4),"input");api.Check(api.hipMalloc(&y,expected.size()*4),"output");api.Check(api.hipMemcpy(x,input.data(),input.size()*4,1),"upload");
+ auto run=[&](){net.Enqueue(x,nullptr,y,0);net.Synchronize();};
+ auto diff=[&](const std::vector<float>&ref)->size_t{std::vector<float>v(ref.size());api.Check(api.hipMemcpy(v.data(),y,v.size()*4,2),"check");size_t bad=0;for(size_t i=0;i<v.size();i++)bad+=memcmp(&v[i],&ref[i],4)!=0||!std::isfinite(v[i]);return bad;};
+ auto verify=[&](const char*what){size_t bad=diff(expected);printf("VERIFY %s bitdiff=%llu\n",what,(unsigned long long)bad);fflush(stdout);if(bad)throw std::runtime_error(std::string("output mismatch ")+what);};
+ net.SetDup("");net.SetCand(0);run();verify("baseline");
+ FILE*f=fopen("slots.csv","wb");if(!f)throw std::runtime_error("slots");fprintf(f,"kind,repeat,target,slot,active,frames,ms,hits_per_frame,bitdiff\n");
+ auto slot=[&](const char*kind,unsigned rep,const std::string&target,unsigned s,bool active,bool must_match){
+  run();size_t bad=diff(expected);if(must_match&&bad)throw std::runtime_error("mismatch "+target);for(unsigned i=0;i<20;i++)run();
+  unsigned h0=std::string(kind)=="dup"?net.dup_hits:net.cand_hits;auto begin=std::chrono::steady_clock::now();for(unsigned i=0;i<frames;i++)run();
+  double ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count()/frames;unsigned h1=std::string(kind)=="dup"?net.dup_hits:net.cand_hits;
+  size_t bad2=diff(expected);if(must_match&&bad2)throw std::runtime_error("mismatch after "+target);
+  fprintf(f,"%s,%u,%s,%u,%u,%u,%.9f,%.3f,%llu\n",kind,rep,target.c_str(),s,active?1:0,frames,ms,double(h1-h0)/frames,(unsigned long long)(bad+bad2));fflush(f);
+  printf("SLOT %s rep=%u target=%s slot=%u active=%u ms=%.6f hits/frame=%.2f bitdiff=%llu\n",kind,rep,target.c_str(),s,active?1:0,ms,double(h1-h0)/frames,(unsigned long long)(bad+bad2));fflush(stdout);};
+ for(unsigned rep=0;rep<repeats;rep++)for(auto&t:split(std::getenv("SWEEP_TARGETS"))){bool order[]={false,true,true,false};for(unsigned s=0;s<4;s++){net.SetDup(order[s]?t:"");slot("dup",rep,t,s,order[s],!order[s]);}net.SetDup("");}
+ auto cands=split(std::getenv("SWEEP_CANDS"));
+ for(unsigned rep=0;rep<repeats;rep++)for(auto&c:cands){bool order[]={false,true,true,false};for(unsigned s=0;s<4;s++){net.SetCand(order[s]?unsigned(std::stoul(c)):0u);slot("cand",rep,c,s,order[s],true);}net.SetCand(0);}
+ fclose(f);
+ unsigned dynamic_frames=cands.empty()?0:16;
+ void*history{};api.Check(api.hipMalloc(&history,input.size()*4),"history");auto original=input,previous=input;auto ref=expected;
+ for(auto&c:cands)for(unsigned frame=0;frame<dynamic_frames;frame++){
+  for(size_t p=0;p<size_t(W)*H;p++){size_t source=((p/W+(frame*3)%H)%H)*W+(p%W+frame*7)%W;
+   for(unsigned ch=0;ch<3;ch++){float v=original[source*4+ch]*(.8f+.025f*(frame%9))+.005f*(int(frame%5)-2);input[p*4+ch]=frame%8==6?0.f:frame%8==7?1.f:std::min(1.f,std::max(0.f,v));}input[p*4+3]=original[p*4+3];}
+  api.Check(api.hipMemcpy(x,input.data(),input.size()*4,1),"dyn upload");api.Check(api.hipMemcpy(history,previous.data(),previous.size()*4,1),"dyn history");
+  unsigned seed=123+frame*17;void*hist=frame?history:nullptr;
+  net.SetCand(0);net.Enqueue(x,hist,y,seed);net.Synchronize();api.Check(api.hipMemcpy(ref.data(),y,ref.size()*4,2),"dyn base");
+  net.SetCand(unsigned(std::stoul(c)));net.Enqueue(x,hist,y,seed);net.Synchronize();size_t bad=diff(ref);
+  printf("DYNAMIC cand=%s frame=%u hits=%u bitdiff=%llu\n",c.c_str(),frame,net.cand_hits,(unsigned long long)bad);fflush(stdout);if(bad||!net.cand_hits)throw std::runtime_error("dynamic mismatch");previous=input;}
+ net.SetCand(0);api.hipFree(history);api.hipFree(x);api.hipFree(y);puts("PASS c32 tail");return 0;
+}catch(const std::exception&e){fprintf(stderr,"FAIL %s\n",e.what());return 1;}}
