@@ -667,3 +667,7 @@ RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 �
 ## 2026-09-26 21:51：0.32 发布
 
 夸克 https://pan.quark.cn/s/b805e071405c ；镜像改用 Gofile https://gofile.io/d/CZ67LYIc （本版不是 Google Drive）。中英 README 当前版本与更新记录已填；tag 0.32 = e1d9bd3（打包源码提交）。同时剑星已整包解压 0.32 常规包做全新安装验证（备份 `D:\DLSSNR-Lab\stellar-fresh-032\backup-20260926-213704`，`install.ps1 -Restore`），待用户游戏内确认。
+
+## 2026-09-26 21:55：0.32 常规包全新安装验证通过
+
+剑星整包解压 0.32（DLSS5-AMD 目录全新、OptiScaler.ini 用包内模板）后用户进游戏：黄字正常、帧率与此前同；日志（全新 logs 目录，pid 29688）wave_owned/c512_m32/vit_proj_n64 均 requested=1 active=1。剑星现为 0.32 包原样安装（旧目录备份见上条）。
