@@ -641,3 +641,7 @@ c512-ffn 回归里那次"基线第 8～11 帧不一致"：回归的 `extra-900-h
 ## 2026-09-26 18:30～18:45：HIP 导入的共享缓冲区永不归还——桥接层按档位池化
 
 受 3z 更新日志启发实测：裸探针按桥接顺序导入/映射/释放 40 次，显存与私有内存各漏 ~3 GB，整套缓冲区一字节不还；真实 `D3D12Bridge` 40 会话切档旧行为约 73 MiB/次（1080 档 ≈93）。add-on（native_game_oneshot 每会话新帧）与 RE9 runtime（每会话 new D3D12Bridge）共用 `hip_d3d12_bridge.h`，一处修：进程级池（设备+字节+UAV），`Release` 归还不销毁，上限 ≈200 MiB；`DLSS5_HIP_SHARED_POOL=0` 回退。池化后第一轮三档后平台期（显存 ≈2530、私有 ≈310 MiB 不再涨）；fresh/复用输出哈希全同；NativeGameFrame 回归 112 个 f16 与此前逐字节同。add-on 5950fe20 部署包 `deployments/vram-pool-20260926`（未装）；RE9 runtime 可按 build-runtime.sh 重编。详见 `results/vram-leak-20260926`。
+
+## 2026-09-26 19:14：显存池 add-on 装进剑星（待用户切档实测）
+
+游戏关闭时 `D:\DLSSNR-Lab\vram-pool-20260926\install.ps1`：只换 add-on 为 5950fe20（0.31 源 + 共享缓冲区池 + PR #9 合并后的共享头），模块/flags 不变，备份 `backups\20260926-191447`。待 Zero 游戏内反复切分辨率/DLSS 档位看显存是否平台化。
