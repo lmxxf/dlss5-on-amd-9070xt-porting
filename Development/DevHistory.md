@@ -663,3 +663,7 @@ RE9 目录原为 0.29～0.31 同款宿主 0ef10229 + runtime 6e9974d7 + 旧 24 �
 ## 2026-09-26 21:20～21:27：0.32 三包打完（待上传）
 
 `Development/tools/package-032.ps1`（0.31 底包，取自 history；源码提交 e1d9bd3）：常规 add-on 5950fe20（显存池 + PR #9 共享头，剑星装机验证）；c32-wave1 宽读版双架构（剑星/RE9 装机同哈希 128bb82c/7ac34418）；RE9 runtime 2aedb521（读 flags、0.31 新核默认开、显存池、PR #9、老宿主 ABI-2 兼容，RE9 装机实测）+ 新 hip-re9-flags 模板；SOURCE-README 追加 runtime 源码提交。产物：Magpie 339,076,857 B `87eeae8e…`、OptiScaler 369,274,773 B `a26d1fab…`、REFramework 423,734,964 B `567b8ef9…`；底包逐文件、44 shader、ZIP 回读、RE9 runtime 冒烟通过。仓库 HEAD 的"env 选项搬家"版 add-on 未入包（待回归）。README 0.32 条目已写好（本地），待链接。
+
+## 2026-09-26 21:51：0.32 发布
+
+夸克 https://pan.quark.cn/s/b805e071405c ；镜像改用 Gofile https://gofile.io/d/CZ67LYIc （本版不是 Google Drive）。中英 README 当前版本与更新记录已填；tag 0.32 = e1d9bd3（打包源码提交）。同时剑星已整包解压 0.32 常规包做全新安装验证（备份 `D:\DLSSNR-Lab\stellar-fresh-032\backup-20260926-213704`，`install.ps1 -Restore`），待用户游戏内确认。
