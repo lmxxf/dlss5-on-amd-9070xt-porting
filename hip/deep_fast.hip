@@ -302,6 +302,45 @@ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint token
 #endif
 }
 #endif
+// HIP_VIT_ATTN_M32 (2026-10-01, results/vit-1080-gap-20261001): mochizuki's vitattn takes 32 queries per group; here one
+// wave keeps two independent 16-query chains (first, first+16) of the production transposed-score body and loads each
+// K fragment / V fragment once for both. Per query every WMMA, its operands and the K16 order are those of
+// vit_attention_transposed_score_body, so outputs are identical; grid unchanged (host), waves with pair>=tokens/32 exit.
+#ifndef HIP_VIT_ATTN_M32
+#define HIP_VIT_ATTN_M32 0
+#endif
+#if HIP_VIT_ATTN_M32
+#if !(HIP_VIT_ATTN_TRANSPOSED_SCORE&&HIP_VIT_ATTN_NATIVE_HALF&&HIP_VIT_ATTN_PROB_PAIR&&HIP_VIT_ATTN_TRANSPOSED_AV)
+#error HIP_VIT_ATTN_M32 is written for the production transposed-score/native-half/pair/transposed-AV body
+#endif
+DEV void vit_attn_m32_prob(f8 a,h8&x,i2&xb){f8 prob{};
+ for(uint e=0;e<8;e++){float af=clampf(a[e]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);
+  uint hb=(bits(af)>>13)-0x1c000u;unsigned short u=(unsigned short)(((hb<<4)+0x4000u)&65535u);
+  union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;prob[e]=float(cv.h);}
+ xb[0]=__builtin_amdgcn_cvt_pk_fp8_f32(prob[0],prob[1],0,false);xb[0]=__builtin_amdgcn_cvt_pk_fp8_f32(prob[2],prob[3],xb[0],true);
+ xb[1]=__builtin_amdgcn_cvt_pk_fp8_f32(prob[4],prob[5],0,false);xb[1]=__builtin_amdgcn_cvt_pk_fp8_f32(prob[6],prob[7],xb[1],true);}
+template<uint MAXT>
+DEV void vit_attention_m32_body(const float*in,float*out,uint tokens){
+ uint head=bid()%32,first=bid()/32*32;if(first>=tokens)return;
+ const bool two=first+16<tokens;
+ const unsigned char*in8=reinterpret_cast<const unsigned char*>(in);
+ i2 q0[2]{},q1[2]{};for(uint k=0;k<32;k+=16){__builtin_memcpy(&q0[k/16],in8+(first+rc())*1024+head*32+k+gr()*8,8);if(two)__builtin_memcpy(&q1[k/16],in8+(first+16+rc())*1024+head*32+k+gr()*8,8);}
+ h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
+ f8 sum0{},sum1{},acc0[2]{},acc1[2]{};
+ for(uint key=0;key<tokens;key+=16){f8 a0{},a1{};
+  for(uint k=0;k<32;k+=16){i2 y{};__builtin_memcpy(&y,in8+(tokens+key+rc())*1024+head*32+k+gr()*8,8);
+   a0=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,q0[k/16],a0);a1=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,q1[k/16],a1);}
+  h8 x0{},x1{};i2 xb0{},xb1{};vit_attn_m32_prob(a0,x0,xb0);vit_attn_m32_prob(a1,x1,xb1);
+  sum0=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,x0,sum0);sum1=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,x1,sum1);
+  for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}
+   acc0[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,xb0,acc0[c]);acc1[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,xb1,acc1[c]);}
+ }
+ float inv0=vit_inv(sum0[0]);
+ for(uint c=0;c<2;c++)for(uint e=0;e<8;e++)reinterpret_cast<unsigned char*>(out)[(first+rc())*1024+head*32+c*16+gr()*8+e]=byte_F(Hrtz(acc0[c][e]*inv0));
+ if(two){float inv1=vit_inv(sum1[0]);
+ for(uint c=0;c<2;c++)for(uint e=0;e<8;e++)reinterpret_cast<unsigned char*>(out)[(first+16+rc())*1024+head*32+c*16+gr()*8+e]=byte_F(Hrtz(acc1[c][e]*inv1));}
+}
+#endif
 template<uint MAXT,bool ByteInput=false,bool ByteOut=false>
 DEV void vit_attention_fused_body(const float*in,float*out,uint tokens){
  uint head=bid()%32,first=bid()/32*16;if(first>=tokens)return;
@@ -326,14 +365,18 @@ DEV void vit_attention_fused_body(const float*in,float*out,uint tokens){
 // Byte-stream twins: byte Q/K/V in, attention output stored as its E4M3 byte for vit_project_bytein_bout.
 WAVE void vit_attention_fused_256_bytein_bout(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_fused_body<256,true,true>(in,out,tokens);}
 WAVE void vit_attention_fused_400_bytein_bout(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;
-#if HIP_VIT_ATTN_TRANSPOSED_SCORE
+#if HIP_VIT_ATTN_M32
+vit_attention_m32_body<400>(in,out,tokens);
+#elif HIP_VIT_ATTN_TRANSPOSED_SCORE
 vit_attention_transposed_score_body<400,true,true>(in,out,tokens);
 #else
 vit_attention_fused_body<400,true,true>(in,out,tokens);
 #endif
 }
 WAVE void vit_attention_fused_640_bytein_bout(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;
-#if HIP_VIT_ATTN_TRANSPOSED_SCORE
+#if HIP_VIT_ATTN_M32
+vit_attention_m32_body<640>(in,out,tokens);
+#elif HIP_VIT_ATTN_TRANSPOSED_SCORE
 vit_attention_transposed_score_body<640,true,true>(in,out,tokens);
 #else
 vit_attention_fused_body<640,true,true>(in,out,tokens);
