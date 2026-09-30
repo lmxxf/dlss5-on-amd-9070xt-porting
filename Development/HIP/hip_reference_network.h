@@ -78,6 +78,7 @@ class Network {
     and cumulative targets stay exact; cleared only after a full drain before uint32 rollover. The last blocks' tensors are held so the pool cannot recycle a buffer
     an in-flight launch still reads. Correctness audit and remaining acquire/scheduling conditions: results/pdl-audit-20260927. */
  unsigned pdl_mode=0,pdl_calls=0;unsigned*pdl_flags=nullptr;bool pdl_anyorder=false;std::deque<Tensor>pdl_keep;
+ bool pdl_requested=false,pdl_effective=false;std::string pdl_reason;
  struct PdlPrev{unsigned*flags=nullptr;unsigned epoch=0,ww=0,sx=0,sy=0;}pdl_prev;unsigned*pdl_ffn_flags=nullptr;unsigned pdl_ffn_epoch=0;
  int(*ext_launch)(Handle,unsigned,unsigned,unsigned,unsigned,unsigned,unsigned,size_t,Handle,void**,void**,Handle,Handle,unsigned)=nullptr;
  static constexpr unsigned PDL_SLOTS=16384,PDL_RING=64;
@@ -92,7 +93,50 @@ class Network {
   }
   pdl_total[s]+=waves;pdl_last_target=pdl_total[s];return pdl_flags+size_t(s)*PDL_SLOTS;}
  static bool PdlChainHead(U block){return block==5||block==9||block==15||block==23||block==40||block==48||block==56||block==62;}
- public: unsigned PdlCalls()const{return pdl_calls;} private:
+ void PreflightPdl(){
+  pdl_mode=0;pdl_effective=false;pdl_reason.clear();
+  if(!opt.pdl){pdl_requested=false;pdl_reason="pdl disabled by configuration";return;}
+  pdl_requested=true;
+  if(opt.graph){pdl_reason="pdl requires graph off";return;}
+  ext_launch=reinterpret_cast<decltype(ext_launch)>(GetProcAddress(api.dll,"hipExtModuleLaunchKernel"));
+  if(!ext_launch){pdl_reason="driver extension hipExtModuleLaunchKernel missing";return;}
+  auto itFast=modules.find("mh_fast");auto itFused=modules.find("mh_fused");
+  if(itFast==modules.end()||itFused==modules.end()){pdl_reason="required modules for pdl missing";return;}
+  static const char* const kPdlFusedSymbols[]={
+   "c64_attention_project_fb_diag_pdl","c64_attention_project_fb_bout_diag_pdl",
+   "c128_attention_project_fb_diag_pdl","c128_attention_project_fb_bout_diag_pdl",
+   "c256_attention_project_fb_diag_pdl","c256_attention_project_fb_bout_diag_pdl"
+  };
+  for(const char* sym : kPdlFusedSymbols){
+   Handle fn{};
+   if(api.hipModuleGetFunction(&fn,itFused->second,sym)!=0||!fn){
+    pdl_reason=std::string("missing pdl symbol in mh_fused: ")+sym;return;
+   }
+  }
+  static const char* const kPdlFastSymbols[]={
+   "mh_ffn_fused_c64_project_g128_qkv_fb_pdl","mh_ffn_fused_c64_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c64_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c64_project_mapped_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c128_project_g128_qkv_fb_pdl","mh_ffn_fused_c128_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c128_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c128_project_mapped_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c256_frag_project_g128_qkv_fb_pdl","mh_ffn_fused_c256_frag_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c256_frag_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c256_frag_project_mapped_g128_qkv_bytein_fb_pdl"
+  };
+  for(const char* sym : kPdlFastSymbols){
+   Handle fn{};
+   if(api.hipModuleGetFunction(&fn,itFast->second,sym)!=0||!fn){
+    pdl_reason=std::string("missing pdl symbol in mh_fast: ")+sym;return;
+   }
+  }
+  api.Check(api.hipMalloc((void**)&pdl_flags,size_t(PDL_SLOTS)*PDL_RING*4),"pdl flags");
+  api.Check(api.hipMemsetAsync(pdl_flags,0,size_t(PDL_SLOTS)*PDL_RING*4,stream),"pdl flags zero");
+  pdl_mode=7;pdl_effective=true;pdl_reason="enabled";
+ }
+ public:
+ unsigned PdlCalls()const{return pdl_calls;}
+ bool PdlRequested()const{return pdl_requested;}
+ bool PdlEffective()const{return pdl_effective;}
+ const std::string& PdlReason()const{return pdl_reason;}
+ private:
 #ifdef DLSS5_LAYER_BENCH
  friend struct LayerBenchmark;
  unsigned diagnostic_kernel_repeats=1;
@@ -525,7 +569,7 @@ if(opt.fused_mh){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/multihead
 if(opt.mh_window_fused){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/c64-window-fused.hsaco").c_str()),"C64 window fused module");modules["mh_window"]=m;}
 if(opt.fast_deep){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+(opt.packed_weights?"/deep_fast-packed.hsaco":"/deep_fast.hsaco")).c_str()),"deep fast module");modules["deep_fast"]=m;}
 if(opt.fast_mh){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+(opt.packed_weights?(opt.mh_wave?"/multihead-fast-padded-wave-packed.hsaco":"/multihead-fast-packed.hsaco"):(opt.mh_wave?"/multihead-fast-padded-wave.hsaco":"/multihead-fast.hsaco"))).c_str()),"MH fast module");modules["mh_fast"]=m;}
- if(opt.pdl){if(opt.graph)throw std::runtime_error("pdl requires graph off");api.Load(ext_launch,"hipExtModuleLaunchKernel");api.Check(api.hipMalloc((void**)&pdl_flags,size_t(PDL_SLOTS)*PDL_RING*4),"pdl flags");api.Check(api.hipMemsetAsync(pdl_flags,0,size_t(PDL_SLOTS)*PDL_RING*4,stream),"pdl flags zero");pdl_mode=7;}
+ PreflightPdl();
 if(opt.fast_prefix){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/prefix_fast.hsaco").c_str()),"prefix fast module");modules["prefix_fast"]=m;}
 if(opt.fused_c32){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/c32_fused_attention.hsaco").c_str()),"fused attention module");modules["c32_fused"]=m;}
 if(opt.fast_c32){const char*f[][2]={{"c32_fast_ffn","c32_fast.hsaco"},{"c32_fast_attention","c32_fast_attention.hsaco"},{"boundary_fast","boundary-fast.hsaco"}};for(auto&v:f){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.tiled){const char*t[][2]={{"c32_tiled","c32_tiled.hsaco"},{"mh_tiled","multihead-tiled.hsaco"}};for(auto&v:t){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.wave){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/wave-pointwise.hsaco").c_str()),"wave module");modules["wave"]=m;}}catch(...){if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}

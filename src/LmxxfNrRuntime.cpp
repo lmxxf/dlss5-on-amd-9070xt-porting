@@ -1550,14 +1550,7 @@ int32_t RecordOutputs(void *context, void *job, void *command_list)
             D3D12_TEXTURE_COPY_LOCATION srcLoc {};
             srcLoc.pResource = src;
             srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-            const auto &geo = session->decode->Geometry();
-            const DXGI_FORMAT fmt = NativeViewFormat(dst->GetDesc().Format);
-            const bool bytes4 = NativeIsRgba8Unorm(fmt) || NativeIsR11G11B10(fmt);
-            srcLoc.PlacedFootprint.Footprint.Format = fmt;
-            srcLoc.PlacedFootprint.Footprint.Width = geo.width;
-            srcLoc.PlacedFootprint.Footprint.Height = geo.height;
-            srcLoc.PlacedFootprint.Footprint.Depth = 1;
-            srcLoc.PlacedFootprint.Footprint.RowPitch = geo.RowPitch(bytes4 ? 4u : 8u);
+            srcLoc.PlacedFootprint.Footprint = session->decode->BufferFootprint();
             list->CopyTextureRegion(&dstLoc, 0, 0, 0, &srcLoc, nullptr);
             std::swap(barriers[0].Transition.StateBefore, barriers[0].Transition.StateAfter);
             std::swap(barriers[1].Transition.StateBefore, barriers[1].Transition.StateAfter);

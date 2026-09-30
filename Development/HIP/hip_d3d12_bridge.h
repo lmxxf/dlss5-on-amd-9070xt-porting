@@ -124,6 +124,9 @@ probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.
  ID3D12Resource*DirectInput()const{return direct_input?input.resource:nullptr;}
  size_t free_at_create{};int hip_device=-1;/* HIP device index chosen for the D3D12 adapter */
  void MemoryReport(FILE*f){if(!network)return;network->Runtime().hipStreamSynchronize(network->Stream());std::fprintf(f,"hip_memory device_free_before_network_MiB=%.1f shared input_MiB=%.1f history_MiB=%.1f output_MiB=%.1f\n",free_at_create/1048576.,pixels*16/1048576.,pixels*16/1048576.,pixels*12/1048576.);network->MemoryReport(f);}
+ bool PdlRequested()const{return network?network->PdlRequested():false;}
+ bool PdlEffective()const{return network?network->PdlEffective():false;}
+ std::string PdlReason()const{return network?network->PdlReason():"bridge uninitialized";}
 #ifdef DLSS5_BENCH_BRIDGE_ISOLATE
  Network& DiagnosticNetwork(){return *network;}
 #endif
