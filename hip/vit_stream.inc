@@ -169,5 +169,73 @@ WAVE void vit_stream_qkv_frag_hin_tm4(const float*in,const float*w,unsigned char
 #error HIP_VIT_QKV_TM must be 2 or 4
 #endif
 #endif
+// HIP_VIT_QKV_WIDE (2026-10-01, results/vit-1080-gap-20261001): the w5 LDS-staged QKV widened. 160 threads = 5 waves;
+// each wave TT 16-token tiles, each group HN heads (32*HN columns); the group's head weights are staged through LDS in
+// 8-step chunks, double buffered, exactly as w5 (only the copy work split differs, copies do not round). Per output:
+// same K order, A/B fragments, norm tile, row-sum WMMA, rsq/scale and byte_F store as w5 (non-tail-vec) -> same bytes.
+// Exports: bit0 vit_stream_qkv_frag_hin_w5t2 (TT=2,HN=1), bit1 vit_stream_qkv_frag_hin_w5h2 (TT=1,HN=2).
+// grid = 3*(32/HN)*ceil(tokens/(16*5*TT)).
+#ifndef HIP_VIT_QKV_WIDE
+#define HIP_VIT_QKV_WIDE 0
+#endif
+#if HIP_VIT_QKV_WIDE
+template<uint TT,uint HN,uint W=5,uint CH=8>
+DEV void vit_qkv_wide_body(const float*in,const float*w,unsigned char*out,uint tokens){
+ constexpr uint CT=2*HN,PIECES=CT*CH*32;static_assert(PIECES%128==0&&PIECES/128<=8,"QKV wide copy split");
+ __attribute__((shared)) _Float16 lds[2*CT*CH*256];
+ __attribute__((shared)) float rawt[W*16*33];
+ const uint t=__builtin_amdgcn_workitem_id_x(),wv=t>>5,lane=t&31,groups=(tokens/16+W*TT-1)/(W*TT),perpart=groups*(32/HN),part=bid()/perpart,local=bid()%perpart,first0=(local/(32/HN)*W*TT+wv*TT)*16,row=local%(32/HN)*(32*HN);if(part>=3)return;
+ const _Float16*hb=reinterpret_cast<const _Float16*>(w)+part*1048576+(row/16)*64*256;
+ constexpr uint NP=PIECES/128;/* threads t<128 move NP 16-byte pieces each, piece t+i*128 */
+ h8 s0{},s1{},s2{},s3{},s4{},s5{},s6{},s7{};
+#define QW_PIECE(I,SV,KC,DO) if((I)<NP){uint pc=t+(I)*128,ct=pc/(CH*32),kk=(pc/32)%CH,ln=pc%32;DO(SV,ct,kk,ln,KC);}
+#define QW_LD(SV,ct,kk,ln,KC) __builtin_memcpy(&SV,hb+ct*16384+((KC)*CH+kk)*256+ln*8,16)
+#define QW_ST(SV,ct,kk,ln,SB) __builtin_memcpy(lds+(SB)*(CT*CH*256)+ct*(CH*256)+kk*256+ln*8,&SV,16)
+#define QW_ALL(X,DO) {if(t<128){QW_PIECE(0,s0,X,DO)QW_PIECE(1,s1,X,DO)QW_PIECE(2,s2,X,DO)QW_PIECE(3,s3,X,DO)QW_PIECE(4,s4,X,DO)QW_PIECE(5,s5,X,DO)QW_PIECE(6,s6,X,DO)QW_PIECE(7,s7,X,DO)}}
+#define QW_FETCH(KC) QW_ALL(KC,QW_LD)
+#define QW_STASH(SB) QW_ALL(SB,QW_ST)
+ f8 acc[TT][CT]{};
+ QW_FETCH(0u)
+#pragma unroll 1
+ for(uint kc=0;kc<1024/(16*CH);kc++){QW_STASH(kc&1)__builtin_amdgcn_s_barrier();if(kc+1<1024/(16*CH))QW_FETCH(kc+1)
+#pragma unroll
+  for(uint kk=0;kk<CH;kk++){uint k=(kc*CH+kk)*16;
+#pragma unroll
+   for(uint tt=0;tt<TT;tt++){uint first=first0+tt*16;if(first<tokens){h8 a{};__builtin_memcpy(&a,reinterpret_cast<const _Float16*>(in)+(first+rc())*1024+k+gr()*8,16);
+#pragma unroll
+    for(uint j=0;j<CT;j++){h8 b;__builtin_memcpy(&b,lds+(kc&1)*(CT*CH*256)+j*(CH*256)+kk*256+lane*8,16);acc[tt][j]=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(a,b,acc[tt][j]);}}}}}
+ float*raw=rawt+wv*(16*33);
+#pragma unroll
+ for(uint tt=0;tt<TT;tt++){uint first=first0+tt*16;
+#pragma unroll
+  for(uint h=0;h<HN;h++){f8 sum{};
+   if(part<2){
+    WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
+    _Pragma("unroll") for(uint j=0;j<2;j++)_Pragma("unroll") for(uint e=0;e<8;e++)raw[(gr()*8+e)*33+j*16+rc()]=acc[tt][h*2+j][e];
+    WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
+    for(uint k=0;k<32;k+=16){h8 x{},ones{};for(uint e=0;e<8;e++){float v=raw[rc()*33+k+gr()*8+e];x[e]=(_Float16)(v*v);ones[e]=(_Float16)1.f;}sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);}
+   }
+   if(first<tokens){
+   const uint hrow=row+h*32;const float scale=part==0?5.65625f*w[1572864+hrow/32]:1.f;
+   _Pragma("unroll") for(uint j=0;j<2;j++)_Pragma("unroll") for(uint e=0;e<8;e++){float v=acc[tt][h*2+j][e];if(part<2){v*=__builtin_amdgcn_rsqf(maxf(sum[e],6.198883056640625e-5f))*scale;}out[(part*tokens+first+gr()*8+e)*1024+hrow+j*16+rc()]=byte_F(v);}}
+  }}
+}
+#undef QW_FETCH
+#undef QW_STASH
+#undef QW_ALL
+#undef QW_LD
+#undef QW_ST
+#undef QW_PIECE
+#if HIP_VIT_QKV_WIDE&1
+KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv_frag_hin_w5t2(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_qkv_wide_body<2,1>(in,w,out,tokens);}
+#endif
+#if HIP_VIT_QKV_WIDE&4
+/* mochizuki's gemmvqkvnorm shape: 4 waves, 64 tokens x 256 columns (8 heads), weights staged 2 k-steps at a time (32KB) */
+KERNEL __attribute__((amdgpu_flat_work_group_size(128,128))) void vit_stream_qkv_frag_hin_big(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_qkv_wide_body<1,8,4,2>(in,w,out,tokens);}
+#endif
+#if HIP_VIT_QKV_WIDE&2
+KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv_frag_hin_w5h2(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_qkv_wide_body<1,2>(in,w,out,tokens);}
+#endif
+#endif
 WAVE void vit_stream_contract_frag_hout(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,false,true,true>(in,w,skip,out,tokens);}
 #endif
