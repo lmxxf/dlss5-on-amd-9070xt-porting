@@ -130,5 +130,44 @@ KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv
 #endif
 }
 #endif
+// HIP_VIT_QKV_TM (2026-10-01, results/vit-1080-gap-20261001): mochizuki's gemmvqkvnorm gives one group a 64-token x
+// 256-column block (grid 10x12 at 640 tokens, nearly flat in token count). Here one wave takes TM (2 or 4) 16-token
+// tiles of one head: 2*TM independent accumulator chains, each weight fragment loaded once for all TM tiles. Per output
+// the K loop (k=0..1008 step 16, same A/B fragments), the norm tile/row-sum WMMA, rsq/scale and byte_F store are those of
+// vit_stream_qkv_frag_hin_w5 (non-tail-vec), so bytes are identical. grid = 96*ceil(tokens/(16*TM)), block 32.
+#ifndef HIP_VIT_QKV_TM
+#define HIP_VIT_QKV_TM 0
+#endif
+#if HIP_VIT_QKV_TM
+template<uint TM>
+DEV void vit_qkv_tm_body(const float*in,const float*w,unsigned char*out,uint tokens){
+ const uint groups=(tokens/16+TM-1)/TM,perpart=groups*32,part=bid()/perpart,local=bid()%perpart,first=local/32*(16*TM),row=local%32*32;if(part>=3)return;
+ const _Float16*w16=reinterpret_cast<const _Float16*>(w)+part*1048576;
+ f8 acc[TM][2]{};
+ for(uint k=0;k<1024;k+=16){h8 b[2];for(uint j=0;j<2;j++)__builtin_memcpy(&b[j],w16+(((row+j*16)/16)*64+k/16)*256+(gr()*16+rc())*8,16);
+#pragma unroll
+  for(uint t=0;t<TM;t++){if(first+t*16>=tokens)continue;h8 a{};__builtin_memcpy(&a,reinterpret_cast<const _Float16*>(in)+(first+t*16+rc())*1024+k+gr()*8,16);
+   for(uint j=0;j<2;j++)acc[t][j]=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(a,b[j],acc[t][j]);}}
+ __attribute__((shared)) float raw[16*33];
+ const float scale=part==0?5.65625f*w[1572864+row/32]:1.f;
+#pragma unroll
+ for(uint t=0;t<TM;t++){if(first+t*16>=tokens)continue;f8 sum{};
+  if(part<2){
+   WG_FENCE(3);__builtin_amdgcn_s_barrier();WG_FENCE(2);
+   for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)raw[(gr()*8+e)*33+j*16+rc()]=acc[t][j][e];
+   WG_FENCE(3);__builtin_amdgcn_s_barrier();WG_FENCE(2);
+   for(uint k=0;k<32;k+=16){h8 x{},ones{};for(uint e=0;e<8;e++){float v=raw[rc()*33+k+gr()*8+e];x[e]=(_Float16)(v*v);ones[e]=(_Float16)1.f;}sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);}
+  }
+  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++){float v=acc[t][j][e];if(part<2){v*=__builtin_amdgcn_rsqf(maxf(sum[e],6.198883056640625e-5f))*scale;}out[(part*tokens+first+t*16+gr()*8+e)*1024+row+j*16+rc()]=byte_F(v);}
+ }
+}
+#if HIP_VIT_QKV_TM==2
+WAVE void vit_stream_qkv_frag_hin_tm2(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_qkv_tm_body<2>(in,w,out,tokens);}
+#elif HIP_VIT_QKV_TM==4
+WAVE void vit_stream_qkv_frag_hin_tm4(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_qkv_tm_body<4>(in,w,out,tokens);}
+#else
+#error HIP_VIT_QKV_TM must be 2 or 4
+#endif
+#endif
 WAVE void vit_stream_contract_frag_hout(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,false,true,true>(in,w,skip,out,tokens);}
 #endif

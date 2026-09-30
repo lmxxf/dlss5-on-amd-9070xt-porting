@@ -1,4 +1,4 @@
-param([string[]]$Modules=@('deep_fast-packed'))
+param([string[]]$Modules=@('vit-stream'))
 $ErrorActionPreference='Stop';$root='D:\DLSSNR-Lab\hip-backend\vit-1080-gap-20261001'
 if(Test-Path "$root\src"){Remove-Item "$root\src" -Recurse -Force};Expand-Archive "$root\src.zip" "$root\src" -Force
 $Modules=@($Modules|ForEach-Object{$_ -split ','}|Where-Object{$_})

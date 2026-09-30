@@ -1,5 +1,5 @@
 # Stellar Blade: swap the given modules (both arches) only; add-on, runtime and flags untouched. Onimusha: runtime (Content + _storage_) backed up, not replaced; HIP modules mirrored from Stellar Blade.
-param([string]$RestoreStellar='',[string]$RestoreOni='',[string[]]$Modules=@('deep_fast-packed'))
+param([string]$RestoreStellar='',[string]$RestoreOni='',[string[]]$Modules=@('vit-stream'))
 $ErrorActionPreference='Stop'
 $root='D:\DLSSNR-Lab\hip-backend\vit-1080-gap-20261001'
 $game='C:\Program Files (x86)\Steam\steamapps\common\StellarBlade\SB\Binaries\Win64'
