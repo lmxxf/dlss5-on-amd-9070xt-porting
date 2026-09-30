@@ -9,7 +9,9 @@ struct SpPlan {
  bool w16=false; // C256 through sp_run256_w16/sp_recover256_w16 with the @ffn-frag-w16 weights
 };
 std::map<std::tuple<U,U,U,U>,SpPlan> sp_plans;
-bool sp_disabled=false;
+bool sp_disabled=false;bool sp_ends_head=false,sp_ends_tail=false;
+bool SpLoadModule(){if(modules.count("sp"))return true;Handle m{};if(api.LoadModule(&m,(opt.modules+"/swin-persistent.hsaco").c_str()))return false;modules["sp"]=m;return true;}
+bool SpEndsCapable(){return HasFn("sp","sp_ends_capable");}
 void *sp_error_allocation=nullptr;std::atomic<U>*sp_error_host=nullptr;U*sp_error_device=nullptr;
 int(*sp_host_free)(void*)=nullptr;
 unsigned long long sp_runs=0,sp_fallbacks=0,sp_rollovers=0,sp_jobs=0;
@@ -50,8 +52,10 @@ SpPlan &SpGetPlan(U w,U h,U c,U first,U layers){
  plan.w16=HIP_C256_FFN_W16&&c==256&&HasFn("sp","sp_run256_w16")&&HasFn("sp","sp_recover256_w16");
  for(U i=0;i<layers;i++){
   U b=first+i,shift=SpShift(b),sx=(shift&1)?4:0,sy=(shift&2)?4:0,ww=(w+sx+7)&~7u,hh=(h+sy+7)&~7u;
-  auto out=New(size_t(w)*h*c/4);
-  plan.layers.push_back({nullptr,plan.w16?PackedFusedMhWeightFragW16(Block(b,"ffn"),c):PackedFusedMhWeightFrag(Block(b,"ffn"),c),WaveOwnedAttentionWeight(Block(b,"attention"),c),P(out),w,h,ww,hh,sx,sy,4,0});
+  /* SP_ENDS: sp_ends_head/tail mark the chain's f32 head input / f32 raw tail output (results/c256-gap-20261001) */
+  const U mode=(i==0&&sp_ends_head?1u:0u)|(i+1==layers&&sp_ends_tail?2u:0u);
+  auto out=New(size_t(w)*h*c/((mode&2)?1:4));
+  plan.layers.push_back({nullptr,plan.w16?PackedFusedMhWeightFragW16(Block(b,"ffn"),c):PackedFusedMhWeightFrag(Block(b,"ffn"),c),WaveOwnedAttentionWeight(Block(b,"attention"),c),P(out),w,h,ww,hh,sx,sy,(mode&2)?3u:4u,mode});
   plan.outputs.push_back(out);
   U count=ww/8*(hh/8);
   for(U j=0;j<count;j++)plan.nodes.push_back({i,j,0,0,{0,0,0,0}});

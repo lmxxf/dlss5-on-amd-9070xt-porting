@@ -230,6 +230,12 @@ DEV float w2_add0(float x){
 #ifndef W2_EXPLICIT_WINDOW
 #define W2_EXPLICIT_WINDOW 0
 #endif
+#ifndef W2_SHARED_PLANES
+#define W2_SHARED_PLANES 0
+#endif
+#if W2_SHARED_PLANES
+__attribute__((shared)) unsigned char w2_planes256[2*64*256];
+#endif
 template<uint C,bool ByteIn,bool ByteOut,bool Up=false
 #if W2_EXPLICIT_WINDOW
  ,bool ExplicitWindow=false
@@ -248,7 +254,15 @@ DEV void swin_wave2_body(const float*in,const float*fw,const float*aw,void*out_a
 #endif
  const uint rc=w2_rc(),gr=w2_gr();
  if(win>=(workw/8)*(workh/8))return;
+#if W2_SHARED_PLANES
+ /* SP_ENDS (results/c256-gap-20261001): one C256 plane pair shared by every instantiation in the kernel (the persistent
+    queue runs the byte/f32 head/tail variants in one kernel; per-instantiation statics would stack 4 x 32KB). Same bytes. */
+ unsigned char*plane0,*plane1;
+ if constexpr(C==256){plane0=w2_planes256;plane1=w2_planes256+64*C;}
+ else{__attribute__((shared)) unsigned char p0[64*C],p1[64*C];plane0=p0;plane1=p1;}
+#else
  __attribute__((shared)) unsigned char plane0[64*C],plane1[64*C];
+#endif
  auto input=[&](uint tok,uint col)->float{
   if constexpr(Up){
    uint ci=(col%32)/16,e=col%8,qt=tok/16;

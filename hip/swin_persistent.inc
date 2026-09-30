@@ -21,6 +21,22 @@ KERNEL void sp_init(SpParams p){
  if(i<3*p.total)p.state[4+i]=0;
  if(i==0){p.state[0]=p.base;p.state[1]=p.base+p.first;p.state[2]=0;p.state[3]=0;}
 }
+// SP_ENDS (2026-10-01, results/c256-gap-20261001): the segment's first/last block join the queue. SpLayer.pad bit0 =
+// f32 block input (chain head, pool/Up output), bit1 = f32 block output (chain tail: raw skip / Down input). The body
+// is the same production swin_wave2_body instantiated as the standalone c*_wave2 / _bi / _bo kernels are; only the
+// window comes from the queue. Mode is uniform per task (readfirstlane of the layer record).
+#ifndef SP_ENDS
+#define SP_ENDS 0
+#endif
+#if SP_ENDS && !W2_SHARED_PLANES
+#error SP_ENDS needs W2_SHARED_PLANES 1 (build with both)
+#endif
+#define SP_BODY_AS(BI,BO,L,WIN) swin_wave2_body<C,BI,BO,false,true,W16>(static_cast<const float*>((L).in),static_cast<const float*>((L).fw),static_cast<const float*>((L).aw),(L).out,(L).w,(L).h,(L).ww,(L).hh,(L).sx,(L).sy,(L).post,nullptr,nullptr,WIN)
+#if SP_ENDS
+#define SP_BODY(L,WIN) {const uint mode=__builtin_amdgcn_readfirstlane((L).pad);if(mode==0)SP_BODY_AS(true,true,L,WIN);else if(mode==1)SP_BODY_AS(false,true,L,WIN);else if(mode==2)SP_BODY_AS(true,false,L,WIN);else SP_BODY_AS(false,false,L,WIN);}
+#else
+#define SP_BODY(L,WIN) SP_BODY_AS(true,true,L,WIN)
+#endif
 template<uint C,bool W16=false> DEV void sp_run_body(SpParams p){
  const uint tid=__builtin_amdgcn_workitem_id_x(),group=__builtin_amdgcn_workgroup_id_x();
  uint *counts=p.state+4,*queue=counts+p.total,*broadcast=queue+p.total;
@@ -63,9 +79,7 @@ template<uint C,bool W16=false> DEV void sp_run_body(SpParams p){
  SpLayer layer=p.layers[layer_index];
  // This function is generated verbatim from the production body except for
  // supplying the window ID rather than reading workgroup_id_x.
- swin_wave2_body<C,true,true,false,true,W16>(static_cast<const float*>(layer.in),
-   static_cast<const float*>(layer.fw),static_cast<const float*>(layer.aw),
-   layer.out,layer.w,layer.h,layer.ww,layer.hh,layer.sx,layer.sy,layer.post,nullptr,nullptr,window);
+ SP_BODY(layer,window);
  // Every wave publishes all its output before the leader publishes readiness.
  sp_global_group_sync();
  if(tid==0&&!sp_load(p.state+2)){
@@ -102,9 +116,7 @@ template<uint C,bool W16=false> DEV void sp_recover_body(SpParams p){
  for(uint li=0;li<p.layers_count;li++){
   SpLayer layer=p.layers[li];uint windows=(layer.ww/8)*(layer.hh/8);
   for(uint win=0;win<windows;win++){
-   swin_wave2_body<C,true,true,false,true,W16>(static_cast<const float*>(layer.in),
-    static_cast<const float*>(layer.fw),static_cast<const float*>(layer.aw),
-    layer.out,layer.w,layer.h,layer.ww,layer.hh,layer.sx,layer.sy,layer.post,nullptr,nullptr,win);
+   SP_BODY(layer,win);
    sp_global_group_sync();
   }
  }
@@ -115,6 +127,10 @@ KERNEL __attribute__((amdgpu_flat_work_group_size(128,128))) void sp_recover128(
 KERNEL __attribute__((amdgpu_flat_work_group_size(256,256))) void sp_recover256(SpParams p){sp_recover_body<256>(p);}
 #if W2_FFN_W16
 KERNEL __attribute__((amdgpu_flat_work_group_size(256,256))) void sp_recover256_w16(SpParams p){sp_recover_body<256,true>(p);}
+#endif
+#if SP_ENDS
+/* marker: this module's sp_run/sp_recover honour SpLayer.pad (host includes the chain ends only when present) */
+KERNEL void sp_ends_capable(){}
 #endif
 
 #endif
