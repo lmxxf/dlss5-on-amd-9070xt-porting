@@ -112,7 +112,7 @@ class Network {
  friend struct LayerBenchmark;
  unsigned diagnostic_kernel_repeats=1;
 #endif
- Api api;Handle stream{};std::map<std::string,Handle>modules,functions;std::map<std::string,Tensor>weights;Options opt;
+ std::string down_fold_file;Tensor down_fold_result;/* W2_DOWN_FUSED handoff, results/resample-fold-20261001 */Api api;Handle stream{};std::map<std::string,Handle>modules,functions;std::map<std::string,Tensor>weights;Options opt;
  struct Timing{std::string name;Handle begin{},end{};};std::vector<Timing>timings;
  std::map<std::string,std::pair<double,unsigned>>wall_timings;
  Handle captured_graph{},graph_exec{};void*graph_input{},*graph_history{},*graph_output{};U graph_seed{};bool graph_warmed{},graph_capturing{};unsigned graph_builds{},graph_replays{};
@@ -444,6 +444,11 @@ class Network {
 #if HIP_SWIN_PERSISTENT_DIAGNOSTICS
   {static bool shown[3]{};U si=c==64?0:c==128?1:2;if(!shown[si]){shown[si]=true;std::printf("W2_C%u %s\n",c,name.c_str());}}
 #endif
+  if(!down_fold_file.empty()&&(c==64||c==128)&&byte_in&&!byte_out&&!w16&&name==(c==64?"c64_wave2_bi":"c128_wave2_bi")&&HasFn("c64_wave2",name+"_down")){
+   /* W2_DOWN_FUSED (results/resample-fold-20261001): this block's downsample as the kernel's per-window epilogue */
+   down_fold_result=New(size_t(w/2)*(h/2)*c*2);
+   Run("c64_wave2",(name+"_down").c_str(),n/64,P(input),PackedFusedMhWeightFrag(Block(block,"ffn"),c),WaveOwnedAttentionWeight(Block(block,"attention"),c),P(out),w,h,ww,hh,sx,sy,U(raw?3:(block==48||block==55||block==61||block==65)?0:4),PackedDsWeightFrag(down_fold_file,c),P(down_fold_result));
+  }else
   Run("c64_wave2",name.c_str(),n/64,P(input),w16?PackedFusedMhWeightFragW16(Block(block,"ffn"),c):PackedFusedMhWeightFrag(Block(block,"ffn"),c),WaveOwnedAttentionWeight(Block(block,"attention"),c),P(out),w,h,ww,hh,sx,sy,U(raw?3:(block==48||block==55||block==61||block==65)?0:4));
   Stage("block"+std::to_string(block),out);return out;
  }
@@ -583,7 +588,7 @@ if(opt.fast_c32){const char*f[][2]={{"c32_fast_ffn","c32_fast.hsaco"},{"c32_fast
  for(U b=1;b<=4;b++){if(opt.skip_blocks.count(b)){if(!opt.raw_chain)throw std::runtime_error("C32 skip needs the raw chain");if(b==4)SkipChainFinish(last,W/2,H/2,true);if(last.main)source=last.main;continue;}last=opt.raw_chain?C32Chain(source,last.raw?&last:nullptr,W/2,H/2,shifts[b-1],Block(b,"ffn"),Block(b,"attention"),b==4,b==4):C32(source,W/2,H/2,shifts[b-1],Block(b,"ffn"),Block(b,"attention"));source=last.main;if(source)Stage("block"+std::to_string(b),source);}Stage("block4-down",last.down);skips[0]=source;Tensor poolcrop;if(last.down_cropped)poolcrop=last.down;else{poolcrop=New(size_t(W/4)*(H/4)*32);Run("mh","mh_shift_crop",size_t(W/4)*(H/4)*32,P(last.down),P(poolcrop),W/4,H/4,last.workw/2,last.sx/2,last.sy/2,U(32));}source=New(size_t(W/4)*(H/4)*64);if(last.down_byte&&!last.down_cropped)throw std::runtime_error("byte C32 down needs the crop path");if(opt.pool32_h16w&&opt.fast_mh)Run("mh_fast",last.down_byte?"mh_pool_project_c32_b8":"mh_pool_project_production_h16w",size_t(W/4)*(H/4)*64,P(poolcrop),PackedDsWeightCast("block4-ds.f32",32),P(source),W/4,H/4,U(0),U(0),U(32));else Run(opt.fast_mh?"mh_fast":"mh",opt.fast_mh?"mh_pool_project_production":"mh_pool_project",size_t(W/4)*(H/4)*64,P(poolcrop),Weight("block4-ds.f32"),P(source),W/4,H/4,U(0),U(0),U(32));poolcrop.reset();last={};
  U starts[]={5,9,15},counts[]={4,6,8},channels[]={64,128,256};for(U g=0;g<3;g++){U w=W/(4u<<g),h=H/(4u<<g);for(U j=0;j<counts[g];j++){
  if(j==1&&SpEnabled(channels[g],false)){source=SpStage(source,w,h,channels[g],starts[g]+1,counts[g]-2);j=counts[g]-2;continue;}
- source=Body(source,w,h,channels[g],shifts[j],starts[g]+j,j+1==counts[g],opt.mh_byte_stream&&j>0,opt.mh_byte_stream&&j+1<counts[g]);}skips[g+1]=source;source=Down(source,w,h,channels[g],Block(starts[g]+counts[g]-1,"ds"));}
+ if(j+1==counts[g]&&g<2&&opt.pool_project_group&&!(w%2)&&!(h%2))down_fold_file=Block(starts[g]+counts[g]-1,"ds");source=Body(source,w,h,channels[g],shifts[j],starts[g]+j,j+1==counts[g],opt.mh_byte_stream&&j>0,opt.mh_byte_stream&&j+1<counts[g]);down_fold_file.clear();}skips[g+1]=source;if(down_fold_result){source=down_fold_result;down_fold_result.reset();}else source=Down(source,w,h,channels[g],Block(starts[g]+counts[g]-1,"ds"));}
  for(U j=0;j<8;j++){source=Body(source,W/32,H/32,512,shifts[j],23+j,j==7);}skips[4]=source;gather_fold=GatherFoldOk();source=Down(source,W/32,H/32,512,"head-matrix.f32",true);U vw=W==1920?32:W/64,vh=W==1920?20:H/64;if(W!=1920&&(vw*vh)%16)vh++;/* 2026-09-17: token grid padded to a multiple of 16 tokens by one row of zero tokens (1600x960: 25x15 real -> 25x16), the way 1920x1152 pads 30x18 -> 32x20 */U n=vw*vh;Stage("head",source);if(!gather_fold)source=Gather(source,n,false);source=AdaptiveVitGroup(source,n);if(!gather_fold)source=Gather(source,n,true);source=Up(source,skips[4],vw,vh,W/32,H/32,1024,512,"decoder39-weights.f32");gather_fold=false;skips[4].reset();Stage("block39",source);for(U b=40;b<=47;b++)source=Body(source,W/32,H/32,512,Shift(b),b,false);
  U ups[]={48,56,62},cs[]={256,128,64},ends[]={55,61,65};for(U g=0;g<3;g++){U ow=W/(16u>>g),oh=H/(16u>>g);const bool byte_up=opt.decoder_byte&&opt.mh_byte_stream&&opt.decoder_h16w&&opt.fast_deep;U begin=ups[g];
  if(g>0&&wave_owned_active&&byte_up&&opt.packed_weights&&opt.grouped_mh_contract&&opt.mh_proj_diag_fb&&opt.mh_project_crop&&opt.mh_input_mapped&&!opt.skip_blocks.count(begin)&&ow%2==0&&oh%2==0){source=UpBody(source,skips[3-g],ow,oh,cs[g],begin);++begin;}

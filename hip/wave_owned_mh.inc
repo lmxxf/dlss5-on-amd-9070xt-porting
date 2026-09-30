@@ -618,6 +618,42 @@ W2_KERNEL(c256_wave2,256,false,false)
 W2_KERNEL(c256_wave2_bi,256,true,false)
 W2_KERNEL(c256_wave2_bo,256,false,true)
 W2_KERNEL(c256_wave2_bi_bo,256,true,true)
+// W2_DOWN_FUSED (2026-10-01, results/resample-fold-20261001): c64/c128_wave2_bi_down = the last block of the C64/C128
+// encoder segment plus its downsample (mh_pool_project_group_c64/128) as a per-window epilogue. The window's own f32
+// outputs are re-read after a workgroup fence; its 8x8 work tile (sx,sy in {0,4}: even) holds whole 2x2 pools, so each
+// pooled token belongs to exactly one window and is computed once. Pool value, f16 LDS row, 32-column chunked WMMA sums,
+// H(acc+sum) chain and F(acc) store are the pool kernel's; only which 16 tokens share an A tile differs (rows independent).
+#ifndef W2_DOWN_FUSED
+#define W2_DOWN_FUSED 0
+#endif
+#if W2_DOWN_FUSED
+template<uint C>
+DEV void w2_down_epilogue(const float*raw,const float*wf,float*output,uint width,uint height,uint workw,uint sx,uint sy){
+ const uint ow=width/2,oh=height/2,N=2*C,S=C+8,win=__builtin_amdgcn_workgroup_id_x();
+ const int bx=(int((win%(workw/8))*8)-int(sx))/2,by=(int((win/(workw/8))*8)-int(sy))/2;
+ const uint t=__builtin_amdgcn_workitem_id_x(),wave=t/32,l=t%32,rc=l&15,g=l>>4,colg=wave*64;
+ __builtin_amdgcn_fence(__ATOMIC_RELEASE,"workgroup");__builtin_amdgcn_s_barrier();__builtin_amdgcn_fence(__ATOMIC_ACQUIRE,"workgroup");
+ // Lane (rc,g) builds its own A fragment (pooled token rc, channels sidx*16+g*8..+8) straight from the raw output:
+ // same pool expression and f16 conversion as the pool kernel's LDS row, no LDS and no second barrier.
+ const int apx=bx+int(rc%4),apy=by+int(rc/4);const bool aok=apx>=0&&apy>=0&&apx<int(ow)&&apy<int(oh);
+ const uint abase=aok?((uint(apy))*2*width+uint(apx)*2)*C:0u;
+ const _Float16*w16=reinterpret_cast<const _Float16*>(wf);
+ f8 acc[4]{};
+ for(uint chunk=0;chunk<C/32;chunk++){f8 sum[4]{};
+  for(uint half=0;half<2;half++){uint sidx=chunk*2+half;h8 a;
+   for(uint e=0;e<8;e++){uint c=sidx*16+g*8+e;float v=0.f;if(aok){uint base=abase;float top=H(raw[base+c]+raw[base+C+c]),bottom=H(raw[base+width*C+c]+raw[base+(width+1)*C+c]);v=F(H(H(top+bottom)*.25f));}a[e]=(_Float16)v;}
+   for(uint j=0;j<4;j++){h8 b;uint nt=colg/16+j;__builtin_memcpy(&b,w16+(nt*(C/16)+sidx)*256+(g*16+rc)*8,16);sum[j]=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(a,b,sum[j]);}}
+  for(uint j=0;j<4;j++)for(uint e=0;e<8;e++)acc[j][e]=H(acc[j][e]+sum[j][e]);
+ }
+ for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint k=g*8+e;int px=bx+int(k%4),py=by+int(k/4);
+  if(px>=0&&py>=0&&px<int(ow)&&py<int(oh))output[(uint(py)*ow+uint(px))*N+colg+j*16+rc]=F(acc[j][e]);}
+}
+#endif
+#if W2_DOWN_FUSED
+#define W2_DOWN_KERNEL(NAME,C) KERNEL __attribute__((amdgpu_flat_work_group_size(C,C))) void NAME(const float*in,const float*fw,const float*aw,void*out,uint w,uint h,uint ww,uint hh,uint sx,uint sy,uint post,const float*dw,float*down){swin_wave2_body<C,true,false>(in,fw,aw,out,w,h,ww,hh,sx,sy,post);if(__builtin_amdgcn_workgroup_id_x()<(ww/8)*(hh/8))w2_down_epilogue<C>(static_cast<const float*>(out),dw,down,w,h,ww,sx,sy);}
+W2_DOWN_KERNEL(c64_wave2_bi_down,64)
+W2_DOWN_KERNEL(c128_wave2_bi_down,128)
+#endif
 #if W2_FFN_W16
 #define W2_KERNEL_W16(NAME,C,BI,BO) KERNEL __attribute__((amdgpu_flat_work_group_size(C,C))) void NAME(const float*in,const float*fw,const float*aw,void*out,uint w,uint h,uint ww,uint hh,uint sx,uint sy,uint post){swin_wave2_body<C,BI,BO,false,true>(in,fw,aw,out,w,h,ww,hh,sx,sy,post);}
 W2_KERNEL_W16(c256_wave2_w16,256,false,false)
