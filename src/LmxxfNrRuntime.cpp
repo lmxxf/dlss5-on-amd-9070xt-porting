@@ -423,7 +423,7 @@ void LoadFlagsFileOnce(const std::wstring &assets)
                                      key == "DLSS5_NETWORK_FREE_RES" || key == "DLSS5_FAST_NUMERIC" ||
                                      key == "DLSS5_MULTI_PASS" || key == "DLSS5_MULTI_PASS_SKIP_BLOCKS" || key == "DLSS5_MULTI_PASS_SKIN_PROTECT" || key == "DLSS5_MULTI_PASS_PREDICT" ||
                                      key == "DLSS5_FRAME_STATS" || key == "DLSS5_STRENGTH" ||
-                                     key == "DLSS5_TEMPORAL_MODE" || key == "DLSS5_FAST_HISTORY" ||
+                                     key == "DLSS5_TEMPORAL_MODE" || key == "DLSS5_TEMPORAL_ENHANCE_STRENGTH" || key == "DLSS5_FAST_HISTORY" ||
                                      key == "DLSS5_TEMPORAL_HISTORY_EXPERIMENT";
                 if (!allowed)
                     continue;
@@ -1120,7 +1120,7 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         }
         if (temporalMode != NativeTemporalMode::Off &&
             (NativeTemporalExperimentRequested() || hip_reference::MultiPassFromEnvironment()!=1))
-            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=1/2 requires MP1 and reference history off");
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=1/2/3 requires MP1 and reference history off");
         if (!session->hipPrepared)
         {
             auto geo = NativeCurrentNetworkGeometry();
@@ -1445,13 +1445,13 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
                 fprintf(f,"runtime temporal_mode=1 active domain=encoded motion=static depth=none frame_id=unverified gate=model-row77\n");fclose(f);
             }
         }
-        if (temporalMode == NativeTemporalMode::LowFrequency && !session->lowFrequency) {
+        if (NativeOutputTemporalMode(temporalMode) && !session->lowFrequency) {
             const auto g=NativeCurrentNetworkGeometry();
             // The encoder owns a complete network viewport. Do not claim native game MV/depth access.
             session->bridge->SetAdaptiveReuseAllowed(false);
             session->lowFrequency=new NativeLowFrequencyTemporal();
-            session->lowFrequency->Create(session->device,g.valid_width,g.valid_height,g.processing_height);
-            OutputDebugStringA("lmxxf: temporal_mode=2 active domain=encoded motion=static capture_id=unverified\n");
+            session->lowFrequency->Create(session->device,g.valid_width,g.valid_height,g.processing_height,temporalMode==NativeTemporalMode::Enhance,temporalMode==NativeTemporalMode::Enhance?NativeTemporalEnhancementStrength():1.f);
+            OutputDebugStringA(temporalMode==NativeTemporalMode::Enhance?"lmxxf: temporal_mode=3 active enhancement=1 domain=encoded motion=static capture_id=unverified\n":"lmxxf: temporal_mode=2 active domain=encoded motion=static capture_id=unverified\n");
         }
         session->job = {};
         session->job.color = color;

@@ -201,9 +201,9 @@ public:
    const bool direct_input=false;
 #endif
    NativeGameFrameStep("input",d);resources->input.Create(d,resources->encode.Output(),directory,!direct_input);
-   const auto temporal_mode=NativeSelectedTemporalMode();const bool fast_history=temporal_mode==NativeTemporalMode::FastHistory,low_temporal=temporal_mode==NativeTemporalMode::LowFrequency;
+   const auto temporal_mode=NativeSelectedTemporalMode();const bool fast_history=temporal_mode==NativeTemporalMode::FastHistory,low_temporal=NativeOutputTemporalMode(temporal_mode);
    if(temporal_mode!=NativeTemporalMode::Off&&NativeTemporalExperimentRequested())throw std::runtime_error("temporal mode and reference experiment are mutually exclusive");
-   if(low_temporal&&(resources->overlap||temporal_rgb))throw std::runtime_error("mode2 requires no overlap or external history");
+   if(low_temporal&&(resources->overlap||temporal_rgb))throw std::runtime_error("output temporal modes require no overlap or external history");
 #ifdef DLSS5_USE_HIP
    NativeFastHistoryPolicy::RequireSinglePass(fast_history||low_temporal,hip_reference::MultiPassFromEnvironment());
 #endif
@@ -243,7 +243,7 @@ public:
    resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
 #endif
    if(low_temporal&&temporal_config){resources->low_render_w=temporal_config->render_width;resources->low_render_h=temporal_config->render_height;}
-   if(low_temporal)resources->low_temporal.Create(d,resources->geometry.valid_width,resources->geometry.valid_height,resources->geometry.processing_height);
+   if(low_temporal)resources->low_temporal.Create(d,resources->geometry.valid_width,resources->geometry.valid_height,resources->geometry.processing_height,temporal_mode==NativeTemporalMode::Enhance,temporal_mode==NativeTemporalMode::Enhance?NativeTemporalEnhancementStrength():1.f);
    NativeGameFrameStep("neural",d);resources->neural.Create(d,resources->network.Output(),directory);
    if(resources->temporal&&!resources->experimental_temporal)resources->smooth.Create(d,resources->network.Output(),resources->sampler.Output(),directory);
    if(resources->temporal&&!resources->experimental_temporal)resources->history_guard.Create(d,resources->sampler.Output(),resources->input.PostBase(),directory);

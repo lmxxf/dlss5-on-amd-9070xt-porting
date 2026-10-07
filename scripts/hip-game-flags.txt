@@ -480,13 +480,15 @@ DLSS5_HOT_RELOAD=1
 # EN: NVIDIA Style 0/1/2: 1 = Stellar Blade style; default 1; 0 = NVIDIA default, closest to reference; restart needed
 DLSS5_STYLE=1
 
-# Temporal selection: 0 off, 1 TheAutomatic Fast History, 2 independent low-frequency output EMA; restart required.
-# 中：历史抑闪实验，默认关闭；只支持 FFX pre / MP1 / 完整视口 / graph0 / overlap0；开启会改变画面，非原版逐位复刻。
-# EN: Temporal flicker experiment, off by default; FFX pre/MP1/full viewport/graph0/overlap0 only; changes output, not bit-exact NGX.
+# Temporal selection: 0 off, 1 TheAutomatic Fast History, 2 low-frequency EMA, 3 low/high residual enhancement; restart required.
+# 中：历史抑闪实验，默认关闭；支持 addon/独立runtime；MP1 / 完整视口 / graph0 / overlap0；开启会改变画面，非原版逐位复刻。
+# EN: Temporal flicker experiment, off by default; addon/runtime; MP1/full viewport/graph0/overlap0; changes output, not bit-exact NGX.
 DLSS5_TEMPORAL_MODE=0
-# Requires matching C32 logit exports + post70-history-head.f16; see CONFIGURATION.md.
+# Mode3 only: 0 original NN identity, 1 default enhancement, 2 stronger; range0..2; restart required.
+DLSS5_TEMPORAL_ENHANCE_STRENGTH=1
+# Mode1 only requires matching C32 logit exports + post70-history-head.f16; see CONFIGURATION.md.
 # Declare unjittered motion only when the game really supplies it; depth direction must be declared, never guessed.
-# 必须按游戏实际约定声明：普通深度 0、反向深度 1（以下不提供启用默认值）。
+# 仅可信运动/深度补偿按实际约定声明，未知使用static：普通深度0、反向1，不猜值。
 # DLSS5_TEMPORAL_MV_UNJITTERED=1
 # DLSS5_FAST_HISTORY_DEPTH_INVERTED=0
 # DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0

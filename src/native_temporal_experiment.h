@@ -16,7 +16,13 @@ inline NativeTemporalMode NativeSelectedTemporalMode(){
  return NativeParseTemporalMode(value,NativeTemporalExperimentFlag(L"DLSS5_FAST_HISTORY","DLSS5_FAST_HISTORY"));
 }
 inline bool NativeFastHistoryRequested(){return NativeSelectedTemporalMode()==NativeTemporalMode::FastHistory;}
-inline bool NativeLowFrequencyRequested(){return NativeSelectedTemporalMode()==NativeTemporalMode::LowFrequency;}
+inline bool NativeLowFrequencyRequested(){return NativeOutputTemporalMode(NativeSelectedTemporalMode());}
+inline float NativeTemporalEnhancementStrength(){
+ std::optional<std::string> value;
+ if(const wchar_t*v=_wgetenv(L"DLSS5_TEMPORAL_ENHANCE_STRENGTH"))value=std::string(v,v+wcslen(v));
+ else for(const auto&line:NativeConfigFileLines())if(line.rfind("DLSS5_TEMPORAL_ENHANCE_STRENGTH=",0)==0)value=line.substr(std::string("DLSS5_TEMPORAL_ENHANCE_STRENGTH=").size());
+ return NativeParseTemporalEnhancementStrength(value);
+}
 struct NativeTemporalFrameMetadata {
  bool ffx_pre{};unsigned frame_id{},dispatch_flags{};
  float motion_scale[2]{},jitter[2]{},pre_exposure{1.f};

@@ -1,0 +1,23 @@
+{
+  "source_sha256": {
+    "src/native_temporal_mode.h": "eada67c3b846078bbb827f0b2d5457d2be2da5168816a328abd9cdfe00e249db",
+    "src/native_temporal_experiment.h": "049d07a95741c7d1598c02e4ed5096568c24d27bdaffdd97526d3a32fa220ed8",
+    "src/native_low_frequency_shader.h": "8eaebd5982f5642369532af298f077c3203771f80306ffe4f681d33676d42ec4",
+    "src/native_low_frequency_temporal.h": "a4505272ba034db40f059e2ddf3cc191c527d7b98a3311a639f86a79a80ba124",
+    "src/native_game_frame.h": "9a71aa4d3978f290f1cbecf5155de4f825c94a86fca6534baf18ea1909a6e6be",
+    "src/LmxxfNrRuntime.cpp": "8c4f97fbaa4cadddd5d37f4849ca5ff4a5fbdd621c6ebf32c9a66b6908190668",
+    "Development/test_temporal_enhancement.cpp": "6d17a3769a6968f87af9b9446b881ebfb6eeaccc9fce21bcffab294f3103cae8",
+    "Development/test_temporal_mode.cpp": "5478135ef92ee0705ed5e5a43c4972bb08ffeadaa398391f48b37c045ff50c44"
+  },
+  "probe_handle": 90050,
+  "probe_exit": 0,
+  "gpu_providers": [
+    "WARP",
+    "AMD"
+  ],
+  "addon_sha256": "4ceef29f363f52e9159e439cd9eecd52caa796a95d281b0ad07a20ce091ef833",
+  "runtime_sha256": "1db0b4c07126da2c7481134a796306c0f5790ad9cad4a5504cd65ee092b9b71a",
+  "game_deployed": false,
+  "performance_measured": false,
+  "full_network_mode3_tested": false
+}

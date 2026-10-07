@@ -43,5 +43,25 @@ bool PreviousBand(float2 p,float3 guide,out float3 value){int2 a=int2(floor(p));
  for(int k=0;k<4;k++){int2 at=a+int2(k%2,k/2);float w=(k%2?f.x:1-f.x)*(k/2?f.y:1-f.y);if(w<=0)continue;if(!At(at)){patch=false;continue;}float4 g=Decode(PriorGuide[at.y*W+at.x]);if(g.w<.999){patch=false;continue;}prior+=w*g.rgb;mass+=w;}
  if(mass<.999){patch=false;continue;}float e=Error(guide,prior);average+=e/9;worst=max(worst,e);float4 current=Difference[q.y*W+q.x];if(current.w<=0)patch=false;minimum=min(minimum,current.rgb);maximum=max(maximum,current.rgb);}
  float quality=Confidence(average,.008,.04)*Confidence(worst,.025,.10);if(patch&&quality>0){float3 padding=.02+quality*abs(old);float3 allowed=clamp(old,minimum-padding,maximum+padding);filtered=low+(allowed-low)*(Memory*quality);}}
- NextBand[i]=Encode(filtered,true);float3 outColor=saturate(float3(Result[3*i],Result[3*i+1],Result[3*i+2])+(filtered-low));if(Past&&any(filtered!=low)){Result[3*i]=outColor.x;Result[3*i+1]=outColor.y;Result[3*i+2]=outColor.z;}}
+ NextBand[i]=Encode(filtered,true);
+ if(Pad){
+  // Independent encoded-domain enhancement. The compression limits only the
+  // new correction, preserving the already-computed neural output as base.
+  if(Unused<=0)return;
+  float3 detail=r.rgb-low;
+  float3 extra=Unused*(.5*filtered+detail);
+  float peak=max(abs(extra.x),max(abs(extra.y),abs(extra.z)));
+  if(peak>.04){float excess=peak-.04;float limited=.04+excess/(1+excess/.12);extra*=limited/peak;}
+  float3 change=(filtered-low)+extra;
+  if(any(change!=0)){
+   float3 base=float3(Result[3*i],Result[3*i+1],Result[3*i+2]);
+   if(any(base<0)||any(base>1))return;
+   float room=1;
+   for(int c=0;c<3;c++){if(change[c]>0)room=min(room,(1-base[c])/change[c]);else if(change[c]<0)room=min(room,base[c]/(-change[c]));}
+   float3 enhanced=base+change*max(0,room);Result[3*i]=enhanced.x;Result[3*i+1]=enhanced.y;Result[3*i+2]=enhanced.z;
+  }
+ }else{
+  float3 outColor=saturate(float3(Result[3*i],Result[3*i+1],Result[3*i+2])+(filtered-low));if(Past&&any(filtered!=low)){Result[3*i]=outColor.x;Result[3*i+1]=outColor.y;Result[3*i+2]=outColor.z;}
+ }}
+
 )shader";

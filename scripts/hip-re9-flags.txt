@@ -449,5 +449,7 @@ DLSS5_STYLE=1
 DLSS5_STRENGTH=auto
 
 # Temporal output selection: 0 off(default), 1 TheAutomatic Fast History, 2 independent low-frequency EMA. Restart required; modes 1/2 require MP1.
-# 时域选择：0关闭，1 TheAutomatic，2低频时域；需重启，开启要求单遍。Mode1不支持独立runtime/Magpie，mode2未知MV仅静态颜色门控。
+# 时域选择：0关闭，1 TheAutomatic，2低频时域，3低高频增强；需重启，开启要求单遍。模式1/2/3未知MV明确静态降级；模式1另需logit模块与row。
 DLSS5_TEMPORAL_MODE=0
+# Mode3 only: 0 original NN identity, 1 default enhancement, 2 stronger; range0..2; restart required.
+DLSS5_TEMPORAL_ENHANCE_STRENGTH=1
