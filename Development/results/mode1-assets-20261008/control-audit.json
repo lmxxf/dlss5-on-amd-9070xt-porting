@@ -1,0 +1,322 @@
+{
+  "installed_to_control": {
+    "functions": {
+      "c32_fast_ffn_attention_fused": {
+        "oldsize": 16008,
+        "newsize": 16048,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half": {
+        "oldsize": 16488,
+        "newsize": 16572,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_mapped": {
+        "oldsize": 17224,
+        "newsize": 17300,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_chain": {
+        "oldsize": 19380,
+        "newsize": 19316,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_finish_main8": {
+        "oldsize": 18952,
+        "newsize": 19056,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_chain_finish": {
+        "oldsize": 21796,
+        "newsize": 21892,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_prefix_finish_main8": {
+        "oldsize": 20180,
+        "newsize": 20288,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_chain_finish_dcrop": {
+        "oldsize": 22312,
+        "newsize": 22320,
+        "raw_code_same": false
+      },
+      "c32_post_merge_head_half": {
+        "oldsize": 17660,
+        "newsize": 17420,
+        "raw_code_same": false
+      },
+      "c32_post_merge_fused_half": {
+        "oldsize": 16524,
+        "newsize": 16480,
+        "raw_code_same": false
+      },
+      "c32_wave1_chain": {
+        "oldsize": 7088,
+        "newsize": 7180,
+        "raw_code_same": false
+      },
+      "c32_wave1_mapped": {
+        "oldsize": 7464,
+        "newsize": 7548,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish": {
+        "oldsize": 10676,
+        "newsize": 10680,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish_dcrop": {
+        "oldsize": 15092,
+        "newsize": 14972,
+        "raw_code_same": false
+      },
+      "c32_wave1_post": {
+        "oldsize": 10088,
+        "newsize": 10180,
+        "raw_code_same": false
+      },
+      "c32_wave1_prefix": {
+        "oldsize": 11124,
+        "newsize": 11136,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish_dcrop_b8": {
+        "oldsize": 15084,
+        "newsize": 14980,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish_dcrop_b8d": {
+        "oldsize": 12392,
+        "newsize": 12516,
+        "raw_code_same": false
+      },
+      "c32_wave1_prefix_b8d": {
+        "oldsize": 10576,
+        "newsize": 10624,
+        "raw_code_same": false
+      },
+      "c32_wave1_mapped_b8": {
+        "oldsize": 7596,
+        "newsize": 7680,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish_b8": {
+        "oldsize": 12852,
+        "newsize": 12932,
+        "raw_code_same": false
+      },
+      "c32_wave1_post_b8": {
+        "oldsize": 10216,
+        "newsize": 10364,
+        "raw_code_same": false
+      },
+      "c32_wave1_post_b8_rgba": {
+        "oldsize": 10120,
+        "newsize": 10272,
+        "raw_code_same": false
+      },
+      "c32_wave1_up_b8": {
+        "oldsize": 9432,
+        "newsize": 9528,
+        "raw_code_same": false
+      },
+      "c32_wave1_up": {
+        "oldsize": 11588,
+        "newsize": 11640,
+        "raw_code_same": false
+      }
+    },
+    "normalized_descriptors": {
+      "c32_fast_ffn_attention_fused.kd": true,
+      "c32_fast_ffn_attention_fused_half.kd": false,
+      "c32_fast_ffn_attention_fused_half_mapped.kd": false,
+      "c32_fast_ffn_attention_fused_half_chain.kd": false,
+      "c32_fast_ffn_attention_fused_half_finish_main8.kd": false,
+      "c32_fast_ffn_attention_fused_half_chain_finish.kd": false,
+      "c32_fast_ffn_attention_fused_half_prefix_finish_main8.kd": false,
+      "c32_fast_ffn_attention_fused_half_chain_finish_dcrop.kd": true,
+      "c32_post_merge_head_half.kd": false,
+      "c32_post_merge_fused_half.kd": false,
+      "c32_wave1_chain.kd": false,
+      "c32_wave1_mapped.kd": true,
+      "c32_wave1_finish.kd": true,
+      "c32_wave1_finish_dcrop.kd": false,
+      "c32_wave1_post.kd": false,
+      "c32_wave1_prefix.kd": true,
+      "c32_wave1_finish_dcrop_b8.kd": true,
+      "c32_wave1_finish_dcrop_b8d.kd": false,
+      "c32_wave1_prefix_b8d.kd": true,
+      "c32_wave1_mapped_b8.kd": true,
+      "c32_wave1_finish_b8.kd": false,
+      "c32_wave1_post_b8.kd": false,
+      "c32_wave1_post_b8_rgba.kd": false,
+      "c32_wave1_up_b8.kd": false,
+      "c32_wave1_up.kd": true
+    },
+    "missing_functions": []
+  },
+  "control_to_aux": {
+    "functions": {
+      "c32_fast_ffn_attention_fused": {
+        "oldsize": 16048,
+        "newsize": 16048,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half": {
+        "oldsize": 16572,
+        "newsize": 16572,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half_mapped": {
+        "oldsize": 17300,
+        "newsize": 17300,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half_chain": {
+        "oldsize": 19316,
+        "newsize": 19316,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half_finish_main8": {
+        "oldsize": 19056,
+        "newsize": 19056,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half_chain_finish": {
+        "oldsize": 21892,
+        "newsize": 21892,
+        "raw_code_same": true
+      },
+      "c32_fast_ffn_attention_fused_half_prefix_finish_main8": {
+        "oldsize": 20288,
+        "newsize": 20288,
+        "raw_code_same": false
+      },
+      "c32_fast_ffn_attention_fused_half_chain_finish_dcrop": {
+        "oldsize": 22320,
+        "newsize": 22320,
+        "raw_code_same": true
+      },
+      "c32_post_merge_head_half": {
+        "oldsize": 17420,
+        "newsize": 17420,
+        "raw_code_same": true
+      },
+      "c32_post_merge_fused_half": {
+        "oldsize": 16480,
+        "newsize": 16480,
+        "raw_code_same": true
+      },
+      "c32_wave1_chain": {
+        "oldsize": 7180,
+        "newsize": 7180,
+        "raw_code_same": true
+      },
+      "c32_wave1_mapped": {
+        "oldsize": 7548,
+        "newsize": 7548,
+        "raw_code_same": true
+      },
+      "c32_wave1_finish": {
+        "oldsize": 10680,
+        "newsize": 10680,
+        "raw_code_same": true
+      },
+      "c32_wave1_finish_dcrop": {
+        "oldsize": 14972,
+        "newsize": 14972,
+        "raw_code_same": true
+      },
+      "c32_wave1_post": {
+        "oldsize": 10180,
+        "newsize": 10180,
+        "raw_code_same": true
+      },
+      "c32_wave1_prefix": {
+        "oldsize": 11136,
+        "newsize": 11136,
+        "raw_code_same": false
+      },
+      "c32_wave1_finish_dcrop_b8": {
+        "oldsize": 14980,
+        "newsize": 14980,
+        "raw_code_same": true
+      },
+      "c32_wave1_finish_dcrop_b8d": {
+        "oldsize": 12516,
+        "newsize": 12516,
+        "raw_code_same": true
+      },
+      "c32_wave1_prefix_b8d": {
+        "oldsize": 10624,
+        "newsize": 10624,
+        "raw_code_same": false
+      },
+      "c32_wave1_mapped_b8": {
+        "oldsize": 7680,
+        "newsize": 7680,
+        "raw_code_same": true
+      },
+      "c32_wave1_finish_b8": {
+        "oldsize": 12932,
+        "newsize": 12932,
+        "raw_code_same": true
+      },
+      "c32_wave1_post_b8": {
+        "oldsize": 10364,
+        "newsize": 10364,
+        "raw_code_same": true
+      },
+      "c32_wave1_post_b8_rgba": {
+        "oldsize": 10272,
+        "newsize": 10272,
+        "raw_code_same": true
+      },
+      "c32_wave1_post_b8_features": {
+        "oldsize": 10488,
+        "newsize": 10488,
+        "raw_code_same": true
+      },
+      "c32_wave1_up_b8": {
+        "oldsize": 9528,
+        "newsize": 9528,
+        "raw_code_same": true
+      },
+      "c32_wave1_up": {
+        "oldsize": 11640,
+        "newsize": 11640,
+        "raw_code_same": true
+      }
+    },
+    "normalized_descriptors": {
+      "c32_fast_ffn_attention_fused.kd": true,
+      "c32_fast_ffn_attention_fused_half.kd": true,
+      "c32_fast_ffn_attention_fused_half_mapped.kd": true,
+      "c32_fast_ffn_attention_fused_half_chain.kd": true,
+      "c32_fast_ffn_attention_fused_half_finish_main8.kd": true,
+      "c32_fast_ffn_attention_fused_half_chain_finish.kd": true,
+      "c32_fast_ffn_attention_fused_half_prefix_finish_main8.kd": true,
+      "c32_fast_ffn_attention_fused_half_chain_finish_dcrop.kd": true,
+      "c32_post_merge_head_half.kd": true,
+      "c32_post_merge_fused_half.kd": true,
+      "c32_wave1_chain.kd": true,
+      "c32_wave1_mapped.kd": true,
+      "c32_wave1_finish.kd": true,
+      "c32_wave1_finish_dcrop.kd": true,
+      "c32_wave1_post.kd": true,
+      "c32_wave1_prefix.kd": true,
+      "c32_wave1_finish_dcrop_b8.kd": true,
+      "c32_wave1_finish_dcrop_b8d.kd": true,
+      "c32_wave1_prefix_b8d.kd": true,
+      "c32_wave1_mapped_b8.kd": true,
+      "c32_wave1_finish_b8.kd": true,
+      "c32_wave1_post_b8.kd": true,
+      "c32_wave1_post_b8_rgba.kd": true,
+      "c32_wave1_post_b8_features.kd": true,
+      "c32_wave1_up_b8.kd": true,
+      "c32_wave1_up.kd": true
+    },
+    "missing_functions": []
+  }
+}

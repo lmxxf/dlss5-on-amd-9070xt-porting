@@ -1,0 +1,12 @@
+SP_PLAN c=256 first=16 layers=6 tasks=624 initial=104 state_bytes=7504 w16=1
+SP_PLAN c=256 first=49 layers=6 tasks=624 initial=104 state_bytes=7504 w16=1
+FRAME frame=0 phase=cold hash=9b5e89bbb399a904 nonfinite=0
+FRAME frame=1 phase=warm hash=e96e4ef06bed2af3 nonfinite=0
+FRAME frame=2 phase=changed hash=dd52d4a831b0234d nonfinite=0
+FRAME frame=3 phase=reset_return hash=9b5e89bbb399a904 nonfinite=0
+FRAME frame=4 phase=gap_return hash=9b5e89bbb399a904 nonfinite=0
+FRAME frame=5 phase=exposure_reset hash=cd519a3684372f73 nonfinite=0
+round=0 size=1600x900 mean_ms=78.261 hash=cd519a3684372f73 vram_mib=1521 status=lmxxf modules_ok=78 hip=1 net=1600x900 color_job=1600x900 weights=1 recreates=0 net_gpu_ms=off wave_owned=1/1 c512_m32=1/1 vit_proj_n64=1/1 pdl=1/1 skip=0 swin_run=1/1 vit_stream=3/3 multi_pass=1 predict=0 skin=0 | flags: D:\DLSSNR-Lab\mode1-runtime-ready-20261008\DLSS5-AMD layers=DCN applied=18 env_kept=13
+SP_STATS runs=14 fallback=0 rollover=0 jobs=8736 disabled=0 errors=0
+rt_bench: ok
+

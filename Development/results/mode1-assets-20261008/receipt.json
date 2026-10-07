@@ -1,0 +1,187 @@
+{
+  "source_freeze": "c9b122f1",
+  "row": {
+    "bytes": 64,
+    "sha256": "77c745c4e1d84a6227a2224291d83c37d1e9bd18d45e95add166b1174225ce8f",
+    "origin": "original 21808B post weights 197024afb1f78602dc08cfd5ae87c413385237c5f537dd5dcfeae742be85eca8, offset0x5130 row6; no fitting"
+  },
+  "module_build_handle": 93250,
+  "control_handle": 67525,
+  "target": "gfx1201 only; gfx1200 installed modules retained, no new verification claim",
+  "module_static": "4 canonical LLVM23 rows: actual 3 aux exports each; logit kernarg104/features96, 132VGPR60SGPR4KLDS0private0spill; samechain control legacy26 descriptors same,23 code functions same; stock differs from prePR control so raw legacy binary identity not claimed",
+  "gpu_handle": 73476,
+  "exit": 0,
+  "scope": "720/900 real ABI2 full71 MP1 FAST1 Style1 AE0 graph0/pulse0; oldmode0/newmode0/newmode1 6 frames each cold,warm,gainchange,explicitreset,300msgap,exposurescalechange",
+  "mode0_gold": "12 pairs actual compact RGBA16F bit0 oldstock against new4modules, finite all36",
+  "mode1": "firstcold history_enabled0 seed0, actual secondsubmitted history_enabled1 seed1; reset/gap cold hashes equal first; all finite. Perpixel GPU blend delta was separately demonstrated in90615, not inferred from enabled flag or different seeds",
+  "raw": {
+    "900-new1-0.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "dfe85bf69ecc9496a204d370dc3f47e57eeddb331eb76d36cc6d6b22547636bf"
+    },
+    "900-new1-1.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "ecc04a5019268eaa41b375f09760d15680df52dc47d90a4417c89f2123b5d77d"
+    },
+    "720-new1-2.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "1ed7c88b38fac7c68ef99b1d056c69438e387909e238ec1d9900f6f2207bf4b7"
+    },
+    "720-new0-3.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "720-old0-2.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "5b4e9ceba14500f1bc3686450eab3a1399f6b438cc92a7118aa4edecf5f9f59f"
+    },
+    "900-new0-5.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "3210afd9ce72af276d6643904b680a89fcc1d700e64c851df33a1d2d2bc9a7f6"
+    },
+    "720-old0-0.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "900-old0-0.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "720-new0-2.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "5b4e9ceba14500f1bc3686450eab3a1399f6b438cc92a7118aa4edecf5f9f59f"
+    },
+    "900-old0-5.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "3210afd9ce72af276d6643904b680a89fcc1d700e64c851df33a1d2d2bc9a7f6"
+    },
+    "900-new1-4.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "dfe85bf69ecc9496a204d370dc3f47e57eeddb331eb76d36cc6d6b22547636bf"
+    },
+    "900-old0-3.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "720-new1-1.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "ce1e2b14b4c40e88976a63727fb3268975eef97fb066e45d5db69c679d57975f"
+    },
+    "720-new0-0.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "900-new0-1.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "720-old0-4.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "720-old0-1.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "720-old0-5.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "3baa47f4a1d1be5fb0e6ad0ef6c2b97604c07135522878ecc379db449773a4df"
+    },
+    "900-new0-4.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "900-old0-4.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "900-new1-3.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "dfe85bf69ecc9496a204d370dc3f47e57eeddb331eb76d36cc6d6b22547636bf"
+    },
+    "900-new0-0.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "900-new1-2.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "09b4cc5fb0e2f2333d128193ba3d28d1e31b0f4efec9776bdcecca91d32f7c9c"
+    },
+    "900-new0-3.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "720-new1-0.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "5f8c797f744e357c0f82c33dfb809682796254fb2b4bbe175972e0a360108d36"
+    },
+    "900-old0-2.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "4824cf67b9f9acfd3a2b12b8c2a61c27f59c88ad544f9fef4d5e541ac2fc937e"
+    },
+    "720-old0-3.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "900-new1-5.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "35135d8bba4e55b39bec2a00194067313b11977b7c0bb4c449201c20c1464d0c"
+    },
+    "720-new0-1.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "720-new0-5.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "3baa47f4a1d1be5fb0e6ad0ef6c2b97604c07135522878ecc379db449773a4df"
+    },
+    "720-new1-4.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "5f8c797f744e357c0f82c33dfb809682796254fb2b4bbe175972e0a360108d36"
+    },
+    "900-old0-1.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "f4f0b5b4b8a9ef61b1bfe0baa47a6bf29af892ecc15e743599fbe3fefa5beeb1"
+    },
+    "720-new0-4.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0"
+    },
+    "900-new0-2.rgba16f": {
+      "bytes": 11520000,
+      "sha256": "4824cf67b9f9acfd3a2b12b8c2a61c27f59c88ad544f9fef4d5e541ac2fc937e"
+    },
+    "720-new1-5.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "868b09ce5d77deabe67259f387f41668be8a6a3192800eed46cf494b3d1b4710"
+    },
+    "720-new1-3.rgba16f": {
+      "bytes": 7372800,
+      "sha256": "5f8c797f744e357c0f82c33dfb809682796254fb2b4bbe175972e0a360108d36"
+    }
+  },
+  "not_performance": true,
+  "initial_prepare_failure": "27511 script policy prevented assetcopy; first run failed LoadLibrary(old.dll) before D3D/HIP, no raw; logs preserved; failfast/path/hash gates fixed before73476",
+  "deployment_handle": 37992,
+  "deployment_exit": 0,
+  "backup": "D:\\DLSSNR-Lab\\mode1-deploy-20261008\\backups\\20261008-022921",
+  "addon": "3d962455111edbfe4023bdaf19c20096e2754c46d56794a7c2f387d43b89af25",
+  "runtime": "3eaed204f5d6ad803749d6e8c79ed1e79c514f5d02ef1e68d8dcb3f292638db6",
+  "installed_module_count_each": 79,
+  "unchanged_old_modules_each": 75,
+  "sums_sha": "c08125c23b6d7d523dcfae3ef4669d05bbeb25284403a993ca55c5c8de092ea1",
+  "settings": {
+    "TEMPORAL_MODE": 1,
+    "MULTI_PASS": 1,
+    "MULTI_PASS_PREDICT": 0,
+    "FAST_HISTORY": 0,
+    "TEMPORAL_HISTORY_EXPERIMENT": 0
+  },
+  "preserved": "default and native config identity; AE/SKIN/strength/geometry preferences; no MV or depth declaration guessed",
+  "limits": [
+    "Mode1 static screen-space fallback, no native MV/depth claim",
+    "No game launched, no flicker/FPS/NGX-quality claim",
+    "Onimusha root/_storage_ runtimes share Content assets; _storage_ has no DLSS5-AMD directory"
+  ],
+  "lock_released": true
+}

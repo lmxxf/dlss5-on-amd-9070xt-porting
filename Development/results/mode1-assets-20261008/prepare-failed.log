@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/tmp/dlss5-low-frequency-temporal/Development/tools/llvm-fork/compile-modules.py", line 119, in <module>
+    main()
+  File "/tmp/dlss5-low-frequency-temporal/Development/tools/llvm-fork/compile-modules.py", line 68, in main
+    for name, compiler, source, defs, sources, ropts in recipe(a.hip):
+  File "/tmp/dlss5-low-frequency-temporal/Development/tools/llvm-fork/compile-modules.py", line 35, in recipe
+    chunks.append(types.read_text().replace('#pragma once', '') + '\n')
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/mode1-admission-20261008/Development/HIP/swin_persistent_types.h'
