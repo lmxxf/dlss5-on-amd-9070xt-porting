@@ -100,3 +100,11 @@ history and uses current-frame NR. Depth may be padded because sampling uses
 the declared render extent.
 
 当前 Fast History 只接收 mip0 尺寸恰等于实际 render 区域的运动纹理；带padding或显示分辨率MV缺少上下文/有效区域合同，会重置历史并用本帧NR，不猜测采样区域。深度按声明的render区域采样，可保留分配padding。
+
+## Single temporal mode selector / 统一时域模式
+
+`DLSS5_TEMPORAL_MODE=0` is the default: unchanged NR output with no new temporal resources. `1` selects TheAutomatic Fast History (the existing approximate PR12 implementation, FFX-only, explicit unjittered MV/depth/row/logit exports required); `2` selects an independently implemented low-frequency residual EMA at the final NR output, no row or new NN exports. Both active modes require MP1 and cannot combine with `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=1`. Restart to change modes. An explicit MODE value, including0, wins over legacy `DLSS5_FAST_HISTORY`; only absent MODE maps legacy FAST_HISTORY1 to mode1. Invalid/empty MODE is rejected.
+
+Mode2 operates in the codec's encoded NR working domain, not Magpie's display RGB. It retains this frame's high-frequency residual and smooths only guided low-frequency residual over approximately80ms. With a declared valid render-sized unjittered MV it may compensate motion; otherwise it explicitly uses screen coordinates plus conservative original-colour rejection (no invented zero-MV validity, no depth guess). Ghosting/quality and real-game cost remain experimental. The first implementation is synchronous to protect buffer/control lifetimes. It gates approximate ViT reuse for the session without rewriting preference. Runtime input identity is unknown: no duplicate-frame skipping is inferred.
+
+唯一主开关 `DLSS5_TEMPORAL_MODE`：0关闭（默认）、1原TheAutomatic Fast History、2独立实现的低频时域滤波。显式MODE含0压过旧FAST_HISTORY；缺MODE才兼容旧1。两种开启档都要求MP1，不能与reference实验叠用，切档需重启；非法/空值拒绝。Mode2在NR编码工作域而非显示HDR域，仅平滑低频修正、高频留本帧。可信声明的MV可补偿，否则明确用屏幕坐标静态颜色门，可能拖影，不伪造运动/深度合同。当前同步原型优先资源安全；观感/游戏性能需实际试用，旧History耗时不能套用。

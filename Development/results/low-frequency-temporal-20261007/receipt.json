@@ -1,0 +1,21 @@
+{
+  "reference": "SAOG0721/Magpie 2fceab5e241bc9f8ded001ab3266762f1f8bc51e GPLv3 algorithm specification; independently written HLSL/host, no source copied, not clean-room isolation claim",
+  "mode": "DLSS5_TEMPORAL_MODE 0(defaultoff)/1(existingTheAutomatic)/2(lowfrequency encoded-domain adaptation); explicitMODE overrideslegacyFAST_HISTORY, absentMODE mapslegacy1, invalid/emptyreject; referenceexperimentmutuallyexclusive",
+  "algorithm": "r=NNencoded\u2212sameframeoriginalencoded,halfpacked2x2lowobservation+guidedrebuild;historylowonly,reprojection/guidepatch confidence/boxclamp;currenthigh kept via y+(filteredlow\u2212currentlow),approx80ms",
+  "fixture": "20385 WARP/RX9070 bothactualshaderPASS; constant/independenthalfEMA,currentcheckerhigh,reset/exposure/gap/colourreject/black; sharedactualFFX admission noMVdeclaration secondstaticPast1 assertion",
+  "selector_test": "nativeLinux test_temporal_mode PASS presence/legacy/default/invalid; selectorsourceusedbyFFXandRuntime",
+  "runtime_smoke": "68326actualAPIold634off/newmode0 allbyte0; mode2cold/resetbyte0/allfinite; staticwarmfixturealsobyte0, not inventednonzeroruntimegain; shaderfixtureindependentlyprovedeffect",
+  "addon_build": "6243/88131failed PR12wstring ifstream constructor portability; fixedwidepath.c_str only; final52532exit0",
+  "addon_sha256": "7383045e8a1d58cd7d4fd28b4450e1588d0146237bd16d41422c30f8c6c4f81a",
+  "runtime_sha256": "0f3c3aec0ddcc74a684e11ec9bd62bf1a28001e1ad047af398e8f709aeecaf5f",
+  "lifecycle": "synchronous initialprototype. Singleimmutablecontrol waits submittedretirement;separatehistorypingpong;strongraw/out/guidepins;unknownpending/cancel retainsbuffers, notkillgame",
+  "domain": "codecencodedNRworkingdomain, notsourceMagpie SDRdisplaymathbitexact; noOklab/gaincontrols; noNNnewexports/row",
+  "guidance": "undeclared/unsupportedMV=explicitstaticcolour-rejectedscreenhistory, notvalidzeromotion; no guesseddepth requirement; no inferredduplicatecapture skipping. timeisprocessedcallcadence, notcapturetimestamp",
+  "deployment": "authorized22724exit0 actual2gamesbackups/readback; MOD2 MP1 PRED0 root/storageDLL hashesmatch; modules78/default/SUMS unchanged; details lowfreq-runtime-20261007",
+  "limitations": [
+    "Realgamevisual/flicker/FPS stillusertrial, mayghost; costunmeasured synchronous",
+    "No hardwaregfx1200/meaningfulmotionquarterpixelcoveragebeyondcurrentstaticfixture",
+    "Runtimeidentityunknown/Pastshadergate notformalcontinuouscaptureevidence",
+    "Oldflags/preferences retained exceptauthorizedmode/pass; noformalZIP/tag/push"
+  ]
+}

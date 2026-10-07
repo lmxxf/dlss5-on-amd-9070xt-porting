@@ -1,0 +1,8 @@
+FRAME frame=0 phase=cold hash=d6c0867426a31448 nonfinite=0
+FRAME frame=1 phase=warm hash=d6c0867426a31448 nonfinite=0
+FRAME frame=2 phase=changed hash=7ffef7fb53711533 nonfinite=0
+FRAME frame=3 phase=reset_return hash=d6c0867426a31448 nonfinite=0
+round=0 size=1280x720 mean_ms=13.623 hash=d6c0867426a31448 vram_mib=1112 status=lmxxf modules_ok=78 hip=1 net=1280x720 color_job=1280x720 weights=1 recreates=0 net_gpu_ms=off wave_owned=1/1 c512_m32=1/1 vit_proj_n64=1/1 pdl=1/1 skip=0 swin_run=1/0 vit_stream=3/3 multi_pass=1 predict=0 skin=0 | flags: C:\XboxGames\Onimusha- Way of the Sword\Content\DLSS5-AMD layers=DCN applied=18 env_kept=10
+SP_STATS runs=0 fallback=0 rollover=0 jobs=0 disabled=0 errors=0
+rt_bench: ok
+

@@ -22,7 +22,7 @@ class NativeAddonFastHistory {
 public:
  bool enabled{};
  static std::vector<float> Row(const std::wstring&directory){
-  std::ifstream f(directory+L"\\post70-history-head.f16",std::ios::binary|std::ios::ate);
+  std::ifstream f((directory+L"\\post70-history-head.f16").c_str(),std::ios::binary|std::ios::ate);
   if(!f||f.tellg()!=64)throw std::runtime_error("fast history requires post70-history-head.f16 (32 half coefficients)");
   uint16_t halves[32];f.seekg(0);if(!f.read(reinterpret_cast<char*>(halves),64))throw std::runtime_error("fast history row read");
   std::vector<float> row;for(auto h:halves)row.push_back(NativeHalfToFloat(h));return row;

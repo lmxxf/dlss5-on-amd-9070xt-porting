@@ -1,0 +1,83 @@
+{
+  "gpu_handle": 68326,
+  "gpu_exit": 0,
+  "lock_released": true,
+  "domain": "synthetic RGBA16F input / codec encoded NN / original decoder output",
+  "scope": "ABI2 real D3D12/HIP runtime 1280x720 full71 MP1 Style1 AE0 graph0 pulse0; 4 frames cold/warm/gain-change/reset-return; no performance",
+  "old_runtime_sha": "634faf4501c976c80d6cff9ff8eadaf4101ab40f7afa42882eeed54163089da4",
+  "new_runtime_sha": "0f3c3aec0ddcc74a684e11ec9bd62bf1a28001e1ad047af398e8f709aeecaf5f",
+  "addon_sha": "7383045e8a1d58cd7d4fd28b4450e1588d0146237bd16d41422c30f8c6c4f81a",
+  "host_sha": "a0d2c7e6732486f1f7702a25ec4b221f5ef2cd5c505691c2e1fbac96f6a3a242",
+  "raw": {
+    "old0-1.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new2-2.rgba16f": {
+      "sha256": "5b4e9ceba14500f1bc3686450eab3a1399f6b438cc92a7118aa4edecf5f9f59f",
+      "bytes": 7372800
+    },
+    "old0-3.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new0-3.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "old0-2.rgba16f": {
+      "sha256": "5b4e9ceba14500f1bc3686450eab3a1399f6b438cc92a7118aa4edecf5f9f59f",
+      "bytes": 7372800
+    },
+    "new0-0.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new0-2.rgba16f": {
+      "sha256": "5b4e9ceba14500f1bc3686450eab3a1399f6b438cc92a7118aa4edecf5f9f59f",
+      "bytes": 7372800
+    },
+    "new2-1.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new2-3.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new2-0.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "new0-1.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    },
+    "old0-0.rgba16f": {
+      "sha256": "cad381fe15d0d3bc1c69f8b45243be1e2908641f327eb5e0662c9407c55fcde0",
+      "bytes": 7372800
+    }
+  },
+  "finite": "all 12 outputs nonfinite=0",
+  "same": "old0/new0 all4 bit0; new2 all4 bit0 against new0 on this fixture; actual mode2 log observed",
+  "limits": [
+    "No game started / no flicker or FPS claim",
+    "Stable warm and gain change rejected history: no nonzero output temporal effect observed in Runtime smoke; independent math fixture is separate",
+    "Runtime static fallback: no captured motion or verified capture identity",
+    "No NN modules changed"
+  ],
+  "deploy_handle": 22724,
+  "deploy_exit": 0,
+  "backup": "D:\\DLSSNR-Lab\\lowfreq-deploy-20261007\\backups\\20261007-234253",
+  "deployed_settings": {
+    "TEMPORAL_MODE": 2,
+    "MULTI_PASS": 1,
+    "MULTI_PASS_PREDICT": 0,
+    "FAST_HISTORY": 0,
+    "TEMPORAL_HISTORY_EXPERIMENT": 0
+  },
+  "preserved": "default config byte identity, 78 modules per game + sums each file hash, AE/SKIN/strength/geometry/MV/depth preferences",
+  "failed_cpu_build": 59781,
+  "final_cpu_build": 34577,
+  "config_mock": "actual EditConfig BOM/CRLF/duplicate-native/absent/preserved keys PASS; absent-byte-array bug repaired before any install"
+}

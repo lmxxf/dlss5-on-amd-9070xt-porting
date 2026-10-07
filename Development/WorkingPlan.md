@@ -184,3 +184,5 @@
 
 
 - 2026-10-07 PR12当前3ef0b6e本地合并并补consumer MP1 startup/hotguard、RGB首次状态回归、MV有效区failclosed；FastHistory新flag默认0，近似策略与reference独立，开启需重启/明确guide/匹配row+exports。源码scope/最终runtime与MSVC WARP/9070接口suite1392、受影响补检14793通过；未真实游戏/性能/fullNNaux/gfx1200门，不改0.41/041a包与安装。具体证据results/pr12-integration-20261007；ReplayAuto暂停，原mochi差距目标未完成。
+
+- 2026-10-07 用户授权AMD低频实验及两游戏试装：统一TEMPORAL_MODE0/1/2默认0，2为独立SAOG算法编码域适配；小数学20385和Runtime实际API68326通过，mode0保旧字节；未知MV静态颜色门控不假补偿，初版同步/成本观感未知。22724已备份部署Mode2/MP1/PRED0、Addon7383/两runtime0f3c，78模块/SUMS不变；正式包/tag不动，等用户游戏反馈，不goalcomplete。证据low-frequency-temporal-20261007/lowfreq-runtime-20261007。

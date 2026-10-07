@@ -4,6 +4,6 @@
 namespace NativeFastHistoryPolicy {
 inline void RequireSinglePass(bool enabled, unsigned passes) {
  if(enabled && passes != 1)
-  throw std::runtime_error("Fast History addon supports MP1 only; disable DLSS5_FAST_HISTORY and restart before selecting multiple passes");
+  throw std::runtime_error("Temporal modes 1/2 support MP1 only; set DLSS5_TEMPORAL_MODE=0 and restart before selecting multiple passes");
 }
 }

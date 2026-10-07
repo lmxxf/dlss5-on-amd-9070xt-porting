@@ -13,6 +13,8 @@
 #include "native_network_geometry.h"
 #include "native_rgb_texture.h"
 #include "hip_d3d12_bridge.h"
+#include "native_temporal_experiment.h"
+#include "native_low_frequency_temporal.h"
 
 #include <atomic>
 #include <mutex>
@@ -313,7 +315,9 @@ void LoadFlagsFileOnce(const std::wstring &assets)
                                      key == "DLSS5_NETWORK_1080_ROWS" || key == "DLSS5_STYLE" || key == "DLSS5_DIRECT_IO" ||
                                      key == "DLSS5_NETWORK_FREE_RES" || key == "DLSS5_FAST_NUMERIC" ||
                                      key == "DLSS5_MULTI_PASS" || key == "DLSS5_MULTI_PASS_SKIP_BLOCKS" || key == "DLSS5_MULTI_PASS_SKIN_PROTECT" || key == "DLSS5_MULTI_PASS_PREDICT" ||
-                                     key == "DLSS5_FRAME_STATS" || key == "DLSS5_STRENGTH";
+                                     key == "DLSS5_FRAME_STATS" || key == "DLSS5_STRENGTH" ||
+                                     key == "DLSS5_TEMPORAL_MODE" || key == "DLSS5_FAST_HISTORY" ||
+                                     key == "DLSS5_TEMPORAL_HISTORY_EXPERIMENT";
                 if (!allowed)
                     continue;
                 if (NativeConfigFind(env, key))
@@ -398,6 +402,12 @@ struct Session
     bool zeroOutputFallback = false;
     bool failed = false; /* Fail-closed poisoning */
     hip_reference::D3D12Bridge *bridge = nullptr;
+    bool temporalModeSelected = false;
+    NativeTemporalMode selectedTemporalMode = NativeTemporalMode::Off;
+    NativeLowFrequencyTemporal *lowFrequency = nullptr;
+    bool lowFrequencyPending = false;
+    bool lowFrequencyReset = true;
+    float lowFrequencyExposureScale = 0.f;
     NativeGameCodec *encode = nullptr;
     NativeGameRgbInput *rgbInput = nullptr;
     NativeRgbTexture *rgbTex = nullptr;
@@ -495,6 +505,8 @@ struct Session
                 throw std::runtime_error("TeardownCodecChain: bridge work did not complete");
             }
         }
+        if (lowFrequency) { lowFrequency->CancelUnsubmitted(); delete lowFrequency; lowFrequency=nullptr; }
+        lowFrequencyPending=false; lowFrequencyReset=true; lowFrequencyExposureScale=0.f;
         delete bridge;
         bridge = nullptr;
         hipPrepared = false;
@@ -582,6 +594,7 @@ struct Session
     {
         // Fail-closed intentional leak: GPU may still reference the whole chain.
         bridge = nullptr;
+        lowFrequency = nullptr; // preserve lease/resources if GPU drain failed
         decodeDisplay = nullptr;
         decode = nullptr;
         rgbTex = nullptr;
@@ -634,6 +647,8 @@ struct Session
             }
         }
         // Bridge dtor also synchronizes HIP / pending fence, then frees shared buffers.
+        if (lowFrequency) { lowFrequency->CancelUnsubmitted(); delete lowFrequency; lowFrequency=nullptr; }
+        lowFrequencyPending=false; lowFrequencyReset=true; lowFrequencyExposureScale=0.f;
         delete bridge;
         bridge = nullptr;
         if (decodeDisplay)
@@ -1183,6 +1198,17 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         if (retiredExposure)
             retiredExposure->Release();
 
+        const auto temporalMode = NativeSelectedTemporalMode();
+        if (session->temporalModeSelected && session->selectedTemporalMode!=temporalMode)
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: temporal mode changed; restart required");
+        if (!session->temporalModeSelected) {
+            session->selectedTemporalMode=temporalMode; session->temporalModeSelected=true;
+        }
+        if (temporalMode == NativeTemporalMode::FastHistory)
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=1 is addon-only; use 0 or 2");
+        if (temporalMode == NativeTemporalMode::LowFrequency &&
+            (NativeTemporalExperimentRequested() || hip_reference::MultiPassFromEnvironment()!=1))
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=2 requires MP1 and reference history off");
         if (!session->encode)
         {
             if (!session->bridge)
@@ -1294,6 +1320,14 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             }
         }
 
+        if (temporalMode == NativeTemporalMode::LowFrequency && !session->lowFrequency) {
+            const auto g=NativeCurrentNetworkGeometry();
+            // The encoder owns a complete network viewport. Do not claim native game MV/depth access.
+            session->bridge->SetAdaptiveReuseAllowed(false);
+            session->lowFrequency=new NativeLowFrequencyTemporal();
+            session->lowFrequency->Create(session->device,g.valid_width,g.valid_height,g.processing_height);
+            OutputDebugStringA("lmxxf: temporal_mode=2 active domain=encoded motion=static capture_id=unverified\n");
+        }
         session->job = {};
         session->job.color = color;
         session->job.colorState = static_cast<D3D12_RESOURCE_STATES>(info->color_state);
@@ -1540,7 +1574,22 @@ int32_t RecordOutputs(void *context, void *job, void *command_list)
         if (!j->codec_passthrough)
         {
             session->bridge->RecordOutputReadable(list);
+            if (session->lowFrequency) {
+                if (session->lowFrequencyPending)
+                    throw std::runtime_error("Runtime: temporal output must be Retired before next RecordOutputs");
+                const bool reset=session->lowFrequencyReset || session->lowFrequencyExposureScale!=j->exposure_scale;
+                session->lowFrequency->Prepare(session->queue,j->frame_id,false,j->pre_exposure,reset);
+                session->lowFrequency->Record(list,session->rgbInput->PostBase(),session->bridge->Output(),
+                    session->bridge->DirectInput()?D3D12_RESOURCE_STATE_COMMON:D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+                session->lowFrequencyPending=true;
+                session->lowFrequencyExposureScale=j->exposure_scale;
+            }
             session->rgbTex->Record(list);
+        }
+        else if (session->lowFrequency) {
+            // A bypass frame is not a temporal observation; returning starts cold.
+            session->lowFrequency->Reset();
+            session->lowFrequencyReset=true;
         }
         if (!session->decode)
             return Fail(LMXXF_NR_FAILED, "RecordOutputs: decode missing");
@@ -1605,6 +1654,8 @@ int32_t CancelUnsubmitted(void *context, void *job)
             j->state = LMXXF_NR_JOB_RETIRED;
         if (session->bridge)
             session->bridge->CancelUnsubmitted();
+        if (session->lowFrequency) session->lowFrequency->CancelUnsubmitted();
+        session->lowFrequencyPending=false;session->lowFrequencyReset=true;
         SetError("");
         return static_cast<int32_t>(LMXXF_NR_OK);
     });
@@ -1633,6 +1684,10 @@ int32_t Retire(void *context, void *job)
             j->state = LMXXF_NR_JOB_RETIRED;
         if (session->bridge)
             session->bridge->NotifyOutputSubmittedIfRecorded(session->queue);
+        if (session->lowFrequency && session->lowFrequencyPending) {
+            session->lowFrequency->Submitted(session->queue);
+            session->lowFrequencyPending=false;session->lowFrequencyReset=false;
+        }
         SetError("");
         return static_cast<int32_t>(LMXXF_NR_OK);
     });
@@ -1643,6 +1698,8 @@ int32_t ResetHistory(void *context)
     return GuardSession(session, [&] {
         if (!session)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "null context");
+        if (session->lowFrequency) session->lowFrequency->Reset();
+        session->lowFrequencyReset=true;
         SetError("");
         return static_cast<int32_t>(LMXXF_NR_OK);
     });

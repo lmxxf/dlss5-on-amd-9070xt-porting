@@ -1,0 +1,5 @@
+默认关闭的独立低频时域原型：唯一TEMPORAL_MODE0/1/2，1保原TheAutomatic，2在codec编码工作域的最终NR输出一次低频EMA、高频留本帧，不反馈prefix，不增加NN行/exports。参考SAOG0721/Magpie2fce GPL算法规格，独立写HLSL/host并保来源说明，非clean-room声称；未拷贝GPL实现表达。
+
+20385实际WARP/9070小数学fixture与shared FFX admission无声明第二帧Past1通过；68326实际Runtime API mode0对旧634输出0diff，mode2cold/reset0diff/allfinite，稳定fixture也same不伪效果；具体部署receipt见lowfreq-runtime。当前未知MV明确static颜色门控、未知capture重复不猜跳，80ms按实际处理调用时间。初版同步owner保护GPU控制/guide/pingpong/借用资源，未测游戏成本与抗闪观感，可能拖影。
+
+用户授权实际22724部署剑星+鬼武者单遍Mode2，Addon7383/两Runtime0f3c读回同；旧载荷/配置有备份，modules78/SUMS/default不变。原正式包/tag不改，等待真实游戏反馈。

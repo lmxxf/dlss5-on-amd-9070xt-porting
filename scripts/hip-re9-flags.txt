@@ -447,3 +447,7 @@ DLSS5_STYLE=1
 # 中：亮度/细节,颜色强度，各0..1；auto沿宿主；数值优先菜单；改文件需重启
 # EN: transfer,colour strengths, each 0..1; auto keeps host values; numeric overrides menu; file edits need restart
 DLSS5_STRENGTH=auto
+
+# Temporal output selection: 0 off(default), 1 TheAutomatic Fast History, 2 independent low-frequency EMA. Restart required; modes 1/2 require MP1.
+# 时域选择：0关闭，1 TheAutomatic，2低频时域；需重启，开启要求单遍。Mode1不支持独立runtime/Magpie，mode2未知MV仅静态颜色门控。
+DLSS5_TEMPORAL_MODE=0

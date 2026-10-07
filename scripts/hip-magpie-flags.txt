@@ -477,3 +477,7 @@ DLSS5_HOT_RELOAD=1
 # 中：NVIDIA Style 0/1/2：1 = 剑星原版风格；默认 1；0 = NVIDIA 默认、最接近参考输出；改了输出风格就变；需重启
 # EN: NVIDIA Style 0/1/2: 1 = Stellar Blade style; default 1; 0 = NVIDIA default, closest to reference; restart needed
 DLSS5_STYLE=1
+
+# Temporal output selection: 0 off(default), 1 TheAutomatic Fast History, 2 independent low-frequency EMA. Restart required; modes 1/2 require MP1.
+# 时域选择：0关闭，1 TheAutomatic，2低频时域；需重启，开启要求单遍。Mode1不支持独立runtime/Magpie，mode2未知MV仅静态颜色门控。
+DLSS5_TEMPORAL_MODE=0

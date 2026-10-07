@@ -336,3 +336,10 @@ APP pulse0对pulse0 f7a48855三轮合并mean/p99过：pooledwall−.070848/p99�
 锁定 TheAutomatic PR12 `3ef0b6e`，本地merge保作者祖先与现H900/Pulse/实验记录。新增 `DLSS5_FAST_HISTORY=0` 默认关闭，用户可在custom-config显式开启并重启；仅FFX pre/MP1/fullviewport/graph0/overlap0、真实无抖动MV及显式depth方向，reference实验互斥。额外row与匹配C32 logit exports必需，Magpie/RE9独立runtime不支持。F32反馈/有效性启发式是近似，不声称NV/041a逐位等价、游戏抑闪已修或借reference耗时。
 
 修latest接口拓宽导致addon漏MP1 startup/F9防线（genericaux MP1/2/3保留），修PR普通RGBinput首次漏UAV→SRV默认回归；未知padding/display MV有效区failclosed。源policy/首状态检查与最终MinGW runtime77426通过。实际1392 MSVC/WARP/9070接口套件PASS、14793受影响addon补检PASS，codec默认输出对297b字节同；未做完整NN aux资产/真实游戏/性能/gfx1200硬件门。1392在最后RGB修前，14793单列不伪全套重跑。results/pr12-integration-20261007留receipt/日志。0.41/041a包、本机DLL与游戏配置不改。
+
+
+### 2026-10-07 AMD低频时域模式与用户试装
+
+独立实现SAOG0721/Magpie2fce算法规格（未copy GPL表达，非clean-room声称），codec编码域r=最终NR−同帧original，2×2半精低观察/颜色引导low，仅low做约80ms EMA/high保本帧，不回NN前端。统一TEMPORAL_MODE0/1/2默认0；1原TheAutomatic、2本算法；显式MODE含0优先旧FAST_HISTORY，reference诊断拒叠。未知MV为明确static颜色门控，不假有效零MV，不猜重复capture；初版同步owner安全优先，成本/观感未知可能拖影。
+
+实际数学20385 WARP/9070与FFX无声明metadata连续Past1门通过；Runtime68326 mode0对旧634输出字节同、mode2cold/reset同/allfinite，稳定warm也same不伪效果。Addon PR12 wideifstream portability前置fail修c_str后52532exit0，final7383045e；Runtime0f3c3aec。用户授权22724备份后部署剑星/鬼武者Mode2 MP1 PRED0（根/storage两runtime读回），其余AE/strength/guide声明等保、default/78modules/SUMS不变，backup lowfreq-deploy-20261007/backups/20261007-234253。无正式ZIP/tag/push，等待实玩反馈，不宣抑闪已解决。owned结果目录留合同/日志/哈希。
