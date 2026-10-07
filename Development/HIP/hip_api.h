@@ -66,12 +66,18 @@ struct Api {
   std::ifstream f(std::filesystem::u8path(path),std::ios::binary|std::ios::ate);
   if(!f)throw std::runtime_error(std::string("module file missing: ")+path);
   auto n=f.tellg();if(n<=0)throw std::runtime_error("empty module");std::vector<char>bytes(static_cast<size_t>(n));f.seekg(0);if(!f.read(bytes.data(),n))throw std::runtime_error("module read failed");
-  int r=hipModuleLoadData(module,bytes.data());
-  if(!r&&style_feature>=0){
-   if(!hipModuleGetGlobal)Load(hipModuleGetGlobal,"hipModuleGetGlobal");
-   void*p=nullptr;size_t s=0;if(!hipModuleGetGlobal(&p,&s,*module,"dlss5_style_feature")&&p&&s==sizeof(float))Check(hipMemcpy(p,&style_feature,sizeof(float),1),"DLSS5_STYLE");
-  }
-  return r;
+  // Publish ownership only after optional module initialization succeeds.
+  *module=nullptr;Handle loaded=nullptr;
+  int r=hipModuleLoadData(&loaded,bytes.data());
+  if(r)return r;
+  try{
+   if(style_feature>=0){
+    if(!hipModuleGetGlobal)Load(hipModuleGetGlobal,"hipModuleGetGlobal");
+    void*p=nullptr;size_t s=0;if(!hipModuleGetGlobal(&p,&s,loaded,"dlss5_style_feature")&&p&&s==sizeof(float))Check(hipMemcpy(p,&style_feature,sizeof(float),1),"DLSS5_STYLE");
+   }
+  }catch(...){hipModuleUnload(loaded);throw;}
+  *module=loaded;
+  return 0;
  }
  void EnableVmm(){Load(hipMemAddressReserve,"hipMemAddressReserve");Load(hipMemAddressFree,"hipMemAddressFree");Load(hipMemCreate,"hipMemCreate");Load(hipMemRelease,"hipMemRelease");Load(hipMemMap,"hipMemMap");Load(hipMemUnmap,"hipMemUnmap");Load(hipMemSetAccess,"hipMemSetAccess");Load(hipMemGetAllocationGranularity,"hipMemGetAllocationGranularity");}
  void EnableGraphs(){Load(hipStreamBeginCapture,"hipStreamBeginCapture");Load(hipStreamEndCapture,"hipStreamEndCapture");Load(hipGraphInstantiate,"hipGraphInstantiate");Load(hipGraphLaunch,"hipGraphLaunch");Load(hipGraphDestroy,"hipGraphDestroy");Load(hipGraphExecDestroy,"hipGraphExecDestroy");}

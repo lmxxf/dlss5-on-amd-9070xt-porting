@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$OutputDir = (Join-Path $PSScriptRoot 'modules'),
     [string]$Compiler = (Join-Path $PSScriptRoot 'rtc_compile.exe'),
     [string]$SourceDir = $PSScriptRoot,

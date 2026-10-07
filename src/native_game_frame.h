@@ -13,6 +13,7 @@
 #include "native_rgb_texture.h"
 #include "native_temporal_feed.h"
 #include "native_temporal_experiment.h"
+#include "native_addon_fast_history.h"
 #include "native_temporal_coordinates.h"
 #include "native_temporal_sample.h"
 #include "native_submitted_readback.h"
@@ -145,7 +146,7 @@ class NativeGameFrame {
   NativeActualNetwork70 network;
 #endif
   NativeRgbTexture neural;NativeOutputSmooth smooth;NativeHistoryGuard history_guard;NativeBlackProbe black;
-  NativeGameCodec decode;
+  NativeGameCodec decode;NativeAddonFastHistory fast_history;
   NativeTextOverlay fps_overlay;bool show_fps{};char fps_text[80]{};ULONGLONG fps_tick{};
   // Temporal path (optional): motion texture -> coordinates -> sampled history -> network temporal input.
   // Frame-side GPU probe (DLSS5_GAME_PROBE): pre-network passes / network / decode+copy per frame, averaged in the log.
@@ -199,7 +200,9 @@ public:
    const bool direct_input=false;
 #endif
    NativeGameFrameStep("input",d);resources->input.Create(d,resources->encode.Output(),directory,!direct_input);
-   if(temporal_config&&!temporal_rgb){
+   const bool fast_history=NativeFastHistoryRequested();
+   if(fast_history&&(!temporal_config||!temporal_config->experimental_ffx||!NativeTemporalExperimentUnjittered()||NativeAddonFastHistory::DepthDirection()<0||resources->overlap||temporal_rgb||NativeTemporalExperimentRequested()))throw std::runtime_error("fast history requires FFX pre, unjittered vectors, explicit depth direction, no overlap/reference history");
+   if(temporal_config&&!temporal_rgb&&!fast_history){
     const bool experiment=NativeTemporalExperimentRequested()&&NativeTemporalExperimentUnjittered()&&temporal_config->experimental_ffx&&!resources->overlap;
     // Motion vectors arrive in UV units of the render grid; the coordinate pass uses the captured
     // NGX contract (subrect 0,0..render extent over the motion texture; displacement scale 1/1920,1/1080).
@@ -227,8 +230,10 @@ public:
    // Captured original post origin(-4,-4) corresponds to shift3.
    NativeGameFrameStep("network",d);
 #ifdef DLSS5_USE_HIP
-   resources->network.Create(resources->overlap?resources->compute_queue:resources->queue,resources->input.PostBase(),noise,directory,temporal_rgb,3,direct_input,resources->experimental_temporal);if(direct_input){resources->input.RedirectOutput(resources->network.DirectInput());NativeGameFrameStep("direct_input",d);}
+   resources->network.Create(resources->overlap?resources->compute_queue:resources->queue,resources->input.PostBase(),noise,directory,temporal_rgb,3,direct_input,resources->experimental_temporal,fast_history?NativeAddonFastHistory::Row(directory):std::vector<float>{});
+   if(fast_history){const auto g=resources->geometry;const auto fit=resources->encode.Geometry();if(g.processing_width!=g.valid_width||fit.x||fit.y||fit.fit_width!=g.valid_width||fit.fit_height!=g.valid_height)throw std::runtime_error("fast history requires full network viewport");resources->fast_history.Create(d,g.valid_width,g.valid_height,g.processing_height,temporal_config->render_width,temporal_config->render_height,resources->network.PostAuxiliary().offset,resources->network.DirectHistory());}if(direct_input){resources->input.RedirectOutput(resources->network.DirectInput());NativeGameFrameStep("direct_input",d);}
 #else
+   if(fast_history)throw std::runtime_error("fast history requires HIP backend");
    resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
 #endif
    NativeGameFrameStep("neural",d);resources->neural.Create(d,resources->network.Output(),directory);
@@ -373,7 +378,7 @@ public:
  }
  // deliver=false: skip the copy into target (the caller consumes DirectOutput() instead); only valid when DirectOutput() is non-null.
  void ProcessSubmittedFrame(ID3D12Resource*target,D3D12_RESOURCE_STATES source_state,
-                            D3D12_RESOURCE_STATES target_state,UINT seed,bool temporal_enabled=false,ID3D12Resource*motion_texture=nullptr,bool reset=false,bool deliver=true){
+                            D3D12_RESOURCE_STATES target_state,UINT seed,bool temporal_enabled=false,ID3D12Resource*motion_texture=nullptr,bool reset=false,bool deliver=true,ID3D12Resource*depth=nullptr,D3D12_RESOURCE_STATES depth_state=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE){
   std::lock_guard<std::mutex>guard(mutex);
   if(!ready||failed||!target)throw std::runtime_error("frame unavailable");
   if(target==resources->original&&source_state!=target_state)throw std::runtime_error("aliased frame texture states disagree");
@@ -382,6 +387,8 @@ public:
   ID3D12Device*owner=nullptr;auto hr=target->GetDevice(IID_PPV_ARGS(&owner));if(FAILED(hr))throw std::runtime_error("frame target device query");bool same=NativeSameDevice(owner,resources->submit.Device());owner->Release();if(!same)throw std::runtime_error("frame target device mismatch");
   try{
    auto&r=*resources;
+   const bool fast_use=r.fast_history.Prepare(r.submit,motion_texture,depth,experimental_metadata,reset);
+   if(r.fast_history.enabled)seed=r.fast_history.Seed();
    bool experimental_active=false;
 #ifdef DLSS5_USE_HIP
    if(r.experimental_temporal)experimental_active=r.network.ExperimentalTemporalActive(); // apply F9/hot options BEFORE selecting input/seed
@@ -404,14 +411,16 @@ public:
      r.black.CountDump();dump_prefix=prefix;}}
    const auto cpu_start=std::chrono::steady_clock::now();if(r.probe_on)r.probe.Reset();
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t0");r.encode.Record(c,{source_state},NativePaperWhite());if(r.probe_on)r.probe.Mark(c,"encode");r.input.Record(c,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    r.fast_history.Inputs(c,r.input.PostBase(),r.network.Output(),depth_state);
     if(use_history){r.feed.RecordMotion(c,motion_texture);r.coordinates.Record(c);if(!r.experimental_temporal){r.sampler.Record(c);r.history_guard.Record(c);}}if(r.probe_on)r.probe.Mark(c,"t1");});
    if(!dump_prefix.empty()&&(use_history||(r.temporal&&r.black.enabled))){r.submit.Flush();DumpTemporalNow(dump_prefix);{char line[160];snprintf(line,sizeof line,"black_probe dumped history=%u reset=%u motion=%u",use_history?1u:0u,reset?1u:0u,motion_texture?1u:0u);if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu %s\n",GetCurrentProcessId(),line);fclose(f);}}dump_prefix.clear();}
-   r.network.Run(r.submit,seed,r.temporal?use_history:temporal_enabled);
+   r.network.Run(r.submit,seed,r.fast_history.enabled?fast_use:r.temporal?use_history:temporal_enabled);
    if(r.experimental_temporal){r.experimental_exposure=experimental_metadata.pre_exposure;r.experimental_frame_id=experimental_metadata.frame_id;
     r.experimental_prior_ready=experimental_active&&motion_texture&&experimental_metadata.Valid()&&experimental_metadata.motion_scale[0]==r.experimental_scale_x&&experimental_metadata.motion_scale[1]==r.experimental_scale_y;if(r.experimental_prior_ready)++r.experimental_seed;else r.experimental_seed=0;
     static unsigned logged=0;if(logged++<8||reset||logged%100==0)if(FILE*f=_wfopen(NativeLabPath(L"logs\\temporal-history-experiment.txt").c_str(),L"ab")){fprintf(f,"frame=%u requested=1 active=%u history=%u reset=%u seed=%u pre_exposure=%.9g jitter=%.9g,%.9g mvscale=%.9g,%.9g mv_unjittered_assumed=1 depth_gate=0 reason=%s\n",experimental_metadata.frame_id,unsigned(experimental_active),unsigned(use_history),unsigned(reset),seed,experimental_metadata.pre_exposure,experimental_metadata.jitter[0],experimental_metadata.jitter[1],experimental_metadata.motion_scale[0],experimental_metadata.motion_scale[1],!experimental_active?"backend-condition-fallback":!experimental_metadata.Valid()?"missing-invalid-ffx-metadata":reset?"first-reset-or-exposure-gap":"history-eligible");fclose(f);}
    }
    r.submit.Submit([&](ID3D12GraphicsCommandList*c){if(r.probe_on)r.probe.Mark(c,"t2");
+    r.fast_history.Outputs(c,r.input.PostBase(),r.network.Output(),depth_state);
     if(use_history&&!r.experimental_temporal)r.smooth.Record(c);r.black.Record(c);
     if(r.temporal&&!r.experimental_temporal)r.feed.RecordHistory(c);
     if(!r.io_fuse)r.neural.Record(c);if(r.probe_on)r.probe.Mark(c,"neural");r.decode.Record(c,{D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,source_state});if(r.probe_on)r.probe.Mark(c,"decode");
@@ -427,7 +436,7 @@ public:
     if(r.fps_text[0])r.fps_overlay.Draw(c,target,r.fps_text,24,96,3,target_state);
     }
     if(r.probe_on){r.probe.Mark(c,"t3");r.probe.Resolve(c);}
-   });r.black.Submitted(r.submit.LastValue());
+   });r.black.Submitted(r.submit.LastValue());r.fast_history.Submitted(r.submit.LastValue());
    /* 2026-10-01 input-slim: finer marks (encode | input(+history) | network+handoff | neural | decode | copy+overlay), per-step µs averaged per 100 frames */
    if(r.probe_on){r.submit.Flush();std::vector<double>iv;if(r.probe.Intervals(r.submit.TimestampFrequency(),iv)&&iv.size()<=8){r.probe_parts=unsigned(iv.size());for(size_t i=0;i<iv.size();i++)r.probe_sum[i]+=iv[i];}
     r.probe_cpu+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-cpu_start).count();

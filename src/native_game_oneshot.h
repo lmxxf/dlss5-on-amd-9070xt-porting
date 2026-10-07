@@ -70,7 +70,7 @@ class NativeGameOneShot {
    self->frame=new NativeGameFrame;
 #ifdef NATIVE_GAME_TILED_VERIFICATION
    Log("build_mode","tiled verification; separate assets; reset-history only");
-   {const bool experiment=NativeTemporalExperimentRequested();const bool temporal_on=(experiment?(NativeTemporalExperimentUnjittered()&&task->temporal.experimental_ffx):GetFileAttributesW(NativeLabPath(L"temporal-history.txt").c_str())!=INVALID_FILE_ATTRIBUTES)&&task->temporal.motion_width>=2&&task->temporal.motion_height>=2&&task->temporal.render_width&&task->temporal.render_height;
+   {const bool experiment=NativeTemporalExperimentRequested()||NativeFastHistoryRequested();const bool temporal_on=(experiment?(NativeTemporalExperimentUnjittered()&&task->temporal.experimental_ffx):GetFileAttributesW(NativeLabPath(L"temporal-history.txt").c_str())!=INVALID_FILE_ATTRIBUTES)&&task->temporal.motion_width>=2&&task->temporal.motion_height>=2&&task->temporal.render_width&&task->temporal.render_height;
     if(experiment){const char*reason=!NativeTemporalExperimentUnjittered()?"mv-unjittered-contract-not-admitted":!task->temporal.experimental_ffx?"requires-ffx-pre-upscale-metadata":temporal_on?"ffx-unjittered-assumption-admitted-backend-gates-pending":"invalid-motion-render-geometry";Log("temporal_history_experiment",(std::string("requested=1 eligible=")+std::to_string(temporal_on)+" reason="+reason).c_str());}
     char text[160];snprintf(text,sizeof text,"temporal=%u motion=%ux%u render=%ux%u",temporal_on?1u:0u,task->temporal.motion_width,task->temporal.motion_height,task->temporal.render_width,task->temporal.render_height);Log("temporal_config",text);
     NativeReleaseReservedVram();
@@ -146,9 +146,9 @@ public:
     texture (NON_PIXEL_SHADER_RESOURCE) to the upscaler instead. nullptr: the result is in source as before. */
  ID3D12Resource*delivered{};ID3D12Resource*Delivered()const{return delivered;}
  /* state: the D3D12 state the upscaler declared for its output (the frame transitions from it and back to it) */
- void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0,D3D12_RESOURCE_STATES state=D3D12_RESOURCE_STATE_UNORDERED_ACCESS,bool external_overlay=false,bool direct_output=false,const NativeTemporalFrameMetadata*experimental=nullptr){
+ void OnSubmitted(ID3D12CommandQueue*q,ID3D12Resource*source,ID3D12Resource*motion=nullptr,bool reset=false,unsigned mw=0,unsigned mh=0,unsigned rw=0,unsigned rh=0,D3D12_RESOURCE_STATES state=D3D12_RESOURCE_STATE_UNORDERED_ACCESS,bool external_overlay=false,bool direct_output=false,const NativeTemporalFrameMetadata*experimental=nullptr,ID3D12Resource*depth=nullptr,D3D12_RESOURCE_STATES depth_state=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE){
   delivered=nullptr;
-  const bool experiment=NativeTemporalExperimentRequested();const bool experiment_metadata=experiment&&experimental&&experimental->Valid();
+  const bool experiment=NativeTemporalExperimentRequested()||NativeFastHistoryRequested();const bool experiment_metadata=experiment&&experimental&&experimental->Valid();
   {const unsigned state=phase.load();if(state==5||((state==2||state==4)&&queue&&q!=queue)){if(!ResetForNewSession(state==5?"previous initialization/render failed":"upscaler queue changed"))return;}}
   if(source&&(phase.load()==2||phase.load()==4)){
    auto desc=source->GetDesc();
@@ -189,7 +189,7 @@ public:
     if((every_frame_count==299||every_frame_count==599)&&_wgetenv(L"DLSS5_DEBUG_DUMPS")){ /* diagnostic only (233MB); DLSS5_DEBUG_DUMPS=1 in native-game-flags.txt */wchar_t prefix[MAX_PATH];swprintf(prefix,MAX_PATH,NativeLabPath(L"logs\\temporal-probe-%lu-%lu").c_str(),GetCurrentProcessId(),every_frame_count+1);frame->RequestTemporalDump(prefix);Log("temporal_dump_requested",std::to_string(every_frame_count+1).c_str());}
     frame->RebindSourceAfterCompletion(source);
     frame->UpdateFps(AvgMs());
-    {ID3D12Resource*out=direct_output?frame->DirectOutput():nullptr;frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset,out==nullptr);delivered=out;}
+    {ID3D12Resource*out=direct_output?frame->DirectOutput():nullptr;frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset,out==nullptr,depth,depth_state);delivered=out;}
     // Temporal alignment probe: dump history/motion/color at frames 300 and 600 while the user pans the camera.
     auto now=GetTickCount64();if(++every_frame_count%100==0){char text[96];snprintf(text,sizeof text,"frames=%lu avg_ms_per_frame=%.1f",every_frame_count,double(now-every_frame_tick)/100.0);Log("every_frame",text);avg_ms.store(double(now-every_frame_tick)/100.0);every_frame_tick=now;}
     if(every_frame_count==1)every_frame_tick=now;
@@ -200,7 +200,7 @@ public:
    if(input_check!=NativeFrameInputCheck::valid){Log("input_rejected",input_check==NativeFrameInputCheck::black?"black RGB; no neural write; new request required":"invalid input; no neural write; new request required");phase=2;return;}
    frame->RebindSourceAfterCompletion(source);
    Log("render_begin",frame->TemporalReady()?"seed=0 temporal path armed (history from previous processed frame)":"seed=0 history=0 explicit diagnostic reset");
-   frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset);
+   frame->ProcessSubmittedFrame(source,state,state,0,false,motion,reset,true,depth,depth_state);
    auto after=NativeReadSubmittedFrame(q,source,state);Save(request,L"after",after);
    Log("render_complete",before==after?"pixels_identical; investigate":"pixels_changed; independent verification pending");phase=4;
   }catch(const std::exception&e){Log("render_failed",e.what());phase=5;}

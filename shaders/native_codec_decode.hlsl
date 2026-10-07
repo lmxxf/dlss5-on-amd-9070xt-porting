@@ -10,6 +10,31 @@ cbuffer CodecConstants : register(b0) {
 #if NATIVE_CODEC_EXPOSURE
 Texture2D<float> GameExposure : register(t4);
 #endif
+// Same meter as encode; sample the original game colour so both sides share the white point.
+Texture2D<float4> Proxy : register(t1);
+Texture2D<float4> Neural : register(t2);
+Texture2D<float4> OutputOriginal : register(t3);
+static const float kTargetEncodedMean = 0.45f;
+float WhitePointForMean(float meanLuma) {
+    float encoded = pow(kTargetEncodedMean, 2.2f);
+    float ratio = encoded / (1.0 - encoded);
+    float wp = meanLuma / ratio;
+    return clamp(wp, 0.01f, 10000.0f);
+}
+float SampleMeanLuma() {
+    uint w = max(SourceSize.x, 1u), h = max(SourceSize.y, 1u);
+    float sum = 0.0;
+    const int N = 5;
+    for (int y = 0; y < N; y++) {
+        for (int x = 0; x < N; x++) {
+            uint2 p = uint2(uint((x + 0.5) * (w - 1) / (N - 1)), uint((y + 0.5) * (h - 1) / (N - 1)));
+            p = min(p, uint2(w, h) - 1);
+            float3 c = max(OutputOriginal.Load(int3(p, 0)).rgb, 0.0);
+            sum += dot(c, float3(0.2126, 0.7152, 0.0722));
+        }
+    }
+    return max(sum / float(N * N), 1e-4);
+}
 float EffectivePaperWhite() {
 #if NATIVE_CODEC_EXPOSURE
  float e=GameExposure.Load(int3(0,0,0));
@@ -17,6 +42,11 @@ float EffectivePaperWhite() {
  float exposure=e*scale/pre;
  return PaperWhiteScale / ((isfinite(exposure)&&exposure>0)?exposure:1.0);
 #else
+ if ((Reserved.x & 0x10000u) != 0)
+     return WhitePointForMean(SampleMeanLuma()) * PaperWhiteScale;
+ float preOnly=asfloat(Reserved.y);
+ if ((Reserved.x & 0x20000u) != 0 && isfinite(preOnly)&&preOnly>0&&abs(preOnly-1.0)>1e-3)
+     return PaperWhiteScale*preOnly;
  return PaperWhiteScale;
 #endif
 }
@@ -32,9 +62,6 @@ uint ByteOffset(uint2 p,uint bpp) {
 }
 // Mode1 candidate. Oracle: captured codec-22724-36e36d370.dxbc.
 // Host must reject other modes; GPU comparison required before integration.
-Texture2D<float4> Proxy : register(t1);
-Texture2D<float4> Neural : register(t2);
-Texture2D<float4> OutputOriginal : register(t3);
 #ifndef NATIVE_CODEC_UINT_OUT
 #define NATIVE_CODEC_UINT_OUT 0
 #endif
@@ -159,9 +186,11 @@ float3 ReadFittedNeural(float2 p) {
 [numthreads(16,16,1)]
 void main(uint3 id:SV_DispatchThreadID) {
  if(any(id.xy>=Size))return;
+ // Allocation padding is outside the host active render area.
+ if(any(id.xy>=SourceSize)){Store(id.xy,OutputOriginal.Load(int3(id.xy,0)));return;}
  if(HdrMode!=1||PaperWhiteScale<=0){Store(id.xy,0);return;}
  uint2 extent=max(ProxySize,uint2(1,1));
- uint2 p=min(uint2((float2(id.xy)+0.5)*float2(extent)/float2(Size)),extent-1);
+ uint2 p=min(uint2((float2(id.xy)+0.5)*float2(extent)/float2(SourceSize)),extent-1);
  float4 source=OutputOriginal.Load(int3(id.xy,0));
 #if NATIVE_CODEC_SRGB_IO
  /* DLSS5_CODEC_SRGB (Magpie): the source is display-referred sRGB; linearize it for the blend and re-encode the result */
@@ -170,23 +199,31 @@ void main(uint3 id:SV_DispatchThreadID) {
  float3 original=max(source.rgb,0)/EffectivePaperWhite();
 #endif
  #if NATIVE_CODEC_FIT
- float2 network_p=Padding.xy+(float2(id.xy)+.5)*Padding.zw/float2(Size)-.5;
+ float2 network_p=Padding.xy+(float2(id.xy)+.5)*Padding.zw/float2(SourceSize)-.5;
  float3 upgraded=Upgrade(original,Decode(ReadFitted(Proxy,network_p)),Decode(NEURAL_FITTED(network_p)));
 #else
  float3 upgraded=Upgrade(original,Decode(Proxy.Load(int3(p,0)).rgb),Decode(NEURAL_AT(id.xy)));
 #endif
  float oy=Luminance(original),uy=Luminance(upgraded);
  float ratio=oy==0?1:clamp(uy/oy,0,4);
+ // Legacy CS=1 remains the upgraded result. Hosts explicitly opt into the
+ // alternative curve: CS=0 original, CS=1 game chroma/network luma, CS=2 upgraded.
  float3 result=lerp(original*ratio,upgraded,ColorStrength);
+ if ((Reserved.x & 0x40000u) != 0) {
+  float3 hueSafe=original*ratio;
+  result=lerp(original,hueSafe,clamp(ColorStrength,0.0,1.0));
+  result=lerp(result,upgraded,max(ColorStrength-1.0,0.0));
+ }
+ uint view=Reserved.x & 0xFFFFu;
  // Optional per-dispatch views; view 0 preserves the captured composition exactly.
- if(Reserved.x==1||Reserved.x==2){
+ if(view==1||view==2){
 #if NATIVE_CODEC_FIT
-  result=Reserved.x==1?Decode(ReadFitted(Proxy,network_p)):Decode(NEURAL_FITTED(network_p));
+  result=view==1?Decode(ReadFitted(Proxy,network_p)):Decode(NEURAL_FITTED(network_p));
 #else
-  result=Reserved.x==1?Decode(Proxy.Load(int3(p,0)).rgb):Decode(NEURAL_AT(id.xy));
+  result=view==1?Decode(Proxy.Load(int3(p,0)).rgb):Decode(NEURAL_AT(id.xy));
 #endif
- }else if(Reserved.x==3)result=saturate(0.5+(upgraded-original)*20.0);
- else if(Reserved.x==4)result*=float3(1.2,0.3,1.2);
+ }else if(view==3)result=saturate(0.5+(upgraded-original)*20.0);
+ else if(view==4)result*=float3(1.2,0.3,1.2);
 
 #if NATIVE_CODEC_SRGB_IO
  result=saturate(result);result=result<=0.0031308?result*12.92:1.055*pow(result,1.0/2.4)-0.055;

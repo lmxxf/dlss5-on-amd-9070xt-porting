@@ -24,7 +24,11 @@ class D3D12Bridge {
  size_t zero_upload_bytes{};bool clear_submission_unconfirmed{};
  /* Direct input (2026-09-28): the host producer writes the network input straight into the shared buffer (UAV) and leaves it in
     COMMON; RecordInput then skips the 35 MB D3D12 copy. Requested before Create; the bytes the network reads are unchanged. */
- bool direct_input{};
+ bool direct_input{},direct_history{};std::vector<float> post_auxiliary_row;
+ using PassthroughCopyFn=int(*)(void*,size_t,const void*,size_t,size_t,size_t,int,Handle);
+ PassthroughCopyFn passthrough_copy{};void*passthrough_rgb{};unsigned long long passthrough_queued{};
+ Handle release_mark{};bool release_marker_requested{};unsigned long long release_marks{},release_mark_failures{};
+ bool recording_leases{},recording_active{},recording_submission_unconfirmed{};UINT64 recording_completion{};
 public:
  enum class Phase { Ready, InputRecorded, OutputRecordedPendingHip, HipQueued, OutputRecorded };
  Phase CurrentPhase()const{return phase;}
@@ -50,44 +54,46 @@ private:
     EnableNetworkTiming() or DLSS5_NET_TIMING=1. Any HIP error here turns timing off and never fails a frame. Bytes unchanged. */
  static constexpr unsigned kTimingSlots=4;
  Handle timing_begin[kTimingSlots]{},timing_end[kTimingSlots]{};unsigned long long timing_slot_tag[kTimingSlots]{};bool timing_busy[kTimingSlots]{};
- bool timing_on{};unsigned timing_next{},timing_oldest{};unsigned long long timing_tag{},timing_last_tag{};float timing_last_ms{};bool timing_valid{};
- using EventQueryFn=int(*)(Handle);EventQueryFn timing_query{};EventQueryFn post_query{};
- void TimingOff(){timing_on=false;for(unsigned k=0;k<kTimingSlots;k++)timing_busy[k]=false;}
+ bool timing_on{},timing_requested{},timing_faulted{};unsigned long long timing_epoch{},timing_slot_epoch[kTimingSlots]{};unsigned timing_next{},timing_oldest{};unsigned long long timing_tag{},timing_last_tag{};float timing_last_ms{};bool timing_valid{};
+ using EventQueryFn=int(*)(Handle);EventQueryFn timing_query{},post_query{};
+ void TimingOff(){timing_on=false;timing_valid=false;timing_faulted=true;}
  void HarvestTiming(){
   if(!timing_on)return;auto&api=network->Runtime();
   for(unsigned n=0;n<kTimingSlots;n++){const unsigned k=timing_oldest;if(!timing_busy[k])return;
    const int q=timing_query(timing_end[k]);if(q==600/*hipErrorNotReady*/)return;if(q!=0){TimingOff();return;}
-   float ms=-1;if(api.hipEventElapsedTime(&ms,timing_begin[k],timing_end[k])==0&&ms>=0&&ms<1e6f){timing_last_ms=ms;timing_last_tag=timing_slot_tag[k];timing_valid=true;}
+   float ms=-1;if(api.hipEventElapsedTime(&ms,timing_begin[k],timing_end[k])==0&&ms>=0&&ms<1e6f&&timing_slot_epoch[k]==timing_epoch){timing_last_ms=ms;timing_last_tag=timing_slot_tag[k];timing_valid=true;}
    timing_busy[k]=false;timing_oldest=(k+1)%kTimingSlots;}
  }
  bool TimingBegin(){ // after the input wait; returns true when this frame is being timed
-  if(!timing_on)return false;HarvestTiming();if(!timing_on||timing_busy[timing_next])return false;
+  if(!timing_on||!timing_requested)return false;HarvestTiming();if(!timing_on||timing_busy[timing_next])return false;
   if(network->Runtime().hipEventRecord(timing_begin[timing_next],network->Stream())){TimingOff();return false;}return true;
  }
  void TimingEnd(){ // before the output signal
   if(!timing_on)return;const unsigned k=timing_next;
   if(network->Runtime().hipEventRecord(timing_end[k],network->Stream())){TimingOff();return;}
-  /* One non-blocking query of the end event right after recording it, before the output signal (TheAutomatic,
-     2026-10-02): without it Windows HIP can leave the begin/end timestamps of a deferred batch nearly equal and spans
-     collapse to ~0.001 ms. success or hipErrorNotReady are both fine; no wait, no extra GPU dependency. */
-  {const int q=timing_query(timing_end[k]);if(q!=0&&q!=600/*hipErrorNotReady*/){TimingOff();return;}}
-  timing_slot_tag[k]=timing_tag;timing_busy[k]=true;timing_next=(k+1)%kTimingSlots;
+  // Submit the timestamp batch before the external signal/completion marker. On
+  // Windows HIP, deferring this query until a later frame can collapse the span.
+  // Query is non-blocking: success and not-ready both leave harvesting to the ring.
+  const int q=timing_query(timing_end[k]);if(q!=0&&q!=600/*hipErrorNotReady*/){TimingOff();return;}
+  timing_slot_epoch[k]=timing_epoch;timing_slot_tag[k]=timing_tag;timing_busy[k]=true;timing_next=(k+1)%kTimingSlots;
  }
  void DestroyTiming(){if(!network)return;auto&api=network->Runtime();for(unsigned k=0;k<kTimingSlots;k++){if(timing_begin[k])api.hipEventDestroy(timing_begin[k]);if(timing_end[k])api.hipEventDestroy(timing_end[k]);timing_begin[k]=timing_end[k]=nullptr;}TimingOff();}
 public:
  /* Starts network timing (idempotent). false = unavailable (no hipEventQuery export or event creation failed); frames are unaffected. */
  bool EnableNetworkTiming(){
-  if(timing_on)return true;if(!network||failed)return false;auto&api=network->Runtime();
+  timing_requested=true;if(timing_faulted)return false;if(timing_on)return true;if(!network||failed)return false;auto&api=network->Runtime();
   if(!timing_query)timing_query=reinterpret_cast<EventQueryFn>(GetProcAddress(api.dll,"hipEventQuery"));if(!timing_query)return false;
   for(unsigned k=0;k<kTimingSlots;k++){if(!timing_begin[k]&&api.hipEventCreate(&timing_begin[k])){DestroyTiming();return false;}if(!timing_end[k]&&api.hipEventCreate(&timing_end[k])){DestroyTiming();return false;}}
   timing_next=timing_oldest=0;timing_on=true;return true;
  }
- bool NetworkTimingEnabled()const{return timing_on;}
+ bool NetworkTimingEnabled()const{return timing_on&&timing_requested;}
+ void PauseNetworkTiming(){timing_requested=false;timing_valid=false;}
+ void SetTimingEpoch(unsigned long long epoch){if(epoch!=timing_epoch){timing_epoch=epoch;timing_valid=false;}}
  /* Tag stored with the next timed enqueue (the RE9 runtime passes LmxxfNrFrameInfo::frame_id). */
  void SetTimingTag(unsigned long long tag){timing_tag=tag;}
  /* Non-blocking: collects every completed span, then returns the most recent one. valid=false until one has completed. */
  struct NetworkTiming{bool valid;float ms;unsigned long long tag;};
- NetworkTiming PollNetworkTiming(){if(network&&!failed)HarvestTiming();return {timing_valid,timing_last_ms,timing_last_tag};}
+ NetworkTiming PollNetworkTiming(){if(network&&!failed&&timing_requested)HarvestTiming();return {timing_requested&&timing_valid&&!failed,timing_last_ms,timing_last_tag};}
 private:
  /* DLSS5_HIP_INPUT_POLL=1 (2026-09-30, results/handoff-gpu-20260930): the D3D->HIP half of the handoff waits on the GPU instead of
     through the shared fence. The queue runs a pre-recorded list whose only command is WriteBufferImmediate(MARKER_OUT) of a slot
@@ -185,7 +191,7 @@ public:
  // False means resources may still be referenced by unsubmitted/failed work.
  // This also lets wrappers retain their input references until consumers retire.
  bool WaitForSubmittedWork()noexcept{
-  if(phase!=Phase::Ready||clear_submission_unconfirmed)return false;
+  if(phase!=Phase::Ready||clear_submission_unconfirmed||recording_submission_unconfirmed||recording_active)return false;
   if(network&&(network->Runtime().hipSetDevice(hip_device)||network->Runtime().hipStreamSynchronize(network->Stream())))return false;
   if(pending&&queue&&fence){auto target=++value;if(FAILED(queue->Signal(fence,target))||FAILED(fence->SetEventOnCompletion(target,event))||WaitForSingleObject(event,30000)!=WAIT_OBJECT_0||fence->GetCompletedValue()<target)return false;}
   if(device&&FAILED(device->GetDeviceRemovedReason()))return false;
@@ -194,7 +200,7 @@ public:
  ~D3D12Bridge(){
   if(!WaitForSubmittedWork()||(network&&!network->CloseSubmitPulse()))return;
   if(clear_cmd)clear_cmd->Release();if(clear_alloc)clear_alloc->Release();if(zero_upload)zero_upload->Release();
-  if(network){DestroyTiming();TeardownPoll();Release(input);Release(history);Release(output);if(semaphore)network->Runtime().hipDestroyExternalSemaphore(semaphore);delete network;}
+  if(network){DestroyTiming();TeardownPoll();auto&api=network->Runtime();for(auto h:{release_mark,span_begin,span_end})if(h)api.hipEventDestroy(h);if(passthrough_rgb)api.hipFree(passthrough_rgb);Release(input);Release(history);Release(output);if(semaphore)network->Runtime().hipDestroyExternalSemaphore(semaphore);delete network;}
   if(fence_handle)CloseHandle(fence_handle);if(event)CloseHandle(event);if(fence)fence->Release();if(queue)queue->Release();if(device)device->Release();
  }
  void Create(ID3D12CommandQueue*q,Options options,const std::vector<float>&noise){
@@ -216,10 +222,14 @@ probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.
   }
   module_directory=options.modules;
   network=new Network(std::move(options));auto&api=network->Runtime();
-  Share(input,pixels*16,direct_input);Share(history,pixels*16);Share(output,pixels*12,true);Check(device->CreateFence(0,D3D12_FENCE_FLAG_SHARED,IID_PPV_ARGS(&fence)),"shared fence");Check(device->CreateSharedHandle(fence,nullptr,GENERIC_ALL,nullptr,&fence_handle),"fence handle");hip_probe::SemaphoreDesc sd{};sd.type=4;sd.handle.win32.handle=fence_handle;api.Check(api.hipImportExternalSemaphore(&semaphore,&sd),"import fence");event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("bridge completion event");if(const char*v=std::getenv("DLSS5_HIP_SPAN_PROBE"))span_probe=!strcmp(v,"1");if(span_probe){api.Check(api.hipEventCreate(&span_begin),"span begin event");api.Check(api.hipEventCreate(&span_end),"span end event");fprintf(stderr,"hip_span probe enabled\n");}network->SetNoise(noise);
+  if((direct_history||!post_auxiliary_row.empty())&&network->ExperimentalTemporalConfigured())throw std::runtime_error("direct history/auxiliary output cannot use experimental temporal layout");
+  if(!post_auxiliary_row.empty()&&!network->NativeHistorySupported())throw std::runtime_error("auxiliary post unsupported network");
+  Share(input,pixels*16,direct_input);Share(history,pixels*16,direct_history);Share(output,pixels*(post_auxiliary_row.empty()?12:20),true);
+  if(!post_auxiliary_row.empty())network->EnableNativePostHistory(post_auxiliary_row,{static_cast<char*>(output.mapped)+pixels*12,pixels*8,network->W,network->H,8});
+  Check(device->CreateFence(0,D3D12_FENCE_FLAG_SHARED,IID_PPV_ARGS(&fence)),"shared fence");Check(device->CreateSharedHandle(fence,nullptr,GENERIC_ALL,nullptr,&fence_handle),"fence handle");hip_probe::SemaphoreDesc sd{};sd.type=4;sd.handle.win32.handle=fence_handle;api.Check(api.hipImportExternalSemaphore(&semaphore,&sd),"import fence");event=CreateEventW(nullptr,FALSE,FALSE,nullptr);if(!event)throw std::runtime_error("bridge completion event");if(const char*v=std::getenv("DLSS5_HIP_SPAN_PROBE"))span_probe=!strcmp(v,"1");if(span_probe){api.Check(api.hipEventCreate(&span_begin),"span begin event");api.Check(api.hipEventCreate(&span_end),"span end event");fprintf(stderr,"hip_span probe enabled\n");}if(release_marker_requested)api.Check(api.hipEventCreate(&release_mark),"release marker event");network->SetNoise(noise);
   {const char*v=std::getenv("DLSS5_HIP_POST_SIGNAL_QUERY");if(!(v&&!strcmp(v,"0")))post_query=reinterpret_cast<EventQueryFn>(GetProcAddress(api.dll,"hipStreamQuery"));}
   if(const char*v=std::getenv("DLSS5_NET_TIMING");v&&!strcmp(v,"1"))EnableNetworkTiming();
-  if(const char*v=std::getenv("DLSS5_HIP_INPUT_POLL")){if(strcmp(v,"0")&&strcmp(v,"1")&&strcmp(v,"2"))throw std::runtime_error("DLSS5_HIP_INPUT_POLL must be 0, 1 or 2");poll_inline=!strcmp(v,"2");if(strcmp(v,"0")){try{SetupPoll();}catch(const std::exception&e){poll=false;poll_off=true;fprintf(stderr,"hip_input_poll unavailable (%s); fence path\n",e.what());}}}
+  if(const char*v=std::getenv("DLSS5_HIP_INPUT_POLL");options.integration.allow_input_poll&&v){if(strcmp(v,"0")&&strcmp(v,"1")&&strcmp(v,"2"))throw std::runtime_error("DLSS5_HIP_INPUT_POLL must be 0, 1 or 2");poll_inline=!strcmp(v,"2");if(strcmp(v,"0")){try{SetupPoll();}catch(const std::exception&e){poll=false;poll_off=true;fprintf(stderr,"hip_input_poll unavailable (%s); fence path\n",e.what());}}}
   // Performance scope fingerprint from the actual validated RX9070XT driver.
   // A missing/changed fingerprint falls back to old NN in auto mode.
   const bool pulse_arch=architecture=="gfx1201";
@@ -230,8 +240,29 @@ probe.Check(probe.hipSetDevice(chosen),"select device");size_t total=0;if(probe.
  ID3D12Resource*Output()const{return output.resource;}
  void RequestDirectInput(){if(network)throw std::runtime_error("direct input must be requested before Create");direct_input=true;}
  ID3D12Resource*DirectInput()const{return direct_input?input.resource:nullptr;}
+ // Request before Create. The producer must leave shared history in COMMON;
+ // all writers/readers use the bridge's producer/consumer queue ordering.
+ // Optional stream-retirement event; no allocation or enqueue when not requested.
+ void RequestReleaseMarkers(){if(network||queue)throw std::runtime_error("release markers must precede Create");release_marker_requested=true;}
+ unsigned long long ReleaseMarks()const{return release_marks;}
+ unsigned long long ReleaseMarkFailures()const{return release_mark_failures;}
+ unsigned long long HipPassthroughQueued()const{return passthrough_queued;}
+ void RequestDirectHistory(){if(network||queue)throw std::runtime_error("direct history must precede Create");direct_history=true;}
+ ID3D12Resource*DirectHistory()const{return direct_history?history.resource:nullptr;}
+ void RequestPostAuxiliary(const std::vector<float>&row){
+  if(network||queue||row.size()!=32)throw std::runtime_error("post auxiliary request contract");
+  for(float v:row)if(!std::isfinite(v))throw std::runtime_error("post auxiliary nonfinite weight");
+  post_auxiliary_row=row;
+ }
+ struct AuxiliaryOutput {ID3D12Resource*resource=nullptr;UINT64 offset=0,bytes=0;UINT width=0,height=0,pixel_stride=8;};
+ AuxiliaryOutput PostAuxiliary()const{return network&&!post_auxiliary_row.empty()?AuxiliaryOutput{output.resource,pixels*12,pixels*8,network->W,network->H,8}:AuxiliaryOutput{};}
+ void SetAdaptiveReuseAllowed(bool allowed){Require(Phase::Ready);network->SetAdaptiveReuseAllowed(allowed);}
+
  size_t free_at_create{};int hip_device=-1;/* HIP device index chosen for the D3D12 adapter */
  void MemoryReport(FILE*f){if(!network)return;network->Runtime().hipStreamSynchronize(network->Stream());std::fprintf(f,"hip_memory device_free_before_network_MiB=%.1f shared input_MiB=%.1f history_MiB=%.1f output_MiB=%.1f\n",free_at_create/1048576.,pixels*16/1048576.,pixels*16/1048576.,pixels*12/1048576.);network->MemoryReport(f);}
+ bool PdlRequested()const{return network?network->PdlRequested():false;}
+ bool PdlEffective()const{return network?network->PdlEffective():false;}
+ std::string PdlReason()const{return network?network->PdlReason():"bridge uninitialized";}
 #ifdef DLSS5_BENCH_BRIDGE_ISOLATE
  Network& DiagnosticNetwork(){return *network;}
 #endif
@@ -247,15 +278,16 @@ private:
   phase=Phase::InputRecorded;recorded_temporal=temporal!=nullptr;
   try{
    auto copy=[&](ID3D12Resource*src,Shared&dst,size_t bytes_per_pixel=16){Barrier(c,src,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);Barrier(c,dst.resource,D3D12_RESOURCE_STATE_COMMON,D3D12_RESOURCE_STATE_COPY_DEST);c->CopyBufferRegion(dst.resource,0,src,0,pixels*bytes_per_pixel);Barrier(c,dst.resource,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COMMON);Barrier(c,src,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);};
-   if(!(direct_input&&rgba==input.resource))copy(rgba,input);/* direct: the producer already wrote input and left it in COMMON */if(temporal)copy(temporal,history,network->ExperimentalTemporalConfigured()?8:16);if(readable)Barrier(c,output.resource,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COMMON);readable=false;
+   if(!(direct_input&&rgba==input.resource))copy(rgba,input);/* direct: the producer already wrote input and left it in COMMON */if(temporal&&!(direct_history&&temporal==history.resource))copy(temporal,history,network->ExperimentalTemporalConfigured()?8:16);if(readable)Barrier(c,output.resource,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COMMON);readable=false;
    poll_recorded=false;if(poll&&poll_inline&&!poll_off){ID3D12GraphicsCommandList2*c2{};if(SUCCEEDED(c->QueryInterface(IID_PPV_ARGS(&c2)))){poll_recorded_target=poll_frame%kPollSlots+1;D3D12_WRITEBUFFERIMMEDIATE_PARAMETER wp{flag.resource->GetGPUVirtualAddress(),poll_recorded_target};D3D12_WRITEBUFFERIMMEDIATE_MODE wm=D3D12_WRITEBUFFERIMMEDIATE_MODE_MARKER_OUT;c2->WriteBufferImmediate(1,&wp,&wm);c2->Release();poll_recorded=true;}}
   }catch(...){failed=true;throw;}
  }
- void Enqueue(ID3D12CommandQueue*producer,U seed,bool temporal,bool external){
+ void Enqueue(ID3D12CommandQueue*producer,U seed,bool temporal,bool external,bool hip_passthrough=false){
   if(!network||failed)throw std::runtime_error("bridge unavailable");
   const bool output_recorded=phase==Phase::OutputRecordedPendingHip;
   if(phase!=Phase::InputRecorded&&!output_recorded)throw std::runtime_error("bridge stage order");
   QueueContract(producer);if(temporal!=recorded_temporal)throw std::runtime_error("bridge temporal input mismatch");if(external&&network->GraphEnabled())throw std::runtime_error("staged bridge requires HIP graph off");
+  if(hip_passthrough&&(!passthrough_copy||!passthrough_rgb||temporal))throw std::runtime_error("HIP passthrough not prepared or temporal input supplied");
   auto&api=network->Runtime();
   try{
    api.Check(api.hipSetDevice(hip_device),"select HIP device for enqueue");
@@ -271,14 +303,26 @@ private:
     {std::lock_guard<std::mutex> lk(poll_mutex);poll_armed={true,poll_value,poll_evt[slot],target};}poll_frame++;}
    else{Check(queue->Signal(fence,++value),"D3D input signal");hip_probe::WaitParams wait{};wait.params.fence.value=value;api.Check(api.hipWaitExternalSemaphoresAsync(&semaphore,&wait,1,network->Stream()),"HIP input wait");}
    if(span_probe){if(span_pending){float ms=-1;int sync=api.hipEventSynchronize(span_end),status=api.hipEventElapsedTime(&ms,span_begin,span_end);fprintf(stderr,"hip_span gpu_ms=%.3f cpu_enqueue_ms=%.3f sync=%d status=%d\n",ms,span_cpu,sync,status);span_pending=false;}api.Check(api.hipEventRecord(span_begin,network->Stream()),"span begin");}
-   const bool timed=TimingBegin();
-   auto start=std::chrono::steady_clock::now();network->Enqueue(input.mapped,temporal?history.mapped:nullptr,output.mapped,seed);
+   const bool timed=!hip_passthrough&&TimingBegin();
+   auto start=std::chrono::steady_clock::now();
+   if(hip_passthrough){
+    // Raster float4 -> raster float3, not a flat byte copy. Chunk the strided
+    // copy below the Windows HIP 2^20-row limit (also used by MultiPassFeed).
+    const size_t chunk=size_t(1)<<19;
+    for(size_t offset=0;offset<pixels;offset+=chunk)
+     api.Check(passthrough_copy(static_cast<char*>(passthrough_rgb)+offset*12,12,
+       static_cast<const char*>(input.mapped)+offset*16,16,12,std::min(chunk,pixels-offset),3,network->Stream()),"HIP passthrough RGBA to RGB");
+    // Keep the normal final device-to-shared-output copy as well as both fences.
+    api.Check(api.hipMemcpyAsync(output.mapped,passthrough_rgb,pixels*12,3,network->Stream()),"HIP passthrough output copy");
+   }else network->Enqueue(input.mapped,temporal?history.mapped:nullptr,output.mapped,seed);
    if(timed)TimingEnd();
    if(span_probe){span_cpu=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();api.Check(api.hipEventRecord(span_end,network->Stream()),"span end");span_pending=true;}
    hip_probe::SignalParams signal{};signal.params.fence.value=++value;api.Check(api.hipSignalExternalSemaphoresAsync(&semaphore,&signal,1,network->Stream()),"HIP output signal");
    /* DLSS5_HIP_POST_SIGNAL_QUERY (outside-net 2026-10-02, default 1; 0 = off): one non-blocking hipStreamQuery right after the output
       signal so Windows HIP submits the whole batch (network + signal) now. Bytes unchanged; add-on ABBA -0.01..-0.12 ms. */
    if(post_query)post_query(network->Stream());
+   if(release_mark){if(api.hipEventRecord(release_mark,network->Stream())==0)++release_marks;else ++release_mark_failures;}
+   if(hip_passthrough)++passthrough_queued;
    Check(queue->Wait(fence,value),"D3D output wait");phase=output_recorded?Phase::OutputRecorded:Phase::HipQueued;
   }catch(...){failed=true;throw;}
  }
@@ -292,6 +336,52 @@ public:
  // Optional host preparation before recording the first staged frame. Lazy
  // weight uploads synchronize the HIP stream; perform them before inserting an
  // external producer wait, rather than inside a game's Execute callback.
+ // Optional replayable recording: the caller owns every recorded resource until Reset/Release
+ // and completion, and serializes these methods. Legacy staged callers remain unchanged.
+ void EnableRecordingLeases(){
+  Require(Phase::Ready);
+  if(pending||value||readable||network->GraphEnabled())throw std::runtime_error("recording leases require fresh graph-off bridge");
+  if(poll||poll_inline)throw std::runtime_error("recording leases require input poll off");
+  recording_leases=true;
+ }
+ // Call after the last output reader was recorded. Both shared-buffer boundaries
+ // are COMMON, so discard and replay do not depend on CPU-only readable state.
+ void SealRecordedOutput(ID3D12GraphicsCommandList*c){
+  if(!recording_leases||recording_active)throw std::runtime_error("not a recording lease");
+  Require(Phase::OutputRecordedPendingHip);ListContract(c);
+  Barrier(c,output.resource,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COMMON);
+  readable=false;phase=Phase::Ready;
+ }
+ // BEFORE submitting the producer, order it after the previous actual consumer,
+ // including executions on another same-device queue. Never wait on the CPU here.
+ void BeginRecordedExecution(ID3D12CommandQueue*actual,bool temporal=false){
+  if(!recording_leases||recording_active||recording_submission_unconfirmed)throw std::runtime_error("recording execution unavailable");
+  Require(Phase::Ready);
+  if(!actual||actual->GetDesc().Type!=queue->GetDesc().Type)throw std::runtime_error("recording queue type mismatch");
+  ID3D12Device*owner{};Check(actual->GetDevice(IID_PPV_ARGS(&owner)),"recording queue device");
+  bool same=NativeSameDevice(owner,device);owner->Release();if(!same)throw std::runtime_error("recording queue device mismatch");
+  if(actual!=queue){
+   if(recording_completion)Check(actual->Wait(fence,recording_completion),"previous recorded consumer wait");
+   actual->AddRef();queue->Release();queue=actual;
+  }
+  recorded_temporal=temporal;recording_active=true;phase=Phase::OutputRecordedPendingHip;
+ }
+ // Called for each execution, with submission facts rather than recording state.
+ // A missing consumer is a discard of that execution, not retirement of the lease.
+ void EndRecordedExecution(ID3D12CommandQueue*actual,bool producer_submitted,bool consumer_submitted){
+  if(!recording_leases||!recording_active)throw std::runtime_error("no recording execution");
+  QueueContract(actual);
+  if(consumer_submitted&&!producer_submitted)throw std::runtime_error("consumer without producer");
+  if(producer_submitted){
+   // A failed enqueue cannot be certified by a later successful queue signal.
+   if(failed||phase!=Phase::OutputRecorded){recording_submission_unconfirmed=true;throw std::runtime_error("recorded HIP execution incomplete");}
+   pending=true;const UINT64 target=++value;
+   HRESULT hr=actual->Signal(fence,target);
+   if(FAILED(hr)){recording_submission_unconfirmed=true;Check(hr,"recorded consumer signal");}
+   recording_completion=target;
+  }
+  recording_active=false;readable=false;phase=Phase::Ready;
+ }
  void PrepareStagedKernels(){
   Require(Phase::Ready);
   if(pending||value||readable||network->GraphEnabled())throw std::runtime_error("bridge preparation requires fresh graph-off session");
@@ -300,6 +390,16 @@ public:
   catch(...){failed=true;throw;}
  }
  void RecordInputCopy(ID3D12GraphicsCommandList*c,ID3D12Resource*rgba,ID3D12Resource*temporal=nullptr){RecordInput(c,rgba,temporal,true);}
+ void PrepareHipPassthrough(){
+  Require(Phase::Ready);
+  if(passthrough_rgb)return;
+  auto&api=network->Runtime();
+  api.Check(api.hipSetDevice(hip_device),"select HIP device for passthrough preparation");
+  passthrough_copy=reinterpret_cast<PassthroughCopyFn>(GetProcAddress(api.dll,"hipMemcpy2DAsync"));
+  if(!passthrough_copy)throw std::runtime_error("HIP passthrough requires hipMemcpy2DAsync");
+  api.Check(api.hipMalloc(&passthrough_rgb,pixels*12),"HIP passthrough RGB buffer");
+ }
+ void EnqueueHipPassthroughAfterProducer(ID3D12CommandQueue*producer){Enqueue(producer,1,false,true,true);}
  void EnqueueAfterProducer(ID3D12CommandQueue*producer,U seed,bool temporal=false){Enqueue(producer,seed,temporal,true);}
  void RecordOutputReadable(ID3D12GraphicsCommandList*c){
   if(!network||failed)throw std::runtime_error("bridge unavailable");

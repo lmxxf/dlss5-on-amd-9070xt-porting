@@ -8,6 +8,7 @@ inline bool NativeTemporalExperimentFlag(const wchar_t*name,const char*key){
 }
 inline bool NativeTemporalExperimentRequested(){return NativeTemporalExperimentFlag(L"DLSS5_TEMPORAL_HISTORY_EXPERIMENT","DLSS5_TEMPORAL_HISTORY_EXPERIMENT");}
 inline bool NativeTemporalExperimentUnjittered(){return NativeTemporalExperimentFlag(L"DLSS5_TEMPORAL_MV_UNJITTERED","DLSS5_TEMPORAL_MV_UNJITTERED");}
+inline bool NativeFastHistoryRequested(){return NativeTemporalExperimentFlag(L"DLSS5_FAST_HISTORY","DLSS5_FAST_HISTORY");}
 struct NativeTemporalFrameMetadata {
  bool ffx_pre{};unsigned frame_id{},dispatch_flags{};
  float motion_scale[2]{},jitter[2]{},pre_exposure{1.f};

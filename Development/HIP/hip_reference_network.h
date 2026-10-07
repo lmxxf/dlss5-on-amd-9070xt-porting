@@ -127,7 +127,15 @@ inline std::set<U> ParseSkipBlocks(const std::string&s){std::set<U>out;size_t p=
 inline float StyleFeatureFromEnvironment(){const char*v=std::getenv("DLSS5_STYLE");if(!v||!*v)return -1;
  if(!std::strcmp(v,"0"))return 0.f;if(!std::strcmp(v,"2"))return 2.f/128.f;if(std::strcmp(v,"1"))std::fprintf(stderr,"DLSS5_STYLE=%s invalid (0/1/2), using 1\n",v);return -1;}
 inline bool FastPrefixFromEnvironment(){const char*v=std::getenv("DLSS5_HIP_FAST");if(!v)return false;if(std::strcmp(v,"0")&&std::strcmp(v,"1"))throw std::runtime_error("DLSS5_HIP_FAST must be 0 or 1");return !std::strcmp(v,"1");}
-struct Options {unsigned submit_pulse=2; /* 0 off, 1 explicit same-arch experiment, 2 driver-scoped auto. Bridge only. */bool experimental_temporal=false;unsigned temporal_valid_height=0;bool temporal_feature_tap=false; /* Experimental MP1 diagnostic: retain post half32 for original-gate validation; default off. */bool swin_run=false;unsigned vit_stream=0; /* bit0: AV FP8, bit1: contract F16; explicit paired dispatch */bool wave_owned=false;bool c512_m32=false; /* 2026-09-26: C512 QKV+mix 32 tokens per wave (results/c512-ffn-20260926) */bool vit_proj_n64=false; /* 2026-09-26: ViT projection 16 tokens x 64 columns per wave (results/m32-sweep-20260926) */bool pdl=false; /* 2026-09-25: chain launches any-order + tile flags (results/pdl-chain-20260925) */ bool mh_ffn_frag256=false;bool decoder_byte=false;std::set<U>skip_blocks;U width=512,height=512,seed=0,post_shift=0;std::string assets,modules,dump_dir,dump_only;unsigned ffn_qkv_max_c=64,runtime=7,device=0/* HIP device index; the bridge picks the one matching the D3D12 adapter (multi-GPU / iGPU hosts) */,tiled_ffn_min_c=64,vit_weight_mask=0;bool mh_window_fused=false;/* 2026-09-17 experiment: C64 blocks as one kernel per 8x8 window (FFN+QKV+attention+projection, Development/HIP/c64_window_fused.hip, module c64-window-fused.hsaco) */bool mh_proj_diag_fb=false;/* 2026-09-17: residual scales as diagonal MMAs in the byte-feature attention-project kernels (c64/c128/c256 *_fb_diag) */bool sparse_weights=false;std::string sparse_filter;/* diagnostic: only keys ending with this go sparse */bool sparse_full=false;/* diagnostic: VMM path with every page backed (isolates mapping from dead-range accounting) *//* 2026-09-17 experiment, DO NOT SHIP: in-place packing leaves 3/4 of every E4M3 region (1/2 of every f16 region) dead in the f32 layout; this maps only the live 64 KiB pages of each weight through the VMM API (addresses unchanged; weights 607 -> 236 MiB). Copies work, but on driver 32.0.31007.2048 kernels hang (64 KiB chunks) or fail (2 MiB chunks) on any reservation backed by more than one physical chunk, and hipMemMap refuses partial mappings of one chunk; only reservation == one chunk is kernel-visible, which cannot skip holes. All three hashes change. Kept for re-testing on newer drivers (vmm_probe / vmm_kernel_probe). */bool vit_qkv_fused=false,ffn_qkv=false,grouped_mh_contract=false,direct_prefix_input=false,prefix_fused=false,mh_input_mapped=false,mh_project_crop=false,vit_qkv_blocked=false,split_project_blocked=false,split_mix_blocked=false,split_ffn_fused=false,fused_ffn_project=false,post_merge_fold=false,pre_main8=false,raw_chain=false,elide_identity_shift=false,fast_vit=false,wmma=false,pooled=false,profile=false,wall_profile=false,wave=false,tiled=false,fast_c32=false,fused_c32=false,fast_mh=false,fast_deep=false,fast_prefix=false,mh_wave=false,fused_ffn=false,fused_mh=false,packed_weights=false,packed_c32=false,fp8_normalized=false,fp8_ffn=false,fp8_av=false,fp8_deep=false,fp8_middle=false,half_c32=false,crop_c32=false,fused_qkv_norm=false,vit_pack_input=false,vit_contract_blocked=false,vit_blocked=false,vit_split_k=false,mapped_c32=false,fused_mh_ffn=false,tiled_mh_ffn=false,graph=false,vit_attn_fused=false,vit_qkv_fp8=false,mh_byte_stream=false,vit_expand_m4=false,vit_expand_frag=false,vit_byte_stream=false,vit_half_stream=false,vit_qkv_n4=false,ffn_qkv_batched_norm=false,pool_project_fused=false,qkv_norm_wave_c512=false,vit_expand_m2=false,vit_input_tiled=false,vit_ffn_fused=false,split_mix_fused=false,split_mix_h16w=false,pool_project_h16w=false,decoder_h16w=false,mh_attn_w16=false,c512_qkv_frag=false,c512_proj_frag=false,c512_proj_tiles=false,mh_feature_byte=false,mh_proj_diag=false,post_head_fused=false,c32_finish_fused=false,down_crop_fused=false,pool32_h16w=false,tiled_ffn_small=false,pool_project_group=false,prefix_inline=false,vit_proj_frag=false,vit_qkv_frag=false,vit_contract_frag=false,mh_ffn_frag=false;unsigned dup_count=2;std::string dup_prefix;/* diagnostic: launch matching kernels twice (pure kernels: identical output, frame delta = in-frame marginal cost) */};
+// Consumer-owned policy. Empty overrides preserve the addon/environment behavior.
+struct IntegrationOptions {
+ bool allow_vit_hotkey=true,allow_input_poll=true;
+ bool override_multi_pass_skip=false;std::set<U> multi_pass_skip;
+ // Called only during module selection. Return a module stem without .hsaco.
+ // The consumer owns its supported twin list and exact-module policy.
+ std::function<std::string(const std::string&,bool,const std::string&)> select_module;
+};
+struct Options {unsigned submit_pulse=2; /* 0 off, 1 explicit same-arch experiment, 2 driver-scoped auto. Bridge only. */bool experimental_temporal=false;unsigned temporal_valid_height=0;bool temporal_feature_tap=false; /* Experimental MP1 diagnostic: retain post half32 for original-gate validation; default off. */bool swin_run=false;unsigned vit_stream=0; /* bit0: AV FP8, bit1: contract F16; explicit paired dispatch */bool wave_owned=false;bool c512_m32=false; /* 2026-09-26: C512 QKV+mix 32 tokens per wave (results/c512-ffn-20260926) */bool vit_proj_n64=false; /* 2026-09-26: ViT projection 16 tokens x 64 columns per wave (results/m32-sweep-20260926) */bool pdl=false; /* 2026-09-25: chain launches any-order + tile flags (results/pdl-chain-20260925) */ bool mh_ffn_frag256=false;bool decoder_byte=false;std::set<U>skip_blocks;U width=512,height=512,seed=0,post_shift=0;std::string assets,modules,dump_dir,dump_only;unsigned ffn_qkv_max_c=64,runtime=7,device=0/* HIP device index; the bridge picks the one matching the D3D12 adapter (multi-GPU / iGPU hosts) */,tiled_ffn_min_c=64,vit_weight_mask=0;bool mh_window_fused=false;/* 2026-09-17 experiment: C64 blocks as one kernel per 8x8 window (FFN+QKV+attention+projection, Development/HIP/c64_window_fused.hip, module c64-window-fused.hsaco) */bool mh_proj_diag_fb=false;/* 2026-09-17: residual scales as diagonal MMAs in the byte-feature attention-project kernels (c64/c128/c256 *_fb_diag) */bool sparse_weights=false;std::string sparse_filter;/* diagnostic: only keys ending with this go sparse */bool sparse_full=false;/* diagnostic: VMM path with every page backed (isolates mapping from dead-range accounting) *//* 2026-09-17 experiment, DO NOT SHIP: in-place packing leaves 3/4 of every E4M3 region (1/2 of every f16 region) dead in the f32 layout; this maps only the live 64 KiB pages of each weight through the VMM API (addresses unchanged; weights 607 -> 236 MiB). Copies work, but on driver 32.0.31007.2048 kernels hang (64 KiB chunks) or fail (2 MiB chunks) on any reservation backed by more than one physical chunk, and hipMemMap refuses partial mappings of one chunk; only reservation == one chunk is kernel-visible, which cannot skip holes. All three hashes change. Kept for re-testing on newer drivers (vmm_probe / vmm_kernel_probe). */bool vit_qkv_fused=false,ffn_qkv=false,grouped_mh_contract=false,direct_prefix_input=false,prefix_fused=false,mh_input_mapped=false,mh_project_crop=false,vit_qkv_blocked=false,split_project_blocked=false,split_mix_blocked=false,split_ffn_fused=false,fused_ffn_project=false,post_merge_fold=false,pre_main8=false,raw_chain=false,elide_identity_shift=false,fast_vit=false,wmma=false,pooled=false,profile=false,wall_profile=false,wave=false,tiled=false,fast_c32=false,fused_c32=false,fast_mh=false,fast_deep=false,fast_prefix=false,mh_wave=false,fused_ffn=false,fused_mh=false,packed_weights=false,packed_c32=false,fp8_normalized=false,fp8_ffn=false,fp8_av=false,fp8_deep=false,fp8_middle=false,half_c32=false,crop_c32=false,fused_qkv_norm=false,vit_pack_input=false,vit_contract_blocked=false,vit_blocked=false,vit_split_k=false,mapped_c32=false,fused_mh_ffn=false,tiled_mh_ffn=false,graph=false,vit_attn_fused=false,vit_qkv_fp8=false,mh_byte_stream=false,vit_expand_m4=false,vit_expand_frag=false,vit_byte_stream=false,vit_half_stream=false,vit_qkv_n4=false,ffn_qkv_batched_norm=false,pool_project_fused=false,qkv_norm_wave_c512=false,vit_expand_m2=false,vit_input_tiled=false,vit_ffn_fused=false,split_mix_fused=false,split_mix_h16w=false,pool_project_h16w=false,decoder_h16w=false,mh_attn_w16=false,c512_qkv_frag=false,c512_proj_frag=false,c512_proj_tiles=false,mh_feature_byte=false,mh_proj_diag=false,post_head_fused=false,c32_finish_fused=false,down_crop_fused=false,pool32_h16w=false,tiled_ffn_small=false,pool_project_group=false,prefix_inline=false,vit_proj_frag=false,vit_qkv_frag=false,vit_contract_frag=false,mh_ffn_frag=false;unsigned dup_count=2;std::string dup_prefix;/* diagnostic: launch matching kernels twice (pure kernels: identical output, frame delta = in-frame marginal cost) */IntegrationOptions integration;};
 // 2026-09-26: C512 QKV/mix 32-token kernels (DLSS5_HIP_C512_M32) replace only the production h16w-mix + frag-QKV configuration.
 // 2026-09-26: the ViT projection 64-column kernel (DLSS5_HIP_VIT_PROJ_N64) replaces only the production fragment projection.
 inline bool VitProjN64Compatible(const Options&opt){return opt.vit_proj_n64&&opt.fast_deep&&opt.packed_weights&&opt.vit_proj_frag;}
@@ -181,6 +189,7 @@ inline bool SwinRunCompatible(const Options&o){
 }
 inline std::atomic<int> AdaptivePreviewState{0};
 class Network {friend class D3D12Bridge;
+ Tensor native_post_row;void* native_post_output=nullptr;
  bool sp1440_ready=false;bool final_direct_compatible=false;bool pool64_byte_available=false;
  bool vit_contract_byte_edge=false; // paired exact representation of an already E4M3-valued edge
  bool free_geometry=false; /* DLSS5_NETWORK_FREE_RES geometry (FreeGeometry): generic ViT grid, no 640-token cap */
@@ -191,6 +200,7 @@ class Network {friend class D3D12Bridge;
     and cumulative targets stay exact; cleared only after a full drain before uint32 rollover. The last blocks' tensors are held so the pool cannot recycle a buffer
     an in-flight launch still reads. Correctness audit and remaining acquire/scheduling conditions: results/pdl-audit-20260927. */
  unsigned pdl_mode=0,pdl_calls=0;unsigned*pdl_flags=nullptr;bool pdl_anyorder=false;std::deque<Tensor>pdl_keep;
+ bool pdl_requested=false,pdl_effective=false;std::string pdl_reason;
  struct PdlPrev{unsigned*flags=nullptr;unsigned epoch=0,ww=0,sx=0,sy=0;}pdl_prev;unsigned*pdl_ffn_flags=nullptr;unsigned pdl_ffn_epoch=0;
  int(*ext_launch)(Handle,unsigned,unsigned,unsigned,unsigned,unsigned,unsigned,size_t,Handle,void**,void**,Handle,Handle,unsigned)=nullptr;
  static constexpr unsigned PDL_SLOTS=16384,PDL_RING=64;
@@ -205,7 +215,51 @@ class Network {friend class D3D12Bridge;
   }
   pdl_total[s]+=waves;pdl_last_target=pdl_total[s];return pdl_flags+size_t(s)*PDL_SLOTS;}
  static bool PdlChainHead(U block){return block==5||block==9||block==15||block==23||block==40||block==48||block==56||block==62;}
- public: unsigned PdlCalls()const{return pdl_calls;} private:
+ void PreflightPdl(){
+  pdl_mode=0;pdl_effective=false;pdl_reason.clear();
+  if(!opt.pdl){pdl_requested=false;pdl_reason="pdl disabled by configuration";return;}
+  pdl_requested=true;
+  if(free_geometry&&size_t(W/4)*(H/4)/16>PDL_SLOTS){pdl_reason="processing geometry exceeds pdl counter capacity";return;}
+  if(opt.graph){pdl_reason="pdl requires graph off";return;}
+  ext_launch=reinterpret_cast<decltype(ext_launch)>(GetProcAddress(api.dll,"hipExtModuleLaunchKernel"));
+  if(!ext_launch){pdl_reason="driver extension hipExtModuleLaunchKernel missing";return;}
+  auto itFast=modules.find("mh_fast");auto itFused=modules.find("mh_fused");
+  if(itFast==modules.end()||itFused==modules.end()){pdl_reason="required modules for pdl missing";return;}
+  static const char* const kPdlFusedSymbols[]={
+   "c64_attention_project_fb_diag_pdl","c64_attention_project_fb_bout_diag_pdl",
+   "c128_attention_project_fb_diag_pdl","c128_attention_project_fb_bout_diag_pdl",
+   "c256_attention_project_fb_diag_pdl","c256_attention_project_fb_bout_diag_pdl"
+  };
+  for(const char* sym : kPdlFusedSymbols){
+   Handle fn{};
+   if(api.hipModuleGetFunction(&fn,itFused->second,sym)!=0||!fn){
+    pdl_reason=std::string("missing pdl symbol in mh_fused: ")+sym;return;
+   }
+  }
+  static const char* const kPdlFastSymbols[]={
+   "mh_ffn_fused_c64_project_g128_qkv_fb_pdl","mh_ffn_fused_c64_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c64_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c64_project_mapped_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c128_project_g128_qkv_fb_pdl","mh_ffn_fused_c128_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c128_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c128_project_mapped_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c256_frag_project_g128_qkv_fb_pdl","mh_ffn_fused_c256_frag_project_g128_qkv_bytein_fb_pdl",
+   "mh_ffn_fused_c256_frag_project_mapped_g128_qkv_fb_pdl","mh_ffn_fused_c256_frag_project_mapped_g128_qkv_bytein_fb_pdl"
+  };
+  for(const char* sym : kPdlFastSymbols){
+   Handle fn{};
+   if(api.hipModuleGetFunction(&fn,itFast->second,sym)!=0||!fn){
+    pdl_reason=std::string("missing pdl symbol in mh_fast: ")+sym;return;
+   }
+  }
+  api.Check(api.hipMalloc((void**)&pdl_flags,size_t(PDL_SLOTS)*PDL_RING*4),"pdl flags");
+  api.Check(api.hipMemsetAsync(pdl_flags,0,size_t(PDL_SLOTS)*PDL_RING*4,stream),"pdl flags zero");
+  pdl_mode=7;pdl_effective=true;pdl_reason="enabled";
+ }
+ public:
+ unsigned PdlCalls()const{return pdl_calls;}
+ bool PdlRequested()const{return pdl_requested;}
+ bool PdlEffective()const{return pdl_effective;}
+ const std::string& PdlReason()const{return pdl_reason;}
+ private:
 #ifdef DLSS5_LAYER_BENCH
  friend struct LayerBenchmark;
  unsigned diagnostic_kernel_repeats=1;
@@ -352,7 +406,10 @@ class Network {friend class D3D12Bridge;
  Handle Fn(const std::string&m,const std::string&name){static const std::string normkey="c32_norm900";const std::string&actual=m=="c32_wave1"&&C32Norm900Active()?normkey:m;std::string key=actual+":"+name;auto it=functions.find(key);if(it!=functions.end())return it->second;Handle f{};api.Check(api.hipModuleGetFunction(&f,modules.at(actual),name.c_str()),name.c_str());functions.emplace(key,f);return f;}
  /* DLSS5_FAST_NUMERIC twin (2026-10-03 fast-vit-c512): <stem>.hsaco -> <stem>-fast.hsaco when the option is 1 and the file
     exists; missing twin falls back to the exact module with one stderr line (same contract as the C32/C64 swap). */
- std::string FastTwin(const std::string&stem)const{if(!fast_numeric)return stem;const std::string fast=stem+"-fast";
+ std::string FastTwin(const std::string&requested,bool wave_c32=false)const{
+  if(opt.integration.select_module)return opt.integration.select_module(requested,fast_numeric,opt.modules);
+  const std::string stem=wave_c32?"c32-wave1":requested;
+  if(!fast_numeric)return stem;const std::string fast=stem+"-fast";
   if(std::ifstream(std::filesystem::u8path(opt.modules+"/"+fast+".hsaco"),std::ios::binary).good())return fast;
   std::fprintf(stderr,"DLSS5_FAST_NUMERIC=1: %s.hsaco missing, using %s.hsaco\n",fast.c_str(),stem.c_str());return stem;}
  template<class...A>void Run(const char*m,const char*name,size_t n,A...args){
@@ -412,7 +469,7 @@ class Network {friend class D3D12Bridge;
   }
   if(module=="c32_fused"||module=="c32_fused_ffn"||module=="mh_fused"){groups=count;threads=128;}
   if(module=="c64_wave2"){groups=count;threads=kernel.rfind("c64_",0)==0?64:kernel.rfind("c128_",0)==0?128:256;}
-  if(module=="c32_wave1"&&(kernel=="c32_wave1_up"||kernel=="c32_wave1_up_b8"||kernel=="c32_wave1_up_lb"||kernel=="c32_wave1_up_b8_lb"||kernel=="c32_wave1_finish_dcrop_b8"||kernel=="c32_wave1_finish_dcrop_b8d"||kernel=="c32_wave1_prefix_b8d"||kernel=="c32_wave1_mapped_b8"||kernel=="c32_wave1_finish_b8"||(kernel=="c32_wave1_post_b8"||kernel=="c32_wave1_post_b8_rgba"||kernel=="c32_wave1_post_b8_features"))){groups=count;threads=32;}
+  if(module=="c32_wave1"&&(kernel=="c32_wave1_up"||kernel=="c32_wave1_up_b8"||kernel=="c32_wave1_up_lb"||kernel=="c32_wave1_up_b8_lb"||kernel=="c32_wave1_finish_dcrop_b8"||kernel=="c32_wave1_finish_dcrop_b8d"||kernel=="c32_wave1_prefix_b8d"||kernel=="c32_wave1_mapped_b8"||kernel=="c32_wave1_finish_b8"||(kernel=="c32_wave1_post_logit"||kernel=="c32_wave1_post_b8_logit"||kernel=="c32_wave1_post_b8"||kernel=="c32_wave1_post_b8_rgba"||kernel=="c32_wave1_post_b8_features"))){groups=count;threads=32;}
   if(module=="c512_m32_mh"||module=="c512_m32_deep"){groups=count/1024;threads=32;}
   if(kernel=="split_ffn_one_w2"||kernel=="split_ffn_one_w2f8")threads=64;
   if(kernel=="split_ffn_proj_fused"){threads=256;groups=count/8192;}
@@ -614,12 +671,12 @@ class Network {friend class D3D12Bridge;
  static long long AdaptiveIdleMs(){static const long long ms=[]{const char*v=std::getenv("DLSS5_VIT_ADAPTIVE_IDLE_MS");if(!v||!*v)return 500LL;char*e=nullptr;long long x=std::strtoll(v,&e,10);return (e&&!*e&&x>=0)?x:500LL;}();return ms;}
  Tensor adaptive_image_anchor,adaptive_image_signature,adaptive_image_delta;void*adaptive_image=nullptr;
  void*adaptive_prev_history=nullptr;void*adaptive_prev_input=nullptr;U adaptive_prev_seed=0;
- bool adaptive_dirty=false,adaptive_key_down=false,adaptive_user_disabled=false;U adaptive_last_mode=0,adaptive_frame=0;
+ bool adaptive_allowed=true,adaptive_dirty=false,adaptive_key_down=false,adaptive_user_disabled=false;U adaptive_last_mode=0,adaptive_frame=0;
  bool adaptive_active=false;U adaptive_n=0;std::chrono::steady_clock::time_point adaptive_last{};
  Tensor AdaptiveVitGroup(Tensor input,U n){
-  const char*mode_s=std::getenv("DLSS5_VIT_ADAPTIVE");U mode=mode_s?U(std::stoul(mode_s)):0;
+  const char*mode_s=std::getenv("DLSS5_VIT_ADAPTIVE");U mode=adaptive_allowed&&mode_s?U(std::stoul(mode_s)):0;
   const char*hotkey=std::getenv("DLSS5_VIT_REUSE_HOTKEY");
-  if(hotkey&&!strcmp(hotkey,"1")){bool down=(GetAsyncKeyState(VK_F8)&0x8000)!=0;if(down&&!adaptive_key_down)adaptive_user_disabled=!adaptive_user_disabled;adaptive_key_down=down;if(adaptive_user_disabled)mode=0;}
+  if(opt.integration.allow_vit_hotkey&&hotkey&&!strcmp(hotkey,"1")){bool down=(GetAsyncKeyState(VK_F8)&0x8000)!=0;if(down&&!adaptive_key_down)adaptive_user_disabled=!adaptive_user_disabled;adaptive_key_down=down;if(adaptive_user_disabled)mode=0;}
   AdaptivePreviewState.store(mode?1:0);if(mode!=adaptive_last_mode){adaptive_dirty=true;adaptive_last_mode=mode;}
   if(multi_pass>1)mode=0;
   if(!mode){Tensor full=input;for(U b=31;b<=38;b++)full=Vit(full,n,b);return full;}++adaptive_frame;
@@ -634,7 +691,17 @@ class Network {friend class D3D12Bridge;
    else{std::vector<double>product(1024,1.);for(U block=31;block<=38;block++)for(const char*part:{"contract","projection"}){auto weight=ReadWeights(opt.assets+"/block"+std::to_string(block)+"-"+part+".f32");size_t matrix=!strcmp(part,"contract")?4194304:1048576;if(weight.size()!=matrix+1024)throw std::runtime_error("adaptive gain weight shape");for(U i=0;i<1024;i++)product[i]*=double(weight[matrix+i]);}for(U i=0;i<1024;i++)gain[i]=float(product[i]);}
    for(float v:gain)if(!std::isfinite(v))throw std::runtime_error("adaptive gain nonfinite");adaptive_gain=Upload(gain.data(),4096,true);
   }
-  if(reset){U zero[8]{};adaptive_state=Upload(zero,sizeof(zero),true);adaptive_anchor_in=New(size_t(n)*1024);adaptive_anchor_out=New(size_t(n)*1024);adaptive_stats=New(size_t(n)*4);adaptive_n=n;U tiles=((W+31)/32)*((H+31)/32);adaptive_image_anchor=New(size_t(tiles)*3);adaptive_image_signature=New(size_t(tiles)*3);adaptive_image_delta=New(tiles);}
+  if(reset){
+   // PrepareStagedKernels warms the first allocation before producer waits.
+   // Same-geometry resets must not free old anchors or synchronously upload:
+   // queued frames may still use them, waiting for a producer not yet submitted.
+   if(!adaptive_state||adaptive_n!=n){
+    adaptive_state=std::make_shared<Allocation>(api,8*sizeof(U));
+    adaptive_anchor_in=New(size_t(n)*1024);adaptive_anchor_out=New(size_t(n)*1024);adaptive_stats=New(size_t(n)*4);adaptive_n=n;
+    U tiles=((W+31)/32)*((H+31)/32);adaptive_image_anchor=New(size_t(tiles)*3);adaptive_image_signature=New(size_t(tiles)*3);adaptive_image_delta=New(tiles);
+   }
+   api.Check(api.hipMemsetAsync(P(adaptive_state),0,8*sizeof(U),stream),"adaptive reset");
+  }
   U stride=free_geometry?(W/64+3)/4*4:W==1920?32:W/64,tiles=((W+31)/32)*((H+31)/32);
   if(!adaptive_image)throw std::runtime_error("adaptive image missing");
   Run("deep","reuse_image_stats",size_t(tiles)*256,adaptive_image,P(adaptive_image_anchor),P(adaptive_state),P(adaptive_image_signature),P(adaptive_image_delta),W,H);
@@ -687,7 +754,7 @@ class Network {friend class D3D12Bridge;
  static U Shift(U block){static constexpr U s[]={0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,1,2,0,3,1,2,0,3,1,2,0,3,1,2};if(block<40||block>69)throw std::runtime_error("decoder shift");return s[block-40];}
 public:
  Network(const Network&)=delete;Network&operator=(const Network&)=delete;
- explicit Network(Options o):api(o.runtime),pulse_ops{int(o.device),&stream,api.hipSetDevice,api.hipEventCreate,api.hipEventRecord,api.hipStreamSynchronize,api.hipEventDestroy},pulse_lease(pulse_ops),opt(std::move(o)),W(opt.width),H(opt.height){api.style_feature=StyleFeatureFromEnvironment();{const char*v=std::getenv("DLSS5_OVERLAP");final_direct_compatible=HIP_FINAL_OUTPUT_DIRECT&&!opt.graph&&(!v||!*v||!std::strcmp(v,"0"));}multi_pass=MultiPassFromEnvironment();multi_predict=MultiPredictFromEnvironment();multi_skin=MultiSkinFromEnvironment();multi_skip=MultiPassSkipFromEnvironment();std::fprintf(stderr,"multi_pass=%u multi_pass_predict=%u actual_network_passes=%u\n",multi_pass,unsigned(multi_predict),multi_predict&&multi_pass==3?2:multi_pass);fast_numeric=FastNumericFromEnvironment();if(opt.experimental_temporal){
+ explicit Network(Options o):api(o.runtime),pulse_ops{int(o.device),&stream,api.hipSetDevice,api.hipEventCreate,api.hipEventRecord,api.hipStreamSynchronize,api.hipEventDestroy},pulse_lease(pulse_ops),opt(std::move(o)),W(opt.width),H(opt.height){api.style_feature=StyleFeatureFromEnvironment();{const char*v=std::getenv("DLSS5_OVERLAP");final_direct_compatible=HIP_FINAL_OUTPUT_DIRECT&&!opt.graph&&(!v||!*v||!std::strcmp(v,"0"));}multi_pass=MultiPassFromEnvironment();multi_predict=MultiPredictFromEnvironment();multi_skin=MultiSkinFromEnvironment();multi_skip=opt.integration.override_multi_pass_skip?opt.integration.multi_pass_skip:MultiPassSkipFromEnvironment();std::fprintf(stderr,"multi_pass=%u multi_pass_predict=%u actual_network_passes=%u\n",multi_pass,unsigned(multi_predict),multi_predict&&multi_pass==3?2:multi_pass);fast_numeric=FastNumericFromEnvironment();if(opt.experimental_temporal){
   const std::string tap=fast_numeric?"c32-wave1-temporal-fast":"c32-wave1-temporal";
   bool assets=std::ifstream(opt.modules+"/"+tap+".hsaco").good()&&std::ifstream(opt.modules+"/temporal-history.hsaco").good()&&std::ifstream(opt.assets+"/post70-history-head.f16").good()&&std::ifstream(opt.assets+"/native-temporal-sigmoid.f32").good();
   if(!NativeExperimentalTemporalCompatible()||!assets||opt.graph||multi_pass!=1||multi_skin||!opt.temporal_valid_height||opt.temporal_valid_height>H){opt.experimental_temporal=false;std::fprintf(stderr,"history_experiment requested=1 active=0 reason=incompatible_or_missing_assets\n");}
@@ -705,7 +772,7 @@ std::fprintf(stderr,"vit_contract_byte_edge=%u\n",unsigned(vit_contract_byte_edg
 if(wave_owned_active){
  const bool rtz_tall=HIP_C32_RTZ_TALL&&W==1920&&(H==1152||H==1088)&&std::ifstream(std::filesystem::u8path(opt.modules+"/c32-wave1-rtz.hsaco"),std::ios::binary).good();
  std::string extra[][2]={{"c64_wave2","c64-wave2"},{"c32_wave1",rtz_tall?"c32-wave1-rtz":"c32-wave1"}};
- for(auto&entry:extra)entry[1]=entry[0]==std::string("c32_wave1")&&opt.experimental_temporal?(fast_numeric?"c32-wave1-temporal-fast":"c32-wave1-temporal"):FastTwin(entry[0]==std::string("c32_wave1")?"c32-wave1":entry[1]); /* c32: the rtz build of the fast C32 disassembles identically, so the twin stem is always c32-wave1 */
+ for(auto&entry:extra)entry[1]=entry[0]==std::string("c32_wave1")&&opt.experimental_temporal?(fast_numeric?"c32-wave1-temporal-fast":"c32-wave1-temporal"):FastTwin(entry[1],entry[0]==std::string("c32_wave1")); /* c32: the rtz build of the fast C32 disassembles identically, so the twin stem is always c32-wave1 */
  for(auto&entry:extra){entry[1]+=".hsaco";Handle m{};
   api.Check(api.LoadModule(&m,(opt.modules+"/"+entry[1]).c_str()),entry[1].c_str());modules[entry[0]]=m;
   if(entry[0]=="c32_wave1"){
@@ -738,7 +805,7 @@ if(opt.mh_window_fused){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/c6
 if(opt.fast_deep){const std::string deep_stem=opt.packed_weights?"deep_fast-packed":"deep_fast";Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+FastTwin(deep_stem)+".hsaco").c_str()),"deep fast module");modules["deep_fast"]=m;}
 if(opt.fast_mh){const std::string mh_stem=opt.packed_weights?(opt.mh_wave?"multihead-fast-padded-wave-packed":"multihead-fast-packed"):(opt.mh_wave?"multihead-fast-padded-wave":"multihead-fast");Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+FastTwin(mh_stem)+".hsaco").c_str()),"MH fast module");modules["mh_fast"]=m;}
  /* free geometry: the per-slot tile counters (PDL_SLOTS, one per 16 C64 tokens) cover processing surfaces up to 4.19M pixels; larger free sizes run without PDL */
- if(opt.pdl&&!(free_geometry&&size_t(W/4)*(H/4)/16>PDL_SLOTS)){if(opt.graph)throw std::runtime_error("pdl requires graph off");api.Load(ext_launch,"hipExtModuleLaunchKernel");api.Check(api.hipMalloc((void**)&pdl_flags,size_t(PDL_SLOTS)*PDL_RING*4),"pdl flags");api.Check(api.hipMemsetAsync(pdl_flags,0,size_t(PDL_SLOTS)*PDL_RING*4,stream),"pdl flags zero");pdl_mode=7;}
+ PreflightPdl();
 if(opt.fast_prefix){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/prefix_fast.hsaco").c_str()),"prefix fast module");modules["prefix_fast"]=m;}
 if(opt.fused_c32){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/c32_fused_attention.hsaco").c_str()),"fused attention module");modules["c32_fused"]=m;}
 if(opt.fast_c32){const char*f[][2]={{"c32_fast_ffn","c32_fast.hsaco"},{"c32_fast_attention","c32_fast_attention.hsaco"},{"boundary_fast","boundary-fast.hsaco"}};for(auto&v:f){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.tiled){const char*t[][2]={{"c32_tiled","c32_tiled.hsaco"},{"mh_tiled","multihead-tiled.hsaco"}};for(auto&v:t){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.wave){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/wave-pointwise.hsaco").c_str()),"wave module");modules["wave"]=m;}if(HIP_POOL64_BYTE_EDGE&&wave_owned_active&&opt.mh_byte_stream&&opt.mh_project_crop&&opt.mh_input_mapped&&opt.elide_identity_shift&&opt.grouped_mh_contract&&opt.packed_weights&&opt.mh_proj_diag_fb&&opt.pool32_h16w&&opt.fast_mh&&!opt.skip_blocks.count(5)&&!observer&&opt.dump_dir.empty()){
@@ -762,7 +829,7 @@ if(opt.experimental_temporal){
 }
 
 if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
- ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
+ ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
  void PrintMemory(){size_t bytes=0,free=0,total=0;std::set<void*>seen;auto add=[&](const Tensor&t){if(t&&t->owned&&seen.insert(t->ptr).second)bytes+=t->capacity;};for(auto&t:pool)add(t);for(auto&w:weights)add(w.second);for(auto&maps:gather_maps)for(auto&m:maps)add(m.second);add(device_noise);api.Check(api.hipMemGetInfo(&free,&total),"memory stats");std::printf("memory owned_MiB=%.1f allocations=%zu device_free_MiB=%.1f total_MiB=%.1f\n",bytes/1048576.,seen.size(),free/1048576.,total/1048576.);}
  /* DLSS5_HIP_MEMORY=1 (diagnostic): device memory by category after the pool has warmed — weights by key, pool tensors by capacity, gather maps, noise, and the runtime's free/total. */
  void MemoryReport(FILE*f){std::set<void*>seen;size_t wsum=0,psum=0,gsum=0,nsum=0;std::vector<std::pair<size_t,std::string>>w,p;
@@ -787,7 +854,7 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
  bool EncoderSkipByte(U g){const std::string cs=std::to_string(g?128:64);return HasFn("c64_wave2","c"+cs+"_wave2_bi_hob")&&HasFn("c64_wave2","c"+cs+"_wave2_up_lb_sb");}
  bool EncoderHalfTail(U g){if(g>1||!opt.mh_byte_stream||!opt.pool_project_group)return false;static constexpr U tails[]={8,14};const U c=g?128:64;const std::string cs=std::to_string(c);
   return !opt.skip_blocks.count(tails[g])&&DecoderUpBody(2-g)&&HasFn("c64_wave2","c"+cs+"_wave2_bi_ho")&&HasFn("mh_fast","mh_pool_project_group_c"+cs+"_hin")&&HasFn("c64_wave2","c"+cs+"_wave2_up_sh")&&HasFn("c64_wave2","c"+cs+"_wave2_up_lb_sh");}
- Tensor RunGraph(Tensor color,Tensor noisegpu,Tensor hist,bool request_rgba=false,void*final_rgb=nullptr){if(request_rgba&&final_rgb)throw std::runtime_error("external RGB output cannot be RGBA");graph_output_stride=3;adaptive_image=P(color);if(opt.vit_qkv_fused&&!opt.fast_deep)throw std::runtime_error("ViT QKV fusion requires fast deep kernels");if(opt.ffn_qkv&&(!opt.grouped_mh_contract||!opt.fast_mh||!opt.fused_qkv_norm||!opt.fp8_normalized))throw std::runtime_error("FFN/QKV requires grouped byte pipeline");if(opt.grouped_mh_contract&&!opt.fused_ffn_project)throw std::runtime_error("grouped contraction requires fused project");if(opt.direct_prefix_input&&(!opt.fast_prefix||!opt.prefix_fused))throw std::runtime_error("direct input requires fused fast prefix");if(opt.mh_input_mapped&&!opt.fused_ffn_project)throw std::runtime_error("mapped MH input requires fused FFN project");if(opt.mh_project_crop&&(!opt.fast_mh||!opt.fp8_av))throw std::runtime_error("MH crop requires fast byte AV pipeline");if(opt.split_ffn_fused&&(!opt.fast_deep||!opt.fp8_deep))throw std::runtime_error("split fused FFN requires fast byte deep pipeline");if(opt.fused_ffn_project&&(!opt.fused_mh_ffn||!opt.packed_weights||!opt.fp8_middle||!opt.tiled_mh_ffn||opt.tiled_ffn_min_c!=256))throw std::runtime_error("fused FFN project requires selected packed FFN pipeline");if(opt.post_merge_fold&&(!opt.pre_main8||!opt.fused_ffn||!opt.half_c32||!opt.mapped_c32))throw std::runtime_error("post merge fold requires pre-main8 and fused half mapped pipeline");if(opt.pre_main8&&(!opt.fast_c32||!opt.half_c32||observer||!opt.dump_dir.empty()))throw std::runtime_error("pre main8 needs fast half path and no stage dumps");if(opt.raw_chain&&(!opt.fused_ffn||!opt.half_c32||!opt.mapped_c32||!opt.crop_c32||observer||!opt.dump_dir.empty()))throw std::runtime_error("raw chain requires fused half mapped crop pipeline and no stage dumps");auto tiles=opt.direct_prefix_input?color:New(size_t(W)*H*4),base=opt.direct_prefix_input?color:New(size_t(W)*H*4),prefix=opt.prefix_inline?Tensor{}:New(size_t(W)*H*32);if(!opt.direct_prefix_input)Run("boundary","hip_input_reflect",size_t(W)*H,P(color),P(base),P(tiles),W,H,W,H);color=base;if(opt.prefix_inline){if(!opt.direct_prefix_input||!opt.c32_finish_fused||!opt.pre_main8||!opt.fused_ffn||!opt.half_c32)throw std::runtime_error("inline prefix requires the direct raster input and the fused block 0 finish");inline_prefix=true;inline_rgba=tiles;inline_hist=hist;inline_seed=opt.seed;inline_temporal=U(bool(hist));}else if(opt.fast_prefix&&opt.prefix_fused){Run("prefix_fast",opt.direct_prefix_input?"dlss5_prefix_fast_fused_raster":"dlss5_prefix_fast_fused",size_t(W)*H*32,P(tiles),P(hist),Weight("block0-ffn.f32"),P(prefix),W,H,opt.seed,U(bool(hist)));}else if(opt.fast_prefix){auto features=New(size_t(W)*H*32);Run("prefix_fast","dlss5_prefix_fast_features",size_t(W)*H,P(tiles),P(hist),P(features),W,H,opt.seed,U(bool(hist)));Run("prefix_fast","dlss5_prefix_fast_project",size_t(W)*H*32,P(features),Weight("block0-ffn.f32"),P(prefix),W*H);}else{Run("c32","dlss5_prefix_reference",size_t(W)*H,P(tiles),P(hist),P(noisegpu),Weight("block0-ffn.f32"),P(prefix),static_cast<void*>(nullptr),W,H,opt.seed,U(bool(hist)));}tiles.reset();noisegpu.reset();hist.reset();auto pre=C32Body(prefix,W,H,"block0-ffn.f32","block0-attention.f32");prefix.reset();pre.raw.reset();Stage("pre-down",pre.down);Tensor skip0=pre.main,source=pre.down;pre.main.reset();pre.down.reset();Stage("block0",skip0);Tensor skips[5];U shifts[]={0,3,1,2,0,3,1,2};C32Result last;
+ Tensor RunGraph(Tensor color,Tensor noisegpu,Tensor hist,bool request_rgba=false,void*final_rgb=nullptr,bool final_pass=true){if(request_rgba&&final_rgb)throw std::runtime_error("external RGB output cannot be RGBA");graph_output_stride=3;adaptive_image=P(color);if(opt.vit_qkv_fused&&!opt.fast_deep)throw std::runtime_error("ViT QKV fusion requires fast deep kernels");if(opt.ffn_qkv&&(!opt.grouped_mh_contract||!opt.fast_mh||!opt.fused_qkv_norm||!opt.fp8_normalized))throw std::runtime_error("FFN/QKV requires grouped byte pipeline");if(opt.grouped_mh_contract&&!opt.fused_ffn_project)throw std::runtime_error("grouped contraction requires fused project");if(opt.direct_prefix_input&&(!opt.fast_prefix||!opt.prefix_fused))throw std::runtime_error("direct input requires fused fast prefix");if(opt.mh_input_mapped&&!opt.fused_ffn_project)throw std::runtime_error("mapped MH input requires fused FFN project");if(opt.mh_project_crop&&(!opt.fast_mh||!opt.fp8_av))throw std::runtime_error("MH crop requires fast byte AV pipeline");if(opt.split_ffn_fused&&(!opt.fast_deep||!opt.fp8_deep))throw std::runtime_error("split fused FFN requires fast byte deep pipeline");if(opt.fused_ffn_project&&(!opt.fused_mh_ffn||!opt.packed_weights||!opt.fp8_middle||!opt.tiled_mh_ffn||opt.tiled_ffn_min_c!=256))throw std::runtime_error("fused FFN project requires selected packed FFN pipeline");if(opt.post_merge_fold&&(!opt.pre_main8||!opt.fused_ffn||!opt.half_c32||!opt.mapped_c32))throw std::runtime_error("post merge fold requires pre-main8 and fused half mapped pipeline");if(opt.pre_main8&&(!opt.fast_c32||!opt.half_c32||observer||!opt.dump_dir.empty()))throw std::runtime_error("pre main8 needs fast half path and no stage dumps");if(opt.raw_chain&&(!opt.fused_ffn||!opt.half_c32||!opt.mapped_c32||!opt.crop_c32||observer||!opt.dump_dir.empty()))throw std::runtime_error("raw chain requires fused half mapped crop pipeline and no stage dumps");auto tiles=opt.direct_prefix_input?color:New(size_t(W)*H*4),base=opt.direct_prefix_input?color:New(size_t(W)*H*4),prefix=opt.prefix_inline?Tensor{}:New(size_t(W)*H*32);if(!opt.direct_prefix_input)Run("boundary","hip_input_reflect",size_t(W)*H,P(color),P(base),P(tiles),W,H,W,H);color=base;if(opt.prefix_inline){if(!opt.direct_prefix_input||!opt.c32_finish_fused||!opt.pre_main8||!opt.fused_ffn||!opt.half_c32)throw std::runtime_error("inline prefix requires the direct raster input and the fused block 0 finish");inline_prefix=true;inline_rgba=tiles;inline_hist=hist;inline_seed=opt.seed;inline_temporal=U(bool(hist));}else if(opt.fast_prefix&&opt.prefix_fused){Run("prefix_fast",opt.direct_prefix_input?"dlss5_prefix_fast_fused_raster":"dlss5_prefix_fast_fused",size_t(W)*H*32,P(tiles),P(hist),Weight("block0-ffn.f32"),P(prefix),W,H,opt.seed,U(bool(hist)));}else if(opt.fast_prefix){auto features=New(size_t(W)*H*32);Run("prefix_fast","dlss5_prefix_fast_features",size_t(W)*H,P(tiles),P(hist),P(features),W,H,opt.seed,U(bool(hist)));Run("prefix_fast","dlss5_prefix_fast_project",size_t(W)*H*32,P(features),Weight("block0-ffn.f32"),P(prefix),W*H);}else{Run("c32","dlss5_prefix_reference",size_t(W)*H,P(tiles),P(hist),P(noisegpu),Weight("block0-ffn.f32"),P(prefix),static_cast<void*>(nullptr),W,H,opt.seed,U(bool(hist)));}tiles.reset();noisegpu.reset();hist.reset();auto pre=C32Body(prefix,W,H,"block0-ffn.f32","block0-attention.f32");prefix.reset();pre.raw.reset();Stage("pre-down",pre.down);Tensor skip0=pre.main,source=pre.down;pre.main.reset();pre.down.reset();Stage("block0",skip0);Tensor skips[5];U shifts[]={0,3,1,2,0,3,1,2};C32Result last;
  for(U b=1;b<=4;b++){if(opt.skip_blocks.count(b)){if(!opt.raw_chain)throw std::runtime_error("C32 skip needs the raw chain");if(b==4)SkipChainFinish(last,W/2,H/2,true);if(last.main)source=last.main;continue;}last=opt.raw_chain?C32Chain(source,last.raw?&last:nullptr,W/2,H/2,shifts[b-1],Block(b,"ffn"),Block(b,"attention"),b==4,b==4):C32(source,W/2,H/2,shifts[b-1],Block(b,"ffn"),Block(b,"attention"));source=last.main;if(source)Stage("block"+std::to_string(b),source);}Stage("block4-down",last.down);skips[0]=source;Tensor poolcrop;if(last.down_cropped)poolcrop=last.down;else{poolcrop=New(size_t(W/4)*(H/4)*32);Run("mh","mh_shift_crop",size_t(W/4)*(H/4)*32,P(last.down),P(poolcrop),W/4,H/4,last.workw/2,last.sx/2,last.sy/2,U(32));}const bool pool64_byte=pool64_byte_available&&last.down_byte&&last.down_cropped;source=New(size_t(W/4)*(H/4)*64/(pool64_byte?4:1));if(last.down_byte&&!last.down_cropped)throw std::runtime_error("byte C32 down needs the crop path");if(opt.pool32_h16w&&opt.fast_mh)Run("mh_fast",pool64_byte?"mh_pool_project_c32_b8_out8":last.down_byte?"mh_pool_project_c32_b8":"mh_pool_project_production_h16w",size_t(W/4)*(H/4)*64,P(poolcrop),PackedDsWeightCast("block4-ds.f32",32),P(source),W/4,H/4,U(0),U(0),U(32));else Run(opt.fast_mh?"mh_fast":"mh",opt.fast_mh?"mh_pool_project_production":"mh_pool_project",size_t(W/4)*(H/4)*64,P(poolcrop),Weight("block4-ds.f32"),P(source),W/4,H/4,U(0),U(0),U(32));poolcrop.reset();last={};
  U starts[]={5,9,15},counts[]={4,6,8},channels[]={64,128,256};for(U g=0;g<3;g++){U w=W/(4u<<g),h=H/(4u<<g);for(U j=0;j<counts[g];j++){
  if(j==1&&SpEnabled(channels[g],false)){source=SpStage(source,w,h,channels[g],starts[g]+1,counts[g]-2);j=counts[g]-2;continue;}
@@ -809,7 +876,10 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
  else
  {if(c32_skip_byte)throw std::runtime_error("byte C32 skip needs the wave-owned up");source=Up(source,skips[0],W/4,H/4,W/2,H/2,64,32,"block66-weights.f32");}skips[0].reset();c32_skip_byte=false;for(U b=c32_begin;b<=69;b++){if(opt.skip_blocks.count(b)){if(!opt.raw_chain)throw std::runtime_error("C32 skip needs the raw chain");if(b==69)SkipChainFinish(chain,W/2,H/2,false);if(chain.main)source=chain.main;continue;}chain=opt.raw_chain?C32Chain(source,chain.raw?&chain:nullptr,W/2,H/2,Shift(b),Block(b,"ffn"),Block(b,"attention"),b==69,false):C32(source,W/2,H/2,Shift(b),Block(b,"ffn"),Block(b,"attention"));source=chain.main;if(source)Stage("block"+std::to_string(b),source);}chain={};
  C32Result post{};
- if(opt.post_merge_fold){U sx=(opt.post_shift&1)?4:0,sy=(opt.post_shift&2)?4:0,ww=W+2*sx,hh=H+2*sy,windows=ww*hh/64;if(opt.post_head_fused){const bool lowb=c32_post_low_byte;const bool rgba=request_rgba&&lowb&&HasFn("c32_wave1","c32_wave1_post_b8_rgba");graph_output_stride=rgba?4:3;Tensor out;if(rgba){out=multi_feed[multi_next];multi_next^=1;if(!out)throw std::runtime_error("RGBA outputs must be prepared before producer wait");}else out=(final_rgb?std::make_shared<Allocation>(api,final_rgb,size_t(W)*H*12):New(size_t(W)*H*3));c32_post_low_byte=false;if(temporal_feature_tap_active){
+ if(opt.post_merge_fold){U sx=(opt.post_shift&1)?4:0,sy=(opt.post_shift&2)?4:0,ww=W+2*sx,hh=H+2*sy,windows=ww*hh/64;if(opt.post_head_fused){const bool lowb=c32_post_low_byte;const bool rgba=request_rgba&&lowb&&HasFn("c32_wave1","c32_wave1_post_b8_rgba");graph_output_stride=rgba?4:3;Tensor out;if(rgba){out=multi_feed[multi_next];multi_next^=1;if(!out)throw std::runtime_error("RGBA outputs must be prepared before producer wait");}else out=(final_rgb?std::make_shared<Allocation>(api,final_rgb,size_t(W)*H*12):New(size_t(W)*H*3));c32_post_low_byte=false;if(native_post_output&&final_pass){
+ if(rgba)throw std::runtime_error("auxiliary post requires final RGB output");
+ Run("c32_wave1",lowb?"c32_wave1_post_b8_logit":"c32_wave1_post_logit",windows,P(source),P(skip0),Weight("post70-scales.f32"),PackedC32Weight("post70-ffn.f32",false),PackedC32Weight("post70-attention.f32",true),P(color),Weight("post70-head.f32"),P(out),windows,W,H,sx,sy,.03125f,P(native_post_row),native_post_output);
+ }else if(temporal_feature_tap_active){
  if(!lowb||rgba)throw std::runtime_error("temporal feature tap post layout changed");
  Run("c32_wave1","c32_wave1_post_b8_features",windows,P(source),P(skip0),Weight("post70-scales.f32"),PackedC32Weight("post70-ffn.f32",false),PackedC32Weight("post70-attention.f32",true),P(color),Weight("post70-head.f32"),P(out),windows,W,H,sx,sy,.03125f,P(temporal_features));
 }else Run(lowb?"c32_wave1":"c32_fused_ffn",lowb?(rgba?"c32_wave1_post_b8_rgba":"c32_wave1_post_b8"):"c32_post_merge_head_half",windows,P(source),P(skip0),Weight("post70-scales.f32"),PackedC32Weight("post70-ffn.f32",false),PackedC32Weight("post70-attention.f32",true),P(color),Weight("post70-head.f32"),P(out),windows,W,H,sx,sy,.03125f);source.reset();skip0.reset();Stage("block70",out);return out;}
@@ -850,6 +920,29 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
  bool PulseProfileCompatible()const noexcept{return opt.runtime==7&&opt.pooled&&opt.wmma&&opt.wave&&opt.fast_prefix&&opt.fast_c32&&opt.fast_mh&&opt.fast_deep&&opt.packed_weights&&opt.packed_c32&&opt.fp8_normalized&&opt.fp8_av&&opt.fp8_deep&&opt.raw_chain&&opt.prefix_inline&&opt.fused_qkv_norm&&opt.ffn_qkv&&opt.ffn_qkv_max_c==256&&opt.grouped_mh_contract&&opt.split_ffn_fused&&opt.split_mix_blocked&&opt.split_project_blocked&&opt.vit_qkv_fused&&opt.vit_attn_fused&&opt.vit_qkv_fp8&&opt.vit_contract_frag&&opt.vit_weight_mask==1&&opt.vit_pack_input&&opt.mh_project_crop&&opt.pool_project_group&&opt.wave_owned&&final_direct_compatible&&opt.dup_prefix.empty()&&opt.mh_byte_stream&&opt.mh_ffn_frag256&&opt.decoder_byte&&opt.c512_m32&&opt.vit_proj_n64&&opt.vit_stream==3&&opt.swin_run&&!opt.vit_byte_stream&&!opt.vit_half_stream&&!opt.vit_qkv_n4&&!opt.vit_split_k&&!opt.sparse_weights;}
  unsigned PulseRejectMask(bool at_site=false)const noexcept{const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");return (pulse_frame_history?1u:0u)|(!pulse_platform_scope?131072u:0u)|(opt.submit_pulse==2&&!pulse_driver_validated?262144u:0u)|(!PulseProfileCompatible()||!pulse_capabilities_ok?524288u:0u)|(pulse_bridge_diagnostics?2097152u:0u)|(at_site&&!SwinRunActive()?1048576u:0u)|(opt.graph?2u:0u)|(opt.profile?4u:0u)|(opt.wall_profile?8u:0u)|(opt.experimental_temporal?16u:0u)|(opt.temporal_feature_tap?32u:0u)|(!opt.skip_blocks.empty()?64u:0u)|(multi_pass!=1?128u:0u)|(multi_pass==3&&multi_predict?256u:0u)|(multi_skin?512u:0u)|((ae&&*ae&&std::strcmp(ae,"0"))?1024u:0u)|(pdl_anyorder?2048u:0u)|(at_site&&!pulse_ordered_down_c256?65536u:0u)|(!opt.pool_project_group?32768u:0u)|(!fast_numeric?8192u:0u)|(!((W==1600&&H==960)||(W==1920&&H==1152))?16384u:0u);}
  bool PulseEligible()const noexcept{return PulseRejectMask()==0;}
+ // Optional raster auxiliary output: two floats per processing pixel, FP32 logit
+ // followed by its half-RTZ diagnostic value. Caller owns the device buffer until
+ // all enqueued work completes; configuration is serialized before warm-up.
+ // Normal Enqueue writes this only on the final real pass; predicted MP3 uses
+ // pass 2's logits. The consumer applies history after prediction/skin blending.
+ struct PostAuxiliary {void* data=nullptr;size_t bytes=0;U width=0,height=0;U pixel_stride=8;};
+ bool NativeHistorySupported()const{
+#ifdef HIP_MP_RAW_EXPORT
+  // This diagnostic path runs a separate per-pass export schedule. Do not admit
+  // auxiliary history until that schedule has the same final-pass contract.
+  return false;
+#else
+  return wave_owned_active&&opt.post_merge_fold&&opt.post_head_fused&&!opt.graph&&!opt.experimental_temporal&&!opt.temporal_feature_tap;
+#endif
+ }
+ void EnableNativePostHistory(const std::vector<float>&row,const PostAuxiliary&aux){
+  if(row.size()!=32||!aux.data||aux.bytes<size_t(W)*H*8||aux.width!=W||aux.height!=H||aux.pixel_stride!=8||native_post_row||!NativeHistorySupported())throw std::runtime_error("auxiliary post layout or network unsupported");
+  for(float v:row)if(!std::isfinite(v))throw std::runtime_error("auxiliary post nonfinite weight");
+  // Fn follows the actual selected module, including norm900. Never silently
+  // replace an optimized upstream module with a different numerical route.
+  Fn("c32_wave1","c32_wave1_post_logit");Fn("c32_wave1","c32_wave1_post_b8_logit");
+  native_post_row=Upload(row.data(),128,true);native_post_output=aux.data;
+ }
  bool GraphEnabled()const{return opt.graph;}
  bool WaveOwnedActive()const{return wave_owned_active;}
  bool SwinRunActive()const{return SwinRunCompatible(opt)&&!sp_disabled&&(!sp_error_host||!sp_error_host[0].load(std::memory_order_acquire));}
@@ -860,6 +953,10 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
  Handle Stream()const{return stream;}
  Api& Runtime(){return api;}
  void Synchronize(){api.Check(api.hipStreamSynchronize(stream),"network completion");}
+ // Serialize with Enqueue on this instance. Does not change environment/hotkey
+ // preferences; callers opt out when their temporal policy requires full ViT.
+ void SetAdaptiveReuseAllowed(bool allowed){if(adaptive_allowed!=allowed){adaptive_allowed=allowed;adaptive_dirty=true;}}
+
  void Enqueue(void*rgba,void*history,void*rgb_output,U seed){pulse_ordered_down_c256=false;pulse_frame_pdl_start=pdl_calls;pulse_frame_history=history!=nullptr;if(adaptive_prev_history!=history||adaptive_prev_seed!=seed||adaptive_prev_input!=rgba){adaptive_dirty=true;adaptive_prev_history=history;adaptive_prev_seed=seed;adaptive_prev_input=rgba;}
   if(!rgba||!rgb_output||(!device_noise&&!opt.fast_prefix)||!opt.pooled||opt.profile||opt.wall_profile||observer||!opt.dump_dir.empty())throw std::runtime_error("device graph requires initialized noise, pooled mode and no diagnostic readbacks");
   if(opt.graph){
@@ -904,7 +1001,7 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
 #ifdef HIP_MP_RAW_EXPORT
   const char*export_dir=std::getenv("DLSS5_MP_RAW_EXPORT");bool export_raw=export_dir&&*export_dir;
   auto save_raw=[&](const char*name,const Tensor&t,size_t channels){if(!export_raw)return;Synchronize();std::vector<float>v(size_t(W)*H*channels);api.Check(api.hipMemcpy(v.data(),P(t),v.size()*4,2),"raw export");std::string path=std::string(export_dir)+"/"+name+".f32";FILE*f=fopen(path.c_str(),"wb");if(!f)throw std::runtime_error("raw export open");fwrite(v.data(),4,v.size(),f);fclose(f);};
-  save_raw("x",color,4);auto out=RunGraph(color,device_noise,hist);save_raw("y1",out,3);if(export_raw&&multi_pass==3&&!multi_predict&&!multi_skin){auto f=MultiPassFeed(out);out=RunGraph(f,device_noise,hist);save_raw("y2",out,3);f=MultiPassFeed(out);out=RunGraph(f,device_noise,hist);save_raw("y3",out,3);}else if(multi_pass>1){out=MultiPassRest(out,hist,color);color.reset();}
+  save_raw("x",color,4);auto out=RunGraph(color,device_noise,multi_pass==1||!native_post_output?hist:Tensor{},false,nullptr,multi_pass==1);save_raw("y1",out,3);if(export_raw&&multi_pass==3&&!multi_predict&&!multi_skin){auto f=MultiPassFeed(out);out=RunGraph(f,device_noise,native_post_output?Tensor{}:hist,false,nullptr,false);save_raw("y2",out,3);f=MultiPassFeed(out);out=RunGraph(f,device_noise,hist);save_raw("y3",out,3);}else if(multi_pass>1){out=MultiPassRest(out,hist,color);color.reset();}
   save_raw("final",out,3);
 #else
   // Borrow the bridge-owned final RGB sink. Intermediate multi-pass tensors stay private.
@@ -912,7 +1009,7 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
   // Allocation(api, pointer, bytes) has owned=false; it never frees or synchronizes this pointer.
   auto overlaps_output=[&](void*input){if(!input)return false;const auto a=reinterpret_cast<uintptr_t>(input),b=reinterpret_cast<uintptr_t>(rgb_output);return a<b+size_t(W)*H*12&&b<a+size_t(W)*H*16;};
   void*final_rgb=final_direct_compatible&&!overlaps_output(rgba)&&!overlaps_output(history)?rgb_output:nullptr;
-  auto out=RunGraph(color,device_noise,hist,multi_pass>1&&DirectRgbaAllowed(),multi_pass==1?final_rgb:nullptr);const U first_stride=graph_output_stride;if(multi_pass>1){out=MultiPassRest(out,hist,color,first_stride,final_rgb);color.reset();}
+  auto out=RunGraph(color,device_noise,multi_pass==1||!native_post_output?hist:Tensor{},multi_pass>1&&DirectRgbaAllowed(),multi_pass==1?final_rgb:nullptr,multi_pass==1);const U first_stride=graph_output_stride;if(multi_pass>1){out=MultiPassRest(out,hist,color,first_stride,final_rgb);color.reset();}
 #endif
   for(unsigned repeat=0;P(out)!=rgb_output&&repeat<HIP_FINAL_COPY_REPEAT;repeat++)
    api.Check(api.hipMemcpyAsync(rgb_output,P(out),size_t(W)*H*12,3,stream),"device output copy");
@@ -924,7 +1021,12 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
  using Memcpy2DFn=int(*)(void*,size_t,const void*,size_t,size_t,size_t,int,Handle);Memcpy2DFn memcpy2d{};
  std::set<U> multi_skip;
  U graph_output_stride=3,skin_first_stride=3;bool multi_predict=true,multi_skin=false;Tensor predict_gain,skin_first,skin_mask,skin_result;
- __attribute__((noinline)) Tensor MultiPassRest(Tensor out,const Tensor&hist,const Tensor&original,U stride=3,void*final_rgb=nullptr){
+ #if defined(_MSC_VER)
+ __declspec(noinline)
+ #else
+ __attribute__((noinline))
+ #endif
+ Tensor MultiPassRest(Tensor out,const Tensor&hist,const Tensor&original,U stride=3,void*final_rgb=nullptr){
   if(multi_skin){if(!skin_first)throw std::runtime_error("skin resources must be prepared before producer wait");skin_first_stride=stride;api.Check(api.hipMemcpyAsync(P(skin_first),P(out),size_t(W)*H*stride*4,3,stream),"save first pass for skin");}
   /* passes 2..N: DLSS5_MULTI_PASS_SKIP_BLOCKS added to the configured skip set (restored after, also on a throw) */
   std::set<U> saved;const bool swap=!multi_skip.empty();if(swap){saved=opt.skip_blocks;opt.skip_blocks.insert(multi_skip.begin(),multi_skip.end());}
@@ -937,7 +1039,7 @@ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predic
    Run("mp_predict","mp_predict_apply",size_t(W)*H,P(first),P(second),P(predict_gain),P(predicted),W,H);}
    return multi_skin?BlendSkin(original,predicted,final_rgb):predicted;
   }
-  for(U pass=1;pass<multi_pass;pass++){auto feed=MultiPassFeed(out,stride);out.reset();out=RunGraph(feed,device_noise,hist,pass+1<multi_pass&&DirectRgbaAllowed(),pass+1==multi_pass&&!multi_skin?final_rgb:nullptr);stride=graph_output_stride;}return multi_skin?BlendSkin(original,out,final_rgb):out;}
+  for(U pass=1;pass<multi_pass;pass++){auto feed=MultiPassFeed(out,stride);out.reset();out=RunGraph(feed,device_noise,pass+1==multi_pass||!native_post_output?hist:Tensor{},pass+1<multi_pass&&DirectRgbaAllowed(),pass+1==multi_pass&&!multi_skin?final_rgb:nullptr,pass+1==multi_pass);stride=graph_output_stride;}return multi_skin?BlendSkin(original,out,final_rgb):out;}
  public:
  /* Pass count changed at run time (add-on hot reload / hotkey, 2026-10-03). Same value = no-op. A graph is rebuilt; feed buffers
     are allocated on the next multi-pass frame (outside capture: the warm frame). */

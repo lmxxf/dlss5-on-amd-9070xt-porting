@@ -29,8 +29,21 @@ struct NativeHalfInclude final:ID3DInclude {
  }
  HRESULT STDMETHODCALLTYPE Close(const void*)override{return S_OK;}
 };
-inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACRO*macros,const char*entry,ID3DBlob**code,ID3DBlob**errors){
+// Optional per-creation compiler. The caller owns its lifetime for the call.
+// Providers own their cache policy; bypass the default cache so compiler identity,
+// includes and flags cannot collide with another provider or the default compiler.
+struct NativeShaderCompiler {
+ virtual ~NativeShaderCompiler()=default;
+ virtual HRESULT File(const std::wstring& path,const D3D_SHADER_MACRO* macros,const char* entry,ID3DBlob** code,ID3DBlob** errors)=0;
+ virtual HRESULT Blob(const void* source,SIZE_T size,const char* name,const D3D_SHADER_MACRO* macros,ID3DInclude* includes,const char* entry,const char* target,UINT flags,ID3DBlob** code,ID3DBlob** errors)=0;
+};
+inline HRESULT NativeCompileShaderBlob(const void* source,SIZE_T size,const char* name,const D3D_SHADER_MACRO* macros,ID3DInclude* includes,const char* entry,ID3DBlob** code,ID3DBlob** errors,const char* target="cs_5_1",UINT flags=D3DCOMPILE_OPTIMIZATION_LEVEL3,NativeShaderCompiler* compiler=nullptr){
+ if(!code||!source||!entry||!target)return E_INVALIDARG;*code=nullptr;if(errors)*errors=nullptr;
+ return compiler?compiler->Blob(source,size,name,macros,includes,entry,target,flags,code,errors):D3DCompile(source,size,name,macros,includes,entry,target,flags,0,code,errors);
+}
+inline HRESULT CompileNativeShader(const std::wstring&path,const D3D_SHADER_MACRO*macros,const char*entry,ID3DBlob**code,ID3DBlob**errors,NativeShaderCompiler*compiler=nullptr){
  if(!code||!entry)return E_INVALIDARG;*code=nullptr;if(errors)*errors=nullptr;
+ if(compiler)return compiler->File(path,macros,entry,code,errors);
  std::ifstream file(path.c_str(),std::ios::binary);if(!file)return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
  std::string source((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
  const bool has_include=source.find("include")!=std::string::npos;
