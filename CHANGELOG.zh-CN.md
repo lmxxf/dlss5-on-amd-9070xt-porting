@@ -315,7 +315,7 @@
 - **接入修复**：`DLSS5_PRE_UPSCALE=auto`探测命令列表合同，不适用时退到后置；HIP Enqueue在调用线程重绑选定设备，正式采纳[XMoon的PR #15](https://github.com/lmxxf/dlss5-on-amd-9070xt-porting/pull/15)。贡献者核显+独显测试从九次InvalidHandle错误变为600多帧无错；本机单HIP设备检查不能代替双设备独立复现。
 - **RE9强度文件控制**：合法`DLSS5_STRENGTH=a,b`文件/环境数值（各0～1）覆盖宿主菜单亮度/色彩；auto/空/缺省继续宿主默认。add-on/Magpie仍支持0～3。不改ABI、默认强度或网络Style。RE9文件需重启，add-on强度仍可热载。`results/strength-config-20261004`。
 - **可选肤色保护**：`DLSS5_MULTI_PASS_SKIN_PROTECT=1`在肤色掩码核心保第一遍、其他区域用最终遍；只是颜色启发式，不是语义分割，暖色背景/有色灯光及history反馈有局限。用户反馈整体收益不明显，默认保持关闭。`results/skin-protect-20261004`。
-- **包与文档**：每架构38模块、合计76，五行LLVM23.1.2、其余33行驱动COMGR；重编CPU宿主、刷新RE9源码包，配置说明拆中英文并链接全部注释默认文件。发行默认MP1/PRED1/SKIN0，不塞玩家custom/native；用户已上传镜像；本次未创建GitHub release或tag。
+- **包与文档**：每架构38模块、合计76，五行LLVM23.1.2、其余33行驱动COMGR；重编CPU宿主、刷新RE9源码包，配置说明拆中英文并链接全部注释默认文件。发行默认MP1/PRED1/SKIN0，不塞玩家custom/native；用户已上传镜像，`0.41` tag已发布；未创建GitHub Release页面。
 
 已装开发版用户读数：剑星1x约57.6fps、快速3x约37fps；鬼武者900P快速3x约49fps，与此前一样且无异常。不是同批ABBA收益证据。gfx1200只做构建/ELF核对，真机验证仍在gfx1201。
 
@@ -325,3 +325,25 @@
 - C32 范数复用同一 lane 内相同的逆平方根。可选模块 `c32-wave1-fast-norm900.hsaco` 仅在 FAST_NUMERIC=1、处理尺寸 1600×960、单遍、graph 关闭、实验 history 关闭时使用；其他尺寸/模式保持原模块。26 个原有出口整体校验，模块缺失或出口不全就整体回落，无新用户开关。
 - RX 9070 XT 原 O2、NET_TIMING=0 的 HDR 完整帧回放三轮正式测试，900 档均值改善约 0.045～0.049ms；两轮 p99 改善，第三轮在原计时器 1µs 分辨率内未分辨出退步。1152 行短筛 p99 退步，维持原路由。数字覆盖 codec/桥接/网络/decode，不作为完整游戏帧率。
 - 常规 19 项兼容、受控 seed/history 与模块回落逐位一致。AE 检查数学正确性，性能测量关闭 AE。本次仅源码接入，未装机或打包；详见 Development/results/c32-norm-hoist-*。
+
+## 未发布源码更新 — 2026-10-07～08
+
+以下内容已进入源码和本地测试构建，已发布的0.41包保持不变；临时0.41-a历史实验不列为新的正式版本。
+
+- **可选集成接口**：合入 [TheAutomatic 的 PR #12](https://github.com/lmxxf/dlss5-on-amd-9070xt-porting/pull/12)，提供可选编解码控制和最后一遍的辅助输出，供历史消费者使用；原编解码默认行为保留。通用辅助接口支持多遍，下面的时序消费者只支持单遍。
+- **统一时序选项** `DLSS5_TEMPORAL_MODE`，默认 **0**：
+
+  | 值 | 行为 |
+  |---|---|
+  | `0` | 关闭，不创建新增时序shader或历史资源 |
+  | `1` | TheAutomatic Fast History：用模型门控混合上一帧输出，并把历史反馈到下一帧网络输入 |
+  | `2` | 低频时域稳定：只混合输出修正量的低频部分，高频保留当前帧，不回灌网络 |
+
+  在 `custom-config.txt` 修改后**重启游戏**。显式新选项（包括0）优先于旧 `DLSS5_FAST_HISTORY`；新键仍遵循原有文件/环境变量优先级，非法值明确拒绝。旧 `DLSS5_TEMPORAL_HISTORY_EXPERIMENT` 诊断不能与模式1/2叠加；已有 `DLSS5_FAST_TEMPORAL` 不会开启这两个新模式。
+- **模式1配套与runtime支持**：常规HIP插件和RE9式独立runtime均已接入Fast History。需要原模型的64字节 `post70-history-head.f16` 及匹配的C32辅助出口，覆盖normal、RTZ、FAST和norm900变体；旧包只改开关不够，缺资产会明确报错。runtime的ABI没有已验证的运动/深度引导，因此使用静态屏幕空间历史；插件仅在资源有效、明确声明无抖动MV及深度方向时使用运动/深度，否则同样退到静态历史，并按原始颜色变化拒绝旧内容。不猜未知合同。
+- **AMD模式2**：依据 [SAOG0721/Magpie](https://github.com/SAOG0721/Magpie/tree/2fceab5e241bc9f8ded001ab3266762f1f8bc51e) 描述的机制独立实现。在codec编码颜色域中，把最终修正量拆成低频与高频，低频使用约80ms历史记忆，高频保留当前帧。不多跑网络，不加强单遍力度，也不等同于模拟两遍/三遍增强；不会自动加入Oklab控制或额外增益。
+- **范围与恢复**：模式1/2要求HIP、MP1、graph关闭、无overlap/外部历史；插件使用完整网络视口。时序会话关闭实际ViT复用，但不重写用户偏好。启动及F9/热载检查阻止时序开启时切到MP2/3。重置、曝光变化、长帧间隔和引导模式变化使历史失效；runtime在真实队列提交后才退休常量与资源。本次集成没有在Magpie插件上开启这两个消费者。
+- **兼容修复**：恢复RGB输入缓冲首次使用的UAV→SRV状态转换，修复MinGW宽字符路径打开。模式0保持原路；新辅助模块在720/900受控runtime关闭模式检查中逐位一致，时序shader、重置、长间隔和有限输出检查已在WARP/RX 9070 XT通过。这些检查不等于游戏画质改善验收。
+- **限定范围的提交优化**：未发布源码中的 `DLSS5_HIP_SUBMIT_PULSE=auto` 仅在已验证gfx1201/Runtime7驱动及兼容的单遍、history关闭配方中录制一个自有HIP事件；其他范围保持原路，`0`可关闭。不改输出算术或默认画质，不承诺游戏FPS。此前norm900优化见上一节。
+
+两个时序模式都是改变输出的近似方案，可能拖影；不声称NGX逐位等价、普遍消除闪烁、画质提高或性能优势。本地剑星/鬼武者试装使用MP1，不改变发行默认。配置详见[中文说明](scripts/CONFIGURATION.zh-CN.md)。证据：`Development/results/pr12-integration-20261007`、`low-frequency-temporal-20261007`、`lowfreq-runtime-20261007`、`mode1-assets-20261008`。
