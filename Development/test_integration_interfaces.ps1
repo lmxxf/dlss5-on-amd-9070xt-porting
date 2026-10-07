@@ -12,6 +12,10 @@ try {
     & "$PSScriptRoot/test_codec_integration.ps1" -Amd:$Amd
     $out = Join-Path $PWD 'exports/integration-interfaces'
     New-Item -ItemType Directory -Force $out | Out-Null
+    & cl.exe /nologo /std:c++17 /EHsc /utf-8 Development/test_fast_history_scope.cpp "/Fe:$out/history-scope.exe" "/Fo:$out/history-scope.obj"
+    if ($LASTEXITCODE) { throw 'History consumer scope compilation failed' }
+    & "$out/history-scope.exe"
+    if ($LASTEXITCODE) { throw 'History consumer MP1 scope failed' }
     & cl.exe /nologo /std:c++17 /EHsc /utf-8 /DNOMINMAX /I src /c Development/HIP/bridge_network.cpp "/Fo:$out/bridge.obj"
     if ($LASTEXITCODE) { throw 'Bridge compilation failed' }
     & cl.exe /nologo /std:c++17 /EHsc /utf-8 Development/HIP/test_module_load.cpp "/Fe:$out/module.exe" "/Fo:$out/module.obj"

@@ -329,3 +329,10 @@ APP pulse0对pulse0 f7a48855三轮合并mean/p99过：pooledwall−.070848/p99�
 产品EagerAuto2 vsReplayOff0先12gold ee3919ba：Auto实际Create1/drivercaps1/RecordAccepted15=warm4+12−1/cleanup1，OffGraph12/事件0、F16同。quiet后验移setup/final保nativePulse原guard，原O2benchmark字节同。53360/6afdb3ba actualAuto163 vsOffGraph160、8rawsamefinite/计时有效；**Replay mean +.006975ms**、p99−.0451，controlmean drift+.013213。收益门未达**首筛STOP，不formal/重刷/defaultGraph**；漂移更大也不能断言普遍慢。pure/APP/marker旧数字不可相加兜mean。
 
 当前ReplayAuto仅CPU组合候选（cd0534bb已O2编译，源审尚未完成，无GPU）：官方EventRecord=7/GetEvent存在，需设备导出/161kernel+1ownedEvent/162强DAG精确Down→Event→C512位置、事件handle真实lease匹配；graph/exec先销再leaseClose/import释放；每帧host资格/key检查不能靠捕获后staleDown字段。capture时CPU Record不算GPU marker执行N。sourcegold审后才另排probe，目前未GPU/收益/生产接受。详graph0-product-baseline-review/replay-auto-minimal-review与新source结果，旧替换失败保留。
+
+
+### 2026-10-07 PR12 Fast History 默认关闭合入
+
+锁定 TheAutomatic PR12 `3ef0b6e`，本地merge保作者祖先与现H900/Pulse/实验记录。新增 `DLSS5_FAST_HISTORY=0` 默认关闭，用户可在custom-config显式开启并重启；仅FFX pre/MP1/fullviewport/graph0/overlap0、真实无抖动MV及显式depth方向，reference实验互斥。额外row与匹配C32 logit exports必需，Magpie/RE9独立runtime不支持。F32反馈/有效性启发式是近似，不声称NV/041a逐位等价、游戏抑闪已修或借reference耗时。
+
+修latest接口拓宽导致addon漏MP1 startup/F9防线（genericaux MP1/2/3保留），修PR普通RGBinput首次漏UAV→SRV默认回归；未知padding/display MV有效区failclosed。源policy/首状态检查与最终MinGW runtime77426通过。实际1392 MSVC/WARP/9070接口套件PASS、14793受影响addon补检PASS，codec默认输出对297b字节同；未做完整NN aux资产/真实游戏/性能/gfx1200硬件门。1392在最后RGB修前，14793单列不伪全套重跑。results/pr12-integration-20261007留receipt/日志。0.41/041a包、本机DLL与游戏配置不改。

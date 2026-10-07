@@ -479,3 +479,14 @@ DLSS5_HOT_RELOAD=1
 # 中：NVIDIA Style 0/1/2：1 = 剑星原版风格；默认 1；0 = NVIDIA 默认、最接近参考输出；改了输出风格就变；需重启
 # EN: NVIDIA Style 0/1/2: 1 = Stellar Blade style; default 1; 0 = NVIDIA default, closest to reference; restart needed
 DLSS5_STYLE=1
+
+# Fast History: opt-in temporal approximation for HIP FFX pre-upscale only. Restart required.
+# 中：历史抑闪实验，默认关闭；只支持 FFX pre / MP1 / 完整视口 / graph0 / overlap0；开启会改变画面，非原版逐位复刻。
+# EN: Temporal flicker experiment, off by default; FFX pre/MP1/full viewport/graph0/overlap0 only; changes output, not bit-exact NGX.
+DLSS5_FAST_HISTORY=0
+# Requires matching C32 logit exports + post70-history-head.f16; see CONFIGURATION.md.
+# Declare unjittered motion only when the game really supplies it; depth direction must be declared, never guessed.
+# 必须按游戏实际约定声明：普通深度 0、反向深度 1（以下不提供启用默认值）。
+# DLSS5_TEMPORAL_MV_UNJITTERED=1
+# DLSS5_FAST_HISTORY_DEPTH_INVERTED=0
+# DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0

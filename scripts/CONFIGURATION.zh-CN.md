@@ -82,3 +82,21 @@ Development/native-game-flags.txt是早期测试配置，scripts/game-flags.txt�
 
 0.28.1仅重打RE9专用包，入口Development/tools/package-0281-re9.ps1；采用74b8a67边界/恢复修复候选，其他两包维持0.28。新包验证通过后撤下本地RE9 0.28整包及其README下载入口。
 
+
+## 可选 Fast History 抑闪实验（默认关闭）
+
+在 `custom-config.txt` 设置 `DLSS5_FAST_HISTORY=1`，退出并重启游戏后生效。仅支持 HIP 的 FFX pre-upscale、完整网络视口、`MULTI_PASS=1`、`HIP_GRAPH=0`、`OVERLAP=0`；Magpie 与 RE9 独立 runtime 不支持这个消费路径。多层用户要先关闭 Fast History 并重启；不能在开启时用 F9 切到2/3层。预测偏好在 MP1 下不影响单遍。
+
+同时必须声明实际为无抖动的运动向量：`DLSS5_TEMPORAL_MV_UNJITTERED=1`；按游戏实际深度方向设置 `DLSS5_FAST_HISTORY_DEPTH_INVERTED=0`（普通）或 `1`（反向），不要猜值。设置 `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0`，两套历史不能叠用。现有 `DLSS5_FAST_TEMPORAL=1` 只是旧采样优化，不代表新开关已开启。配置读取仍按本文层级，旧 `native-game-flags.txt` 与环境变量可能覆盖你的设置。
+
+还需匹配所选 FAST/RTZ/norm900 模块的新 logit exports，及模型目录里的 `post70-history-head.f16`；旧包缺少这些内容，不能仅改配置就得到完整功能。[接口与提取方法](../Development/integration_interfaces.md#addon-fast-history)。默认0不依赖这些新资产。
+
+这是独立的近似时序策略：FP32反馈、深度/颜色/黑输出有效性启发式与原版及0.41-a参考实验不同，开启后会改变输出，可能产生拖影。已有数值测试不等于游戏观感验收；新路径成本尚未实测，不能套用参考实验的耗时。开启时整段会禁用近似ViT复用，但不会重写用户偏好。
+
+Fast History currently admits motion textures whose mip-zero dimensions exactly
+match the active render width/height. Padded or display-resolution motion
+layouts are unsupported: their missing context/active-extent contract resets
+history and uses current-frame NR. Depth may be padded because sampling uses
+the declared render extent.
+
+当前 Fast History 只接收 mip0 尺寸恰等于实际 render 区域的运动纹理；带padding或显示分辨率MV缺少上下文/有效区域合同，会重置历史并用本帧NR，不猜测采样区域。深度按声明的render区域采样，可保留分配padding。

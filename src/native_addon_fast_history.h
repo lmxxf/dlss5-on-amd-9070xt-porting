@@ -46,10 +46,13 @@ public:
   const int inverted=DepthDirection();
   if(!motion||!depth||!m.Valid()||inverted<0){prior=false;seed=0;return false;}
   auto md=motion->GetDesc(),dd=depth->GetDesc();
+  // Context flags/active MV subrect are unavailable here. Admit only a full
+  // render-sized motion surface; padded or display-resolution layouts reset
+  // history rather than sampling an unknown active extent.
   if(NativeFastHistorySupport::TextureIssue(md)||NativeFastHistorySupport::TextureIssue(dd)||
      NativeFastHistorySupport::MotionFormat(md.Format)==DXGI_FORMAT_UNKNOWN||
      NativeFastHistorySupport::DepthFormat(dd.Format)==DXGI_FORMAT_UNKNOWN||
-     !md.Width||!md.Height||dd.Width<parameters.renderWidth||dd.Height<parameters.renderHeight){prior=false;seed=0;return false;}
+     !md.Width||!md.Height||md.Width!=parameters.renderWidth||md.Height!=parameters.renderHeight||dd.Width<parameters.renderWidth||dd.Height<parameters.renderHeight){prior=false;seed=0;return false;}
   auto&s=slots[next++%slots.size()];auto done=submit.Completed();
   if(done==UINT64_MAX)throw std::runtime_error("fast history device removed");
   if(s.fence>done)submit.Flush(); // bounded ring pressure only, not a per-frame wait

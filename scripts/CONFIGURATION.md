@@ -92,3 +92,21 @@ With FAST_NUMERIC=1, an available `c32-wave1-fast-norm900.hsaco` can be selected
 `DLSS5_HIP_SUBMIT_PULSE=auto` is the new internal default. Auto applies only to the verified Windows gfx1201/Runtime7 driver32.0.31007.2048, processing1600×960 or1920×1152, current full71 FAST1/MP1/AE0/graph-off/no-active-history recipe, and the actual ordinaryC256Down boundary before C512. It creates one owned timed event and records it there; it never enables timing getters or adds a query/wait in the frame path. `0` disables it. `1` is an explicit experiment on the samearchitecture/runtime/topology and may admit another driver; the log marks that driver unvalidated and no speed claim follows. gfx1200 and other scopes retain the prior path.
 
 Driver lookup failure, missing required active recipe exports, or event creation/recording failure disables the pulse while preserving the old network attempt. OptionalSP init_pair is not mandatory: the measuredstock profile has no such export; auto rejects a differentSP pair recipe. Device/runtime failure is not guaranteed recoverable. Per-frame runtimeeligibility is checked at the known ordinaryDown boundary, not from cumulativePDL count. Resources retire on the owningdevice/stream; failed cleanup retains the owner context. Existingconfiguration values and packagefiles are unchanged. This source change remains local pendingproduction compatibility/resmoke and combinedvalidation.
+
+## Optional Fast History experiment (default off)
+
+Set `DLSS5_FAST_HISTORY=1` in `custom-config.txt` and restart the game. This consumer supports only HIP FFX pre-upscale, a full network viewport, `MULTI_PASS=1`, `HIP_GRAPH=0` and `OVERLAP=0`. Magpie and the RE9 standalone runtime do not support this consumer. Disable Fast History and restart before selecting MP2/3; F9 cannot switch it to multiple passes. Prediction preferences are inactive in MP1.
+
+Declare `DLSS5_TEMPORAL_MV_UNJITTERED=1` only for genuinely unjittered motion vectors. Declare `DLSS5_FAST_HISTORY_DEPTH_INVERTED=0` for conventional depth or `1` for reversed depth according to the game; there is no guessed default. Set `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0`: the two history modes are mutually exclusive. Existing `DLSS5_FAST_TEMPORAL=1` is a legacy sampling optimization, not activation of this new feature. Normal configuration precedence still applies, including legacy native-game-flags and environment overrides.
+
+Matching C32 logit exports for the actually selected FAST/RTZ/norm900 modules and `post70-history-head.f16` beside the model assets are required. An older package cannot gain the complete feature by changing flags alone. See [interfaces and row extraction](../Development/integration_interfaces.md#addon-fast-history). Default0 does not depend on these new assets.
+
+This separate approximation uses FP32 feedback and depth/raw/black-output validity heuristics; it differs from NGX and the0.41-a reference experiment. It changes output and may produce ghosting. Numerical fixtures do not establish game visual acceptance. Its cost has not been measured here and must not inherit the reference experiment's timings. Approximate ViT reuse is gated for the session without changing the user's preference.
+
+Fast History currently admits motion textures whose mip-zero dimensions exactly
+match the active render width/height. Padded or display-resolution motion
+layouts are unsupported: their missing context/active-extent contract resets
+history and uses current-frame NR. Depth may be padded because sampling uses
+the declared render extent.
+
+当前 Fast History 只接收 mip0 尺寸恰等于实际 render 区域的运动纹理；带padding或显示分辨率MV缺少上下文/有效区域合同，会重置历史并用本帧NR，不猜测采样区域。深度按声明的render区域采样，可保留分配padding。

@@ -44,5 +44,7 @@ int main(int argc,char**){try{
   for(UINT j=0;j<n*3;++j)Require(std::abs(static_cast<float*>(p)[j]-expected[i])<2e-6,"immutable deferred history controls and feedback");readbacks[i]->Unmap(0,&none);}
  m.frame_id=11;Require(!history.Prepare(submit,motion.Get(),depth.Get(),m,false),"frame gap resets history");
  m.frame_id=12;m.pre_exposure=2;Require(!history.Prepare(submit,motion.Get(),depth.Get(),m,false),"exposure change resets history");
+ auto paddedMotion=g.Texture(w+1,h,DXGI_FORMAT_R32G32_FLOAT);m.frame_id=13;
+ Require(!history.Prepare(submit,paddedMotion.Get(),depth.Get(),m,false),"unknown padded motion active extent resets history");
  g.NoErrors();puts("addon fast history deferred controls, reset/gap/exposure, guide ownership PASS");return 0;
 }catch(const std::exception&e){fprintf(stderr,"FAIL: %s\n",e.what());return 1;}}

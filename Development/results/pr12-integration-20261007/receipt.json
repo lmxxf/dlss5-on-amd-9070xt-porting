@@ -1,0 +1,39 @@
+{
+  "PR": 12,
+  "PR_head": "3ef0b6e98c3db19a2477998e755471ebe3507851",
+  "base": "297b032ac55f005d78568e684f30608651044f62",
+  "merge_commit": "b3d05ab34beaea97fa7062b20e19f76398c287fd",
+  "integration_branch": "integrate-pr12",
+  "default": "DLSS5_FAST_HISTORY=0, oldH900/Pulse/source experiments preserved",
+  "fixes": [
+    "Addonstartup actualMP1 guard andhotwholesnapshot guard beforepredict/skinsetters; reusableauxMP1/2/3 preserved",
+    "RestoreordinaryfirstRGBinput closingUAV\u2192SRV transition (defaultregression inPR)",
+    "Onlyrender-sizedfullMV admitted; padded/displayMV resetcurrentframeNR, noFFXcontextguess",
+    "FP32feedback/heuristics separateapproximation and selectedHrtz(identityFAST1)diagnostic explicitlydocumented"
+  ],
+  "tests": {
+    "native_policy": "PASS LinuxC++ scope truth table",
+    "rgb_state_contract": "prefixedPR header assertionFAIL; finalheaderPASS (staticcontrolflow, not GPUstatequery)",
+    "runtime_build_sessions": {
+      "45263": "exit0 initialfix",
+      "59534": "exit0 RGBbarrierfix",
+      "77426": "exit0 finalMVscopefix"
+    },
+    "runtime_sha256": "e0483a0fde45327f274af0901655517fbf1d96032086723671f90304ccce114b",
+    "interface_suite1392": "exit0/LOCK_RELEASED MSVC/WARP/RX9070 codeclegacybytes,ownershipfault, bridge/auxcompile, history/deferred/4Kcoverage",
+    "affected_patch_suite14793": "exit0/LOCK_RELEASED addonMSVC/WARP/AMD withpaddedMVnegativefixture"
+  },
+  "reference_acquisition": "Suiteonly stagecopy uses pinned297b oldencode/decode shaders instead ofgitshow; samebytes/hash, production testscript unchanged",
+  "pinned_reference_sha256": {
+    "native_codec_decode.hlsl": "a70789a1449765a027edd735fac077360f1ba53045c2349377016568df9de437",
+    "native_codec_encode.hlsl": "237332c83235cba639053fd1b6d7030c75c699936449efc43a4a36243d78c2f9"
+  },
+  "source_default_readback": "WARP+AMD candidatecodec HDR/sRGB/R10fallback byteexact297b; oldordinaryRGBstate regression foundindependently andfixed",
+  "limits": [
+    "No realgameflicker/visualacceptance orperformance claim",
+    "No fullnetworkauxGPUrun/newmodulebundle rebuilt; optionaltestskipped withoutAssets/Modules; sourcefeatureon requiresmatchedC32logitexportsandrow",
+    "No gfx1200devicehardwaretest andD3D12debuglayer unavailable",
+    "1392preRGBfixpass not misreported asfinalfullsuite; finalaffectedpatch14793separate",
+    "Official0.41/041aZIP/tag/userinstalledDLL/config unchanged; no install/push bychild"
+  ]
+}

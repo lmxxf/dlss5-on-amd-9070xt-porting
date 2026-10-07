@@ -4,7 +4,7 @@
 #include <wrl/client.h>
 #include <vector>
 
-// Native model pre/post history. The host serializes GPU users; each
+// Opt-in model-logit pre/post history approximation. The host serializes GPU users; each
 // recording pins its own guides/descriptor heap. Control is updated at execution.
 // The two reprojected buffers differ: depth selects pre motion, post uses centre.
 namespace NativeFastHistory
@@ -14,8 +14,9 @@ using NativeFastHistorySupport::Transition;
 using NativeFastHistorySupport::MotionFormat;
 using NativeFastHistorySupport::DepthFormat;
 inline constexpr char kShader[] = R"hlsl(
-// Original model temporal contract: pre uses nearest-depth motion, post uses
-// centre motion. Both use the normalized five-tap Catmull-Rom reconstruction.
+// Pre uses nearest-depth motion; post uses centre motion and five-tap
+// reconstruction. FP32 feedback and raw/depth validity heuristics make this
+// an independent approximation, not the bit-exact original NGX/041a contract.
 Texture2D<float2> Motion : register(t0);
 Texture2D<float> Depth : register(t1);
 StructuredBuffer<float4> Raw : register(t2);

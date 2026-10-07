@@ -24,7 +24,8 @@ No end-to-end game validation or completed downstream release is claimed.
   COMMON; consumers use the bridge's existing semaphore/queue ordering.
 - `RequestPostAuxiliary(row)` enables an additional raster logit output.
   `PostAuxiliary()` describes the resource, offset, capacity, processing dimensions
-  and 8-byte pixel stride: FP32 logit followed by its half-RTZ diagnostic value.
+  and 8-byte pixel stride: FP32 logit followed by the selected module's `Hrtz` diagnostic value (identity
+  in FAST1; half rounding in the normal/RTZ rows).
   The row has exactly 32 finite coefficients. Unsupported layouts or missing exports
   fail explicitly. The actual selected norm900 module is checked too; no silent
   downgrade to a different numerical module. Without this request, allocation and
@@ -87,14 +88,22 @@ neither set of synthetic results substitutes for game visual acceptance.
 
 ## Addon Fast History
 
+`DLSS5_FAST_HISTORY` defaults to **0**. This addon policy is a separate temporal
+approximation: FP32 blended-output feedback and raw/depth/black-output validity
+heuristics differ from the original NGX and the 0.41-a reference experiment.
+No game flicker improvement or runtime overhead has been measured for this
+consumer here; the reference experiment's timing is not its timing.
+
+
 Set these restart-required flags explicitly:
 
 ```text
 DLSS5_PRE_UPSCALE=1
 DLSS5_FAST_HISTORY=1
 DLSS5_TEMPORAL_MV_UNJITTERED=1
-DLSS5_FAST_HISTORY_DEPTH_INVERTED=1
+ # Set DLSS5_FAST_HISTORY_DEPTH_INVERTED to 0 or 1 for the actual game.
 DLSS5_MULTI_PASS=1
+DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0
 DLSS5_HIP_GRAPH=0
 DLSS5_OVERLAP=0
 ```
@@ -234,3 +243,11 @@ elimination of all scene-specific flicker is claimed.
 Downstream pins stay in place until the author merges the complete PR and the
 actual merge SHA is reviewed. Its previous zero-pin rehearsal applies to 304613aa;
 this scheduling extension must also be present before removing preservation rules.
+
+Fast History currently admits motion textures whose mip-zero dimensions exactly
+match the active render width/height. Padded or display-resolution motion
+layouts are unsupported: their missing context/active-extent contract resets
+history and uses current-frame NR. Depth may be padded because sampling uses
+the declared render extent.
+
+当前 Fast History 只接收 mip0 尺寸恰等于实际 render 区域的运动纹理；带padding或显示分辨率MV缺少上下文/有效区域合同，会重置历史并用本帧NR，不猜测采样区域。深度按声明的render区域采样，可保留分配padding。

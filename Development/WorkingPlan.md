@@ -181,3 +181,6 @@
 
 - directproduct实际53360/6afdb3ba首筛STOP：Auto2 Create1/ordinary与RecordAccepted163，对Off Graph160/资源0；8F16rawsamefinite、时间有效。steady mean ReplayOff比Auto **+0.006975ms**、p99−0.0451ms；control mean漂移+0.013213ms，不能证明普遍变慢，也不满足替换收益门。不formal/重刷/defaultGraph，不借旧off/off三轮或相加收益。
 - 下一仅CPU ReplayAuto最小机制准备：官方EventRecord7/GetEvent接口已见；需162节点(161kernel+1真实lease事件)的dtype/handle/强DAG位置门，graph/exec先销后leaseClose、每帧host eligibility及固定key复核。capture时host Record累计不等GPU重放次数；实际DLL导出/节点支持和raw尚未验证，仍无生产变化。
+
+
+- 2026-10-07 PR12当前3ef0b6e本地合并并补consumer MP1 startup/hotguard、RGB首次状态回归、MV有效区failclosed；FastHistory新flag默认0，近似策略与reference独立，开启需重启/明确guide/匹配row+exports。源码scope/最终runtime与MSVC WARP/9070接口suite1392、受影响补检14793通过；未真实游戏/性能/fullNNaux/gfx1200门，不改0.41/041a包与安装。具体证据results/pr12-integration-20261007；ReplayAuto暂停，原mochi差距目标未完成。

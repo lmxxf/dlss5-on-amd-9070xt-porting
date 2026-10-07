@@ -201,6 +201,9 @@ public:
 #endif
    NativeGameFrameStep("input",d);resources->input.Create(d,resources->encode.Output(),directory,!direct_input);
    const bool fast_history=NativeFastHistoryRequested();
+#ifdef DLSS5_USE_HIP
+   NativeFastHistoryPolicy::RequireSinglePass(fast_history,hip_reference::MultiPassFromEnvironment());
+#endif
    if(fast_history&&(!temporal_config||!temporal_config->experimental_ffx||!NativeTemporalExperimentUnjittered()||NativeAddonFastHistory::DepthDirection()<0||resources->overlap||temporal_rgb||NativeTemporalExperimentRequested()))throw std::runtime_error("fast history requires FFX pre, unjittered vectors, explicit depth direction, no overlap/reference history");
    if(temporal_config&&!temporal_rgb&&!fast_history){
     const bool experiment=NativeTemporalExperimentRequested()&&NativeTemporalExperimentUnjittered()&&temporal_config->experimental_ffx&&!resources->overlap;

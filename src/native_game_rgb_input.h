@@ -60,7 +60,7 @@ public:
   c->SetDescriptorHeaps(1,&heap);c->SetComputeRootSignature(root);c->SetPipelineState(pso);
   c->SetComputeRootDescriptorTable(0,heap->GetGPUDescriptorHandleForHeapStart());
   c->SetComputeRootUnorderedAccessView(1,(tiles?tiles:out)->GetGPUVirtualAddress());c->SetComputeRootUnorderedAccessView(2,out->GetGPUVirtualAddress());c->Dispatch(geometry.processing_width/8,geometry.processing_height/8,1);
-  if(replayable_recording||recorded)for(auto*r:{tiles,color})if(r&&!(external&&r==color))transition(c,r,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+  for(auto*r:{tiles,color})if(r&&!(external&&r==color))transition(c,r,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
   if(external)transition(c,out,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,rest);
   transition(c,source,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,before);recorded=true;
  }

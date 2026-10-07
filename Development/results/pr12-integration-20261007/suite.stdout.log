@@ -1,0 +1,45 @@
+d3d12_codec_integration_test.cpp
+debug_layer=unavailable
+PASS: legacy HDR/sRGB bytes, opt-ins, four debug views, R10 fallback, subrect, replay, typed views, provider isolation, History pipeline creation
+PASS: disabled R10 fallback
+debug_layer=unavailable
+PASS: legacy HDR/sRGB bytes, opt-ins, four debug views, R10 fallback, subrect, replay, typed views, provider isolation, History pipeline creation
+test_fast_history_scope.cpp
+PASS default-off MP1/2/3 and Fast History startup/hot snapshot MP1 scope
+bridge_network.cpp
+test_module_load.cpp
+PASS module initialization ownership and failure cleanup
+test_multipass_aux.cpp
+test_multipass_aux.cpp
+SKIP full-network auxiliary GPU test: supply -Amd -Assets <weights> -Modules <arch modules>
+test_fast_history.cpp
+D:\DLSSNR-Lab\build-tools\VC\Tools\MSVC\14.44.35207\include\xutility(5310): warning C4244: '=': 將 'const _Ty' 轉換為 'float'，由於類型不同，可能導致資料遺失
+        with
+        [
+            _Ty=int
+        ]
+D:\DLSSNR-Lab\build-tools\VC\Tools\MSVC\14.44.35207\include\xutility(5310): note: 範本具現化內容 (首先是最舊的) 是
+Development/test_fast_history.cpp(149): note: 請參考正在進行編譯的函式 樣板 具現化 'void std::fill<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<_Ty>>>,int>(const _FwdIt,const _FwdIt,const int &)'
+        with
+        [
+            _Ty=float,
+            _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<float>>>
+        ]
+test_addon_fast_history.cpp
+D3D12 debug layer unavailable; numerical/synchronization tests still execute
+addon fast history deferred controls, reset/gap/exposure, guide ownership PASS
+D3D12 debug layer unavailable; numerical/synchronization tests still execute
+native temporal dispatch coverage PASS 65x3 processing=65x4 direct=0
+native temporal dispatch coverage PASS 65x3 processing=65x4 direct=1
+native temporal dispatch coverage PASS 3456x1440 processing=3456x1472 direct=1
+native temporal dispatch coverage PASS 3840x2160 processing=3840x2176 direct=1
+native temporal WARP PASS: distinct pre/post motion, 5tap, edges, reversed depth, post model feedback, zero recovery/reset/fit, dispatch coverage
+D3D12 debug layer unavailable; numerical/synchronization tests still execute
+addon fast history deferred controls, reset/gap/exposure, guide ownership PASS
+D3D12 debug layer unavailable; numerical/synchronization tests still execute
+native temporal dispatch coverage PASS 65x3 processing=65x4 direct=0
+native temporal dispatch coverage PASS 65x3 processing=65x4 direct=1
+native temporal dispatch coverage PASS 3456x1440 processing=3456x1472 direct=1
+native temporal dispatch coverage PASS 3840x2160 processing=3840x2176 direct=1
+native temporal GPU PASS: distinct pre/post motion, 5tap, edges, reversed depth, post model feedback, zero recovery/reset/fit, dispatch coverage
+
