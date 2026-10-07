@@ -5,6 +5,7 @@
 #include "native_temporal_experiment.h"
 #include <array>
 #include <fstream>
+#include <chrono>
 
 // Addon policy around the reusable shader helper. A slot owns immutable frame
 // constants and guide views until the output submission fence completes.
@@ -19,6 +20,7 @@ class NativeAddonFastHistory {
  NativeFastHistory::Parameters parameters{};
  bool prior{}; unsigned frame{},seed{}; float exposure{1};
  Slot* current{};
+ std::chrono::steady_clock::time_point stamp{};bool haveTime{};unsigned logs{};
 public:
  bool enabled{};
  static std::vector<float> Row(const std::wstring&directory){
@@ -34,7 +36,7 @@ public:
   parameters.logitOffset=UINT(offset/4);enabled=true;
  }
  // No depth-direction guess: FFX context flags are not carried by this addon.
- // The opt-in requires an explicit convention alongside the unjittered-MV contract.
+ // Without both declarations the opt-in uses explicit screen-coordinate history.
  static int DepthDirection(){
   const wchar_t*v=_wgetenv(L"DLSS5_FAST_HISTORY_DEPTH_INVERTED");
   return v&&!wcscmp(v,L"0")?0:v&&!wcscmp(v,L"1")?1:-1;
@@ -44,15 +46,21 @@ public:
   current=nullptr;
   if(!enabled)return false;
   const int inverted=DepthDirection();
-  if(!motion||!depth||!m.Valid()||inverted<0){prior=false;seed=0;return false;}
-  auto md=motion->GetDesc(),dd=depth->GetDesc();
-  // Context flags/active MV subrect are unavailable here. Admit only a full
-  // render-sized motion surface; padded or display-resolution layouts reset
-  // history rather than sampling an unknown active extent.
-  if(NativeFastHistorySupport::TextureIssue(md)||NativeFastHistorySupport::TextureIssue(dd)||
-     NativeFastHistorySupport::MotionFormat(md.Format)==DXGI_FORMAT_UNKNOWN||
-     NativeFastHistorySupport::DepthFormat(dd.Format)==DXGI_FORMAT_UNKNOWN||
-     !md.Width||!md.Height||md.Width!=parameters.renderWidth||md.Height!=parameters.renderHeight||dd.Width<parameters.renderWidth||dd.Height<parameters.renderHeight){prior=false;seed=0;return false;}
+  D3D12_RESOURCE_DESC md{},dd{};
+  bool real=false;
+  if(motion&&depth&&m.Valid()&&NativeTemporalExperimentUnjittered()&&inverted>=0){
+   md=motion->GetDesc();dd=depth->GetDesc();
+   real=!NativeFastHistorySupport::TextureIssue(md)&&!NativeFastHistorySupport::TextureIssue(dd)&&
+    (md.Format==DXGI_FORMAT_R16G16_FLOAT||md.Format==DXGI_FORMAT_R32G32_FLOAT)&&
+    NativeFastHistorySupport::DepthFormat(dd.Format)!=DXGI_FORMAT_UNKNOWN&&
+    md.Width==parameters.renderWidth&&md.Height==parameters.renderHeight&&dd.Width>=parameters.renderWidth&&dd.Height>=parameters.renderHeight;
+  }
+  if(!real){motion=nullptr;depth=nullptr;md={};dd={};}
+  const bool known=m.Valid();
+  const unsigned id=known?m.frame_id:frame+1;
+  const float exp=known?m.pre_exposure:1.f;
+  reset=reset||parameters.reserved[0]!=unsigned(real);
+  parameters.reserved[0]=real?1u:0u;parameters.hasDepth=real?1u:0u;
   auto&s=slots[next++%slots.size()];auto done=submit.Completed();
   if(done==UINT64_MAX)throw std::runtime_error("fast history device removed");
   if(s.fence>done)submit.Flush(); // bounded ring pressure only, not a per-frame wait
@@ -63,14 +71,17 @@ public:
    rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
    NativeFastHistorySupport::Check(submit.Device()->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_GENERIC_READ,nullptr,IID_PPV_ARGS(&s.control)),"frame control");
   }
-  reset=reset||!prior||m.frame_id!=frame+1||m.pre_exposure!=exposure;
+  auto now=std::chrono::steady_clock::now();
+  reset=reset||!prior||id!=frame+1||exp!=exposure||(haveTime&&std::chrono::duration<double>(now-stamp).count()>.25);
+  stamp=now;haveTime=true;
   if(reset)seed=0;
   parameters.useHistory=!reset;parameters.motionWidth=UINT(md.Width);parameters.motionHeight=md.Height;
-  parameters.scaleX=m.motion_scale[0]/parameters.renderWidth;parameters.scaleY=m.motion_scale[1]/parameters.renderHeight;
-  parameters.depthInverted=UINT(inverted); // unjittered vectors; no jitter delta added
+  parameters.scaleX=real?m.motion_scale[0]/parameters.renderWidth:0;parameters.scaleY=real?m.motion_scale[1]/parameters.renderHeight:0;
+  parameters.depthInverted=real?UINT(inverted):0; // unjittered vectors; no jitter delta added
   void*p{};D3D12_RANGE none{};NativeFastHistorySupport::Check(s.control->Map(0,&none,&p),"frame control map");
   std::memcpy(p,&parameters,sizeof parameters);s.control->Unmap(0,nullptr);
-  frame=m.frame_id;exposure=m.pre_exposure;current=&s;return parameters.useHistory!=0;
+  if(logs++<8){FILE*f=_wfopen(NativeLabPath(L"fast-history-mode1.log").c_str(),L"a");if(f){fprintf(f,"mode1 static_fallback=%u motion=%u depth=%u use_history=%u seed=%u source_sequence=%u\n",unsigned(!real),unsigned(real),unsigned(real),parameters.useHistory,seed,unsigned(known));fclose(f);}}
+  frame=id;exposure=exp;current=&s;return parameters.useHistory!=0;
  }
  UINT Seed()const{return seed;}
  void Inputs(ID3D12GraphicsCommandList*c,ID3D12Resource*raw,ID3D12Resource*out,D3D12_RESOURCE_STATES ds){

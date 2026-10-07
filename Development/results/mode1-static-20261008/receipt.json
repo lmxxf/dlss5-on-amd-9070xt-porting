@@ -1,0 +1,28 @@
+{
+  "source_sha256": {
+    "src/native_fast_history.h": "226d9d48d221364701f39ae9d7818be3df6ec7adef58c17e8ba61e5fab9933e4",
+    "src/native_addon_fast_history.h": "cd83c5cf408bb850e23dc358d87e128bbb077a77f5511ba818db8d1261394f65",
+    "src/native_game_frame.h": "df13d252bb9993bca85fb363b09e80c7667c3058e192a1f06d1868965c5cca21",
+    "src/native_temporal_mode.h": "26c80e6b9f2b9c9c617b118c22dd8754f54e4747b2ef50ed3eb686d83ee623ef",
+    "src/LmxxfNrRuntime.cpp": "4f8d6ba53edf1c769ea46c64ec8f86936cbca61729591c70d0868de9a1fef349",
+    "Development/test_fast_history_static.cpp": "3387533b0146158e0546856762303a71ceaf0244bfc880d6e6200afad45534a7",
+    "Development/test_addon_fast_history_static.cpp": "a77fb97006f54f427ae68b5f700eec8fbc885dfec84d87d1d20927d11f604be1"
+  },
+  "addon_sha256": "3d962455111edbfe4023bdaf19c20096e2754c46d56794a7c2f387d43b89af25",
+  "runtime_sha256": "3eaed204f5d6ad803749d6e8c79ed1e79c514f5d02ef1e68d8dcb3f292638db6",
+  "shader_probe": {
+    "handle": 90615,
+    "exit": 0
+  },
+  "addon_policy_probe": {
+    "handle": 29016,
+    "exit": 0
+  },
+  "previous_fixture_failure": {
+    "handle": 65890,
+    "message": "unknown padded motion active extent resets history",
+    "cause": "obsolete assertion against explicitly-static fallback",
+    "production_changed": false
+  },
+  "scope": "known static/no-guide local math and addon policy; not full Frame/network or performance"
+}

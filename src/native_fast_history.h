@@ -51,6 +51,7 @@ float GetDepth(float2 uv) {
     return Depth.Load(int3(p,0));
 }
 float2 GetMotion(float2 uv) {
+    if (reserved.x == 0) return float2(0,0); // explicitly declared screen-space fallback
     uint2 p=min(uint2(saturate(uv)*float2(motionWidth,motionHeight)),uint2(motionWidth-1,motionHeight-1));
     return Motion.Load(int3(p,0))*float2(scaleX,scaleY);
 }
@@ -156,7 +157,7 @@ struct Parameters
     UINT renderWidth{}, renderHeight{}, motionWidth{}, motionHeight{};
     float scaleX{}, scaleY{}, jitterX{}, jitterY{};
     float historyStrength{1}; UINT logitOffset{}, depthInverted{}, hasDepth{1};
-    UINT reserved[4]{};
+    UINT reserved[4]{1,0,0,0}; // bit 0: read real motion; zero is static fallback
 };
 static_assert(sizeof(Parameters)==96);
 class History
@@ -255,9 +256,9 @@ public:
         auto handle=heap->GetCPUDescriptorHandleForHeapStart();
         D3D12_SHADER_RESOURCE_VIEW_DESC sv{}; sv.ViewDimension=D3D12_SRV_DIMENSION_TEXTURE2D;
         sv.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING; sv.Texture2D.MipLevels=1;
-        sv.Format=MotionFormat(motion->GetDesc().Format);device->CreateShaderResourceView(motion,&sv,handle);
+        sv.Format=motion?MotionFormat(motion->GetDesc().Format):DXGI_FORMAT_R32G32_FLOAT;device->CreateShaderResourceView(motion,&sv,handle);
         handle.ptr+=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-        sv.Format=DepthFormat(depth->GetDesc().Format);device->CreateShaderResourceView(depth,&sv,handle);
+        sv.Format=depth?DepthFormat(depth->GetDesc().Format):DXGI_FORMAT_R32_FLOAT;device->CreateShaderResourceView(depth,&sv,handle);
         return heap;
     }
     void RecordInputs(ID3D12GraphicsCommandList *cmd,ID3D12Resource *raw,ID3D12Resource *output,
@@ -266,25 +267,25 @@ public:
     {
         // Only mip 0, array slice 0, plane 0 is exposed by these SRVs. Other
         // mips and the stencil plane can be in different states in the game.
-        Transition(cmd,motion,ms,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
-        Transition(cmd,depth,ds,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
+        if(motion) Transition(cmd,motion,ms,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
+        if(depth) Transition(cmd,depth,ds,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
         Transition(cmd,preWarp,preState,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
         Transition(cmd,postWarp,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
         // Keep each dispatch axis below D3D12's 65535-group limit, including 4K.
         Bind(cmd,raw,output,p,heap,control); cmd->SetPipelineState(reproject); cmd->Dispatch((width+63)/64,processingHeight,1);
         Transition(cmd,preWarp,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,preState);
         Transition(cmd,postWarp,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-        Transition(cmd,motion,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ms,0);
-        Transition(cmd,depth,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ds,0);
+        if(motion) Transition(cmd,motion,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ms,0);
+        if(depth) Transition(cmd,depth,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ds,0);
     }
     void RecordOutputs(ID3D12GraphicsCommandList *cmd,ID3D12Resource *raw,ID3D12Resource *output,
                        ID3D12Resource *depth,D3D12_RESOURCE_STATES ds,const Parameters &p, ID3D12DescriptorHeap* heap, D3D12_GPU_VIRTUAL_ADDRESS control)
     {
-        Transition(cmd,depth,ds,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
+        if(depth) Transition(cmd,depth,ds,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,0);
         for(auto *r:{previousRaw,previousModel,output}) Transition(cmd,r,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
         Bind(cmd,raw,output,p,heap,control); cmd->SetPipelineState(finish); cmd->Dispatch((width+63)/64,processingHeight,1);
         for(auto *r:{previousRaw,previousModel,output}) Transition(cmd,r,D3D12_RESOURCE_STATE_UNORDERED_ACCESS,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-        Transition(cmd,depth,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ds,0);
+        if(depth) Transition(cmd,depth,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,ds,0);
     }
     ID3D12Resource *Warped() const { return preWarp; }
     ID3D12Resource *PostWarped() const { return postWarp; }

@@ -85,9 +85,9 @@ Development/native-game-flags.txt是早期测试配置，scripts/game-flags.txt�
 
 ## 可选 Fast History 抑闪实验（默认关闭）
 
-在 `custom-config.txt` 设置 `DLSS5_FAST_HISTORY=1`，退出并重启游戏后生效。仅支持 HIP 的 FFX pre-upscale、完整网络视口、`MULTI_PASS=1`、`HIP_GRAPH=0`、`OVERLAP=0`；Magpie 与 RE9 独立 runtime 不支持这个消费路径。多层用户要先关闭 Fast History 并重启；不能在开启时用 F9 切到2/3层。预测偏好在 MP1 下不影响单遍。
+在 `custom-config.txt` 设置 `DLSS5_TEMPORAL_MODE=1`，退出并重启游戏后生效。支持 HIP addon 和独立 runtime 的完整网络视口、`MULTI_PASS=1`、`HIP_GRAPH=0`、`OVERLAP=0`。多层用户要先关闭 Fast History 并重启；不能在开启时用 F9 切到2/3层。预测偏好在 MP1 下不影响单遍。
 
-同时必须声明实际为无抖动的运动向量：`DLSS5_TEMPORAL_MV_UNJITTERED=1`；按游戏实际深度方向设置 `DLSS5_FAST_HISTORY_DEPTH_INVERTED=0`（普通）或 `1`（反向），不要猜值。设置 `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0`，两套历史不能叠用。现有 `DLSS5_FAST_TEMPORAL=1` 只是旧采样优化，不代表新开关已开启。配置读取仍按本文层级，旧 `native-game-flags.txt` 与环境变量可能覆盖你的设置。
+只有使用运动补偿时才声明实际为无抖动的运动向量：`DLSS5_TEMPORAL_MV_UNJITTERED=1`；按游戏实际深度方向设置 `DLSS5_FAST_HISTORY_DEPTH_INVERTED=0`（普通）或 `1`（反向），不要猜值。缺少可信 MV/深度约定时明确使用屏幕坐标 static fallback，只靠颜色变化拒绝历史，不能补偿运动或可靠识别遮挡，可能拖影。独立 runtime 使用此降级路径；前几帧实际状态写入 `fast-history-mode1.log`。设置 `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=0`，两套历史不能叠用。现有 `DLSS5_FAST_TEMPORAL=1` 只是旧采样优化，不代表新开关已开启。配置读取仍按本文层级，旧 `native-game-flags.txt` 与环境变量可能覆盖你的设置。
 
 还需匹配所选 FAST/RTZ/norm900 模块的新 logit exports，及模型目录里的 `post70-history-head.f16`；旧包缺少这些内容，不能仅改配置就得到完整功能。[接口与提取方法](../Development/integration_interfaces.md#addon-fast-history)。默认0不依赖这些新资产。
 
@@ -103,7 +103,7 @@ the declared render extent.
 
 ## Single temporal mode selector / 统一时域模式
 
-`DLSS5_TEMPORAL_MODE=0` is the default: unchanged NR output with no new temporal resources. `1` selects TheAutomatic Fast History (the existing approximate PR12 implementation, FFX-only, explicit unjittered MV/depth/row/logit exports required); `2` selects an independently implemented low-frequency residual EMA at the final NR output, no row or new NN exports. Both active modes require MP1 and cannot combine with `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=1`. Restart to change modes. An explicit MODE value, including0, wins over legacy `DLSS5_FAST_HISTORY`; only absent MODE maps legacy FAST_HISTORY1 to mode1. Invalid/empty MODE is rejected.
+`DLSS5_TEMPORAL_MODE=0` is the default: unchanged NR output with no new temporal resources. `1` selects TheAutomatic Fast History (the existing approximate PR12 implementation, row/logit exports required; undeclared motion/depth uses explicit static fallback); `2` selects an independently implemented low-frequency residual EMA at the final NR output, no row or new NN exports. Both active modes require MP1 and cannot combine with `DLSS5_TEMPORAL_HISTORY_EXPERIMENT=1`. Restart to change modes. An explicit MODE value, including0, wins over legacy `DLSS5_FAST_HISTORY`; only absent MODE maps legacy FAST_HISTORY1 to mode1. Invalid/empty MODE is rejected.
 
 Mode2 operates in the codec's encoded NR working domain, not Magpie's display RGB. It retains this frame's high-frequency residual and smooths only guided low-frequency residual over approximately80ms. With a declared valid render-sized unjittered MV it may compensate motion; otherwise it explicitly uses screen coordinates plus conservative original-colour rejection (no invented zero-MV validity, no depth guess). Ghosting/quality and real-game cost remain experimental. The first implementation is synchronous to protect buffer/control lifetimes. It gates approximate ViT reuse for the session without rewriting preference. Runtime input identity is unknown: no duplicate-frame skipping is inferred.
 

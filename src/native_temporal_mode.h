@@ -10,4 +10,4 @@ inline NativeTemporalMode NativeParseTemporalMode(const std::optional<std::strin
 }
 
 struct NativeTemporalAdmission {bool motion_read,metadata,reset;};
-inline NativeTemporalAdmission NativeAdmitTemporalSource(NativeTemporalMode mode,bool reference,bool unjittered,bool valid,bool rgFloat,bool sourceReset){bool read=(reference||mode!=NativeTemporalMode::Off)&&unjittered&&valid&&rgFloat;bool meta=read||(mode==NativeTemporalMode::LowFrequency&&valid);return {read,meta,meta?sourceReset:true};}
+inline NativeTemporalAdmission NativeAdmitTemporalSource(NativeTemporalMode mode,bool reference,bool unjittered,bool valid,bool rgFloat,bool sourceReset){bool read=(reference||mode!=NativeTemporalMode::Off)&&unjittered&&valid&&rgFloat;bool meta=read||(mode!=NativeTemporalMode::Off&&valid);return {read,meta,meta?sourceReset:true};}

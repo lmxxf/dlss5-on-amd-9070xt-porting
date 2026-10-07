@@ -15,7 +15,9 @@
 #include "hip_d3d12_bridge.h"
 #include "native_temporal_experiment.h"
 #include "native_low_frequency_temporal.h"
+#include "native_addon_fast_history.h"
 
+#include <chrono>
 #include <atomic>
 #include <mutex>
 #include <cstddef>
@@ -28,6 +30,111 @@
 
 namespace
 {
+// Runtime ABI has no trustworthy motion/depth guides. This is explicitly the
+// static, raw-change-rejected consumer of the same model-gated mode 1 shader.
+// Retire acknowledges an actual consumer submission; it never means GPU idle.
+class RuntimeMode1History {
+    struct Slot {
+        Microsoft::WRL::ComPtr<ID3D12Resource> control;
+        UINT64 completion{};
+    };
+    std::array<Slot,64> slots{};
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> bindings;
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence;
+    HANDLE event{};
+    NativeFastHistory::History history;
+    NativeFastHistory::Parameters parameters{};
+    Slot *current{};
+    unsigned next{}, seed{};
+    UINT64 serial{};
+    bool prior{}, pending{}, forceReset{true}, invalidFrame{};
+    float priorExposure{}, priorScale{};
+    std::chrono::steady_clock::time_point lastPrepare{};
+    bool haveTime{};
+public:
+    RuntimeMode1History(ID3D12Device*d,const NativeNetworkGeometry&g,
+                        hip_reference::D3D12Bridge& bridge) {
+        const auto auxiliary=bridge.PostAuxiliary();
+        if(!auxiliary.resource || !bridge.DirectHistory() || auxiliary.offset%4 ||
+           auxiliary.offset/4>UINT_MAX || g.processing_width!=g.valid_width)
+            throw std::runtime_error("Runtime mode1 auxiliary/geometry contract");
+        history.Create(d,g.valid_width,g.valid_height,g.processing_height,bridge.DirectHistory());
+        parameters.width=g.valid_width;parameters.height=g.valid_height;
+        parameters.processingHeight=g.processing_height;
+        parameters.viewWidth=parameters.width;parameters.viewHeight=parameters.height;
+        parameters.renderWidth=parameters.motionWidth=parameters.width;
+        parameters.renderHeight=parameters.motionHeight=parameters.height;
+        parameters.logitOffset=UINT(auxiliary.offset/4);
+        parameters.hasDepth=0;parameters.reserved[0]=0;
+        bindings=NativeFastHistory::History::Binding(d,nullptr,nullptr);
+        NativeFastHistorySupport::Check(d->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)),"runtime history fence");
+        event=CreateEventW(nullptr,FALSE,FALSE,nullptr);
+        if(!event)throw std::runtime_error("Runtime mode1 event");
+    }
+    ~RuntimeMode1History(){if(event)CloseHandle(event);}
+    void Prepare(ID3D12Device*d,float exposure,float scale) {
+        if(current || pending)throw std::runtime_error("Runtime mode1 previous frame must be Retired or cancelled");
+        auto&s=slots[next++%slots.size()];
+        const auto done=fence->GetCompletedValue();
+        if(done==UINT64_MAX)throw std::runtime_error("Runtime mode1 device removed");
+        if(s.completion>done){
+            NativeFastHistorySupport::Check(fence->SetEventOnCompletion(s.completion,event),"runtime history completion");
+            if(WaitForSingleObject(event,3000)!=WAIT_OBJECT_0)throw std::runtime_error("Runtime mode1 slot completion timeout");
+        }
+        if(!s.control){
+            D3D12_HEAP_PROPERTIES hp{};hp.Type=D3D12_HEAP_TYPE_UPLOAD;
+            D3D12_RESOURCE_DESC rd{};rd.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;rd.Width=256;
+            rd.Height=1;rd.DepthOrArraySize=rd.MipLevels=1;rd.SampleDesc.Count=1;rd.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            NativeFastHistorySupport::Check(d->CreateCommittedResource(&hp,D3D12_HEAP_FLAG_NONE,&rd,D3D12_RESOURCE_STATE_GENERIC_READ,nullptr,IID_PPV_ARGS(&s.control)),"runtime history control");
+        }
+        const auto now=std::chrono::steady_clock::now();
+        const bool gap=haveTime && now-lastPrepare>std::chrono::milliseconds(250);
+        lastPrepare=now;haveTime=true;
+        const bool reset=forceReset||!prior||gap||exposure!=priorExposure||scale!=priorScale;
+        if(reset)seed=0;
+        parameters.useHistory=!reset;
+        void*p{};D3D12_RANGE none{};
+        NativeFastHistorySupport::Check(s.control->Map(0,&none,&p),"runtime history map");
+        std::memcpy(p,&parameters,sizeof parameters);s.control->Unmap(0,nullptr);
+        current=&s;invalidFrame=false;priorExposure=exposure;priorScale=scale;
+    }
+    unsigned Seed()const{return seed;}
+    bool UsesHistory()const{return current&&parameters.useHistory;}
+    void Inputs(ID3D12GraphicsCommandList*c,ID3D12Resource*raw,ID3D12Resource*out){
+        if(!current)throw std::runtime_error("Runtime mode1 inputs without Prepare");
+        history.RecordInputs(c,raw,out,nullptr,nullptr,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+            D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,parameters,bindings.Get(),current->control->GetGPUVirtualAddress());
+    }
+    void Outputs(ID3D12GraphicsCommandList*c,ID3D12Resource*raw,ID3D12Resource*out){
+        if(!current||pending)throw std::runtime_error("Runtime mode1 output recording contract");
+        history.RecordOutputs(c,raw,out,nullptr,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+            parameters,bindings.Get(),current->control->GetGPUVirtualAddress());pending=true;
+    }
+    void Submitted(ID3D12CommandQueue*q){
+        if(!pending)return;
+        // On signal failure retain current ownership and poison the Session.
+        NativeFastHistorySupport::Check(q->Signal(fence.Get(),serial+1),"runtime history submitted");
+        current->completion=++serial;
+        if(serial<=2 || serial%100==0){
+            if(FILE*f=_wfopen(NativeLabPath(L"logs\\temporal-mode.txt").c_str(),L"ab")){
+                fprintf(f,"runtime temporal_mode=1 submitted=%llu motion=static depth=none history_enabled=%u seed=%u invalid=%u\n",
+                    static_cast<unsigned long long>(serial),parameters.useHistory,seed,unsigned(invalidFrame));fclose(f);
+            }
+        }
+        current=nullptr;pending=false;prior=!invalidFrame;forceReset=invalidFrame;
+        if(invalidFrame)seed=0;else ++seed;
+    }
+    void Cancel(ID3D12CommandQueue*q=nullptr){
+        // A cancelled consumer can still have a submitted producer reading its
+        // constants. Fence that preceding queue work before this slot is reused.
+        if(current&&q){
+            NativeFastHistorySupport::Check(q->Signal(fence.Get(),serial+1),"runtime history cancel fence");
+            current->completion=++serial;
+        }
+        current=nullptr;pending=false;prior=false;forceReset=true;seed=0;
+    }
+    void Reset(){prior=false;forceReset=true;invalidFrame=true;seed=0;}
+};
 thread_local char g_lastError[2048] = {};
 
 // LMXXF_NR_FRAME_INFO_V1_SIZE is what an ABI v1 host sends as struct_size. It must equal the
@@ -405,6 +512,7 @@ struct Session
     bool temporalModeSelected = false;
     NativeTemporalMode selectedTemporalMode = NativeTemporalMode::Off;
     NativeLowFrequencyTemporal *lowFrequency = nullptr;
+    RuntimeMode1History *fastHistory = nullptr;
     bool lowFrequencyPending = false;
     bool lowFrequencyReset = true;
     float lowFrequencyExposureScale = 0.f;
@@ -505,6 +613,7 @@ struct Session
                 throw std::runtime_error("TeardownCodecChain: bridge work did not complete");
             }
         }
+        if (fastHistory) { fastHistory->Cancel(); delete fastHistory; fastHistory=nullptr; }
         if (lowFrequency) { lowFrequency->CancelUnsubmitted(); delete lowFrequency; lowFrequency=nullptr; }
         lowFrequencyPending=false; lowFrequencyReset=true; lowFrequencyExposureScale=0.f;
         delete bridge;
@@ -595,6 +704,7 @@ struct Session
         // Fail-closed intentional leak: GPU may still reference the whole chain.
         bridge = nullptr;
         lowFrequency = nullptr; // preserve lease/resources if GPU drain failed
+        fastHistory = nullptr; // preserve history/constant/fence pins on drain failure
         decodeDisplay = nullptr;
         decode = nullptr;
         rgbTex = nullptr;
@@ -647,6 +757,7 @@ struct Session
             }
         }
         // Bridge dtor also synchronizes HIP / pending fence, then frees shared buffers.
+        if (fastHistory) { fastHistory->Cancel(); delete fastHistory; fastHistory=nullptr; }
         if (lowFrequency) { lowFrequency->CancelUnsubmitted(); delete lowFrequency; lowFrequency=nullptr; }
         lowFrequencyPending=false; lowFrequencyReset=true; lowFrequencyExposureScale=0.f;
         delete bridge;
@@ -1001,6 +1112,15 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         // blocks must skip SetError when a notice is already pending - otherwise the recreate
         // reason is clobbered and a per-frame rebuild becomes invisible in the log.
         bool keepLastError = false;
+        const auto temporalMode = NativeSelectedTemporalMode();
+        if (session->temporalModeSelected && session->selectedTemporalMode!=temporalMode)
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: temporal mode changed; restart required");
+        if (!session->temporalModeSelected) {
+            session->selectedTemporalMode=temporalMode; session->temporalModeSelected=true;
+        }
+        if (temporalMode != NativeTemporalMode::Off &&
+            (NativeTemporalExperimentRequested() || hip_reference::MultiPassFromEnvironment()!=1))
+            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=1/2 requires MP1 and reference history off");
         if (!session->hipPrepared)
         {
             auto geo = NativeCurrentNetworkGeometry();
@@ -1009,7 +1129,11 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             if (opt.graph)
                 return Fail(LMXXF_NR_FAILED, "PrepareFrame: graph must stay off");
             session->bridge = new hip_reference::D3D12Bridge();
-            if (RuntimeDirectInput()) session->bridge->RequestDirectInput();
+            if (RuntimeDirectInput() && temporalMode!=NativeTemporalMode::FastHistory) session->bridge->RequestDirectInput();
+                if (temporalMode==NativeTemporalMode::FastHistory) {
+                    session->bridge->RequestDirectHistory();
+                    session->bridge->RequestPostAuxiliary(NativeAddonFastHistory::Row(session->weightsDir));
+                }
             session->bridge->Create(session->queue, opt, {});
             if (session->timingRequested) session->bridge->EnableNetworkTiming(); /* kept across a recreate once a host asked */
             session->builtProcW=geo.processing_width; session->builtProcH=geo.processing_height;
@@ -1198,17 +1322,6 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
         if (retiredExposure)
             retiredExposure->Release();
 
-        const auto temporalMode = NativeSelectedTemporalMode();
-        if (session->temporalModeSelected && session->selectedTemporalMode!=temporalMode)
-            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: temporal mode changed; restart required");
-        if (!session->temporalModeSelected) {
-            session->selectedTemporalMode=temporalMode; session->temporalModeSelected=true;
-        }
-        if (temporalMode == NativeTemporalMode::FastHistory)
-            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=1 is addon-only; use 0 or 2");
-        if (temporalMode == NativeTemporalMode::LowFrequency &&
-            (NativeTemporalExperimentRequested() || hip_reference::MultiPassFromEnvironment()!=1))
-            return Fail(LMXXF_NR_INVALID_ARGUMENT, "Runtime: TEMPORAL_MODE=2 requires MP1 and reference history off");
         if (!session->encode)
         {
             if (!session->bridge)
@@ -1219,7 +1332,11 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
                 if (opt.graph)
                     return Fail(LMXXF_NR_FAILED, "PrepareFrame: graph must stay off");
                 session->bridge = new hip_reference::D3D12Bridge();
-                if (RuntimeDirectInput()) session->bridge->RequestDirectInput();
+                if (RuntimeDirectInput() && temporalMode!=NativeTemporalMode::FastHistory) session->bridge->RequestDirectInput();
+                if (temporalMode==NativeTemporalMode::FastHistory) {
+                    session->bridge->RequestDirectHistory();
+                    session->bridge->RequestPostAuxiliary(NativeAddonFastHistory::Row(session->weightsDir));
+                }
                 session->bridge->Create(session->queue, opt, {});
                 if (session->timingRequested) session->bridge->EnableNetworkTiming(); /* kept across a recreate once a host asked */
                 session->builtProcW=geo.processing_width; session->builtProcH=geo.processing_height;
@@ -1320,6 +1437,14 @@ int32_t PrepareFrame(void *context, const LmxxfNrFrameInfo *info, LmxxfNrJob *jo
             }
         }
 
+        if (temporalMode == NativeTemporalMode::FastHistory && !session->fastHistory) {
+            session->bridge->SetAdaptiveReuseAllowed(false);
+            session->fastHistory=new RuntimeMode1History(session->device,NativeCurrentNetworkGeometry(),*session->bridge);
+            CreateDirectoryW(NativeLabPath(L"logs").c_str(),nullptr);
+            if(FILE*f=_wfopen(NativeLabPath(L"logs\\temporal-mode.txt").c_str(),L"ab")){
+                fprintf(f,"runtime temporal_mode=1 active domain=encoded motion=static depth=none frame_id=unverified gate=model-row77\n");fclose(f);
+            }
+        }
         if (temporalMode == NativeTemporalMode::LowFrequency && !session->lowFrequency) {
             const auto g=NativeCurrentNetworkGeometry();
             // The encoder owns a complete network viewport. Do not claim native game MV/depth access.
@@ -1431,7 +1556,13 @@ int32_t RecordInputs(void *context, void *job, void *command_list)
             return static_cast<int32_t>(LMXXF_NR_OK);
         }
         session->rgbInput->Record(list, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-        session->bridge->RecordInputCopy(list, session->rgbInput->PostBase(), nullptr);
+        if(session->fastHistory){
+            session->fastHistory->Prepare(session->device,j->pre_exposure,j->exposure_scale);
+            session->fastHistory->Inputs(list,session->rgbInput->PostBase(),session->bridge->Output());
+            j->seed=session->fastHistory->Seed();
+        }
+        session->bridge->RecordInputCopy(list, session->rgbInput->PostBase(),
+            session->fastHistory && session->fastHistory->UsesHistory()?session->bridge->DirectHistory():nullptr);
         j->state = LMXXF_NR_JOB_PRODUCER_SUBMITTED;
         SetError("");
         return static_cast<int32_t>(LMXXF_NR_OK);
@@ -1485,6 +1616,7 @@ int32_t EnqueueHip(void *context, void *job, void *command_queue)
                 return Fail(LMXXF_NR_FAILED, "EnqueueHip: producer or old session queue did not drain before fallback clear");
             }
             // A zero neural output makes the normal decoder view use original Color.
+            if(session->fastHistory)session->fastHistory->Reset();
             const bool cleared = session->bridge && session->bridge->ClearOutput(targetQueue);
             if (cleared)
             {
@@ -1506,7 +1638,7 @@ int32_t EnqueueHip(void *context, void *job, void *command_queue)
         try
         {
             session->bridge->SetTimingTag(j->frame_id);
-            session->bridge->EnqueueAfterProducer(targetQueue, j->seed, false);
+            session->bridge->EnqueueAfterProducer(targetQueue, j->seed, session->fastHistory && session->fastHistory->UsesHistory());
             if (j->state == LMXXF_NR_JOB_PRODUCER_SUBMITTED)
                 j->state = LMXXF_NR_JOB_NR_COMPLETE;
             SetError("");
@@ -1516,6 +1648,7 @@ int32_t EnqueueHip(void *context, void *job, void *command_queue)
         {
             if (!session->zeroOutputFallback)
                 throw;
+            if(session->fastHistory)session->fastHistory->Reset();
             const bool cleared = session->bridge && session->bridge->ClearOutput(targetQueue);
             if (cleared)
             {
@@ -1574,6 +1707,7 @@ int32_t RecordOutputs(void *context, void *job, void *command_list)
         if (!j->codec_passthrough)
         {
             session->bridge->RecordOutputReadable(list);
+            if(session->fastHistory)session->fastHistory->Outputs(list,session->rgbInput->PostBase(),session->bridge->Output());
             if (session->lowFrequency) {
                 if (session->lowFrequencyPending)
                     throw std::runtime_error("Runtime: temporal output must be Retired before next RecordOutputs");
@@ -1586,9 +1720,10 @@ int32_t RecordOutputs(void *context, void *job, void *command_list)
             }
             session->rgbTex->Record(list);
         }
-        else if (session->lowFrequency) {
+        else if (session->lowFrequency || session->fastHistory) {
             // A bypass frame is not a temporal observation; returning starts cold.
-            session->lowFrequency->Reset();
+            if(session->fastHistory)session->fastHistory->Reset();
+            if(session->lowFrequency)session->lowFrequency->Reset();
             session->lowFrequencyReset=true;
         }
         if (!session->decode)
@@ -1654,6 +1789,7 @@ int32_t CancelUnsubmitted(void *context, void *job)
             j->state = LMXXF_NR_JOB_RETIRED;
         if (session->bridge)
             session->bridge->CancelUnsubmitted();
+        if(session->fastHistory)session->fastHistory->Cancel(session->queue);
         if (session->lowFrequency) session->lowFrequency->CancelUnsubmitted();
         session->lowFrequencyPending=false;session->lowFrequencyReset=true;
         SetError("");
@@ -1684,6 +1820,7 @@ int32_t Retire(void *context, void *job)
             j->state = LMXXF_NR_JOB_RETIRED;
         if (session->bridge)
             session->bridge->NotifyOutputSubmittedIfRecorded(session->queue);
+        if(session->fastHistory)session->fastHistory->Submitted(session->queue);
         if (session->lowFrequency && session->lowFrequencyPending) {
             session->lowFrequency->Submitted(session->queue);
             session->lowFrequencyPending=false;session->lowFrequencyReset=false;
@@ -1698,6 +1835,7 @@ int32_t ResetHistory(void *context)
     return GuardSession(session, [&] {
         if (!session)
             return Fail(LMXXF_NR_INVALID_ARGUMENT, "null context");
+        if(session->fastHistory)session->fastHistory->Reset();
         if (session->lowFrequency) session->lowFrequency->Reset();
         session->lowFrequencyReset=true;
         SetError("");

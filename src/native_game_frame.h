@@ -196,7 +196,7 @@ public:
    resources->original=source;
    {const auto&g=resources->encode.Geometry();char info[160];snprintf(info,sizeof info,"input=%ux%u network=%ux%u viewport=%u,%u,%u,%u output=%ux%u",g.width,g.height,g.network_width,g.network_height,g.x,g.y,g.fit_width,g.fit_height,g.width,g.height);NativeGameFrameStep(info,d);}
  #ifdef DLSS5_USE_HIP
-   const bool direct_input=(NativeDirectIo()&1)&&!resources->overlap&&!temporal_config&&!temporal_rgb;
+   const bool direct_input=(NativeDirectIo()&1)&&!resources->overlap&&!temporal_config&&!temporal_rgb&&NativeSelectedTemporalMode()!=NativeTemporalMode::FastHistory;
 #else
    const bool direct_input=false;
 #endif
@@ -207,7 +207,7 @@ public:
 #ifdef DLSS5_USE_HIP
    NativeFastHistoryPolicy::RequireSinglePass(fast_history||low_temporal,hip_reference::MultiPassFromEnvironment());
 #endif
-   if(fast_history&&(!temporal_config||!temporal_config->experimental_ffx||!NativeTemporalExperimentUnjittered()||NativeAddonFastHistory::DepthDirection()<0||resources->overlap||temporal_rgb||NativeTemporalExperimentRequested()))throw std::runtime_error("fast history requires FFX pre, unjittered vectors, explicit depth direction, no overlap/reference history");
+   if(fast_history&&(resources->overlap||temporal_rgb||NativeTemporalExperimentRequested()))throw std::runtime_error("fast history requires no overlap/reference history; undeclared guides use static fallback");
    if(temporal_config&&!temporal_rgb&&temporal_mode==NativeTemporalMode::Off){
     const bool experiment=NativeTemporalExperimentRequested()&&NativeTemporalExperimentUnjittered()&&temporal_config->experimental_ffx&&!resources->overlap;
     // Motion vectors arrive in UV units of the render grid; the coordinate pass uses the captured
@@ -237,7 +237,7 @@ public:
    NativeGameFrameStep("network",d);
 #ifdef DLSS5_USE_HIP
    resources->network.Create(resources->overlap?resources->compute_queue:resources->queue,resources->input.PostBase(),noise,directory,temporal_rgb,3,direct_input,resources->experimental_temporal,fast_history?NativeAddonFastHistory::Row(directory):std::vector<float>{},low_temporal);
-   if(fast_history){const auto g=resources->geometry;const auto fit=resources->encode.Geometry();if(g.processing_width!=g.valid_width||fit.x||fit.y||fit.fit_width!=g.valid_width||fit.fit_height!=g.valid_height)throw std::runtime_error("fast history requires full network viewport");resources->fast_history.Create(d,g.valid_width,g.valid_height,g.processing_height,temporal_config->render_width,temporal_config->render_height,resources->network.PostAuxiliary().offset,resources->network.DirectHistory());}if(direct_input){resources->input.RedirectOutput(resources->network.DirectInput());NativeGameFrameStep("direct_input",d);}
+   if(fast_history){const auto g=resources->geometry;const auto fit=resources->encode.Geometry();if(g.processing_width!=g.valid_width||fit.x||fit.y||fit.fit_width!=g.valid_width||fit.fit_height!=g.valid_height)throw std::runtime_error("fast history requires full network viewport");resources->fast_history.Create(d,g.valid_width,g.valid_height,g.processing_height,temporal_config?temporal_config->render_width:g.valid_width,temporal_config?temporal_config->render_height:g.valid_height,resources->network.PostAuxiliary().offset,resources->network.DirectHistory());}if(direct_input){resources->input.RedirectOutput(resources->network.DirectInput());NativeGameFrameStep("direct_input",d);}
 #else
    if(fast_history)throw std::runtime_error("fast history requires HIP backend");
    resources->network.Create(d,resources->input.Tiles(),resources->input.PostBase(),noise,directory,temporal_rgb,3);
