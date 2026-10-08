@@ -1,0 +1,33 @@
+{
+  "kind": "GPU_CAPTURE_SAME_NN_BEFORE_AFTER",
+  "current_live_game": false,
+  "domain": "codec encoded RGB; not decoded HDR",
+  "width": 1920,
+  "valid_height": 1080,
+  "processing_height": 1088,
+  "strength": 1,
+  "original_sha256": "3ef42d34cebd1bc847e5caa3a95b3c3b70f45c9eeed4e828a3e2f85615b49b68",
+  "before_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+  "after_sha256": "11b10952cccbb2033f43e3b90adbf653b6c7b30bd9464ac344e6e17f8ae894f5",
+  "changed_pixels_fraction": 0.999964313271605,
+  "mae": 0.0179792158305645,
+  "max_abs": 0.0751183032989502,
+  "nn_residual_mae": 0.03646828979253769,
+  "estimated_low_support_invalid_fraction": 0.0,
+  "estimated_out_of_range_skip_fraction": 0.0,
+  "estimated_zero_residual_fraction": 0.0,
+  "estimated_room_zero_among_eligible": 3.568672839506173e-05,
+  "estimated_room_below_01_among_eligible": 3.568672839506173e-05,
+  "cpu_prediction_mae_to_after": 5.817285000375705e-06,
+  "scope": "Cold spatial enhancement only; no prior history simulation. CPU gate estimates are not hardware counters.",
+  "actual_valid_rgb_finite": true,
+  "actual_changed_rgb_components": 6220569,
+  "actual_rgb_components_total": 6220800,
+  "actual_absdiff_percentiles": {
+    "p50": 0.014640092849731445,
+    "p90": 0.038341641426086426,
+    "p99": 0.061285794079303735
+  },
+  "actual_after_min": 0.039036571979522705,
+  "actual_after_max": 1.0
+}

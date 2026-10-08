@@ -1,7 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$Original,[Parameter(Mandatory=$true)][string]$Before)
 $ErrorActionPreference='Stop'
 $root='D:\DLSSNR-Lab\mode3-real-output-20261008'
-function Idle {& D:\DLSSNR-Lab\game-check.ps1 'SB-Win64 Onimusha re9.exe SandFall Magpie';if($LASTEXITCODE -ne 1){throw 'game live/check failed; no GPU probe'}}
+function Idle {& D:\DLSSNR-Lab\game-check.ps1 'SB-Win64 Onimusha re9.exe SandFall Magpie';if($LASTEXITCODE -ne 1){throw 'game live/check failed; no GPU probe'};if(Get-Process -Name rtc_compile -ErrorAction SilentlyContinue){throw 'RTC active'}}
 Idle
 if([IO.DriveInfo]::new('D:\').AvailableFreeSpace -lt 100GB){throw 'disk<100GB'}
 # These identities are the existing coupled encoded-gradient/fullNN snapshot, not current game/HDR output.
