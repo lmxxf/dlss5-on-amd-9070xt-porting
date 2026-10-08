@@ -1,0 +1,7 @@
+#include <cstring>
+#include "../../../fast_history_fixture.h"
+#include "../../../../src/native_low_frequency_temporal.h"
+#include <fstream>
+#include <vector>
+static std::vector<float> Read(const char*p,size_t count){std::ifstream f(p,std::ios::binary|std::ios::ate);if(!f||size_t(f.tellg())!=count*4)throw std::runtime_error("captured f32 footprint");std::vector<float>x(count);f.seekg(0);f.read((char*)x.data(),count*4);for(float v:x)if(!std::isfinite(v))throw std::runtime_error("nonfinite captured values");return x;}
+int main(int argc,char**argv)try{if(argc!=9)throw std::runtime_error("originalRGBA32f beforeRGB32f afterRGB32f W H PH strength providerAMD1");UINT w=std::stoul(argv[4]),h=std::stoul(argv[5]),ph=std::stoul(argv[6]);float strength=std::stof(argv[7]);auto x=Read(argv[1],size_t(w)*ph*4),y=Read(argv[2],size_t(w)*ph*3);Gpu g(std::stoul(argv[8])!=0);auto original=g.Buffer(x.size()*4),output=g.Buffer(y.size()*4);g.Upload(original.Get(),x);g.Upload(output.Get(),y);NativeLowFrequencyTemporal f;f.Create(g.device.Get(),w,h,ph,true,strength);f.Prepare(g.queue.Get(),0,false,1,true);g.Run([&](auto*c){f.Record(c,original.Get(),output.Get());});f.Submitted(g.queue.Get());auto after=g.Read(output.Get());std::ofstream save(argv[3],std::ios::binary);save.write((const char*)after.data(),after.size()*4);g.NoErrors();printf("CAPTURED_NN_MODE3_REPLAY noNNrerun=1 cold=1 originalRGBA32f=1 beforeAfterSameBuffer=1 width=%u validH=%u procH=%u strength=%g\n",w,h,ph,strength);return save?0:1;}catch(const std::exception&e){fprintf(stderr,"FAIL %s\n",e.what());return 1;}

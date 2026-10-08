@@ -1,0 +1,23 @@
+{
+  "kind": "CPU_COLD_MODEL_NOT_EXECUTED_MODE3",
+  "current_live_game": false,
+  "domain": "codec encoded RGB; not decoded HDR",
+  "width": 1920,
+  "valid_height": 1080,
+  "processing_height": 1088,
+  "strength": 1,
+  "original_sha256": "3ef42d34cebd1bc847e5caa3a95b3c3b70f45c9eeed4e828a3e2f85615b49b68",
+  "before_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+  "after_sha256": null,
+  "changed_pixels_fraction": 0.999964313271605,
+  "mae": 0.017973460257053375,
+  "max_abs": 0.07511067390441895,
+  "nn_residual_mae": 0.03646828979253769,
+  "estimated_low_support_invalid_fraction": 0.0,
+  "estimated_out_of_range_skip_fraction": 0.0,
+  "estimated_zero_residual_fraction": 0.0,
+  "estimated_room_zero_among_eligible": 3.568672839506173e-05,
+  "estimated_room_below_01_among_eligible": 3.568672839506173e-05,
+  "cpu_prediction_mae_to_after": null,
+  "scope": "Cold spatial enhancement only; no prior history simulation. CPU gate estimates are not hardware counters."
+}
