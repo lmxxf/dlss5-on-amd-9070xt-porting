@@ -1,0 +1,36 @@
+{
+  "source_freeze": "e8fa0661",
+  "addon_sha256": "4ceef29f363f52e9159e439cd9eecd52caa796a95d281b0ad07a20ce091ef833",
+  "artifact": "/tmp/dlss5-mode3-build/DLSS5-AMD.addon64",
+  "math_gate": {
+    "handle": 90050,
+    "exit": 0,
+    "providers": [
+      "WARP",
+      "AMD"
+    ],
+    "full_network_mode3_tested_before_deployment": false
+  },
+  "deployment": "actual Apply exit0 immediate terminal / lock released",
+  "backup": "D:\\DLSSNR-Lab\\mode3-stellar-deploy-20261008\\backups\\20261008-112330",
+  "target": "Stellar Blade addon only",
+  "config": {
+    "TEMPORAL_MODE": 3,
+    "TEMPORAL_ENHANCE_STRENGTH": 1,
+    "MULTI_PASS": 1,
+    "MULTI_PASS_PREDICT": 0,
+    "FAST_HISTORY": 0,
+    "TEMPORAL_HISTORY_EXPERIMENT": 0
+  },
+  "custom_sha256": "4bdb8c3a056d27164dd0e575428eec2c5523dee91d7b2a74c5b1c711a5415586",
+  "preserved": "default/native config identity, AE/SKIN/strength/geometry, all79 modules+SUMS+64Brow; no guessed MV/depth declaration",
+  "sums_sha256": "c08125c23b6d7d523dcfae3ef4669d05bbeb25284403a993ca55c5c8de092ea1",
+  "row_sha256": "77c745c4e1d84a6227a2224291d83c37d1e9bd18d45e95add166b1174225ce8f",
+  "onimusha": "No writes; root and storage runtime3eaed204f5d6ad803749d6e8c79ed1e79c514f5d02ef1e68d8dcb3f292638db6/configMODE1/SUMS unchanged verified",
+  "game_state": "No game at start/game-check+atomiclock; user-started Stellar PID19776 appeared at final readback; agent did not launch/kill game",
+  "limits": [
+    "screen-space fallback when guide conventions undeclared; no fake motion/depth",
+    "no performance run, perceptual assessment or full-network mode3 claim",
+    "formal0.41 ZIP/tag unchanged"
+  ]
+}

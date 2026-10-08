@@ -343,3 +343,11 @@ APP pulse0对pulse0 f7a48855三轮合并mean/p99过：pooledwall−.070848/p99�
 独立实现SAOG0721/Magpie2fce算法规格（未copy GPL表达，非clean-room声称），codec编码域r=最终NR−同帧original，2×2半精低观察/颜色引导low，仅low做约80ms EMA/high保本帧，不回NN前端。统一TEMPORAL_MODE0/1/2默认0；1原TheAutomatic、2本算法；显式MODE含0优先旧FAST_HISTORY，reference诊断拒叠。未知MV为明确static颜色门控，不假有效零MV，不猜重复capture；初版同步owner安全优先，成本/观感未知可能拖影。
 
 实际数学20385 WARP/9070与FFX无声明metadata连续Past1门通过；Runtime68326 mode0对旧634输出字节同、mode2cold/reset同/allfinite，稳定warm也same不伪效果。Addon PR12 wideifstream portability前置fail修c_str后52532exit0，final7383045e；Runtime0f3c3aec。用户授权22724备份后部署剑星/鬼武者Mode2 MP1 PRED0（根/storage两runtime读回），其余AE/strength/guide声明等保、default/78modules/SUMS不变，backup lowfreq-deploy-20261007/backups/20261007-234253。无正式ZIP/tag/push，等待实玩反馈，不宣抑闪已解决。owned结果目录留合同/日志/哈希。
+
+### 2026-10-08 仅剑星模式3试装
+
+用户明确授权仅《剑星》试用模式3。依据源码e8fa0661、数学fixture90050 WARP/9070 PASS与正式O2 addon5768，安装前实查游戏/RTC未运行、D盘余量约383GB，原子锁下备份原模式1后更新addon为4ceef29f，并设置MODE3 / ENHANCE_STRENGTH1 / MP1 / PRED0，FAST_HISTORY与reference保持0。模式3单NN后增强编码域低/高残差，冷帧也增强，新增增量软压缩与统一RGB余量保护；不是两遍NN等价或更近NV的证据。
+
+真实载荷/配置读回通过：剑星custom SHA4bdb8c3a，default181171BA与native2226F311逐字保持；AE/SKIN/strength/geometry及全部79模块、SUMSC08125C2、row77c745保持。不写MV/depth未知声明，未声明时明确静态回退。鬼武者完全未改：根/_storage_ runtime仍3eaed204、MODE1 / MP1 / PRED0，配置及SUMS原SHA同。备份与rollback：D:\DLSSNR-Lab\mode3-stellar-deploy-20261008\backups\20261008-112330。
+
+安装命令实际exit0/LOCK_RELEASED；未代启动游戏、未测FPS或观感，也未先跑完整NN模式3门（receipt明确数学fixture范围）。末只读核验时用户已自行启动剑星PID19776，之后未写文件/取锁/跑GPU干扰。正式0.41包/tag不动。完整安装前后manifest/模块身份/脚本见results/mode3-stellar-deploy-20261008。

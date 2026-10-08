@@ -1,6 +1,6 @@
 # 当前工作计划
 
-更新：2026-10-06（只读优化差距审计后）。此文件整份重写，保存当前状态与尚未完成事项；历史过程见 DevHistory.md。
+更新：2026-10-08（仅剑星模式3试装状态更新）。此文件整份重写，保存当前状态与尚未完成事项；历史过程见 DevHistory.md。
 
 ## 工作规矩
 
@@ -19,8 +19,8 @@
 - 发布默认为 MULTI_PASS=1、MULTI_PASS_PREDICT=1、SKIN_PROTECT=0。预测只在选择 3x 时执行两遍真实网络并预测第三遍；显式 PREDICT=0 为真实三遍，1x/2x 不受影响。
 - 发布包为 38 模块/架构、共 76；每架构五行公开 LLVM23.1.2，其余 COMGR LLVM21，双架构 ELF 目标已核。旧 rtc 忽略目标的问题已通过当前源码重编工具与目标检查处理，不再列为待发布阻碍。
 - 发布后的三刀已完成：76750a80 最终 RGB 共享输出免一次 copy；9bbd3749 block4 pool→首 C64 字节边；c756f296 仅真实 1440/FAST1 的同数学 SP-fast 持久队列。各自数值、正式平均/p99及必要宿主兼容门通过，收益不能跨批相加为 FPS 承诺。
-- 当前双游戏已装第三刀：剑星 addon 698A23A4，鬼武者根及 _storage_ runtime 634FAF45；开发载荷共 78 模块（旧 76 不变，新增双架构 SP-fast），与已发布 0.41 的 76 区分。最新回滚脚本：`D:\DLSSNR-Lab\sp1440-fast-20261005\backups\20261005-080146\rollback.ps1`。
-- 当前玩家配置与发布默认不同：剑星、鬼武者均 MP3/PREDICT1/SKIN0，HEIGHT=auto/FREE_RES=0，强度未改。剑星 F9 只切 1/2/3 遍数；文件约 1 秒热载。鬼武者无 F9、无文件热载，修改需重启。
+- 当前本机载荷（不是正式发行包）：剑星addon4ceef29f为模式3源码e8fa0661；鬼武者根/_storage_ runtime3eaed204仍模式1。每游戏79模块（仅gfx1201 C32 normal/RTZ/FAST/norm900更新，gfx1200旧模块保持）、SUMSC08125C2与原64B row77c745；模式3安装不改模块。剑星最近回滚：`D:\DLSSNR-Lab\mode3-stellar-deploy-20261008\backups\20261008-112330\rollback.ps1`；双游戏模式1安装回滚仍见mode1-deploy-20261008/backups/20261008-022921。
+- 当前玩家配置与发行默认分开：剑星MODE3 / ENHANCE_STRENGTH1，鬼武者MODE1；两者MP1/PRED0/SKIN0、HEIGHT=auto/FREE_RES=0，原强度/AE偏好保持。未声明MV/depth合同，使用明确静态回退；时序模式要求MP1，切模式/增强强度需重启。未代启动游戏；模式3完整NN/游戏观感及性能验收未做，等待用户试用反馈。
 - 既往实玩剑星 1x 约57.6fps、快速3x约37fps；鬼武者900P快速3x约49fps、强度更新后无异常。均为用户观察，未提供三刀后的同场景 ABBA/FPS 验证。
 - PR15 已正式 merge 8a6c7bc1，保留贡献者作者；Enqueue 入口恢复已选 HIP device，0.41 已含。RE9 强度文件数字覆盖已含；auto/缺省继续尊重宿主参数。中英文 README/配置页与公众号使用说明已完成。
 
