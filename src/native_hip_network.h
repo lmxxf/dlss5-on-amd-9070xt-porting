@@ -45,7 +45,7 @@ private:
  int hot_generation=-1;
  void ApplyHotMultiPass(){
   auto&hot=NativeHotFlags::Instance();if(!NativeHotFlags::Enabled()&&!NativeHotFlags::HotkeyCode())return;
-  hot.PollMultiPassHotkey(bridge.MultiPass());
+  hot.PollMultiPassHotkey(bridge.MultiPass(),!fast_history_consumer);
   const auto v=hot.Get();if(int(v.generation)==hot_generation)return;
   // Reject the entire snapshot before applying prediction/skin setters as well.
   NativeFastHistoryPolicy::RequireSinglePass(fast_history_consumer,v.multi_pass>0?unsigned(v.multi_pass):bridge.MultiPass());

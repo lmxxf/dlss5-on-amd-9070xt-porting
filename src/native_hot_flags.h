@@ -85,12 +85,14 @@ public:
   if(!done){if(!out.empty()&&out.back()!='\n')out+=nl;out+=want+nl;}
   const std::wstring tmp=path+L".tmp";FILE*f=_wfopen(tmp.c_str(),L"wb");if(!f)return false;const bool ok=std::fwrite(out.data(),1,out.size(),f)==out.size();std::fclose(f);
   if(!ok||!MoveFileExW(tmp.c_str(),path.c_str(),MOVEFILE_REPLACE_EXISTING)){DeleteFileW(tmp.c_str());return false;}return true;}
- unsigned PollMultiPassHotkey(unsigned current){
+ unsigned PollMultiPassHotkey(unsigned current,bool allow_cycle=true){
   const unsigned vk=HotkeyCode();if(!vk)return 0;const bool down=(GetAsyncKeyState(int(vk))&0x8000)!=0;
   if(!down||hotkey_down.exchange(down)){if(!down)hotkey_down=false;return 0;}
-  return CycleMultiPass(current);}
+  return CycleMultiPass(current,allow_cycle);}
  /* The press itself (separate for tests): writes the files, logs, returns the new count. */
- static unsigned CycleMultiPass(unsigned current){
+ static unsigned CycleMultiPass(unsigned current,bool allow_cycle=true){
+  // Consume the key edge before rejecting: never persist an unsupported pass count.
+  if(!allow_cycle){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-oneshot.txt").c_str(),L"ab")){fprintf(f,"pid=%lu tick=%llu event=multi_pass_hotkey_blocked reason=active_temporal_mode_requires_MP1\n",GetCurrentProcessId(),GetTickCount64());fclose(f);}return 0;}
   const unsigned next=current%3+1;const std::string n=std::to_string(next);
   const bool custom=RewriteKey(L"custom-config.txt","DLSS5_MULTI_PASS",n,true);
   std::string native;bool native_has=false;
