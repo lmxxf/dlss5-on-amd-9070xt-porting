@@ -1,0 +1,42 @@
+{
+  "gold_handle": 15399,
+  "gold_exit": 0,
+  "timing_pair_handle": 76655,
+  "timing_exit": 0,
+  "lock_released": true,
+  "input": {
+    "path": "D:\\DLSSNR-Lab\\nr-dx12-pure-20261009\\gold-vit31-input.f32",
+    "sha256": "012df8bc0e5f589af334509d094487a7e8a7c5aab66cf40ef512c3cad2499cd6",
+    "bytes": 2621440,
+    "shape": [
+      640,
+      1024
+    ],
+    "dtype": "F32 little endian",
+    "layout": "actual logical NativeVitGather / vit[0].Input",
+    "upstream": "controlled already-encoded synthetic processing1152 gradient -> legacy full71 HLSL; not HDR/menu/current game"
+  },
+  "scope": "same NativeVitBlock original weights/immutableinput; expand,contract,QKV,attention RecordStage0..3; fusedFFN forced0; 4lists vs1list, no wholeNetworkRecordUnsubmitted",
+  "gold": "4/4 actualhostRecordStage calls; u32bitdiff0 allfinite/nonzero; repeated timing outputs match priorgoldc6e798",
+  "cpu_builds": {
+    "gold27882": "passed",
+    "timer53213": "passed"
+  },
+  "timer_exe_sha256": "ecbe5f2d2442b7d7bc9c98e04f4c9b10e0268682279240f29fd4134421764377",
+  "single_pair_ms": {
+    "separate_wall": 0.659,
+    "separate_outer_gpu": 0.57816,
+    "batch_wall": 0.788,
+    "batch_outer_gpu": 0.52192
+  },
+  "limitations": [
+    "single pair only, no formal performance conclusion",
+    "2 extra marker lists each route, GPUouter includes queue/submit gaps and shader memory work; wall includes marker/setup APIs",
+    "raw memory checks outside timing",
+    "GPUdelta-.05624ms with walldelta+.129ms is mixed, not accepted gain",
+    "legacy HLSL math not currentHIPFAST1; no fullNN/frameFPS inference",
+    "previewSM6.10/Agility721/driver32.0.31007.2048 on9070 only; no installation/default switch"
+  ],
+  "production_source_changed": false,
+  "game_changed": false
+}

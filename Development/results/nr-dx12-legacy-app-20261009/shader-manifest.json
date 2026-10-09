@@ -1,0 +1,262 @@
+[
+    {
+        "sha256":  "d6bd50976f44c4bbb5c1f2fbd42b95de0757e1c259b7e1ba8c872b2389a953b6",
+        "name":  "native_rgb_reflect.hlsl"
+    },
+    {
+        "sha256":  "261edc63a479c05f794e4b8e288e166407e46c1572b81fa831781604d4621080",
+        "name":  "native_c32_reframe.hlsl"
+    },
+    {
+        "sha256":  "566fbc274c9d4fe9d6e094e186870f7642bce282686cb5f9039df902cba5756a",
+        "name":  "native_c32_ds.hlsl"
+    },
+    {
+        "sha256":  "1d7087115a893aefab6500c1b61a142f02ae3c42d13fc0eb6d9d13d1921705fd",
+        "name":  "native_c64_ds.hlsl"
+    },
+    {
+        "sha256":  "efb60cd42b882825ff6fd027d77d35cba90e93efe32c5e6efe49bbcd15a94d96",
+        "name":  "native_c64.hlsl"
+    },
+    {
+        "sha256":  "75c9e3982ac6bca504ac781badc16be7070ba62613e07abada668918e48c02e1",
+        "name":  "native_c64_shift.hlsl"
+    },
+    {
+        "sha256":  "64ef6ba687b1c61cd88328c6ae589aa2ba63c9e5b9e376ccce9e91cc915261a9",
+        "name":  "preblock_input_mix.hlsl"
+    },
+    {
+        "sha256":  "e67915791df4a2011012d695b7bade70879095a69b38765a4b62e345f04386a0",
+        "name":  "preblock_attention_core.hlsl"
+    },
+    {
+        "sha256":  "55d689a19ec22a07688d307ffcd5d9e05e5578d844bcd205e7dc6b959ca1f6e6",
+        "name":  "preblock_finish.hlsl"
+    },
+    {
+        "sha256":  "84a422a8d2b92750de3241a6f859849c3840fbff3a30d85ff294c390f31d5c08",
+        "name":  "native_split.hlsl"
+    },
+    {
+        "sha256":  "1509a41b265367d824fde264fef5ef18a1409a73e9888eec7d218684c1ebb3ac",
+        "name":  "native_split_window.hlsl"
+    },
+    {
+        "sha256":  "1618c27f2a10d753941cbd1b8b0a5e3301fe6ec769ae9c130ce5a61feeabcaca",
+        "name":  "native_vit_attention.hlsl"
+    },
+    {
+        "sha256":  "9db00368be0e1120fd882199fbe32614dd82acff90839a16172a7b74878c9534",
+        "name":  "native_vit_gather.hlsl"
+    },
+    {
+        "sha256":  "13c1ecd8737144975a850b5378fff97ad7ce2a97db99c0942f2e7c312fc4f631",
+        "name":  "native_vit_linear.hlsl"
+    },
+    {
+        "sha256":  "05f11f152db441466f6fb26eec4508022a97e683d559173c0bbce422034508f8",
+        "name":  "native_vit_qkv.hlsl"
+    },
+    {
+        "sha256":  "e2b806fc8dc6934439db12219fe819b3912e88fa13ba8be2e72e0a615ad0e1d5",
+        "name":  "native_half_square.hlsli"
+    },
+    {
+        "sha256":  "fc2d18f313de670d78750937060b4a57cc81ebb149a63dbe384c06b26cffad3c",
+        "name":  "native_post70.hlsl"
+    },
+    {
+        "sha256":  "18666e7b3d41b0b8f2d3758764fdf3c2bcf9c0b113982a66a339ec33715a3e7b",
+        "name":  "native_temporal_sample.hlsl"
+    },
+    {
+        "sha256":  "1c628f5c0c673c71e549b4c8e700e0ac0d26fba0e396bfd4be44d64e225b9b04",
+        "name":  "native_temporal_coordinates.hlsl"
+    },
+    {
+        "sha256":  "db19ecf7cdcbd40fd68b7cf9ca5e022c1474dd16ce9aa09ee4783d5579f04654",
+        "name":  "native_game_rgb_input.hlsl"
+    },
+    {
+        "sha256":  "e97477ad12055d2338325d24ecd69019efc7b7ba03805b58b5c25276ca630615",
+        "name":  "native_codec_encode.hlsl"
+    },
+    {
+        "sha256":  "977c2d52f098703b0ba742c6cf277f0496bb7ee7368067d506e6364e1e8c0dff",
+        "name":  "native_codec_decode.hlsl"
+    },
+    {
+        "sha256":  "7c6022375dfd944888c800af354b04f3b01d31bbe99b6fd405b65b3dbd2da6de",
+        "name":  "native_rgb_texture.hlsl"
+    },
+    {
+        "sha256":  "dc04b0fac0ce3d80be147c5ff5c6c97fabee8691d25ac67ef033f66b91f7c5b7",
+        "name":  "native_fp8_fast.hlsli"
+    },
+    {
+        "sha256":  "85583b5509f4e19dbf40bfcac206517e7799a0f576fde7a03685c7bd018194e9",
+        "name":  "native_head_pool.hlsl"
+    },
+    {
+        "sha256":  "5f731484ecbdfe0ad775bdc5fea7040325df36896944d55d3fa05891b7f0e4bc",
+        "name":  "native_matrix_expand.hlsl"
+    },
+    {
+        "sha256":  "7c8029f75c8532d3d6289712a578004603bd183cee6f8d0f8778dca8ac3f926a",
+        "name":  "native_matrix_pack.hlsl"
+    },
+    {
+        "sha256":  "1300b10ffed96248455ebb4404aa40b7e45ad5e940e6763fdf0fca658e53085f",
+        "name":  "native_matrix_qkv.hlsl"
+    },
+    {
+        "sha256":  "4ea8d0640b66cb506f60faf68ecf87513656b884149cb38f836b152a593eca41",
+        "name":  "native_scaled_integer_half.hlsli"
+    },
+    {
+        "sha256":  "30cdd2a9890b84d1989418bfe957ff6c239cc875f20e9f5f0128c512baa23280",
+        "name":  "native_wave_attention_direct.hlsl"
+    },
+    {
+        "sha256":  "4aa4439a930a84008152a4d13df94758aa3503b37fc8342ec0bc0ca14896fb29",
+        "name":  "native_wave_c32_ffn_blocked.hlsl"
+    },
+    {
+        "sha256":  "a6ba3df867d13fdcd0372194e4a70a2d047d2382505e464ebd8eb5a7454809ee",
+        "name":  "native_wave_c32_ffn_local.hlsl"
+    },
+    {
+        "sha256":  "783d56fccd51345234ff49e465cadfae263b324ec71a097e6e76074601625efc",
+        "name":  "native_wave_c32_split_attention.hlsl"
+    },
+    {
+        "sha256":  "e13f9f9b2564abca01068b1a95dc5973346765b4103d11c5316b029f229bd9f4",
+        "name":  "native_wave_contract.hlsl"
+    },
+    {
+        "sha256":  "f8c63e707f0f5546561d53ad84a11d9d6e2afad1801bc16d090c8f8b736b3715",
+        "name":  "native_wave_decoder_entry.hlsl"
+    },
+    {
+        "sha256":  "19045b550720a05ab44275ab0b9c95ec6aefc18e24243dbe27e2556b19c33a12",
+        "name":  "native_wave_expand.hlsl"
+    },
+    {
+        "sha256":  "53265b59ebfa8dfb0705d12c6f6c78cc9e533658f48455f27ba998866fd853b0",
+        "name":  "native_wave_ffn_blocked.hlsl"
+    },
+    {
+        "sha256":  "5c7b49867e55796a08536c7459c0777595629b278ebdc7a972021e2f3cb7299d",
+        "name":  "native_wave_head_project.hlsl"
+    },
+    {
+        "sha256":  "fb26d68791407ee91e7f49d72f60a8720a59e377d6a326dcd875d7db4623d981",
+        "name":  "native_wave_project.hlsl"
+    },
+    {
+        "sha256":  "ee52271b114bb09672eecf97088e940f8b89745d50058737e741360be45aa1b9",
+        "name":  "native_wave_split_ffwd_parallel.hlsl"
+    },
+    {
+        "sha256":  "144c0260d6f2970dc493507d35899cf462f737f83a39ecb98611242fcaee7ef2",
+        "name":  "native_wave_vit_attention.hlsl"
+    },
+    {
+        "sha256":  "11f7c7a9085ea166d7db8c65c465ad2fbe7a23666f0f8cf82743beddcf1db42e",
+        "name":  "native_wave_vit_attention_half.hlsl"
+    },
+    {
+        "sha256":  "3a97910e02b4a0c2eabc0f9075d4f8169f356b6b01bef5426c9998962209fed0",
+        "name":  "native_wave_vit_blocked.hlsl"
+    },
+    {
+        "sha256":  "636a1e750b840d87bc6ff386b50d3d905fe5b8eaf7142acff712c4d9afdc64c6",
+        "name":  "native_wave_vit_expand.hlsl"
+    },
+    {
+        "sha256":  "73a2387a4f4962e0fcbf6bd13db568ca97348ffef3d8a73e2944d154710cb9b1",
+        "name":  "native_wave_vit_qkv.hlsl"
+    },
+    {
+        "sha256":  "3c4e7f53209c6c8391917d54cb8e6af5592536c6d27906f1bba5f9cdb9544bbe",
+        "name":  "native_wave_vit_reduce.hlsl"
+    },
+    {
+        "sha256":  "ae97737ab877700f913f590f625bc95d3eb5950080d495ec7736c62347f68f44",
+        "name":  "preblock_attention_four_wave.hlsl"
+    },
+    {
+        "sha256":  "10700e73a63ea49caaa996292d29c13c05e05b72e88200d6f091222dda062358",
+        "name":  "native_wave_qkv.hlsl"
+    },
+    {
+        "sha256":  "5ef04843e70a0a99d872c04bc90c687857c8470c4d0e0cfe195c7855a9a22816",
+        "name":  "native_temporal_feed.hlsl"
+    },
+    {
+        "sha256":  "329a63031874c6d039cc1e260b96799e14ab35d4804554edc7723b13875f7669",
+        "name":  "native_wave_ffn_fused.hlsl"
+    },
+    {
+        "sha256":  "0e55894c268c4cadc45ff914767d6222b359e6ca829afafb00081fd465cc95ba",
+        "name":  "native_wave_qkv_normalize.hlsl"
+    },
+    {
+        "sha256":  "b78a889afa5a7a851ae9c1ec5fbca141cc76ec9855856f82cf735acd0c0349dc",
+        "name":  "native_vit_pack.hlsl"
+    },
+    {
+        "sha256":  "87b49a034b6eeaea44603f98973e4a361eedb9b530891294692ee0cce0257d7d",
+        "name":  "native_wave_c32_ds.hlsl"
+    },
+    {
+        "sha256":  "0e1c6f7272b973f4e64ecbe6bcb2503df80ecc69918ae6e4a3515413c9e328c0",
+        "name":  "native_wave_vit_attention_fp8.hlsl"
+    },
+    {
+        "sha256":  "52be40d309975ac6de780758931a52f0ff1c38cdcfba7e32508600f380a93a24",
+        "name":  "native_wave_prefix.hlsl"
+    },
+    {
+        "sha256":  "501492be980260678ad1d1d5111fffb8e38693f220abd05a5ebe3778edd722e3",
+        "name":  "native_wave_attention_fused_qkv.hlsl"
+    },
+    {
+        "sha256":  "1f48b0ed344db708746a12a6c5c7c6d23ebc78944a2385cab28dfde0a3093fde",
+        "name":  "native_output_smooth.hlsl"
+    },
+    {
+        "sha256":  "8398dd3cbfb4ab450e772dac561e94e5f7084daacac818b721509d28620f46b0",
+        "name":  "native_c32_ffn_fused.hlsli"
+    },
+    {
+        "sha256":  "145ff958b6055301fd9370cb8db5f870bc7790eedcd1daf6224ec426d3dd5168",
+        "name":  "native_wave_ffn_proj0_fused.hlsl"
+    },
+    {
+        "sha256":  "946c78f25c4ded8b75f39b0bbfb10e4da5e5a885d25225c8ac15b552df2ca85a",
+        "name":  "native_black_probe.hlsl"
+    },
+    {
+        "sha256":  "951be54f4eab75d6c294f1a5dded37ef902d68d466c917bd3b6b32f93d62a81b",
+        "name":  "native_text_overlay.hlsl"
+    },
+    {
+        "sha256":  "fdba45eaf94a170b79066f6e2878e365c3afd1da3862676bb0028e63dccc1368",
+        "name":  "native_history_guard.hlsl"
+    },
+    {
+        "sha256":  "ccd244b842fb37bb1deef8a3eed53ac54cdf51153fef72135c2f0a2be4d37254",
+        "name":  "native_wave_vit_ffn_fused.hlsl"
+    },
+    {
+        "sha256":  "c6b4cd56af79d3646082d06214aeb32bfba1160cceb17be2547134cb28a21fb2",
+        "name":  "native_sat_cast.hlsli"
+    },
+    {
+        "sha256":  "46d539d9b461a30f925893afc0e4a6dfad4c1ff0a66e36e677f2391b5516e05b",
+        "name":  "native_half_corrected.hlsli"
+    }
+]

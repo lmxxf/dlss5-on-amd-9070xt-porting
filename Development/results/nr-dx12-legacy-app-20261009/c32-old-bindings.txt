@@ -1,0 +1,95 @@
+;
+; Note: shader requires additional functionality:
+;       Wave level operations
+;       Use native low precision
+;
+;
+; Input signature:
+;
+; Name                 Index   Mask Register SysValue  Format   Used
+; -------------------- ----- ------ -------- -------- ------- ------
+; no parameters
+;
+; Output signature:
+;
+; Name                 Index   Mask Register SysValue  Format   Used
+; -------------------- ----- ------ -------- -------- ------- ------
+; no parameters
+; shader hash: 7a2f1ea85304ee20f75e211915406c03
+;
+; Pipeline Runtime Information: 
+;
+;PSVRuntimeInfo:
+; Compute Shader
+; NumThreads=(32,1,1)
+; NumBytesGroupSharedMemory: 5632
+; WaveSize=32
+; UsesViewID: false
+; SigInputElements: 0
+; SigOutputElements: 0
+; SigPatchConstOrPrimElements: 0
+; SigInputVectors: 0
+; SigOutputVectors[0]: 0
+; SigOutputVectors[1]: 0
+; SigOutputVectors[2]: 0
+; SigOutputVectors[3]: 0
+; EntryFunctionName: main
+;
+;
+; Buffer Definitions:
+;
+; cbuffer Geometry
+; {
+;
+;   struct Geometry
+;   {
+;
+;       uint seed;                                    ; Offset:    0
+;       uint width;                                   ; Offset:    4
+;       uint height;                                  ; Offset:    8
+;       uint local_oracle;                            ; Offset:   12
+;       uint temporal;                                ; Offset:   16
+;       uint map_mode;                                ; Offset:   20
+;       uint src_width;                               ; Offset:   24
+;       uint src_height;                              ; Offset:   28
+;       uint shift_x;                                 ; Offset:   32
+;       uint shift_y;                                 ; Offset:   36
+;       uint prev_shift_x;                            ; Offset:   40
+;       uint prev_shift_y;                            ; Offset:   44
+;       uint prev_work_width;                         ; Offset:   48
+;   
+;   } Geometry;                                       ; Offset:    0 Size:    52
+;
+; }
+;
+;
+; Resource Bindings:
+;
+; Name                                 Type  Format         Dim      ID      HLSL Bind  Count
+; ------------------------------ ---------- ------- ----------- ------- -------------- ------
+; Geometry                          cbuffer      NA          NA     CB0            cb0     1
+; weights                           texture    byte         r/o      T0             t0     1
+; input_bytes                       texture    byte         r/o      T1             t1     1
+; skip_bytes                        texture    byte         r/o      T2             t2     1
+; merge_w                           texture    byte         r/o      T3             t3     1
+; output                                UAV    byte         r/w      U0             u0     1
+;
+target datalayout = "e-m:e-p:32:32-i1:32-i8:8-i16:16-i32:32-i64:64-f16:16-f32:32-f64:64-n8:16:32:64"
+target triple = "dxil-ms-dx"
+
+%dx.types.Handle = type { i8* }
+%dx.types.ResBind = type { i32, i32, i32, i8 }
+%dx.types.ResourceProperties = type { i32, i32 }
+%dx.types.LinAlgMatrixC9M16N16U2S1 = type { i8* }
+%dx.types.CBufRet.i32 = type { i32, i32, i32, i32 }
+%dx.types.ResRet.i32 = type { i32, i32, i32, i32, i32 }
+%dx.types.ResRet.v3i32 = type { <3 x i32>, i32 }
+%dx.types.LinAlgMatrixC8M16N32U0S1 = type { i8* }
+%dx.types.LinAlgMatrixC8M32N16U1S1 = type { i8* }
+%dx.types.ResRet.f16 = type { half, half, half, half, i32 }
+%dx.types.LinAlgMatrixC21M16N16U2S1 = type { i8* }
+%dx.types.LinAlgMatrixC21M16N32U0S1 = type { i8* }
+%dx.types.LinAlgMatrixC21M32N16U1S1 = type { i8* }
+%dx.types.LinAlgMatrixC8M16N16U2S1 = type { i8* }
+%struct.ByteAddressBuffer = type { i32 }
+%struct.RWByteAddressBuffer = type { i32 }

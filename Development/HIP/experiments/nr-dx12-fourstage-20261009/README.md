@@ -1,0 +1,9 @@
+# Bounded native D3D12 four-stage recorder
+
+CPU build33064 passed. `prepare.py` copies current headers privately and exposes only `NativeVitBlock::DiagnosticAttentionOutput`; no production class is changed. The caller accepts one actual640×1024F32 block31 input, full original block31 weights and the vetted legacy WaveMatrix profile. Historical64-token effective/approximate matrices are deliberately not substituted. The actual model input will be exported after math's first pureNN succeeds; until then the caller is CPU-ready, not GPU-ready.
+
+`VIT_FUSED_FFN=0` prevents stage1 becoming an empty API call. The same immutable input, weights and single block instance run expand/contract/QKV/attention using existing `RecordStage(0..3)` and their resource transitions. Reference: four separate lists followed by fence/readback. Candidate: one list recording exactly those four stages, followed by fence/readback. Both actual host record-call counts and bitwise/finite output equality are checked. Readback state is restored. All owned buffers and weights remain alive until the queue drains.
+
+This neither uses nor bypasses whole-network `RecordUnsubmitted`; it is not a claim of a novel batching speed-up (the old network already batches ViT layers). It is a bounded, independently callable native-backend organization/gold prototype, retaining legacy HLSL math. GPU validation and any timing require the root's exclusive queue and guards. No GPU, installation or performance experiment has yet been run.
+
+Arguments: `fourstage.exe ASSETS FLAGS ACTUAL_VIT31_INPUT_F32 640 OUTPUT_PREFIX`. Stage existing Agility721 beside the EXE as `D3D12\`. Use actual original weights and compiled wave shaders, not the old approximate `block31-*-effective` bring-up assets. This standalone four-stage path does not need the prefix noise table; the full71 APP path does, and its stage script now explicitly supplements noise from history-trial041a if absent.

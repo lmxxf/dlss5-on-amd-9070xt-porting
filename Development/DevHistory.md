@@ -351,3 +351,9 @@ APP pulse0对pulse0 f7a48855三轮合并mean/p99过：pooledwall−.070848/p99�
 真实载荷/配置读回通过：剑星custom SHA4bdb8c3a，default181171BA与native2226F311逐字保持；AE/SKIN/strength/geometry及全部79模块、SUMSC08125C2、row77c745保持。不写MV/depth未知声明，未声明时明确静态回退。鬼武者完全未改：根/_storage_ runtime仍3eaed204、MODE1 / MP1 / PRED0，配置及SUMS原SHA同。备份与rollback：D:\DLSSNR-Lab\mode3-stellar-deploy-20261008\backups\20261008-112330。
 
 安装命令实际exit0/LOCK_RELEASED；未代启动游戏、未测FPS或观感，也未先跑完整NN模式3门（receipt明确数学fixture范围）。末只读核验时用户已自行启动剑星PID19776，之后未写文件/取锁/跑GPU干扰。正式0.41包/tag不动。完整安装前后manifest/模块身份/脚本见results/mode3-stellar-deploy-20261008。
+
+### 2026-10-09 原生D3D12有界四阶段原型
+
+复用旧NativeVitBlock的expand/contract/QKV/attention，明确fusedFFN0、原weights/immutableactual640×1024F32输入。输入012df8bc来自controlled encoded1152 gradient跑旧full71→NativeVitGather/vit0.Input，不是真游戏/HDR菜单。GPU15399实际4个list对1个list四stage，4/4hostRecordStage计数、outputbit0/finite，654815/655360非零、范围[-18,18]（内部域）。53213仅补单pair计时后GPU76655exit0，warm/timed两路仍对原goldc6e798bit0，读取在计时外。separate GPUouter.57816/wall.659ms；batch GPUouter.52192/wall.788ms：GPU-.05624但wall+.129，单pair加对称两markerlist，不判收益/不刷/不相加外推fullNN或FPS。保stage内部barrier/fence与异常drain前资源持有，不绕wholeRecordUnsubmitted。
+
+APP -DCOMPARE_HLSL私有caller21603CPU过，源57NNshader匹配旧manifest、8codec/UI/temporal有差异仅实际codec私有覆盖；VitFP8当前DXC同recipe重编CSO4a28227a与旧全文件同。旧prefix root实际选择bug已在私有copy包括prefix_wave修，未修改生产main。APP未GPU跑，不重复主pure已发现的missingnoise/1088tailguard失败。旧HLSL数学不同HIPFAST1，预览驱动/Agility环境支持不等可发布后端提速。原型/receipt见results/nr-dx12-fourstage-20261009与nr-dx12-legacy-app-20261009，未安装/玩家配置/发行默认变动。
