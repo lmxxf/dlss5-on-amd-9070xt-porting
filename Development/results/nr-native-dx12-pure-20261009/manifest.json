@@ -1,0 +1,53 @@
+{
+  "source_commit_base": "8407ebc8",
+  "full71_gold_run": 58885,
+  "full71_gold_exit": 0,
+  "legacy_pilot_run": 42273,
+  "hip_pilot_run": 40214,
+  "physical_geometry": [
+    1920,
+    1152
+  ],
+  "valid_rgb_geometry": [
+    1920,
+    1080,
+    3
+  ],
+  "vit_tokens": 640,
+  "seed": 0,
+  "mp": 1,
+  "history": false,
+  "ae": false,
+  "style": 1,
+  "raw": {
+    "gold-last.rgb32f": {
+      "bytes": 26542080,
+      "sha256": "6cb6ecd10c49d941d9e55a8a39ff948672ba9e793764c207fc8c26ad738a1376"
+    },
+    "gold-vit31-input.f32": {
+      "bytes": 2621440,
+      "sha256": "012df8bc0e5f589af334509d094487a7e8a7c5aab66cf40ef512c3cad2499cd6"
+    },
+    "gold-first.rgb32f": {
+      "bytes": 26542080,
+      "sha256": "6cb6ecd10c49d941d9e55a8a39ff948672ba9e793764c207fc8c26ad738a1376"
+    }
+  },
+  "actual_created_psos": 957,
+  "created_pso_all_success": true,
+  "psos_created_not_dispatched_count": true,
+  "exe_sha256": "67018a475d3987e8a9b84450a02dec20af3b51e00a8dbb8676b65d8da12f6293",
+  "source_sha256": {
+    "Development/HIP/experiments/nr-native-dx12-20261009/pure.cpp": "e440e7062254a8a9c56879247d6ffad82471fa162c6f83d63f019f489cdb4b3e",
+    "Development/HIP/experiments/nr-native-dx12-20261009/run.ps1": "b2a18c8297dff3cc9df8b35b8c65793f4c7a7ecd61705fb4603fc657b561f0ec",
+    "Development/HIP/experiments/nr-native-dx12-20261009/hip1152.ps1": "d51feaab99a425de2537ff872db79e3dded9ef5f8e65698d3f33ad59dff26d4f",
+    "Development/HIP/experiments/nr-native-dx12-20261009/stage-assets.ps1": "ea248b469510e0056cb880e7f4db9cc3a684ceefedc49c5b6c5e9ad77076c887",
+    "Development/HIP/experiments/nr-native-dx12-20261009/full71.flags": "c6d02db273602c07f06ec47686dd3befdacc628b01bafcd9fe7cb1cd09d1df2c",
+    "src/native_preblock_runtime.h": "fef376c33cc46133d52d48b0dc97f6a8bca08379b0c51ce1e8dda5afb161737c",
+    "src/native_pso.h": "9a989095d5d23bc6e416a46154bf89fa4745415acc413eba56cee88d6a25c329",
+    "src/native_actual_network70.h": "c64ca7f0ef3464144a7bb9fa48fd45e77f89cbf2fc8c70cb7840e33d184d97d9"
+  },
+  "noise_equivalence_to_hip_proved": false,
+  "math_equivalence_to_hip_proved": false,
+  "game_deployed": false
+}

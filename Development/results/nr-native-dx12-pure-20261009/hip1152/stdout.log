@@ -1,0 +1,6 @@
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SP_PLAN c=256 first=16 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+SP_PLAN c=256 first=49 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1152 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm=10 frames=20 gpu_mean_ms=9.171575975 cpu_mean_ms=9.472550000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_domain=encoded_synthetic
+SP_STATS runs=62 fallback=0 rollover=0 jobs=55366 disabled=0 errors=0
+

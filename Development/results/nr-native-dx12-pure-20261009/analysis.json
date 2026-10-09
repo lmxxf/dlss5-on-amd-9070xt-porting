@@ -1,0 +1,28 @@
+{
+  "shape": [
+    1920,
+    1080,
+    1152,
+    640
+  ],
+  "valid_rgb_finite": true,
+  "min": 0.0251312255859375,
+  "max": 1.0,
+  "mean": 0.5127139091491699,
+  "variance": 0.043703317642211914,
+  "nonzero_components": 6220800,
+  "components": 6220800,
+  "ownrepeat_bitdiff": 0,
+  "vs_same1152_HIP_diagnostic_MAE": 0.0019834194433302407,
+  "vs_same1152_HIP_diagnostic_maxabs": 0.03290003538131714,
+  "vs_same1152_HIP_diagnostic_PSNR_peak1": 51.38195277570068,
+  "noise_equivalence_proved": false,
+  "math_equivalence_proved": false,
+  "vit31_input_shape": [
+    640,
+    1024
+  ],
+  "vit31_input_bytes": 2621440,
+  "vit31_input_finite": true,
+  "vit31_input_sha256": "012df8bc0e5f589af334509d094487a7e8a7c5aab66cf40ef512c3cad2499cd6"
+}

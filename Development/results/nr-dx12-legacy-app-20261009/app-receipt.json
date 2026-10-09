@@ -1,0 +1,42 @@
+{
+  "gpu_handle": 29430,
+  "exit": 0,
+  "lock_released": true,
+  "host_sha256": "358dcbbb8a3d7ad90d472fff58e7fd94a35cf3d7957d16b13ead6924d36472b8",
+  "input": {
+    "path": "D:\\DLSSNR-Lab\\hip-backend\\live-menu-before.f16",
+    "sha256": "fa3c18735ac5f105903614a18a9b1475966b9afd9dd4aeb0cd9cad7bc759ec9b",
+    "bytes": 7464960,
+    "shape": [
+      720,
+      1296,
+      4
+    ],
+    "dtype": "original frozen realHDR RGBA16F menu, not currentgame"
+  },
+  "actual_geometry_log": "processing1920x1152 valid1920x1080 Network70_VitTokensArgument640",
+  "scope": "one independentD3D12 device/NativeGameFrame originalfull71 HLSL, MP1AE0hist0 Style1seed0, current5codec/inputprivateoverlay, rootfixprefix selection and complete201MB-equivalentnoise. No gamehost installed",
+  "output": {
+    "shape": [
+      720,
+      1296,
+      4
+    ],
+    "dtype": "RGBA16F decoded linearHDR",
+    "finite": true,
+    "nonzero_rgb": 2796326,
+    "range_rgb": [
+      -0.0,
+      29.9375
+    ],
+    "bytes": 7464960,
+    "sha256": "740c534212ce0be989d38d764608c98e520e5fa08734034f9373347a67dd004f"
+  },
+  "cold_wall_ms_diagnostic_only": 51.414,
+  "not_performance": true,
+  "not_quality_comparison": true,
+  "source_only_backend_route": "COMPARE_HLSL1 compiles NativeActualNetwork70 rather than NativeHipNetwork; process-module enumeration was not collected, do not assert observedNoHIPDLLload",
+  "legacy_math": "not currentHIPFAST1 math; finite output supports integration not acceleration",
+  "data": "no model or raw binary committed; output retained /tmp/nr-dx12-legacy-app-20261009/results/frame-first.f16 andDprivateexperiment, SHAinoutput",
+  "game_unchanged": true
+}

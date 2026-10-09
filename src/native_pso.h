@@ -9,7 +9,9 @@
 #include <string>
 struct NativePsoStats{static ULONGLONG&Ms(){static ULONGLONG v=0;return v;}static unsigned&Count(){static unsigned c=0;return c;}};
 inline HRESULT NativeCreateComputePipelineState(ID3D12Device*d,const D3D12_COMPUTE_PIPELINE_STATE_DESC*pd,REFIID iid,void**pso){
- const ULONGLONG t=GetTickCount64();HRESULT h=d->CreateComputePipelineState(pd,iid,pso);NativePsoStats::Ms()+=GetTickCount64()-t;NativePsoStats::Count()++;return h;}
+ const ULONGLONG t=GetTickCount64();HRESULT h=d->CreateComputePipelineState(pd,iid,pso);
+ if(const wchar_t*dir=_wgetenv(L"NR_DX12_PSO_DIR")){static unsigned number=0;wchar_t path[MAX_PATH];swprintf(path,MAX_PATH,L"%ls\\pso-%04u.cso",dir,number++);if(FILE*f=_wfopen(path,L"wb")){fwrite(pd->CS.pShaderBytecode,1,pd->CS.BytecodeLength,f);fclose(f);}fprintf(stderr,"ACTUAL_DX12_PSO bytes=%zu hr=%08x captured=%ls\n",size_t(pd->CS.BytecodeLength),unsigned(h),path);}
+NativePsoStats::Ms()+=GetTickCount64()-t;NativePsoStats::Count()++;return h;}
 // Fine-grained init timing (DLSS5_VRAM_LOG=1): prints the milliseconds since the previous checkpoint.
 // DLSS5_INIT_LOG=<file>: the same checkpoints appended to a file (the add-on has no stdout).
 inline void NativeInitTick(const char*label){

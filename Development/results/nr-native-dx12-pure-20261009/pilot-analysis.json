@@ -1,0 +1,36 @@
+{
+  "legacy": {
+    "samples": 20,
+    "metrics": {
+      "gpu_ms": {
+        "mean": 23.388309999999997,
+        "min": 22.563,
+        "max": 23.8298,
+        "p99_descriptive": 23.826874
+      },
+      "host_ms": {
+        "mean": 23.574450000000002,
+        "min": 22.656,
+        "max": 24.074,
+        "p99_descriptive": 24.06754
+      }
+    }
+  },
+  "hip": {
+    "samples": 20,
+    "metrics": {
+      "gpu_ms": {
+        "mean": 9.171576,
+        "min": 8.87559,
+        "max": 9.40073,
+        "p99_descriptive": 9.3860905
+      },
+      "cpu_ms": {
+        "mean": 9.47255,
+        "min": 9.344,
+        "max": 9.618,
+        "p99_descriptive": 9.612490000000001
+      }
+    }
+  }
+}
