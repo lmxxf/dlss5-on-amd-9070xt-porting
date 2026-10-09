@@ -1,0 +1,18 @@
+{
+  "cases": [
+    "zeros",
+    "firstK_identity",
+    "secondK_nonasym_basis",
+    "nonasym_dyadic",
+    "signed_dyadic"
+  ],
+  "count": 5,
+  "contract": "exact small dyadic FP8/F16 operands and F32 C; no overflow, all F16 gold representable; not arbitrary rounding-equivalence proof",
+  "files": {
+    "input-a.f16": "5490aed927e65013c309f72c45363cec06f0d88c7205fb794caf439688b26f54",
+    "input-b.f16": "ae694dab833d45b06a53cf9001221c56cb2b1ecf13d62a93c1367fe0f4d8e460",
+    "input-c.f32": "f21b6ab44853dc5dbca203589dcfbf55373938f20ce2e52e26a6225cfb86e969",
+    "input-b.fp8": "f75ef98e287c74ca0121977a597f8be7eded90bbe461ce7d0378d3944a3657f0",
+    "input-a.fp8": "113c3a8d999d68ac95d06d84b6397bd6fbcb538f16b2c5aae78215b0d6bbba1a"
+  }
+}

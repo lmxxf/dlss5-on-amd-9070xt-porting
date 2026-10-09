@@ -1,0 +1,40 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261009214615
+Username: desktop-2026\lmxxf
+RunAs User: desktop-2026\lmxxf
+Configuration Name: 
+Machine: DESKTOP-2026 (Microsoft Windows NT 10.0.26340.0)
+Host Application: powershell -NoProfile -ExecutionPolicy Bypass -File D:\DLSSNR-Lab\nr-dx12-matrix-probe-20261009\compile.ps1
+Process ID: 17028
+PSVersion: 5.1.26100.9596
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9596
+BuildVersion: 10.0.26100.9596
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is D:\DLSSNR-Lab\nr-dx12-matrix-probe-20261009\cpu-build.log
+VERSION D:\DLSSNR-Lab\matrix-probe\dxc-preview\bin\x64\dxc.exe 1.10.2605.24
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          24C2FC90E8949AC3390E2371F6F0DE12F7E03F1050913F023D6D4921396EEE03       D:\DLSSNR-Lab\matrix-probe\dx...
+VERSION D:\DLSSNR-Lab\matrix-probe\dxc-preview\bin\x64\dxcompiler.dll 1.10.2605.24
+SHA256          F66C89ED6D6E739A342695CB340AF9B5C03CB7C018458794621F1C01BEF62A84       D:\DLSSNR-Lab\matrix-probe\dx...
+VERSION D:\DLSSNR-Lab\matrix-probe\D3D12\D3D12Core.dll 1.721.3.0.20260730.2
+SHA256          7F8BB6F4B8A45C9032F00229BEF82CA0D38A763EE858B83F9CAD11BA82DEF6D6       D:\DLSSNR-Lab\matrix-probe\D3...
+SHA256          3AE10964162004CAB4FF23061036E681F1A46F5E5E03402841A91E3D51B6200B       D:\DLSSNR-Lab\matrix-probe\dx...
+
+SHA256          9C0E781B9E836A1798C32C9696B50958DBFD2D15653EB4724D1BBBF6E927BD44       D:\DLSSNR-Lab\nr-dx12-matrix-...
+SHA256          6A4DBBEF6EACA4B87311AC06876E518D7DAD9F590FFB75CDB16F429F250AD3BA       D:\DLSSNR-Lab\nr-dx12-matrix-...
+
+SHA256          B43362ADF1CFDA6296222E2A0731DA286A9196C51A8C8181E207C321B6A05942       D:\DLSSNR-Lab\nr-dx12-matrix-...
+SHA256          1C9E4447669167176ED3F40F53297A9CC14C881314CC915318C8A05A573CB5DF       D:\DLSSNR-Lab\nr-dx12-matrix-...
+CPU_BUILD_OK_NOT_GPU_SUPPORT
+**********************
+Windows PowerShell transcript end
+End time: 20261009214615
+**********************

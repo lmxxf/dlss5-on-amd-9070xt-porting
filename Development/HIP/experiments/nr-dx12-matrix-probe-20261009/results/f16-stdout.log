@@ -1,0 +1,6 @@
+TUPLE operand=F16 shapeA=16x32 shapeB=32x16 accumulator=F32 wave=32 shader_bytes=6448 no_scalar_fallback=1
+adapter=AMD Radeon RX 9070 XT
+FEATURE shader_model_hr=00000000 highest=6a
+TUPLE_PSO_CREATED=1 operand=F16
+RESULT cases=5 variants=4 float_nonfinite=0 (half overflow permitted; compare saved HIP/HLSL bytes separately)
+
