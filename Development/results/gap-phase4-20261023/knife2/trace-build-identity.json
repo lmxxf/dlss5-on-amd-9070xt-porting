@@ -1,0 +1,24 @@
+{
+  "trace_hosts": {
+    "trace-baseline.exe": "93ac8fd925c21b138737f0e0f3dc5493c714e8abf7e3746e5228b8023a50107f",
+    "trace-candidate.exe": "112d090d47cf4f8585dc3945e902c4838124de8bf41d3f27e1e9e52366bc64d0"
+  },
+  "measurement_hosts_unchanged": {
+    "frame-baseline-standard.exe": "7a15bc6542f9a12fbf5ea26feee94f5277a98faa9790d5d895b0f02f9a9e77f4",
+    "frame-baseline-free1072.exe": "e7fae90f76af4ef0d590028deb87ba484151ba38e27fbe0b189c6a3659bad00b",
+    "frame-candidate-standard.exe": "39c5e035835df6d5516b0d634b2127b4533249e857d40c58e77186040617994e",
+    "frame-candidate-free1072.exe": "7ea7f8c37c858bcd0dd04809ce99195aa4a0acbeca853acabb152ee0bb090f10"
+  },
+  "uses_observer": false,
+  "uses_gpu_timing": false,
+  "profiles": [
+    "small900",
+    "small720",
+    "smallfree1088",
+    "small1080"
+  ],
+  "input_receipt": "make-trace-inputs.json",
+  "requires_effective_small31": true,
+  "reports_vfrag_per_frame_deltas": true,
+  "optional_baseline_output_bit_compare": true
+}

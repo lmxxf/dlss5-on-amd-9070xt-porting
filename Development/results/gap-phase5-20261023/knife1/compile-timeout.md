@@ -1,0 +1,1 @@
+首次baseline COMGR CPU编译被统一15秒墙钟上限终止，未运行GPU kernel，原回执保留。GPU执行仍硬15秒；只对白名单rtc_compile-current.exe且cpu_compile标记的CPU编译设180秒，期间仍持gpu.lock并15秒检查游戏/磁盘。

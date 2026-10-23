@@ -1,0 +1,394 @@
+{
+  "default_idle_ms": 500,
+  "idle_override_absent": true,
+  "profiles": {
+    "original1088": {
+      "baseline": {
+        "hashes": {
+          "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+        },
+        "ae_csv": [
+          [
+            "1",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "2",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "3",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "4",
+            "1",
+            "2",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "5",
+            "1",
+            "3",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "6",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "7",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ]
+        ],
+        "actual_frame_states": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "compute_frames": 1,
+        "reuse_frames": 5,
+        "wall_ms": [
+          1466.076,
+          12.658,
+          11.9581,
+          12.1291,
+          12.3393,
+          12.3512
+        ],
+        "route_launches": 0
+      },
+      "candidate": {
+        "hashes": {
+          "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+          "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+        },
+        "ae_csv": [
+          [
+            "1",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "2",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "3",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "4",
+            "1",
+            "2",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "5",
+            "1",
+            "3",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "6",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "7",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ]
+        ],
+        "actual_frame_states": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "compute_frames": 1,
+        "reuse_frames": 5,
+        "wall_ms": [
+          1455.7267,
+          12.4775,
+          11.9385,
+          12.086,
+          12.3524,
+          11.8495
+        ],
+        "route_launches": 64
+      },
+      "outputs_equal": true,
+      "decisions_and_metrics_equal": true,
+      "interpretation": "Default-idle observations only. If wall-driven decisions differ, do not attribute output/state differences to V layout without a controlled comparison."
+    },
+    "small720": {
+      "baseline": {
+        "hashes": {
+          "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+        },
+        "ae_csv": [
+          [
+            "1",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "2",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "3",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "4",
+            "1",
+            "2",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "5",
+            "1",
+            "3",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "6",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "7",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ]
+        ],
+        "actual_frame_states": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "compute_frames": 1,
+        "reuse_frames": 5,
+        "wall_ms": [
+          1286.6727,
+          12.4987,
+          14.8284,
+          12.7676,
+          12.2752,
+          12.1011
+        ],
+        "route_launches": 0
+      },
+      "candidate": {
+        "hashes": {
+          "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+          "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+        },
+        "ae_csv": [
+          [
+            "1",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "2",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "3",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "4",
+            "1",
+            "2",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "5",
+            "1",
+            "3",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "6",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ],
+          [
+            "7",
+            "1",
+            "4",
+            "8",
+            "0",
+            "0",
+            "0"
+          ]
+        ],
+        "actual_frame_states": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "compute_frames": 1,
+        "reuse_frames": 5,
+        "wall_ms": [
+          1160.0367,
+          5.5784,
+          10.305,
+          12.3582,
+          11.1761,
+          11.8178
+        ],
+        "route_launches": 64
+      },
+      "outputs_equal": true,
+      "decisions_and_metrics_equal": true,
+      "interpretation": "Default-idle observations only. If wall-driven decisions differ, do not attribute output/state differences to V layout without a controlled comparison."
+    }
+  },
+  "controlled_numerical_gate": "Use ae-jobs with fixed long idle separately. This report records wall-dependent default behavior, not a forced identical-decision gate.",
+  "performance_inference": false
+}

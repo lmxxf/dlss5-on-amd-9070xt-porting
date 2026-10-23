@@ -1,0 +1,38 @@
+{
+  "scope": "CPU exhaustive address/byte permutation check; arbitrary post-byte_F bytes, not GPU quantization arithmetic",
+  "cases": [
+    {
+      "tokens": 400,
+      "producer_groups": 480,
+      "attention_groups_unchanged": 800,
+      "total_bytes": 1228800,
+      "V_base": 819200,
+      "V_bytes": 409600,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 0
+    },
+    {
+      "tokens": 640,
+      "producer_groups": 768,
+      "attention_groups_unchanged": 1280,
+      "total_bytes": 1966080,
+      "V_base": 1310720,
+      "V_bytes": 655360,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 0
+    }
+  ],
+  "candidate_patch_sha256": "7a57353d031f60c50e35106fb4ad1d4be84953774470a8a3c8a6c4726f0b4488"
+}

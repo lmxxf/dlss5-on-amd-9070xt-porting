@@ -1,0 +1,22 @@
+{
+  "status": "PASS CPU/source preparation; NOT GPU validated",
+  "baseline_header_sha256": "09cb03d5343a78abffa2add3ee7e00545689047ea8dd3f95872465513172d734",
+  "candidate_header_sha256": "8ae0e238e6e518546c4a4e1fe527d78ab901b2ec01f4a8da9fe035c75c80ed28",
+  "unchanged_critical_functions": {
+    "Tensor AdaptiveVitGroup(": true,
+    "void PrepareForExternalInput(": true,
+    "template<class...A>void Run(": true,
+    "void SetModelMode(": true
+  },
+  "actual_extracted_helper_cpu_cases_passed": 407,
+  "mapping_tokens": [
+    288,
+    400,
+    448,
+    640
+  ],
+  "mapping_file": "mapping-review.json",
+  "GPU_or_target_tools_used": false,
+  "execution_modules": "Root to lock accepted knife1 pair modules in an independent directory; never overwrite immutable phase5 baseline/modules",
+  "production_changed_by_this_task": false
+}

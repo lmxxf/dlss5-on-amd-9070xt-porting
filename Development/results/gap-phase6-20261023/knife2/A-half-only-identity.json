@@ -1,0 +1,23 @@
+{
+  "source_root": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/A/half-only-source",
+  "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated-qk-rebased/deep_fast-packed-fast.half-only.hip",
+  "sha256": "4540899a6ffcb8941451f2544b748d5dcc70eff5fc095603793f42d4a16bd6cc",
+  "defines": [
+    "HIP_ISA_HALF 1",
+    "HIP_UP_WIDE_BYTE_PAIR 1",
+    "HIP_DEC_WIDE 1",
+    "HIP_VIT_ATTN_NATIVE_HALF 1",
+    "HIP_VIT_ATTN_PROB_PAIR 1",
+    "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+    "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+    "HIP_BRANCHLESS_F 1",
+    "C512_F_MASK 1",
+    "C512_T8_TAIL_VEC 1",
+    "HIP_BYTE_F_ADD0 1",
+    "HIP_VIT_ATTN_RCP 1",
+    "VIT_FAST_NUM 15"
+  ],
+  "opts": [],
+  "scope": "ByteOutput && !W8; no resolution condition; W8 including W16 scalar",
+  "production_changed": false
+}

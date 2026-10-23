@@ -1,0 +1,62 @@
+[
+  {
+    "variant": "compile-cpu-baseline",
+    "vgpr": 188,
+    "instructions": 2483,
+    "valu": 1367,
+    "wait": 136,
+    "v_cvt_pk_fp8_f32": 144,
+    "v_perm_b32": 52,
+    "v_or3_b32": 52,
+    "v_lshlrev_b32": 121,
+    "v_and_b32": 68,
+    "ds_bpermute_b32": 16,
+    "v_permlanex16_b32": 0,
+    "s_wait_dscnt": 45
+  },
+  {
+    "variant": "compile-cpu-pair",
+    "vgpr": 188,
+    "instructions": 2104,
+    "valu": 1025,
+    "wait": 137,
+    "v_cvt_pk_fp8_f32": 72,
+    "v_perm_b32": 16,
+    "v_or3_b32": 16,
+    "v_lshlrev_b32": 37,
+    "v_and_b32": 40,
+    "ds_bpermute_b32": 16,
+    "v_permlanex16_b32": 0,
+    "s_wait_dscnt": 45
+  },
+  {
+    "variant": "compile-cpu-perm",
+    "vgpr": 188,
+    "instructions": 2542,
+    "valu": 1438,
+    "wait": 122,
+    "v_cvt_pk_fp8_f32": 144,
+    "v_perm_b32": 52,
+    "v_or3_b32": 52,
+    "v_lshlrev_b32": 122,
+    "v_and_b32": 72,
+    "ds_bpermute_b32": 0,
+    "v_permlanex16_b32": 16,
+    "s_wait_dscnt": 31
+  },
+  {
+    "variant": "compile-cpu-combined",
+    "vgpr": 188,
+    "instructions": 2175,
+    "valu": 1084,
+    "wait": 121,
+    "v_cvt_pk_fp8_f32": 72,
+    "v_perm_b32": 16,
+    "v_or3_b32": 16,
+    "v_lshlrev_b32": 37,
+    "v_and_b32": 41,
+    "ds_bpermute_b32": 0,
+    "v_permlanex16_b32": 16,
+    "s_wait_dscnt": 31
+  }
+]

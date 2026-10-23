@@ -1,0 +1,20 @@
+{
+  "before_header_sha256": "a0a7190d1beda15681982d3b2f60318bc0f15ebc22af304050ff504279538df3",
+  "production_header_sha256": "09cb03d5343a78abffa2add3ee7e00545689047ea8dd3f95872465513172d734",
+  "measured_candidate_header_sha256": "09cb03d5343a78abffa2add3ee7e00545689047ea8dd3f95872465513172d734",
+  "production_header_identical_to_measured_candidate": true,
+  "module_manifest_sha256": "3b6471c2534b02eea6608ec17cabfe17d167a986753f39f837e52f770bc016e1",
+  "all_80_modules_unchanged": true,
+  "vfrag_eligibility_unchanged": true,
+  "source_change": "one shared geometry helper and its two Init call sites only",
+  "hosts": {
+    "final-frame-standard.exe": "39c5e035835df6d5516b0d634b2127b4533249e857d40c58e77186040617994e",
+    "final-pure.exe": "1121e2b3671fbe2a69a0ec1056fa57ed5edcfb46dbc62f3718f046086016173f",
+    "final-frame-free1072.exe": "7ea7f8c37c858bcd0dd04809ce99195aa4a0acbeca853acabb152ee0bb090f10"
+  },
+  "frame_standard_identical_to_measured_candidate": true,
+  "frame_free1072_identical_to_measured_candidate": true,
+  "pure_source": "Development/results/gap-phase4-20261023/knife1/pure.cpp",
+  "pure_source_sha256": "887e0768b7c000c28d63af998da0f682a6fc9936a1a55b08457d6086f70b30ef",
+  "pure_forces_original_1x": true
+}

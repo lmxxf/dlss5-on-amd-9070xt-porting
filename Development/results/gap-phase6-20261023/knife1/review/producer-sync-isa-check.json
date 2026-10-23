@@ -1,0 +1,42 @@
+{
+  "formal_producer_PC_checks_pass": true,
+  "checks": [
+    {
+      "pc": "0x9adac",
+      "instruction": "s_wait_dscnt 0x0                                           // 00000009ADAC: BFC60000"
+    },
+    {
+      "pc": "0x9adc0",
+      "instruction": "v_wmma_f32_16x16x16_f16 v[17:24], v[33:36], v[37:40], 0    // 00000009ADC0: CC404011 1A024B21"
+    },
+    {
+      "pc": "0x9ade4",
+      "instruction": "v_wmma_f32_16x16x16_f16 v[17:24], v[41:44], v[37:40], v[17:24]// 00000009ADE4: CC404011 1C464B29"
+    },
+    {
+      "pc": "0x9b02c",
+      "instruction": "ds_store_b8 v1, v3                                         // 00000009B02C: D8780000 00000301"
+    },
+    {
+      "pc": "0x9b1ac",
+      "instruction": "ds_store_b8 v1, v11 offset:240                             // 00000009B1AC: D87800F0 00000B01"
+    },
+    {
+      "pc": "0x9b1b4",
+      "instruction": "s_wait_dscnt 0x0                                           // 00000009B1B4: BFC60000"
+    },
+    {
+      "pc": "0x9b1b8",
+      "instruction": "ds_load_2addr_b64 v[0:3], v0 offset1:2                     // 00000009B1B8: D9DC0200 00000000"
+    },
+    {
+      "pc": "0x9b484",
+      "instruction": "s_wait_dscnt 0x0                                           // 00000009B484: BFC60000"
+    },
+    {
+      "pc": "0x9b488",
+      "instruction": "global_store_b128 v[4:5], v[0:3], off                      // 00000009B488: EE07407C 00000000 00000004"
+    }
+  ],
+  "scope": "Check exact formal disassembly dependency window, not a timing/stall claim"
+}

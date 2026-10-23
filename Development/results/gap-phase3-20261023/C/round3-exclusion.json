@@ -1,0 +1,7 @@
+{
+  "decided_utc": "2026-10-23T11:25:11.309723+00:00",
+  "reason": "Root prepared current-gap files on target during C round3; possible host I/O/tail interference.",
+  "exclude": "All three tiers original round3 retained but excluded before steady/pooled CSV analysis",
+  "retain": "Original round1 and round2",
+  "replacement": "One quiet 4-slot ABBA per tier, round3; no further value-based reruns"
+}

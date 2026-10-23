@@ -1,0 +1,3536 @@
+{
+  "cases": [
+    {
+      "height": 1152,
+      "scenario": "default",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            153,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            153,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "fast0",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1",
+            "frame-1.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1",
+            "frame-2.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1",
+            "frame-1.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1",
+            "frame-2.rgb32f": "c9495a8f7ddce8ab558bc78e756ad4e61a0ccd75be943cb1ec851d96e05c0ca1"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "mp2",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            322,
+            322,
+            322
+          ],
+          "raw": {
+            "frame-0.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-1.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-2.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            322,
+            322,
+            322
+          ],
+          "raw": {
+            "frame-0.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-1.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-2.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "hot-mp",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            306,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            306,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "3c9240f3cc03d1d93d2db20a20a5052ce905c50256cf078584b09419b37c6a64",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "missing-contract",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "missing-projection",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "missing-bstream",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1152,
+      "scenario": "missing-bout",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1152",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-1.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf",
+            "frame-2.rgb32f": "1a1f6a92f2ad689484b1c5cc62fd5c5cecca3098d93c96e390fe9e0a6525bddf"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "default",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            153,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "fast0",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c",
+            "frame-1.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c",
+            "frame-2.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c",
+            "frame-1.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c",
+            "frame-2.rgb32f": "80fabb27e8288716c2bbf08c54d36735692c937192e4c877b96a1cdaf540a24c"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "mp2",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            322,
+            322,
+            322
+          ],
+          "raw": {
+            "frame-0.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-1.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-2.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            322,
+            322,
+            322
+          ],
+          "raw": {
+            "frame-0.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-1.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-2.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "hot-mp",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            322,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            153,
+            306,
+            153
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "461639bc7e15a1b88b11ab080158db41be3abeb4a146a077a827074852b239ef",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "missing-contract",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "missing-projection",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "missing-bstream",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 1088,
+      "scenario": "missing-bout",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1920",
+              "H": "1088",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            161,
+            161,
+            161
+          ],
+          "raw": {
+            "frame-0.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-1.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+            "frame-2.rgb32f": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "default",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            157,
+            157,
+            157
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "fast0",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99",
+            "frame-1.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99",
+            "frame-2.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99",
+            "frame-1.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99",
+            "frame-2.rgb32f": "1d6606f5e9c78c45440714c93f245a0a2b45713923edc4e916a089390c642c99"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "mp2",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            330,
+            330,
+            330
+          ],
+          "raw": {
+            "frame-0.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-1.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-2.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            330,
+            330,
+            330
+          ],
+          "raw": {
+            "frame-0.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-1.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-2.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "hot-mp",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            330,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "2",
+              "effective": "2",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "1",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            157,
+            314,
+            157
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "c528fb78f11c49a9076f26c75e9137e47f6b946df5b195ff6bc02ecc6dfa2378",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "missing-contract",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "1",
+              "contract_w16": "0",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "missing-projection",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "0",
+              "contract_w16": "1",
+              "projection_w16": "0",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "missing-bstream",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "0",
+              "projection_bout": "1",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    },
+    {
+      "height": 960,
+      "scenario": "missing-bout",
+      "arms": [
+        {
+          "role": "baseline",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "0",
+              "compact_projection": "0",
+              "contract_w16": "0",
+              "projection_w16": "0",
+              "contract_bstream": "0",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": false
+        },
+        {
+          "role": "candidate",
+          "profiles": [
+            {
+              "frame": "0",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "1",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            },
+            {
+              "frame": "2",
+              "W": "1600",
+              "H": "960",
+              "model": "1",
+              "effective": "1",
+              "compact_contract": "1",
+              "compact_projection": "1",
+              "contract_w16": "1",
+              "projection_w16": "1",
+              "contract_bstream": "1",
+              "projection_bout": "0",
+              "vit_contract_byte_edge": "1",
+              "C512ByteStreamOk": "1",
+              "VitEntryExitByteOk": "0",
+              "pdl_effective": "1",
+              "swin_run": "1"
+            }
+          ],
+          "counts": [
+            165,
+            165,
+            165
+          ],
+          "raw": {
+            "frame-0.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-1.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755",
+            "frame-2.rgb32f": "f3e4ca370908ea9e66aa0030f65711a1d4db3063c743a989e64a3c392f438755"
+          },
+          "injection_logged": true
+        }
+      ],
+      "bit_equal": true
+    }
+  ],
+  "paired_cases": 24,
+  "trace_frames": 144,
+  "final_frame_gold_frames": 9,
+  "pass_all": true
+}

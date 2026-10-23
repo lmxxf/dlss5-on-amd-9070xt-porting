@@ -1,0 +1,8 @@
+LOCK_RELEASED
+failed knife2/B-compile-read-support exit=1
+At D:\DLSSNR-Lab\gap-phase6-20261023\run-jobs.ps1:30 char:25
++ ... if($p.ExitCode -ne 0){throw "failed $($j.label) exit=$($p.ExitCode)"}
++                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (failed knife2/B...-support exit=1:String) [], RuntimeException
+    + FullyQualifiedErrorId : failed knife2/B-compile-read-support exit=1
+ 

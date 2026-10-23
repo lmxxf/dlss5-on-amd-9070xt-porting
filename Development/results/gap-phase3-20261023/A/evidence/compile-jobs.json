@@ -1,0 +1,23 @@
+{
+  "name": "A-comgr",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\A\\candidate.generated.hip",
+      "sha256": "5994545bcc0e2d5e92fb402b394555f85261899edce2a01d6fa4ff9a4aedf0fa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "A/compile-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\A\\candidate.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

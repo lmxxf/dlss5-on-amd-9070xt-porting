@@ -1,0 +1,50 @@
+{
+  "initial_analyzer_sha256": "c035c8c26ebbd53d41277f0ae42e1e5fe76f913dd419e4e5b8dc5bbc248471b9",
+  "original_assertion": "use == [0,1,1,0,1,1]",
+  "original_assertion_failed": true,
+  "observed": {
+    "baseline": {
+      "history_use": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "first_frame_wall_ms": 864.3142,
+      "explicit_reset": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    "candidate": {
+      "history_use": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "first_frame_wall_ms": 830.7558,
+      "explicit_reset": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    }
+  },
+  "mechanism": "native_addon_fast_history.h fixed duration(now-stamp) > .25 reset; cold model preparation occurs after Prepare in first ProcessSubmittedFrame",
+  "correction_scope": "Only additionally accept [0,0,1,0,1,1] when first frame wall>250ms, explicit frame3 reset, cold image0/1/3 hash equal and both arms use sequence/per-frame hashes equal. Preserve actual sequence in report.",
+  "gpu_rerun": false,
+  "production_changed": false,
+  "updated_analyzer_sha256": "56282a11bb71a29dcc6a9475dd02617422e3e6d5d6a0ab003fbcfcbe001d7294"
+}

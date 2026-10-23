@@ -2684,3 +2684,56 @@ Down4每wave算64全列、W16权重、共享字节输入，保Hrtz(0+sum)并合�
 ### 2026-10-17｜候选5：融合Up56/62/66 W16 FP8｜部分性能负，完整Gold失败
 
 56/62实际命中新核、Gold0900同；3轮ABBA mean −0.670/−2.868/+14.202µs，pooled+3.555µs，p99三轮全退/pooled+20.987µs，STOP。独立派发记录发现66仍c32_wave1_up_b8：配方CW_UP_LOW_BYTES0缺原字节low导出，原计划输入假设不符。补通65字节输出→已编译66新export后，full Gold首帧2,768,436/3,732,480 half值异于0900，finite/repeat通过但数值门失败，未跑后续ABBA。原因未隔离，不泛归FP8/WMMA本身。完整停止，不入生产；代码/原失败结果/派发日志见results/upbody-f8-w16-20261017及HIP/experiments/five-bitexact-20261017/candidates.patch。
+
+### 2026-10-23｜刀2 C32激活首级FMA_MIX+ALT｜完整Frame无净收益 STOP
+
+- 原float Horner首级改v_fma_mix_f32，一SGPR打包两个精确half常量，变量/结果仍F32；ALT与MIX两模块.text完全同，仅测MIX。直接packed literal被LLVM MC拒后改SGPR，失败保留。
+- c32-wave1-fast及norm900热点代码少64–72B、1–2条scalar，VOPD/VALU/寄存器/LDS/WMMA/wait不变。54帧三档三图样Gold0。
+- 刀1后完整Frame三档各3轮ABBA（240弃80/960样本每arm）：900 mean−7.787µs但R2退；1088 mean+10.902µs/p99+31.698µs；1152 mean−0.474µs近零。STOP，不合入，不追加同.text的ALT测试。
+- 新条件须是实际不同机器码/常量承载/调度改进，不能改名重做此SGPR-MIX。证据results/gap-phase2-20261023/knife2。
+
+### 2026-10-23｜刀3 C512 projection N-pair｜Gold通过、目标1088无收益 STOP
+
+- 独立N-pair权重键+两新export，将K32配对改N32配对，保每输出K16顺序/skip-first/末量化；旧路已A复用4片，不声称A读取减半。正式COMGR旧89Fn机器码/资源全同，新增两Fn VGPR100→80，LDS1024/spill0不变。
+- 54三图样+6普通F32skip+6实际缺导出回退，共66帧Gold同。3档各3轮完整FrameABBA（240弃80/960每arm），同host+同candidate模块仅NR0/1；active3856calls/slot（含1准备帧）核实。
+- 900mean+0.909µs近零且不稳定；1088三轮都退，pooledmean+6.152µs/p99+21.655µs；1152mean−11.935µs，但R2p99+36.063µs且部分漂移较大。整体STOP，保留1152正值不抹，不合生产/不扫其它展开度。
+- 需新shape/实际动态供数或调度证据才重开；此结果不否定所有N-pair。证据results/gap-phase2-20261023/knife3。
+
+### 2026-10-23｜Phase3 A 当前FAST1精确QT32共享K/V｜明确复验仍负 STOP
+
+- 用户明确要求复验；旧10-01 M32已19 SAME且性能负，不改写为“仅有损”。当前候选保FAST1 score/den/AV顺序，真实半grid，400尾Two=false删除整条第二链；正式COMGR旧89Fn同，新98VGPR/0LDS/private0。
+- 源/ISA证明K/V逻辑请求400−48%/640−50%，有用WMMA同，非DRAM计数；60帧Gold含实际缺导出回退同。
+- 三档各3轮FrameABBA：900mean+12.039µs/p99+62.208µs，1088+97.277/+89.184µs、1152+90.150/+100.465µs；后两档每轮mean/p99均退。STOP，不合生产/不扫同类展开。
+- 后续重开须用户新授权或明确新数学/供数/硬件条件，不能把低VGPR与重复KV当未试。证据results/gap-phase3-20261023/A。
+
+### 2026-10-23｜Phase3 B C512 FFN→Projection 64bit tile-chain｜真重叠但整网负 STOP
+
+- 两wave FFN发布8贡献/tile，consumer bounded acquire后原projection；64bit累计target不逐帧reset。超时完整零写+sticky、最终drain拒整批，非产品回退；16槽hold/FrameFlush后clear成本计候选，NR0不加假hold。
+- 实际生产producer是empty-opts；max-ilp会改旧89函数，已隔离未上GPU。fresh emptybaseline整SHA同生产，最终新旧stock91/89Fn同。首次afterwait缺池被保护拒，修候选冷预热有界稳定，保失败不刷性能。
+- 84主Gold/诊断帧同，独立timeout-zero canary及CPU复核PASS；强制完整Frame失败status1/exit1正常拒批；carry32/64极限关闭过。
+- trace三档16边全部真首WMMA重叠，ordered0；完整Frame各3轮ABBA仍900+86.410µs、1088+124.866µs、1152+52.815µs，九轮mean/p99全退。STOP，不合生产，不扫同步变体。成本未单独分摊，不否定所有TCHAIN。证据results/gap-phase3-20261023/B。
+
+### 2026-10-23｜Phase3 C C512 QKV最后等待前移独立WMMA｜微小不稳定 STOP
+
+- 31处wait0均有真实RAW，未盲改阈值；仅W16最后两K16步用compiler sched barrier把7条独立WMMA移到wait0前。正式COMGR仅目标Fn代码变、其它112同，资源/大小/全opcode计数同。
+- 54帧Gold同。原r3期间root准备后续对账文件有目标CPU/I/O干扰，在steady统计前声明排除，保原轮并补单个quiet r3；不按结果挑选。
+- 有效三档3轮FrameABBA：900mean+4.076µs/p99+10.880µs；1088mean−4.563µs但轮次不稳、R1p99+40.309µs；1152mean+0.788µs。STOP，不合生产、不扫尾步/深度。
+- 证据results/gap-phase3-20261023/C；仅此窗口无稳定收益，不扩称无任何load/wait机会。
+
+### 2026-10-23｜C512 serial_norm permlanex16及与pair打包组合｜STOP
+
+同四段累加顺序、ds_bpermute16→0、permlanex16=16、wait_dscnt45→31，Gold和独立GPU/CPU lane/FP8探针全通过。仅perm总指令2483→2542、VALU1367→1438，1088三ABBA均值+4.869µs，2轮回退；combined三档mean有小收益，但pure1088 pooledp99+184.606µs，多槽尾部不是单个max。保留全部样本，不将组合尾退直接归因perm。最终只采纳pair-only（cvt144→72）；norm/w2未动。证据results/gap-phase5-20261023/knife1，静态wait减少不等整网收益。
+
+### 2026-10-23｜QK-fragment全档推广与C512 LDS TR｜限定/停止
+
+QK配对数学/同步/Gold通过，七档ABBA未全正。仅Orig900/Small900/Small1080按pooledmean/p99门采纳；Orig1088 Frame近零不稳且pure pooled尾+10.364µs，Orig1152尾+18.668µs、Smallfree1088尾+41.4µs，Small720mean+3.704µs，四档保持V-only。所有分轮反例在gap-phase6-20261023/knife1。不是静态b128或61→60VGPR就能推整网大幅提速。
+
+C512 ds_load_tr8：本地LLVM23限定gfx1250，gfx1201汇编拒；正式COMGR该拼法未声明，提示ds_read_tr8后再次编译明确requires gfx950-insts。均CPU预期拒绝，没有GPUlaunch。旧C512_COMPACT_VT已有09-30/10-03负账，本次无新写端机制不复刷；不否定未来不同LDS组织。证据gap-phase6-20261023/knife2/B-result.md。
+
+### 2026-10-24｜Up wide全开成对打包｜W16路径STOP
+
+ByteOutput出口每4值4次单输入换2次pair，正式W16核总指令3612→3446，但全核cvt208→192，不是104；其余转换未删，目标VGPR166不变。63候选Gold+42AE+6半权重回退通过、真实route可核。七档84slot中四个W16档位pooled mean均退：Original900+0.910µs、1088+11.397µs、1152+2.946µs、Small1080+9.677µs。fullA pure1088 mean−5.983µs但p99+35.709µs且三轮p99都退，不能采纳全开。FP16权重Up48三个Small档有改善，另独立half-only编译期!W8候选验证；它恢复W16和其余91核基线码，不把fullA收益冒作新版本收益。证据gap-phase6-20261023/knife2/A-statistics.json、A-pure-statistics.json。
+
+### 2026-10-24｜Up ByteOutput仅FP16权重pair｜STOP
+
+最后!W8候选仅2halfFn变且等fullA，余91Fn全等基线，21freshGold通过。4profile各3ABBA：Small720−5.874µs/p99−64.665，free1088−7.860/p99−7.414，但Small900mean−0.459µs近零、p99+22.444µs（R2/R3尾+35.843/+44.571），未过受影响全范围门，停止，不加分辨率条件、不再变体。Original1088控制不执行改核，其−4.224µs读数仅作为噪声控制，不宣优化收益。生产无刀2变更。证据gap-phase6-20261023/knife2/half-statistics.json。

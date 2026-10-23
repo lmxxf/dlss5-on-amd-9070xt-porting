@@ -1,0 +1,35 @@
+{
+  "name": "knife3-comgr",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\baseline.generated.hip",
+      "sha256": "33575da65d9d54147bee5b998a458942731d9a62387c9b78fc73c5234f5b0569"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\candidate.generated.hip",
+      "sha256": "26f3de2983e5c39622a61bf7f4e1dfff1b73f4f525150f6ea0853716fb64d9f1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase2-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife3/compile-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase2-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\baseline.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife3/compile-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase2-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\candidate.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

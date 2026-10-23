@@ -1,0 +1,344 @@
+{
+  "slots": [
+    {
+      "label": "00-r1-current-v-mochi-N",
+      "round": 1,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.5295125,
+      "cpu_mean_ms": 8.70474375,
+      "gpu_p99_ms": 8.8382389,
+      "gpu_median_ms": 8.5097
+    },
+    {
+      "label": "01-r1-current-v-mochi-M",
+      "round": 1,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.8592812499999996,
+      "cpu_mean_ms": 8.001949999999999
+    },
+    {
+      "label": "02-r1-current-v-mochi-M",
+      "round": 1,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.852681250000001,
+      "cpu_mean_ms": 7.99196875
+    },
+    {
+      "label": "03-r1-current-v-mochi-N",
+      "round": 1,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.5060871875,
+      "cpu_mean_ms": 8.6732625,
+      "gpu_p99_ms": 8.9016777,
+      "gpu_median_ms": 8.48148
+    },
+    {
+      "label": "04-r1-old-v-current-O",
+      "round": 1,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.894225375,
+      "cpu_mean_ms": 9.074418750000001,
+      "gpu_p99_ms": 9.2756826,
+      "gpu_median_ms": 8.86958
+    },
+    {
+      "label": "05-r1-old-v-current-N",
+      "round": 1,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.544897500000001,
+      "cpu_mean_ms": 8.714125,
+      "gpu_p99_ms": 8.9955146,
+      "gpu_median_ms": 8.52229
+    },
+    {
+      "label": "06-r1-old-v-current-N",
+      "round": 1,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.5530045625,
+      "cpu_mean_ms": 8.7228125,
+      "gpu_p99_ms": 8.9880528,
+      "gpu_median_ms": 8.537040000000001
+    },
+    {
+      "label": "07-r1-old-v-current-O",
+      "round": 1,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.932576812499999,
+      "cpu_mean_ms": 9.12350625,
+      "gpu_p99_ms": 9.3566044,
+      "gpu_median_ms": 8.90807
+    },
+    {
+      "label": "08-r2-current-v-mochi-N",
+      "round": 2,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.5318528125,
+      "cpu_mean_ms": 8.70130625,
+      "gpu_p99_ms": 8.747912600000001,
+      "gpu_median_ms": 8.521450000000002
+    },
+    {
+      "label": "09-r2-current-v-mochi-M",
+      "round": 2,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.872225,
+      "cpu_mean_ms": 8.0247625
+    },
+    {
+      "label": "10-r2-current-v-mochi-M",
+      "round": 2,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.85646875,
+      "cpu_mean_ms": 8.01418125
+    },
+    {
+      "label": "11-r2-current-v-mochi-N",
+      "round": 2,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.52647475,
+      "cpu_mean_ms": 8.70308125,
+      "gpu_p99_ms": 8.8236988,
+      "gpu_median_ms": 8.530175
+    },
+    {
+      "label": "12-r2-old-v-current-O",
+      "round": 2,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.9033230625,
+      "cpu_mean_ms": 9.073625000000002,
+      "gpu_p99_ms": 9.1207012,
+      "gpu_median_ms": 8.899529999999999
+    },
+    {
+      "label": "13-r2-old-v-current-N",
+      "round": 2,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.553730437499999,
+      "cpu_mean_ms": 8.718525000000001,
+      "gpu_p99_ms": 8.7682497,
+      "gpu_median_ms": 8.554884999999999
+    },
+    {
+      "label": "14-r2-old-v-current-N",
+      "round": 2,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.543131375,
+      "cpu_mean_ms": 8.743481249999999,
+      "gpu_p99_ms": 8.7705778,
+      "gpu_median_ms": 8.530135000000001
+    },
+    {
+      "label": "15-r2-old-v-current-O",
+      "round": 2,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.9316266875,
+      "cpu_mean_ms": 9.13005,
+      "gpu_p99_ms": 9.111614,
+      "gpu_median_ms": 8.928090000000001
+    },
+    {
+      "label": "16-r3-current-v-mochi-N",
+      "round": 3,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.5495405,
+      "cpu_mean_ms": 8.74309375,
+      "gpu_p99_ms": 8.7453228,
+      "gpu_median_ms": 8.5501
+    },
+    {
+      "label": "17-r3-current-v-mochi-M",
+      "round": 3,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.876637499999999,
+      "cpu_mean_ms": 8.02573125
+    },
+    {
+      "label": "18-r3-current-v-mochi-M",
+      "round": 3,
+      "pair": "current-v-mochi",
+      "kind": "M",
+      "frames": 160,
+      "gpu_mean_ms": 7.885468749999999,
+      "cpu_mean_ms": 8.01778125
+    },
+    {
+      "label": "19-r3-current-v-mochi-N",
+      "round": 3,
+      "pair": "current-v-mochi",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.554834375,
+      "cpu_mean_ms": 8.750200000000001,
+      "gpu_p99_ms": 8.8354634,
+      "gpu_median_ms": 8.53859
+    },
+    {
+      "label": "20-r3-old-v-current-O",
+      "round": 3,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.9270589375,
+      "cpu_mean_ms": 9.094962500000001,
+      "gpu_p99_ms": 9.135315199999999,
+      "gpu_median_ms": 8.922184999999999
+    },
+    {
+      "label": "21-r3-old-v-current-N",
+      "round": 3,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.56769225,
+      "cpu_mean_ms": 8.755906249999999,
+      "gpu_p99_ms": 8.837827800000001,
+      "gpu_median_ms": 8.555895
+    },
+    {
+      "label": "22-r3-old-v-current-N",
+      "round": 3,
+      "pair": "old-v-current",
+      "kind": "N",
+      "frames": 160,
+      "gpu_mean_ms": 8.563048499999999,
+      "cpu_mean_ms": 8.731893750000001,
+      "gpu_p99_ms": 8.774411800000001,
+      "gpu_median_ms": 8.5628
+    },
+    {
+      "label": "23-r3-old-v-current-O",
+      "round": 3,
+      "pair": "old-v-current",
+      "kind": "O",
+      "frames": 160,
+      "gpu_mean_ms": 8.9498564375,
+      "cpu_mean_ms": 9.12775,
+      "gpu_p99_ms": 9.1017682,
+      "gpu_median_ms": 8.951775000000001
+    }
+  ],
+  "pairs": {
+    "current-v-mochi": {
+      "a": "N",
+      "b": "M",
+      "a_gpu_ms": 8.533050354166667,
+      "b_gpu_ms": 7.867127083333333,
+      "a_minus_b_ms": 0.6659232708333338,
+      "rounds": [
+        {
+          "round": 1,
+          "a_ms": 8.51779984375,
+          "b_ms": 7.85598125,
+          "a_minus_b_ms": 0.6618185937499996,
+          "a_slot_drift_ms": -0.023425312499998796,
+          "b_slot_drift_ms": -0.006599999999998829
+        },
+        {
+          "round": 2,
+          "a_ms": 8.52916378125,
+          "b_ms": 7.864346875000001,
+          "a_minus_b_ms": 0.6648169062499996,
+          "a_slot_drift_ms": -0.005378062500000169,
+          "b_slot_drift_ms": -0.015756249999999916
+        },
+        {
+          "round": 3,
+          "a_ms": 8.5521874375,
+          "b_ms": 7.881053124999999,
+          "a_minus_b_ms": 0.6711343125000013,
+          "a_slot_drift_ms": 0.005293874999999559,
+          "b_slot_drift_ms": 0.008831250000000068
+        }
+      ],
+      "steady_frames_per_arm": 960
+    },
+    "old-v-current": {
+      "a": "O",
+      "b": "N",
+      "a_gpu_ms": 8.92311121875,
+      "b_gpu_ms": 8.554250770833333,
+      "a_minus_b_ms": 0.36886044791666706,
+      "rounds": [
+        {
+          "round": 1,
+          "a_ms": 8.91340109375,
+          "b_ms": 8.54895103125,
+          "a_minus_b_ms": 0.36445006249999956,
+          "a_slot_drift_ms": 0.03835143749999936,
+          "b_slot_drift_ms": 0.008107062499998818
+        },
+        {
+          "round": 2,
+          "a_ms": 8.917474875,
+          "b_ms": 8.54843090625,
+          "a_minus_b_ms": 0.3690439687500007,
+          "a_slot_drift_ms": 0.0283036249999995,
+          "b_slot_drift_ms": -0.010599062499998979
+        },
+        {
+          "round": 3,
+          "a_ms": 8.9384576875,
+          "b_ms": 8.565370375,
+          "a_minus_b_ms": 0.37308731249999916,
+          "a_slot_drift_ms": 0.02279749999999936,
+          "b_slot_drift_ms": -0.00464375000000139
+        }
+      ],
+      "steady_frames_per_arm": 960
+    }
+  },
+  "raw_groups": {
+    "O": [
+      "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    ],
+    "N": [
+      "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    ],
+    "M": [
+      "624d9d1a2f5cedb300182bb7766df1c3b421d57555c9edc20220baa14431a612"
+    ]
+  },
+  "historical_20261006": {
+    "old_hip_ms": 8.931545125,
+    "mochi_ms": 7.885259375,
+    "gap_ms": 1.04628575
+  },
+  "old_mochi_historical_sha_match": true,
+  "old_hip_historical_sha_match": true
+}

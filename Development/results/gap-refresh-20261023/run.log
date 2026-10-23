@@ -1,0 +1,143 @@
+00-r1-current-v-mochi-N
+
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.529512495 cpu_mean_ms=8.704743750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+01-r1-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.859 ms  @ 0 MHz
+measurement wall 1280.312 ms, GPU total 1257.485 ms over 160 frames
+02-r1-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.853 ms  @ 0 MHz
+measurement wall 1278.715 ms, GPU total 1256.429 ms over 160 frames
+03-r1-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.506087196 cpu_mean_ms=8.673262500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+04-r1-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.894225401 cpu_mean_ms=9.074418750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+05-r1-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.544897497 cpu_mean_ms=8.714125000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+06-r1-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.553004605 cpu_mean_ms=8.722812500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+07-r1-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.932576823 cpu_mean_ms=9.123506250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+08-r2-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.531852829 cpu_mean_ms=8.701306250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+09-r2-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.872 ms  @ 0 MHz
+measurement wall 1283.962 ms, GPU total 1259.556 ms over 160 frames
+10-r2-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.856 ms  @ 0 MHz
+measurement wall 1282.269 ms, GPU total 1257.035 ms over 160 frames
+11-r2-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.526474437 cpu_mean_ms=8.703081250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+12-r2-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.903323054 cpu_mean_ms=9.073625000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+13-r2-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.553730428 cpu_mean_ms=8.718525000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+14-r2-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.543131387 cpu_mean_ms=8.743481250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+15-r2-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.931626695 cpu_mean_ms=9.130050000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+16-r3-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.549540496 cpu_mean_ms=8.743093750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+17-r3-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.877 ms  @ 0 MHz
+measurement wall 1284.117 ms, GPU total 1260.262 ms over 160 frames
+18-r3-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.885 ms  @ 0 MHz
+measurement wall 1282.845 ms, GPU total 1261.675 ms over 160 frames
+19-r3-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.554834360 cpu_mean_ms=8.750200000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+20-r3-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.927058929 cpu_mean_ms=9.094962500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+21-r3-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.567692256 cpu_mean_ms=8.755906250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+22-r3-old-v-current-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.563048500 cpu_mean_ms=8.731893750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+23-r3-old-v-current-O
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.949856442 cpu_mean_ms=9.127750000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+COMPLETED_24_SLOTS
+LOCK_RELEASED
+
+

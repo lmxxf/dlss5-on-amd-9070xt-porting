@@ -1,0 +1,35 @@
+{
+  "name": "C-comgr",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\C\\baseline.generated.hip",
+      "sha256": "c1f4e4ad73754bcff22b28744b39526554173d270247cb1c3c7b70c160d62d3c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\C\\candidate.generated.hip",
+      "sha256": "fe5538e3a2f46d8b7a56b9cfc7043854964fc0104d268a983f6bbeda0e05ff0d"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "C/compile-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\C\\baseline.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "C/compile-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\C\\candidate.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

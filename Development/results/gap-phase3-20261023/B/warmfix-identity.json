@@ -1,0 +1,16 @@
+{
+  "old_frame_sha256": "110b83d51c5fef4bd842d907225ea3687d834f3c651ea6cae94bf2188f5c88d4",
+  "new_frame_sha256": "0e914317e4de5a3898cee28a77cbb115d422e2575d2d52b1020c4dfad25b9ff6",
+  "hip_sources_unchanged": true,
+  "hip_sources": {
+    "c512-m32-deep.baseline.generated.hip": "a7a7cd51f4b063220ee873f0967236a6f020d5114a5fbbc84ddb82dc597cf957",
+    "c512-m32-deep.generated.hip": "9defee2afa2793a840ca5681d2eca15436b572f04d1a973f6d6bb663ccaac399",
+    "deep_fast-packed-fast.generated.hip": "b322a0ad6cdad63ba2cc9eaf4d621f7225bd8c5ab92a73789d2c96ab53f8c5cf",
+    "deep_fast-packed-fast.trace.generated.hip": "d49e5ec9a5c180442ba107961bc8f81798eecd366c2402ba09f6ab07b333201b",
+    "c512-m32-deep.trace.generated.hip": "79b537125bd42431fa9abab84966a65a10cd45303e9c9392d93d325e9733f05a"
+  },
+  "header_sha256": "edb1d79139a9ee1a2473897b88788866260565b6dad0d92cc397ad79d1e2ce35",
+  "warm_max_enqueues": 8,
+  "consecutive_stable_cycles": 2,
+  "four_GPU_modules_not_rebuilt": true
+}

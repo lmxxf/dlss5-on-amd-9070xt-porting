@@ -1,0 +1,27 @@
+{
+  "pair": {
+    "sha256": "f3f37d03f6122fe8f55b104e69e3993f6e37f998008ee2b9fc100bd358a32430",
+    "changed_functions": [
+      "c512_qkv_attention_compact_w16",
+      "c512_qkv_attention_compact"
+    ],
+    "all_other_functions_byte_same": true
+  },
+  "perm": {
+    "sha256": "227f9ee5d2b28172cb501481294d605fff5e3db5e67e10fb43e48e6064d60f27",
+    "changed_functions": [
+      "c512_qkv_attention_compact_w16",
+      "c512_qkv_attention_compact"
+    ],
+    "all_other_functions_byte_same": true
+  },
+  "combined": {
+    "sha256": "84b1be917bdb073b0f4f0c777258cc552593b250ec2edee2ce9e579d27b9dbf0",
+    "changed_functions": [
+      "c512_qkv_attention_compact_w16",
+      "c512_qkv_attention_compact"
+    ],
+    "all_other_functions_byte_same": true
+  },
+  "resources": "Changes confined to RSRC3 instruction prefetch size bit4..11 in affected descriptors; allocation/FP mode and other fields unchanged."
+}

@@ -1,0 +1,1 @@
+首次non-W16 baseline在读输入阶段exit1：生成脚本全串combined→pair误改了fixture目录名，未执行GPU网络。改为正确combined-vs041路径，新case保留原失败回执，不改内核或Gold口径。

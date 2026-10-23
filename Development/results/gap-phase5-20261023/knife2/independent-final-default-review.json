@@ -1,0 +1,73 @@
+{
+  "pass": true,
+  "jobs": 9,
+  "frames": 36,
+  "formal_c512_module_sha256": "8b2132d95c61c23c112eae1d465c73703f3686ad03a68c5797093dcf202403b5",
+  "no_NR_override": true,
+  "cases": [
+    {
+      "label": "knife2/final-default-small900",
+      "frames": 3,
+      "paired_launches": 32,
+      "reference": "knife2/gold-small900-p0-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-small720",
+      "frames": 3,
+      "paired_launches": 32,
+      "reference": "knife2/gold-small720-p0-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-small1080",
+      "frames": 3,
+      "paired_launches": 40,
+      "reference": "knife2/gold-small1080-p0-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-smallfree1088",
+      "frames": 3,
+      "paired_launches": 32,
+      "reference": "knife2/gold-smallfree1088-p0-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-ae-original900",
+      "frames": 6,
+      "paired_launches": 64,
+      "reference": "knife2/ae-original900-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-ae-original1088",
+      "frames": 6,
+      "paired_launches": 64,
+      "reference": "knife2/ae-original1088-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-default-ae-original1080",
+      "frames": 6,
+      "paired_launches": 64,
+      "reference": "knife2/ae-original1080-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-off-small720",
+      "frames": 3,
+      "paired_launches": 0,
+      "reference": "knife2/gold-small720-p0-candidate",
+      "all_raw_hashes_equal": true
+    },
+    {
+      "label": "knife2/final-off-smallfree1088",
+      "frames": 3,
+      "paired_launches": 0,
+      "reference": "knife2/gold-smallfree1088-p0-candidate",
+      "all_raw_hashes_equal": true
+    }
+  ],
+  "local_only": true
+}

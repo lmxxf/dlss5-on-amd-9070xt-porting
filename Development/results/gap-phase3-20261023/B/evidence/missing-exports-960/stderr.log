@@ -1,0 +1,39 @@
+model requested=1x effective=1x blocks=71 assets=D:\DLSSNR-Lab\combined-vs041-20261006\assets-common reason=original
+multi_pass=1 multi_pass_predict=0 actual_network_passes=1
+vit_contract_byte_edge=1
+c32_norm900 scope=1 loaded=1 selected=c32-wave1-fast-norm900.hsaco processing=1600x960 fast_numeric=1 mp=1 graph=0 experimental=0
+DLSS5_FAST_NUMERIC=1: multihead-fast-padded-wave-packed-fast.hsaco missing, using multihead-fast-padded-wave-packed.hsaco
+pool64_byte_edge=1
+C512_CHAIN unavailable=exports_or_extension requested=1
+submit_pulse device_scope arch=gfx1201 runtime=70260201 driver_query=00000000 driver=00200000791f0800 validated=1
+submit_pulse capabilities=1 c32_full26=1 wave_owned=1 c512_m32=1 vit_proj_n64=1 vit_stream=3 vit_byte_edge=1 pool64_byte_edge=1 sp_w16=1 sp_init_pair=0
+submit_pulse requested=auto initialized=1 active=0 reason=pending-first-record init_reject_mask=0 driver=validated site=C512_encoder_start preceding=ordered_Down_c256 mode=timed_single
+DLSS5_MULTI_PASS_HOTKEY=none invalid (F1..F24, key code, 0), using F9
+submit_pulse requested=1 active=1 reason=eligible-first-record site=C512_encoder_start preceding=ordered_Down_c256 launch_mode=hipModuleLaunchKernel mode=timed_single current_anyorder=0 record_attempts=1 record_accepted=1 lifetime_pdl_calls=2 frame_prefix_pdl=2
+CONTRACT_COMPACT key=block31-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block31-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block32-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block32-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block33-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block33-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block34-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block34-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block35-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block35-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block36-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block36-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block37-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block37-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+CONTRACT_COMPACT key=block38-contract.f32@vit-frag@compact-contract bytes=4198400 legacy_held=0
+PROJECTION_COMPACT key=block38-projection.f32@vit-proj-frag@compact-projection bytes=1052672 legacy_held=0
+C512_CHAIN warm runs=1 cycle=1 profile=1 pool=0->38 bytes=0->235309904 uploads=0->194 stable=0 enabled=0 overflow=0 before_producer_wait=1
+C512_CHAIN warm runs=2 cycle=2 profile=1 pool=38->54 bytes=235309904->308501328 uploads=194->194 stable=0 enabled=0 overflow=0 before_producer_wait=1
+C512_CHAIN warm runs=3 cycle=3 profile=1 pool=54->57 bytes=308501328->338352976 uploads=194->194 stable=0 enabled=0 overflow=0 before_producer_wait=1
+C512_CHAIN warm runs=4 cycle=4 profile=1 pool=57->57 bytes=338352976->338352976 uploads=194->194 stable=1 enabled=0 overflow=0 before_producer_wait=1
+C512_CHAIN warm runs=5 cycle=5 profile=1 pool=57->57 bytes=338352976->338352976 uploads=194->194 stable=2 enabled=0 overflow=0 before_producer_wait=1
+C512_CHAIN warm_ready runs=5 cycles=5 profile=1 pool=57 bytes=338352976 uploads=194 enabled=0 overflow=0 before_producer_wait=1
+model_prepared mode=1 profile=1 uploads=194 active_weights=192 retained_weights=0 before_producer_wait=1
+C512_CHAIN final requested=1 enabled=0 calls=0 anyorder=0 ordered=0 overflow=0 status=0 counter_values=0 counter_mismatches=0
+submit_pulse resources create=1 create_ok=1 record=8 record_ok=8 destroy=1 destroy_ok=1 drain=1 site_visits=8 accepted=8 reject_mask=0 lifetime_pdl_calls=32
+C512_W16_SUMMARY mode=2 w16_blocks=128 stock_blocks=0 ffn_mode=1 ffn_w16_blocks=128 ffn_stock_blocks=0 c32_mode=1 c32_w16_calls=80 c32_stock_calls=0 vit_mode=7 vit_w16_calls=64 vit_stock_calls=0 vit_contract_w16=1 vit_proj_w16=1 vit_inter_byte=15 vit_inter_byte_calls=216 weights_count=192 weights_bytes=307054632
+

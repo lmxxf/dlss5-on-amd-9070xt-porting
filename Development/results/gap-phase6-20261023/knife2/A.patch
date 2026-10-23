@@ -1,0 +1,11 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -548,7 +548,7 @@
+   __builtin_memcpy(sk,__builtin_assume_aligned(skip+base,16),64);__builtin_memcpy(sc,__builtin_assume_aligned(w+inputs*outputs+row,16),64);
+   float r[16];for(uint c=0;c<16;c++){float merged=H(tl[tk*17+c]+F(sk[c])*sc[c]);
+    if constexpr(ByteOutput)r[c]=HIP_BYTE_F_ADD0?fp8_add0(merged):F(merged);else r[c]=outputs==32?merged:F(merged);}
+-  if constexpr(ByteOutput){uint wv[4];for(uint q=0;q<4;q++){uint v=0;for(uint b=0;b<4;b++)v|=(uint(__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4+b],0.f,0,false))&255u)<<(8*b);wv[q]=v;}__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+base,16),wv,16);}
++  if constexpr(ByteOutput){uint wv[4];for(uint q=0;q<4;q++){uint v=__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4],r[q*4+1],0,false);wv[q]=__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4+2],r[q*4+3],v,true);}__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+base,16),wv,16);}
+   else __builtin_memcpy(__builtin_assume_aligned(out+base,16),r,64);}
+ }
+ template<bool ByteOutput,bool W8=false,bool ByteInput=false,bool W16=false>

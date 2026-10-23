@@ -1,0 +1,47 @@
+{
+  "production": {
+    "file": "/home/lmxxf/work/dlss5-five-build/final-payload/HIP/gfx1201/deep_fast-packed-fast.hsaco",
+    "sha256": "00e39349bc8a1a02e5a61b4606d1541d5ed1e4988de8c17db3cc5c8380c095ce",
+    "sections": {
+      "": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".note": "6d3a869142002864e7b4c38815490acd21d7657c64d4b5275bcd0550c4da88ae",
+      ".dynsym": "86ad7aeb4a54c132a5f62ce856cc7bbeb88d0d7b73428413ca1fcf4ac6f5c5e7",
+      ".gnu.hash": "6e52caf385935a4aa943223642cb08c96fb4a61c667a7695c31ec2481565ad35",
+      ".hash": "b3e77eb0eff5a6b3daf08b3e71ab6f9bdc3f17184cda0b84586bedb98d64b5ef",
+      ".dynstr": "8f86078225a9c0a317805cfac162b2a8ce44e888346b48565d38f099f2fe896c",
+      ".rodata": "78a3ab2f0a6588f9b21622c295184ff64baea3df50cd301da28332f7b3792fb1",
+      ".text": "ed9b8d42c3e945e4fc881c0ab40ae55568d9a966269180d351b5c4a3b817e2bc",
+      ".dynamic": "4cf22eb59fc5c3c2ebd150a6454d6accc4f4cf02d5eac1a16c906ff2412d73c8",
+      ".relro_padding": "8dc6901c57130c15b6b05d552cd3f6c56aeb9af11fadde7e798ad13c643ba4cc",
+      ".bss": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      ".AMDGPU.gpr_maximums": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".comment": "414c4cf9cd3a89b20423e80678834221581c0e3aaea0fae77066f7013d770806",
+      ".symtab": "79a1ab45489f3eb55a0ddc3960f369a112d2eb5761c5b4e14d9dc5c8b832a252",
+      ".shstrtab": "382f1c7f500c32363faeb8c337c109a13b9789c2e82837f0f6b74ebaa7eaf704",
+      ".strtab": "a43dd113e13dfaaf9a027875851899d2f9e1722fc4a5fd89900ac12913acde22"
+    }
+  },
+  "llvm21_cpu_rebuild": {
+    "file": "/home/lmxxf/work/dlss5-phase2-build-20261023/baseline-llvm21/gfx1201/deep_fast-packed-fast.hsaco",
+    "sha256": "ab9253fb9f4d6f8819ee3c9097917fc564ebb0142e5ae2d9602c57d9811192bb",
+    "sections": {
+      "": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".note": "621991a108df0e9000117535408dccbf888b42b169a08b67890b2770c463cded",
+      ".dynsym": "0e296c88548d07bdb1cb2c8d02736d385d665df19016e6df3e7acc66d45dd079",
+      ".gnu.hash": "6e52caf385935a4aa943223642cb08c96fb4a61c667a7695c31ec2481565ad35",
+      ".hash": "b3e77eb0eff5a6b3daf08b3e71ab6f9bdc3f17184cda0b84586bedb98d64b5ef",
+      ".dynstr": "8f86078225a9c0a317805cfac162b2a8ce44e888346b48565d38f099f2fe896c",
+      ".rodata": "01bf884047b3b5297d092ba9dad3147923f1ff2a2437f08979c637a3cf62773e",
+      ".text": "7a9eb43200196734c96af388165a9a9b9b2750411464e19c7aa7cfce5b0ce2a9",
+      ".dynamic": "4cf22eb59fc5c3c2ebd150a6454d6accc4f4cf02d5eac1a16c906ff2412d73c8",
+      ".relro_padding": "28b531f23d735d936feecf149ddda36b53cd0e131403991026111e4246078085",
+      ".bss": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      ".AMDGPU.gpr_maximums": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".comment": "74d7a75c48c796027e06a8aa55a750b7e4169fd0b8ca614c1c048fbed224af78",
+      ".symtab": "f5f13aa003afc51acfa86ef6db13a967776979e9691fdaef371e0a8eafcffba8",
+      ".shstrtab": "382f1c7f500c32363faeb8c337c109a13b9789c2e82837f0f6b74ebaa7eaf704",
+      ".strtab": "a43dd113e13dfaaf9a027875851899d2f9e1722fc4a5fd89900ac12913acde22"
+    }
+  },
+  "text_equal": false
+}

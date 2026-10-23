@@ -1,0 +1,22 @@
+{
+  "hosts": {
+    "frame-baseline-standard.exe": "7a15bc6542f9a12fbf5ea26feee94f5277a98faa9790d5d895b0f02f9a9e77f4",
+    "frame-baseline-free1072.exe": "e7fae90f76af4ef0d590028deb87ba484151ba38e27fbe0b189c6a3659bad00b",
+    "frame-candidate-standard.exe": "39c5e035835df6d5516b0d634b2127b4533249e857d40c58e77186040617994e",
+    "frame-candidate-free1072.exe": "7ea7f8c37c858bcd0dd04809ce99195aa4a0acbeca853acabb152ee0bb090f10"
+  },
+  "base_standard_equals_knife1_final": true,
+  "module_manifest_sha256": "3b6471c2534b02eea6608ec17cabfe17d167a986753f39f837e52f770bc016e1",
+  "four_hosts_O2": true,
+  "GPU_modules_recompiled": false,
+  "input": {
+    "file": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife2/free1072-input.f16",
+    "width": 1920,
+    "height": 1072,
+    "format": "little-endian RGBA16F",
+    "kind": "controlled synthetic gradient, not real capture",
+    "formula": "rgb half bits=0x2000+(x*17+y*31+c*53)%10240; alpha=0x3c00",
+    "bytes": 16465920,
+    "sha256": "d4a7b07b4de53a79589b73fec3d8131c06baf53b460341805ad1482e102ddda4"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "review": "PASS limited to current fixed-shape Original FAST1 MP1 AE0 experiment",
+  "files": {
+    "Development/HIP/hip_reference_network.h": "edb1d79139a9ee1a2473897b88788866260565b6dad0d92cc397ad79d1e2ce35",
+    "Development/HIP/benchmark_live_capture.cpp": "bd6b19fca36ccd98be9de785e4f67d66cd0e9adee2e78acec733a7596e8df642"
+  },
+  "warm_fragment_sha256": "5e677a1e20488fe18123050e450b787b3d94947098f253a5ecf961e37e6b35e9",
+  "counter_status_trace_reset_in_warm": false,
+  "nr0_original_warm_count_preserved": true,
+  "max_candidate_warm_runs": 8,
+  "consecutive_stable_required": 2,
+  "after_external_wait_pool_miss_still_rejects": true,
+  "gpu_by_this_reviewer": false,
+  "consecutive_stable_unit": "whole original profile cycle: requested AE plus optional AE-off, restored before compare",
+  "ae_grouped_cycle_source_review_pass": true
+}

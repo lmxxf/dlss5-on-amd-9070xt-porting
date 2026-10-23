@@ -1,0 +1,43 @@
+{
+  "pair": {
+    "c512_qkv_attention_compact.kd": {
+      "segments_same": true,
+      "rsrc1_same": true,
+      "other_rsrc_after_rsrc3_same": true,
+      "rsrc3_old": "0x9b0",
+      "rsrc3_new": "0x860"
+    },
+    "c512_qkv_attention_compact_w16.kd": {
+      "segments_same": true,
+      "rsrc1_same": true,
+      "other_rsrc_after_rsrc3_same": true,
+      "rsrc3_old": "0x8e0",
+      "rsrc3_new": "0x790"
+    }
+  },
+  "perm": {
+    "c512_qkv_attention_compact_w16.kd": {
+      "segments_same": true,
+      "rsrc1_same": true,
+      "other_rsrc_after_rsrc3_same": true,
+      "rsrc3_old": "0x8e0",
+      "rsrc3_new": "0x8f0"
+    }
+  },
+  "combined": {
+    "c512_qkv_attention_compact.kd": {
+      "segments_same": true,
+      "rsrc1_same": true,
+      "other_rsrc_after_rsrc3_same": true,
+      "rsrc3_old": "0x9b0",
+      "rsrc3_new": "0x880"
+    },
+    "c512_qkv_attention_compact_w16.kd": {
+      "segments_same": true,
+      "rsrc1_same": true,
+      "other_rsrc_after_rsrc3_same": true,
+      "rsrc3_old": "0x8e0",
+      "rsrc3_new": "0x7c0"
+    }
+  }
+}

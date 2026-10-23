@@ -1,0 +1,22 @@
+{
+  "header_before": "09cb03d5343a78abffa2add3ee7e00545689047ea8dd3f95872465513172d734",
+  "header_after": "8ae0e238e6e518546c4a4e1fe527d78ab901b2ec01f4a8da9fe035c75c80ed28",
+  "exact_tested_candidate": true,
+  "preserved_pair_module_manifest": "c8e6d3fa5c0a05688d6dca4a8d34c16392818a223fe46fcc5afa51ec89a7c237",
+  "scope": "Original existing 3 processing shapes plus Small 4 processing shapes; existing AE policies admitted; FAST1 single-pass and other restrictions unchanged",
+  "gpu_sources_or_modules_changed_by_this_integration": false,
+  "production_comment": "Retained candidate wording intentionally for exact tested source/build reproduction",
+  "final_host_directory": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife2/final-host",
+  "hosts": {
+    "standard": {
+      "path": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife2/final-host/frame-standard.exe",
+      "sha256": "2915d38c26ed40cbe9192c82cd626feb637f8c1389cd5a38ca551c401dcb1def",
+      "exact_tested_candidate_binary": true
+    },
+    "free1072": {
+      "path": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife2/final-host/frame-free1072.exe",
+      "sha256": "5ee936c2d029e08e4b0dccfa201719658e38d68796d05c447d1c0c370c5f7f25",
+      "exact_tested_candidate_binary": true
+    }
+  }
+}

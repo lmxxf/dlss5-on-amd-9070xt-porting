@@ -1,0 +1,35 @@
+{
+  "verified_files": 80,
+  "unchanged_files": 76,
+  "changed": {
+    "gfx1200/deep_fast-packed-fast.hsaco": {
+      "sha256": "1e19af79bfef2b761ccf29c854d5274a8c3d4f4d6c34c81b23efbf82b187571a",
+      "elf_flags": "0x48",
+      "source_sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+      "from": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-final-gfx1200-deep_fast-packed-fast/deep_fast-packed-fast.hsaco"
+    },
+    "gfx1200/vit-stream-fast.hsaco": {
+      "sha256": "08ebae642bba863e29d8b27939ec02fb707db41e52ab5856be37a317596bf345",
+      "elf_flags": "0x48",
+      "source_sha256": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539",
+      "from": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-final-gfx1200-vit-stream-fast/vit-stream-fast.hsaco"
+    },
+    "gfx1201/deep_fast-packed-fast.hsaco": {
+      "sha256": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354",
+      "elf_flags": "0x4e",
+      "source_sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+      "from": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-candidate-deep_fast-packed-fast/deep_fast-packed-fast.hsaco"
+    },
+    "gfx1201/vit-stream-fast.hsaco": {
+      "sha256": "bf1dd632743a0792a76832e436229c1faee68999801a565e62c9f66145522836",
+      "elf_flags": "0x4e",
+      "source_sha256": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539",
+      "from": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-candidate-vit-stream-fast/vit-stream-fast.hsaco"
+    }
+  },
+  "manifest_sha256": "2753bd68b7dcf185088f9c312f3d7bb231bfc59857e79e7d4c99540f70716026",
+  "payload": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/final-payload/HIP",
+  "gfx1200_validation": "compile/ELF/source identity only; not hardware tested",
+  "gfx1201_validation": "exact measured modules",
+  "source_unchanged": true
+}

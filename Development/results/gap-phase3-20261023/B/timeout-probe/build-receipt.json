@@ -1,0 +1,11 @@
+{
+  "exe": "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/timeout-probe.exe",
+  "exe_sha256": "9ffdd2facb96ca7c525f79f3b49e718a4d35eacd457d577812bd745fa6ed3a60",
+  "source_sha256": "0c4d6ed60d5018491bcf90f48c04c7a626f5e8ba12db91c9784f35632c8bd95b",
+  "hip_api_sha256": "88ba78c5f0700001ca744040fcde5f11cc4345f9350e0b9cf5577bae782f78c9",
+  "consumer_source_sha256": "165db33136b848de7a3be5f28dfc8571adfd018caf8e160772c8d230016cfbb0",
+  "consumer_generated_sha256": "b322a0ad6cdad63ba2cc9eaf4d621f7225bd8c5ab92a73789d2c96ab53f8c5cf",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "gpu_executed": false,
+  "arguments": "MODULE_HSACO OUTPUT_DIRECTORY [HIP_DEVICE=0]"
+}

@@ -1,0 +1,133 @@
+{
+  "pure": {
+    "baseline": 8.341778979166667,
+    "candidate": 8.305513708333333,
+    "delta_ms": -0.03626527083333464,
+    "p99_delta_ms": -0.04552089999999964,
+    "rounds": [
+      {
+        "round": 1,
+        "delta_ms": -0.033754593750002115,
+        "p99_delta_ms": -0.016080399999998107
+      },
+      {
+        "round": 2,
+        "delta_ms": -0.039896187500000124,
+        "p99_delta_ms": -0.05096090000000153
+      },
+      {
+        "round": 3,
+        "delta_ms": -0.0351450312499999,
+        "p99_delta_ms": -0.04741369999999989
+      }
+    ]
+  },
+  "default_compat_frames": 39,
+  "cases": {
+    "default-960": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 1,
+      "producer_calls": 32,
+      "consumer_calls": 32
+    },
+    "default-1088": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 1,
+      "producer_calls": 32,
+      "consumer_calls": 32
+    },
+    "default-1152": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 1,
+      "producer_calls": 32,
+      "consumer_calls": 32
+    },
+    "fallback-ae1-baseline": {
+      "requested": 0,
+      "available": 0,
+      "ae0": 0,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-ae1-candidate": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 0,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-fast0-baseline": {
+      "requested": 0,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-fast0-candidate": {
+      "requested": 1,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-mp2-baseline": {
+      "requested": 0,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-mp2-candidate": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-missing-consumer": {
+      "requested": 1,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "fallback-missing-producer": {
+      "requested": 1,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "public-off": {
+      "requested": 0,
+      "available": 0,
+      "ae0": 1,
+      "producer_calls": 0,
+      "consumer_calls": 0
+    },
+    "nr-overrides-off": {
+      "requested": 1,
+      "available": 1,
+      "ae0": 1,
+      "producer_calls": 32,
+      "consumer_calls": 32
+    }
+  },
+  "payload_verified_count": 80,
+  "payload_targets": {
+    "gfx1200": 40,
+    "gfx1201": 40
+  },
+  "changed_payload_modules": 4,
+  "production_source_matches_signed_identity": {
+    "hip/deep_fast.hip": true,
+    "hip/vit_stream.inc": true,
+    "Development/HIP/hip_reference_network.h": true
+  },
+  "final_hosts_sha_verified": true,
+  "actual_helper_cpu_cases": 20,
+  "helper_hasfn_is_stub": true
+}

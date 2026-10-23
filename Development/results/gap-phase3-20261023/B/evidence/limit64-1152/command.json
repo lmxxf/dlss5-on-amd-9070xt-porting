@@ -1,0 +1,11 @@
+{
+    "label":  "B/limit64-1152",
+    "env":  {
+                "SMALL_FRAME_CAPTURE":  "1",
+                "NR_C512_CHAIN":  "1",
+                "NR_C512_CHAIN_START":  "18446744073709551600"
+            },
+    "arguments":  "\"D:\\DLSSNR-Lab\\combined-vs041-20261006\\assets-common\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\limit64-1152\\same.flags\" \"D:\\DLSSNR-Lab\\combined-vs041-20261006\\input.f16\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\limit64-1152\\out\" 3 0 \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\modules\" 0 0 0 0",
+    "exe":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\frame-warmed.exe",
+    "start":  "2026-10-23T10:52:56.5017443Z"
+}

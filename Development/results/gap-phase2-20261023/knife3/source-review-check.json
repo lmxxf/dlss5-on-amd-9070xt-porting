@@ -1,0 +1,17 @@
+{
+  "status": "PASS_CPU_SOURCE_REVIEW",
+  "candidate_patch_sha256": "8ae37cc6bd902dfdbe9501ebea91d224c216a83f75db0f4d6ace70fa31554de4",
+  "actual_helper_sha256": "b11544bfd1a1750caa0dbeb55e0b7c040da4e06523b7031fbbaf4ba1c48e4287",
+  "checker_sha256": "dc3231ef01c57bc4bd5a050d530b623d86ec5980ba55b5202ed3a3ca487eb2e0",
+  "matrix_bytes_checked": 262144,
+  "coordinate_byte_passes": 3,
+  "all_nonmatrix_bytes_unchanged": true,
+  "full_grid_tokens": [
+    1504,
+    2048,
+    2160
+  ],
+  "gpu_run": false,
+  "compiler": "g++ -std=c++17 -O2",
+  "note": "Actual candidate host packing helper; independent fragment read-coordinate and output coverage checks. Not GPU arithmetic proof."
+}

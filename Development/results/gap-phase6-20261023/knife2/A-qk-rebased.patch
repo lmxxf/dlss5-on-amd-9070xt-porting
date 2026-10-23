@@ -1,0 +1,35 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -1,3 +1,6 @@
++#ifndef HIP_UP_WIDE_BYTE_PAIR
++#define HIP_UP_WIDE_BYTE_PAIR 0
++#endif
+ #ifndef VIT_CONTRACT_OCC_LDS
+ #define VIT_CONTRACT_OCC_LDS 0 /* bytes of dummy LDS on vit_contract_blocked_body (occupancy cap) */
+ #endif
+@@ -555,7 +558,13 @@
+   __builtin_memcpy(sk,__builtin_assume_aligned(skip+base,16),64);__builtin_memcpy(sc,__builtin_assume_aligned(w+inputs*outputs+row,16),64);
+   float r[16];for(uint c=0;c<16;c++){float merged=H(tl[tk*17+c]+F(sk[c])*sc[c]);
+    if constexpr(ByteOutput)r[c]=HIP_BYTE_F_ADD0?fp8_add0(merged):F(merged);else r[c]=outputs==32?merged:F(merged);}
+-  if constexpr(ByteOutput){uint wv[4];for(uint q=0;q<4;q++){uint v=0;for(uint b=0;b<4;b++)v|=(uint(__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4+b],0.f,0,false))&255u)<<(8*b);wv[q]=v;}__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+base,16),wv,16);}
++  if constexpr(ByteOutput){uint wv[4];for(uint q=0;q<4;q++){
++#if HIP_UP_WIDE_BYTE_PAIR
++uint v=__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4],r[q*4+1],0,false);wv[q]=__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4+2],r[q*4+3],v,true);
++#else
++uint v=0;for(uint b=0;b<4;b++)v|=(uint(__builtin_amdgcn_cvt_pk_fp8_f32(r[q*4+b],0.f,0,false))&255u)<<(8*b);wv[q]=v;
++#endif
++}__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+base,16),wv,16);}
+   else __builtin_memcpy(__builtin_assume_aligned(out+base,16),r,64);}
+ }
+ template<bool ByteOutput,bool W8=false,bool ByteInput=false,bool W16=false>
+--- a/hip/build-modules.ps1
++++ b/hip/build-modules.ps1
+@@ -74,7 +74,7 @@
+     # F(H)->F. Host swaps these twins under the option. The C512 attention-projection f16-residual twin
+     # (split_projection_frag_f16res/_f16only + mh_attention_project_frag_c512_f16res) measured BIT-EXACT but slower
+     # both forms (900 merged +0.016 / +0.059 ms) — the projection family is not residual-traffic-bound; not shipped.
+-    @{ name = 'deep_fast-packed-fast';                   defines = @('HIP_DEC_WIDE 1','HIP_VIT_ATTN_NATIVE_HALF 1','HIP_VIT_ATTN_PROB_PAIR 1','HIP_VIT_ATTN_TRANSPOSED_AV 1','HIP_VIT_ATTN_TRANSPOSED_SCORE 1','HIP_BRANCHLESS_F 1','C512_F_MASK 1','C512_T8_TAIL_VEC 1','HIP_BYTE_F_ADD0 1','HIP_VIT_ATTN_RCP 1','VIT_FAST_NUM 15');    sources = @('deep_fast.hip') },
++    @{ name = 'deep_fast-packed-fast';                   defines = @('HIP_UP_WIDE_BYTE_PAIR 1','HIP_DEC_WIDE 1','HIP_VIT_ATTN_NATIVE_HALF 1','HIP_VIT_ATTN_PROB_PAIR 1','HIP_VIT_ATTN_TRANSPOSED_AV 1','HIP_VIT_ATTN_TRANSPOSED_SCORE 1','HIP_BRANCHLESS_F 1','C512_F_MASK 1','C512_T8_TAIL_VEC 1','HIP_BYTE_F_ADD0 1','HIP_VIT_ATTN_RCP 1','VIT_FAST_NUM 15');    sources = @('deep_fast.hip') },
+     @{ name = 'vit-stream-fast'; defines = @('VIT_CONTRACT_BYTE_EDGE 1','HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1','HIP_VIT_STREAM_KERNELS 1','HIP_VIT_QKV_W5 1','VIT_CONTRACT_OCC_LDS 4096','VIT_QKV_F8W 1','HIP_BYTE_F_ADD0 1','VIT_FAST_NUM 4'); sources = @('deep_fast.hip','vit_stream.inc') },
+     @{ name = 'c512-m32-mh'; defines = @('C512_PAIR_PACK 1','C512_COMPACT_QKV_ATTN 1','C512_FUSED_QKV_ATTN 1','HIP_PREPACKED_WEIGHTS 1','HIP_FFN_HOIST_RES 2','HIP_PDL_KERNELS 0','HIP_FMED3_CLAMP 1','C512_COMPACT_NOF 1','C512_COMPACT_RCP 1','C512_COMPACT_FUSEQKV 1','C512_COMPACT_QKV_DEEP 4','C512_COMPACT_QKV_SCHED 1'); sources = @('multihead_fast_padded.hip','c512_m32_mh.inc','c512_qkv_attention_fused.inc','c512_qkv_attention_compact.inc') },
+     @{ name = 'c512-m32-deep'; defines = @('C512_DIRECT_PACK 3','HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1','C512_MIX_OCC_LDS 4096','C512_F_MASK 1','HIP_BYTE_F_ADD0 1','C512_FFN_ONE 2','C512_FFN_F8W 1'); sources = @('deep_fast.hip','c512_m32_deep.inc'); opts = '-mllvm=-amdgpu-sched-strategy=max-ilp' },

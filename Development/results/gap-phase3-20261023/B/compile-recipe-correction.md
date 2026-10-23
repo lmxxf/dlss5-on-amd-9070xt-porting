@@ -1,0 +1,3 @@
+首次B producer两构建遗漏正式row opts max-ilp；未加载/执行GPU，原输出及日志保留，不用于Gold或性能。consumer正式配方本来为空opts，可复用。另以正确row opts重建producer baseline/candidate/trace，核baseline生产SHA后再接上机。
+
+最终纠正：上述把emptyopts称为错误过早。对实际生产二进制核查证明emptyopts候选旧91个Fn全同生产，max-ilp组反而改89个旧Fn；故采用最初emptyopts producer及其trace，max-ilp组全隔离且未执行GPU。另fresh baseline emptyopts整HSACO已复现生产a6866439…9828。recipe中的可选opts字段不是实际RowOpts使用记录。

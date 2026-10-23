@@ -1,0 +1,861 @@
+{
+  "pass": true,
+  "paired_cases": 7,
+  "jobs": 14,
+  "checked_frames": 108,
+  "note": "No per-mode or history frames were required to equal an unrelated first-frame SHA. Switch compares repeated same-mode frames and final Small roundtrip. No performance use.",
+  "cases": [
+    {
+      "case": "compat-switch-900-baseline",
+      "kind": "switch",
+      "geometry": "900",
+      "arm": "baseline",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1600x1024",
+        "1600x960",
+        "1600x1024"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+        "3": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+        "4": "b93a18a82509b58ead64a33b2ba8fb40b4ffc9791a7a678e92b0d9bbe3d8a1ed",
+        "5": "b93a18a82509b58ead64a33b2ba8fb40b4ffc9791a7a678e92b0d9bbe3d8a1ed",
+        "6": "55e8a158e1f42f362edf548149564050c39db4f146f46da4dc9c2d96ff4c8062",
+        "7": "55e8a158e1f42f362edf548149564050c39db4f146f46da4dc9c2d96ff4c8062",
+        "8": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "9": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      }
+    },
+    {
+      "case": "compat-switch-900-candidate",
+      "kind": "switch",
+      "geometry": "900",
+      "arm": "candidate",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1600x1024",
+        "1600x960",
+        "1600x1024"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+        "3": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+        "4": "b93a18a82509b58ead64a33b2ba8fb40b4ffc9791a7a678e92b0d9bbe3d8a1ed",
+        "5": "b93a18a82509b58ead64a33b2ba8fb40b4ffc9791a7a678e92b0d9bbe3d8a1ed",
+        "6": "55e8a158e1f42f362edf548149564050c39db4f146f46da4dc9c2d96ff4c8062",
+        "7": "55e8a158e1f42f362edf548149564050c39db4f146f46da4dc9c2d96ff4c8062",
+        "8": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "9": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      }
+    },
+    {
+      "case": "compat-switch-720-baseline",
+      "kind": "switch",
+      "geometry": "720",
+      "arm": "baseline",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1344x768",
+        "1280x768",
+        "1344x768"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "0b9d944f3b431f5b4e5f2dd5b31bde96354cbda318bf6cfe6c3773ee0091bfb2",
+        "3": "0b9d944f3b431f5b4e5f2dd5b31bde96354cbda318bf6cfe6c3773ee0091bfb2",
+        "4": "28b4504275d81b25f9863c27ab434d3fe652f06f7c846c09134fa2eda281a251",
+        "5": "28b4504275d81b25f9863c27ab434d3fe652f06f7c846c09134fa2eda281a251",
+        "6": "3be71a38c63772e0ec032f36763bbc26cacf44fcdf4cd6d9dcd23851f534e588",
+        "7": "3be71a38c63772e0ec032f36763bbc26cacf44fcdf4cd6d9dcd23851f534e588",
+        "8": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "9": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      }
+    },
+    {
+      "case": "compat-switch-720-candidate",
+      "kind": "switch",
+      "geometry": "720",
+      "arm": "candidate",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1344x768",
+        "1280x768",
+        "1344x768"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "0b9d944f3b431f5b4e5f2dd5b31bde96354cbda318bf6cfe6c3773ee0091bfb2",
+        "3": "0b9d944f3b431f5b4e5f2dd5b31bde96354cbda318bf6cfe6c3773ee0091bfb2",
+        "4": "28b4504275d81b25f9863c27ab434d3fe652f06f7c846c09134fa2eda281a251",
+        "5": "28b4504275d81b25f9863c27ab434d3fe652f06f7c846c09134fa2eda281a251",
+        "6": "3be71a38c63772e0ec032f36763bbc26cacf44fcdf4cd6d9dcd23851f534e588",
+        "7": "3be71a38c63772e0ec032f36763bbc26cacf44fcdf4cd6d9dcd23851f534e588",
+        "8": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "9": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      }
+    },
+    {
+      "case": "compat-switch-free1072-baseline",
+      "kind": "switch",
+      "geometry": "free1072",
+      "arm": "baseline",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088",
+        "1920x1152",
+        "1920x1088"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "648eecc708a538f49fe3e7b8d5894adaee3a2cff6c1ec5b8bda666875ba04b6c",
+        "3": "648eecc708a538f49fe3e7b8d5894adaee3a2cff6c1ec5b8bda666875ba04b6c",
+        "4": "ef6750474a42098c2367629e38ed474efcbb69c3c90ff320b26e87518bafbcd6",
+        "5": "ef6750474a42098c2367629e38ed474efcbb69c3c90ff320b26e87518bafbcd6",
+        "6": "38f53419537434a56059caf4c9483acee6dd9780ca21a3267db95557f1154a72",
+        "7": "38f53419537434a56059caf4c9483acee6dd9780ca21a3267db95557f1154a72",
+        "8": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "9": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      }
+    },
+    {
+      "case": "compat-switch-free1072-candidate",
+      "kind": "switch",
+      "geometry": "free1072",
+      "arm": "candidate",
+      "checked_frames": 10,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "1",
+        "1",
+        "2",
+        "2",
+        "3",
+        "3",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088",
+        "1920x1152",
+        "1920x1088"
+      ],
+      "actual_small_records": 2,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "648eecc708a538f49fe3e7b8d5894adaee3a2cff6c1ec5b8bda666875ba04b6c",
+        "3": "648eecc708a538f49fe3e7b8d5894adaee3a2cff6c1ec5b8bda666875ba04b6c",
+        "4": "ef6750474a42098c2367629e38ed474efcbb69c3c90ff320b26e87518bafbcd6",
+        "5": "ef6750474a42098c2367629e38ed474efcbb69c3c90ff320b26e87518bafbcd6",
+        "6": "38f53419537434a56059caf4c9483acee6dd9780ca21a3267db95557f1154a72",
+        "7": "38f53419537434a56059caf4c9483acee6dd9780ca21a3267db95557f1154a72",
+        "8": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "9": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      }
+    },
+    {
+      "case": "compat-ae1-900-baseline",
+      "kind": "ae1",
+      "geometry": "900",
+      "arm": "baseline",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1600x1024"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "3": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "4": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "5": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-ae1-900-candidate",
+      "kind": "ae1",
+      "geometry": "900",
+      "arm": "candidate",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1600x1024"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "3": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "4": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "5": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-ae1-720-baseline",
+      "kind": "ae1",
+      "geometry": "720",
+      "arm": "baseline",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1344x768"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-ae1-720-candidate",
+      "kind": "ae1",
+      "geometry": "720",
+      "arm": "candidate",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1344x768"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-ae1-free1072-baseline",
+      "kind": "ae1",
+      "geometry": "free1072",
+      "arm": "baseline",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "3": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "4": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "5": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-ae1-free1072-candidate",
+      "kind": "ae1",
+      "geometry": "free1072",
+      "arm": "candidate",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "3": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "4": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "5": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "adaptive_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "4",
+          "8",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "case": "compat-mode1-free1072-baseline",
+      "kind": "mode1",
+      "geometry": "free1072",
+      "arm": "baseline",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "d4741226964876c4aae5ee61a213911495062ba3820786e139bc486949ca2cbd",
+        "3": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "4": "d4741226964876c4aae5ee61a213911495062ba3820786e139bc486949ca2cbd",
+        "5": "5b406ce10a78a2dd42c7111c87677d8aefb4fe9bea1ec115022e3e32d8f0ef79"
+      },
+      "first_frame_wall_ms": 864.3142,
+      "history_idle_threshold_ms": 250,
+      "history_use": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "history_reason": "first cold frame exceeds fixed 250ms history idle reset; frame1 resets internally; frames2/4/5 truly warm",
+      "history_mode": "static fallback, real temporal history"
+    },
+    {
+      "case": "compat-mode1-free1072-candidate",
+      "kind": "mode1",
+      "geometry": "free1072",
+      "arm": "candidate",
+      "checked_frames": 6,
+      "direct_modes": [
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "processing_sequence": [
+        "1920x1088"
+      ],
+      "actual_small_records": 1,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "d4741226964876c4aae5ee61a213911495062ba3820786e139bc486949ca2cbd",
+        "3": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "4": "d4741226964876c4aae5ee61a213911495062ba3820786e139bc486949ca2cbd",
+        "5": "5b406ce10a78a2dd42c7111c87677d8aefb4fe9bea1ec115022e3e32d8f0ef79"
+      },
+      "first_frame_wall_ms": 830.7558,
+      "history_idle_threshold_ms": 250,
+      "history_use": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "history_reason": "first cold frame exceeds fixed 250ms history idle reset; frame1 resets internally; frames2/4/5 truly warm",
+      "history_mode": "static fallback, real temporal history"
+    }
+  ]
+}

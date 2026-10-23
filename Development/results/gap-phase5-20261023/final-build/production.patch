@@ -1,0 +1,353 @@
+diff --git a/Development/HIP/hip_reference_network.h b/Development/HIP/hip_reference_network.h
+index 4a69bcd8..605ca057 100644
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -471,11 +471,17 @@ class Network {friend class D3D12Bridge;
+ #ifndef HIP_COMPACT_VIT_CONTRACT
+ #define HIP_COMPACT_VIT_CONTRACT 1
+ #endif
++ // Central shape admission for the paired contract/projection tail paths.
++ bool CompactVitTailGeometryEligible()const{
++  if(W==1920&&H==1152)return true; // Existing Original and Small 1080 path.
++  if(!small_active)return (W==1920&&H==1088)||(W==1600&&H==960);
++  return (W==1600&&H==1024)||(W==1344&&H==768)||(W==1920&&H==1088);
++ }
+  bool CompactVitTailDeviceEligible(){hip_probe::DevicePropertiesR0600 props{};return !api.hipGetDevicePropertiesR0600(&props,int(opt.device))&&!std::strncmp(props.gcnArchName,"gfx1201",7)&&(props.gcnArchName[7]==0||props.gcnArchName[7]==':')&&std::strstr(props.name,"9070 XT");}
+  void InitCompactContract(){
+ #if HIP_COMPACT_VIT_CONTRACT
+   const bool device_ok=CompactVitTailDeviceEligible();
+-  if(device_ok&&!opt.integration.select_module&&fast_numeric&&W==1920&&H==1152&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
++  if(device_ok&&!opt.integration.select_module&&fast_numeric&&CompactVitTailGeometryEligible()&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
+    if((VitW16Mode()&2)&&HasFn("vit_stream","vit_stream_contract_frag_bout_compactw_w16")){
+     compact_contract_fn=Fn("vit_stream","vit_stream_contract_frag_bout_compactw_w16");compact_contract_w16=true;
+     if(HasFn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16"))compact_contract_bstream_fn=Fn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16");
+@@ -492,7 +498,7 @@ class Network {friend class D3D12Bridge;
+ #endif
+  void InitCompactProjection(){
+ #if HIP_COMPACT_VIT_PROJECTION
+-  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&W==1920&&H==1152&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
++  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&CompactVitTailGeometryEligible()&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
+    if((VitW16Mode()&4)&&HasFn("vit_stream","vit_stream_project_n64_bb_compactw_w16")){
+     compact_projection_fn=Fn("vit_stream","vit_stream_project_n64_bb_compactw_w16");compact_projection_w16=true;
+     if(HasFn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16"))compact_projection_bout_fn=Fn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16");
+@@ -626,7 +632,7 @@ class Network {friend class D3D12Bridge;
+   if(vit_proj_n64_active&&module=="deep_fast"&&kernel=="vit_project_frag"&&count%1024==0){module="vit_wide_deep";kernel="vit_project_frag_n64";groups=unsigned(((count/1024+15)/16)*16);threads=32;}
+   if(vit_proj_n64_active&&module=="deep_fast"&&kernel=="vit_project_frag_bout"&&count%1024==0){module="vit_stream";kernel="vit_stream_project_n64_bb_bout";groups=unsigned(((count/1024+15)/16)*16);threads=32;}
+   if(kernel=="vit_stream_contract_frag_hout"||kernel=="vit_stream_contract_frag_bout"||kernel=="vit_stream_contract_frag_bstream_bout"){module="vit_stream";groups=count/1024;threads=32;}
+-  if(kernel=="vit_stream_qkv_frag_bin_w5f8"){module="vit_stream";groups=96*((count/3072/16+4)/5);threads=160;}
++  if(kernel=="vit_stream_qkv_frag_bin_w5f8"||kernel=="vit_stream_qkv_frag_bin_w5f8_vfrag"){module="vit_stream";groups=96*((count/3072/16+4)/5);threads=160;}
+   if(kernel=="vit_stream_qkv_frag_hin"){module="vit_stream";groups=count/512;threads=32;if(count%3072==0&&HIP_VIT_QKV_F8W&&HasFn(module,"vit_stream_qkv_frag_hin_w5f8")){kernel="vit_stream_qkv_frag_hin_w5f8";groups=96*((count/3072/16+4)/5);threads=160;}else if(count%3072==0&&HasFn(module,"vit_stream_qkv_frag_hin_w5")){kernel="vit_stream_qkv_frag_hin_w5";groups=96*((count/3072/16+4)/5);threads=160;}} /* w5: five waves share one head's weights through LDS; same per-wave math */
+   if(vit_stream_active&&kernel=="vit_project_frag_n64"){module="vit_stream";kernel=vit_contract_byte_edge?"vit_stream_project_n64_bb":vit_stream_active==1?"vit_stream_project_n64_b":vit_stream_active==2?"vit_stream_project_n64_h":"vit_stream_project_n64_bh";}
+   if(module=="mh_window"){groups=count;threads=256;} /* one 8x8 window per 256-thread group (c64_window_fused*) */
+@@ -881,6 +887,19 @@ class Network {friend class D3D12Bridge;
+  }
+ 
+  Tensor Gather(Tensor input,U n,bool inverse,bool byte_mode=false){auto it=gather_maps[inverse].find(n);if(it==gather_maps[inverse].end()){std::vector<U>map(size_t(n)*1024);for(U t=0;t<n;t++)for(U c=0;c<1024;c++){U raster=(t&~15u)|((t&1u)<<3)|((t&14u)>>1),ch=(c&~31u)|((c&1u)<<1)|((c&2u)>>1)|((c&4u)<<2)|((c&24u)>>1),to=t*1024+c,from=raster*1024+ch;if(inverse)map[from]=to;else map[to]=from;}it=gather_maps[inverse].emplace(n,Upload(map.data(),map.size()*4,true)).first;}auto out=New(size_t(n)*(byte_mode?256:1024));if(byte_mode)Run("deep","vit_gather_b8",size_t(n)*256,P(input),P(it->second),P(out),U(n*1024));else Run("deep","vit_gather",size_t(n)*1024,P(input),P(it->second),P(out),n*1024);input.reset();return out;}
++ // Isolated phase5 candidate: Original/Small FAST1 single-pass, AE gated by the existing shared reuse state.
++ // NR diagnostic override > DLSS5_HIP_VIT_VFRAG > built-in 1; non-empty values other than 1 disable.
++ bool vfrag_requested=false,vfrag_available=false,vfrag_ae_off=false;unsigned long long vfrag_producer_calls=0,vfrag_consumer_calls=0;
++ void InitVitVFragment(){const char*v=std::getenv("NR_VIT_VFRAG");if(!v||!*v)v=std::getenv("DLSS5_HIP_VIT_VFRAG");vfrag_requested=!v||!*v||std::strcmp(v,"1")==0;const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");vfrag_ae_off=ae&&std::strcmp(ae,"0")==0;if(vfrag_requested)vfrag_available=HasFn("vit_stream","vit_stream_qkv_frag_bin_w5f8_vfrag")&&HasFn("deep_fast","vit_attention_fused_400_bytein_bout_vfrag")&&HasFn("deep_fast","vit_attention_fused_640_bytein_bout_vfrag");}
++ bool VitVFragmentEligible(U n){
++  // Phase5 knife2: only admission expands; reuse_gate, AE decisions/anchors and GPU byte layout stay unchanged.
++  const bool shape=small_active?
++   ((W==1600&&H==1024&&n==448)||(W==1344&&H==768&&n==288)||(W==1920&&(H==1088||H==1152)&&n==640)):
++   ((W==1600&&H==960&&n==400)||(W==1920&&(H==1088||H==1152)&&n==640));
++  if(!vfrag_requested||!vfrag_available||!shape||!fast_numeric||multi_pass!=1||opt.graph||!opt.skip_blocks.empty()||!opt.dup_prefix.empty()||observer||!opt.dump_dir.empty()||opt.vit_byte_stream||opt.vit_half_stream||vit_stream_active!=3||!vit_contract_byte_edge||!opt.vit_qkv_fused||!opt.vit_qkv_frag||!opt.vit_qkv_fp8||!opt.vit_attn_fused)return false;
++  if(HIP_VIT_ATTN_KSPLIT_HOST&&HasFn("deep_fast",std::string(n<=400?"vit_attention_fused_400_bytein_bout":"vit_attention_fused_640_bytein_bout")+"_ks2"))return false;
++  return true;
++ }
+  Tensor vit_in8; // byte stream: block input bytes produced by the previous block's vit_project_bytein_bout
+  bool vit_entry_exit_byte=false;
+  Tensor Vit(Tensor input,U n,U block){if(block==31&&!vit_entry_exit_byte)vit_in8.reset();if(opt.skip_blocks.count(block)){vit_in8.reset();Stage("block"+std::to_string(block),input);return input;}const bool inter_byte=((VitInterByteMode()&1)!=0||vit_entry_exit_byte)&&!opt.vit_byte_stream&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag&&opt.vit_contract_frag&&opt.vit_contract_blocked&&opt.vit_pack_input&&!opt.vit_input_tiled&&!opt.vit_ffn_fused&&!opt.vit_split_k&&compact_contract_bstream_fn&&compact_projection_bout_fn&&!adaptive_active&&!observer&&opt.dump_dir.empty();Tensor expanded_input=input,in8_skip;if(opt.vit_byte_stream&&vit_in8)expanded_input=vit_in8;else if(inter_byte&&vit_in8){expanded_input=vit_in8;in8_skip=vit_in8;vit_in8.reset();}else if(opt.vit_pack_input){vit_in8.reset();expanded_input=New(size_t(n)*256);Run("deep",opt.vit_input_tiled?"vit_pack_input_tiled":"vit_pack_input",size_t(n)*256,P(input),P(expanded_input),U(n*1024));}
+@@ -892,7 +911,7 @@ class Network {friend class D3D12Bridge;
+    auto av=New(size_t(n)*256);std::string fused=n<=256?"vit_attention_fused_256":n<=400?"vit_attention_fused_400":"vit_attention_fused_640";fused+="_bytein_bout";if(HIP_VIT_ATTN_KSPLIT_HOST&&n>256&&HasFn("deep_fast",fused+"_ks2"))fused+="_ks2"; /* fast tier HIP_VIT_ATTN_KSPLIT (lossy, module opt-in) */Run("deep",fused.c_str(),size_t(n)*512,P(norm),P(av),n);norm.reset();
+    auto out=New(size_t(n)*1024);Tensor out8;if(block<38)out8=New(size_t(n)*256);
+    Run("deep",opt.vit_half_stream?"vit_project_bytein_bout_hskip":"vit_project_bytein_bout",size_t(n)*1024,P(av),PackedDeepWeight(Block(block,"projection"),1048576),P(contract8),P(out),P(out8),n);
+-    vit_in8=out8;Stage("block"+std::to_string(block),out);return out;}std::string expand_name="vit_expand_blocked_fp8";if(opt.vit_weight_mask&1)expand_name+="_tiled";if(opt.vit_pack_input)expand_name+="_bytein";if(opt.vit_expand_m4)expand_name+="_m4";if(opt.vit_expand_frag)expand_name=opt.vit_expand_m4?"vit_expand_blocked_fp8_frag_bytein_m4":opt.vit_expand_m2?"vit_expand_blocked_fp8_frag_bytein_m2":"vit_expand_blocked_fp8_frag_bytein";if(opt.vit_input_tiled)expand_name="vit_expand_blocked_fp8_frag_tiledin";const bool expand_w16=expand_name=="vit_expand_blocked_fp8_frag_bytein"&&(VitW16Mode()&1)&&!opt.sparse_weights&&opt.vit_expand_frag&&opt.vit_pack_input&&opt.vit_blocked&&opt.fp8_deep&&(opt.vit_weight_mask&1)&&!opt.vit_ffn_fused&&!opt.vit_expand_m2&&!opt.vit_expand_m4&&!opt.vit_input_tiled&&HasFn("deep_fast","vit_expand_blocked_fp8_frag_bytein_w16");if(expand_w16){expand_name="vit_expand_blocked_fp8_frag_bytein_w16";++vit_w16_calls;}else ++vit_stock_calls;auto hidden=opt.vit_ffn_fused?Tensor{}:New(size_t(n)*(opt.fp8_deep?1024:4096)),contract=New(size_t(n)*(vit_contract_byte_edge?256:(vit_stream_active&2)?512:1024));if(opt.vit_ffn_fused){if(n%16)throw std::runtime_error("fused ViT FFN token count");Run("deep","vit_ffn_fused",size_t(n)*1024,P(expanded_input),PackedVitWeight(Block(block,"expand"),4096,1024,true,true),PackedVitWeight(Block(block,"contract"),1024,4096,false),P(input),P(contract),n);expanded_input.reset();}else{Run("deep",opt.vit_blocked?expand_name.c_str():opt.fp8_deep?"vit_expand_fp8":"vit_expand",size_t(n)*4096,P(expanded_input),PackedVitWeight(Block(block,"expand"),4096,1024,opt.vit_weight_mask&1,opt.vit_expand_frag,expand_w16),P(hidden),n,U(1024),U(4096));expanded_input.reset();if(opt.vit_split_k){auto parts=New(size_t(n)*4096);auto cw=PackedVitWeight(Block(block,"contract"),1024,4096,opt.vit_weight_mask&2);Run("deep",opt.vit_contract_blocked?(opt.vit_weight_mask&2?"vit_contract_parts_blocked_fp8_tiled":"vit_contract_parts_blocked_fp8"):"vit_contract_parts_fp8",size_t(n)*4096,P(hidden),cw,P(parts),n);Run("deep","vit_contract_combine",size_t(n)*1024,P(parts),cw,P(input),P(contract),n);}else{if(opt.vit_contract_frag&&opt.vit_contract_blocked)Run("deep",vit_contract_byte_edge?(in8_skip?"vit_stream_contract_frag_bstream_bout":"vit_stream_contract_frag_bout"):(vit_stream_active&2)?"vit_stream_contract_frag_hout":"vit_contract_blocked_fp8_frag",size_t(n)*1024,P(hidden),(vit_contract_byte_edge?CompactContractWeight(Block(block,"contract"),1024,4096,true,true):PackedVitWeight(Block(block,"contract"),1024,4096,true,true)),in8_skip?P(in8_skip):P(input),P(contract),n,U(4096),U(1024));else Run("deep",opt.vit_contract_blocked?(opt.vit_weight_mask&2?"vit_contract_blocked_fp8_tiled":"vit_contract_blocked_fp8"):opt.fp8_deep?"vit_project_fp8":"vit_project",size_t(n)*1024,P(hidden),PackedVitWeight(Block(block,"contract"),1024,4096,opt.vit_weight_mask&2),P(input),P(contract),n,U(4096),U(1024));}hidden.reset();in8_skip.reset();input.reset();}auto qkv=opt.vit_qkv_fused?Tensor{}:New(size_t(n)*3072),norm=New(opt.vit_qkv_fp8?size_t(n)*768:size_t(n)*3072);auto qw=(opt.vit_qkv_fused&&opt.packed_weights)?(opt.vit_qkv_frag&&opt.vit_qkv_fp8?((vit_stream_active&2)&&HIP_VIT_QKV_F8W&&HasFn("vit_stream","vit_stream_qkv_frag_hin_w5f8")?PackedVitQkvWeightFrag8(Block(block,"qkv")):PackedVitQkvWeightFrag(Block(block,"qkv"))):PackedVitQkvWeight(Block(block,"qkv"))):Weight(Block(block,"qkv"));if(opt.vit_qkv_fused)Run("deep",opt.vit_qkv_fp8?(opt.vit_qkv_frag?(vit_contract_byte_edge?"vit_stream_qkv_frag_bin_w5f8":(vit_stream_active&2)?"vit_stream_qkv_frag_hin":"vit_qkv_project_normalize_fused_f16compact_fp8_frag"):"vit_qkv_project_normalize_fused_f16compact_fp8"):opt.packed_weights?"vit_qkv_project_normalize_fused_f16compact":"vit_qkv_project_normalize_fused",size_t(n)*3072,P(contract),qw,P(norm),n);else{Run("deep",opt.vit_qkv_blocked?"vit_qkv_project_blocked":"vit_qkv_project",size_t(n)*3072,P(contract),qw,P(qkv),n);Run("deep","vit_qkv_normalize",size_t(n)*96,P(qkv),qw,P(norm),n);}qkv.reset();auto av=New(size_t(n)*((vit_stream_active&1)?256:1024));if(opt.vit_attn_fused){if(n%16||(n>640&&!free_geometry))throw std::runtime_error("fused ViT attention token count");std::string fused=n<=256?"vit_attention_fused_256":n<=400?"vit_attention_fused_400":"vit_attention_fused_640";if(opt.vit_qkv_fp8)fused+="_bytein";if(vit_stream_active&1)fused+="_bout";if(HIP_VIT_ATTN_KSPLIT_HOST&&n>256&&fused.size()>12&&fused.compare(fused.size()-12,12,"_bytein_bout")==0&&HasFn("deep_fast",fused+"_ks2"))fused+="_ks2"; /* fast tier HIP_VIT_ATTN_KSPLIT */Run("deep",fused.c_str(),size_t(n)*512,P(norm),P(av),n);}else{auto ex=New(size_t(n)*32*n),inv=New(size_t(n)*32);Run("deep",opt.fast_vit?"vit_attention_scores_fast":"vit_attention_scores",size_t(n)*32*n,P(norm),P(ex),n);Run("deep",opt.fast_vit?"vit_attention_inverse_fast":"vit_attention_inverse",size_t(n)*32,P(ex),P(inv),n);Run("deep",opt.fast_vit?"vit_attention_av_fast":"vit_attention_av",size_t(n)*1024,P(norm),P(ex),P(inv),P(av),n);ex.reset();inv.reset();}norm.reset();const bool bout=inter_byte&&((block<38&&!opt.skip_blocks.count(block+1))||(block==38&&vit_entry_exit_byte));auto out=New(size_t(n)*(bout?256:1024));if(opt.vit_proj_frag)Run("deep",bout?"vit_project_frag_bout":"vit_project_frag",size_t(n)*1024,P(av),((vit_contract_byte_edge&&vit_proj_n64_active)?CompactProjectionWeight(Block(block,"projection")):PackedVitProjectionFrag(Block(block,"projection"))),P(contract),P(out),n,U(1024),U(1024));else Run("deep","vit_project",size_t(n)*1024,P(av),PackedDeepWeight(Block(block,"projection"),1048576),P(contract),P(out),n,U(1024),U(1024));if(bout){if(block<38)vit_in8=out;++vit_inter_byte_calls;}Stage("block"+std::to_string(block),out);return out;}
++    vit_in8=out8;Stage("block"+std::to_string(block),out);return out;}std::string expand_name="vit_expand_blocked_fp8";if(opt.vit_weight_mask&1)expand_name+="_tiled";if(opt.vit_pack_input)expand_name+="_bytein";if(opt.vit_expand_m4)expand_name+="_m4";if(opt.vit_expand_frag)expand_name=opt.vit_expand_m4?"vit_expand_blocked_fp8_frag_bytein_m4":opt.vit_expand_m2?"vit_expand_blocked_fp8_frag_bytein_m2":"vit_expand_blocked_fp8_frag_bytein";if(opt.vit_input_tiled)expand_name="vit_expand_blocked_fp8_frag_tiledin";const bool expand_w16=expand_name=="vit_expand_blocked_fp8_frag_bytein"&&(VitW16Mode()&1)&&!opt.sparse_weights&&opt.vit_expand_frag&&opt.vit_pack_input&&opt.vit_blocked&&opt.fp8_deep&&(opt.vit_weight_mask&1)&&!opt.vit_ffn_fused&&!opt.vit_expand_m2&&!opt.vit_expand_m4&&!opt.vit_input_tiled&&HasFn("deep_fast","vit_expand_blocked_fp8_frag_bytein_w16");if(expand_w16){expand_name="vit_expand_blocked_fp8_frag_bytein_w16";++vit_w16_calls;}else ++vit_stock_calls;auto hidden=opt.vit_ffn_fused?Tensor{}:New(size_t(n)*(opt.fp8_deep?1024:4096)),contract=New(size_t(n)*(vit_contract_byte_edge?256:(vit_stream_active&2)?512:1024));if(opt.vit_ffn_fused){if(n%16)throw std::runtime_error("fused ViT FFN token count");Run("deep","vit_ffn_fused",size_t(n)*1024,P(expanded_input),PackedVitWeight(Block(block,"expand"),4096,1024,true,true),PackedVitWeight(Block(block,"contract"),1024,4096,false),P(input),P(contract),n);expanded_input.reset();}else{Run("deep",opt.vit_blocked?expand_name.c_str():opt.fp8_deep?"vit_expand_fp8":"vit_expand",size_t(n)*4096,P(expanded_input),PackedVitWeight(Block(block,"expand"),4096,1024,opt.vit_weight_mask&1,opt.vit_expand_frag,expand_w16),P(hidden),n,U(1024),U(4096));expanded_input.reset();if(opt.vit_split_k){auto parts=New(size_t(n)*4096);auto cw=PackedVitWeight(Block(block,"contract"),1024,4096,opt.vit_weight_mask&2);Run("deep",opt.vit_contract_blocked?(opt.vit_weight_mask&2?"vit_contract_parts_blocked_fp8_tiled":"vit_contract_parts_blocked_fp8"):"vit_contract_parts_fp8",size_t(n)*4096,P(hidden),cw,P(parts),n);Run("deep","vit_contract_combine",size_t(n)*1024,P(parts),cw,P(input),P(contract),n);}else{if(opt.vit_contract_frag&&opt.vit_contract_blocked)Run("deep",vit_contract_byte_edge?(in8_skip?"vit_stream_contract_frag_bstream_bout":"vit_stream_contract_frag_bout"):(vit_stream_active&2)?"vit_stream_contract_frag_hout":"vit_contract_blocked_fp8_frag",size_t(n)*1024,P(hidden),(vit_contract_byte_edge?CompactContractWeight(Block(block,"contract"),1024,4096,true,true):PackedVitWeight(Block(block,"contract"),1024,4096,true,true)),in8_skip?P(in8_skip):P(input),P(contract),n,U(4096),U(1024));else Run("deep",opt.vit_contract_blocked?(opt.vit_weight_mask&2?"vit_contract_blocked_fp8_tiled":"vit_contract_blocked_fp8"):opt.fp8_deep?"vit_project_fp8":"vit_project",size_t(n)*1024,P(hidden),PackedVitWeight(Block(block,"contract"),1024,4096,opt.vit_weight_mask&2),P(input),P(contract),n,U(4096),U(1024));}hidden.reset();in8_skip.reset();input.reset();}const bool vfrag=VitVFragmentEligible(n);auto qkv=opt.vit_qkv_fused?Tensor{}:New(size_t(n)*3072),norm=New(opt.vit_qkv_fp8?size_t(n)*768:size_t(n)*3072);auto qw=(opt.vit_qkv_fused&&opt.packed_weights)?(opt.vit_qkv_frag&&opt.vit_qkv_fp8?((vit_stream_active&2)&&HIP_VIT_QKV_F8W&&HasFn("vit_stream","vit_stream_qkv_frag_hin_w5f8")?PackedVitQkvWeightFrag8(Block(block,"qkv")):PackedVitQkvWeightFrag(Block(block,"qkv"))):PackedVitQkvWeight(Block(block,"qkv"))):Weight(Block(block,"qkv"));if(opt.vit_qkv_fused){Run("deep",opt.vit_qkv_fp8?(opt.vit_qkv_frag?(vit_contract_byte_edge?(vfrag?"vit_stream_qkv_frag_bin_w5f8_vfrag":"vit_stream_qkv_frag_bin_w5f8"):(vit_stream_active&2)?"vit_stream_qkv_frag_hin":"vit_qkv_project_normalize_fused_f16compact_fp8_frag"):"vit_qkv_project_normalize_fused_f16compact_fp8"):opt.packed_weights?"vit_qkv_project_normalize_fused_f16compact":"vit_qkv_project_normalize_fused",size_t(n)*3072,P(contract),qw,P(norm),n);if(vfrag)++vfrag_producer_calls;}else{Run("deep",opt.vit_qkv_blocked?"vit_qkv_project_blocked":"vit_qkv_project",size_t(n)*3072,P(contract),qw,P(qkv),n);Run("deep","vit_qkv_normalize",size_t(n)*96,P(qkv),qw,P(norm),n);}qkv.reset();auto av=New(size_t(n)*((vit_stream_active&1)?256:1024));if(opt.vit_attn_fused){if(n%16||(n>640&&!free_geometry))throw std::runtime_error("fused ViT attention token count");std::string fused=n<=256?"vit_attention_fused_256":n<=400?"vit_attention_fused_400":"vit_attention_fused_640";if(opt.vit_qkv_fp8)fused+="_bytein";if(vit_stream_active&1)fused+="_bout";if(vfrag){fused+="_vfrag";++vfrag_consumer_calls;}if(HIP_VIT_ATTN_KSPLIT_HOST&&n>256&&fused.size()>12&&fused.compare(fused.size()-12,12,"_bytein_bout")==0&&HasFn("deep_fast",fused+"_ks2"))fused+="_ks2"; /* fast tier HIP_VIT_ATTN_KSPLIT */Run("deep",fused.c_str(),size_t(n)*512,P(norm),P(av),n);}else{auto ex=New(size_t(n)*32*n),inv=New(size_t(n)*32);Run("deep",opt.fast_vit?"vit_attention_scores_fast":"vit_attention_scores",size_t(n)*32*n,P(norm),P(ex),n);Run("deep",opt.fast_vit?"vit_attention_inverse_fast":"vit_attention_inverse",size_t(n)*32,P(ex),P(inv),n);Run("deep",opt.fast_vit?"vit_attention_av_fast":"vit_attention_av",size_t(n)*1024,P(norm),P(ex),P(inv),P(av),n);ex.reset();inv.reset();}norm.reset();const bool bout=inter_byte&&((block<38&&!opt.skip_blocks.count(block+1))||(block==38&&vit_entry_exit_byte));auto out=New(size_t(n)*(bout?256:1024));if(opt.vit_proj_frag)Run("deep",bout?"vit_project_frag_bout":"vit_project_frag",size_t(n)*1024,P(av),((vit_contract_byte_edge&&vit_proj_n64_active)?CompactProjectionWeight(Block(block,"projection")):PackedVitProjectionFrag(Block(block,"projection"))),P(contract),P(out),n,U(1024),U(1024));else Run("deep","vit_project",size_t(n)*1024,P(av),PackedDeepWeight(Block(block,"projection"),1048576),P(contract),P(out),n,U(1024),U(1024));if(bout){if(block<38)vit_in8=out;++vit_inter_byte_calls;}Stage("block"+std::to_string(block),out);return out;}
+  void* PackedDecoderFp8(const std::string&name,size_t matrix){auto key=name+"@decoder-fp8";auto it=weights.find(key);if(it==weights.end()){auto v=ReadWeights(opt.assets+"/"+name);if(v.size()<matrix)throw std::runtime_error("decoder weight shape");Fp8(v,{{0,matrix}});it=weights.emplace(key,UploadWeight(v,key)).first;}return P(it->second);} /* 2026-10-01 HIP_DEC_F8W: exact E4M3 matrix for decoder_project2x_h16w*_f8 (results/c512-qkv-pipeline-20261001 §11) */
+  static int DecoderF8W16Mode(){static const int m=[]{const char*v=std::getenv("NR_DEC_F8_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_DEC_F8_W16");return v&&*v?std::atoi(v):3;}();return m;}
+  void* PackedDecoderF8W16(const std::string&name,U ic,U oc){auto key=name+"@decoder-f8w16";auto it=weights.find(key);if(it==weights.end()){auto v=ReadWeights(opt.assets+"/"+name);size_t matrix=size_t(ic)*oc;if(v.size()<matrix+oc)throw std::runtime_error("decoder W16 weight shape");Fp8(v,{{0,matrix}});FragmentPackedMatrixW16(v,0,oc,ic);it=weights.emplace(key,UploadWeight(v,key)).first;}return P(it->second);}
+@@ -1002,8 +1021,8 @@ if(opt.experimental_temporal){
+  std::fprintf(stderr,"history_experiment requested=1 active=1 mode=MP1 metadata=UV_unjittered_assumed valid=%ux%u\n",W,opt.temporal_valid_height);
+ }
+ 
+-if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
+- ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
++if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();InitVitVFragment();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
++ ~Network(){std::fprintf(stderr,"VIT_VFRAG requested=%u available=%u explicit_ae0=%u producers=%llu consumers=%llu\n",unsigned(vfrag_requested),unsigned(vfrag_available),unsigned(vfrag_ae_off),vfrag_producer_calls,vfrag_consumer_calls);if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
+  void PrintMemory(){size_t bytes=0,free=0,total=0;std::set<void*>seen;auto add=[&](const Tensor&t){if(t&&t->owned&&seen.insert(t->ptr).second)bytes+=t->capacity;};for(auto&t:pool)add(t);for(auto&w:weights)add(w.second);for(auto&maps:gather_maps)for(auto&m:maps)add(m.second);add(device_noise);api.Check(api.hipMemGetInfo(&free,&total),"memory stats");std::printf("memory owned_MiB=%.1f allocations=%zu device_free_MiB=%.1f total_MiB=%.1f\n",bytes/1048576.,seen.size(),free/1048576.,total/1048576.);}
+  /* DLSS5_HIP_MEMORY=1 (diagnostic): device memory by category after the pool has warmed — weights by key, pool tensors by capacity, gather maps, noise, and the runtime's free/total. */
+  void MemoryReport(FILE*f){std::set<void*>seen;size_t wsum=0,psum=0,gsum=0,nsum=0;std::vector<std::pair<size_t,std::string>>w,p;
+diff --git a/hip/SHA256SUMS b/hip/SHA256SUMS
+index 4d710353..b48e31c5 100644
+--- a/hip/SHA256SUMS
++++ b/hip/SHA256SUMS
+@@ -13,12 +13,12 @@ c082056f859f9a9129b328d886f8711036cbae53a6bfc6f2f280a585c108ce74  gfx1200/c32-wa
+ 8baa6c390005b2124a8eaee3f57865e302a20b667cf5ef5ffdd5f84429ed672f  gfx1200/c32-wave1-fast-norm900.hsaco
+ 0be2193a3d9f4ec0a4c552fa76df023579bfff15e33d808f73f9cdfcf8aea3c0  gfx1200/c32-wave1-rtz.hsaco
+ db0201dc5d4e81e17058e3d1a545fc400f06bbf08e89537a31e3ba761747ef33  gfx1200/c512-m32-deep.hsaco
+-f8881c1d9b38e230e1c95861dc05b388df9b69e118ca065c88aac5edf36790c8  gfx1200/c512-m32-mh.hsaco
++9f85f0f415cc8e6b40d5027082fb859a61e3f3b045e98fb891e4a064ee0dc8ee  gfx1200/c512-m32-mh.hsaco
+ cb98c2fad00cbf3c98d5adbb3da4d8269dbf241ed00d363399d40797e4436638  gfx1200/c64-wave2.hsaco
+ dc10c540748ad40725a1ee7241da69857a0680046099ccb121a951c0616705b3  gfx1200/c64-wave2-fast.hsaco
+ 04164c98f481a03659778619556c5b9e921daac3f5604b5888d7901577d96097  gfx1200/deep_fast.hsaco
+ 2c26dd8cb251624f6ac11bbb2ecf7e0d46a3788b96d12b6a328539289ceed4e4  gfx1200/deep_fast-packed.hsaco
+-43058688e04c11e84a1ec69d1ec24e059b99e8913a9fec20377644d5caa57e0a  gfx1200/deep_fast-packed-fast.hsaco
++c3b2c05e5bd20d07246c8c142df09efe48b28d451014a22056a3b91490585ab2  gfx1200/deep_fast-packed-fast.hsaco
+ c2779cdff408360721e5cd1312d945ae1951cffc955893821efd75724c67852e  gfx1200/deep_reference.hsaco
+ 6b708483d0a9fcee96967862e92aa5895be969ab2316749eb5860cfe39be0af1  gfx1200/deep_wmma.hsaco
+ 5b1cad8f5b5061fbdf9d26c98c68785f4a57e359bfdaab6b0a330e51f59db10b  gfx1200/multihead_fused_attention.hsaco
+@@ -35,7 +35,7 @@ c33dcd30746f7de2e7bd442322cadf183c87eaa29e6c086acf8757767cd26c53  gfx1200/multi-
+ 3bea7eaf652890b74e2688ad949e81320e3624319b4ada06f90ad4f5be44fa39  gfx1200/swin-persistent.hsaco
+ f56edfafc74cca3ea7a793cf5e1ab8f2b31967a20096443af34250b39784e00b  gfx1200/swin-persistent-fast.hsaco
+ 1c12309ddd8d74201d432ca977ee0561bcdc78ede3a473b82f58c229ea3bd8de  gfx1200/vit-stream.hsaco
+-201b405c78ade73e05a8ee827b84e9a3a04ff91f09f42389f91680c22e091189  gfx1200/vit-stream-fast.hsaco
++c0868e217aae32a0c9b64a61742579b1181b46c9f08ebb23a9d695b94efc9bc6  gfx1200/vit-stream-fast.hsaco
+ ca48690da20f6920eb050ba385bc8918e498dc40a1360770e7432ae74b92ee79  gfx1200/vit-wide-deep.hsaco
+ 1cff01355f32152834286c303d38efd05628757c6d4e0fd7f1c0a0f3db9e701f  gfx1200/wave-pointwise.hsaco
+ 1b1a514743924d43542ed9ac30e4ca50ec6e84e62d2bafab1960aaf061e0adc8  gfx1201/boundary_reference.hsaco
+@@ -53,12 +53,12 @@ c0634176bf9e0a79ffb0e28fb120df310a646d4dedcaad69c34f7185718d2155  gfx1201/c32_fu
+ 337a4e13c9a1242666e530cd43a49bbf278cd9927df3fa0c792966ec5252db85  gfx1201/c32-wave1-fast-norm900.hsaco
+ 5519be636d94e97855e75665740af3f2322494ae4797ad245903223310f08554  gfx1201/c32-wave1-rtz.hsaco
+ a6866439fa89e770d2de82ef683b3e61e31819f4cb3618d50999b2ff14159828  gfx1201/c512-m32-deep.hsaco
+-9afa918bc6252ab1beee5bcd15ed6ab838c612cc8368d814b48e28b67a7079b4  gfx1201/c512-m32-mh.hsaco
++8b2132d95c61c23c112eae1d465c73703f3686ad03a68c5797093dcf202403b5  gfx1201/c512-m32-mh.hsaco
+ 3b5273abc6afc577bc4fd4fbbf7fee6667f2288f2b9cb21ad9e4a288821af69c  gfx1201/c64-wave2.hsaco
+ 475f515fe8d5fa2d1dc679fc74017adfd35b7ba38be1fb6c56dc67f9ce7690e0  gfx1201/c64-wave2-fast.hsaco
+ a92cab05b61a41985db7294ae0a7b2043fb9b4c878f9b67bd5a3055177e3c257  gfx1201/deep_fast.hsaco
+ 30d4d5739c990f0ec7c9ae1050dc1201751c2138bd02079a6c3675ea9b5f5ebe  gfx1201/deep_fast-packed.hsaco
+-00e39349bc8a1a02e5a61b4606d1541d5ed1e4988de8c17db3cc5c8380c095ce  gfx1201/deep_fast-packed-fast.hsaco
++68021d286fbfb09d24b38259f9b0ac8c177dec50f837f062047a67d0ce45d12c  gfx1201/deep_fast-packed-fast.hsaco
+ 0d2e3e9658a8abc53be68b6fc108ce57594784d3ed56f237bedd9766d86db895  gfx1201/deep_reference.hsaco
+ b562c8986300b0517818ae54a46108e725e1ecc6c6b6c88a3b7fa14c749a5b2f  gfx1201/deep_wmma.hsaco
+ f7f23560d490868eacb161d7e49c958548faaa1d61384014ea0859b5e8cef1b9  gfx1201/multihead_fused_attention.hsaco
+@@ -75,6 +75,6 @@ bfc99774435fcf89985a795ea6e1c20de3335053097b40206839adf687d0e226  gfx1201/multih
+ ad4600c9f824762baf6f898988225a2c1169caf88ec57b1e9c25ca0b03039ab8  gfx1201/swin-persistent.hsaco
+ 9b58cab4e4859645aa79c61d67972906d8dd76eb4d94c9491894461af6bbec39  gfx1201/swin-persistent-fast.hsaco
+ 7d570e3c92cc0f9d61e95d46d4651f11f3a562e84453e0b62dbdc93021b49e96  gfx1201/vit-stream.hsaco
+-8401ed6157f8ed840a1c070237f2dae08762a84e04b7377f3e6abb705b3dd2ee  gfx1201/vit-stream-fast.hsaco
++2cfd9c5f4fb050a9bbbcdd861c2518454444f550701d08f57550c6198e76d320  gfx1201/vit-stream-fast.hsaco
+ dadadb24ec212a592f41f0f74e777335929235996d84614d1ad76e1c808e2493  gfx1201/vit-wide-deep.hsaco
+ 5e65693da46044b697218194bb17ec8453952fa4a4a684c6ecc59df1cecf12aa  gfx1201/wave-pointwise.hsaco
+diff --git a/hip/build-modules.ps1 b/hip/build-modules.ps1
+index 89c73db2..6d75f10e 100644
+--- a/hip/build-modules.ps1
++++ b/hip/build-modules.ps1
+@@ -76,7 +76,7 @@ $modules = @(
+     # both forms (900 merged +0.016 / +0.059 ms) — the projection family is not residual-traffic-bound; not shipped.
+     @{ name = 'deep_fast-packed-fast';                   defines = @('HIP_DEC_WIDE 1','HIP_VIT_ATTN_NATIVE_HALF 1','HIP_VIT_ATTN_PROB_PAIR 1','HIP_VIT_ATTN_TRANSPOSED_AV 1','HIP_VIT_ATTN_TRANSPOSED_SCORE 1','HIP_BRANCHLESS_F 1','C512_F_MASK 1','C512_T8_TAIL_VEC 1','HIP_BYTE_F_ADD0 1','HIP_VIT_ATTN_RCP 1','VIT_FAST_NUM 15');    sources = @('deep_fast.hip') },
+     @{ name = 'vit-stream-fast'; defines = @('VIT_CONTRACT_BYTE_EDGE 1','HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1','HIP_VIT_STREAM_KERNELS 1','HIP_VIT_QKV_W5 1','VIT_CONTRACT_OCC_LDS 4096','VIT_QKV_F8W 1','HIP_BYTE_F_ADD0 1','VIT_FAST_NUM 4'); sources = @('deep_fast.hip','vit_stream.inc') },
+-    @{ name = 'c512-m32-mh'; defines = @('C512_COMPACT_QKV_ATTN 1','C512_FUSED_QKV_ATTN 1','HIP_PREPACKED_WEIGHTS 1','HIP_FFN_HOIST_RES 2','HIP_PDL_KERNELS 0','HIP_FMED3_CLAMP 1','C512_COMPACT_NOF 1','C512_COMPACT_RCP 1','C512_COMPACT_FUSEQKV 1','C512_COMPACT_QKV_DEEP 4','C512_COMPACT_QKV_SCHED 1'); sources = @('multihead_fast_padded.hip','c512_m32_mh.inc','c512_qkv_attention_fused.inc','c512_qkv_attention_compact.inc') },
++    @{ name = 'c512-m32-mh'; defines = @('C512_PAIR_PACK 1','C512_COMPACT_QKV_ATTN 1','C512_FUSED_QKV_ATTN 1','HIP_PREPACKED_WEIGHTS 1','HIP_FFN_HOIST_RES 2','HIP_PDL_KERNELS 0','HIP_FMED3_CLAMP 1','C512_COMPACT_NOF 1','C512_COMPACT_RCP 1','C512_COMPACT_FUSEQKV 1','C512_COMPACT_QKV_DEEP 4','C512_COMPACT_QKV_SCHED 1'); sources = @('multihead_fast_padded.hip','c512_m32_mh.inc','c512_qkv_attention_fused.inc','c512_qkv_attention_compact.inc') },
+     @{ name = 'c512-m32-deep'; defines = @('C512_DIRECT_PACK 3','HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1','C512_MIX_OCC_LDS 4096','C512_F_MASK 1','HIP_BYTE_F_ADD0 1','C512_FFN_ONE 2','C512_FFN_F8W 1'); sources = @('deep_fast.hip','c512_m32_deep.inc'); opts = '-mllvm=-amdgpu-sched-strategy=max-ilp' },
+     @{ name = 'vit-stream'; defines = @('VIT_CONTRACT_BYTE_EDGE 1','HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1','HIP_VIT_STREAM_KERNELS 1','HIP_VIT_QKV_W5 1','VIT_CONTRACT_OCC_LDS 4096','VIT_QKV_F8W 1','HIP_BYTE_F_ADD0 1'); sources = @('deep_fast.hip','vit_stream.inc') },
+     @{ name = 'vit-wide-deep'; defines = @('HIP_PREPACKED_WEIGHTS 1','HIP_BRANCHLESS_F 1'); sources = @('deep_fast.hip','vit_wide_deep.inc') },
+diff --git a/hip/c512_qkv_attention_compact.inc b/hip/c512_qkv_attention_compact.inc
+index 11987870..834fea13 100644
+--- a/hip/c512_qkv_attention_compact.inc
++++ b/hip/c512_qkv_attention_compact.inc
+@@ -1,3 +1,7 @@
++// Paired FP8 conversion preserves the path-specific float operations before packing.
++#ifndef C512_PAIR_PACK
++#define C512_PAIR_PACK 0
++#endif
+ // C512 compact unshifted input; attention windows retain original shifted geometry. Appended to multihead_fast_padded.hip.
+ // The host supplies the same tiled FFN feature and fragment-packed QKV weights
+ // as mh_qkv_normalize_frag_c512_m32; AV remains raster FP8 for the old projection.
+@@ -67,13 +71,21 @@ DEV float c5c_serial_norm(f8 lo,f8 hi){
+  // Both half-waves execute, but only the correct prefix is carried to the next half.
+  uint row=__builtin_amdgcn_workitem_id_x()&15u;float s=0.f;
+  _Pragma("unroll 8") for(uint e=0;e<8;e++)s+=lo[e]*lo[e];
++
+  s=c5c_shuffle(s,row);
++
+  _Pragma("unroll 8") for(uint e=0;e<8;e++)s+=lo[e]*lo[e];
++
+  s=c5c_shuffle(s,row+16);
++
+  _Pragma("unroll 8") for(uint e=0;e<8;e++)s+=hi[e]*hi[e];
++
+  s=c5c_shuffle(s,row);
++
+  _Pragma("unroll 8") for(uint e=0;e<8;e++)s+=hi[e]*hi[e];
++
+  return c5c_shuffle(s,row+16);
++
+ }
+ // Keep C512 attention's own clamp/F/byte semantics (not the C256 bounded reciprocal).
+ DEV float c5c_clamp(float a,float lo,float hi){float b=a>lo?a:lo;return b<hi?b:hi;}
+@@ -89,6 +101,18 @@ DEV float c5c_inv(float x){
+ DEV uint c5c_q8mz(float a,float b){
+ #pragma clang fp contract(off)
+  return q8(__builtin_amdgcn_fmed3f(a*b+0.f,-448.f,448.f));}
++#if C512_PAIR_PACK
++// Both arguments arrive after their original path-specific float operations.
++DEV i2 c5c_pack8_pairs(f8 v){i2 a{};
++ a[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[0],v[1],0,false);
++ a[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[2],v[3],a[0],true);
++ a[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[4],v[5],0,false);
++ a[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[6],v[7],a[1],true);return a;}
++DEV float c5c_pair_qkv_input(float a,float b){
++#pragma clang fp contract(off)
++ return __builtin_amdgcn_fmed3f(a*b+0.f,-448.f,448.f);}
++DEV float c5c_pair_plain_input(float x){return __builtin_amdgcn_fmed3f(x,-448.f,448.f);}
++#endif
+ DEV void c5c_bits(i2&v,uint e,uint b){v[e/4]=int(uint(v[e/4])|((b&255u)<<(8*(e%4))));}
+ DEV i2 c5c_load(const unsigned char*p,uint row,uint col){i2 a;__builtin_memcpy(&a,p+row*32+col,8);return a;}
+ 
+@@ -227,11 +251,21 @@ DEV void c5c_body(const unsigned char*in8,const float*w,unsigned char*out,uint v
+    float inv=1.f;
+    if(part<2){float ss=(C512_COMPACT_ABLATE&1)?acc[t][0][0]:c5c_serial_norm(acc[t][0],acc[t][1]);inv=__builtin_amdgcn_rsqf(maxf(ss,6.198883056640625e-5f))*(part==0?w[4*C*C+16*4096+head]:1.f);}
+    _Pragma("unroll 2") for(uint ci=0;ci<2;ci++){
++#if C512_PAIR_PACK
++    f8 qv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){
++#if C512_COMPACT_NOF
++     qv[e]=c5c_pair_qkv_input(acc[t][ci][e],inv);
++#else
++     qv[e]=F(acc[t][ci][e]*inv);
++#endif
++    }i2 a=c5c_pack8_pairs(qv);
++#else
+     i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++)
+ #if C512_COMPACT_NOF
+      c5c_bits(a,e,c5c_q8mz(acc[t][ci][e],inv));
+ #else
+      c5c_bits(a,e,q8(F(acc[t][ci][e]*inv)));
++#endif
+ #endif
+ 
+     uint tok=(wave*QT+t)*16+row;
+@@ -277,7 +311,11 @@ DEV void c5c_body(const unsigned char*in8,const float*w,unsigned char*out,uint v
+   }
+   i2 prob[4];
+   _Pragma("unroll 4") for(uint key=0;key<4;key++){
++#if C512_PAIR_PACK
++   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
++#else
+    i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);c5c_bits(a,e,c5c_fp8(float(exponent[key][e])*inv));}prob[key]=a;
++#endif
+   }
+   _Pragma("unroll 2") for(uint ci=0;ci<2;ci++){
+    f8 av{};
+@@ -289,11 +327,21 @@ DEV void c5c_body(const unsigned char*in8,const float*w,unsigned char*out,uint v
+ #endif
+     av=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(v,prob[kt],av);
+    }
++#if C512_PAIR_PACK
++   f8 bv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){
++#if C512_COMPACT_NOF
++    bv[e]=c5c_pair_plain_input(av[e]);
++#else
++    bv[e]=c5c_pair_plain_input(c5c_F(av[e]));
++#endif
++   }i2 bytes=c5c_pack8_pairs(bv);
++#else
+    i2 bytes{};_Pragma("unroll 8") for(uint e=0;e<8;e++)
+ #if C512_COMPACT_NOF
+     c5c_bits(bytes,e,c5c_fp8(av[e]));
+ #else
+     c5c_bits(bytes,e,c5c_fp8(c5c_F(av[e])));
++#endif
+ #endif
+ 
+    uint tok=first+row;int x=int((win%(width/8))*8+tok%8)-int(sx),y=int((win/(width/8))*8+tok/8)-int(sy);
+diff --git a/hip/deep_fast.hip b/hip/deep_fast.hip
+index 454f5b4c..3b035be4 100644
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -277,7 +277,7 @@ DEV float vit_attn_hrtz(float x){return Hrtz(x);}
+ #define HIP_VIT_ATTN_TRANSPOSED_SCORE 0
+ #endif
+ #if HIP_VIT_ATTN_TRANSPOSED_SCORE
+-template<uint MAXT,bool ByteInput=false,bool ByteOut=false>
++template<uint MAXT,bool ByteInput=false,bool ByteOut=false,bool VFragment=false>
+ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint tokens){
+  uint head=bid()%32,first=bid()/32*16;if(first>=tokens)return;
+ 
+@@ -322,7 +322,11 @@ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint token
+ #else
+   sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);
+ #endif
+-  for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+vkey)*1024+head*32+c*16+rc()]);}
++  uint __attribute__((ext_vector_type(4))) vpair{};
++  if constexpr(VFragment){static_assert(ByteInput,"V fragment requires byte QKV");const size_t off=size_t(2)*tokens*1024+(size_t(head)*(tokens/16)+key/16)*512+(gr()*16+rc())*16;__builtin_memcpy(&vpair,__builtin_assume_aligned(in8+off,16),16);}
++  for(uint c=0;c<2;c++){i2 y{};
++   if constexpr(VFragment){y=i2{int(vpair[c*2]),int(vpair[c*2+1])};}
++   else for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+vkey)*1024+head*32+c*16+rc()]);}
+ #if HIP_VIT_ATTN_TRANSPOSED_AV
+   acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,xb,acc[c]);
+ #else
+@@ -341,6 +345,9 @@ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint token
+  for(uint c=0;c<2;c++)for(uint e=0;e<8;e++){if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[(first+gr()*8+e)*1024+head*32+c*16+rc()]=byte_F(vit_attn_hrtz(acc[c][e]*inv[e]));else out[(first+gr()*8+e)*1024+head*32+c*16+rc()]=F(vit_attn_hrtz(acc[c][e]*inv[e]));}
+ #endif
+ }
++WAVE void vit_attention_fused_400_bytein_bout_vfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<400,true,true,true>(in,out,tokens);}
++WAVE void vit_attention_fused_640_bytein_bout_vfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<640,true,true,true>(in,out,tokens);}
++
+ #endif
+ // FAST TIER (lossy, 2026-10-01 fast-tier): HIP_VIT_ATTN_KSPLIT 1 exports vit_attention_fused_{400,640}_bytein_bout_ks2:
+ // 64-thread groups, wave w takes the w-th contiguous half of the key tiles; partial f32 sum/acc of wave 1 are added to
+diff --git a/hip/vit_stream.inc b/hip/vit_stream.inc
+index 2621e5c4..daf8390e 100644
+--- a/hip/vit_stream.inc
++++ b/hip/vit_stream.inc
+@@ -261,6 +261,58 @@ KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv
+  #pragma unroll
+  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)out[(part*tokens+first+gr()*8+e)*1024+row+j*16+rc()]=byte_F(acc[j][e]);
+ }
++// Paired with attention *_vfrag; total QKV byte capacity is unchanged.
++KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv_frag_bin_w5f8_vfrag(const float*in,const float*w,unsigned char*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;
++ constexpr uint CH=8;
++ __attribute__((shared)) _Float16 lds[2*2*CH*256];/* bytes: 2 buffers x 2 column tiles x CH x 256B = 8KB used for staging; 16KB kept for the norm tiles */
++ unsigned char*l8=reinterpret_cast<unsigned char*>(lds);
++ const uint t=__builtin_amdgcn_workitem_id_x(),wv=t>>5,lane=t&31,groups=(tokens/16+4)/5,perpart=groups*32,part=bid()/perpart,local=bid()%perpart,first=(local/32*5+wv)*16,row=local%32*32;if(part>=3)return;
++ const bool live=first<tokens;
++ const unsigned char*hb=reinterpret_cast<const unsigned char*>(w)+part*1048576+(row/16)*64*256;
++ int __attribute__((ext_vector_type(4))) s0{},s1{};/* t<128 moves pieces p=t+i*128: column tile p>>7, 16B at (p&127)*16 of the chunk */
++#define F8_SRC(i) (hb+((t+(i)*128)>>7)*16384+kc*CH*256+(t&127)*16)
++#define F8_DST(i) (l8+sb*(2*CH*256)+((t+(i)*128)>>7)*(CH*256)+(t&127)*16)
++#define F8_FETCH {if(t<128){__builtin_memcpy(&s0,F8_SRC(0),16);__builtin_memcpy(&s1,F8_SRC(1),16);}}
++#define F8_STASH {if(t<128){__builtin_memcpy(F8_DST(0),&s0,16);__builtin_memcpy(F8_DST(1),&s1,16);}}
++ f8 acc[2]{};
++ {const uint kc=0;F8_FETCH}
++#pragma unroll 1
++ for(uint kc=0;kc<1024/(16*CH);kc++){{const uint sb=kc&1;F8_STASH}__builtin_amdgcn_s_barrier();if(kc+1<1024/(16*CH)){const uint kc1=kc+1;{const uint kc=kc1;F8_FETCH}}
++  if(live)
++#pragma unroll
++  for(uint kk=0;kk<CH;kk++){uint k=(kc*CH+kk)*16;i2 a8;__builtin_memcpy(&a8,reinterpret_cast<const unsigned char*>(in)+(first+rc())*1024+k+gr()*8,8);
++#pragma unroll
++   for(uint j=0;j<2;j++){i2 b;__builtin_memcpy(&b,l8+(kc&1)*(2*CH*256)+j*(CH*256)+kk*256+lane*8,8);acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a8,b,acc[j]);}}}
++#undef F8_SRC
++#undef F8_DST
++#undef F8_FETCH
++#undef F8_STASH
++ __builtin_amdgcn_s_barrier();
++ float*raw=reinterpret_cast<float*>(lds)+wv*(16*33);
++ f8 sum{};
++ if(part<2){
++  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)raw[(gr()*8+e)*33+j*16+rc()]=acc[j][e];
++  __builtin_amdgcn_s_barrier();
++  for(uint k=0;k<32;k+=16){h8 x{},ones{};for(uint e=0;e<8;e++){float v=raw[rc()*33+k+gr()*8+e];x[e]=(_Float16)(v*v);ones[e]=(_Float16)1.f;}sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);}
++ }
++ if(!live)return;
++ if(part<2){
++  const float scale=part==0?5.65625f*w[786432+row/32]:1.f;
++  #pragma unroll
++  for(uint e=0;e<8;e++){float inv=__builtin_amdgcn_rsqf(__builtin_fmaxf(sum[e],6.198883056640625e-5f))*scale;acc[0][e]*=inv;acc[1][e]*=inv;}
++ }
++ // Q/K remain row-major. V stores exactly the two B fragments this same lane will consume.
++ if(part==2){
++  uint __attribute__((ext_vector_type(4))) packed{};
++  #pragma unroll
++  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)packed[j*2+e/4]|=uint(byte_F(acc[j][e]))<<(8*(e%4));
++  const size_t off=size_t(2)*tokens*1024+(size_t(row/32)*(tokens/16)+first/16)*512+lane*16;
++  __builtin_memcpy(__builtin_assume_aligned(out+off,16),&packed,16);
++ }else{
++  #pragma unroll
++  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)out[(part*tokens+first+gr()*8+e)*1024+row+j*16+rc()]=byte_F(acc[j][e]);
++ }
++}
+ #endif
+ #endif
+ 

@@ -1,0 +1,61 @@
+{
+  "work": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/A/qk-rebase",
+  "header_sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8",
+  "production_deep_sha256": "afec92b71d33e049a33af65fc249f2e550b37ca902fc0978f50e5a7ddb2444e9",
+  "module_manifest_sha256": "c8e6d3fa5c0a05688d6dca4a8d34c16392818a223fe46fcc5afa51ec89a7c237",
+  "rows": [
+    {
+      "role": "baseline",
+      "name": "deep_fast-packed-fast",
+      "source": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated-qk-rebased/deep_fast-packed-fast.baseline.hip",
+      "sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1",
+        "VIT_FAST_NUM 15"
+      ],
+      "opts": [],
+      "preserved_qk_exports": [
+        "vit_attention_fused_400_bytein_bout_qkfrag",
+        "vit_attention_fused_640_bytein_bout_qkfrag"
+      ]
+    },
+    {
+      "role": "candidate",
+      "name": "deep_fast-packed-fast",
+      "source": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated-qk-rebased/deep_fast-packed-fast.candidate.hip",
+      "sha256": "5d5d33b47fb1bc597f9205a5d34151e8b8e2f6b11f2e758ef0731244b039c47e",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_UP_WIDE_BYTE_PAIR 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1",
+        "VIT_FAST_NUM 15"
+      ],
+      "opts": [],
+      "preserved_qk_exports": [
+        "vit_attention_fused_400_bytein_bout_qkfrag",
+        "vit_attention_fused_640_bytein_bout_qkfrag"
+      ]
+    }
+  ],
+  "production_changed": false,
+  "host": "reuse accepted limited-QK host"
+}

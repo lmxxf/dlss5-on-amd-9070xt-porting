@@ -1,0 +1,128 @@
+{
+  "hip_ms": 8.36690828125,
+  "mochi_ms": 7.888277083333333,
+  "gap_ms": 0.4786311979166671,
+  "relative_percent": 6.0676265914636485,
+  "rounds": [
+    {
+      "round": 1,
+      "hip_ms": 8.3537185,
+      "mochi_ms": 7.882575,
+      "gap_ms": 0.47114349999999927
+    },
+    {
+      "round": 2,
+      "hip_ms": 8.36874365625,
+      "mochi_ms": 7.891103125000001,
+      "gap_ms": 0.4776405312499996
+    },
+    {
+      "round": 3,
+      "hip_ms": 8.378262687500001,
+      "mochi_ms": 7.891153125000001,
+      "gap_ms": 0.4871095625000006
+    }
+  ],
+  "slots": [
+    {
+      "label": "00-r1-current-v-mochi-N",
+      "round": 1,
+      "kind": "N",
+      "gpu_ms": 8.35372025,
+      "cpu_ms": 8.500612499999999,
+      "p99_ms": 8.5262322
+    },
+    {
+      "label": "01-r1-current-v-mochi-M",
+      "round": 1,
+      "kind": "M",
+      "gpu_ms": 7.877987500000001,
+      "cpu_ms": 8.025287500000001
+    },
+    {
+      "label": "02-r1-current-v-mochi-M",
+      "round": 1,
+      "kind": "M",
+      "gpu_ms": 7.8871625,
+      "cpu_ms": 8.03734375
+    },
+    {
+      "label": "03-r1-current-v-mochi-N",
+      "round": 1,
+      "kind": "N",
+      "gpu_ms": 8.35371675,
+      "cpu_ms": 8.51395,
+      "p99_ms": 8.5080641
+    },
+    {
+      "label": "04-r2-current-v-mochi-N",
+      "round": 2,
+      "kind": "N",
+      "gpu_ms": 8.356884375,
+      "cpu_ms": 8.5082625,
+      "p99_ms": 8.516751
+    },
+    {
+      "label": "05-r2-current-v-mochi-M",
+      "round": 2,
+      "kind": "M",
+      "gpu_ms": 7.88539375,
+      "cpu_ms": 8.040481250000001
+    },
+    {
+      "label": "06-r2-current-v-mochi-M",
+      "round": 2,
+      "kind": "M",
+      "gpu_ms": 7.8968125,
+      "cpu_ms": 8.044118749999999
+    },
+    {
+      "label": "07-r2-current-v-mochi-N",
+      "round": 2,
+      "kind": "N",
+      "gpu_ms": 8.380602937499999,
+      "cpu_ms": 8.54289375,
+      "p99_ms": 8.5649708
+    },
+    {
+      "label": "08-r3-current-v-mochi-N",
+      "round": 3,
+      "kind": "N",
+      "gpu_ms": 8.378988625,
+      "cpu_ms": 8.53174375,
+      "p99_ms": 8.604803
+    },
+    {
+      "label": "09-r3-current-v-mochi-M",
+      "round": 3,
+      "kind": "M",
+      "gpu_ms": 7.88990625,
+      "cpu_ms": 8.040825
+    },
+    {
+      "label": "10-r3-current-v-mochi-M",
+      "round": 3,
+      "kind": "M",
+      "gpu_ms": 7.8924,
+      "cpu_ms": 8.0445875
+    },
+    {
+      "label": "11-r3-current-v-mochi-N",
+      "round": 3,
+      "kind": "N",
+      "gpu_ms": 8.37753675,
+      "cpu_ms": 8.5450875,
+      "p99_ms": 8.571874
+    }
+  ],
+  "raw_sha": {
+    "N": [
+      "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    ],
+    "M": [
+      "624d9d1a2f5cedb300182bb7766df1c3b421d57555c9edc20220baa14431a612"
+    ]
+  },
+  "samples_per_arm": 960,
+  "mochi_p99_available": false
+}

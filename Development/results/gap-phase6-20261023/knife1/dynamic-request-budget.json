@@ -1,0 +1,42 @@
+[
+  {
+    "tokens": 288,
+    "attention_waves": 576,
+    "key_steps": 18,
+    "old_vfrag_vmem_load_instructions": 32256,
+    "new_qkfrag_vmem_load_instructions": 21312,
+    "old_and_new_logical_read_bytes": 10911744,
+    "wmma_both": 51840,
+    "producer_inactive_waves_per_head_part": 2
+  },
+  {
+    "tokens": 400,
+    "attention_waves": 800,
+    "key_steps": 25,
+    "old_vfrag_vmem_load_instructions": 61600,
+    "new_qkfrag_vmem_load_instructions": 40800,
+    "old_and_new_logical_read_bytes": 20889600,
+    "wmma_both": 100000,
+    "producer_inactive_waves_per_head_part": 0
+  },
+  {
+    "tokens": 448,
+    "attention_waves": 896,
+    "key_steps": 28,
+    "old_vfrag_vmem_load_instructions": 77056,
+    "new_qkfrag_vmem_load_instructions": 51072,
+    "old_and_new_logical_read_bytes": 26148864,
+    "wmma_both": 125440,
+    "producer_inactive_waves_per_head_part": 2
+  },
+  {
+    "tokens": 640,
+    "attention_waves": 1280,
+    "key_steps": 40,
+    "old_vfrag_vmem_load_instructions": 156160,
+    "new_qkfrag_vmem_load_instructions": 103680,
+    "old_and_new_logical_read_bytes": 53084160,
+    "wmma_both": 256000,
+    "producer_inactive_waves_per_head_part": 0
+  }
+]

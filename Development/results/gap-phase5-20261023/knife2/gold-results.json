@@ -1,0 +1,418 @@
+{
+  "pass": true,
+  "kind": "gold",
+  "paired_cases": 12,
+  "jobs": 24,
+  "checked_frames": 72,
+  "note": "Cross-arm each-frame SHA required. AE may change between frames; never compares all AE frames to first. Last N AE CSV rows establish actual compute/reuse; route_calls count launches only. No performance inference.",
+  "cases": [
+    {
+      "label": "knife2/gold-small900-p0-baseline",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "baseline",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small900-p0-candidate",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "candidate",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "1": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+        "2": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small900-p1-baseline",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "baseline",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88",
+        "1": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88",
+        "2": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small900-p1-candidate",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "candidate",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88",
+        "1": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88",
+        "2": "a16d7e4ee643a1f62490c294513378f1d5f3fabb4143120f17a768882caf9e88"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small900-p2-baseline",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "baseline",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29",
+        "1": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29",
+        "2": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small900-p2-candidate",
+      "kind": "gold",
+      "profile": "small900",
+      "arm": "candidate",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1600x1024",
+      "expected_tokens_by_verified_geometry": 448,
+      "frame_sha256": {
+        "0": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29",
+        "1": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29",
+        "2": "1ca76cc52a2afd5c32e1530ff07a8f7d3294d2331d03903f6f34b56f2c725e29"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p0-baseline",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "baseline",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p0-candidate",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "candidate",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p1-baseline",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "baseline",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10",
+        "1": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10",
+        "2": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p1-candidate",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "candidate",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10",
+        "1": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10",
+        "2": "fb75b1297defde27581d28d7a9c180a19d9b875ea46a9d2fb437453f68b38a10"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p2-baseline",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "baseline",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274",
+        "1": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274",
+        "2": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small720-p2-candidate",
+      "kind": "gold",
+      "profile": "small720",
+      "arm": "candidate",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1344x768",
+      "expected_tokens_by_verified_geometry": 288,
+      "frame_sha256": {
+        "0": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274",
+        "1": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274",
+        "2": "e66452ca2c31cfd897090b4cc57757e61d12a5efc1a3a24a327f3ff2d184f274"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p0-baseline",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "baseline",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+        "1": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+        "2": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      "vfrag_route_launches": 8,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p0-candidate",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "candidate",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+        "1": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+        "2": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      "vfrag_route_launches": 40,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p1-baseline",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "baseline",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24",
+        "1": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24",
+        "2": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24"
+      },
+      "vfrag_route_launches": 8,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p1-candidate",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "candidate",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24",
+        "1": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24",
+        "2": "8618ea68e2a10380a08744b2f0bb5f24448857a6c70b829fba9a58b9f1821d24"
+      },
+      "vfrag_route_launches": 40,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p2-baseline",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "baseline",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40",
+        "1": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40",
+        "2": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40"
+      },
+      "vfrag_route_launches": 8,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-small1080-p2-candidate",
+      "kind": "gold",
+      "profile": "small1080",
+      "arm": "candidate",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1920x1152",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40",
+        "1": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40",
+        "2": "ff798440625a6982c46f71611f6cc4c57bf643ac556e450f0dcd2fe622373c40"
+      },
+      "vfrag_route_launches": 40,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p0-baseline",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "baseline",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p0-candidate",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "candidate",
+      "pattern": 0,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p1-baseline",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "baseline",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p1-candidate",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "candidate",
+      "pattern": 1,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "1": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+        "2": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p2-baseline",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "baseline",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec",
+        "1": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec",
+        "2": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec"
+      },
+      "vfrag_route_launches": 0,
+      "route_launches_are_not_execution_count": true
+    },
+    {
+      "label": "knife2/gold-smallfree1088-p2-candidate",
+      "kind": "gold",
+      "profile": "smallfree1088",
+      "arm": "candidate",
+      "pattern": 2,
+      "frames": 3,
+      "processing": "1920x1088",
+      "expected_tokens_by_verified_geometry": 640,
+      "frame_sha256": {
+        "0": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec",
+        "1": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec",
+        "2": "e91f56643e69c348f827c3db8b73c9ca14a171330bd747f6066aa558350627ec"
+      },
+      "vfrag_route_launches": 32,
+      "route_launches_are_not_execution_count": true
+    }
+  ]
+}

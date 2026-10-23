@@ -1,0 +1,73 @@
+model pack: D:\DLSSNR-Lab\competitor-timing-20260930\mz\dlssnr.bin (599 entries)
+accumulation: fp32 (FP32 hardware)
+Swin position bias storage: fp32; FP32 logit addition
+152 steps from D:\DLSSNR-Lab\competitor-timing-20260930\mz\plan-1920x1080.txt
+152 of 152 layers have a kernel
+model pack: D:\DLSSNR-Lab\competitor-timing-20260930\mz\dlssnr.bin (599 entries)
+accumulation: fp32 (FP32 hardware)
+Swin position bias storage: fp32; FP32 logit addition
+152 steps from D:\DLSSNR-Lab\competitor-timing-20260930\mz\plan-1920x1080.txt
+152 of 152 layers have a kernel
+math profile: 3 (4096-byte activation table; baked exp bias=1)
+pre conditioning [style,tone,structure,skin,other]=[0.0078125,1,1,1,1]
+Automatic Mask: requested=1, conditioning=enabled; external ControlMask absent
+Overall Intensity: requested=1, GPU push=1, mapping=nr-delta-v1
+N-pair FP8 weight layout: 332 matrices
+persist: C=64 layers b005l0..b008l0 (4, last is DS) windows 2135 items 8349 wg 384
+persist: C=128 layers b009l0..b014l0 (6, last is DS) windows 558 items 3203 wg 256
+persist: C=256 layers b015l0..b022l0 (8, last is DS) windows 144 items 1116 wg 1116 (one per item)
+persist: C=256 layers b049l0..b055l0 (8, first is UPS) windows 144 items 1116 wg 1116 (one per item)
+persist: C=128 layers b057l0..b061l0 (6, first is UPS) windows 558 items 3202 wg 256
+persist: C=64 layers b063l0..b065l0 (4, first is UPS) windows 2135 items 8349 wg 384
+persist: 6 merged runs, 123 dispatches left
+arena reuse: unsized slot 247 (block 30) aliases value 0 (block 0 layer 0) +0
+activation arena 390.5 MB over 185 values, shared by lifetime (1047.7 MB without)
+unpacking weights from artifacts
+math profile: 3 (4096-byte activation table; baked exp bias=1)
+pre conditioning [style,tone,structure,skin,other]=[0.0078125,1,1,1,1]
+Automatic Mask: requested=1, conditioning=enabled; external ControlMask absent
+Overall Intensity: requested=1, GPU push=1, mapping=nr-delta-v1
+weight arena 169.7 MB over 153 dispatches
+N-pair FP8 weight layout: 332 matrices
+persist: C=64 layers b005l0..b008l0 (4, last is DS) windows 2135 items 8349 wg 384
+persist: C=128 layers b009l0..b014l0 (6, last is DS) windows 558 items 3203 wg 256
+persist: C=256 layers b015l0..b022l0 (8, last is DS) windows 144 items 1116 wg 1116 (one per item)
+persist: C=256 layers b049l0..b055l0 (8, first is UPS) windows 144 items 1116 wg 1116 (one per item)
+persist: C=128 layers b057l0..b061l0 (6, first is UPS) windows 558 items 3202 wg 256
+persist: C=64 layers b063l0..b065l0 (4, first is UPS) windows 2135 items 8349 wg 384
+persist: 6 merged runs, 123 dispatches left
+GPU    AMD Radeon RX 9070 XT
+allocating arenas: activation 390.8 MB, weights 170.4 MB
+[nr] activation arena through its device address: yes
+native working extent 1920x1088; source/output 1920x1080
+images in 1920x1080, out 1920x1080 (x2)
+input image: 33.2 MB host + 33.2 MB mapped staging
+uploading weights: 170.4 MB through a mapped staging buffer of the same size
+inter-dispatch barrier: execution + invalidate (no availability op)
+[nr] graph build 1.07s: plan 0.38s  weights-unpack 0.30s  arena-alloc 0.20s  input-image 0.06s  weights-upload 0.03s  noise-field 0.00s  pipelines 0.10s  arena-zero 0.00s  (22 pipelines, 1.8 MB of pipeline cache)
+
+123 dispatches, one submit: 7.885 ms  @ 0 MHz
+measurement wall 1282.845 ms, GPU total 1261.675 ms over 160 frames
+surface 0: 1920x1080 RGBA32F, 100.0% non-zero, rms 0.6902, range [0.02441, 1]
+  wrote D:\DLSSNR-Lab\gap-refresh-20261023\18-r3-current-v-mochi-M\final.rgba32f
+
+family                             dispatches
+CCDecInputUpsample                      2
+CCSplitSwin16HFfwd                     16
+CCSplitSwin16HFfwdProj                 16
+CCSplitSwin16HFinalHead                 1
+CCSplitSwin16HProj                     15
+CCSplitSwin16HProjPool                  1
+CCSplitSwin16HQKVAttn                  16
+CCTinlayoutFusedPostBlockSwin1H         1
+CCTinlayoutFusedPreBlockSwin1H          1
+CCTinlayoutFusedSwin1H                  8
+CCTinlayoutFusedSwin2H                  2
+CCTinlayoutFusedSwin4H                  2
+CCTinlayoutFusedSwin8H                  2
+CCVit1DAttention                        8
+CCVit1DFfnContract                      8
+CCVit1DFfnExpand                        8
+CCVit1DProjection                       8
+CCVit1DQKV                              8
+

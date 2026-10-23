@@ -1,0 +1,9 @@
+{
+    "started":  "2026-10-23T08:29:56.7634924Z",
+    "label":  "02-r1-current-v-mochi-M",
+    "pair":  "current-v-mochi",
+    "exe":  "D:\\DLSSNR-Lab\\competitor-timing-20260930\\mz\\nr_graph.exe",
+    "round":  1,
+    "kind":  "M",
+    "arguments":  "--plan D:\\DLSSNR-Lab\\competitor-timing-20260930\\mz\\plan-1920x1080.txt --model-pack D:\\DLSSNR-Lab\\competitor-timing-20260930\\mz\\dlssnr.bin --spv-dir D:\\DLSSNR-Lab\\competitor-timing-20260930\\mz\\spv --host-boundary --reuse --source-width 1920 --source-height 1080 --accumulation fp32 --pipeline-cache D:\\DLSSNR-Lab\\gap-refresh-20261023\\mochi-cache.bin --warmup 80 --repeats 160 --chunk 1 --style 1 --img-seed 0 --in-image D:\\DLSSNR-Lab\\sync-network-gap1080-20261006\\fixture\\valid.rgba32f --out-image D:\\DLSSNR-Lab\\gap-refresh-20261023\\02-r1-current-v-mochi-M\\final.rgba32f"
+}

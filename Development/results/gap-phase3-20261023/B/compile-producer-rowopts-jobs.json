@@ -1,0 +1,47 @@
+{
+  "name": "B-producer-rowopts",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.baseline.generated.hip",
+      "sha256": "a7a7cd51f4b063220ee873f0967236a6f020d5114a5fbbc84ddb82dc597cf957"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.generated.hip",
+      "sha256": "9defee2afa2793a840ca5681d2eca15436b572f04d1a973f6d6bb663ccaac399"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.trace.generated.hip",
+      "sha256": "79b537125bd42431fa9abab84966a65a10cd45303e9c9392d93d325e9733f05a"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "B/compile-producer-rowopts-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": "-mllvm=-amdgpu-sched-strategy=max-ilp"
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.baseline.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "B/compile-producer-rowopts-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": "-mllvm=-amdgpu-sched-strategy=max-ilp"
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "B/compile-producer-rowopts-trace",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": "-mllvm=-amdgpu-sched-strategy=max-ilp"
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.trace.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

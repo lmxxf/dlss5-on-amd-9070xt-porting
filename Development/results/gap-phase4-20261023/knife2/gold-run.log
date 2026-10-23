@@ -1,0 +1,10 @@
+LOCK_RELEASED
+Missing stderr gate knife2/gold-small1080-p0-baseline: VIT_VFRAG requested=1 available=1 explicit_ae0=1 producers=0 con
+sumers=0
+At D:\DLSSNR-Lab\gap-phase4-20261023\run-jobs.ps1:33 char:99
++ ... tmatch $pattern){throw "Missing stderr gate $($j.label): $pattern"}}}
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Missing stderr ...s=0 consumers=0:String) [], RuntimeException
+    + FullyQualifiedErrorId : Missing stderr gate knife2/gold-small1080-p0-baseline: VIT_VFRAG requested=1 available=1 
+    explicit_ae0=1 producers=0 consumers=0
+ 

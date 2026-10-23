@@ -1,0 +1,10 @@
+Hash mismatch D:\DLSSNR-Lab\sync-network-gap1080-20261006\fixture\valid.rgba32f expected=b3d114c4779fc1f593162b36d22bbb
+5ae7777e22e7aec701f0f551916539b2ac actual=17b2e09bf9757a5a98fbd65a08f618100ec42f4d7abb7036cb03cb19e3ae4e2a
+At D:\DLSSNR-Lab\gap-refresh-20261023\run.ps1:7 char:135
++ ... .ToLower()){throw "Hash mismatch $path expected=$expected actual=$act ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Hash mismatch D...b03cb19e3ae4e2a:String) [], RuntimeException
+    + FullyQualifiedErrorId : Hash mismatch D:\DLSSNR-Lab\sync-network-gap1080-20261006\fixture\valid.rgba32f expected 
+   =b3d114c4779fc1f593162b36d22bbb5ae7777e22e7aec701f0f551916539b2ac actual=17b2e09bf9757a5a98fbd65a08f618100ec42f4d7  
+  abb7036cb03cb19e3ae4e2a
+ 

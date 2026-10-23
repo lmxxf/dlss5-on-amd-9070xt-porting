@@ -1,0 +1,30 @@
+{
+  "status": "HOSTS_FROZEN_GPU_PAYLOAD_PENDING_A_DECISION",
+  "production_header_sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8",
+  "host_source_manifest_sha256": "4e5075ddfcc02fd82264a4c9849300f9836a0b1cdf9414ac1cbad2eccb2fae6c",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "host_artifacts": [
+    {
+      "path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/final-payload/dlss5-amd.addon64",
+      "sha256": "dcd468ed836cad86e2cf3c6cc594b13a0ad4f7a67fa3affa49b472b049e59166",
+      "bytes": 4665791
+    },
+    {
+      "path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/final-payload/LmxxfNrRuntime.dll",
+      "sha256": "d3ea1907de63d9045dbd078221053e3a1202d10c7067b3c90d323437e6fcf722",
+      "bytes": 4351373
+    },
+    {
+      "path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/final-payload/LmxxfNrRuntime.dll.a",
+      "sha256": "802e123fcba16f78dd7e0b1915afe5cafeeaf0fd413280ff250d8262474f0311",
+      "bytes": 1626
+    }
+  ],
+  "build_scripts": [
+    "scripts/build-addon.sh --hip",
+    "scripts/build-runtime.sh"
+  ],
+  "GPU_source_not_part_of_host_compile_manifest": true,
+  "GPU_payload_status": "knife1 HIP80 placeholder; A may replace deep modules later",
+  "GPU_or_target_actions_by_builder": false
+}

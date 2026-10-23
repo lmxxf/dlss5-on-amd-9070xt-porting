@@ -1,0 +1,59 @@
+{
+  "name": "phase5-c512-comgr",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\baseline.generated.hip",
+      "sha256": "c1f4e4ad73754bcff22b28744b39526554173d270247cb1c3c7b70c160d62d3c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\pair.generated.hip",
+      "sha256": "74f42423511fd3e6057fc228509cd6a5e5d264ab8b19ce2e4dea5803e4494f37"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\perm.generated.hip",
+      "sha256": "9b4d5a508cdce13c7f4784d7b2f2f2a72a186f3b4fff78741d87658252ffb20d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\combined.generated.hip",
+      "sha256": "11a4c70bf3e56c93433893c50572a5f6aea67541ae13ca9376f9a8c13be22217"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\baseline.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-pair",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\pair.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-perm",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\perm.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-combined",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\combined.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "wave_private_raw_stride_bytes": 2112,
+  "reused_byte_tile_bytes": 512,
+  "five_wave_raw_extent_bytes": 10560,
+  "declared_LDS_bytes": 16384,
+  "wave_tile_transpose_symbolic_equal": true,
+  "cases": [
+    {
+      "tokens": 288,
+      "QK_plane_bytes": 294912,
+      "all_plane_bytes_written_once": true,
+      "all_16B_start_aligned": true,
+      "Q_and_K_disjoint_by_plane_offset": true,
+      "inactive_waves_per_3parts": 192
+    },
+    {
+      "tokens": 400,
+      "QK_plane_bytes": 409600,
+      "all_plane_bytes_written_once": true,
+      "all_16B_start_aligned": true,
+      "Q_and_K_disjoint_by_plane_offset": true,
+      "inactive_waves_per_3parts": 0
+    },
+    {
+      "tokens": 448,
+      "QK_plane_bytes": 458752,
+      "all_plane_bytes_written_once": true,
+      "all_16B_start_aligned": true,
+      "Q_and_K_disjoint_by_plane_offset": true,
+      "inactive_waves_per_3parts": 192
+    },
+    {
+      "tokens": 640,
+      "QK_plane_bytes": 655360,
+      "all_plane_bytes_written_once": true,
+      "all_16B_start_aligned": true,
+      "Q_and_K_disjoint_by_plane_offset": true,
+      "inactive_waves_per_3parts": 0
+    }
+  ],
+  "scope": "CPU address/ownership proof; quantized bytes arbitrary, GPU numeric check separate"
+}

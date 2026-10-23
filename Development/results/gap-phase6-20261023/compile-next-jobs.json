@@ -1,0 +1,50 @@
+{
+  "name": "phase6-finalQK1200-and-Up-pair1201",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\deep_fast-packed-fast.final.hip",
+      "sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\vit-stream-fast.final.hip",
+      "sha256": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife2\\up-pair.generated.hip",
+      "sha256": "5d5d33b47fb1bc597f9205a5d34151e8b8e2f6b11f2e758ef0731244b039c47e"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-final-gfx1200-deep_fast-packed-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\deep_fast-packed-fast.final.hip\" comgr gfx1200"
+    },
+    {
+      "label": "knife1/compile-final-gfx1200-vit-stream-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\vit-stream-fast.final.hip\" comgr gfx1200"
+    },
+    {
+      "label": "knife2/A-compile-gfx1201",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife2\\up-pair.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -1,0 +1,982 @@
+{
+  "original1088": {
+    "baseline_ms": 8.732559375000001,
+    "candidate_ms": 8.743956145833334,
+    "delta_ms": 0.011396770833332681,
+    "p99_delta_ms": 0.011664999999998926,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 8.709332499999999,
+        "candidate_ms": 8.699262812499999,
+        "delta_ms": -0.010069687499999702,
+        "p99_delta_ms": -0.013339999999999463
+      },
+      {
+        "round": 2,
+        "baseline_ms": 8.74346,
+        "candidate_ms": 8.759628125,
+        "delta_ms": 0.01616812500000009,
+        "p99_delta_ms": -0.03452199999999905
+      },
+      {
+        "round": 3,
+        "baseline_ms": 8.744885624999998,
+        "candidate_ms": 8.7729775,
+        "delta_ms": 0.02809187500000121,
+        "p99_delta_ms": 0.11103799999999886
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-original1088-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 8.683508749999998,
+        "p99_ms": 8.866902,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 8.6946975,
+        "p99_ms": 8.898487000000001,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 8.703828125,
+        "p99_ms": 8.931264,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 8.73515625,
+        "p99_ms": 9.02215,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 8.73684375,
+        "p99_ms": 8.972227,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 8.7631975,
+        "p99_ms": 8.995381,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 8.75605875,
+        "p99_ms": 8.926062,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 8.750076250000001,
+        "p99_ms": 8.966051,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 8.75075,
+        "p99_ms": 8.914139,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 8.761655000000001,
+        "p99_ms": 8.919236,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 8.784299999999998,
+        "p99_ms": 9.025211,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      {
+        "label": "knife2/A-perf-original1088-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 8.739021249999999,
+        "p99_ms": 8.880501,
+        "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      }
+    ]
+  },
+  "original1152": {
+    "baseline_ms": 9.027200625,
+    "candidate_ms": 9.03014625,
+    "delta_ms": 0.0029456249999988415,
+    "p99_delta_ms": 0.0001249999999988205,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 8.95609125,
+        "candidate_ms": 8.9650059375,
+        "delta_ms": 0.008914687500000795,
+        "p99_delta_ms": -0.013010000000001298
+      },
+      {
+        "round": 2,
+        "baseline_ms": 9.052353437499999,
+        "candidate_ms": 9.054739375,
+        "delta_ms": 0.0023859375000014893,
+        "p99_delta_ms": -0.002220000000001221
+      },
+      {
+        "round": 3,
+        "baseline_ms": 9.073157187499998,
+        "candidate_ms": 9.070693437500001,
+        "delta_ms": -0.002463749999996878,
+        "p99_delta_ms": 0.009262999999998911
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-original1152-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 8.933116875,
+        "p99_ms": 9.10756,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 8.967678750000001,
+        "p99_ms": 9.141338999999999,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 8.962333125,
+        "p99_ms": 9.118651,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 8.979065625,
+        "p99_ms": 9.144289,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 9.06153,
+        "p99_ms": 9.254882,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 9.056603124999999,
+        "p99_ms": 9.249462,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 9.052875625,
+        "p99_ms": 9.309351,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 9.043176874999999,
+        "p99_ms": 9.274676,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 9.073725,
+        "p99_ms": 9.279938,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 9.07419625,
+        "p99_ms": 9.264387,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 9.067190625,
+        "p99_ms": 9.265824,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      },
+      {
+        "label": "knife2/A-perf-original1152-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 9.072589374999998,
+        "p99_ms": 9.217148,
+        "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+      }
+    ]
+  },
+  "original960": {
+    "baseline_ms": 6.3870233333333335,
+    "candidate_ms": 6.387933125000001,
+    "delta_ms": 0.0009097916666673811,
+    "p99_delta_ms": 0.0433040000000009,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 6.3688203125000005,
+        "candidate_ms": 6.3709846875,
+        "delta_ms": 0.002164374999999552,
+        "p99_delta_ms": 0.017999999999999794
+      },
+      {
+        "round": 2,
+        "baseline_ms": 6.393405625,
+        "candidate_ms": 6.393859375,
+        "delta_ms": 0.00045375000000014154,
+        "p99_delta_ms": 0.07003000000000004
+      },
+      {
+        "round": 3,
+        "baseline_ms": 6.398844062499999,
+        "candidate_ms": 6.3989553125,
+        "delta_ms": 0.00011125000000067331,
+        "p99_delta_ms": 0.021252000000000493
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-original960-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 6.3597325,
+        "p99_ms": 6.521617999999999,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 6.3678824999999994,
+        "p99_ms": 6.5276309999999995,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 6.374086875,
+        "p99_ms": 6.564197,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 6.377908125,
+        "p99_ms": 6.556978,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 6.39314125,
+        "p99_ms": 6.497391,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 6.38597375,
+        "p99_ms": 6.525954,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 6.401745,
+        "p99_ms": 6.582725,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 6.39367,
+        "p99_ms": 6.501855,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 6.396230624999999,
+        "p99_ms": 6.488923,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 6.3947825,
+        "p99_ms": 6.508317,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 6.403128125,
+        "p99_ms": 6.511779,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      },
+      {
+        "label": "knife2/A-perf-original960-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 6.401457499999999,
+        "p99_ms": 6.5056329999999996,
+        "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+      }
+    ]
+  },
+  "small1080": {
+    "baseline_ms": 5.453747083333334,
+    "candidate_ms": 5.463424375,
+    "delta_ms": 0.009677291666665866,
+    "p99_delta_ms": 0.09347500000000064,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 5.4504334375,
+        "candidate_ms": 5.44572,
+        "delta_ms": -0.004713437500000417,
+        "p99_delta_ms": 0.0044880000000002696
+      },
+      {
+        "round": 2,
+        "baseline_ms": 5.4556740625,
+        "candidate_ms": 5.4473053125,
+        "delta_ms": -0.008368749999999814,
+        "p99_delta_ms": -0.07953899999999958
+      },
+      {
+        "round": 3,
+        "baseline_ms": 5.45513375,
+        "candidate_ms": 5.4972478125,
+        "delta_ms": 0.04211406250000049,
+        "p99_delta_ms": 0.1465019999999999
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-small1080-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.4538262500000005,
+        "p99_ms": 5.592785,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.4436975,
+        "p99_ms": 5.61691,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.4477425,
+        "p99_ms": 5.572225,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.447040625,
+        "p99_ms": 5.60729,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.44887375,
+        "p99_ms": 5.631075,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.44363125,
+        "p99_ms": 5.565879,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.450979375,
+        "p99_ms": 5.566533,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.462474374999999,
+        "p99_ms": 5.641312,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.438695,
+        "p99_ms": 5.640693000000001,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.515809375000001,
+        "p99_ms": 5.856293,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.47868625,
+        "p99_ms": 5.705234,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      },
+      {
+        "label": "knife2/A-perf-small1080-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.471572500000001,
+        "p99_ms": 5.6879100000000005,
+        "sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+      }
+    ]
+  },
+  "small720": {
+    "baseline_ms": 2.9987526041666666,
+    "candidate_ms": 2.9917521875,
+    "delta_ms": -0.00700041666666662,
+    "p99_delta_ms": -0.012452999999999825,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.9939,
+        "candidate_ms": 2.983403125,
+        "delta_ms": -0.01049687499999985,
+        "p99_delta_ms": -0.02070599999999967
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.9974721875,
+        "candidate_ms": 2.9892984374999996,
+        "delta_ms": -0.008173750000000535,
+        "p99_delta_ms": -0.03017599999999998
+      },
+      {
+        "round": 3,
+        "baseline_ms": 3.004885625,
+        "candidate_ms": 3.002555,
+        "delta_ms": -0.0023306249999999196,
+        "p99_delta_ms": -0.0225139999999997
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-small720-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 2.99364375,
+        "p99_ms": 3.116052,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 2.987730625,
+        "p99_ms": 3.1033690000000003,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 2.979075625,
+        "p99_ms": 3.063397,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 2.99415625,
+        "p99_ms": 3.089679,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 3.00671875,
+        "p99_ms": 3.244586,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 2.98665125,
+        "p99_ms": 3.136082,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 2.991945625,
+        "p99_ms": 3.1018280000000003,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 2.9882256249999997,
+        "p99_ms": 3.10251,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 3.004479375,
+        "p99_ms": 3.168255,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 3.0010737499999998,
+        "p99_ms": 3.161927,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 3.00403625,
+        "p99_ms": 3.126258,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      {
+        "label": "knife2/A-perf-small720-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 3.005291875,
+        "p99_ms": 3.118417,
+        "sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      }
+    ]
+  },
+  "small900": {
+    "baseline_ms": 4.247656770833333,
+    "candidate_ms": 4.2463178125,
+    "delta_ms": -0.0013389583333331956,
+    "p99_delta_ms": -0.004978999999999623,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 4.251227500000001,
+        "candidate_ms": 4.245088750000001,
+        "delta_ms": -0.00613874999999986,
+        "p99_delta_ms": -0.043083999999999456
+      },
+      {
+        "round": 2,
+        "baseline_ms": 4.2461078125,
+        "candidate_ms": 4.2483503124999995,
+        "delta_ms": 0.002242499999999481,
+        "p99_delta_ms": 0.03636399999999984
+      },
+      {
+        "round": 3,
+        "baseline_ms": 4.245635,
+        "candidate_ms": 4.245514375000001,
+        "delta_ms": -0.00012062499999920817,
+        "p99_delta_ms": -2.000000000279556e-06
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-small900-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 4.2501862500000005,
+        "p99_ms": 4.385443,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 4.2458075,
+        "p99_ms": 4.357122,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 4.244370000000001,
+        "p99_ms": 4.3693409999999995,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 4.252268750000001,
+        "p99_ms": 4.420643,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 4.2472925,
+        "p99_ms": 4.433407,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 4.248170625,
+        "p99_ms": 4.448028,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 4.248530000000001,
+        "p99_ms": 4.3910540000000005,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 4.244923125000001,
+        "p99_ms": 4.372336,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 4.2467918749999995,
+        "p99_ms": 4.403255,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 4.241631875,
+        "p99_ms": 4.385517,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 4.249396875,
+        "p99_ms": 4.374087,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      },
+      {
+        "label": "knife2/A-perf-small900-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 4.2444781250000005,
+        "p99_ms": 4.369329,
+        "sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+      }
+    ]
+  },
+  "smallfree1088": {
+    "baseline_ms": 5.298516458333333,
+    "candidate_ms": 5.293491875000001,
+    "delta_ms": -0.005024583333332444,
+    "p99_delta_ms": -0.019966999999999402,
+    "samples_per_arm": 960,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 5.3001875,
+        "candidate_ms": 5.287988125,
+        "delta_ms": -0.01219937499999979,
+        "p99_delta_ms": -0.0736460000000001
+      },
+      {
+        "round": 2,
+        "baseline_ms": 5.2955396875,
+        "candidate_ms": 5.2937925,
+        "delta_ms": -0.0017471874999994697,
+        "p99_delta_ms": -0.007392999999999539
+      },
+      {
+        "round": 3,
+        "baseline_ms": 5.2998221875,
+        "candidate_ms": 5.298695,
+        "delta_ms": -0.0011271874999998488,
+        "p99_delta_ms": 0.031167000000000833
+      }
+    ],
+    "slots": [
+      {
+        "label": "knife2/A-perf-smallfree1088-r1-0-baseline",
+        "round": 1,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.3096175,
+        "p99_ms": 5.511049,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r1-1-candidate",
+        "round": 1,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.293695625,
+        "p99_ms": 5.436081,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r1-2-candidate",
+        "round": 1,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.282280625,
+        "p99_ms": 5.408943000000001,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r1-3-baseline",
+        "round": 1,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.2907575,
+        "p99_ms": 5.473482,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r2-0-baseline",
+        "round": 2,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.2991287499999995,
+        "p99_ms": 5.521719,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r2-1-candidate",
+        "round": 2,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.277945625,
+        "p99_ms": 5.413869,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r2-2-candidate",
+        "round": 2,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.309639375000001,
+        "p99_ms": 5.5302359999999995,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r2-3-baseline",
+        "round": 2,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.291950625,
+        "p99_ms": 5.512056,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r3-0-baseline",
+        "round": 3,
+        "slot": 0,
+        "arm": "baseline",
+        "mean_ms": 5.306773125,
+        "p99_ms": 5.500763,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r3-1-candidate",
+        "round": 3,
+        "slot": 1,
+        "arm": "candidate",
+        "mean_ms": 5.30169625,
+        "p99_ms": 5.561742999999999,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r3-2-candidate",
+        "round": 3,
+        "slot": 2,
+        "arm": "candidate",
+        "mean_ms": 5.29569375,
+        "p99_ms": 5.4497919999999995,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      },
+      {
+        "label": "knife2/A-perf-smallfree1088-r3-3-baseline",
+        "round": 3,
+        "slot": 3,
+        "arm": "baseline",
+        "mean_ms": 5.29287125,
+        "p99_ms": 5.4229579999999995,
+        "sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+      }
+    ]
+  }
+}

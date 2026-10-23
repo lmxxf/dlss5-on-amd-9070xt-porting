@@ -1,0 +1,12 @@
+{
+  "hosts": {
+    "frame-baseline-standard.exe": "39c5e035835df6d5516b0d634b2127b4533249e857d40c58e77186040617994e",
+    "frame-baseline-free1072.exe": "7ea7f8c37c858bcd0dd04809ce99195aa4a0acbeca853acabb152ee0bb090f10",
+    "frame-candidate-standard.exe": "2915d38c26ed40cbe9192c82cd626feb637f8c1389cd5a38ca551c401dcb1def",
+    "frame-candidate-free1072.exe": "5ee936c2d029e08e4b0dccfa201719658e38d68796d05c447d1c0c370c5f7f25"
+  },
+  "baseline_standard_equals_phase4_final": true,
+  "baseline_free1072_equals_phase4_final": true,
+  "build": "MinGW O2 static fixed image base/no timestamp; local CPU only",
+  "GPU_modules_recompiled": false
+}

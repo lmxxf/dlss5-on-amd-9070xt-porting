@@ -1,0 +1,14 @@
+{
+  "gpu_executed": false,
+  "exe": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife1/pair-probe.exe",
+  "exe_sha256": "f8602997ec241a6485a8676e78950683df6a2de71ec153ebd511670e072402d8",
+  "probe_source_sha256": "f7828c690f316695969cab69064c5bb2f61ea9585aab4989428f6992445b1977",
+  "hip_api_sha256": "88ba78c5f0700001ca744040fcde5f11cc4345f9350e0b9cf5577bae782f78c9",
+  "packed_weights_header_sha256": "a4d13d15f9804a4cbebd7807907000eaca7121f3b9bfcff2bfe87bcff622ff15",
+  "production_pack_source_sha256": "deb120d52eae0b01899610152b756c2d9431ac442185a9f2d17c63088dcf6a34",
+  "production_weight_index_and_exact_encoder_expression_same": true,
+  "producer_source_sha256": "1e2e20b323d775ddc2cdce343801b0493b809e7472dc622b4d0d1c9de84b6bbf",
+  "consumer_source_sha256": "56fd5b251bc6aed445a49e86951ffaf9c55ec1c88c2237d8526364f849eb121a",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "arguments": "MODULE_DIRECTORY BLOCK31_QKV_F32 OUTPUT_DIRECTORY [HIP_DEVICE=0]"
+}

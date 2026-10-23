@@ -1,0 +1,1 @@
+First build command used a repository-relative mkdir with cwd already set to the repository, so log redirection failed before invoking the compiler. Created empty nested directories were removed; corrected to absolute output paths. No product changes or compilation occurred in the failed invocation.

@@ -1,0 +1,313 @@
+{
+  "module_manifest_sha256": "c8e6d3fa5c0a05688d6dca4a8d34c16392818a223fe46fcc5afa51ec89a7c237",
+  "header_sha256": "8ae0e238e6e518546c4a4e1fe527d78ab901b2ec01f4a8da9fe035c75c80ed28",
+  "rows": [
+    {
+      "role": "baseline",
+      "name": "deep_fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast.baseline.hip",
+      "sha256": "5126c6f4bb4159d187dd722fabf0bc24beafc237dee46c2521bf828949b5fbd6",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "baseline",
+      "name": "deep_fast-packed",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast-packed.baseline.hip",
+      "sha256": "6ec68ec65a31de097af6ae83c9f2cd19315269a42223d8e263ee20f9683dbe1a",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "baseline",
+      "name": "deep_fast-packed-fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast-packed-fast.baseline.hip",
+      "sha256": "6790d6975340dd40ceabf44dfc62e898aaa1e46f46e4ce27fa391433172f0bd3",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1",
+        "VIT_FAST_NUM 15"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "baseline",
+      "name": "vit-stream-fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-stream-fast.baseline.hip",
+      "sha256": "1d9bc17635047b3d2fb0c617d8726c97dee156658e9bd70ec2279745f1cba116",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "VIT_CONTRACT_BYTE_EDGE 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "HIP_VIT_STREAM_KERNELS 1",
+        "HIP_VIT_QKV_W5 1",
+        "VIT_CONTRACT_OCC_LDS 4096",
+        "VIT_QKV_F8W 1",
+        "HIP_BYTE_F_ADD0 1",
+        "VIT_FAST_NUM 4"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_stream.inc"
+      ],
+      "opts": []
+    },
+    {
+      "role": "baseline",
+      "name": "c512-m32-deep",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/c512-m32-deep.baseline.hip",
+      "sha256": "513087380faa076ec9b18d0edb91391525e5599711811e6d0c78e3b3c0284964",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "C512_DIRECT_PACK 3",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_MIX_OCC_LDS 4096",
+        "C512_F_MASK 1",
+        "HIP_BYTE_F_ADD0 1",
+        "C512_FFN_ONE 2",
+        "C512_FFN_F8W 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "c512_m32_deep.inc"
+      ],
+      "opts": [
+        "-amdgpu-sched-strategy=max-ilp"
+      ]
+    },
+    {
+      "role": "baseline",
+      "name": "vit-stream",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-stream.baseline.hip",
+      "sha256": "2d31ddcc9a22a9aee31666b64cf6ecf2caf9dbd291aa6f28c455e9d88733761d",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "VIT_CONTRACT_BYTE_EDGE 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "HIP_VIT_STREAM_KERNELS 1",
+        "HIP_VIT_QKV_W5 1",
+        "VIT_CONTRACT_OCC_LDS 4096",
+        "VIT_QKV_F8W 1",
+        "HIP_BYTE_F_ADD0 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_stream.inc"
+      ],
+      "opts": []
+    },
+    {
+      "role": "baseline",
+      "name": "vit-wide-deep",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-wide-deep.baseline.hip",
+      "sha256": "199e720c3d0019f9cfc0caa86f546a5bfc396cae5f0492067f122d45a00a3925",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_wide_deep.inc"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "deep_fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast.A.hip",
+      "sha256": "a7c896624bc4e843b858e5ff0b0163ed3ede81067286f5604323fcbedc6b254a",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "deep_fast-packed",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast-packed.A.hip",
+      "sha256": "c623ed18e4c5d9be391a3a9fff2c8660b292ba974cf9b7278b14e94a4a87bfba",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "deep_fast-packed-fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/deep_fast-packed-fast.A.hip",
+      "sha256": "bf8e982d3ae3ff082352715436fe6e04856f2f8355ba51ed581143e20d000717",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1",
+        "VIT_FAST_NUM 15"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "vit-stream-fast",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-stream-fast.A.hip",
+      "sha256": "eaf5a592e0e1a0aa5153dbdb17f5b1f8b9cc7d504ed03b5316cfb3852e512d55",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "VIT_CONTRACT_BYTE_EDGE 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "HIP_VIT_STREAM_KERNELS 1",
+        "HIP_VIT_QKV_W5 1",
+        "VIT_CONTRACT_OCC_LDS 4096",
+        "VIT_QKV_F8W 1",
+        "HIP_BYTE_F_ADD0 1",
+        "VIT_FAST_NUM 4"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_stream.inc"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "c512-m32-deep",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/c512-m32-deep.A.hip",
+      "sha256": "c56c134d53b9e294315114a4a78803ed1ffa6450aac00e58230bb3690db00476",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "C512_DIRECT_PACK 3",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_MIX_OCC_LDS 4096",
+        "C512_F_MASK 1",
+        "HIP_BYTE_F_ADD0 1",
+        "C512_FFN_ONE 2",
+        "C512_FFN_F8W 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "c512_m32_deep.inc"
+      ],
+      "opts": [
+        "-amdgpu-sched-strategy=max-ilp"
+      ]
+    },
+    {
+      "role": "A",
+      "name": "vit-stream",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-stream.A.hip",
+      "sha256": "43b10c117ab8f2e06838c853da1f9f347bfbaebc8e61a72e659fc410113f2640",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "VIT_CONTRACT_BYTE_EDGE 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "HIP_VIT_STREAM_KERNELS 1",
+        "HIP_VIT_QKV_W5 1",
+        "VIT_CONTRACT_OCC_LDS 4096",
+        "VIT_QKV_F8W 1",
+        "HIP_BYTE_F_ADD0 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_stream.inc"
+      ],
+      "opts": []
+    },
+    {
+      "role": "A",
+      "name": "vit-wide-deep",
+      "generated": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/gap-phase6-20261023/knife2/generated/vit-wide-deep.A.hip",
+      "sha256": "f47019da9e03ac329fd539a95a5ac34818ecdf647a6e38a3e95a0c1bd3d81ed6",
+      "compiler": "",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "vit_wide_deep.inc"
+      ],
+      "opts": []
+    }
+  ],
+  "production_untouched": true
+}

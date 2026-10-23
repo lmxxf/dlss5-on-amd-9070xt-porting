@@ -1,0 +1,28 @@
+{
+  "name": "phase6-qk-pair-probe",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\modules\\deep_fast-packed-fast.hsaco",
+      "sha256": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\modules\\vit-stream-fast.hsaco",
+      "sha256": "bf1dd632743a0792a76832e436229c1faee68999801a565e62c9f66145522836"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\pair-probe.exe",
+      "sha256": "8f90915619d5d5f857de8c64a23de51adcbbaf57d340ea87944ae715d62707b6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\combined-vs041-20261006\\assets-common\\block31-qkv.f16",
+      "sha256": "0a98b968119392138726eb355cb5a0554cd491528597b3b9ad7024eedbba8e2e"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/pair-probe",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\pair-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\modules\" \"D:\\DLSSNR-Lab\\combined-vs041-20261006\\assets-common\\block31-qkv.f32\" \"{OUT}\" 0"
+    }
+  ]
+}

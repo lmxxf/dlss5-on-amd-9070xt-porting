@@ -1,0 +1,304 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -916,7 +916,7 @@
+ }
+ WAVE void split_projection_frag(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_body<true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_body<true,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
+-template<bool W32,bool F16Res=false,bool ByteSkip=false,bool Transposed=false> DEV void split_projection_frag_w16_body(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,_Float16*out16,uint tokens){
++template<bool W32,bool F16Res=false,bool ByteSkip=false,bool Transposed=false,bool ChainTrace=false> DEV void split_projection_frag_w16_body(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,_Float16*out16,uint tokens,unsigned long long*chain_trace=nullptr){
+  uint first=bid()/8*16,row=bid()%8*64;if(first>=tokens)return;
+  typedef int w16_i4 __attribute__((ext_vector_type(4)));
+  const unsigned char*wb=reinterpret_cast<const unsigned char*>(w);
+@@ -959,6 +959,8 @@
+   _Pragma("unroll") for(uint j=0;j<4;j++){uint n0=row+j*16+rc();w16_i4 bw;__builtin_memcpy(&bw,wb+((n0/16)*16+gs)*512+(gr()*16+n0%16)*16,16);
+    i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
+    acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a0,b0,acc[j]);
++   if constexpr(ChainTrace){if(chain_trace&&gs==0&&j==0&&rc()==0&&gr()==0){reinterpret_cast<volatile uint*>(chain_trace)[bid()*2]=bits(acc[j][0]);__builtin_amdgcn_fence(__ATOMIC_RELEASE,"agent");chain_trace[bid()]=__builtin_amdgcn_s_sendmsg_rtnl(131);}}
++
+    acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a1,b1,acc[j]);}}
+ #if C512_T8_TAIL_VEC
+  __attribute__((shared)) unsigned char t8[1024];
+@@ -971,6 +973,25 @@
+ }
+ WAVE void split_projection_frag_w16(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_w16_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true,false,true,false>(in8,w,skip,out,out8,nullptr,tokens);}
++
++#ifndef C512_CHAIN_TRACE
++#define C512_CHAIN_TRACE 0
++#endif
++WAVE void split_projection_frag_w16_bskip_chain(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens,const unsigned long long*ready,unsigned long long target,uint*status,uint wait_limit,unsigned long long*trace){
++ const uint first=bid()/8*16,row=bid()%8*64,lane=__builtin_amdgcn_workitem_id_x();
++ if(first>=tokens)return;
++ uint ok=0;
++ if(lane==0){for(uint tries=0;tries<wait_limit;tries++){if(__hip_atomic_load(ready+first/16,__ATOMIC_ACQUIRE,__HIP_MEMORY_SCOPE_AGENT)>=target){ok=1;break;}__builtin_amdgcn_s_sleep(1);}}
++ ok=__builtin_amdgcn_readfirstlane(ok);
++ if(!ok){
++  // Do not read producer data, skip, or weights on failure. Define every owned output, reject the whole experiment.
++  for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint r=first+gr()*8+e,c=row+j*16+rc();out[r*512+c]=0.f;out8[((r/16)*16+c/32)*512+(r%16)*32+c%32]=0;}
++  if(lane==0)__hip_atomic_fetch_or(status,1u,__ATOMIC_RELAXED,__HIP_MEMORY_SCOPE_AGENT);
++  return;
++ }
++ __builtin_amdgcn_fence(__ATOMIC_ACQUIRE,"agent");
++ split_projection_frag_w16_body<true,false,true,false,(C512_CHAIN_TRACE!=0)>(in8,w,skip,out,out8,nullptr,tokens,trace);
++}
+ WAVE void split_projection_frag_w16_nof32(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<false,false,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_w16_nof32_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<false,false,true,true>(in8,w,skip,out,out8,nullptr,tokens);}
+ #if VIT_FAST_NUM&16
+--- a/hip/c512_m32_deep.inc
++++ b/hip/c512_m32_deep.inc
+@@ -342,6 +342,24 @@
+ KERNEL __attribute__((amdgpu_flat_work_group_size(64,64))) void split_ffn_one_w2f8_w16_tvec(const float*in,const float*w,unsigned char*out8,uint tokens){c512_ffn_one_w2f8_w16_body<true>(in,w,out8,tokens);}
+ KERNEL __attribute__((amdgpu_flat_work_group_size(64,64))) void split_ffn_one_w2f8_w16_bin(const float*in,const float*w,unsigned char*out8,uint tokens){c512_ffn_one_w2f8_w16_body<false,true>(in,w,out8,tokens);}
+ KERNEL __attribute__((amdgpu_flat_work_group_size(64,64))) void split_ffn_one_w2f8_w16_tvec_bin(const float*in,const float*w,unsigned char*out8,uint tokens){c512_ffn_one_w2f8_w16_body<true,true>(in,w,out8,tokens);}
++
++#ifndef C512_CHAIN_TRACE
++#define C512_CHAIN_TRACE 0
++#endif
++KERNEL __attribute__((amdgpu_flat_work_group_size(64,64))) void split_ffn_one_w2f8_w16_bin_chain(const float*in,const float*w,unsigned char*out8,uint tokens,unsigned long long*ready,unsigned long long*trace){
++ c512_ffn_one_w2f8_w16_body<false,true>(in,w,out8,tokens);
++ // Both waves, including an invalid tail wave, join both barriers.
++ __builtin_amdgcn_s_barrier();
++ __builtin_amdgcn_fence(__ATOMIC_RELEASE,"agent");
++ __builtin_amdgcn_s_barrier();
++ const uint tid=__builtin_amdgcn_workitem_id_x(),wave=tid/32,first=bid()/8*32+wave*16;
++ if((tid&31u)==0&&first<tokens){
++#if C512_CHAIN_TRACE
++  if(trace)trace[bid()*2+wave]=__builtin_amdgcn_s_sendmsg_rtnl(131);
++#endif
++  __hip_atomic_fetch_add(ready+first/16,1ull,__ATOMIC_ACQ_REL,__HIP_MEMORY_SCOPE_AGENT);
++ }
++}
+ #endif
+ #ifndef C512_FFN_PROJ_FUSE
+ #define C512_FFN_PROJ_FUSE 0 /* 2026-10-02 ideas-yami-ikaruga: 1 = export split_ffn_proj_fused (needs C512_FFN_F8W): split_ffn_one_w2f8 and
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -23,6 +23,7 @@
+ #include <tuple>
+ #include <chrono>
+ #include <atomic>
++#include <array>
+ #include <type_traits>
+ namespace hip_reference {
+ using U=uint32_t;using Api=hip_probe::Api;using Handle=hip_probe::Handle;
+@@ -302,7 +303,7 @@
+ 
+  U W,H;std::function<void(const std::string&)>progress;std::function<void(const std::string&,void*,size_t)>observer;
+  static U Count(size_t n){if(!n||n>std::numeric_limits<U>::max())throw std::runtime_error("HIP reference index count overflow");return U(n);}
+- Tensor New(size_t n){Count(n);size_t bytes=n*4;if(opt.pooled){Tensor*best=nullptr;for(auto&t:pool)if(t.use_count()==1&&t->capacity>=bytes&&(!best||t->capacity<(*best)->capacity))best=&t;if(best){(*best)->bytes=bytes;return *best;}if(graph_capturing)throw std::runtime_error("graph capture requires warmed allocation pool");auto t=std::make_shared<Allocation>(api,bytes);pool.push_back(t);return t;}return std::make_shared<Allocation>(api,bytes);}
++ Tensor New(size_t n){Count(n);size_t bytes=n*4;if(opt.pooled){Tensor*best=nullptr;for(auto&t:pool)if(t.use_count()==1&&t->capacity>=bytes&&(!best||t->capacity<(*best)->capacity))best=&t;if(best){(*best)->bytes=bytes;return *best;}if(graph_capturing)throw std::runtime_error("graph capture requires warmed allocation pool");if(chain_requested&&external_input_wait){size_t total=0,held=0,max_free=0;for(const auto&t:pool){total+=t->capacity;if(t.use_count()>1)++held;else max_free=std::max(max_free,t->capacity);}throw std::runtime_error("chain pool was not prepared before external wait bytes="+std::to_string(bytes)+" pool="+std::to_string(pool.size())+" pool_bytes="+std::to_string(total)+" held="+std::to_string(held)+" max_free="+std::to_string(max_free));}auto t=std::make_shared<Allocation>(api,bytes);pool.push_back(t);return t;}return std::make_shared<Allocation>(api,bytes);}
+  /* 2026-09-30 (HIP_C512_PAD16): C512 tensors whose token count is not a multiple of 16 (900: 50x30=1500) get a
+     buffer rounded up to 16 tokens; `bytes` stays the valid size (stage dumps unchanged). CompactC512Body then reads the
+     input in place instead of mh_shift_pack copying it into a zero-padded buffer: every C512 kernel is row-independent
+@@ -589,7 +590,7 @@
+    if(kernel.rfind("vit_expand_blocked_fp8",0)==0&&kernel.size()>3&&kernel.compare(kernel.size()-3,3,"_m2")==0)groups=((count/4096+31)/32)*64;
+    if(kernel=="vit_qkv_project_blocked"||kernel=="vit_qkv_project_normalize_fused"||kernel=="vit_qkv_project_normalize_fused_f16compact"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_bytein"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_h16in"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_frag")groups=count/512;
+    if(kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_h16in_n4")groups=count/1024;
+-   if(kernel=="split_mix_blocked"||kernel=="split_mix_blocked_h16w"||kernel=="split_projection_blocked"||kernel=="split_projection_blocked_t8"||kernel=="split_projection_frag"||kernel=="split_projection_frag_bskip"||kernel=="split_projection_frag_w16"||kernel=="split_projection_frag_w16_bskip"||kernel=="split_projection_frag_w16_nof32"||kernel=="split_projection_frag_w16_nof32_bskip"||kernel=="split_projection_frag_nof32")groups=count/1024;
++   if(kernel=="split_mix_blocked"||kernel=="split_mix_blocked_h16w"||kernel=="split_projection_blocked"||kernel=="split_projection_blocked_t8"||kernel=="split_projection_frag"||kernel=="split_projection_frag_bskip"||kernel=="split_projection_frag_w16"||kernel=="split_projection_frag_w16_bskip"||kernel=="split_projection_frag_w16_bskip_chain"||kernel=="split_projection_frag_w16_nof32"||kernel=="split_projection_frag_w16_nof32_bskip"||kernel=="split_projection_frag_nof32")groups=count/1024;
+    if(kernel=="split_ffn_fused"||kernel=="split_ffn_fused_fp8"||kernel=="split_ffn_fused_fp8_mix"||kernel=="split_ffn_fused_fp8_t8"){threads=128;groups=count/1024;}
+    if(kernel=="vit_ffn_fused"){threads=512;groups=count/16384;}
+    if(kernel=="vit_contract_combine"||kernel=="vit_pack_input"||kernel=="vit_pack_input_tiled"||kernel=="vit_gather_b8")threads=256;
+@@ -619,7 +620,7 @@
+   if(module=="c64_wave2"){groups=count;threads=kernel.rfind("c64_",0)==0?64:kernel.rfind("c128_",0)==0?128:256;}
+   if(module=="c32_wave1"&&(kernel=="c32_wave1_up"||kernel=="c32_wave1_up_b8"||kernel=="c32_wave1_up_lb"||kernel=="c32_wave1_up_b8_lb"||kernel=="c32_wave1_finish_dcrop_b8"||kernel=="c32_wave1_finish_dcrop_b8d"||kernel=="c32_wave1_prefix_b8d"||kernel=="c32_wave1_mapped_b8"||kernel=="c32_wave1_finish_b8"||(kernel=="c32_wave1_post_logit"||kernel=="c32_wave1_post_b8_logit"||kernel=="c32_wave1_post_b8"||kernel=="c32_wave1_post_b8_rgba"||kernel=="c32_wave1_post_b8_features"))){groups=count;threads=32;}
+   if(module=="c512_m32_mh"||module=="c512_m32_deep"){groups=count/1024;threads=32;}
+-  if(kernel=="split_ffn_one_w2"||kernel=="split_ffn_one_w2f8"||kernel=="split_ffn_one_w2f8_w16"||kernel=="split_ffn_one_w2f8_w16_bin"||kernel=="split_ffn_one_w2f8_w16_tvec"||kernel=="split_ffn_one_w2f8_w16_tvec_bin")threads=64;
++  if(kernel=="split_ffn_one_w2"||kernel=="split_ffn_one_w2f8"||kernel=="split_ffn_one_w2f8_w16"||kernel=="split_ffn_one_w2f8_w16_bin"||kernel=="split_ffn_one_w2f8_w16_bin_chain"||kernel=="split_ffn_one_w2f8_w16_tvec"||kernel=="split_ffn_one_w2f8_w16_tvec_bin")threads=64;
+   if(kernel=="split_ffn_proj_fused"){threads=256;groups=count/8192;}
+   if(module=="c512_m32_mh"&&kernel=="c512_qkv_attention_fused"){groups=count;threads=64;}
+   if(module=="c512_m32_mh"&&(kernel=="c512_qkv_attention_compact"||kernel=="c512_qkv_attention_compact_w16")){groups=count;threads=64;}
+@@ -653,7 +654,7 @@
+ #ifdef HIP_SWIN_PERSISTENT_TRACE
+   std::printf("TOPO,%s,%s,%u,%u,%u\n",module.c_str(),kernel.c_str(),count,unsigned(groups?groups:(count+255ull)/256),threads);
+ #endif
+-  void*reuse_gate_arg=adaptive_active?P(adaptive_state):nullptr;void*argv[]={static_cast<void*>(&args)...,static_cast<void*>(&reuse_gate_arg)};Handle paired_contract_fn{};if(kernel=="vit_stream_contract_frag_bout"||kernel=="vit_stream_contract_frag_bstream_bout"){if(sizeof...(A)!=7)throw std::runtime_error("contract ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_contract_ptrs.count(wp)){Handle fn=kernel=="vit_stream_contract_frag_bstream_bout"?compact_contract_bstream_fn:compact_contract_fn;if(!fn)throw std::runtime_error("compact weight without paired function");paired_contract_fn=fn;}}if(kernel=="vit_stream_project_n64_bb"||kernel=="vit_stream_project_n64_bb_bout"){if(sizeof...(A)!=7)throw std::runtime_error("projection ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_projection_ptrs.count(wp)){Handle fn=kernel=="vit_stream_project_n64_bb_bout"?compact_projection_bout_fn:compact_projection_fn;if(!fn)throw std::runtime_error("compact projection without paired function");paired_contract_fn=fn;}}unsigned repeats_here=launch_repeats*((!opt.dup_prefix.empty()&&(opt.dup_prefix.back()=='$'?kernel==opt.dup_prefix.substr(0,opt.dup_prefix.size()-1):kernel.rfind(opt.dup_prefix,0)==0))?opt.dup_count:1u);for(unsigned repeat=0;repeat<repeats_here;repeat++){unsigned gg=unsigned(groups?groups:(count+255ull)/256);if(pdl_anyorder){++pdl_calls;api.Check(ext_launch(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg*threads,1,1,threads,1,1,0,stream,argv,nullptr,nullptr,nullptr,1u/*hipExtAnyOrderLaunch*/),name);}else api.Check(api.hipModuleLaunchKernel(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg,1,1,threads,1,1,0,stream,argv,nullptr),name);}if(opt.profile)api.Check(api.hipEventRecord(timing.end,stream),"event end");if(!opt.pooled)api.Check(api.hipStreamSynchronize(stream),name);
++  void*reuse_gate_arg=adaptive_active?P(adaptive_state):nullptr;void*argv[]={static_cast<void*>(&args)...,static_cast<void*>(&reuse_gate_arg)};Handle paired_contract_fn{};if(kernel=="vit_stream_contract_frag_bout"||kernel=="vit_stream_contract_frag_bstream_bout"){if(sizeof...(A)!=7)throw std::runtime_error("contract ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_contract_ptrs.count(wp)){Handle fn=kernel=="vit_stream_contract_frag_bstream_bout"?compact_contract_bstream_fn:compact_contract_fn;if(!fn)throw std::runtime_error("compact weight without paired function");paired_contract_fn=fn;}}if(kernel=="vit_stream_project_n64_bb"||kernel=="vit_stream_project_n64_bb_bout"){if(sizeof...(A)!=7)throw std::runtime_error("projection ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_projection_ptrs.count(wp)){Handle fn=kernel=="vit_stream_project_n64_bb_bout"?compact_projection_bout_fn:compact_projection_fn;if(!fn)throw std::runtime_error("compact projection without paired function");paired_contract_fn=fn;}}unsigned repeats_here=launch_repeats*((!opt.dup_prefix.empty()&&(opt.dup_prefix.back()=='$'?kernel==opt.dup_prefix.substr(0,opt.dup_prefix.size()-1):kernel.rfind(opt.dup_prefix,0)==0))?opt.dup_count:1u);for(unsigned repeat=0;repeat<repeats_here;repeat++){unsigned gg=unsigned(groups?groups:(count+255ull)/256);if(kernel=="split_projection_frag_w16_bskip_chain"){if(chain_ordered){++chain_ordered_calls;api.Check(api.hipModuleLaunchKernel(Fn(module,kernel),gg,1,1,threads,1,1,0,stream,argv,nullptr),"C512 chain ordered projection");}else{++chain_anyorder_calls;api.Check(chain_ext_launch(Fn(module,kernel),gg*threads,1,1,threads,1,1,0,stream,argv,nullptr,nullptr,nullptr,1u),"C512 chain anyorder projection");}}else if(pdl_anyorder){++pdl_calls;api.Check(ext_launch(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg*threads,1,1,threads,1,1,0,stream,argv,nullptr,nullptr,nullptr,1u/*hipExtAnyOrderLaunch*/),name);}else api.Check(api.hipModuleLaunchKernel(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg,1,1,threads,1,1,0,stream,argv,nullptr),name);}if(opt.profile)api.Check(api.hipEventRecord(timing.end,stream),"event end");if(!opt.pooled)api.Check(api.hipStreamSynchronize(stream),name);
+   if(opt.wall_profile){api.Check(api.hipStreamSynchronize(stream),"wall profile completion");auto&entry=wall_timings[kernel];entry.first+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-wall_begin).count()/launch_repeats;++entry.second;}
+  }
+  void Stage(const std::string&name,const Tensor&t){if(progress)progress(name);if(observer){Synchronize();observer(name,P(t),t->bytes);}if(opt.dump_dir.empty()||(!opt.dump_only.empty()&&(","+opt.dump_only+",").find(","+name+",")==std::string::npos))return;api.Check(api.hipStreamSynchronize(stream),"before dump");std::vector<char>b(t->bytes);api.Check(api.hipMemcpy(b.data(),P(t),b.size(),2),"stage dump");std::ofstream f(opt.dump_dir+"/"+name+".f32",std::ios::binary);if(!f.write(b.data(),b.size()))throw std::runtime_error("stage dump write");}
+@@ -747,6 +748,72 @@
+     (raw Hrtz outputs, Down/skip consumers) still write f32. Inside a block the FFN feature is always bytes on this path. */
+  static int C512W16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_W16");if(!v||!*v)return int(HIP_C512_W16);return std::atoi(v);}();return m;}
+  static int C512FfnW16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_FFN_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_FFN_W16");if(!v||!*v)return int(HIP_C512_FFN_W16);return std::atoi(v);}();return m;}
++ // Experiment B: allocations/exports prepared at construction, no reset/upload after external input wait.
++ bool chain_lab=false,chain_requested=false,chain_enabled=false,chain_overflow=false,chain_ordered=false;
++ int chain_force_slot=-1;std::string chain_trace_dir;unsigned chain_prod_stride=0,chain_cons_stride=0;
++ unsigned chain_tiles=0,chain_wait_limit=16384;unsigned long long chain_calls=0,chain_anyorder_calls=0,chain_ordered_calls=0;
++ std::array<unsigned long long,16>chain_targets{};
++ std::array<std::array<Tensor,2>,16>chain_keep{};
++ Tensor chain_ready,chain_status,chain_prod_trace,chain_cons_trace;
++ decltype(ext_launch)chain_ext_launch=nullptr;
++ static int C512ChainSlot(U block){return block>=23&&block<=30?int(block-23):block>=40&&block<=47?int(block-40+8):-1;}
++ unsigned long long*ChainCounter(int slot){return static_cast<unsigned long long*>(P(chain_ready))+size_t(slot)*chain_tiles;}
++ unsigned long long*ChainProducerTrace(int slot){return chain_prod_trace?static_cast<unsigned long long*>(P(chain_prod_trace))+size_t(slot)*chain_prod_stride:nullptr;}
++ unsigned long long*ChainConsumerTrace(int slot){return chain_cons_trace?static_cast<unsigned long long*>(P(chain_cons_trace))+size_t(slot)*chain_cons_stride:nullptr;}
++ unsigned long long ChainWaitTarget(int slot)const{return chain_targets[slot]+(slot==chain_force_slot?8ull:0ull);}
++ void InitC512Chain(){
++  const char*mode=std::getenv("NR_C512_CHAIN");chain_lab=mode!=nullptr;chain_requested=mode&&std::strcmp(mode,"1")==0;
++  if(!chain_lab)return;
++  const bool shape=(W==1600&&H==960)||(W==1920&&(H==1088||H==1152));
++  if(!shape||small_active||!fast_numeric||multi_pass!=1||opt.graph||!opt.pooled||opt.sparse_weights||opt.experimental_temporal||!opt.skip_blocks.empty()||!opt.dup_prefix.empty()||opt.wall_profile||opt.profile)return;
++  chain_tiles=(W/32*(H/32)+15)/16;
++  if(const char*v=std::getenv("NR_C512_CHAIN_ORDERED"))chain_ordered=std::strcmp(v,"1")==0;
++  if(const char*v=std::getenv("NR_C512_CHAIN_FORCE_TIMEOUT")){chain_force_slot=std::stoi(v);if(chain_force_slot<0||chain_force_slot>=16)throw std::runtime_error("chain force slot outside0..15");}
++  if(const char*v=std::getenv("NR_C512_CHAIN_TRACE_DIR")){chain_trace_dir=v;if(!chain_trace_dir.empty())std::filesystem::create_directories(std::filesystem::u8path(chain_trace_dir));}
++
++  chain_ext_launch=reinterpret_cast<decltype(chain_ext_launch)>(GetProcAddress(api.dll,"hipExtModuleLaunchKernel"));
++  const bool exports=chain_ext_launch&&HasFn("c512_m32_deep","split_ffn_one_w2f8_w16_bin_chain")&&HasFn("deep_fast","split_projection_frag_w16_bskip_chain");
++  if(!exports){std::fprintf(stderr,"C512_CHAIN unavailable=exports_or_extension requested=%u\n",unsigned(chain_requested));return;}
++  unsigned long long start=0;if(const char*v=std::getenv("NR_C512_CHAIN_START")){start=std::stoull(v);if(start%8)throw std::runtime_error("chain start must be multiple of 8");}
++  if(const char*v=std::getenv("NR_C512_CHAIN_WAIT")){chain_wait_limit=unsigned(std::stoul(v));if(!chain_wait_limit||chain_wait_limit>16384)throw std::runtime_error("chain wait outside 1..16384");}
++  chain_ready=std::make_shared<Allocation>(api,size_t(16)*chain_tiles*8);chain_status=std::make_shared<Allocation>(api,4);
++  std::vector<unsigned long long>initial(size_t(16)*chain_tiles,start);unsigned zero=0;
++  api.Check(api.hipMemcpy(P(chain_ready),initial.data(),initial.size()*8,1),"chain initial counters");api.Check(api.hipMemcpy(P(chain_status),&zero,4,1),"chain initial status");
++  if(chain_force_slot>=0&&start>std::numeric_limits<unsigned long long>::max()-16)throw std::runtime_error("forced timeout target would overflow");
++  if(!chain_trace_dir.empty()){
++   chain_prod_stride=((chain_tiles+1)/2)*16;chain_cons_stride=chain_tiles*8;
++   chain_prod_trace=std::make_shared<Allocation>(api,size_t(16)*chain_prod_stride*8);chain_cons_trace=std::make_shared<Allocation>(api,size_t(16)*chain_cons_stride*8);
++   std::vector<unsigned long long>zero_trace(size_t(16)*std::max(chain_prod_stride,chain_cons_stride),0);
++   api.Check(api.hipMemcpy(P(chain_prod_trace),zero_trace.data(),size_t(16)*chain_prod_stride*8,1),"chain initial producer trace");api.Check(api.hipMemcpy(P(chain_cons_trace),zero_trace.data(),size_t(16)*chain_cons_stride*8,1),"chain initial consumer trace");
++  }
++  chain_targets.fill(start);chain_enabled=chain_requested;
++  std::fprintf(stderr,"C512_CHAIN init requested=%u enabled=%u tiles=%u start=%llu wait=%u\n",unsigned(chain_requested),unsigned(chain_enabled),chain_tiles,start,chain_wait_limit);
++ }
++ bool PrepareC512Chain(U block,U n,bool eligible){
++  const int slot=C512ChainSlot(block);
++  if(!chain_enabled||slot<0||!eligible||small_active||!fast_numeric||multi_pass!=1||opt.graph||!opt.pooled||pdl_anyorder||!opt.dup_prefix.empty()||opt.wall_profile||opt.profile||n/16!=chain_tiles||n%16||C512W16Mode()<=0||(VitInterByteMode()&16))return false;
++  if(chain_targets[slot]>std::numeric_limits<unsigned long long>::max()-(slot==chain_force_slot?16ull:8ull)){chain_enabled=false;chain_overflow=true;return false;}
++  chain_targets[slot]+=8;++chain_calls;return true;
++ }
++ public:
++ // Caller has already flushed the frame; clear only references. Candidate retention/release is part of its measured cost.
++ void ReleaseChainFrame(){if(!chain_requested)return;for(auto&pair:chain_keep){pair[0].reset();pair[1].reset();}}
++ void CheckChainStatus(){
++  if(!chain_lab)return;api.Check(api.hipSetDevice(int(opt.device)),"chain check owner");unsigned status=0;api.Check(api.hipStreamSynchronize(stream),"chain final drain");
++  if(chain_status)api.Check(api.hipMemcpy(&status,P(chain_status),4,2),"chain final status");
++  std::vector<unsigned long long>ready(chain_ready?size_t(16)*chain_tiles:0);size_t mismatches=0;
++  if(chain_ready){api.Check(api.hipMemcpy(ready.data(),P(chain_ready),ready.size()*8,2),"chain final ready");for(unsigned slot=0;slot<16;slot++)for(unsigned t=0;t<chain_tiles;t++)mismatches+=ready[size_t(slot)*chain_tiles+t]!=chain_targets[slot];}
++  std::fprintf(stderr,"C512_CHAIN final requested=%u enabled=%u calls=%llu anyorder=%llu ordered=%llu overflow=%u status=%u counter_values=%zu counter_mismatches=%zu\n",unsigned(chain_requested),unsigned(chain_enabled),chain_calls,chain_anyorder_calls,chain_ordered_calls,unsigned(chain_overflow),status,ready.size(),mismatches);
++  if(status||mismatches)throw std::runtime_error("C512 chain timeout/counter mismatch: whole experiment rejected");
++  if(chain_prod_trace&&chain_cons_trace){
++   std::vector<unsigned long long>pt(size_t(16)*chain_prod_stride),ct(size_t(16)*chain_cons_stride);
++   api.Check(api.hipMemcpy(pt.data(),P(chain_prod_trace),pt.size()*8,2),"chain trace producers");api.Check(api.hipMemcpy(ct.data(),P(chain_cons_trace),ct.size()*8,2),"chain trace consumers");
++   std::ofstream f(std::filesystem::u8path(chain_trace_dir)/"chain-trace.json");if(!f)throw std::runtime_error("chain trace output open");
++   f<<"{\"clock\":\"gfx12 realtime message131 ticks\",\"ordered\":"<<(chain_ordered?1:0)<<",\"tiles\":"<<chain_tiles<<",\"producer_stride\":"<<chain_prod_stride<<",\"consumer_stride\":"<<chain_cons_stride<<",\"edges\":[";
++   for(unsigned s=0;s<16;s++){if(s)f<<',';f<<"{\"slot\":"<<s<<",\"block\":"<<(s<8?s+23:s-8+40)<<",\"target\":"<<chain_targets[s]<<",\"producer_prepublish\":[";for(unsigned i=0;i<chain_prod_stride;i++){if(i)f<<',';f<<pt[size_t(s)*chain_prod_stride+i];}f<<"],\"consumer_first_mma_complete\":[";for(unsigned i=0;i<chain_cons_stride;i++){if(i)f<<',';f<<ct[size_t(s)*chain_cons_stride+i];}f<<"],\"ready\":[";for(unsigned i=0;i<chain_tiles;i++){if(i)f<<',';f<<ready[size_t(s)*chain_tiles+i];}f<<"]}";}f<<"]}\n";if(!f)throw std::runtime_error("chain trace output write");
++  }
++ }
++ private:
+  unsigned long long c512_w16_calls=0,c512_stock_calls=0,c512_ffn_w16_calls=0,c512_ffn_stock_calls=0;
+  Tensor CompactC512Body(Tensor input,U w,U h,U ww,U hh,U sx,U sy,U block,bool raw,bool byte_in=false,bool byte_out=false){
+   U valid=w*h,n=(valid+15)&~15u;
+@@ -758,7 +825,11 @@
+   const char*ffn_w16_fn=byte_in?(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec_bin":"split_ffn_one_w2f8_w16_bin"):(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec":"split_ffn_one_w2f8_w16");
+   const bool ffn_w16=!fpf&&ffn_w16m>0&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep",ffn_w16_fn);
+   if(ffn_w16)++c512_ffn_w16_calls;else ++c512_ffn_stock_calls;
+-  if(fpf)Run("c512_m32_deep","split_ffn_proj_fused",size_t(n)*512,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd")),PackedSplitProjectionFrag(Block(block,"ffwd-projection")),P(ffn),P(ffn8),n);
++  const int chain_slot=C512ChainSlot(block);
++  const bool chain_this=PrepareC512Chain(block,n,byte_in&&ffn_w16&&ffn_w16m==1&&!fpf);if(chain_this){chain_keep[chain_slot][0]=compact;chain_keep[chain_slot][1]=contract8;}
++
++  if(chain_this)Run("c512_m32_deep","split_ffn_one_w2f8_w16_bin_chain",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd"),true),P(contract8),n,ChainCounter(chain_slot),ChainProducerTrace(chain_slot));
++  else if(fpf)Run("c512_m32_deep","split_ffn_proj_fused",size_t(n)*512,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd")),PackedSplitProjectionFrag(Block(block,"ffwd-projection")),P(ffn),P(ffn8),n);
+   else if(ffn_w16)Run("c512_m32_deep",ffn_w16_fn,size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd"),true),P(contract8),n);
+   else if(HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep","split_ffn_one_w2f8"))Run("c512_m32_deep","split_ffn_one_w2f8",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd")),P(contract8),n);
+   else if(HIP_C512_FFN_ONE&&HasFn("c512_m32_deep","split_ffn_one_w2"))Run("c512_m32_deep","split_ffn_one_w2",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(contract8),n);
+@@ -772,7 +843,8 @@
+   const bool w16_mh=w16_fb8||(w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")));
+   if(w16_ffn&&w16_mh){++c512_w16_calls;if(w16_fb8)++vit_inter_byte_calls;}else ++c512_stock_calls;
+   const bool fb8=!byte_in&&!byte_out&&!w16_mh&&HIP_C512_PROJ_FB8&&HasFn("deep_fast","split_projection_frag_nof32")&&HasFn("mh_fast","mh_attention_project_frag_c512_fb8");
+-  if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
++  if(chain_this)Run("deep","split_projection_frag_w16_bskip_chain",size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),true),P(compact),P(ffn),P(ffn8),n,ChainCounter(chain_slot),ChainWaitTarget(chain_slot),static_cast<unsigned*>(P(chain_status)),chain_wait_limit,ChainConsumerTrace(chain_slot));
++  else if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
+   compact.reset();contract.reset();contract8.reset();
+   auto av=New(size_t(n)*128);
+   void*att_w=PackedMhWeightQkvFrag(Block(block,"attention"),512,w16_mh);
+@@ -1002,8 +1074,8 @@
+  std::fprintf(stderr,"history_experiment requested=1 active=1 mode=MP1 metadata=UV_unjittered_assumed valid=%ux%u\n",W,opt.temporal_valid_height);
+ }
+ 
+-if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
+- ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
++if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();InitC512Chain();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(chain_ready||chain_status||chain_prod_trace||chain_cons_trace){api.hipStreamSynchronize(stream);chain_ready.reset();chain_status.reset();chain_prod_trace.reset();chain_cons_trace.reset();}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
++ ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();ReleaseChainFrame();chain_ready.reset();chain_status.reset();chain_prod_trace.reset();chain_cons_trace.reset();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
+  void PrintMemory(){size_t bytes=0,free=0,total=0;std::set<void*>seen;auto add=[&](const Tensor&t){if(t&&t->owned&&seen.insert(t->ptr).second)bytes+=t->capacity;};for(auto&t:pool)add(t);for(auto&w:weights)add(w.second);for(auto&maps:gather_maps)for(auto&m:maps)add(m.second);add(device_noise);api.Check(api.hipMemGetInfo(&free,&total),"memory stats");std::printf("memory owned_MiB=%.1f allocations=%zu device_free_MiB=%.1f total_MiB=%.1f\n",bytes/1048576.,seen.size(),free/1048576.,total/1048576.);}
+  /* DLSS5_HIP_MEMORY=1 (diagnostic): device memory by category after the pool has warmed — weights by key, pool tensors by capacity, gather maps, noise, and the runtime's free/total. */
+  void MemoryReport(FILE*f){std::set<void*>seen;size_t wsum=0,psum=0,gsum=0,nsum=0;std::vector<std::pair<size_t,std::string>>w,p;
+@@ -1247,8 +1319,26 @@
+   try{
+    api.Check(api.hipMemsetAsync(scratch,0,bytes,stream),"cold model zero");
+    auto*out=static_cast<char*>(scratch)+pixels*16;auto*hist=temporal?static_cast<char*>(scratch)+pixels*28:nullptr;
+-   Enqueue(scratch,hist,out,0);Synchronize();
+-   if(saved_adaptive&&ae&&strcmp(ae,"0")){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();SetAdaptiveReuseAllowed(saved_adaptive);}
++   unsigned chain_warm_runs=0;
++   auto pool_bytes=[&](){size_t total=0;for(const auto&t:pool)total+=t->capacity;return total;};
++   if(chain_requested){
++    unsigned stable=0,cycles=0;const bool extra_ae=saved_adaptive&&ae&&strcmp(ae,"0");
++    while(chain_warm_runs+(extra_ae?2u:1u)<=8){
++     const size_t before_pool=pool.size(),before_bytes=pool_bytes();const auto before_uploads=weight_uploads;
++     Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();++chain_warm_runs;
++     if(extra_ae){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();++chain_warm_runs;SetAdaptiveReuseAllowed(saved_adaptive);}
++     ++cycles;const size_t after_pool=pool.size(),after_bytes=pool_bytes();
++     const bool unchanged=after_pool==before_pool&&after_bytes==before_bytes&&weight_uploads==before_uploads;
++     stable=unchanged?stable+1:0;
++     std::fprintf(stderr,"C512_CHAIN warm runs=%u cycle=%u profile=%u pool=%zu->%zu bytes=%zu->%zu uploads=%llu->%llu stable=%u enabled=%u overflow=%u before_producer_wait=1\n",chain_warm_runs,cycles,profile,before_pool,after_pool,before_bytes,after_bytes,before_uploads,weight_uploads,stable,unsigned(chain_enabled),unsigned(chain_overflow));
++     if(stable>=2)break;
++    }
++    if(stable<2)throw std::runtime_error("C512 chain cold pool did not stabilize in 8 warm runs");
++    std::fprintf(stderr,"C512_CHAIN warm_ready runs=%u cycles=%u profile=%u pool=%zu bytes=%zu uploads=%llu enabled=%u overflow=%u before_producer_wait=1\n",chain_warm_runs,cycles,profile,pool.size(),pool_bytes(),weight_uploads,unsigned(chain_enabled),unsigned(chain_overflow));
++   }else{
++    Enqueue(scratch,hist,out,0);Synchronize();
++    if(saved_adaptive&&ae&&strcmp(ae,"0")){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();SetAdaptiveReuseAllowed(saved_adaptive);}
++   }
+    InvalidateExperimentalHistory();adaptive_dirty=true;adaptive_user_disabled=saved_user_disabled;opt.integration.allow_vit_hotkey=saved_hotkey;prepared_input_profiles.insert(profile);
+    std::fprintf(stderr,"model_prepared mode=%s profile=%u uploads=%llu active_weights=%zu retained_weights=%zu before_producer_wait=1\n",dlss5_mode::Name(requested_mode),profile,weight_uploads,weights.size(),inactive_model_weights.size());
+   }catch(...){SetAdaptiveReuseAllowed(saved_adaptive);adaptive_user_disabled=saved_user_disabled;opt.integration.allow_vit_hotkey=saved_hotkey;api.hipStreamSynchronize(stream);api.hipFree(scratch);throw;}
+--- a/Development/HIP/benchmark_live_capture.cpp
++++ b/Development/HIP/benchmark_live_capture.cpp
+@@ -52,11 +52,11 @@
+ // Restore the SAME original HDR texture; never process the previous output recursively.
+  submit.Submit([&](ID3D12GraphicsCommandList*c){restore(c,target,up,fp);});submit.Flush();auto begin=std::chrono::steady_clock::now();const bool direct_test=std::getenv("SMALL_FRAME_DIRECT_TEST")!=nullptr;auto*old_output=direct_test?frame.DirectOutput():nullptr;
+  frame.ProcessSubmittedFrame(target,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_DEST,seed,false,temporal?motion:nullptr,!temporal||i==0||(reset_every&&i%reset_every==0),!direct_test);
+- if(direct_test){if(!frame.DiagnosticOverlaySuppressed())throw std::runtime_error("overlay suppression lost during rebuild");auto*out=frame.DirectOutput();if(!out)throw std::runtime_error("direct output unavailable");auto desc=out->GetDesc();if(desc.Width!=W||desc.Height!=H)throw std::runtime_error("stale direct output geometry");submit.Submit([&](auto*c){barrier(c,out,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);barrier(c,target,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_DEST);c->CopyResource(target,out);barrier(c,out,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});printf("DIRECT mode=%s output_same=%u fresh_after_process=1\n",dlss5_mode::Name(dlss5_mode::Requested()),unsigned(old_output==out));}submit.Submit([](ID3D12GraphicsCommandList*){});submit.Flush();double elapsed=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();walltotal+=elapsed;
++ if(direct_test){if(!frame.DiagnosticOverlaySuppressed())throw std::runtime_error("overlay suppression lost during rebuild");auto*out=frame.DirectOutput();if(!out)throw std::runtime_error("direct output unavailable");auto desc=out->GetDesc();if(desc.Width!=W||desc.Height!=H)throw std::runtime_error("stale direct output geometry");submit.Submit([&](auto*c){barrier(c,out,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,D3D12_RESOURCE_STATE_COPY_SOURCE);barrier(c,target,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_DEST);c->CopyResource(target,out);barrier(c,out,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);});printf("DIRECT mode=%s output_same=%u fresh_after_process=1\n",dlss5_mode::Name(dlss5_mode::Requested()),unsigned(old_output==out));}submit.Submit([](ID3D12GraphicsCommandList*){});submit.Flush();if(const char*v=std::getenv("NR_C512_CHAIN");v&&std::strcmp(v,"1")==0)frame.DiagnosticNetwork().ReleaseChainFrame();double elapsed=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();walltotal+=elapsed;
+  if(edges_only&&i>0&&i+1<N){fprintf(csv,"%u,%u,%.6f,,,,,,,,,,0\n",i,!temporal||(reset_every&&i%reset_every==0),elapsed);fflush(csv);continue;}
+  submit.Submit([&](ID3D12GraphicsCommandList*c){barrier(c,target,D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_COPY_SOURCE);D3D12_TEXTURE_COPY_LOCATION a{},b{};a.pResource=readback;a.Type=D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;a.PlacedFootprint=fp;b.pResource=target;b.Type=D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;c->CopyTextureRegion(&a,0,0,0,&b,nullptr);barrier(c,target,D3D12_RESOURCE_STATE_COPY_SOURCE,D3D12_RESOURCE_STATE_COPY_DEST);});submit.Flush();D3D12_RANGE rr{0,size_t(size)};ck(readback->Map(0,&rr,&p));last.resize(count);for(UINT y=0;y<H;y++)memcpy(last.data()+size_t(y)*W*4,static_cast<char*>(p)+fp.Offset+size_t(y)*fp.Footprint.RowPitch,size_t(W)*8);readback->Unmap(0,&none);if(!i){first=last;save_frame(prefix+L"-first",first,W,H);}if(std::getenv("SMALL_FRAME_CAPTURE"))save_frame(prefix+L"-frame-"+std::to_wstring(i),last,W,H);auto s=stats(last,W,H);invalidtotal+=s.invalid;size_t changed=0;double maxdiff=0;for(size_t j=0;j<count;j++){changed+=last[j]!=first[j];float a=NativeHalfToFloat(last[j]),b=NativeHalfToFloat(first[j]);if(std::isfinite(a)&&std::isfinite(b))maxdiff=std::max(maxdiff,std::abs(double(a)-b));}fprintf(csv,"%u,%u,%.6f,%zu,%.9g,%.9g,%.9g,%.9g,%zu,%zu,%zu,%.9g,1\n",i,!temporal||i==0||(reset_every&&i%reset_every==0),elapsed,s.invalid,s.min,s.max,s.mean,s.roi_mean,s.dark,s.roi_dark,changed,maxdiff);fflush(csv);printf("frame=%u reset=%u wall_ms=%.3f invalid=%zu luma=%.7g roi=%.7g dark=%zu roi_dark=%zu changed_first=%zu maxabs_first=%.7g\n",i,!temporal||i==0||(reset_every&&i%reset_every==0),elapsed,s.invalid,s.mean,s.roi_mean,s.dark,s.roi_dark,changed,maxdiff);fflush(stdout);
+  }
+- fclose(csv);save_frame(prefix,last,W,H);submit.Flush();
++ fclose(csv);save_frame(prefix,last,W,H);submit.Flush();frame.DiagnosticNetwork().CheckChainStatus();
+ #ifdef DLSS5_BENCH_BRIDGE_ISOLATE
+  if(temporal)throw std::runtime_error("bridge isolation requires temporal=0");
+  auto&network=frame.DiagnosticNetwork();auto&api=network.Runtime();const auto geo=NativeCurrentNetworkGeometry();const size_t pixels=size_t(geo.processing_width)*geo.processing_height;
+--- a/src/native_game_frame.h
++++ b/src/native_game_frame.h
+@@ -382,7 +382,7 @@
+    if(++r.probe_frames%100==0){if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-game-probe.txt").c_str(),L"ab")){fprintf(f,"frames=%u avg_ms pre=%.2f network=%.2f post=%.2f gpu_total=%.2f cpu_frame=%.2f history=%u reset=%u nomotion=%u overlap=1\n",r.probe_frames,r.probe_sum[0]/100,r.probe_sum[1]/100,r.probe_sum[2]/100,(r.probe_sum[0]+r.probe_sum[1]+r.probe_sum[2])/100,r.probe_cpu/100,r.probe_history,r.probe_reset,r.probe_nomotion);fclose(f);}for(auto&v:r.probe_sum)v=0;r.probe_cpu=0;r.probe_history=r.probe_reset=r.probe_nomotion=0;}}
+  }
+ public:
+-#if defined(DLSS5_BENCH_BRIDGE_ISOLATE) && defined(DLSS5_USE_HIP)
++#if (defined(DLSS5_BENCH_BRIDGE_ISOLATE) || defined(DLSS5_C512_CHAIN_LAB)) && defined(DLSS5_USE_HIP)
+  // Diagnostic caller must own a quiescent frame; returned objects are borrowed.
+  auto DiagnosticNetworkTiming(){return resources->network.PollNetworkTiming();}
+  hip_reference::Network& DiagnosticNetwork(){resources->submit.Flush();return resources->network.DiagnosticNetwork();}
+--- a/src/native_hip_network.h
++++ b/src/native_hip_network.h
+@@ -69,7 +69,7 @@
+  ID3D12Resource*Output()const{return bridge.Output();}
+  /* Shared network input when created with direct_input (the RGB input pass writes it); nullptr otherwise. */
+  ID3D12Resource*DirectInput()const{return bridge.DirectInput();}
+-#ifdef DLSS5_BENCH_BRIDGE_ISOLATE
++#if defined(DLSS5_BENCH_BRIDGE_ISOLATE) || defined(DLSS5_C512_CHAIN_LAB)
+  hip_reference::Network& DiagnosticNetwork(){return bridge.DiagnosticNetwork();}
+ #endif
+ };
+--- a/Development/HIP/hip_d3d12_bridge.h
++++ b/Development/HIP/hip_d3d12_bridge.h
+@@ -275,7 +275,7 @@
+  bool PdlRequested()const{return network?network->PdlRequested():false;}
+  bool PdlEffective()const{return network?network->PdlEffective():false;}
+  std::string PdlReason()const{return network?network->PdlReason():"bridge uninitialized";}
+-#ifdef DLSS5_BENCH_BRIDGE_ISOLATE
++#if defined(DLSS5_BENCH_BRIDGE_ISOLATE) || defined(DLSS5_C512_CHAIN_LAB)
+  Network& DiagnosticNetwork(){return *network;}
+ #endif
+ private:

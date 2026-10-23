@@ -1,0 +1,659 @@
+{
+  "name": "small-compact-actual-trace",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\frame-baseline-standard.exe",
+      "sha256": "7a15bc6542f9a12fbf5ea26feee94f5277a98faa9790d5d895b0f02f9a9e77f4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\frame-baseline-free1072.exe",
+      "sha256": "e7fae90f76af4ef0d590028deb87ba484151ba38e27fbe0b189c6a3659bad00b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\frame-candidate-standard.exe",
+      "sha256": "39c5e035835df6d5516b0d634b2127b4533249e857d40c58e77186040617994e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\frame-candidate-free1072.exe",
+      "sha256": "7ea7f8c37c858bcd0dd04809ce99195aa4a0acbeca853acabb152ee0bb090f10"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\free1072-input.f16",
+      "sha256": "d4a7b07b4de53a79589b73fec3d8131c06baf53b460341805ad1482e102ddda4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\boundary-fast.hsaco",
+      "sha256": "40fa66062eca6bbe654e480944783c27b9bd93970696e1ffca9bbc8773ca9700"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\boundary_reference.hsaco",
+      "sha256": "1b1a514743924d43542ed9ac30e4ca50ec6e84e62d2bafab1960aaf061e0adc8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32-wave1-fast-norm900.hsaco",
+      "sha256": "337a4e13c9a1242666e530cd43a49bbf278cd9927df3fa0c792966ec5252db85"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32-wave1-fast.hsaco",
+      "sha256": "8a5d9ddc139cfd44c242acade1b684810af6a40633a0ebc378209cd510818e83"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32-wave1-rtz.hsaco",
+      "sha256": "5519be636d94e97855e75665740af3f2322494ae4797ad245903223310f08554"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32-wave1.hsaco",
+      "sha256": "4e6132a537447bfe7b29ba77597da015d7866d7d9f3e9bdd91ba7919783d3d01"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_fast.hsaco",
+      "sha256": "a639601561123594f6d8b335f884f4e229338875f460213af1396bc2f28c90ec"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_fast_attention.hsaco",
+      "sha256": "b3abd5620764f5a5ba4d86fb439e0a57688e346afdd5945f6f1d9067da6d032c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_fused_attention.hsaco",
+      "sha256": "5091d35e5ac53e4a8d16de2f5fb1c8c057159c72d6605faeb5a5ca7daa65aacd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_fused_ffn_attention-packed.hsaco",
+      "sha256": "c0634176bf9e0a79ffb0e28fb120df310a646d4dedcaad69c34f7185718d2155"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_fused_ffn_attention.hsaco",
+      "sha256": "aedb066c95a76aa60fe67c91443c2cf8189c5e4f8e849356695cb5cd9fdc9870"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_prefix_reference.hsaco",
+      "sha256": "65103d0c3930dd22d7ec40e282e38285d68169c9c8860df7d561a7c04fef7640"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_tiled.hsaco",
+      "sha256": "6e7db748fbd492cd566f208a1aa3b7e48a42a9c0d8b31022148469bb46d01e8f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c32_wmma.hsaco",
+      "sha256": "4d239ca134400ee2b42c60f99dc24202f9a4fd38c21a471c01a98217df04b294"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c512-m32-deep.hsaco",
+      "sha256": "a6866439fa89e770d2de82ef683b3e61e31819f4cb3618d50999b2ff14159828"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c512-m32-mh.hsaco",
+      "sha256": "9afa918bc6252ab1beee5bcd15ed6ab838c612cc8368d814b48e28b67a7079b4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c64-wave2-fast.hsaco",
+      "sha256": "475f515fe8d5fa2d1dc679fc74017adfd35b7ba38be1fb6c56dc67f9ce7690e0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\c64-wave2.hsaco",
+      "sha256": "3b5273abc6afc577bc4fd4fbbf7fee6667f2288f2b9cb21ad9e4a288821af69c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\deep_fast-packed-fast.hsaco",
+      "sha256": "68021d286fbfb09d24b38259f9b0ac8c177dec50f837f062047a67d0ce45d12c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\deep_fast-packed.hsaco",
+      "sha256": "30d4d5739c990f0ec7c9ae1050dc1201751c2138bd02079a6c3675ea9b5f5ebe"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\deep_fast.hsaco",
+      "sha256": "a92cab05b61a41985db7294ae0a7b2043fb9b4c878f9b67bd5a3055177e3c257"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\deep_reference.hsaco",
+      "sha256": "0d2e3e9658a8abc53be68b6fc108ce57594784d3ed56f237bedd9766d86db895"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\deep_wmma.hsaco",
+      "sha256": "b562c8986300b0517818ae54a46108e725e1ecc6c6b6c88a3b7fa14c749a5b2f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multi-pass-predict.hsaco",
+      "sha256": "133f0975e39e7e716e146dab15f05573d6767c8c1c99e01528f3c11509293900"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multi-pass-skin.hsaco",
+      "sha256": "5ff15f49135beef3bc68d744b9d33f615812ce293d13c0783c88b0a3d9aaa011"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-fast-packed.hsaco",
+      "sha256": "31e258756683b9a60e455c1c315c7b22b9605d90ae784891073fb6c74ba8ead7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-fast-padded-wave-packed.hsaco",
+      "sha256": "71d2375cc719f151ca01c36cfd93d30574159d677f6c460c70e11adf476ff2da"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-fast-padded-wave.hsaco",
+      "sha256": "85149ee55b0bb52365fc3f15ac0d7e8b54917d1610319b5d87e4e31866d070a7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-fast.hsaco",
+      "sha256": "3493fb0ede45f233a5d09472bd7a76d7532387f1fd6b0c835d46c20c0d196c9a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-reference.hsaco",
+      "sha256": "1cfa639e9f37b7872c69d738c7332b58eaaf0539caf720cc29a844e770fc8cbe"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-tiled.hsaco",
+      "sha256": "3799ae40ecec89796132bf6464a76faf1adfffe65df2f5e6406f47a86f67aa81"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead-wmma.hsaco",
+      "sha256": "bfc99774435fcf89985a795ea6e1c20de3335053097b40206839adf687d0e226"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\multihead_fused_attention.hsaco",
+      "sha256": "f7f23560d490868eacb161d7e49c958548faaa1d61384014ea0859b5e8cef1b9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\prefix_fast.hsaco",
+      "sha256": "81b3facda5a1512af3940d7a82c5a2f6f2e5cc7a0f2428194f4420fc8b68a57c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\swin-persistent-fast.hsaco",
+      "sha256": "9b58cab4e4859645aa79c61d67972906d8dd76eb4d94c9491894461af6bbec39"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\swin-persistent.hsaco",
+      "sha256": "ad4600c9f824762baf6f898988225a2c1169caf88ec57b1e9c25ca0b03039ab8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\vit-stream-fast.hsaco",
+      "sha256": "2cfd9c5f4fb050a9bbbcdd861c2518454444f550701d08f57550c6198e76d320"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\vit-stream.hsaco",
+      "sha256": "7d570e3c92cc0f9d61e95d46d4651f11f3a562e84453e0b62dbdc93021b49e96"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\vit-wide-deep.hsaco",
+      "sha256": "dadadb24ec212a592f41f0f74e777335929235996d84614d1ad76e1c808e2493"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\\wave-pointwise.hsaco",
+      "sha256": "5e65693da46044b697218194bb17ec8453952fa4a4a684c6ecc59df1cecf12aa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block0-attention.f32",
+      "sha256": "60546870e40215dd952616afbf1958695a989b125fef0948003208d525bf0a45"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block0-ffn.f16",
+      "sha256": "d02292164637e7cdd03f7e3b9e332aef248467e22e155c2f568609ec8399f80c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block14-attention.f32",
+      "sha256": "36cfc46da6eefe6d0ac0e1325576c543f72f6d88378f25ce42290837a088e002"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block14-ds.f16",
+      "sha256": "7f2d403b8d25b2bb9ea1175656994347ba002f713cf42f957474a47ad69f40b4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block14-ffn.f16",
+      "sha256": "efe2eb34f8a4e8339c3ebb4402af480c0a56fd2460d454a799e4ded02a74b25d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block15-attention.f32",
+      "sha256": "8750f0e441799a16d35f08c852dd59211d44deec0e80897462801d5d4bdfb1f4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block15-ffn.f16",
+      "sha256": "b6f867d2e6ef20082175608c1dfdaaf5965e5bf1b66ef952b51005e10db37260"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block1-attention.f32",
+      "sha256": "0a04e3e078a96e7874ff5b9e42bd1247f3a40701dc68e51879eaf26b4717e7ac"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block1-ffn.f16",
+      "sha256": "2e447e8bde04378c118a6e499dfe3377c5fb4d2fa7e9ba82da9eb3ce9d122670"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block22-attention.f32",
+      "sha256": "eeea3b61bd48946cdda6b23aa0eb56dec1f518c4a26f62e07d90f69fa22659b5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block22-ds.f16",
+      "sha256": "7d7b94402364125471ca8a6071e84f588b861e5f9097b1e030d39e29e16d75c2"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block22-ffn.f16",
+      "sha256": "b22444e32365043120c43859e3fe6d61e055d1135cf0fbbf1bed2dddd3b383bc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block23-attention.f32",
+      "sha256": "796f5e23fc9189dba764ee596c008d6db44750aa7667c8932a389d1b3f797c5e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block23-ffwd.f16",
+      "sha256": "fbdc379b902e187f5149e38d026aa867bda12937bf3c5f921003e1fd42bfe4eb"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block23-ffwd-projection.f16",
+      "sha256": "3a28cc6da2a5c0f128ddd9d4da728d7fc885251c03285eceb55bd5caae78c180"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block30-attention.f32",
+      "sha256": "4f2e6ba5831cae5f2bf63771c6a59288552fa6a10ff95c111c973b1b48527487"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block30-ffwd.f16",
+      "sha256": "eab2704bcd08d1fd97946e25a5a73a2d0169b5be304e1753136453ee2838ed5b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block30-ffwd-projection.f16",
+      "sha256": "1b5af5b15bc9fb50c97c432fed46707b45c8bd5406b992e610ae7c6d2f866df3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block31-contract.f16",
+      "sha256": "35baf79d67c764790f9cfd5ccec813566bf2a05b07816189852542704f1eb345"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block31-expand.f16",
+      "sha256": "e1a560142595f75f90845087ed24cc2cf67f784c7b0086ced554260ffd812865"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block31-projection.f16",
+      "sha256": "b632b3844ed713f1edca038cb75fef441eb5c09c9740d23f2ec5a800b28980b0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block31-qkv.f16",
+      "sha256": "7cc6569bd3cc223e9889272e2464b4e98bbe7808482c7dd82f7edfde60d295e2"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block32-contract.f16",
+      "sha256": "5802e388e83496169554ec490783c698f068605c2662cacb6434eb1b21f27579"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block32-expand.f16",
+      "sha256": "4a4559cebd0f319bc57b243df01caa3a3444236e54cda70c69fbaedd6a17beed"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block32-projection.f16",
+      "sha256": "8ba2b3dd40dc5486a5111d925a8cdeab9fe85bba49912dc0d02cf3d4aef2667a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block32-qkv.f16",
+      "sha256": "2341ef69df44363d96445f2e4ad26306252d307de1c6f30e564ec7809607f1e1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block33-contract.f16",
+      "sha256": "514a9f7105e40473f2679a593d1c64860d72a9f2407e67c50f29f18799049134"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block33-expand.f16",
+      "sha256": "5e3768c0332eef185a506bd511e910476cce3bab42f915b752bbe84e0047f625"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block33-projection.f16",
+      "sha256": "109c33ce4c45122a4e630638f4df3a196b0c3c3b2a06dd636830f48a7b3474d5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block33-qkv.f16",
+      "sha256": "d3788c92104d424b951ee79f92eb50e538391f4f13cc5602f83c0dc56fab6e81"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block34-contract.f16",
+      "sha256": "f79a57e42e2f38cb106be1eb236b7ebe1e2f2dfd5b6b23dec6c92698a36a3848"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block34-expand.f16",
+      "sha256": "947e1df8ac026ff9c7d0218229522d4fe1596380769603532cead1b716dfe14a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block34-projection.f16",
+      "sha256": "4a451d328358f5eb9272835aad1ed5465c96e2b33564b4da2fb93747228d1c4c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block34-qkv.f16",
+      "sha256": "9302e64a9aa2a2cedea6e6dab448c8efbb91ffd3cbefcc238101916ce6f561c3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block35-contract.f16",
+      "sha256": "64633b99a52fe1e4ce41621d56ee83de6d76fcd1f40f23255027d6b4ae359b8c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block35-expand.f16",
+      "sha256": "823c712fd668612427e2a16da6cc915f0b808810715c003b4619dc268e69c692"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block35-projection.f16",
+      "sha256": "bdd535eddb0c6e8c03f29a0ffc1b8dffe9ff7b3b91fb2c8ae62a7eaea80891b3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block35-qkv.f16",
+      "sha256": "42e04d9c04b2406e9c45624ab4b94ff843a4a378d98df2a9ced6c1ba7b67604f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block36-contract.f16",
+      "sha256": "2279e2fdb8b362cf285c5c9d0504dea2229d289c665811a2f5e3ed39fab40b86"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block36-expand.f16",
+      "sha256": "551fc51c14878e058ed09e5617109bf1d2c7542f2eaae72b42184914af032df2"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block36-projection.f16",
+      "sha256": "db0e5cc9bf3297dd974ddb2e5ad668c39cd1e2f88d820cb96d232a22518fa406"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block36-qkv.f16",
+      "sha256": "da9ca3c5a3b087ac256a45844760979bf2619402029e8dec040742799e42e343"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block37-contract.f16",
+      "sha256": "b9cb460eafaf17eeb2b586df038f299ef5d815b080597062bdb7b15740af9778"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block37-expand.f16",
+      "sha256": "dc17f730527690b7072db897644269ebb284845995ba1316d5c7ef1820c99fe8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block37-projection.f16",
+      "sha256": "e1860c156b687662f19c0226a4bd3a795846b1dd585d45da8280ff39d062fae3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block37-qkv.f16",
+      "sha256": "526ecef02a3bc11973c2e9c2c39580fada8ca1540b849ad5a99cb003c6ae52d0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block38-contract.f16",
+      "sha256": "2ad89e3b53089e06a480e6952c2447bb304e636cdcfdd5cb1a6faade0514faa1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block38-expand.f16",
+      "sha256": "77d5175292f2aa8ef33d7d8c4e5969eb1e5bd91ffeaabd061c0c9ec9499c741c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block38-projection.f16",
+      "sha256": "e1a71c8df26e4c4e59c8166902145980f63f0c58400a73cd2ca770a7c6fbc7c4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block38-qkv.f16",
+      "sha256": "3ecb6ec6ff7197a4342a9ba777582645dbecb8d0e3fc699c2b8873e0fc90aa6a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block40-attention.f32",
+      "sha256": "ceede871d916eb58b37d04e8de593efffbfb426fc57bed60989f4cf3756ca4b5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block40-ffwd.f16",
+      "sha256": "18d1772b252d7187e374b61e90c74f2be8a1647cf5f17b2736662ce5ad243c3b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block40-ffwd-projection.f16",
+      "sha256": "e1c770d4e9e20ecd31f6c3ef66ead7672f1aa165e5bb37cfc6cc11b7a4a206dc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block47-attention.f32",
+      "sha256": "1187525e6c9684be3ab1c3b8b4f4204a1bebf2e6af0db02bda98e67257e47dea"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block47-ffwd.f16",
+      "sha256": "8dc6a2fc4514227c92541416595640113a32ed79f14db261023ffc3d8c41eced"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block47-ffwd-projection.f16",
+      "sha256": "d01a47d4caccbb17587dc9fd7cc284aaf8b67d7c244a9600dbac8744c115e0ef"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block48-attention.f32",
+      "sha256": "17cfc1868a5c94eaa8dd80cb2a05d6afd9f0c026be8aadfc52e0b6578693e551"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block48-ffn.f16",
+      "sha256": "cb07647f8434dfcdf96d15d8bdd831b429988ffa4b2b8cc77056095c372478fd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block48-weights.f16",
+      "sha256": "1a5cf9bd383eebaf4c0540425c3052935a21afabc7dd2f8d2322c911bec33012"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block4-attention.f32",
+      "sha256": "2bed75139fb628893a9d69daa6a75d6dd2004ada9a87aa42e972a41e11a8ff4b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block4-ds.f16",
+      "sha256": "cbe3dc49637eed2543308fb5755cfe51baa2165fd13ea213bd223163271f02ea"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block4-ffn.f16",
+      "sha256": "4388f542e5576fd36ef73269275b696054f34af93f15ffd60a2e654b61e1b4d0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block55-attention.f32",
+      "sha256": "a24e4d0c3af4b089dda3f5682ac7c7bfc627ed4d039969fd5f0845ecf500d9f8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block55-ffn.f16",
+      "sha256": "a1fc85b7a64096393c4d23b10e82f0d1b375a3d8a73ab72131d8a5157464d5c7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block56-attention.f32",
+      "sha256": "9f011796c18ea4da7398e381d3b33bdd0678ebfde7570970e553b86be97cd588"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block56-ffn.f16",
+      "sha256": "14f51e2332ff4d89cd4b06164adf9372eb6e1fd3687412fdc3daaf129e3d2a56"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block56-weights.f16",
+      "sha256": "68fc8eb7c289908833fc1fb9bd986bc109fb2478d3cba3096fdaa20e23fd05d3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block5-attention.f32",
+      "sha256": "0ad947f3a340aa612a7809249bdf8ff35cf551a336b57341e217a8b82261250e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block5-ffn.f16",
+      "sha256": "2a7ceea7a0c4a58ecd559e2512c5ae38fd919351027198951049bb37c057d969"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block61-attention.f32",
+      "sha256": "6454e3e640e73103e2fc2ad67785e25115cf7c7f0e146915d6b35e50141c393e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block61-ffn.f16",
+      "sha256": "9f8a890138d1d184e43bd38321c58c4fdecfa9c5d634338b893dfe23f31ae0aa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block62-attention.f32",
+      "sha256": "b546bc04d73be9997d80600caf04d9c68bb30219f30baad17e69594460fe051e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block62-ffn.f16",
+      "sha256": "5deab6883dcfec11a45fabfe73f7cb85888e6c3cc4aa3b2418c744e281abafe0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block62-weights.f16",
+      "sha256": "5b807d34c5430dae3e81fe398e98d4748b60ff6c8273270c2412919e1b5fdbdc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block65-attention.f32",
+      "sha256": "9311579130e3dd84aead88fe4b6113eef1bf73e8fe3f8d407bc9047c33408ce5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block65-ffn.f16",
+      "sha256": "2ff22fb052558e60730cbbd18d31f8b486cc505fff478773190c5c2ae397ef2d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block66-attention.f32",
+      "sha256": "701b30cdeff64905cb552ebc810a9c44402b2dbe7aa5f61be953dd045d93e571"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block66-ffn.f16",
+      "sha256": "a03d5f9591b08e6f1a1d304baac0cc7ee86ea1c3265c83fd88e26799eeb955a6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block66-weights.f16",
+      "sha256": "1a57a80d20f975db3f894b4c47ddcfd9045096f6607bf1897515dea916aa71e7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block69-attention.f32",
+      "sha256": "92368b5771f98d3af9d6d68b0d12464b707c7ecbaacd394a153e2858b46f31f1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block69-ffn.f16",
+      "sha256": "752d0f663ed36c0fa9e8313c9220199413f178c498a642d6c215b86444c282d6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block8-attention.f32",
+      "sha256": "80bedf731b6f5d351634a7ce5b5a7821019843a8950b90211a2cd673b60c7797"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block8-ds.f16",
+      "sha256": "063ec9a0f418f1866413a2d1ea5557b2666eaa4e3b35234d653bac31c96d7b80"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block8-ffn.f16",
+      "sha256": "072b79f56f5e96ddffc71b826e297f7833acd21e0df1a299ee79f42393e67aed"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block9-attention.f32",
+      "sha256": "2b3606cd70da4c2358d78cbcdf14cc0abf41abfa84545d94f4c3f937eb5cf2fb"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\block9-ffn.f16",
+      "sha256": "5d5116425a1ef14c752c0b3110770cd492089a0d30063f2ebb3aa766c7cca5c8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\decoder39-weights.f16",
+      "sha256": "24797422a70ebeed4c6e6866609d66fabdec67b2c3b29bf8c5c1306f99437edd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\head-matrix.f16",
+      "sha256": "e522bb96bc79e3fc7a0bc654a697eb0527516074f7800f0f2f640a9a61eb74a7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\model-manifest.json",
+      "sha256": "fdbf7e72e9c1062d168eab4b3ebafd23c7f12d2b4c54b7c5430dbf9dd3ab6c9a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\post70-attention.f32",
+      "sha256": "e683331ab1ec11ac1f450ccf7ce94550cdcd43ff52de6b640d97797d526c607b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\post70-ffn.f16",
+      "sha256": "1b205e8248ef7a9378de06a28c58558430638b133c08e3c891287f45ca7f47c1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\post70-head.f16",
+      "sha256": "d754aed1a715511cc8244b70af34f6c8dc5d62a70dd8a01ea4f6e4699eae0434"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\post70-history-head.f16",
+      "sha256": "c4c5f5189360756001e96abb43a482396ac8bde56f6ac4c7c19ae63db01d0980"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\small-model-20261018\\assets\\small\\post70-scales.f16",
+      "sha256": "a6ec06a1c6f8aae7266c2785209b9de5b49bdebdec89e2c9331706ce97354e5f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-candidate.exe",
+      "sha256": "112d090d47cf4f8585dc3945e902c4838124de8bf41d3f27e1e9e52366bc64d0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-baseline.exe",
+      "sha256": "93ac8fd925c21b138737f0e0f3dc5493c714e8abf7e3746e5228b8023a50107f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small720.rgba32f",
+      "sha256": "9eba20222674f461a3b6e0ed3ffbe09726c37359bd865a6f362b1cc58c12173e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small1080.rgba32f",
+      "sha256": "fe2e3609887fda11d2309e4370107400930db704a1631665927f7414084a0c73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\smallfree1088.rgba32f",
+      "sha256": "77d5923e355f5bc97670fb2887a9fb0a02d119b7dfe70be473f43b334fd4c962"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small900.rgba32f",
+      "sha256": "9b8b8a877620fe2b4adc0186a2fbc4efee36104b8f941d920285b39fd101f5be"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife2/trace-small900-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-baseline.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=900\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small900.rgba32f\" \"{OUT}\" small900",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-small900-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-candidate.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=900\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small900.rgba32f\" \"{OUT}\" small900 \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-small900-baseline\"",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-small720-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-baseline.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=720\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small720.rgba32f\" \"{OUT}\" small720",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-small720-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-candidate.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=720\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small720.rgba32f\" \"{OUT}\" small720 \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-small720-baseline\"",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-smallfree1088-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-baseline.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=1\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\smallfree1088.rgba32f\" \"{OUT}\" smallfree1088",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-smallfree1088-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-candidate.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=1\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\smallfree1088.rgba32f\" \"{OUT}\" smallfree1088 \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-smallfree1088-baseline\"",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-small1080-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-baseline.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small1080.rgba32f\" \"{OUT}\" small1080",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    },
+    {
+      "label": "knife2/trace-small1080-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-candidate.exe",
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=1\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=F9\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=1\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=1\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\n\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_STYLE=1\nDLSS5_HIP_PDL=1\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_HIP_GRAPH=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_HOTKEY=none\nDLSS5_HOT_RELOAD=0\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_FRAME_STATS=0\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\n\nDLSS5_MULTI_PASS_HOTKEY=0\n",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\modules\" \"{OUT}\\same.flags\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\small1080.rgba32f\" \"{OUT}\" small1080 \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife2\\trace-small1080-baseline\"",
+      "required_stderr": [
+        "model requested=0\\.5x effective=0\\.5x blocks=31"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "baseline_ms": 8.336080875,
+  "candidate_ms": 8.322504020833334,
+  "delta_ms": -0.013576854166666763,
+  "baseline_p99_ms": 8.469311300000001,
+  "candidate_p99_ms": 8.4796753,
+  "rounds": [
+    {
+      "round": 1,
+      "baseline_ms": 8.3208479375,
+      "candidate_ms": 8.3069945625,
+      "delta_ms": -0.013853375000000057,
+      "p99_delta_ms": -0.009194700000000111
+    },
+    {
+      "round": 2,
+      "baseline_ms": 8.34170784375,
+      "candidate_ms": 8.326452625,
+      "delta_ms": -0.015255218749999244,
+      "p99_delta_ms": 0.02783369999999863
+    },
+    {
+      "round": 3,
+      "baseline_ms": 8.345686843749998,
+      "candidate_ms": 8.334064875000001,
+      "delta_ms": -0.011621968749997436,
+      "p99_delta_ms": -0.006787699999998509
+    }
+  ],
+  "samples_per_arm": 960,
+  "slots": [
+    {
+      "case": "pure-r1-0-baseline",
+      "round": 1,
+      "role": "baseline",
+      "mean": 8.317251625,
+      "p99": 8.444732799999999
+    },
+    {
+      "case": "pure-r1-1-candidate",
+      "round": 1,
+      "role": "candidate",
+      "mean": 8.3117554375,
+      "p99": 8.4362508
+    },
+    {
+      "case": "pure-r1-2-candidate",
+      "round": 1,
+      "role": "candidate",
+      "mean": 8.302233687500001,
+      "p99": 8.4349501
+    },
+    {
+      "case": "pure-r1-3-baseline",
+      "round": 1,
+      "role": "baseline",
+      "mean": 8.32444425,
+      "p99": 8.489621
+    },
+    {
+      "case": "pure-r2-0-baseline",
+      "round": 2,
+      "role": "baseline",
+      "mean": 8.3328244375,
+      "p99": 8.454823
+    },
+    {
+      "case": "pure-r2-1-candidate",
+      "round": 2,
+      "role": "candidate",
+      "mean": 8.327067,
+      "p99": 8.490861899999999
+    },
+    {
+      "case": "pure-r2-2-candidate",
+      "round": 2,
+      "role": "candidate",
+      "mean": 8.32583825,
+      "p99": 8.4604703
+    },
+    {
+      "case": "pure-r2-3-baseline",
+      "round": 2,
+      "role": "baseline",
+      "mean": 8.350591249999999,
+      "p99": 8.4666313
+    },
+    {
+      "case": "pure-r3-0-baseline",
+      "round": 3,
+      "role": "baseline",
+      "mean": 8.3370169375,
+      "p99": 8.4840958
+    },
+    {
+      "case": "pure-r3-1-candidate",
+      "round": 3,
+      "role": "candidate",
+      "mean": 8.331105375000002,
+      "p99": 8.4819016
+    },
+    {
+      "case": "pure-r3-2-candidate",
+      "round": 3,
+      "role": "candidate",
+      "mean": 8.337024375,
+      "p99": 8.462310800000001
+    },
+    {
+      "case": "pure-r3-3-baseline",
+      "round": 3,
+      "role": "baseline",
+      "mean": 8.354356749999999,
+      "p99": 8.483217699999999
+    }
+  ]
+}

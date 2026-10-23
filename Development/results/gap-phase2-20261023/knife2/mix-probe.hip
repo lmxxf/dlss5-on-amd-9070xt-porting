@@ -1,0 +1,1 @@
+extern "C" __attribute__((global)) void probe(float *out,const float *in){unsigned i=__builtin_amdgcn_workitem_id_x();float g=in[i],q;asm("v_fma_mix_f32 %0, %2, |%1|, %2 op_sel:[0,0,1] op_sel_hi:[1,0,1]" : "=v"(q) : "v"(g), "s"(0x3728ab28u));out[i]=q;}

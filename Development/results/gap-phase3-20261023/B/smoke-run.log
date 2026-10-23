@@ -1,0 +1,14 @@
+DONE B/timeout-zero
+
+  "pass": true,
+TIMEOUT_PROBE_PASS outputs_defined=1 canaries_checked=1
+DONE B/smoke-1152-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=379.668 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+LOCK_RELEASED
+failed B/smoke-1152-candidate exit=1
+At D:\DLSSNR-Lab\gap-phase3-20261023\run-jobs.ps1:29 char:25
++ ... if($p.ExitCode -ne 0){throw "failed $($j.label) exit=$($p.ExitCode)"}
++                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (failed B/smoke-1152-candidate exit=1:String) [], RuntimeException
+    + FullyQualifiedErrorId : failed B/smoke-1152-candidate exit=1
+ 

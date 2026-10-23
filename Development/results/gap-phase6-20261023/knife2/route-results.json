@@ -1,0 +1,114 @@
+{
+  "original1088": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "original1152": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "small900": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": false
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "original960": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "small1080": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "smallfree1088": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": false
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w",
+      "calls": 4,
+      "byte_output": true
+    }
+  ],
+  "small720": [
+    {
+      "inputs": 1024,
+      "outputs": 512,
+      "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+      "calls": 4,
+      "byte_output": false
+    },
+    {
+      "inputs": 512,
+      "outputs": 256,
+      "kernel": "decoder_project2x_h16w_byteout_w",
+      "calls": 4,
+      "byte_output": true
+    }
+  ]
+}

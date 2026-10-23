@@ -1,0 +1,63 @@
+{
+  "producer": {
+    "split_ffn_one_w2f8_w16_bin": {
+      ".vgpr_count": 95,
+      ".sgpr_count": 13,
+      ".group_segment_fixed_size": 0,
+      ".private_segment_fixed_size": 0,
+      ".max_flat_workgroup_size": 64
+    },
+    "split_ffn_one_w2f8_w16_bin_chain": {
+      ".vgpr_count": 96,
+      ".sgpr_count": 16,
+      ".group_segment_fixed_size": 0,
+      ".private_segment_fixed_size": 0,
+      ".max_flat_workgroup_size": 64
+    },
+    "module_clock_count": 0
+  },
+  "consumer": {
+    "split_projection_frag_w16_bskip": {
+      ".vgpr_count": 100,
+      ".sgpr_count": 17,
+      ".group_segment_fixed_size": 1024,
+      ".private_segment_fixed_size": 0,
+      ".max_flat_workgroup_size": 32
+    },
+    "split_projection_frag_w16_bskip_chain": {
+      ".vgpr_count": 101,
+      ".sgpr_count": 21,
+      ".group_segment_fixed_size": 1024,
+      ".private_segment_fixed_size": 0,
+      ".max_flat_workgroup_size": 32
+    },
+    "module_clock_count": 0
+  },
+  "consumer_trace": {
+    "split_projection_frag_w16_bskip_chain": {
+      ".vgpr_count": 123,
+      ".sgpr_count": 26,
+      ".group_segment_fixed_size": 1024,
+      ".private_segment_fixed_size": 0,
+      ".max_flat_workgroup_size": 32
+    },
+    "module_clock_count": 1
+  },
+  "producer_trace": {
+    ".vgpr_count": 96,
+    ".sgpr_count": 18,
+    ".group_segment_fixed_size": 0,
+    ".private_segment_fixed_size": 0,
+    ".max_flat_workgroup_size": 64,
+    "sha256": "c71af7e966854c2cf09e788bd8f06af380ac7a76dcfc55edae2822d65755c902"
+  },
+  "accepted_perf_paths": {
+    "c512-m32-deep.hsaco": "7d9c6beb23845ed4c93f3b16f28d8553da5097b9a576653bab8e88ec0f58678d",
+    "deep_fast-packed-fast.hsaco": "b249f6b9edcfb5005ef0fde51753f445131ae3f7e03958a4efd8f8f016a2db49"
+  },
+  "accepted_trace_paths": {
+    "c512-m32-deep.hsaco": "c71af7e966854c2cf09e788bd8f06af380ac7a76dcfc55edae2822d65755c902",
+    "deep_fast-packed-fast.hsaco": "e0d0d8e4adb125d17918f49d5956a201f4157aa744aea39b7f2bdb6e875ac458"
+  },
+  "baseline_noopts_whole_sha": "a6866439fa89e770d2de82ef683b3e61e31819f4cb3618d50999b2ff14159828"
+}

@@ -1,0 +1,112 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -916,7 +916,7 @@
+ }
+ WAVE void split_projection_frag(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_body<true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_body<true,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
+-template<bool W32,bool F16Res=false,bool ByteSkip=false,bool Transposed=false> DEV void split_projection_frag_w16_body(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,_Float16*out16,uint tokens){
++template<bool W32,bool F16Res=false,bool ByteSkip=false,bool Transposed=false,bool NPair=false> DEV void split_projection_frag_w16_body(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,_Float16*out16,uint tokens){
+  uint first=bid()/8*16,row=bid()%8*64;if(first>=tokens)return;
+  typedef int w16_i4 __attribute__((ext_vector_type(4)));
+  const unsigned char*wb=reinterpret_cast<const unsigned char*>(w);
+@@ -954,12 +954,26 @@
+  f8 acc[4]{};
+  for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint idx=(first+gr()*8+e)*512+row+j*16+rc();float sv=ByteSkip?__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(skip)[idx]),0):skip[idx];acc[j][e]=H(sv*w[262144+row+j*16+rc()]);}
+  const unsigned char*arow=in8+((first/16)*16)*512+rc()*32+gr()*8;
++ if constexpr(NPair){
++  // Pair adjacent N16 fragments in each 16B load; K16 order per output remains 0..31.
++  _Pragma("unroll 4") for(uint kt=0;kt<32;kt++){
++   i2 av;__builtin_memcpy(&av,arow+(kt/2)*512+(kt%2)*16,8);
++   _Pragma("unroll") for(uint np=0;np<2;np++){
++    uint n0=row+np*32+rc();w16_i4 bw;
++    __builtin_memcpy(&bw,wb+((n0/32)*32+kt)*512+(gr()*16+rc())*16,16);
++    i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
++    acc[np*2]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(av,b0,acc[np*2]);
++    acc[np*2+1]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(av,b1,acc[np*2+1]);
++   }
++  }
++ }else{
+  _Pragma("unroll 4") for(uint gs=0;gs<16;gs++){
+   i2 a0,a1;__builtin_memcpy(&a0,arow+gs*512,8);__builtin_memcpy(&a1,arow+gs*512+16,8);
+   _Pragma("unroll") for(uint j=0;j<4;j++){uint n0=row+j*16+rc();w16_i4 bw;__builtin_memcpy(&bw,wb+((n0/16)*16+gs)*512+(gr()*16+n0%16)*16,16);
+    i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
+    acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a0,b0,acc[j]);
+    acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a1,b1,acc[j]);}}
++ }
+ #if C512_T8_TAIL_VEC
+  __attribute__((shared)) unsigned char t8[1024];
+  for(uint j=0;j<4;j++)for(uint e=0;e<8;e++){uint r=first+gr()*8+e,c=row+j*16+rc();float x=VIT_FAST_H(acc[j][e]),xc=__builtin_amdgcn_fmed3f(x+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(xc,0.f,0,false);float v=__builtin_amdgcn_cvt_f32_fp8(b8,0);if constexpr(W32)out[r*512+c]=v;if constexpr(F16Res)out16[r*512+c]=(_Float16)v;uint cl=j*16+rc();t8[(cl/32)*512+(r%16)*32+cl%32]=static_cast<unsigned char>(b8);}
+@@ -971,6 +985,9 @@
+ }
+ WAVE void split_projection_frag_w16(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_w16_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true,false,true,false>(in8,w,skip,out,out8,nullptr,tokens);}
++// Experiment-only N-pair exports; independent host cache key prevents W16 layout aliasing.
++WAVE void split_projection_frag_npair(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true,false,false,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
++WAVE void split_projection_frag_npair_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<true,false,true,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_w16_nof32(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<false,false,false,true>(in8,w,skip,out,out8,nullptr,tokens);}
+ WAVE void split_projection_frag_w16_nof32_bskip(const unsigned char*in8,const float*w,const float*skip,float*out,unsigned char*out8,uint tokens){split_projection_frag_w16_body<false,false,true,true>(in8,w,skip,out,out8,nullptr,tokens);}
+ #if VIT_FAST_NUM&16
+--- a/Development/HIP/packed_weights.h
++++ b/Development/HIP/packed_weights.h
+@@ -78,6 +78,13 @@
+  auto*dst=reinterpret_cast<uint8_t*>(v.data()+start);std::vector<uint8_t>src(dst,dst+rows*columns);
+  for(size_t n=0;n<rows;n++)for(size_t k=0;k<columns;k++)dst[((n/16)*(columns/32)+k/32)*512+((((k%16)/8)*16+n%16)*2+(k%32)/16)*8+k%8]=src[n*columns+k];
+ }
++// N-pair tiles: [N/32][K/16][lane-half][N%16][N16 in N32][8 consecutive K].
++// Input is already row-major FP8 at its original byte address; preserve all scale/bias tails.
++inline void FragmentPackedMatrixNPair(std::vector<float>&v,size_t start,size_t rows,size_t columns){
++ if(rows%32||columns%16||start>v.size()||rows*columns>(v.size()-start)*4)throw std::runtime_error("packed N-pair shape");
++ auto*dst=reinterpret_cast<uint8_t*>(v.data()+start);std::vector<uint8_t>src(dst,dst+rows*columns);
++ for(size_t n=0;n<rows;n++)for(size_t k=0;k<columns;k++)dst[((n/32)*(columns/16)+k/16)*512+((((k%16)/8)*16+n%16)*2+(n%32)/16)*8+k%8]=src[n*columns+k];
++}
+ inline void TilePackedMatrix(std::vector<float>&v,size_t start,size_t rows,size_t columns){
+  if(rows%16||columns%32||start>v.size()||rows*columns>(v.size()-start)*4)throw std::runtime_error("packed tile shape");
+  auto*dst=reinterpret_cast<uint8_t*>(v.data()+start);std::vector<uint8_t>src(dst,dst+rows*columns);
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -360,6 +360,7 @@
+  // QKV rows as fragment tiles (mh_qkv_normalize_frag_c512); projection bytes and the f32 scales stay where PackedMhWeight puts them.
+  // ffwd-projection [512][512] E4M3 bytes in fragment-tile layout for split_projection_frag; the residual scale floats keep their offset.
+  void* PackedSplitProjectionFrag(const std::string&name,bool w16=false){auto key=name+"@proj-frag";auto it=weights.find(key);if(it==weights.end()){auto v=ReadWeights(opt.assets+"/"+name);if(v.size()!=WeightElements(name))throw std::runtime_error("split projection weight shape");Fp8(v,{{0,262144}});if(w16)FragmentPackedMatrixW16(v,0,512,512);else FragmentPackedMatrix(v,0,512,512);it=weights.emplace(key,UploadWeight(v,key)).first;}return P(it->second);}
++ void* PackedSplitProjectionNPair(const std::string&name){const auto key=name+"@proj-npair-v1";auto it=weights.find(key);if(it==weights.end()){auto v=ReadWeights(opt.assets+"/"+name);if(v.size()!=WeightElements(name))throw std::runtime_error("split N-pair weight shape");Fp8(v,{{0,262144}});FragmentPackedMatrixNPair(v,0,512,512);it=weights.emplace(key,UploadWeight(v,key)).first;}return P(it->second);}
+  void* PackedMhWeightQkvFrag(const std::string&name,U c,bool w16=false){const std::string key=name+"@qkv-frag";auto it=weights.find(key);if(it==weights.end()){auto v=ReadWeights(opt.assets+"/"+name);if(v.size()!=WeightElements(name))throw std::runtime_error("packed weight shape "+name);size_t cc=size_t(c)*c;Fp8(v,{{0,3*cc},{3*cc,cc}});if(w16){FragmentPackedMatrixW16(v,0,3*size_t(c),c);FragmentPackedMatrixW16(v,3*cc,c,c);}else{FragmentPackedMatrix(v,0,3*size_t(c),c);FragmentPackedMatrix(v,3*cc,c,c);}it=weights.emplace(key,UploadWeight(v,key)).first;}return P(it->second);}
+  // PackedMhWeight(attention) plus the three residual-scale pieces as diagonal fragment B tiles appended after the float tail
+  // (byte 4*WeightElements; c*96 bytes): the fused attention-project kernels then form the residual with three MMAs instead of scalar FMAs.
+@@ -589,7 +590,7 @@
+    if(kernel.rfind("vit_expand_blocked_fp8",0)==0&&kernel.size()>3&&kernel.compare(kernel.size()-3,3,"_m2")==0)groups=((count/4096+31)/32)*64;
+    if(kernel=="vit_qkv_project_blocked"||kernel=="vit_qkv_project_normalize_fused"||kernel=="vit_qkv_project_normalize_fused_f16compact"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_bytein"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_h16in"||kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_frag")groups=count/512;
+    if(kernel=="vit_qkv_project_normalize_fused_f16compact_fp8_h16in_n4")groups=count/1024;
+-   if(kernel=="split_mix_blocked"||kernel=="split_mix_blocked_h16w"||kernel=="split_projection_blocked"||kernel=="split_projection_blocked_t8"||kernel=="split_projection_frag"||kernel=="split_projection_frag_bskip"||kernel=="split_projection_frag_w16"||kernel=="split_projection_frag_w16_bskip"||kernel=="split_projection_frag_w16_nof32"||kernel=="split_projection_frag_w16_nof32_bskip"||kernel=="split_projection_frag_nof32")groups=count/1024;
++   if(kernel=="split_mix_blocked"||kernel=="split_mix_blocked_h16w"||kernel=="split_projection_blocked"||kernel=="split_projection_blocked_t8"||kernel=="split_projection_frag"||kernel=="split_projection_frag_bskip"||kernel=="split_projection_frag_w16"||kernel=="split_projection_frag_w16_bskip"||kernel=="split_projection_frag_npair"||kernel=="split_projection_frag_npair_bskip"||kernel=="split_projection_frag_w16_nof32"||kernel=="split_projection_frag_w16_nof32_bskip"||kernel=="split_projection_frag_nof32")groups=count/1024;
+    if(kernel=="split_ffn_fused"||kernel=="split_ffn_fused_fp8"||kernel=="split_ffn_fused_fp8_mix"||kernel=="split_ffn_fused_fp8_t8"){threads=128;groups=count/1024;}
+    if(kernel=="vit_ffn_fused"){threads=512;groups=count/16384;}
+    if(kernel=="vit_contract_combine"||kernel=="vit_pack_input"||kernel=="vit_pack_input_tiled"||kernel=="vit_gather_b8")threads=256;
+@@ -747,6 +748,8 @@
+     (raw Hrtz outputs, Down/skip consumers) still write f32. Inside a block the FFN feature is always bytes on this path. */
+  static int C512W16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_W16");if(!v||!*v)return int(HIP_C512_W16);return std::atoi(v);}();return m;}
+  static int C512FfnW16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_FFN_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_FFN_W16");if(!v||!*v)return int(HIP_C512_FFN_W16);return std::atoi(v);}();return m;}
++ bool C512NPairRequested()const{static const bool on=[](){const char*v=std::getenv("NR_C512_NPAIR");return v&&std::strcmp(v,"1")==0;}();return on;}
++ unsigned long long c512_npair_calls=0;
+  unsigned long long c512_w16_calls=0,c512_stock_calls=0,c512_ffn_w16_calls=0,c512_ffn_stock_calls=0;
+  Tensor CompactC512Body(Tensor input,U w,U h,U ww,U hh,U sx,U sy,U block,bool raw,bool byte_in=false,bool byte_out=false){
+   U valid=w*h,n=(valid+15)&~15u;
+@@ -772,7 +775,9 @@
+   const bool w16_mh=w16_fb8||(w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")));
+   if(w16_ffn&&w16_mh){++c512_w16_calls;if(w16_fb8)++vit_inter_byte_calls;}else ++c512_stock_calls;
+   const bool fb8=!byte_in&&!byte_out&&!w16_mh&&HIP_C512_PROJ_FB8&&HasFn("deep_fast","split_projection_frag_nof32")&&HasFn("mh_fast","mh_attention_project_frag_c512_fb8");
+-  if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
++  const bool npair=!small_active&&fast_numeric&&!fpf&&!w16_fb8&&!fb8&&w16_ffn&&C512NPairRequested()&&HasFn("deep_fast","split_projection_frag_npair")&&HasFn("deep_fast","split_projection_frag_npair_bskip");
++  if(npair){++c512_npair_calls;Run("deep",byte_in?"split_projection_frag_npair_bskip":"split_projection_frag_npair",size_t(n)*512,P(contract8),PackedSplitProjectionNPair(Block(block,"ffwd-projection")),P(compact),P(ffn),P(ffn8),n);}
++  else if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
+   compact.reset();contract.reset();contract8.reset();
+   auto av=New(size_t(n)*128);
+   void*att_w=PackedMhWeightQkvFrag(Block(block,"attention"),512,w16_mh);
+@@ -1003,7 +1008,7 @@
+ }
+ 
+ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
+- ~Network(){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
++ ~Network(){std::fprintf(stderr,"C512_NPAIR requested=%u calls=%llu\n",unsigned(C512NPairRequested()),c512_npair_calls);if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
+  void PrintMemory(){size_t bytes=0,free=0,total=0;std::set<void*>seen;auto add=[&](const Tensor&t){if(t&&t->owned&&seen.insert(t->ptr).second)bytes+=t->capacity;};for(auto&t:pool)add(t);for(auto&w:weights)add(w.second);for(auto&maps:gather_maps)for(auto&m:maps)add(m.second);add(device_noise);api.Check(api.hipMemGetInfo(&free,&total),"memory stats");std::printf("memory owned_MiB=%.1f allocations=%zu device_free_MiB=%.1f total_MiB=%.1f\n",bytes/1048576.,seen.size(),free/1048576.,total/1048576.);}
+  /* DLSS5_HIP_MEMORY=1 (diagnostic): device memory by category after the pool has warmed — weights by key, pool tensors by capacity, gather maps, noise, and the runtime's free/total. */
+  void MemoryReport(FILE*f){std::set<void*>seen;size_t wsum=0,psum=0,gsum=0,nsum=0;std::vector<std::pair<size_t,std::string>>w,p;

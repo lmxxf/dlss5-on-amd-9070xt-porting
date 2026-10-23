@@ -1,0 +1,94 @@
+{
+  "tiers": {
+    "960": {
+      "baseline": 6.455124583333333,
+      "candidate": 6.459200833333333,
+      "delta_ms": 0.0040762499999997814,
+      "p99_delta_ms": 0.010880000000000223,
+      "rounds": [
+        {
+          "round": 1,
+          "source": "original",
+          "delta_ms": -0.0008350000000012514,
+          "p99_delta_ms": -0.005161000000000193
+        },
+        {
+          "round": 2,
+          "source": "original",
+          "delta_ms": 0.011800625000000231,
+          "p99_delta_ms": 0.021740000000000315
+        },
+        {
+          "round": 3,
+          "source": "quiet",
+          "delta_ms": 0.0012631250000003647,
+          "p99_delta_ms": -0.009830000000000005
+        }
+      ]
+    },
+    "1088": {
+      "baseline": 8.84716125,
+      "candidate": 8.842598645833334,
+      "delta_ms": -0.004562604166665096,
+      "p99_delta_ms": -0.024269000000000318,
+      "rounds": [
+        {
+          "round": 1,
+          "source": "original",
+          "delta_ms": -0.0038975000000007753,
+          "p99_delta_ms": 0.040309000000000594
+        },
+        {
+          "round": 2,
+          "source": "original",
+          "delta_ms": 0.004007187499999176,
+          "p99_delta_ms": -0.015430000000000277
+        },
+        {
+          "round": 3,
+          "source": "quiet",
+          "delta_ms": -0.013797500000000795,
+          "p99_delta_ms": -0.05163999999999902
+        }
+      ]
+    },
+    "1152": {
+      "baseline": 9.143505833333334,
+      "candidate": 9.144294166666667,
+      "delta_ms": 0.0007883333333325027,
+      "p99_delta_ms": 0.0011330000000011609,
+      "rounds": [
+        {
+          "round": 1,
+          "source": "original",
+          "delta_ms": 0.00377656250000058,
+          "p99_delta_ms": 0.02097899999999875
+        },
+        {
+          "round": 2,
+          "source": "original",
+          "delta_ms": -0.007105312500000238,
+          "p99_delta_ms": -0.005766999999998745
+        },
+        {
+          "round": 3,
+          "source": "quiet",
+          "delta_ms": 0.005693750000000719,
+          "p99_delta_ms": 0.004371000000000791
+        }
+      ]
+    }
+  },
+  "gold_frames": 54,
+  "effective_perf_slots": 36,
+  "excluded_original_r3_slots_retained": 12,
+  "quiet_slots": 12,
+  "changed_modules": [
+    "c512-m32-mh.hsaco"
+  ],
+  "only_target_code_changed": true,
+  "target_resources_and_opcode_counts_same": true,
+  "target_instruction_operands_multiset_same": true,
+  "target_order_changed": true,
+  "production_hip_diff": []
+}

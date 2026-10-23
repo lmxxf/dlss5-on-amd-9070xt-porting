@@ -1,0 +1,477 @@
+{
+  "tiers": {
+    "960": {
+      "baseline_ms": 6.473521979166666,
+      "candidate_ms": 6.485561458333334,
+      "delta_ms": 0.01203947916666781,
+      "delta_percent": 0.1859803551361061,
+      "baseline_p99": 6.64782,
+      "candidate_p99": 6.710027999999999,
+      "p99_delta_ms": 0.06220799999999915,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.47992375,
+          "candidate": 6.4772678125,
+          "delta_ms": -0.0026559375000001495,
+          "p99_delta_ms": 0.021936000000000178,
+          "base_drift": -0.02019250000000028
+        },
+        {
+          "round": 2,
+          "base": 6.472264375,
+          "candidate": 6.512813124999999,
+          "delta_ms": 0.040548749999999245,
+          "p99_delta_ms": 0.10346900000000048,
+          "base_drift": -0.009283749999998925
+        },
+        {
+          "round": 3,
+          "base": 6.4683778125,
+          "candidate": 6.4666034375,
+          "delta_ms": -0.0017743750000001057,
+          "p99_delta_ms": -0.014668000000000347,
+          "base_drift": 0.01849187500000138
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "samples_per_arm": 960
+    },
+    "1088": {
+      "baseline_ms": 8.874891458333332,
+      "candidate_ms": 8.972168645833333,
+      "delta_ms": 0.09727718750000136,
+      "delta_percent": 1.0960943912013743,
+      "baseline_p99": 9.119623,
+      "candidate_p99": 9.208807,
+      "p99_delta_ms": 0.08918399999999949,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.879376875,
+          "candidate": 8.969351875000001,
+          "delta_ms": 0.0899750000000008,
+          "p99_delta_ms": 0.08985700000000207,
+          "base_drift": 0.015292499999997489
+        },
+        {
+          "round": 2,
+          "base": 8.88243375,
+          "candidate": 9.004459375,
+          "delta_ms": 0.12202562499999914,
+          "p99_delta_ms": 0.09822199999999981,
+          "base_drift": -0.04856250000000095
+        },
+        {
+          "round": 3,
+          "base": 8.862863749999999,
+          "candidate": 8.9426946875,
+          "delta_ms": 0.07983093750000059,
+          "p99_delta_ms": 0.0692699999999995,
+          "base_drift": -0.01226124999999989
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    },
+    "1152": {
+      "baseline_ms": 9.16697875,
+      "candidate_ms": 9.257128958333332,
+      "delta_ms": 0.09015020833333232,
+      "delta_percent": 0.9834233370872747,
+      "baseline_p99": 9.389751,
+      "candidate_p99": 9.490216,
+      "p99_delta_ms": 0.1004649999999998,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 9.125242499999999,
+          "candidate": 9.214103750000001,
+          "delta_ms": 0.08886125000000256,
+          "p99_delta_ms": 0.09070299999999953,
+          "base_drift": 0.037286250000001075
+        },
+        {
+          "round": 2,
+          "base": 9.207265625,
+          "candidate": 9.303887499999998,
+          "delta_ms": 0.09662187499999852,
+          "p99_delta_ms": 0.06399399999999744,
+          "base_drift": 0.003444999999999254
+        },
+        {
+          "round": 3,
+          "base": 9.168428125,
+          "candidate": 9.253395625,
+          "delta_ms": 0.08496749999999942,
+          "p99_delta_ms": 0.09248900000000049,
+          "base_drift": 0.020282499999996872
+        }
+      ],
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-1088-r1-0-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.871730625000001,
+      "p99": 9.078398,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-1-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.95568375,
+      "p99": 9.210611,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-2-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.98302,
+      "p99": 9.174591,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-3-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.887023124999999,
+      "p99": 9.169580999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-0-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.906715,
+      "p99": 9.19933,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-1-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.012308125,
+      "p99": 9.228047,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-2-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.996610624999999,
+      "p99": 9.21532,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-3-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.8581525,
+      "p99": 9.064791,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-0-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.868994375,
+      "p99": 9.113964,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-1-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.945583125,
+      "p99": 9.162796,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-2-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.93980625,
+      "p99": 9.136618,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-3-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.856733125,
+      "p99": 9.038837,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1152-r1-0-baseline",
+      "height": 1152,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.106599374999998,
+      "p99": 9.315793,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-1-candidate",
+      "height": 1152,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.207018125000001,
+      "p99": 9.387514999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-2-candidate",
+      "height": 1152,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.221189375,
+      "p99": 9.473023,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-3-baseline",
+      "height": 1152,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.143885625,
+      "p99": 9.348756,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-0-baseline",
+      "height": 1152,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.205543125,
+      "p99": 9.469222,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-1-candidate",
+      "height": 1152,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.316725,
+      "p99": 9.548865000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-2-candidate",
+      "height": 1152,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.29105,
+      "p99": 9.475064,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-3-baseline",
+      "height": 1152,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.208988125,
+      "p99": 9.448936,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-0-baseline",
+      "height": 1152,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.158286875000002,
+      "p99": 9.342709000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-1-candidate",
+      "height": 1152,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.2507,
+      "p99": 9.438843,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-2-candidate",
+      "height": 1152,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.25609125,
+      "p99": 9.404955,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-3-baseline",
+      "height": 1152,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.178569374999999,
+      "p99": 9.339189,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-960-r1-0-baseline",
+      "height": 960,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.4900199999999995,
+      "p99": 6.704938,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-1-candidate",
+      "height": 960,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.486924999999999,
+      "p99": 6.71091,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-2-candidate",
+      "height": 960,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.467610625000001,
+      "p99": 6.679844,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-3-baseline",
+      "height": 960,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.469827499999999,
+      "p99": 6.653535,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-0-baseline",
+      "height": 960,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.476906249999999,
+      "p99": 6.632302,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-1-candidate",
+      "height": 960,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.473495,
+      "p99": 6.655185,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-2-candidate",
+      "height": 960,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.5521312499999995,
+      "p99": 6.755368,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-3-baseline",
+      "height": 960,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.4676225,
+      "p99": 6.627172,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-0-baseline",
+      "height": 960,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.459131875,
+      "p99": 6.61878,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-1-candidate",
+      "height": 960,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.46447875,
+      "p99": 6.591602,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-2-candidate",
+      "height": 960,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.468728125,
+      "p99": 6.629669,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-3-baseline",
+      "height": 960,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.477623750000001,
+      "p99": 6.651901,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    }
+  ]
+}

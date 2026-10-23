@@ -1,0 +1,438 @@
+{
+  "small900": {
+    "baseline": {
+      "profile": {
+        "frame": "1",
+        "W": "1600",
+        "H": "1024",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "52",
+        "deep_h": "32",
+        "vit_w": "28",
+        "vit_h": "16",
+        "tokens": "448",
+        "compact_contract": "0",
+        "compact_projection": "0",
+        "contract_w16": "0",
+        "projection_w16": "0",
+        "contract_bstream": "0",
+        "projection_bout": "0",
+        "entry_exit_eligible": "0",
+        "c512_byte_eligible": "0",
+        "weights_count": "100",
+        "weights_bytes": "290068216",
+        "pool_count": "12",
+        "pool_bytes": "154730496",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "95",
+        "vit_pack_input": "8",
+        "up39_f32_byte_input": "0",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "candidate": {
+      "profile": {
+        "frame": "1",
+        "W": "1600",
+        "H": "1024",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "52",
+        "deep_h": "32",
+        "vit_w": "28",
+        "vit_h": "16",
+        "tokens": "448",
+        "compact_contract": "1",
+        "compact_projection": "1",
+        "contract_w16": "1",
+        "projection_w16": "1",
+        "contract_bstream": "1",
+        "projection_bout": "1",
+        "entry_exit_eligible": "1",
+        "c512_byte_eligible": "0",
+        "weights_count": "100",
+        "weights_bytes": "164239096",
+        "pool_count": "12",
+        "pool_bytes": "154730496",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "87",
+        "vit_pack_input": "0",
+        "up39_f32_byte_input": "1",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w_bin_f8w16",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "weight_capacity_saved_bytes": 125829120
+  },
+  "small720": {
+    "baseline": {
+      "profile": {
+        "frame": "1",
+        "W": "1344",
+        "H": "768",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "44",
+        "deep_h": "24",
+        "vit_w": "24",
+        "vit_h": "12",
+        "tokens": "288",
+        "compact_contract": "0",
+        "compact_projection": "0",
+        "contract_w16": "0",
+        "projection_w16": "0",
+        "contract_bstream": "0",
+        "projection_bout": "0",
+        "entry_exit_eligible": "0",
+        "c512_byte_eligible": "0",
+        "weights_count": "100",
+        "weights_bytes": "290068216",
+        "pool_count": "12",
+        "pool_bytes": "97566720",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "95",
+        "vit_pack_input": "8",
+        "up39_f32_byte_input": "0",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "candidate": {
+      "profile": {
+        "frame": "1",
+        "W": "1344",
+        "H": "768",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "44",
+        "deep_h": "24",
+        "vit_w": "24",
+        "vit_h": "12",
+        "tokens": "288",
+        "compact_contract": "1",
+        "compact_projection": "1",
+        "contract_w16": "1",
+        "projection_w16": "1",
+        "contract_bstream": "1",
+        "projection_bout": "1",
+        "entry_exit_eligible": "1",
+        "c512_byte_eligible": "0",
+        "weights_count": "100",
+        "weights_bytes": "164239096",
+        "pool_count": "12",
+        "pool_bytes": "97566720",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "87",
+        "vit_pack_input": "0",
+        "up39_f32_byte_input": "1",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout",
+        "deep_fast:vit_attention_fused_400_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w_bin_f8w16",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "weight_capacity_saved_bytes": 125829120
+  },
+  "smallfree1088": {
+    "baseline": {
+      "profile": {
+        "frame": "1",
+        "W": "1920",
+        "H": "1088",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "60",
+        "deep_h": "36",
+        "vit_w": "32",
+        "vit_h": "20",
+        "tokens": "640",
+        "compact_contract": "0",
+        "compact_projection": "0",
+        "contract_w16": "0",
+        "projection_w16": "0",
+        "contract_bstream": "0",
+        "projection_bout": "0",
+        "entry_exit_eligible": "0",
+        "c512_byte_eligible": "0",
+        "weights_count": "92",
+        "weights_bytes": "280622584",
+        "pool_count": "12",
+        "pool_bytes": "194306048",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "91",
+        "vit_pack_input": "8",
+        "up39_f32_byte_input": "0",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "candidate": {
+      "profile": {
+        "frame": "1",
+        "W": "1920",
+        "H": "1088",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "60",
+        "deep_h": "36",
+        "vit_w": "32",
+        "vit_h": "20",
+        "tokens": "640",
+        "compact_contract": "1",
+        "compact_projection": "1",
+        "contract_w16": "1",
+        "projection_w16": "1",
+        "contract_bstream": "1",
+        "projection_bout": "1",
+        "entry_exit_eligible": "1",
+        "c512_byte_eligible": "0",
+        "weights_count": "92",
+        "weights_bytes": "154793464",
+        "pool_count": "12",
+        "pool_bytes": "194306048",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "83",
+        "vit_pack_input": "0",
+        "up39_f32_byte_input": "1",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_w_bin_f8w16",
+        "deep_fast:decoder_project2x_h16w_byteout_w"
+      ]
+    },
+    "weight_capacity_saved_bytes": 125829120
+  },
+  "small1080": {
+    "baseline": {
+      "profile": {
+        "frame": "1",
+        "W": "1920",
+        "H": "1152",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "60",
+        "deep_h": "36",
+        "vit_w": "32",
+        "vit_h": "20",
+        "tokens": "640",
+        "compact_contract": "1",
+        "compact_projection": "1",
+        "contract_w16": "1",
+        "projection_w16": "1",
+        "contract_bstream": "1",
+        "projection_bout": "1",
+        "entry_exit_eligible": "1",
+        "c512_byte_eligible": "1",
+        "weights_count": "92",
+        "weights_bytes": "154793464",
+        "pool_count": "12",
+        "pool_bytes": "201572352",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "83",
+        "vit_pack_input": "0",
+        "up39_f32_byte_input": "0",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16"
+      ]
+    },
+    "candidate": {
+      "profile": {
+        "frame": "1",
+        "W": "1920",
+        "H": "1152",
+        "requested": "0",
+        "effective": "0",
+        "small_active": "1",
+        "blocks": "31",
+        "deep_w": "60",
+        "deep_h": "36",
+        "vit_w": "32",
+        "vit_h": "20",
+        "tokens": "640",
+        "compact_contract": "1",
+        "compact_projection": "1",
+        "contract_w16": "1",
+        "projection_w16": "1",
+        "contract_bstream": "1",
+        "projection_bout": "1",
+        "entry_exit_eligible": "1",
+        "c512_byte_eligible": "1",
+        "weights_count": "92",
+        "weights_bytes": "154793464",
+        "pool_count": "12",
+        "pool_bytes": "201572352",
+        "vfrag_producers": "0",
+        "vfrag_consumers": "0",
+        "vfrag_producer_delta": "0",
+        "vfrag_consumer_delta": "0"
+      },
+      "count": {
+        "frame": "1",
+        "dispatches": "83",
+        "vit_pack_input": "0",
+        "up39_f32_byte_input": "0",
+        "unmapped": "0"
+      },
+      "attention": [
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout",
+        "deep_fast:vit_attention_fused_640_bytein_bout"
+      ],
+      "upsample": [
+        "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16"
+      ]
+    },
+    "weight_capacity_saved_bytes": 0
+  }
+}

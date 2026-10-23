@@ -1,0 +1,35 @@
+{
+  "name": "phase4-knife1-headmajor",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\deep_fast-packed-fast.head-major.hip",
+      "sha256": "6790d6975340dd40ceabf44dfc62e898aaa1e46f46e4ce27fa391433172f0bd3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\vit-stream-fast.head-major.hip",
+      "sha256": "1d9bc17635047b3d2fb0c617d8726c97dee156658e9bd70ec2279745f1cba116"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-headmajor-deep_fast-packed-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\deep_fast-packed-fast.head-major.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-headmajor-vit-stream-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase4-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase4-20261023\\knife1\\vit-stream-fast.head-major.hip\" comgr gfx1201"
+    }
+  ]
+}

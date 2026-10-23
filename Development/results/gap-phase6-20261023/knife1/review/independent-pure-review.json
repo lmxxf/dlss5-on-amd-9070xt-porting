@@ -1,0 +1,39 @@
+{
+  "experiment": "all-scope QKfrag, Original1088, NOT limited-default production",
+  "baseline_ms": 8.336080875,
+  "candidate_ms": 8.322504020833334,
+  "delta_ms": -0.013576854166666763,
+  "p99_delta_ms": 0.010363999999999152,
+  "rounds": [
+    {
+      "round": 1,
+      "delta_ms": -0.013853375000000057,
+      "p99_delta_ms": -0.009194700000000111
+    },
+    {
+      "round": 2,
+      "delta_ms": -0.015255218749999244,
+      "p99_delta_ms": 0.02783369999999863
+    },
+    {
+      "round": 3,
+      "delta_ms": -0.011621968750000988,
+      "p99_delta_ms": -0.006787699999998509
+    }
+  ],
+  "samples_per_arm": 960,
+  "distribution": {
+    "baseline": {
+      "median": 8.336455,
+      "p95": 8.4281855,
+      "p99": 8.469311300000001,
+      "max": 8.61124
+    },
+    "candidate": {
+      "median": 8.325585,
+      "p95": 8.409017500000001,
+      "p99": 8.4796753,
+      "max": 8.52955
+    }
+  }
+}

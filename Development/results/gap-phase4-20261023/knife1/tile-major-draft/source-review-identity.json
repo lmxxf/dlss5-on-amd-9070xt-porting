@@ -1,0 +1,11 @@
+{
+  "status": "superseded tile-major CPU-only draft; never GPU-tested",
+  "producer_pre_epilogue_identical": true,
+  "candidate_patch_sha256": "d69231fecbb818852bbda28fc46dc5d2f0ab5e8cbcb708766798f492c4c15939",
+  "source_files": {
+    "hip/vit_stream.inc": "1e2e20b323d775ddc2cdce343801b0493b809e7472dc622b4d0d1c9de84b6bbf",
+    "hip/deep_fast.hip": "56fd5b251bc6aed445a49e86951ffaf9c55ec1c88c2237d8526364f849eb121a",
+    "Development/HIP/hip_reference_network.h": "d63d7c915c7ed8e2d0cff85e55fbff884bed31ac1578a1ced0ef5fe573778035"
+  },
+  "gpu_by_reviewer": false
+}

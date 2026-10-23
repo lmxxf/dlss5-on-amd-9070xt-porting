@@ -1,0 +1,30 @@
+[
+  {
+    "role": "baseline",
+    "module": "deep_fast-packed-fast",
+    "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/deep_fast-packed-fast.baseline.hip",
+    "sha256": "6790d6975340dd40ceabf44dfc62e898aaa1e46f46e4ce27fa391433172f0bd3",
+    "RTC_EXTRA_OPTS": ""
+  },
+  {
+    "role": "baseline",
+    "module": "vit-stream-fast",
+    "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/vit-stream-fast.baseline.hip",
+    "sha256": "1d9bc17635047b3d2fb0c617d8726c97dee156658e9bd70ec2279745f1cba116",
+    "RTC_EXTRA_OPTS": ""
+  },
+  {
+    "role": "candidate",
+    "module": "deep_fast-packed-fast",
+    "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/deep_fast-packed-fast.candidate.hip",
+    "sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+    "RTC_EXTRA_OPTS": ""
+  },
+  {
+    "role": "candidate",
+    "module": "vit-stream-fast",
+    "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/vit-stream-fast.candidate.hip",
+    "sha256": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539",
+    "RTC_EXTRA_OPTS": ""
+  }
+]

@@ -1,0 +1,513 @@
+{
+  "tiers": {
+    "960": {
+      "baseline_ms": 6.455124583333333,
+      "candidate_ms": 6.459200833333333,
+      "delta_ms": 0.0040762499999997814,
+      "delta_percent": 0.06314750315623563,
+      "baseline_p99": 6.600689,
+      "candidate_p99": 6.611569,
+      "p99_delta_ms": 0.010880000000000223,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.449400312500001,
+          "candidate": 6.4485653124999995,
+          "delta_ms": -0.0008350000000012514,
+          "p99_delta_ms": -0.005161000000000193,
+          "base_drift": 0.006005625000002013
+        },
+        {
+          "round": 2,
+          "base": 6.459314375,
+          "candidate": 6.471115,
+          "delta_ms": 0.011800625000000231,
+          "p99_delta_ms": 0.021740000000000315,
+          "base_drift": -0.007027500000002185
+        },
+        {
+          "round": 3,
+          "base": 6.4566590625,
+          "candidate": 6.4579221875,
+          "delta_ms": 0.0012631250000003647,
+          "p99_delta_ms": -0.009830000000000005,
+          "base_drift": 0.018630625000000123
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "samples_per_arm": 960
+    },
+    "1088": {
+      "baseline_ms": 8.847161250000001,
+      "candidate_ms": 8.842598645833334,
+      "delta_ms": -0.004562604166666873,
+      "delta_percent": -0.05157139152026646,
+      "baseline_p99": 9.085813,
+      "candidate_p99": 9.061544,
+      "p99_delta_ms": -0.024269000000000318,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.825465937499999,
+          "candidate": 8.821568437500002,
+          "delta_ms": -0.0038974999999972226,
+          "p99_delta_ms": 0.040309000000000594,
+          "base_drift": 0.027471874999998036
+        },
+        {
+          "round": 2,
+          "base": 8.8543796875,
+          "candidate": 8.858386875,
+          "delta_ms": 0.004007187500000953,
+          "p99_delta_ms": -0.015430000000000277,
+          "base_drift": -0.0019118750000011175
+        },
+        {
+          "round": 3,
+          "base": 8.861638125,
+          "candidate": 8.847840625,
+          "delta_ms": -0.013797500000000795,
+          "p99_delta_ms": -0.05163999999999902,
+          "base_drift": 0.025748749999999987
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    },
+    "1152": {
+      "baseline_ms": 9.143505833333334,
+      "candidate_ms": 9.144294166666667,
+      "delta_ms": 0.0007883333333325027,
+      "delta_percent": 0.008621784113249653,
+      "baseline_p99": 9.36276,
+      "candidate_p99": 9.363893000000001,
+      "p99_delta_ms": 0.0011330000000011609,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 9.092175625,
+          "candidate": 9.0959521875,
+          "delta_ms": 0.00377656250000058,
+          "p99_delta_ms": 0.02097899999999875,
+          "base_drift": 0.040138749999997
+        },
+        {
+          "round": 2,
+          "base": 9.17836125,
+          "candidate": 9.171255937500002,
+          "delta_ms": -0.007105312499998462,
+          "p99_delta_ms": -0.005766999999998745,
+          "base_drift": 0.016408750000000083
+        },
+        {
+          "round": 3,
+          "base": 9.159980625,
+          "candidate": 9.165674375,
+          "delta_ms": 0.005693750000000719,
+          "p99_delta_ms": 0.004371000000000791,
+          "base_drift": 0.02759500000000159
+        }
+      ],
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-1088-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r1-0-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.81173,
+      "p99": 9.003591,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r1-1-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.822923750000001,
+      "p99": 9.050939999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r1-2-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.820213125,
+      "p99": 9.088426,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r1-3-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.839201874999999,
+      "p99": 9.111669,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r2-0-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.855335625,
+      "p99": 9.048907,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r2-1-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.857429375,
+      "p99": 9.046979,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r2-2-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.859344375000001,
+      "p99": 9.061366999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1088-r2-3-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.85342375,
+      "p99": 9.107633,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1088-r3-0-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.84876375,
+      "p99": 9.040186,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1088-r3-1-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.857901250000001,
+      "p99": 9.072365000000001,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1088-r3-2-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.83778,
+      "p99": 9.034856,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1088-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1088-r3-3-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.8745125,
+      "p99": 9.144418,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-1152-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r1-0-baseline",
+      "height": 1152,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.072106250000001,
+      "p99": 9.243416999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r1-1-candidate",
+      "height": 1152,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.082445,
+      "p99": 9.263514,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r1-2-candidate",
+      "height": 1152,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.109459375,
+      "p99": 9.325952,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r1-3-baseline",
+      "height": 1152,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.112244999999998,
+      "p99": 9.291789000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r2-0-baseline",
+      "height": 1152,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.170156875,
+      "p99": 9.357971,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r2-1-candidate",
+      "height": 1152,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.166200625,
+      "p99": 9.362864,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r2-2-candidate",
+      "height": 1152,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.176311250000001,
+      "p99": 9.383882,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-1152-r2-3-baseline",
+      "height": 1152,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.186565625,
+      "p99": 9.380297,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1152-r3-0-baseline",
+      "height": 1152,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.146183124999999,
+      "p99": 9.342113,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1152-r3-1-candidate",
+      "height": 1152,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.1685975,
+      "p99": 9.437419,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1152-r3-2-candidate",
+      "height": 1152,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.16275125,
+      "p99": 9.330646,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-1152-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-1152-r3-3-baseline",
+      "height": 1152,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.173778125,
+      "p99": 9.363547,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-960-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r1-0-baseline",
+      "height": 960,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.446397499999999,
+      "p99": 6.6035070000000005,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r1-1-candidate",
+      "height": 960,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.45569625,
+      "p99": 6.630147,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r1-2-candidate",
+      "height": 960,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.441434375,
+      "p99": 6.548675,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r1-3-baseline",
+      "height": 960,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.452403125000001,
+      "p99": 6.596274,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r2-0-baseline",
+      "height": 960,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.4628281250000015,
+      "p99": 6.58357,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r2-1-candidate",
+      "height": 960,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.482341875,
+      "p99": 6.69349,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r2-2-candidate",
+      "height": 960,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.459888125000001,
+      "p99": 6.5711450000000005,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/perf-960-r2-3-baseline",
+      "height": 960,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.455800624999999,
+      "p99": 6.576439,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-960-r3-0-baseline",
+      "height": 960,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.44734375,
+      "p99": 6.559533999999999,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-960-r3-1-candidate",
+      "height": 960,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.462264374999999,
+      "p99": 6.62227,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-960-r3-2-candidate",
+      "height": 960,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.45358,
+      "p99": 6.5671159999999995,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-960-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase3-20261023/C/evidence/quiet/perf-960-r3-3-baseline",
+      "height": 960,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.465974375,
+      "p99": 6.64045,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    }
+  ]
+}

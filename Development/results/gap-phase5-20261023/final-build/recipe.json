@@ -1,0 +1,17 @@
+{
+  "addon_command": [
+    "bash",
+    "scripts/build-addon.sh",
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/third_party/minhook",
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/third_party/reshade/include",
+    "/home/lmxxf/work/dlss5-gap-phase5-20261023/final-payload/dlss5-amd.addon64",
+    "--hip"
+  ],
+  "runtime_command": [
+    "bash",
+    "scripts/build-runtime.sh",
+    "/home/lmxxf/work/dlss5-gap-phase5-20261023/final-payload"
+  ],
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "module_action": "Copy accepted knife1 final-payload HIP80, verify SHA readback and ELF targets; no RTC/device recompilation."
+}

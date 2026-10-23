@@ -1,0 +1,30 @@
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -471,11 +471,17 @@
+ #ifndef HIP_COMPACT_VIT_CONTRACT
+ #define HIP_COMPACT_VIT_CONTRACT 1
+ #endif
++ // Central shape admission for the paired contract/projection tail paths.
++ bool CompactVitTailGeometryEligible()const{
++  if(W==1920&&H==1152)return true; // Existing Original and Small 1080 path.
++  if(!small_active)return (W==1920&&H==1088)||(W==1600&&H==960);
++  return (W==1600&&H==1024)||(W==1344&&H==768)||(W==1920&&H==1088);
++ }
+  bool CompactVitTailDeviceEligible(){hip_probe::DevicePropertiesR0600 props{};return !api.hipGetDevicePropertiesR0600(&props,int(opt.device))&&!std::strncmp(props.gcnArchName,"gfx1201",7)&&(props.gcnArchName[7]==0||props.gcnArchName[7]==':')&&std::strstr(props.name,"9070 XT");}
+  void InitCompactContract(){
+ #if HIP_COMPACT_VIT_CONTRACT
+   const bool device_ok=CompactVitTailDeviceEligible();
+-  if(device_ok&&!opt.integration.select_module&&fast_numeric&&((W==1920&&H==1152)||(!small_active&&((W==1920&&H==1088)||(W==1600&&H==960))))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
++  if(device_ok&&!opt.integration.select_module&&fast_numeric&&CompactVitTailGeometryEligible()&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
+    if((VitW16Mode()&2)&&HasFn("vit_stream","vit_stream_contract_frag_bout_compactw_w16")){
+     compact_contract_fn=Fn("vit_stream","vit_stream_contract_frag_bout_compactw_w16");compact_contract_w16=true;
+     if(HasFn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16"))compact_contract_bstream_fn=Fn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16");
+@@ -492,7 +498,7 @@
+ #endif
+  void InitCompactProjection(){
+ #if HIP_COMPACT_VIT_PROJECTION
+-  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&((W==1920&&H==1152)||(!small_active&&((W==1920&&H==1088)||(W==1600&&H==960))))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
++  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&CompactVitTailGeometryEligible()&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
+    if((VitW16Mode()&4)&&HasFn("vit_stream","vit_stream_project_n64_bb_compactw_w16")){
+     compact_projection_fn=Fn("vit_stream","vit_stream_project_n64_bb_compactw_w16");compact_projection_w16=true;
+     if(HasFn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16"))compact_projection_bout_fn=Fn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16");

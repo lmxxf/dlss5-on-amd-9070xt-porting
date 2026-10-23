@@ -1,0 +1,33 @@
+{
+  "git_head": "c24e3a97cdf596d0c997cee7deda91c981d520ce",
+  "production_delta": "only knife1 two compact geometry qualifications; added dimensions Original-only",
+  "production_header_sha256": "deb120d52eae0b01899610152b756c2d9431ac442185a9f2d17c63088dcf6a34",
+  "production_patch_sha256": "1fc13fb9634e512c1e334a7b03e003c2c1328e13bf08f3a4df719fed0c8d51d9",
+  "source_manifest_sha256": "4962e9d68a38f4aa5bed96aa1103cf0a508600b50137ab81e3c0310bf5c19660",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "payload": "/home/lmxxf/work/dlss5-gap-phase2-20261023/final-payload",
+  "artifacts": [
+    {
+      "name": "LmxxfNrRuntime.dll",
+      "bytes": 4342159,
+      "sha256": "c77cb78c67e75188e1c76eeb6e0dc0d5a441d240342d96f4d8985cef99c1a8ca"
+    },
+    {
+      "name": "LmxxfNrRuntime.dll.a",
+      "bytes": 1626,
+      "sha256": "802e123fcba16f78dd7e0b1915afe5cafeeaf0fd413280ff250d8262474f0311"
+    },
+    {
+      "name": "dlss5-amd.addon64",
+      "bytes": 4658113,
+      "sha256": "e1b75a99e69b2a31bd463917036f7cb29aea087400eece5bca1895e9939b71a9"
+    }
+  ],
+  "commands": [
+    "bash scripts/build-addon.sh /home/lmxxf/work/ai-theorys-study/wechat/assets/297/third_party/minhook /home/lmxxf/work/ai-theorys-study/wechat/assets/297/third_party/reshade/include /home/lmxxf/work/dlss5-gap-phase2-20261023/final-payload/dlss5-amd.addon64 --hip",
+    "bash scripts/build-runtime.sh /home/lmxxf/work/dlss5-gap-phase2-20261023/final-payload"
+  ],
+  "gpu_smoke_executed": false,
+  "game_install_changed": false,
+  "hsaco_rebuilt": false
+}

@@ -1,0 +1,154 @@
+{
+  "tiers": {
+    "960": {
+      "baseline": 6.447296770833334,
+      "candidate": 6.533707083333334,
+      "delta_ms": 0.08641031249999997,
+      "p99_delta_ms": 0.09763400000000022,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.08673843750000021,
+          "p99_delta_ms": 0.09798200000000001
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.08699625000000033,
+          "p99_delta_ms": 0.07610700000000037
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.08549625000000027,
+          "p99_delta_ms": 0.10695500000000013
+        }
+      ]
+    },
+    "1088": {
+      "baseline": 8.850873854166668,
+      "candidate": 8.975739375,
+      "delta_ms": 0.1248655208333318,
+      "p99_delta_ms": 0.11576200000000014,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.11321625000000068,
+          "p99_delta_ms": 0.09920799999999907
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.1310403124999997,
+          "p99_delta_ms": 0.10096000000000238
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.13033999999999857,
+          "p99_delta_ms": 0.11667500000000075
+        }
+      ]
+    },
+    "1152": {
+      "baseline": 9.140692187500001,
+      "candidate": 9.193507291666666,
+      "delta_ms": 0.05281510416666535,
+      "p99_delta_ms": 0.06564000000000014,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.05565937500000118,
+          "p99_delta_ms": 0.027755999999998338
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.0515090624999992,
+          "p99_delta_ms": 0.043261000000001104
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.051276875000001,
+          "p99_delta_ms": 0.10350800000000149
+        }
+      ]
+    }
+  },
+  "gold_frames": 84,
+  "perf_slots": 36,
+  "warm_runs": [
+    4,
+    5
+  ],
+  "calls": [
+    3904,
+    3920
+  ],
+  "overlap": {
+    "trace-960-ordered": {
+      "positive_edges": 0,
+      "consumers": 0,
+      "invalid_tail_per_edge": [
+        0
+      ]
+    },
+    "trace-960-anyorder": {
+      "positive_edges": 16,
+      "consumers": 6641,
+      "invalid_tail_per_edge": [
+        0
+      ]
+    },
+    "trace-1088-ordered": {
+      "positive_edges": 0,
+      "consumers": 0,
+      "invalid_tail_per_edge": [
+        0
+      ]
+    },
+    "trace-1088-anyorder": {
+      "positive_edges": 16,
+      "consumers": 13091,
+      "invalid_tail_per_edge": [
+        0
+      ]
+    },
+    "trace-1152-ordered": {
+      "positive_edges": 0,
+      "consumers": 0,
+      "invalid_tail_per_edge": [
+        8
+      ]
+    },
+    "trace-1152-anyorder": {
+      "positive_edges": 16,
+      "consumers": 14795,
+      "invalid_tail_per_edge": [
+        8
+      ]
+    }
+  },
+  "carry32_final_target": 4294967344,
+  "limit64": {
+    "requested": 1,
+    "enabled": 0,
+    "calls": 16,
+    "anyorder": 16,
+    "ordered": 0,
+    "overflow": 1,
+    "status": 0,
+    "counter_values": 2160,
+    "counter_mismatches": 0
+  },
+  "forced_rejection": {
+    "requested": 1,
+    "enabled": 1,
+    "calls": 112,
+    "anyorder": 112,
+    "ordered": 0,
+    "overflow": 0,
+    "status": 1,
+    "counter_values": 2160,
+    "counter_mismatches": 0
+  },
+  "timeout_zero_expected_raw_hash_match": true,
+  "producer_emptyopts_used": true,
+  "production_hip_diff": [],
+  "limit64_actual_initial_counter": 18446744073709551600
+}

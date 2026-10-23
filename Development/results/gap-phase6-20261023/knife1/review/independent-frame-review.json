@@ -1,0 +1,414 @@
+{
+  "profiles": {
+    "original1088": {
+      "baseline_ms": 8.775910000000001,
+      "candidate_ms": 8.7738753125,
+      "delta_ms": -0.0020346875000019082,
+      "p99_delta_ms": -0.022968000000000544,
+      "round_mean_wins": 2,
+      "round_p99_wins": 1,
+      "adjacent_pair_wins": 4,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.019989999999999952,
+          "p99_delta_ms": 0.01702799999999982,
+          "baseline_slot_drift_ms": 0.09708812500000086,
+          "candidate_slot_drift_ms": 0.04500062500000013,
+          "adjacent_pair_deltas_ms": [
+            0.04603374999999943,
+            -0.006053750000001301
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.019875312499999964,
+          "p99_delta_ms": 0.013298999999998173,
+          "baseline_slot_drift_ms": 0.0033112499999994327,
+          "candidate_slot_drift_ms": 0.02170562500000095,
+          "adjacent_pair_deltas_ms": [
+            -0.02907250000000161,
+            -0.010678125000000094
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.006218750000000384,
+          "p99_delta_ms": -0.14975700000000103,
+          "baseline_slot_drift_ms": 0.05728937500000164,
+          "candidate_slot_drift_ms": -0.03502687499999979,
+          "adjacent_pair_deltas_ms": [
+            0.03993937500000122,
+            -0.05237687500000021
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 8.7675,
+          "p95": 8.944714999999999,
+          "p99": 9.034097000000001,
+          "max": 9.2627
+        },
+        "candidate": {
+          "median": 8.76415,
+          "p95": 8.94529,
+          "p99": 9.011129,
+          "max": 10.7753
+        }
+      }
+    },
+    "original1152": {
+      "baseline_ms": 9.087454791666666,
+      "candidate_ms": 9.068573229166667,
+      "delta_ms": -0.01888156249999895,
+      "p99_delta_ms": 0.018667999999999907,
+      "round_mean_wins": 3,
+      "round_p99_wins": 1,
+      "adjacent_pair_wins": 6,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.01005843750000146,
+          "p99_delta_ms": -0.004203000000002177,
+          "baseline_slot_drift_ms": 0.010026875000001212,
+          "candidate_slot_drift_ms": -0.0034737500000012744,
+          "adjacent_pair_deltas_ms": [
+            -0.003308124999998441,
+            -0.016808750000000927
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.02096874999999976,
+          "p99_delta_ms": 0.005938000000000443,
+          "baseline_slot_drift_ms": -0.0326637500000011,
+          "candidate_slot_drift_ms": -0.018192500000001388,
+          "adjacent_pair_deltas_ms": [
+            -0.028204374999999615,
+            -0.013733124999999902
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.025617500000002735,
+          "p99_delta_ms": 0.12310599999999994,
+          "baseline_slot_drift_ms": -0.007145624999999711,
+          "candidate_slot_drift_ms": 0.022341874999998623,
+          "adjacent_pair_deltas_ms": [
+            -0.04036124999999835,
+            -0.010873750000000015
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 9.0832,
+          "p95": 9.228565,
+          "p99": 9.293016999999999,
+          "max": 9.4096
+        },
+        "candidate": {
+          "median": 9.0589,
+          "p95": 9.2068,
+          "p99": 9.311684999999999,
+          "max": 9.5076
+        }
+      }
+    },
+    "original960": {
+      "baseline_ms": 6.452625104166667,
+      "candidate_ms": 6.44074,
+      "delta_ms": -0.011885104166666771,
+      "p99_delta_ms": -0.01512399999999925,
+      "round_mean_wins": 3,
+      "round_p99_wins": 1,
+      "adjacent_pair_wins": 6,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.015072187500000389,
+          "p99_delta_ms": 0.00803299999999929,
+          "baseline_slot_drift_ms": -0.0036956250000006463,
+          "candidate_slot_drift_ms": -0.01734624999999923,
+          "adjacent_pair_deltas_ms": [
+            -0.008246875000001097,
+            -0.02189749999999968
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.008276562499998974,
+          "p99_delta_ms": -0.0007119999999991578,
+          "baseline_slot_drift_ms": 0.0031612500000006705,
+          "candidate_slot_drift_ms": 0.007700625000000905,
+          "adjacent_pair_deltas_ms": [
+            -0.01054624999999998,
+            -0.006006874999999745
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.012306562499999174,
+          "p99_delta_ms": 0.007038000000000544,
+          "baseline_slot_drift_ms": -0.0177025000000004,
+          "candidate_slot_drift_ms": 0.0007193750000000776,
+          "adjacent_pair_deltas_ms": [
+            -0.021517500000000744,
+            -0.0030956250000002683
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 6.43615,
+          "p95": 6.586515,
+          "p99": 6.863169999999999,
+          "max": 7.0079
+        },
+        "candidate": {
+          "median": 6.42135,
+          "p95": 6.6056799999999996,
+          "p99": 6.848046,
+          "max": 6.9345
+        }
+      }
+    },
+    "small1080": {
+      "baseline_ms": 5.498271562499999,
+      "candidate_ms": 5.487188229166667,
+      "delta_ms": -0.011083333333332668,
+      "p99_delta_ms": -0.007044999999998858,
+      "round_mean_wins": 3,
+      "round_p99_wins": 2,
+      "adjacent_pair_wins": 5,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.015375312499999794,
+          "p99_delta_ms": -0.010240999999999723,
+          "baseline_slot_drift_ms": 0.013644375000000153,
+          "candidate_slot_drift_ms": 0.005450000000000621,
+          "adjacent_pair_deltas_ms": [
+            -0.011278125000000472,
+            -0.019472500000000004
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.007064687500000666,
+          "p99_delta_ms": -0.026192999999999245,
+          "baseline_slot_drift_ms": 0.0053293749999996365,
+          "candidate_slot_drift_ms": 0.021032499999999565,
+          "adjacent_pair_deltas_ms": [
+            -0.014916249999999742,
+            0.0007868750000001867
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.010810000000000208,
+          "p99_delta_ms": 0.0173400000000008,
+          "baseline_slot_drift_ms": -0.0047418749999996734,
+          "candidate_slot_drift_ms": 0.004684375000000074,
+          "adjacent_pair_deltas_ms": [
+            -0.015523124999999638,
+            -0.006096874999999891
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 5.4826999999999995,
+          "p95": 5.654154999999999,
+          "p99": 5.728654999999999,
+          "max": 5.8359
+        },
+        "candidate": {
+          "median": 5.46795,
+          "p95": 5.646504999999999,
+          "p99": 5.72161,
+          "max": 6.1671
+        }
+      }
+    },
+    "small720": {
+      "baseline_ms": 2.9764217708333334,
+      "candidate_ms": 2.9801254166666666,
+      "delta_ms": 0.003703645833333269,
+      "p99_delta_ms": 0.0032119999999999926,
+      "round_mean_wins": 1,
+      "round_p99_wins": 2,
+      "adjacent_pair_wins": 3,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.012972187499999954,
+          "p99_delta_ms": 0.045611999999999764,
+          "baseline_slot_drift_ms": -0.0033031249999999623,
+          "candidate_slot_drift_ms": 0.010346250000000445,
+          "adjacent_pair_deltas_ms": [
+            0.006147499999999972,
+            0.01979687500000038
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.0006940624999995926,
+          "p99_delta_ms": -0.019733,
+          "baseline_slot_drift_ms": 0.0029818750000001337,
+          "candidate_slot_drift_ms": 0.011906250000000007,
+          "adjacent_pair_deltas_ms": [
+            -0.003768125000000122,
+            0.005156249999999751
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.002555312500000184,
+          "p99_delta_ms": -0.026627999999999652,
+          "baseline_slot_drift_ms": -0.004141875000000184,
+          "candidate_slot_drift_ms": -0.0015887500000002497,
+          "adjacent_pair_deltas_ms": [
+            -0.003831874999999929,
+            -0.0012787499999999952
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 2.96985,
+          "p95": 3.058915,
+          "p99": 3.105482,
+          "max": 3.1933
+        },
+        "candidate": {
+          "median": 2.97035,
+          "p95": 3.06391,
+          "p99": 3.108694,
+          "max": 5.0595
+        }
+      }
+    },
+    "small900": {
+      "baseline_ms": 4.253104583333333,
+      "candidate_ms": 4.2454121874999995,
+      "delta_ms": -0.007692395833333698,
+      "p99_delta_ms": -0.00849499999999992,
+      "round_mean_wins": 2,
+      "round_p99_wins": 2,
+      "adjacent_pair_wins": 5,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.009260312500000367,
+          "p99_delta_ms": -0.027904000000000373,
+          "baseline_slot_drift_ms": -0.014466875000000101,
+          "candidate_slot_drift_ms": -0.00710999999999995,
+          "adjacent_pair_deltas_ms": [
+            -0.012938749999999999,
+            -0.005581874999999847
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.0016556250000006045,
+          "p99_delta_ms": 0.01315500000000025,
+          "baseline_slot_drift_ms": -0.0007706249999994697,
+          "candidate_slot_drift_ms": -0.011161874999999988,
+          "adjacent_pair_deltas_ms": [
+            0.0068512500000004195,
+            -0.0035400000000000986
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.015472499999999556,
+          "p99_delta_ms": -0.03174200000000038,
+          "baseline_slot_drift_ms": -0.019228749999999906,
+          "candidate_slot_drift_ms": 0.004367499999999858,
+          "adjacent_pair_deltas_ms": [
+            -0.027270624999999882,
+            -0.0036743750000001185
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 4.24895,
+          "p95": 4.343825,
+          "p99": 4.383959,
+          "max": 4.6339
+        },
+        "candidate": {
+          "median": 4.2419,
+          "p95": 4.339525,
+          "p99": 4.375464,
+          "max": 4.526
+        }
+      }
+    },
+    "smallfree1088": {
+      "baseline_ms": 5.284172916666666,
+      "candidate_ms": 5.2825038541666665,
+      "delta_ms": -0.0016690624999995407,
+      "p99_delta_ms": 0.04139999999999944,
+      "round_mean_wins": 1,
+      "round_p99_wins": 1,
+      "adjacent_pair_wins": 2,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.009239999999999249,
+          "p99_delta_ms": 0.06014699999999973,
+          "baseline_slot_drift_ms": 0.00039312500000043826,
+          "candidate_slot_drift_ms": 0.008189374999999721,
+          "adjacent_pair_deltas_ms": [
+            0.0053418750000000514,
+            0.013138124999999334
+          ]
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.025399062500000014,
+          "p99_delta_ms": -0.04120200000000018,
+          "baseline_slot_drift_ms": 0.015930625000000198,
+          "candidate_slot_drift_ms": -0.02024500000000007,
+          "adjacent_pair_deltas_ms": [
+            -0.00731124999999988,
+            -0.04348687500000015
+          ]
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.011151874999999478,
+          "p99_delta_ms": 0.06129300000000004,
+          "baseline_slot_drift_ms": -0.01139874999999968,
+          "candidate_slot_drift_ms": -0.014253750000000842,
+          "adjacent_pair_deltas_ms": [
+            0.012579375000000503,
+            0.009724374999999341
+          ]
+        }
+      ],
+      "distribution": {
+        "baseline": {
+          "median": 5.278,
+          "p95": 5.40079,
+          "p99": 5.4696050000000005,
+          "max": 5.5421
+        },
+        "candidate": {
+          "median": 5.270849999999999,
+          "p95": 5.421725,
+          "p99": 5.511005,
+          "max": 5.6116
+        }
+      }
+    }
+  },
+  "slots": 84,
+  "samples_per_arm_per_profile": 960,
+  "all_samples_kept": true,
+  "no_performance_reruns": true
+}

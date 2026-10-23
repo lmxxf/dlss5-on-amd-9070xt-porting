@@ -1,0 +1,20 @@
+--- candidate/hip_reference_network.h
++++ final/hip_reference_network.h
+@@ -475,7 +475,7 @@
+  void InitCompactContract(){
+ #if HIP_COMPACT_VIT_CONTRACT
+   const bool device_ok=CompactVitTailDeviceEligible();
+-  if(device_ok&&!opt.integration.select_module&&fast_numeric&&((W==1920&&(H==1152||H==1088))||(W==1600&&H==960))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
++  if(device_ok&&!opt.integration.select_module&&fast_numeric&&((W==1920&&H==1152)||(!small_active&&((W==1920&&H==1088)||(W==1600&&H==960))))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&!opt.vit_split_k&&!opt.vit_ffn_fused){
+    if((VitW16Mode()&2)&&HasFn("vit_stream","vit_stream_contract_frag_bout_compactw_w16")){
+     compact_contract_fn=Fn("vit_stream","vit_stream_contract_frag_bout_compactw_w16");compact_contract_w16=true;
+     if(HasFn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16"))compact_contract_bstream_fn=Fn("vit_stream","vit_stream_contract_frag_bstream_bout_compactw_w16");
+@@ -492,7 +492,7 @@
+ #endif
+  void InitCompactProjection(){
+ #if HIP_COMPACT_VIT_PROJECTION
+-  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&((W==1920&&(H==1152||H==1088))||(W==1600&&H==960))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
++  if(CompactVitTailDeviceEligible()&&!opt.integration.select_module&&fast_numeric&&((W==1920&&H==1152)||(!small_active&&((W==1920&&H==1088)||(W==1600&&H==960))))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal&&!opt.sparse_weights&&vit_contract_byte_edge&&vit_proj_n64_active&&opt.vit_proj_frag){
+    if((VitW16Mode()&4)&&HasFn("vit_stream","vit_stream_project_n64_bb_compactw_w16")){
+     compact_projection_fn=Fn("vit_stream","vit_stream_project_n64_bb_compactw_w16");compact_projection_w16=true;
+     if(HasFn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16"))compact_projection_bout_fn=Fn("vit_stream","vit_stream_project_n64_bb_bout_compactw_w16");

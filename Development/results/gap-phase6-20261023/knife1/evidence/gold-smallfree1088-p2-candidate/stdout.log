@@ -1,0 +1,9 @@
+seed=0 pattern=2
+input format=RGBA16_FLOAT W=1920 H=1072 invalid=0 min=0 max=0.000122010708 luma=6.09812359e-05 roi_luma=6.09697801e-05
+adapter=AMD Radeon RX 9070 XT
+frame=0 reset=1 wall_ms=1061.783 invalid=0 luma=0.0001033607 roi=0.0001010414 dark=2058240 roi_dark=720000 changed_first=0 maxabs_first=0
+frame=1 reset=1 wall_ms=6.967 invalid=0 luma=0.0001033607 roi=0.0001010414 dark=2058240 roi_dark=720000 changed_first=0 maxabs_first=0
+frame=2 reset=1 wall_ms=19.117 invalid=0 luma=0.0001033607 roi=0.0001010414 dark=2058240 roi_dark=720000 changed_first=0 maxabs_first=0
+SP_STATS runs=0 fallback=0 rollover=0 jobs=0 disabled=0 errors=0
+RESULT frames=3 temporal=0 mean_wall_ms=362.622 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+

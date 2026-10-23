@@ -1,0 +1,61 @@
+DONE B/gold-1152-p0-baseline
+
+RESULT frames=3 temporal=0 mean_wall_ms=374.484 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1152-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=380.956 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1152-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=383.984 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1152-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=378.877 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1152-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=369.551 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1152-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=392.394 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p0-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=370.592 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=381.483 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=371.554 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=385.678 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=367.753 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-1088-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=380.712 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p0-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=378.125 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=381.725 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=375.027 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=386.235 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=374.879 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/gold-960-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=381.460 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-1152-ordered
+RESULT frames=3 temporal=0 mean_wall_ms=389.831 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-1152-anyorder
+RESULT frames=3 temporal=0 mean_wall_ms=379.603 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-1088-ordered
+RESULT frames=3 temporal=0 mean_wall_ms=378.428 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-1088-anyorder
+RESULT frames=3 temporal=0 mean_wall_ms=380.063 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-960-ordered
+RESULT frames=3 temporal=0 mean_wall_ms=382.977 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/trace-960-anyorder
+RESULT frames=3 temporal=0 mean_wall_ms=383.674 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/carry32-1152
+RESULT frames=3 temporal=0 mean_wall_ms=384.920 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/limit64-1152
+RESULT frames=3 temporal=0 mean_wall_ms=381.710 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/missing-exports-1152
+RESULT frames=3 temporal=0 mean_wall_ms=427.549 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE B/missing-exports-960
+RESULT frames=3 temporal=0 mean_wall_ms=427.649 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+ALL_JOBS_DONE B-gold-and-diagnostics
+LOCK_RELEASED
+
+

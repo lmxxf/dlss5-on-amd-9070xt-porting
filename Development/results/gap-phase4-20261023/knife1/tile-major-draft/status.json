@@ -1,0 +1,9 @@
+{
+  "status": "UNTESTED_DRAFT_SUPERSEDED_BEFORE_GPU",
+  "reason": "user requires head-major across key tiles; original draft was tile-major",
+  "hip_sources": {
+    "deep_fast-packed-fast.candidate.hip": "24b21afa694e60f9ece25fa56b0ff9513a658ae34c3e25c399a4be8262842745",
+    "vit-stream-fast.candidate.hip": "0d44f0a1f857aac395a2fba5cdcf20e51209df93efcb173c19e483df02dccbf3",
+    "deep_fast.hip": "56fd5b251bc6aed445a49e86951ffaf9c55ec1c88c2237d8526364f849eb121a"
+  }
+}

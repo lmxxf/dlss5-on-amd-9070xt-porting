@@ -1,0 +1,40 @@
+--- initial/hip_reference_network.h
++++ warmed/hip_reference_network.h
+@@ -303,7 +303,7 @@
+ 
+  U W,H;std::function<void(const std::string&)>progress;std::function<void(const std::string&,void*,size_t)>observer;
+  static U Count(size_t n){if(!n||n>std::numeric_limits<U>::max())throw std::runtime_error("HIP reference index count overflow");return U(n);}
+- Tensor New(size_t n){Count(n);size_t bytes=n*4;if(opt.pooled){Tensor*best=nullptr;for(auto&t:pool)if(t.use_count()==1&&t->capacity>=bytes&&(!best||t->capacity<(*best)->capacity))best=&t;if(best){(*best)->bytes=bytes;return *best;}if(graph_capturing)throw std::runtime_error("graph capture requires warmed allocation pool");if(chain_requested&&external_input_wait)throw std::runtime_error("chain pool was not prepared before external wait");auto t=std::make_shared<Allocation>(api,bytes);pool.push_back(t);return t;}return std::make_shared<Allocation>(api,bytes);}
++ Tensor New(size_t n){Count(n);size_t bytes=n*4;if(opt.pooled){Tensor*best=nullptr;for(auto&t:pool)if(t.use_count()==1&&t->capacity>=bytes&&(!best||t->capacity<(*best)->capacity))best=&t;if(best){(*best)->bytes=bytes;return *best;}if(graph_capturing)throw std::runtime_error("graph capture requires warmed allocation pool");if(chain_requested&&external_input_wait){size_t total=0,held=0,max_free=0;for(const auto&t:pool){total+=t->capacity;if(t.use_count()>1)++held;else max_free=std::max(max_free,t->capacity);}throw std::runtime_error("chain pool was not prepared before external wait bytes="+std::to_string(bytes)+" pool="+std::to_string(pool.size())+" pool_bytes="+std::to_string(total)+" held="+std::to_string(held)+" max_free="+std::to_string(max_free));}auto t=std::make_shared<Allocation>(api,bytes);pool.push_back(t);return t;}return std::make_shared<Allocation>(api,bytes);}
+  /* 2026-09-30 (HIP_C512_PAD16): C512 tensors whose token count is not a multiple of 16 (900: 50x30=1500) get a
+     buffer rounded up to 16 tokens; `bytes` stays the valid size (stage dumps unchanged). CompactC512Body then reads the
+     input in place instead of mh_shift_pack copying it into a zero-padded buffer: every C512 kernel is row-independent
+@@ -1319,8 +1319,26 @@
+   try{
+    api.Check(api.hipMemsetAsync(scratch,0,bytes,stream),"cold model zero");
+    auto*out=static_cast<char*>(scratch)+pixels*16;auto*hist=temporal?static_cast<char*>(scratch)+pixels*28:nullptr;
+-   Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();
+-   if(saved_adaptive&&ae&&strcmp(ae,"0")){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();SetAdaptiveReuseAllowed(saved_adaptive);}
++   unsigned chain_warm_runs=0;
++   auto pool_bytes=[&](){size_t total=0;for(const auto&t:pool)total+=t->capacity;return total;};
++   if(chain_requested){
++    unsigned stable=0,cycles=0;const bool extra_ae=saved_adaptive&&ae&&strcmp(ae,"0");
++    while(chain_warm_runs+(extra_ae?2u:1u)<=8){
++     const size_t before_pool=pool.size(),before_bytes=pool_bytes();const auto before_uploads=weight_uploads;
++     Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();++chain_warm_runs;
++     if(extra_ae){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();ReleaseChainFrame();++chain_warm_runs;SetAdaptiveReuseAllowed(saved_adaptive);}
++     ++cycles;const size_t after_pool=pool.size(),after_bytes=pool_bytes();
++     const bool unchanged=after_pool==before_pool&&after_bytes==before_bytes&&weight_uploads==before_uploads;
++     stable=unchanged?stable+1:0;
++     std::fprintf(stderr,"C512_CHAIN warm runs=%u cycle=%u profile=%u pool=%zu->%zu bytes=%zu->%zu uploads=%llu->%llu stable=%u enabled=%u overflow=%u before_producer_wait=1\n",chain_warm_runs,cycles,profile,before_pool,after_pool,before_bytes,after_bytes,before_uploads,weight_uploads,stable,unsigned(chain_enabled),unsigned(chain_overflow));
++     if(stable>=2)break;
++    }
++    if(stable<2)throw std::runtime_error("C512 chain cold pool did not stabilize in 8 warm runs");
++    std::fprintf(stderr,"C512_CHAIN warm_ready runs=%u cycles=%u profile=%u pool=%zu bytes=%zu uploads=%llu enabled=%u overflow=%u before_producer_wait=1\n",chain_warm_runs,cycles,profile,pool.size(),pool_bytes(),weight_uploads,unsigned(chain_enabled),unsigned(chain_overflow));
++   }else{
++    Enqueue(scratch,hist,out,0);Synchronize();
++    if(saved_adaptive&&ae&&strcmp(ae,"0")){SetAdaptiveReuseAllowed(false);Enqueue(scratch,hist,out,0);Synchronize();SetAdaptiveReuseAllowed(saved_adaptive);}
++   }
+    InvalidateExperimentalHistory();adaptive_dirty=true;adaptive_user_disabled=saved_user_disabled;opt.integration.allow_vit_hotkey=saved_hotkey;prepared_input_profiles.insert(profile);
+    std::fprintf(stderr,"model_prepared mode=%s profile=%u uploads=%llu active_weights=%zu retained_weights=%zu before_producer_wait=1\n",dlss5_mode::Name(requested_mode),profile,weight_uploads,weights.size(),inactive_model_weights.size());
+   }catch(...){SetAdaptiveReuseAllowed(saved_adaptive);adaptive_user_disabled=saved_user_disabled;opt.integration.allow_vit_hotkey=saved_hotkey;api.hipStreamSynchronize(stream);api.hipFree(scratch);throw;}

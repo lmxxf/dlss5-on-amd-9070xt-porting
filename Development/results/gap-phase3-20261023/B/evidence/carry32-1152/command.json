@@ -1,0 +1,13 @@
+{
+    "label":  "B/carry32-1152",
+    "env":  {
+                "SMALL_FRAME_CAPTURE":  "1",
+                "NR_C512_CHAIN":  "1",
+                "NR_C512_CHAIN_ORDERED":  "0",
+                "NR_C512_CHAIN_TRACE_DIR":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\carry32-1152",
+                "NR_C512_CHAIN_START":  "4294967288"
+            },
+    "arguments":  "\"D:\\DLSSNR-Lab\\combined-vs041-20261006\\assets-common\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\carry32-1152\\same.flags\" \"D:\\DLSSNR-Lab\\combined-vs041-20261006\\input.f16\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\carry32-1152\\out\" 3 0 \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\trace-modules\" 0 0 0 0",
+    "exe":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\frame-warmed.exe",
+    "start":  "2026-10-23T10:52:52.8604924Z"
+}

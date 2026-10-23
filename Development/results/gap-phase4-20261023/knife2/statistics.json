@@ -1,0 +1,513 @@
+{
+  "tiers": {
+    "768": {
+      "baseline_ms": 3.0619273958333335,
+      "candidate_ms": 3.0077939583333335,
+      "delta_ms": -0.05413343749999999,
+      "delta_percent": -1.767953008084533,
+      "baseline_p99": 3.3068569999999995,
+      "candidate_p99": 3.1696439999999995,
+      "p99_delta_ms": -0.13721300000000003,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 3.0601653124999997,
+          "candidate": 2.9954718750000002,
+          "delta_ms": -0.06469343749999945,
+          "p99_delta_ms": -0.10860599999999998,
+          "base_drift": 0.017765625000000007
+        },
+        {
+          "round": 2,
+          "base": 3.066445,
+          "candidate": 3.01663,
+          "delta_ms": -0.04981499999999972,
+          "p99_delta_ms": -0.18002699999999994,
+          "base_drift": 0.022463750000000005
+        },
+        {
+          "round": 3,
+          "base": 3.0591718749999997,
+          "candidate": 3.01128,
+          "delta_ms": -0.04789187499999947,
+          "p99_delta_ms": -0.04148399999999963,
+          "base_drift": 0.008464999999999723
+        }
+      ],
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+      "samples_per_arm": 960
+    },
+    "1024": {
+      "baseline_ms": 4.350585729166666,
+      "candidate_ms": 4.286139895833332,
+      "delta_ms": -0.06444583333333398,
+      "delta_percent": -1.4813139504707196,
+      "baseline_p99": 4.517755,
+      "candidate_p99": 4.449542999999999,
+      "p99_delta_ms": -0.06821200000000083,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 4.338115,
+          "candidate": 4.27572375,
+          "delta_ms": -0.06239125000000012,
+          "p99_delta_ms": -0.10259699999999938,
+          "base_drift": 0.03009750000000011
+        },
+        {
+          "round": 2,
+          "base": 4.355099687499999,
+          "candidate": 4.2952265625,
+          "delta_ms": -0.059873124999999305,
+          "p99_delta_ms": -0.04005499999999973,
+          "base_drift": -0.0018593750000004405
+        },
+        {
+          "round": 3,
+          "base": 4.3585425,
+          "candidate": 4.287469375,
+          "delta_ms": -0.07107312500000074,
+          "p99_delta_ms": -0.0686820000000008,
+          "base_drift": 0.011343750000000874
+        }
+      ],
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+      "samples_per_arm": 960
+    },
+    "1088": {
+      "baseline_ms": 5.587079791666667,
+      "candidate_ms": 5.341975000000001,
+      "delta_ms": -0.245104791666666,
+      "delta_percent": -4.386992862214867,
+      "baseline_p99": 5.7595719999999995,
+      "candidate_p99": 5.530056,
+      "p99_delta_ms": -0.2295159999999994,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.581829375,
+          "candidate": 5.323863749999999,
+          "delta_ms": -0.25796562500000064,
+          "p99_delta_ms": -0.3019569999999998,
+          "base_drift": 0.00935125000000081
+        },
+        {
+          "round": 2,
+          "base": 5.59016625,
+          "candidate": 5.34784875,
+          "delta_ms": -0.2423175000000004,
+          "p99_delta_ms": -0.23283599999999982,
+          "base_drift": -0.007985000000000575
+        },
+        {
+          "round": 3,
+          "base": 5.58924375,
+          "candidate": 5.3542125,
+          "delta_ms": -0.23503124999999958,
+          "p99_delta_ms": -0.20389400000000002,
+          "base_drift": 0.01235875000000064
+        }
+      ],
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-1024-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r1-0-baseline",
+      "height": 1024,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.32306625,
+      "p99": 4.481878,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r1-1-candidate",
+      "height": 1024,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.27399125,
+      "p99": 4.413676000000001,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r1-2-candidate",
+      "height": 1024,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.27745625,
+      "p99": 4.419407,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r1-3-baseline",
+      "height": 1024,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.35316375,
+      "p99": 4.523255,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r2-0-baseline",
+      "height": 1024,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.356029375,
+      "p99": 4.503069,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r2-1-candidate",
+      "height": 1024,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.292264375,
+      "p99": 4.43379,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r2-2-candidate",
+      "height": 1024,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.29818875,
+      "p99": 4.474456,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r2-3-baseline",
+      "height": 1024,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.35417,
+      "p99": 4.494286,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r3-0-baseline",
+      "height": 1024,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.3528706249999995,
+      "p99": 4.511311,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r3-1-candidate",
+      "height": 1024,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.28668875,
+      "p99": 4.396889,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r3-2-candidate",
+      "height": 1024,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.28825,
+      "p99": 4.517780999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1024-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1024-r3-3-baseline",
+      "height": 1024,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.364214375,
+      "p99": 4.56565,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-1088-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r1-0-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.57715375,
+      "p99": 5.7374600000000004,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r1-1-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.3296093749999995,
+      "p99": 5.4885,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r1-2-candidate",
+      "height": 1088,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.318118125,
+      "p99": 5.465477,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r1-3-baseline",
+      "height": 1088,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.586505000000001,
+      "p99": 5.867097,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r2-0-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.59415875,
+      "p99": 5.757684,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r2-1-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.34752875,
+      "p99": 5.506584,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r2-2-candidate",
+      "height": 1088,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.348168749999999,
+      "p99": 5.5421570000000004,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r2-3-baseline",
+      "height": 1088,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.5861737499999995,
+      "p99": 5.770242,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r3-0-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.583064375,
+      "p99": 5.706607,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r3-1-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.355402499999999,
+      "p99": 5.557525,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r3-2-candidate",
+      "height": 1088,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.3530225,
+      "p99": 5.535592,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-1088-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-1088-r3-3-baseline",
+      "height": 1088,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.595423125000001,
+      "p99": 5.753381,
+      "raw_sha": "3511aa03c8498690c747a5c9e95bf709fa3733999ef37bbe8ecf2184824acdc6"
+    },
+    {
+      "name": "perf-768-r1-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r1-0-baseline",
+      "height": 768,
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 3.0512825,
+      "p99": 3.2203429999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r1-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r1-1-candidate",
+      "height": 768,
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.0003412500000004,
+      "p99": 3.1578809999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r1-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r1-2-candidate",
+      "height": 768,
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.9906025,
+      "p99": 3.159798,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r1-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r1-3-baseline",
+      "height": 768,
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 3.069048125,
+      "p99": 3.3124499999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r2-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r2-0-baseline",
+      "height": 768,
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 3.055213125,
+      "p99": 3.2172069999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r2-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r2-1-candidate",
+      "height": 768,
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.0152987500000004,
+      "p99": 3.151605,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r2-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r2-2-candidate",
+      "height": 768,
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 3.01796125,
+      "p99": 3.1880889999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r2-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r2-3-baseline",
+      "height": 768,
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 3.077676875,
+      "p99": 3.399794,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r3-0-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r3-0-baseline",
+      "height": 768,
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 3.054939375,
+      "p99": 3.237193,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r3-1-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r3-1-candidate",
+      "height": 768,
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.010878125,
+      "p99": 3.1454880000000003,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r3-2-candidate",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r3-2-candidate",
+      "height": 768,
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 3.011681875,
+      "p99": 3.206355,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-768-r3-3-baseline",
+      "source_path": "wechat/assets/297/Development/results/gap-phase4-20261023/knife2/evidence/perf-768-r3-3-baseline",
+      "height": 768,
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 3.0634043749999997,
+      "p99": 3.180769,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    }
+  ]
+}

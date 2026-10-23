@@ -1,0 +1,33 @@
+{
+  "status": "PRODUCTION_SOURCE_EQUALS_GPU_TESTED_LIMITED_SOURCE",
+  "source_sha256": {
+    "hip/deep_fast.hip": "afec92b71d33e049a33af65fc249f2e550b37ca902fc0978f50e5a7ddb2444e9",
+    "hip/vit_stream.inc": "7060a18496a82d0c6654d54a5791550495f356bd8b3374fc4e4c8cfd2352dd86",
+    "Development/HIP/hip_reference_network.h": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8"
+  },
+  "compile_jobs": [
+    {
+      "module": "deep_fast-packed-fast",
+      "target": "gfx1200",
+      "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/deep_fast-packed-fast.final.hip",
+      "sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+      "RTC_EXTRA_OPTS": "",
+      "gfx1201_measured_module": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-candidate-deep_fast-packed-fast/deep_fast-packed-fast.hsaco",
+      "gfx1201_sha256": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354"
+    },
+    {
+      "module": "vit-stream-fast",
+      "target": "gfx1200",
+      "generated": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/vit-stream-fast.final.hip",
+      "sha256": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539",
+      "RTC_EXTRA_OPTS": "",
+      "gfx1201_measured_module": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/compile-candidate-vit-stream-fast/vit-stream-fast.hsaco",
+      "gfx1201_sha256": "bf1dd632743a0792a76832e436229c1faee68999801a565e62c9f66145522836"
+    }
+  ],
+  "scope": [
+    "Original1600x960/n400",
+    "Small1600x1024/n448",
+    "Small1920x1152/n640"
+  ]
+}

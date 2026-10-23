@@ -1,0 +1,67 @@
+{
+  "format": "little-endian encoded RGBA32F synthetic; each RGB also exact binary16",
+  "formula": "rgb=(1+((reflected_x*17+reflected_y*31+c*53)%256))/8192; alpha1; mirror=2*extent-coordinate-2",
+  "not_real_capture": true,
+  "profiles": [
+    {
+      "profile": "small900",
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife2/trace-inputs/small900.rgba32f",
+      "valid": [
+        1600,
+        900
+      ],
+      "processing": [
+        1600,
+        1024
+      ],
+      "tokens": 448,
+      "bytes": 26214400,
+      "sha256": "9b8b8a877620fe2b4adc0186a2fbc4efee36104b8f941d920285b39fd101f5be"
+    },
+    {
+      "profile": "small720",
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife2/trace-inputs/small720.rgba32f",
+      "valid": [
+        1280,
+        720
+      ],
+      "processing": [
+        1344,
+        768
+      ],
+      "tokens": 288,
+      "bytes": 16515072,
+      "sha256": "9eba20222674f461a3b6e0ed3ffbe09726c37359bd865a6f362b1cc58c12173e"
+    },
+    {
+      "profile": "smallfree1088",
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife2/trace-inputs/smallfree1088.rgba32f",
+      "valid": [
+        1920,
+        1072
+      ],
+      "processing": [
+        1920,
+        1088
+      ],
+      "tokens": 640,
+      "bytes": 33423360,
+      "sha256": "77d5923e355f5bc97670fb2887a9fb0a02d119b7dfe70be473f43b334fd4c962"
+    },
+    {
+      "profile": "small1080",
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife2/trace-inputs/small1080.rgba32f",
+      "valid": [
+        1920,
+        1080
+      ],
+      "processing": [
+        1920,
+        1152
+      ],
+      "tokens": 640,
+      "bytes": 35389440,
+      "sha256": "fe2e3609887fda11d2309e4370107400930db704a1631665927f7414084a0c73"
+    }
+  ]
+}

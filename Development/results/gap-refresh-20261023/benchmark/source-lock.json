@@ -1,0 +1,77 @@
+{
+  "git_head": "c24e3a97cdf596d0c997cee7deda91c981d520ce",
+  "exe": "/home/lmxxf/work/dlss5-gap-refresh-20261023/benchmark.exe",
+  "exe_sha256": "27561d9baa571897ba005a82c65b93e10e708732de8ff0a4960046ac40cd7f44",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-win32",
+  "compile_flags": "-w -std=c++17 -O2 -static -D_WIN32_WINNT=0x0A00; image-base=0x140000000,no-insert-timestamp",
+  "source_snapshot": "/home/lmxxf/work/dlss5-gap-refresh-20261023/source-snapshot",
+  "dependencies": [
+    {
+      "path": "Development/HIP/hip_api.h",
+      "sha256": "88ba78c5f0700001ca744040fcde5f11cc4345f9350e0b9cf5577bae782f78c9"
+    },
+    {
+      "path": "Development/HIP/hip_device_properties.h",
+      "sha256": "bcda817fe03bc7084f9d3a2c23f52567651a92a15838a0092cd9dc451132d254"
+    },
+    {
+      "path": "Development/HIP/hip_reference_network.h",
+      "sha256": "9503ead8970c22939d6fdc294a8f011476514b4d578efa652a90ccdf2312d3c7"
+    },
+    {
+      "path": "Development/HIP/packed_weights.h",
+      "sha256": "a4d13d15f9804a4cbebd7807907000eaca7121f3b9bfcff2bfe87bcff622ff15"
+    },
+    {
+      "path": "Development/HIP/small_model_assets.h",
+      "sha256": "3a0050b355b7284f6ab212b5f0ca57d51bf9f30081631d76e1c65e2def6279d8"
+    },
+    {
+      "path": "Development/HIP/submit_pulse.h",
+      "sha256": "2eac98db8006f4c8e6557d59a0803d0232324bf2dba85b8569ce524949097bcd"
+    },
+    {
+      "path": "Development/HIP/submit_pulse_hip.h",
+      "sha256": "cc122e5b0795d841f9075a32b24014c4021cad986b019a1bfbc4da1cfbe806a2"
+    },
+    {
+      "path": "Development/HIP/swin_persistent_network.h",
+      "sha256": "834fe38497fa810a822c71e1bf0754344f322f24d2c7ffed076fbfd87305a161"
+    },
+    {
+      "path": "Development/HIP/swin_persistent_types.h",
+      "sha256": "9407beca6a80c5be1b0f58f572d530f54d5add82bae416f7a4199232d06bd177"
+    },
+    {
+      "path": "Development/results/gap-refresh-20261023/benchmark/benchmark.cpp",
+      "sha256": "d95f6649d8a5e6f837c1b5af43a2c07cb743b343f3b85f427d434d64dd38bb9e"
+    },
+    {
+      "path": "Development/results/gap-refresh-20261023/benchmark/production_options.generated.h",
+      "sha256": "897eedce23a0914cade3c7010ba59bab8d294ce5efd4e8c786517a006e52d868"
+    },
+    {
+      "path": "src/native_experimental_history.h",
+      "sha256": "de8c1922d5c548799f84bf93277b48cd7cf13d7bc7e204b50f8419eb959730aa"
+    },
+    {
+      "path": "src/native_frame_stats.h",
+      "sha256": "132449b983ad2b94b6880d99c886760c6df926d007f326f8698fde7d60a813ac"
+    },
+    {
+      "path": "src/native_hip_env_options.h",
+      "sha256": "eac5574ddcbb62cdc8549a1abd38bd4612f69f1cce095d5852b02b9d70224983"
+    },
+    {
+      "path": "src/native_hip_network.h",
+      "sha256": "d77d4cdd72f1860b02367509c1032eff3f9ced3d07e67e948476f495874bfdd2"
+    },
+    {
+      "path": "src/native_model_mode.h",
+      "sha256": "48acf374b64d6789568a7b5e65fdac751f9eea725c6e57944789c73801ad044d"
+    }
+  ],
+  "gpu_executed": false,
+  "timing_loop": "unchanged from fresh-mochi1088-20261006/benchmark.cpp",
+  "module_root": "/home/lmxxf/work/dlss5-five-build/final-payload/HIP/gfx1201"
+}

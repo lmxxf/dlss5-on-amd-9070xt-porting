@@ -1,0 +1,28 @@
+[
+  {
+    "tokens": 400,
+    "old_groups": 800,
+    "new_groups": 416,
+    "full_dual_query_groups": 384,
+    "tail_single_query_groups": 32,
+    "Q_and_output_each_byte_once": true,
+    "K_V_all_addresses_in_bounds": true,
+    "old_wmma": 100000,
+    "new_wmma": 100000,
+    "old_logical_KV_bytes": 20480000,
+    "new_logical_KV_bytes": 10649600
+  },
+  {
+    "tokens": 640,
+    "old_groups": 1280,
+    "new_groups": 640,
+    "full_dual_query_groups": 640,
+    "tail_single_query_groups": 0,
+    "Q_and_output_each_byte_once": true,
+    "K_V_all_addresses_in_bounds": true,
+    "old_wmma": 256000,
+    "new_wmma": 256000,
+    "old_logical_KV_bytes": 52428800,
+    "new_logical_KV_bytes": 26214400
+  }
+]

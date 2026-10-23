@@ -1,0 +1,70 @@
+{
+  "scope": "CPU exhaustive address/byte permutation check; arbitrary post-byte_F bytes, not GPU quantization arithmetic",
+  "cases": [
+    {
+      "tokens": 288,
+      "producer_groups": 384,
+      "attention_groups_unchanged": 576,
+      "total_bytes": 884736,
+      "V_base": 589824,
+      "V_bytes": 294912,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 192
+    },
+    {
+      "tokens": 400,
+      "producer_groups": 480,
+      "attention_groups_unchanged": 800,
+      "total_bytes": 1228800,
+      "V_base": 819200,
+      "V_bytes": 409600,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 0
+    },
+    {
+      "tokens": 448,
+      "producer_groups": 576,
+      "attention_groups_unchanged": 896,
+      "total_bytes": 1376256,
+      "V_base": 917504,
+      "V_bytes": 458752,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 192
+    },
+    {
+      "tokens": 640,
+      "producer_groups": 768,
+      "attention_groups_unchanged": 1280,
+      "total_bytes": 1966080,
+      "V_base": 1310720,
+      "V_bytes": 655360,
+      "coordinate_byte_passes": 3,
+      "QK_unchanged": true,
+      "all_V_bytes_match_original_consumer": true,
+      "every_producer_byte_written_once": true,
+      "every_consumer_byte_mapped_once": true,
+      "all_16B_addresses_aligned": true,
+      "guard_bytes_unchanged": true,
+      "inactive_wave_count_in_these_shapes": 0
+    }
+  ],
+  "candidate_patch_sha256": "9b2ec4351717892a6771f0da910209f1e5fc2ef1e82caf6a6aaa8ba0205f683a"
+}

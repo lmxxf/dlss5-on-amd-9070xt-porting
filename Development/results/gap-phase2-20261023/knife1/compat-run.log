@@ -1,0 +1,635 @@
+DONE knife1/compat-1152-default-baseline
+
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=153
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1152-default-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=153
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1152-fast0-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-fast0-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-mp2-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=322
+GAP_PROFILE frame=1 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=322
+GAP_PROFILE frame=2 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=322
+DONE knife1/compat-1152-mp2-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=322
+GAP_PROFILE frame=1 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=322
+GAP_PROFILE frame=2 W=1920 H=1152 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=322
+DONE knife1/compat-1152-hot-mp-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1152 model=2 effective=2 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=306
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1152-hot-mp-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1152 model=2 effective=2 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=306
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1152-missing-contract-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-contract-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-projection-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-projection-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-bstream-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-bstream-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-bout-baseline
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1152-missing-bout-candidate
+GAP_PROFILE frame=0 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1152 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-default-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-default-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=153
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1088-fast0-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-fast0-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-mp2-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=322
+GAP_PROFILE frame=1 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=322
+GAP_PROFILE frame=2 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=322
+DONE knife1/compat-1088-mp2-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=322
+GAP_PROFILE frame=1 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=322
+GAP_PROFILE frame=2 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=322
+DONE knife1/compat-1088-hot-mp-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=322
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-hot-mp-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=153
+GAP_PROFILE frame=1 W=1920 H=1088 model=2 effective=2 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=306
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=153
+DONE knife1/compat-1088-missing-contract-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-contract-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-projection-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-projection-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection
+_w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-bstream-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-bstream-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-bout-baseline
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection
+_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-1088-missing-bout-candidate
+GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=0 dispatches=161
+GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=1 dispatches=161
+GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection
+_w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effect
+ive=1 swin_run=1
+GAP_COUNT frame=2 dispatches=161
+DONE knife1/compat-960-default-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-default-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=157
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=157
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=157
+DONE knife1/compat-960-fast0-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-fast0-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-mp2-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=330
+GAP_PROFILE frame=1 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=330
+GAP_PROFILE frame=2 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=330
+DONE knife1/compat-960-mp2-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=330
+GAP_PROFILE frame=1 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=330
+GAP_PROFILE frame=2 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=330
+DONE knife1/compat-960-hot-mp-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=2 effective=2 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=330
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-hot-mp-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=157
+GAP_PROFILE frame=1 W=1600 H=960 model=2 effective=2 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=314
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=157
+DONE knife1/compat-960-missing-contract-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-contract-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=1 contract_w16=0 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-projection-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-projection-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection_
+w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection_
+w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=0 contract_w16=1 projection_
+w16=0 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-bstream-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-bstream-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=0 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-bout-baseline
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_
+w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/compat-960-missing-bout-candidate
+GAP_PROFILE frame=0 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=0 dispatches=165
+GAP_PROFILE frame=1 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=1 dispatches=165
+GAP_PROFILE frame=2 W=1600 H=960 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_
+w16=1 contract_bstream=1 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effecti
+ve=1 swin_run=1
+GAP_COUNT frame=2 dispatches=165
+DONE knife1/final-gold-1152
+RESULT frames=3 temporal=0 mean_wall_ms=473.029 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife1/final-gold-1088
+RESULT frames=3 temporal=0 mean_wall_ms=393.727 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife1/final-gold-960
+RESULT frames=3 temporal=0 mean_wall_ms=399.594 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+ALL_JOBS_DONE knife1-final-compat
+LOCK_RELEASED
+
+

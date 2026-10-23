@@ -277,16 +277,20 @@ DEV float vit_attn_hrtz(float x){return Hrtz(x);}
 #define HIP_VIT_ATTN_TRANSPOSED_SCORE 0
 #endif
 #if HIP_VIT_ATTN_TRANSPOSED_SCORE
-template<uint MAXT,bool ByteInput=false,bool ByteOut=false>
+template<uint MAXT,bool ByteInput=false,bool ByteOut=false,bool VFragment=false,bool QKFragment=false>
 DEV void vit_attention_transposed_score_body(const float*in,float*out,uint tokens){
  uint head=bid()%32,first=bid()/32*16;if(first>=tokens)return;
 
  const unsigned char*in8=reinterpret_cast<const unsigned char*>(in);
- i2 q[2]{};for(uint k=0;k<32;k+=16){if constexpr(ByteInput)__builtin_memcpy(&q[k/16],in8+(first+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(q[k/16],e,in[(first+rc())*1024+head*32+j]);}}
+ i2 q[2]{};
+ if constexpr(QKFragment){static_assert(ByteInput&&VFragment,"QK fragment requires full byte fragment layout");uint __attribute__((ext_vector_type(4))) qp;const size_t off=(size_t(head)*(tokens/16)+first/16)*512+(gr()*16+rc())*16;__builtin_memcpy(&qp,__builtin_assume_aligned(in8+off,16),16);q[0]=i2{int(qp[0]),int(qp[1])};q[1]=i2{int(qp[2]),int(qp[3])};}
+ else for(uint k=0;k<32;k+=16){if constexpr(ByteInput)__builtin_memcpy(&q[k/16],in8+(first+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(q[k/16],e,in[(first+rc())*1024+head*32+j]);}}
  h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
  f8 sum{},acc[2]{};
  for(uint key=0,tile=0;key<tokens;key+=16,tile^=1u){f8 a{};
-  for(uint k=0;k<32;k+=16){i2 y{};if constexpr(ByteInput)__builtin_memcpy(&y,in8+(tokens+key+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(y,e,in[(tokens+key+rc())*1024+head*32+j]);}a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,q[k/16],a);}
+  uint __attribute__((ext_vector_type(4))) kp{};
+  if constexpr(QKFragment){const size_t off=size_t(tokens)*1024+(size_t(head)*(tokens/16)+key/16)*512+(gr()*16+rc())*16;__builtin_memcpy(&kp,__builtin_assume_aligned(in8+off,16),16);}
+  for(uint k=0;k<32;k+=16){i2 y{};if constexpr(QKFragment)y=i2{int(kp[k/8]),int(kp[k/8+1])};else if constexpr(ByteInput)__builtin_memcpy(&y,in8+(tokens+key+rc())*1024+head*32+k+gr()*8,8);else for(uint e=0;e<8;e++){uint j=k+gr()*8+e;pack(y,e,in[(tokens+key+rc())*1024+head*32+j]);}a=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,q[k/16],a);}
   // Swapping Q/K operands transposes the score output, directly matching
   // the A-fragment consumed by denominator and PV. Same K0 then K16 order.
   h8 x{};i2 xb{};
@@ -322,7 +326,11 @@ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint token
 #else
   sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(x,ones,sum);
 #endif
-  for(uint c=0;c<2;c++){i2 y{};for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+vkey)*1024+head*32+c*16+rc()]);}
+  uint __attribute__((ext_vector_type(4))) vpair{};
+  if constexpr(VFragment){static_assert(ByteInput,"V fragment requires byte QKV");const size_t off=size_t(2)*tokens*1024+(size_t(head)*(tokens/16)+key/16)*512+(gr()*16+rc())*16;__builtin_memcpy(&vpair,__builtin_assume_aligned(in8+off,16),16);}
+  for(uint c=0;c<2;c++){i2 y{};
+   if constexpr(VFragment){y=i2{int(vpair[c*2]),int(vpair[c*2+1])};}
+   else for(uint e=0;e<8;e++){uint vkey=key+gr()*8+e;if constexpr(ByteInput){uint b=in8[(2*tokens+vkey)*1024+head*32+c*16+rc()];y[e/4]=int(uint(y[e/4])|(b<<(8*(e%4))));}else pack(y,e,in[(2*tokens+vkey)*1024+head*32+c*16+rc()]);}
 #if HIP_VIT_ATTN_TRANSPOSED_AV
   acc[c]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y,xb,acc[c]);
 #else
@@ -341,6 +349,12 @@ DEV void vit_attention_transposed_score_body(const float*in,float*out,uint token
  for(uint c=0;c<2;c++)for(uint e=0;e<8;e++){if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[(first+gr()*8+e)*1024+head*32+c*16+rc()]=byte_F(vit_attn_hrtz(acc[c][e]*inv[e]));else out[(first+gr()*8+e)*1024+head*32+c*16+rc()]=F(vit_attn_hrtz(acc[c][e]*inv[e]));}
 #endif
 }
+WAVE void vit_attention_fused_400_bytein_bout_vfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<400,true,true,true>(in,out,tokens);}
+WAVE void vit_attention_fused_640_bytein_bout_vfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<640,true,true,true>(in,out,tokens);}
+WAVE void vit_attention_fused_400_bytein_bout_qkfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<400,true,true,true,true>(in,out,tokens);}
+WAVE void vit_attention_fused_640_bytein_bout_qkfrag(const float*in,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_attention_transposed_score_body<640,true,true,true,true>(in,out,tokens);}
+
+
 #endif
 // FAST TIER (lossy, 2026-10-01 fast-tier): HIP_VIT_ATTN_KSPLIT 1 exports vit_attention_fused_{400,640}_bytein_bout_ks2:
 // 64-thread groups, wave w takes the w-th contiguous half of the key tiles; partial f32 sum/acc of wave 1 are added to

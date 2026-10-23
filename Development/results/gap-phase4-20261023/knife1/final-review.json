@@ -1,0 +1,95 @@
+{
+  "tiers": {
+    "960": {
+      "baseline": 6.457942916666667,
+      "candidate": 6.442445625,
+      "delta_ms": -0.01549729166666669,
+      "p99_delta_ms": -0.04999999999999982,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.012750937499999004,
+          "p99_delta_ms": -0.041570000000000995
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.02033718750000002,
+          "p99_delta_ms": -0.053170000000000606
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.013403750000001047,
+          "p99_delta_ms": 0.004692999999999614
+        }
+      ]
+    },
+    "1088": {
+      "baseline": 8.853382083333335,
+      "candidate": 8.794483125,
+      "delta_ms": -0.05889895833333547,
+      "p99_delta_ms": -0.06176400000000193,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.06323218749999882,
+          "p99_delta_ms": -0.041550000000000864
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.052018125000000026,
+          "p99_delta_ms": -0.046960999999999586
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.06144656250000047,
+          "p99_delta_ms": -0.07353499999999968
+        }
+      ]
+    },
+    "1152": {
+      "baseline": 9.15367625,
+      "candidate": 9.1018821875,
+      "delta_ms": -0.05179406250000085,
+      "p99_delta_ms": -0.07199699999999964,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.044852187500000085,
+          "p99_delta_ms": -0.07222400000000029
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.04683374999999934,
+          "p99_delta_ms": -0.04437499999999872
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.06369624999999957,
+          "p99_delta_ms": -0.12370600000000032
+        }
+      ]
+    }
+  },
+  "gold_frames": 54,
+  "perf_slots": 36,
+  "pair": {
+    "400": {
+      "raw_qk_equal": true,
+      "head_major_v_inverse_equal": true,
+      "av_byte_equal": true,
+      "guards_intact": true,
+      "finite_fp8": true,
+      "reuse_gate_receipt_pass": true
+    },
+    "640": {
+      "raw_qk_equal": true,
+      "head_major_v_inverse_equal": true,
+      "av_byte_equal": true,
+      "guards_intact": true,
+      "finite_fp8": true,
+      "reuse_gate_receipt_pass": true
+    }
+  },
+  "pair_local_raw_sha_matches_archived_cpu_verified": true,
+  "head_major_layout": true
+}

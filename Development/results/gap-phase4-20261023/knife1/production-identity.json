@@ -1,0 +1,39 @@
+{
+  "production_files": {
+    "hip/deep_fast.hip": "bea88aa48610f01a5e4862bc9590ef57894247786a3c18a1ea8b4d6de524d7ac",
+    "hip/vit_stream.inc": "582cbedf167e624e14dd3567152f2f3549272f51941836eff6adcc916cee4a95",
+    "Development/HIP/hip_reference_network.h": "a0a7190d1beda15681982d3b2f60318bc0f15ebc22af304050ff504279538df3"
+  },
+  "gpu_generated": {
+    "deep_fast-packed-fast": {
+      "sha256": "6790d6975340dd40ceabf44dfc62e898aaa1e46f46e4ce27fa391433172f0bd3",
+      "identical_to_tested_headmajor": true,
+      "same_source_for": [
+        "gfx1201",
+        "gfx1200"
+      ],
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife1/production-modules/deep_fast-packed-fast.generated.hip"
+    },
+    "vit-stream-fast": {
+      "sha256": "1d9bc17635047b3d2fb0c617d8726c97dee156658e9bd70ec2279745f1cba116",
+      "identical_to_tested_headmajor": true,
+      "same_source_for": [
+        "gfx1201",
+        "gfx1200"
+      ],
+      "path": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife1/production-modules/vit-stream-fast.generated.hip"
+    }
+  },
+  "scope": "Original FAST1 MP1 explicit AE0, exact same eligibility as measured",
+  "default_priority": "nonempty NR_VIT_VFRAG > nonempty DLSS5_HIP_VIT_VFRAG > 1",
+  "hosts": {
+    "final-frame.exe": "7a15bc6542f9a12fbf5ea26feee94f5277a98faa9790d5d895b0f02f9a9e77f4",
+    "final-pure.exe": "a686b0131d0c10c7528db113a5b06f3b875ea6081b245c81e651b3783a7d3faf"
+  },
+  "eligibility_identical_to_measured": true,
+  "final_payload": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife1/final-payload/HIP",
+  "hip_manifest_sha256": "3b6471c2534b02eea6608ec17cabfe17d167a986753f39f837e52f770bc016e1",
+  "final_module_count": 80,
+  "unchanged_modules": 76,
+  "gfx1200_hardware_tested": false
+}

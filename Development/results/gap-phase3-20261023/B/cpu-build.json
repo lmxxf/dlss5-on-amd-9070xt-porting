@@ -1,0 +1,169 @@
+{
+  "compiler": "clang version 21.0.0git (git@github.com:lmxxf/llvm-project.git 94aca371a8e1c37e281c139eadbd0146120bcca2)\nTarget: unknown\nThread model: posix\nInstalledDir: /home/lmxxf/work/llvm-build-dlss5-gfx12/bin\n",
+  "modules": [
+    {
+      "target": "gfx1201",
+      "module": "deep_fast-packed-fast",
+      "source_sha256": "b322a0ad6cdad63ba2cc9eaf4d621f7225bd8c5ab92a73789d2c96ab53f8c5cf",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "HIP_DEC_WIDE 1",
+        "HIP_VIT_ATTN_NATIVE_HALF 1",
+        "HIP_VIT_ATTN_PROB_PAIR 1",
+        "HIP_VIT_ATTN_TRANSPOSED_AV 1",
+        "HIP_VIT_ATTN_TRANSPOSED_SCORE 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_F_MASK 1",
+        "C512_T8_TAIL_VEC 1",
+        "HIP_BYTE_F_ADD0 1",
+        "HIP_VIT_ATTN_RCP 1",
+        "VIT_FAST_NUM 15"
+      ],
+      "sources": [
+        "deep_fast.hip"
+      ],
+      "commands": [
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "--target=x86_64-pc-windows-msvc",
+          "--offload-arch=gfx1201",
+          "-O3",
+          "-x",
+          "hip",
+          "--offload-device-only",
+          "-cuid=6C60F746EC00114A40B8D2C612C5243B7970D7582BC49D1D0F79828350FE586F",
+          "-c",
+          "-emit-llvm",
+          "-fshort-wchar",
+          "-std=c++14",
+          "-fms-compatibility-version=19.44.35229",
+          "-nogpuinc",
+          "-nogpulib",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/sources/deep_fast-packed-fast/probe.hip",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.bc"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "-target",
+          "amdgcn-amd-amdhsa",
+          "-mcpu=gfx1201",
+          "-O3",
+          "-nogpulib",
+          "-S",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.bc",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.hsaco.s"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "-target",
+          "amdgcn-amd-amdhsa",
+          "-mcpu=gfx1201",
+          "-O3",
+          "-nogpulib",
+          "-c",
+          "-mllvm",
+          "-amdgpu-internalize-symbols",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.bc",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.o"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/ld.lld",
+          "--no-undefined",
+          "-shared",
+          "-plugin-opt=mcpu=gfx1201",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.o",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/deep_fast-packed-fast.hsaco"
+        ]
+      ],
+      "seconds": 7.285428619999948,
+      "sha256": "21d230f631abb4e22ec1707d13fa528791298cb8c78ab9b0fc4b7b38d2f56fdb"
+    },
+    {
+      "target": "gfx1201",
+      "module": "c512-m32-deep",
+      "source_sha256": "9defee2afa2793a840ca5681d2eca15436b572f04d1a973f6d6bb663ccaac399",
+      "defines": [
+        "HIP_ISA_HALF 1",
+        "C512_DIRECT_PACK 3",
+        "HIP_PREPACKED_WEIGHTS 1",
+        "HIP_BRANCHLESS_F 1",
+        "C512_MIX_OCC_LDS 4096",
+        "C512_F_MASK 1",
+        "HIP_BYTE_F_ADD0 1",
+        "C512_FFN_ONE 2",
+        "C512_FFN_F8W 1"
+      ],
+      "sources": [
+        "deep_fast.hip",
+        "c512_m32_deep.inc"
+      ],
+      "commands": [
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "--target=x86_64-pc-windows-msvc",
+          "--offload-arch=gfx1201",
+          "-O3",
+          "-x",
+          "hip",
+          "--offload-device-only",
+          "-cuid=1AFE8135770A9BBFE9131388E8E2C9FAD06DC504F98C9E1F091D6A4E61341787",
+          "-c",
+          "-emit-llvm",
+          "-fshort-wchar",
+          "-std=c++14",
+          "-fms-compatibility-version=19.44.35229",
+          "-nogpuinc",
+          "-nogpulib",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/sources/c512-m32-deep/probe.hip",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.bc"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "-target",
+          "amdgcn-amd-amdhsa",
+          "-mcpu=gfx1201",
+          "-O3",
+          "-nogpulib",
+          "-mllvm",
+          "-amdgpu-sched-strategy=max-ilp",
+          "-S",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.bc",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.hsaco.s"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/clang",
+          "-target",
+          "amdgcn-amd-amdhsa",
+          "-mcpu=gfx1201",
+          "-O3",
+          "-nogpulib",
+          "-mllvm",
+          "-amdgpu-sched-strategy=max-ilp",
+          "-c",
+          "-mllvm",
+          "-amdgpu-internalize-symbols",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.bc",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.o"
+        ],
+        [
+          "/home/lmxxf/work/llvm-build-dlss5-gfx12/bin/ld.lld",
+          "--no-undefined",
+          "-shared",
+          "-plugin-opt=mcpu=gfx1201",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.o",
+          "-o",
+          "/home/lmxxf/work/dlss5-gap-phase3-20261023/B/cpu-build/gfx1201/c512-m32-deep.hsaco"
+        ]
+      ],
+      "seconds": 6.595514839998941,
+      "sha256": "4ed4652130be42800e54317fe76b8c687cb23b6cd647a637c41cce28a89bc79a"
+    }
+  ]
+}

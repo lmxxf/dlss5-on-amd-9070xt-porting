@@ -1,0 +1,11 @@
+{
+    "label":  "knife3/gold-float-skip-candidate",
+    "env":  {
+                "SMALL_FRAME_CAPTURE":  "1",
+                "NR_C512_NPAIR":  "1",
+                "NR_VIT_INTER_BYTE":  "7"
+            },
+    "arguments":  "\"D:\\DLSSNR-Lab\\combined-vs041-20261006\\assets-common\" \"D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\gold-float-skip-candidate\\same.flags\" \"D:\\DLSSNR-Lab\\combined-vs041-20261006\\input.f16\" \"D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\gold-float-skip-candidate\\out\" 3 0 \"D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\modules\" 0 0 0 0",
+    "exe":  "D:\\DLSSNR-Lab\\gap-phase2-20261023\\knife3\\frame.exe",
+    "start":  "2026-10-23T09:22:38.9709910Z"
+}

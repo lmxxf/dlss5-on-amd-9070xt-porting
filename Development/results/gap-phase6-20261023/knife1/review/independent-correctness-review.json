@@ -1,0 +1,91 @@
+{
+  "gold": {
+    "frames": 126,
+    "pairs": 21,
+    "all_paired_frame_hashes_equal": true,
+    "models_and_actual_QK_pair_routes_confirmed": true
+  },
+  "ae": {
+    "frames": 84,
+    "pairs": 7,
+    "all_full_AE_CSV_equal": true,
+    "all_paired_frame_hashes_equal": true,
+    "actual_states": {
+      "original900": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "original1088": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "original1080": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "small900": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "small720": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "small1080": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "smallfree1088": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "module_identity": {
+    "deep_fast-packed-fast": {
+      "candidate_sha256": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354",
+      "old_exports": 91,
+      "all_old_code_and_resources_same": true,
+      "new_exports": [
+        "vit_attention_fused_400_bytein_bout_qkfrag",
+        "vit_attention_fused_640_bytein_bout_qkfrag"
+      ]
+    },
+    "vit-stream-fast": {
+      "candidate_sha256": "bf1dd632743a0792a76832e436229c1faee68999801a565e62c9f66145522836",
+      "old_exports": 102,
+      "all_old_code_and_resources_same": true,
+      "new_exports": [
+        "vit_stream_qkv_frag_bin_w5f8_qkfrag"
+      ]
+    }
+  }
+}

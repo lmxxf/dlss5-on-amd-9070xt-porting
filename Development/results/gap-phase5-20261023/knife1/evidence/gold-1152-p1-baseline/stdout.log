@@ -1,0 +1,11 @@
+seed=0 pattern=1
+input format=RGBA16_FLOAT W=1296 H=720 invalid=0 min=0.0078125 max=7.99609375 luma=1.19164339 roi_luma=1.17294201
+adapter=AMD Radeon RX 9070 XT
+SP_PLAN c=256 first=16 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+SP_PLAN c=256 first=49 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+frame=0 reset=1 wall_ms=1304.069 invalid=0 luma=1.16812 roi=1.155809 dark=2226 roi_dark=765 changed_first=0 maxabs_first=0
+frame=1 reset=1 wall_ms=11.165 invalid=0 luma=1.16812 roi=1.155809 dark=2226 roi_dark=765 changed_first=0 maxabs_first=0
+frame=2 reset=1 wall_ms=10.622 invalid=0 luma=1.16812 roi=1.155809 dark=2226 roi_dark=765 changed_first=0 maxabs_first=0
+SP_STATS runs=8 fallback=0 rollover=0 jobs=7144 disabled=0 errors=0
+RESULT frames=3 temporal=0 mean_wall_ms=441.952 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+

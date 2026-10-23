@@ -1,0 +1,71 @@
+00-r1-current-v-mochi-N
+
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.353720224 cpu_mean_ms=8.500612500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+01-r1-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.878 ms  @ 0 MHz
+measurement wall 1284.046 ms, GPU total 1260.478 ms over 160 frames
+02-r1-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.887 ms  @ 0 MHz
+measurement wall 1285.975 ms, GPU total 1261.946 ms over 160 frames
+03-r1-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.353716767 cpu_mean_ms=8.513950000 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+04-r2-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.356884384 cpu_mean_ms=8.508262500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+05-r2-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.885 ms  @ 0 MHz
+measurement wall 1286.477 ms, GPU total 1261.663 ms over 160 frames
+06-r2-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.897 ms  @ 0 MHz
+measurement wall 1287.059 ms, GPU total 1263.490 ms over 160 frames
+07-r2-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.380602926 cpu_mean_ms=8.542893750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+08-r3-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.378988630 cpu_mean_ms=8.531743750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+09-r3-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.890 ms  @ 0 MHz
+measurement wall 1286.532 ms, GPU total 1262.385 ms over 160 frames
+10-r3-current-v-mochi-M
+native working extent 1920x1088; source/output 1920x1080
+123 dispatches, one submit: 7.892 ms  @ 0 MHz
+measurement wall 1287.134 ms, GPU total 1262.784 ms over 160 frames
+11-r3-current-v-mochi-N
+SYNC_PROFILE wave_owned=1 c512_m32=1 pdl=1 vit_stream=3 swin_run=1 FAST=1 full71=1
+CURRENT_PROFILE requested_model=1 effective_model=1 small_geometry=0 allow_small_model=0 c512_w16=2 c512_ffn_w16=1 c32_
+w16=1 vit_w16=7 vit_inter_byte=15 decoder_f8_w16_default=3 ds_f8_w16_default=1 submit_pulse_bridge_absent=1
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.377536750 cpu_mean_ms=8.545087500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+COMPLETED_12_SLOTS
+LOCK_RELEASED
+
+

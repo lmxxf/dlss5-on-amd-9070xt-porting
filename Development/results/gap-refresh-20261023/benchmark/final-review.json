@@ -1,0 +1,48 @@
+{
+  "current-v-mochi": {
+    "a": 8.533050354166667,
+    "b": 7.867127083333333,
+    "difference": 0.6659232708333338,
+    "slots": 12,
+    "frames_per_arm": 960
+  },
+  "old-v-current": {
+    "a": 8.92311121875,
+    "b": 8.554250770833333,
+    "difference": 0.36886044791666706,
+    "slots": 12,
+    "frames_per_arm": 960
+  },
+  "compact": {
+    "baseline": 8.570213291666667,
+    "candidate": 8.3545021875,
+    "saved": 0.21571110416666706,
+    "p99_delta": -0.2453991000000002,
+    "frames_per_arm": 960
+  },
+  "trace-current": {
+    "dispatches": 161,
+    "frames": 3,
+    "anyorder": 0,
+    "packs": 8,
+    "profiles": [
+      "GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1",
+      "GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1",
+      "GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1"
+    ],
+    "sp_launches": 6
+  },
+  "trace-candidate": {
+    "dispatches": 153,
+    "frames": 3,
+    "anyorder": 0,
+    "packs": 0,
+    "profiles": [
+      "GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1",
+      "GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1",
+      "GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1"
+    ],
+    "sp_launches": 6
+  },
+  "raw_receipts_verified": 32
+}

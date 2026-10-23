@@ -1,0 +1,22 @@
+{
+  "commit": "a9b13dd4cdb5f4bf43db358492d72e6e5e2acd67",
+  "source_root": "/home/lmxxf/work/dlss5-gap-source-20261023/DLSSNR-AMD-a9b13dd4cdb5f4bf43db358492d72e6e5e2acd67",
+  "archive_sha256": "e510dac88363f5e86534aa3774c8c6c804b7cb77be28a2026ac89abca047eb93",
+  "files": {
+    "windows/src/core/nr_graph.cpp": "e177e7c9ade3bc755a423d07e551077322a2287e7e73f4e9e563cb435df8484d",
+    "windows/build/arch/rdna4.sh": "52ce3ce1737095ddb7dd91684a9ca3389842aaa743f35a803262709330fecd50",
+    "linux/shaders/rdna4/pipelines.json": "a4bf42384937e626221c983b5029f33babb02385525db2056e9ea4bc11e8b97b",
+    "windows/shaders/rdna4/pipelines.json": "e9964544677a94534e20e8d8f865851ce57a3402439277673ca72adadbdbe96b",
+    "linux/shaders/rdna4/fswin_t.comp": "9dbe3b581c21978dae1621c16ee2cc2b572b8aa91f7c98826de1e8b94a4ecfc6",
+    "linux/shaders/rdna4/include/fswin_body.glsl": "d8949ccdea9738ffb288562884f0d485e40915f6aa9e2ac1e64942deba5df0b5",
+    "linux/shaders/rdna4/include/swin_math.glsl": "3b6f86a4d6e8836c6bce8c6e62b8359210c1ae7ebb91fe8053fea88957958495",
+    "linux/shaders/rdna4/include/nr_chain.glsl": "5d5d1d8076f3f0d13115ad4b9aa83f0ec1b9164fca04b955dc0a70dd8d136317",
+    "linux/shaders/rdna4/include/coopmm.glsl": "0bd83899a7f8bc7a8726d62caba513e80bf821ef55e744869fef154e9add2e82",
+    "linux/shaders/rdna4/gemm1x1.comp": "843ee69b498f94eabc76bda6e19918a8280a1074771f49c6d7273e92ef468504",
+    "linux/shaders/rdna4/vit_attn.comp": "00f929cfa53f7404269e135b7e23cf1f643e0c50af11c6cc3fb1245b667d1b9e",
+    "linux/shaders/rdna4/include/vit_attn_vt_chunk.glsl": "14536bb3d6c22b5386e23cddf1da1111f147ba0772995d16031b98d6a1ba0cf3",
+    "linux/shaders/rdna4/ffwd3_t.comp": "12f29834b7c1f565c9b306b54b5bbe8a0872fd9fbfd153cf78ae862dbefaeeba",
+    "linux/shaders/rdna4/attn.comp": "5a086bb05dbd2aadde06f0c513202380be4dac048f6f1d6208f0c4b059f4d6d2"
+  },
+  "local_head": "c24e3a97cdf596d0c997cee7deda91c981d520ce"
+}

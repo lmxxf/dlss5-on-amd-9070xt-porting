@@ -1,0 +1,17 @@
+{
+  "module_sha256": "f3a3fd3a9135a2058a123d05d6836950dc0fd0bcdb2d08835f2126ea9db344f9",
+  "exports": 93,
+  "changed_vs_baseline": [
+    "decoder_project2x_h16w_byteout_w",
+    "decoder_project2x_h16w_byteout_w_bin"
+  ],
+  "changed_match_full_A_code_and_all_metadata": true,
+  "other_91_match_baseline_code_and_all_metadata": true,
+  "half_vgpr": [
+    85,
+    72
+  ],
+  "W16_and_QK_match_baseline": true,
+  "full_A_status": "STOP: pure mean -5.983us but p99 +35.709us and all three p99 rounds regressed",
+  "production_changed": false
+}

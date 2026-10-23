@@ -1,0 +1,14 @@
+{
+  "baseline": "phase4 final production only",
+  "base_header": "09cb03d5343a78abffa2add3ee7e00545689047ea8dd3f95872465513172d734",
+  "candidate_header": "8ae0e238e6e518546c4a4e1fe527d78ab901b2ec01f4a8da9fe035c75c80ed28",
+  "module_manifest_sha256": "3b6471c2534b02eea6608ec17cabfe17d167a986753f39f837e52f770bc016e1",
+  "module_root": "/home/lmxxf/work/dlss5-gap-phase4-20261023/knife1/final-payload/HIP",
+  "gpu_source_sha256": {
+    "deep_fast.hip": "bea88aa48610f01a5e4862bc9590ef57894247786a3c18a1ea8b4d6de524d7ac",
+    "vit_stream.inc": "582cbedf167e624e14dd3567152f2f3549272f51941836eff6adcc916cee4a95"
+  },
+  "GPU_sources_or_modules_changed": false,
+  "scope": "Small four geometries plus Original three existing geometries; FAST1/one network evaluation; existing AE modes preserved",
+  "GPU_not_authorized_until_knife1_complete": true
+}

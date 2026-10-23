@@ -1,0 +1,53 @@
+DONE knife2/A-pure/pure-r1-0-baseline
+
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.357621029 cpu_mean_ms=8.546718750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r1-1-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.353066373 cpu_mean_ms=8.557687500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r1-2-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.354156071 cpu_mean_ms=8.557506250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r1-3-baseline
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.362943548 cpu_mean_ms=8.572656250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r2-0-baseline
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.370819122 cpu_mean_ms=8.558406250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r2-1-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.357475936 cpu_mean_ms=8.561918750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r2-2-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.355804327 cpu_mean_ms=8.599793750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r2-3-baseline
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.374281973 cpu_mean_ms=8.570937500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r3-0-baseline
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.366314995 cpu_mean_ms=8.558781250 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r3-1-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.368791801 cpu_mean_ms=8.578737500 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r3-2-candidate
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.376259050 cpu_mean_ms=8.596293750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+DONE knife2/A-pure/pure-r3-3-baseline
+SYNC_NETWORK width=1920 valid_h=1080 proc_h=1088 vit_tokens=640 full71=1 MP1=1 AE0=1 historyoff=1 Style1=1 seed0=1 warm
+=80 frames=160 gpu_mean_ms=8.369470564 cpu_mean_ms=8.567318750 raw_bitdiff=0 output_finite=1 input_upload_once=1 input_
+domain=encoded_synthetic
+ALL_JOBS_DONE phase6-Up-pure1088
+LOCK_RELEASED
+
+

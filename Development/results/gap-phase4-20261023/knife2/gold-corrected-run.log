@@ -1,0 +1,47 @@
+DONE knife2/gold-small1080-p0-baseline-checked
+
+RESULT frames=3 temporal=0 mean_wall_ms=14.000 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small1080-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=11.937 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small1080-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=11.169 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small1080-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=17.259 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small1080-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=10.462 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small1080-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=11.412 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p0-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=352.135 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=358.675 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=359.431 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=346.947 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=361.599 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small900-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=347.630 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p0-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=347.822 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p0-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=342.405 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p1-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=347.705 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p1-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=352.402 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p2-baseline
+RESULT frames=3 temporal=0 mean_wall_ms=351.032 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+DONE knife2/gold-small720-p2-candidate
+RESULT frames=3 temporal=0 mean_wall_ms=336.580 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+LOCK_RELEASED
+Missing stderr gate knife2/gold-smallfree1088-p0-baseline: VIT_VFRAG requested=1 available=1 explicit_ae0=1 producers=8
+ consumers=8
+At D:\DLSSNR-Lab\gap-phase4-20261023\run-jobs.ps1:33 char:99
++ ... tmatch $pattern){throw "Missing stderr gate $($j.label): $pattern"}}}
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Missing stderr ...s=8 consumers=8:String) [], RuntimeException
+    + FullyQualifiedErrorId : Missing stderr gate knife2/gold-smallfree1088-p0-baseline: VIT_VFRAG requested=1 availab 
+   le=1 explicit_ae0=1 producers=8 consumers=8
+ 

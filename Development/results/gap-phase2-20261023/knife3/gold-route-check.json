@@ -1,0 +1,160 @@
+{
+  "gold_frames": 66,
+  "cases": [
+    {
+      "case": "gold-1088-p0-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "frames": 3
+    },
+    {
+      "case": "gold-1088-p0-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "frames": 3
+    },
+    {
+      "case": "gold-1088-p1-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "02ac4af799d562c8996704e4765f803fc26a9fcbf5f7455aaf37ec9435d85b1e",
+      "frames": 3
+    },
+    {
+      "case": "gold-1088-p1-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "02ac4af799d562c8996704e4765f803fc26a9fcbf5f7455aaf37ec9435d85b1e",
+      "frames": 3
+    },
+    {
+      "case": "gold-1088-p2-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "215c38a06a57f7316af1bc1b3546cdb5579169db9345a1576bdd3f1fd7dfb6c9",
+      "frames": 3
+    },
+    {
+      "case": "gold-1088-p2-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "215c38a06a57f7316af1bc1b3546cdb5579169db9345a1576bdd3f1fd7dfb6c9",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p0-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p0-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p1-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "0d36552c148e25a2a6a9e6319bc5ac837251b0fcafeb6c1e221414db1dce950a",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p1-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "0d36552c148e25a2a6a9e6319bc5ac837251b0fcafeb6c1e221414db1dce950a",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p2-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "91c0d839327b1eb9673fa92342092409faff51763eccb174f5f2333ef8590dc9",
+      "frames": 3
+    },
+    {
+      "case": "gold-1152-p2-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "91c0d839327b1eb9673fa92342092409faff51763eccb174f5f2333ef8590dc9",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p0-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p0-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p1-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "f923f2010191562de15e5694c0beae7c04145496f65f4299919b7bb67e2d9d9a",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p1-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "f923f2010191562de15e5694c0beae7c04145496f65f4299919b7bb67e2d9d9a",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p2-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "0f4335e7c09463839a333abb52e77c74c73d4209b4906c69dd1c855b35104c56",
+      "frames": 3
+    },
+    {
+      "case": "gold-960-p2-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "0f4335e7c09463839a333abb52e77c74c73d4209b4906c69dd1c855b35104c56",
+      "frames": 3
+    },
+    {
+      "case": "gold-float-skip-baseline",
+      "requested": 0,
+      "calls": 0,
+      "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "frames": 3
+    },
+    {
+      "case": "gold-float-skip-candidate",
+      "requested": 1,
+      "calls": 64,
+      "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "frames": 3
+    },
+    {
+      "case": "gold-missing-exports-1152",
+      "requested": 1,
+      "calls": 0,
+      "sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "frames": 3
+    },
+    {
+      "case": "gold-missing-exports-960",
+      "requested": 1,
+      "calls": 0,
+      "sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "frames": 3
+    }
+  ],
+  "performance_actual_calls_verified": true
+}

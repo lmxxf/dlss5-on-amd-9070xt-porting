@@ -1,0 +1,37 @@
+{
+  "kind": "CPU producer/consumer index enumeration, not GPU",
+  "cases": [
+    {
+      "tokens": 1504,
+      "producer_wg": 376,
+      "consumer_wg": 752,
+      "ready_entries": 94,
+      "valid_wave_contributions": 752,
+      "invalid_waves_no_signal": 0,
+      "contributions_per_tile": 8,
+      "consumer_wg_per_tile": 8
+    },
+    {
+      "tokens": 2048,
+      "producer_wg": 512,
+      "consumer_wg": 1024,
+      "ready_entries": 128,
+      "valid_wave_contributions": 1024,
+      "invalid_waves_no_signal": 0,
+      "contributions_per_tile": 8,
+      "consumer_wg_per_tile": 8
+    },
+    {
+      "tokens": 2160,
+      "producer_wg": 544,
+      "consumer_wg": 1080,
+      "ready_entries": 135,
+      "valid_wave_contributions": 1080,
+      "invalid_waves_no_signal": 8,
+      "contributions_per_tile": 8,
+      "consumer_wg_per_tile": 8
+    }
+  ],
+  "max_epoch": 2305843009213693951,
+  "last_valid_target": 18446744073709551608
+}

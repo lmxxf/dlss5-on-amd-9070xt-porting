@@ -1,0 +1,48 @@
+{
+  "scope": "CPU address enumeration, not GPU",
+  "cases": [
+    {
+      "tokens": 288,
+      "qkv_groups": 384,
+      "qkv_threads": 160,
+      "invalid_wave_count_across_all_QKV": 192,
+      "all_qkv_bytes_once": true,
+      "attention_export_bound": 400,
+      "attention_groups": 576,
+      "key16_iterations": 18,
+      "last_key_read": 287,
+      "compact_contract_groups": 288,
+      "compact_projection_groups": 288,
+      "gather_in_bounds": true
+    },
+    {
+      "tokens": 448,
+      "qkv_groups": 576,
+      "qkv_threads": 160,
+      "invalid_wave_count_across_all_QKV": 192,
+      "all_qkv_bytes_once": true,
+      "attention_export_bound": 640,
+      "attention_groups": 896,
+      "key16_iterations": 28,
+      "last_key_read": 447,
+      "compact_contract_groups": 448,
+      "compact_projection_groups": 448,
+      "gather_in_bounds": true
+    },
+    {
+      "tokens": 640,
+      "qkv_groups": 768,
+      "qkv_threads": 160,
+      "invalid_wave_count_across_all_QKV": 0,
+      "all_qkv_bytes_once": true,
+      "attention_export_bound": 640,
+      "attention_groups": 1280,
+      "key16_iterations": 40,
+      "last_key_read": 639,
+      "compact_contract_groups": 640,
+      "compact_projection_groups": 640,
+      "gather_in_bounds": true
+    }
+  ],
+  "geometry_header_sha256": "941e2fc1fec48c4db653ffea74b8db011a66b2e7997a1b32b78423f1d2d7187e"
+}

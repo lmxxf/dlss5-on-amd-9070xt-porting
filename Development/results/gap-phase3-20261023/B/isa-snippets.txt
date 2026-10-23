@@ -1,0 +1,126 @@
+
+# producer-chain-noopts.s
+	global_store_b8 v[1:2], v12, off offset:176                // 000000092DB8: EE06007C 06000000 0000B001
+	global_store_b8 v[1:2], v13, off offset:208                // 000000092DC4: EE06007C 06800000 0000D001
+	global_store_b8 v[1:2], v33, off offset:240                // 000000092DD0: EE06007C 10800000 0000F001
+	s_or_b32 exec_lo, exec_lo, s10                             // 000000092DDC: 8C7E0A7E
+	v_and_b32_e32 v0, 31, v0                                   // 000000092DE0: 3600009F
+	s_wait_storecnt 0x0                                        // 000000092DE4: BFC10000
+	s_barrier_signal -1                                        // 000000092DE8: BE804EC1
+	s_barrier_wait 0xffff                                      // 000000092DEC: BF94FFFF
+	s_barrier_signal -1                                        // 000000092DF0: BE804EC1
+	v_cmp_eq_u32_e64 s2, 0, v0                                 // 000000092DF4: D44A0002 00020080
+	s_barrier_wait 0xffff                                      // 000000092DFC: BF94FFFF
+	s_and_b32 s2, s2, vcc_lo                                   // 000000092E00: 8B026A02
+	s_wait_alu 0xfffe                                          // 000000092E04: BF88FFFE
+	s_and_saveexec_b32 s3, s2                                  // 000000092E08: BE832002
+	s_cbranch_execz 13                                         // 000000092E0C: BFA5000D <split_ffn_one_w2f8_w16_bin_chain+0x1544>
+	s_load_b64 s[0:1], s[0:1], 0x20                            // 000000092E10: F4002000 F8000020
+	v_mov_b32_e32 v0, 1                                        // 000000092E18: 7E000281
+	v_mov_b32_e32 v1, 0                                        // 000000092E1C: 7E020280
+	v_lshrrev_b32_e32 v2, 1, v49                               // 000000092E20: 32046281
+	s_wait_kmcnt 0x0                                           // 000000092E24: BFC70000
+	global_atomic_add_u64 v2, v[0:1], s[0:1] scope:SCOPE_DEV   // 000000092E28: EE10C000 00080000 00000002
+	s_wait_storecnt 0x0                                        // 000000092E34: BFC10000
+	global_inv scope:SCOPE_DEV                                 // 000000092E38: EE0AC07C 00080000 00000000
+	s_endpgm                                                   // 000000092E44: BFB00000
+	s_nop 0                                                    // 000000092E48: BF800000
+	s_nop 0                                                    // 000000092E4C: BF800000
+	s_nop 0                                                    // 000000092E50: BF800000
+	s_nop 0                                                    // 000000092E54: BF800000
+	s_nop 0                                                    // 000000092E58: BF800000
+	s_nop 0                                                    // 000000092E5C: BF800000
+	s_nop 0                                                    // 000000092E60: BF800000
+	s_nop 0                                                    // 000000092E64: BF800000
+	s_nop 0                                                    // 000000092E68: BF800000
+	s_nop 0                                                    // 000000092E6C: BF800000
+	s_nop 0                                                    // 000000092E70: BF800000
+
+# consumer-chain.s
+	s_or_b32 exec_lo, exec_lo, s3                              // 0000000840D0: 8C7E037E
+	s_wait_kmcnt 0x0                                           // 0000000840D4: BFC70000
+	s_clause 0x1                                               // 0000000840D8: BF850001
+	s_load_b256 s[4:11], s[0:1], 0x0                           // 0000000840DC: F4006100 F8000000
+	s_load_b64 s[0:1], s[0:1], 0x20                            // 0000000840E4: F4002000 F8000020
+	v_readfirstlane_b32 s14, v1                                // 0000000840EC: 7E1C0501
+	s_lshl_b32 s3, ttmp9, 6                                    // 0000000840F0: 84038675
+	v_lshrrev_b32_e32 v34, 1, v0                               // 0000000840F4: 32440081
+	v_and_b32_e32 v33, 15, v0                                  // 0000000840F8: 3642008F
+	s_and_b32 s3, s3, 0x1c0                                    // 0000000840FC: 8B03FF03 000001C0
+	s_cmp_lg_u32 s14, 0                                        // 000000084104: BF07800E
+	s_mov_b32 s15, 0                                           // 000000084108: BE8F0080
+	s_cbranch_scc0 1058                                        // 00000008410C: BFA10422 <split_projection_frag_w16_bskip_chain+0x1198>
+	v_and_or_b32 v1, v34, 8, s17                               // 000000084110: D6570001 00451122
+	v_or_b32_e32 v2, s3, v33                                   // 000000084118: 38044203
+	s_wait_loadcnt 0x0                                         // 00000008411C: BFC00000
+	global_inv scope:SCOPE_DEV                                 // 000000084120: EE0AC07C 00080000 00000000
+	v_lshrrev_b32_e32 v35, 4, v0                               // 00000008412C: 32460084
+	s_and_b32 s18, ttmp9, 7                                    // 000000084130: 8B128775
+	v_lshlrev_b32_e32 v1, 9, v1                                // 000000084134: 30020289
+	v_lshlrev_b32_e32 v2, 2, v2                                // 000000084138: 30040482
+	s_delay_alu instid0(VALU_DEP_2)                            // 00000008413C: BF870002
+	v_or3_b32 v1, v1, v33, s3                                  // 000000084140: D6580001 000E4301
+	s_wait_kmcnt 0x0                                           // 000000084148: BFC70000
+	s_clause 0x1f                                              // 00000008414C: BF85001F
+	global_load_u8 v3, v1, s[8:9] offset:512                   // 000000084150: EE040008 00000003 00020001
+	global_load_u8 v4, v1, s[8:9]                              // 00000008415C: EE040008 00000004 00000001
+
+# consumer-chain-trace.s
+	s_wait_loadcnt 0x1                                         // 0000000848DC: BFC00001
+	v_wmma_f32_16x16x16_fp8_fp8 v[25:32], v[43:44], v[33:34], v[25:32]// 0000000848E0: CC464019 1C66432B
+	s_wait_alu 0xfffe                                          // 0000000848E8: BF88FFFE
+	s_and_saveexec_b32 s6, s7                                  // 0000000848EC: BE862007
+	s_cbranch_execz 65355                                      // 0000000848F0: BFA5FF4B <split_projection_frag_w16_bskip_chain+0x620>
+	v_dual_mov_b32 v34, s9 :: v_dual_mov_b32 v33, s8           // 0000000848F4: CA100009 22200008
+	s_wait_loadcnt 0x0                                         // 0000000848FC: BFC00000
+	flat_store_b32 v[33:34], v25 scope:SCOPE_SYS               // 000000084900: EC06807C 0C8C0000 00000021
+	s_wait_storecnt_dscnt 0x0                                  // 00000008490C: BFC90000
+	s_sendmsg_rtn_b64 s[22:23], sendmsg(MSG_RTN_GET_REALTIME)  // 000000084910: BE964D83
+	s_wait_kmcnt 0x0                                           // 000000084914: BFC70000
+	s_wait_alu 0xfffe                                          // 000000084918: BF88FFFE
+	v_dual_mov_b32 v34, s23 :: v_dual_mov_b32 v33, s22         // 00000008491C: CA100017 22200016
+	global_store_b64 v48, v[33:34], s[4:5]                     // 000000084924: EE06C004 10800000 00000030
+	s_branch 65339                                             // 000000084930: BFA0FF3B <split_projection_frag_w16_bskip_chain+0x620>
+	v_or_b32_e32 v41, s20, v49                                 // 000000084934: 38526214
+
+# producer-chain-trace-final.s
+	v_and_b32_e32 v2, 31, v0                                   // 000000092DE4: 3604009F
+	s_wait_storecnt 0x0                                        // 000000092DE8: BFC10000
+	s_barrier_signal -1                                        // 000000092DEC: BE804EC1
+	s_barrier_wait 0xffff                                      // 000000092DF0: BF94FFFF
+	v_lshl_add_u32 v0, v1, 4, s9                               // 000000092DF4: D6460000 00250901
+	v_cmp_eq_u32_e32 vcc_lo, 0, v2                             // 000000092DFC: 7C940480
+	s_barrier_signal -1                                        // 000000092E00: BE804EC1
+	s_barrier_wait 0xffff                                      // 000000092E04: BF94FFFF
+	s_delay_alu instid0(VALU_DEP_2)                            // 000000092E08: BF870002
+	v_cmp_gt_u32_e64 s2, s8, v0                                // 000000092E0C: D44C0002 00020008
+	s_and_b32 s2, vcc_lo, s2                                   // 000000092E14: 8B02026A
+	s_wait_alu 0xfffe                                          // 000000092E18: BF88FFFE
+	s_and_saveexec_b32 s3, s2                                  // 000000092E1C: BE832002
+	s_cbranch_execz 34                                         // 000000092E20: BFA50022 <split_ffn_one_w2f8_w16_bin_chain+0x15ac>
+	s_load_b128 s[0:3], s[0:1], 0x20                           // 000000092E24: F4004000 F8000020
+	s_wait_kmcnt 0x0                                           // 000000092E2C: BFC70000
+	s_cmp_eq_u64 s[2:3], 0                                     // 000000092E30: BF108002
+	s_cbranch_scc1 18                                          // 000000092E34: BFA20012 <split_ffn_one_w2f8_w16_bin_chain+0x1580>
+	v_lshl_add_u32 v1, ttmp9, 1, v1                            // 000000092E38: D6460001 04050275
+	s_sendmsg_rtn_b64 s[4:5], sendmsg(MSG_RTN_GET_REALTIME)    // 000000092E40: BE844D83
+	s_wait_kmcnt 0x0                                           // 000000092E44: BFC70000
+	s_wait_alu 0xfffe                                          // 000000092E48: BF88FFFE
+	v_dual_mov_b32 v2, 0 :: v_dual_mov_b32 v3, s4              // 000000092E4C: CA100080 02020004
+	v_mov_b32_e32 v4, s5                                       // 000000092E54: 7E080205
+	s_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_1)// 000000092E58: BF870092
+	v_lshlrev_b64_e32 v[1:2], 3, v[1:2]                        // 000000092E5C: 3E020283
+	v_add_co_u32 v1, vcc_lo, s2, v1                            // 000000092E60: D7006A01 00020202
+	s_wait_alu 0xfffd                                          // 000000092E68: BF88FFFD
+	v_add_co_ci_u32_e64 v2, null, s3, v2, vcc_lo               // 000000092E6C: D5207C02 01AA0403
+	global_store_b64 v[1:2], v[3:4], off                       // 000000092E74: EE06C07C 01800000 00000001
+	v_mov_b32_e32 v1, 1                                        // 000000092E80: 7E020281
+	v_mov_b32_e32 v2, 0                                        // 000000092E84: 7E040280
+	v_lshrrev_b32_e32 v0, 1, v0                                // 000000092E88: 32000081
+	s_wait_storecnt 0x0                                        // 000000092E8C: BFC10000
+	global_atomic_add_u64 v0, v[1:2], s[0:1] scope:SCOPE_DEV   // 000000092E90: EE10C000 00880000 00000000
+	s_wait_storecnt 0x0                                        // 000000092E9C: BFC10000
+	global_inv scope:SCOPE_DEV                                 // 000000092EA0: EE0AC07C 00080000 00000000
+	s_endpgm                                                   // 000000092EAC: BFB00000
+	s_nop 0                                                    // 000000092EB0: BF800000
+	s_nop 0                                                    // 000000092EB4: BF800000

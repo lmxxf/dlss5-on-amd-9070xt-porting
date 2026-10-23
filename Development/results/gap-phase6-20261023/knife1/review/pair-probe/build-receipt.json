@@ -1,0 +1,18 @@
+{
+  "exe": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/pair-probe.exe",
+  "sha256": "8f90915619d5d5f857de8c64a23de51adcbbaf57d340ea87944ae715d62707b6",
+  "source_sha256": "e31df13c3d593d9a5b10fd224fa4de39de59c2dfbd4e4d2c965609aa4ebfdbac",
+  "producer_source_sha256": "7060a18496a82d0c6654d54a5791550495f356bd8b3374fc4e4c8cfd2352dd86",
+  "consumer_source_sha256": "afec92b71d33e049a33af65fc249f2e550b37ca902fc0978f50e5a7ddb2444e9",
+  "tokens": [
+    288,
+    400,
+    448,
+    640
+  ],
+  "baseline": "phase5 active Vfrag exports",
+  "candidate": "QKfrag exports; V layout unchanged",
+  "loader": "current production ReadWeights(logical .f32) with actual f16 fallback",
+  "gpu_by_builder": false,
+  "root_gpu_result": "PASS; local raw independently verified in cpu-verified.json"
+}

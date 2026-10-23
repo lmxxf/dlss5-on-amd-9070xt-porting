@@ -1,0 +1,3 @@
+首个baseline子进程exit0，但runner错误要求VFRAG全程0；现有Small初始化会在1152/1088同geometry预热一次Original，因此汇总含8个producer/consumer。Small本身仍拒VF。保旧case，不用于性能；根据真实model_prepared日志修门，重新检查首case，后续照排。normal hotkey值同时从非法none改为合法0，避免意外F9。
+
+进一步源核：预热Original仅1920×1152且post_auxiliary_row为空。free1088没有该预热，真实VF总数0正确。此前free baseline子进程exit0、三帧Gold完好，只runner误门；CPU复核并补raw哈希回执，不重跑GPU，后续5个freecase继续。

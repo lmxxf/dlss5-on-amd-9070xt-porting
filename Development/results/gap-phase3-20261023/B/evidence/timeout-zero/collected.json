@@ -1,0 +1,68 @@
+{
+    "cpu_raw_check":  true,
+    "files":  [
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\modules\\deep_fast-packed-fast.hsaco",
+                      "sha256":  "b249f6b9edcfb5005ef0fde51753f445131ae3f7e03958a4efd8f8f016a2db49",
+                      "bytes":  702080
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-probe.exe",
+                      "sha256":  "9ffdd2facb96ca7c525f79f3b49e718a4d35eacd457d577812bd745fa6ed3a60",
+                      "bytes":  2725616
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-zero\\receipt.json",
+                      "sha256":  "aa95ba3a49c51ed093b6be2b0ac03d14d9b4bd3277193a31ca248e43bca47af5",
+                      "bytes":  760
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-zero\\float-output-with-canaries.bin",
+                      "sha256":  "5a6bd063b83fbf417a7813f0fcb9043bbab08126c7087c8312377af9cb6ba3ab",
+                      "bytes":  33280
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-zero\\byte-output-with-canaries.bin",
+                      "sha256":  "b036e4e7e0a20729e2dafc043704436feff1129d1103a1da528274f1f0e8f82e",
+                      "bytes":  8704
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-zero\\ready-with-canaries.bin",
+                      "sha256":  "e64ce012749b3822d8b0ac4f32d85645a85adc9370a4b09659ea9dc72ab637fa",
+                      "bytes":  520
+                  },
+                  {
+                      "path":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\timeout-zero\\status-with-canaries.bin",
+                      "sha256":  "ce971e7aff33274badcf9f13f689dbfcfd9742a3c1edec6f2719e230c019a769",
+                      "bytes":  516
+                  }
+              ],
+    "root_guarded_gpu_receipt":  {
+                                     "pass":  true,
+                                     "module":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\modules\\deep_fast-packed-fast.hsaco",
+                                     "device":  0,
+                                     "device_name":  "AMD Radeon RX 9070 XT",
+                                     "architecture":  "gfx1201",
+                                     "tokens":  16,
+                                     "workgroups":  8,
+                                     "threads_per_workgroup":  32,
+                                     "ready_initial":  0,
+                                     "target":  8,
+                                     "wait_limit":  1,
+                                     "module_load_status":  0,
+                                     "export_status":  0,
+                                     "launch_status":  0,
+                                     "drain_status":  0,
+                                     "sticky_status":  1,
+                                     "float_output_nonzero_bytes":  0,
+                                     "byte_output_nonzero_bytes":  0,
+                                     "float_canary_changed":  0,
+                                     "byte_canary_changed":  0,
+                                     "status_canary_changed":  0,
+                                     "ready_unchanged":  true,
+                                     "poison_inputs_and_trace_unchanged":  true,
+                                     "host_launch_and_drain_ms_diagnostic_only":  0.114,
+                                     "producer_launches":  0,
+                                     "downstream_launches":  0
+                                 }
+}

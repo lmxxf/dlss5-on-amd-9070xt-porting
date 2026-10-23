@@ -1,0 +1,34 @@
+[
+  {
+    "gpu": "gfx1201",
+    "cmd": [
+      "/home/lmxxf/work/llvm-build-23/bin/clang",
+      "-target",
+      "amdgcn-amd-amdhsa",
+      "-mcpu=gfx1201",
+      "-c",
+      "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/B/support.s",
+      "-o",
+      "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/B/gfx1201.o"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/B/support.s:2:1: error: instruction not supported on this GPU (gfx1201): ds_load_tr8_b64\nds_load_tr8_b64 v[0:1], v2\n^\n"
+  },
+  {
+    "gpu": "gfx1250",
+    "cmd": [
+      "/home/lmxxf/work/llvm-build-23/bin/clang",
+      "-target",
+      "amdgcn-amd-amdhsa",
+      "-mcpu=gfx1250",
+      "-c",
+      "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/B/support.s",
+      "-o",
+      "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/B/gfx1250.o"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

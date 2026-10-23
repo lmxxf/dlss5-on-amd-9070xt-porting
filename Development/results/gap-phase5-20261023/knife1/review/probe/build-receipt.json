@@ -1,0 +1,18 @@
+{
+  "source_sha256": "251aff025aa15546d2881b206146a06581cf99cfa6e31d52b4f5614450825db1",
+  "host_source_sha256": "4fc1228b12f0d1427953077ce489b774d313569c47fde6417f85c38924d82e11",
+  "host_exe_sha256": "214c4500583d326130ab3a29861697eac1d591fbb450a08c8e24f9ce688a15a3",
+  "host_path": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife1/helper-probe.exe",
+  "device_source_path": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife1/probe.generated.hip",
+  "cpu_front_syntax_pass": true,
+  "old_ds_bpermute_calls_present": true,
+  "new_permlanex16_calls_present": true,
+  "gpu_executed": false,
+  "remote_rtc_executed": false,
+  "arguments": "PROBE_HSACO OUTPUT_DIRECTORY [HIP_DEVICE=0]",
+  "launches": 2,
+  "norm_lanes": 32768,
+  "norm_waves": 1024,
+  "pack_lanes": 65536,
+  "FP8_values_per_path": 524288
+}

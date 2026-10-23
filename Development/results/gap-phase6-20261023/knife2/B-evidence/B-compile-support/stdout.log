@@ -1,0 +1,9 @@
+COMGR 3.0
+ISA amdgcn-amd-amdhsa--gfx1201
+COMGR kind5: D:\DLSSNR-Lab\gap-phase6-20261023\cache\comgr-e469f2\input\probe.hip:7:7: error: use of undeclared identifier '__builtin_amdgcn_ds_load_tr8_b64_v2i32'; did you mean '__builtin_amdgcn_ds_read_tr8_b64_v2i32'?
+    7 |  i2 x=__builtin_amdgcn_ds_load_tr8_b64_v2i32(tile+lane);
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |       __builtin_amdgcn_ds_read_tr8_b64_v2i32
+1 error generated when compiling for gfx1201.
+
+

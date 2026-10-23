@@ -1,0 +1,96 @@
+{
+  "tiers": {
+    "960": {
+      "baseline": 6.461980104166667,
+      "candidate": 6.4628893750000005,
+      "delta_ms": 0.0009092708333335864,
+      "p99_delta_ms": -0.09078499999999945,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.022635312500000282,
+          "p99_delta_ms": 0.11137100000000011
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.02094625000000061,
+          "p99_delta_ms": -0.2476130000000003
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.001038749999999311,
+          "p99_delta_ms": -0.03062999999999949
+        }
+      ]
+    },
+    "1088": {
+      "baseline": 8.8699934375,
+      "candidate": 8.876145416666667,
+      "delta_ms": 0.006151979166666877,
+      "p99_delta_ms": 0.021655000000000868,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": 0.01067656249999871,
+          "p99_delta_ms": 0.05480299999999794
+        },
+        {
+          "round": 2,
+          "delta_ms": 0.0007931250000012824,
+          "p99_delta_ms": -0.05052699999999888
+        },
+        {
+          "round": 3,
+          "delta_ms": 0.006986249999998861,
+          "p99_delta_ms": 0.06793599999999955
+        }
+      ]
+    },
+    "1152": {
+      "baseline": 9.158256562499998,
+      "candidate": 9.146321875,
+      "delta_ms": -0.011934687499998375,
+      "p99_delta_ms": -0.0792389999999994,
+      "rounds": [
+        {
+          "round": 1,
+          "delta_ms": -0.01678374999999832,
+          "p99_delta_ms": -0.07659600000000033
+        },
+        {
+          "round": 2,
+          "delta_ms": -0.0020931250000018053,
+          "p99_delta_ms": 0.0360630000000004
+        },
+        {
+          "round": 3,
+          "delta_ms": -0.016927187499998553,
+          "p99_delta_ms": -0.18425199999999897
+        }
+      ]
+    }
+  },
+  "gold_frames": 66,
+  "perf_slots": 36,
+  "hit_counts": {
+    "gold-float-skip-baseline": [
+      0,
+      0
+    ],
+    "gold-float-skip-candidate": [
+      1,
+      64
+    ],
+    "gold-missing-exports-1152": [
+      1,
+      0
+    ],
+    "gold-missing-exports-960": [
+      1,
+      0
+    ]
+  },
+  "old89_code_and_resources_same": true,
+  "production_hip_diff": [],
+  "production_no_npair": true
+}

@@ -1,0 +1,146 @@
+{
+  "pass": true,
+  "scope": "phase5 Vfrag baseline vs QKfrag candidate; 4 actual token counts; CPU reread raw",
+  "cases": [
+    {
+      "tokens": 288,
+      "QK_bytes_independently_checked": 589824,
+      "QK_consumer_map_equal": true,
+      "V_baseline_headmajor_bytes_unchanged": true,
+      "AV_byte_equal": true,
+      "guards_and_finite_pass": true,
+      "reuse_gate_from_gpu_full_buffer_equality": true
+    },
+    {
+      "tokens": 400,
+      "QK_bytes_independently_checked": 819200,
+      "QK_consumer_map_equal": true,
+      "V_baseline_headmajor_bytes_unchanged": true,
+      "AV_byte_equal": true,
+      "guards_and_finite_pass": true,
+      "reuse_gate_from_gpu_full_buffer_equality": true
+    },
+    {
+      "tokens": 448,
+      "QK_bytes_independently_checked": 917504,
+      "QK_consumer_map_equal": true,
+      "V_baseline_headmajor_bytes_unchanged": true,
+      "AV_byte_equal": true,
+      "guards_and_finite_pass": true,
+      "reuse_gate_from_gpu_full_buffer_equality": true
+    },
+    {
+      "tokens": 640,
+      "QK_bytes_independently_checked": 1310720,
+      "QK_consumer_map_equal": true,
+      "V_baseline_headmajor_bytes_unchanged": true,
+      "AV_byte_equal": true,
+      "guards_and_finite_pass": true,
+      "reuse_gate_from_gpu_full_buffer_equality": true
+    }
+  ],
+  "files": [
+    {
+      "path": "288/qkv-old-guard.bin",
+      "bytes": 885248,
+      "sha256": "d8839feaa380f111a3477f5926d161997a25251f2c89ff8c27c6178dbec2030a"
+    },
+    {
+      "path": "288/qkv-new-guard.bin",
+      "bytes": 885248,
+      "sha256": "b86b0f660464112884e4dc4c19a2e2194d775062c6cd3a21eae9f2c02ec52dd7"
+    },
+    {
+      "path": "288/qkv-new-inverse.bin",
+      "bytes": 884736,
+      "sha256": "e799cb126531408b3fc5e7e00dba38cfbe7732031bc97a56b7dae74631e24647"
+    },
+    {
+      "path": "288/av-old-guard.bin",
+      "bytes": 295424,
+      "sha256": "d8b8e4855d81c1fd9aa2bffd432e4d575b41c4d0779767b97bc580b05563f658"
+    },
+    {
+      "path": "288/av-new-guard.bin",
+      "bytes": 295424,
+      "sha256": "d8b8e4855d81c1fd9aa2bffd432e4d575b41c4d0779767b97bc580b05563f658"
+    },
+    {
+      "path": "400/qkv-old-guard.bin",
+      "bytes": 1229312,
+      "sha256": "1907067f7b0619914b196fbaa1c2d08db7b7d6bf71bc3e784acd1335418e3d5e"
+    },
+    {
+      "path": "400/qkv-new-guard.bin",
+      "bytes": 1229312,
+      "sha256": "f72673cbb66bc894d0778ba6dcf6abdf9aca8d801019352bf201ad3be138a72f"
+    },
+    {
+      "path": "400/qkv-new-inverse.bin",
+      "bytes": 1228800,
+      "sha256": "2850f70bbdfcf59af110156969fc874714a859622182da6148fdd544b6f101e8"
+    },
+    {
+      "path": "400/av-old-guard.bin",
+      "bytes": 410112,
+      "sha256": "fcec7c39414285be9b53bfc1847758ee86b04b267290830e3f917012d44f24ba"
+    },
+    {
+      "path": "400/av-new-guard.bin",
+      "bytes": 410112,
+      "sha256": "fcec7c39414285be9b53bfc1847758ee86b04b267290830e3f917012d44f24ba"
+    },
+    {
+      "path": "448/qkv-old-guard.bin",
+      "bytes": 1376768,
+      "sha256": "4461c55b253c195827d18a7573b24c019564eee4cb39b34da7b62ab07fc16e7a"
+    },
+    {
+      "path": "448/qkv-new-guard.bin",
+      "bytes": 1376768,
+      "sha256": "d4409597a3f1c873d6aa1ae9c7d225e982f227293e17ca531d1b887d013389d1"
+    },
+    {
+      "path": "448/qkv-new-inverse.bin",
+      "bytes": 1376256,
+      "sha256": "6294dd9a2a8e53606672dd78dda05e3b4d49238bed7ca72f3ae98d838a9cd293"
+    },
+    {
+      "path": "448/av-old-guard.bin",
+      "bytes": 459264,
+      "sha256": "980ba3b0fb7d63c4c47c0539126863ccf9596a326575b531d2d34e4d2e41c14d"
+    },
+    {
+      "path": "448/av-new-guard.bin",
+      "bytes": 459264,
+      "sha256": "980ba3b0fb7d63c4c47c0539126863ccf9596a326575b531d2d34e4d2e41c14d"
+    },
+    {
+      "path": "640/qkv-old-guard.bin",
+      "bytes": 1966592,
+      "sha256": "dd5464f4b0a9f1e068e3c353d331eb3910aa9d5ff0e33461768f73a9d5b4f558"
+    },
+    {
+      "path": "640/qkv-new-guard.bin",
+      "bytes": 1966592,
+      "sha256": "95555ef31a17660e978d959364a446ef47a056d3d175e788631f7ed1b1e9029c"
+    },
+    {
+      "path": "640/qkv-new-inverse.bin",
+      "bytes": 1966080,
+      "sha256": "5afaa2e4c7fc2a684aebe784516c90a95746e6cc41b7d718162198a20c675d26"
+    },
+    {
+      "path": "640/av-old-guard.bin",
+      "bytes": 655872,
+      "sha256": "ce3aacf8fb7795aef663a66f2a5b19eec9f802d656765b2d8dc3632de9f6a48f"
+    },
+    {
+      "path": "640/av-new-guard.bin",
+      "bytes": 655872,
+      "sha256": "ce3aacf8fb7795aef663a66f2a5b19eec9f802d656765b2d8dc3632de9f6a48f"
+    }
+  ],
+  "reuse_raw_exported": false,
+  "gpu_rerun_by_verifier": false
+}

@@ -1,0 +1,19 @@
+seed=0 pattern=0
+input format=RGBA16_FLOAT W=1296 H=720 invalid=0 min=0 max=34.53125 luma=0.0157641119 roi_luma=0.0250669576
+adapter=AMD Radeon RX 9070 XT
+SP_PLAN c=256 first=16 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=1024 oc=512 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=512 oc=256 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+SP_PLAN c=256 first=49 layers=6 tasks=893 initial=160 state_bytes=10732 w16=1
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=1024 oc=512 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=512 oc=256 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+frame=0 reset=1 wall_ms=1338.698 invalid=0 luma=0.01307101 roi=0.01974189 dark=806206 roi_dark=258238 changed_first=0 maxabs_first=0
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=1024 oc=512 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=512 oc=256 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+frame=1 reset=1 wall_ms=10.828 invalid=0 luma=0.01307101 roi=0.01974189 dark=806206 roi_dark=258238 changed_first=0 maxabs_first=0
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=1024 oc=512 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+UP_ROUTE small_active=0 model=1 W=1920 H=1152 ic=512 oc=256 module=deep_fast kernel=decoder_project2x_h16w_byteout_w_bin_f8w16
+frame=2 reset=1 wall_ms=10.570 invalid=0 luma=0.01307101 roi=0.01974189 dark=806206 roi_dark=258238 changed_first=0 maxabs_first=0
+SP_STATS runs=8 fallback=0 rollover=0 jobs=7144 disabled=0 errors=0
+RESULT frames=3 temporal=0 mean_wall_ms=453.365 invalid_total=0 restored_capture_every_frame=1 HDR_preserved=1
+

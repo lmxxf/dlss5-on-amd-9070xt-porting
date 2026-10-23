@@ -1,0 +1,1737 @@
+{
+  "baseline_gpu_ms": 8.570213291666668,
+  "candidate_gpu_ms": 8.3545021875,
+  "saved_ms": 0.21571110416666883,
+  "relative_percent": 2.516986413586902,
+  "p99_baseline_ms": 8.816156,
+  "p99_candidate_ms": 8.5707569,
+  "rounds": [
+    {
+      "round": 1,
+      "base_ms": 8.53799034375,
+      "candidate_ms": 8.329662875,
+      "saved_ms": 0.2083274687499994,
+      "p99_delta_ms": -0.2086737000000003,
+      "a_drift_ms": 0.025907437499997243,
+      "b_drift_ms": 0.0017582499999981849
+    },
+    {
+      "round": 2,
+      "base_ms": 8.571157750000001,
+      "candidate_ms": 8.367223718750001,
+      "saved_ms": 0.2039340312500002,
+      "p99_delta_ms": -0.19987270000000024,
+      "a_drift_ms": 0.033215499999998954,
+      "b_drift_ms": -0.022383687500001415
+    },
+    {
+      "round": 3,
+      "base_ms": 8.601491781250001,
+      "candidate_ms": 8.36661996875,
+      "saved_ms": 0.23487181250000155,
+      "p99_delta_ms": -0.273705399999999,
+      "a_drift_ms": 0.025583812500000747,
+      "b_drift_ms": 0.0004143124999984593
+    }
+  ],
+  "slots": [
+    {
+      "slot": "r1-0-N",
+      "round": 1,
+      "kind": "N",
+      "mean": 8.525036625000002,
+      "p99": 8.6878074,
+      "median": 8.5379
+    },
+    {
+      "slot": "r1-1-C",
+      "round": 1,
+      "kind": "C",
+      "mean": 8.328783750000001,
+      "p99": 8.4694653,
+      "median": 8.342410000000001
+    },
+    {
+      "slot": "r1-2-C",
+      "round": 1,
+      "kind": "C",
+      "mean": 8.330542,
+      "p99": 8.5369613,
+      "median": 8.332855
+    },
+    {
+      "slot": "r1-3-N",
+      "round": 1,
+      "kind": "N",
+      "mean": 8.5509440625,
+      "p99": 8.7509102,
+      "median": 8.54668
+    },
+    {
+      "slot": "r2-0-N",
+      "round": 2,
+      "kind": "N",
+      "mean": 8.55455,
+      "p99": 8.7155787,
+      "median": 8.56026
+    },
+    {
+      "slot": "r2-1-C",
+      "round": 2,
+      "kind": "C",
+      "mean": 8.3784155625,
+      "p99": 8.5563772,
+      "median": 8.37896
+    },
+    {
+      "slot": "r2-2-C",
+      "round": 2,
+      "kind": "C",
+      "mean": 8.356031875,
+      "p99": 8.5630692,
+      "median": 8.357815
+    },
+    {
+      "slot": "r2-3-N",
+      "round": 2,
+      "kind": "N",
+      "mean": 8.5877655,
+      "p99": 8.849670399999999,
+      "median": 8.575485
+    },
+    {
+      "slot": "r3-0-N",
+      "round": 3,
+      "kind": "N",
+      "mean": 8.588699875,
+      "p99": 8.8525306,
+      "median": 8.591650000000001
+    },
+    {
+      "slot": "r3-1-C",
+      "round": 3,
+      "kind": "C",
+      "mean": 8.3664128125,
+      "p99": 8.6036917,
+      "median": 8.35771
+    },
+    {
+      "slot": "r3-2-C",
+      "round": 3,
+      "kind": "C",
+      "mean": 8.366827124999999,
+      "p99": 8.5845436,
+      "median": 8.36525
+    },
+    {
+      "slot": "r3-3-N",
+      "round": 3,
+      "kind": "N",
+      "mean": 8.6142836875,
+      "p99": 8.9370676,
+      "median": 8.61407
+    }
+  ],
+  "gold_sha": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+  "samples_per_arm": 960,
+  "trace": {
+    "trace-current": {
+      "profiles": [
+        "GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1",
+        "GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1",
+        "GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=0 compact_projection=0 contract_w16=0 projection_w16=0 contract_bstream=0 projection_bout=0 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=0 pdl_effective=1 swin_run=1"
+      ],
+      "counts": [
+        "GAP_COUNT frame=0 dispatches=161",
+        "GAP_COUNT frame=1 dispatches=161",
+        "GAP_COUNT frame=2 dispatches=161"
+      ],
+      "dispatch": [
+        {
+          "index": 0,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_prefix_b8d_w16"
+        },
+        {
+          "index": 1,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_mapped_b8_w16"
+        },
+        {
+          "index": 2,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 3,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 4,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_finish_dcrop_b8d_w16"
+        },
+        {
+          "index": 5,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_c32_b8_out8"
+        },
+        {
+          "index": 6,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 7,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 8,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 9,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_ho"
+        },
+        {
+          "index": 10,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c64_hin_out8_f8w16"
+        },
+        {
+          "index": 11,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 12,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 13,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 14,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 15,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 16,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_ho"
+        },
+        {
+          "index": 17,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c128_hin_out8_f8w16"
+        },
+        {
+          "index": 18,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 19,
+          "kind": "ordered",
+          "key": "sp:sp_init"
+        },
+        {
+          "index": 20,
+          "kind": "ordered",
+          "key": "sp:sp_run256_w16"
+        },
+        {
+          "index": 21,
+          "kind": "ordered",
+          "key": "sp:sp_recover256_w16"
+        },
+        {
+          "index": 22,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_w16"
+        },
+        {
+          "index": 23,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c256_out8_f8w16"
+        },
+        {
+          "index": 24,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 25,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 26,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 27,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 28,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 29,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 30,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 31,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 32,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 33,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 34,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 35,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 36,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 37,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 38,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 39,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 40,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 41,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 42,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 43,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 44,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 45,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 46,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 47,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 48,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 49,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 50,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 51,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 52,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 53,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 54,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 55,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4"
+        },
+        {
+          "index": 56,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c512_f8w16"
+        },
+        {
+          "index": 57,
+          "kind": "ordered",
+          "key": "deep:vit_gather"
+        },
+        {
+          "index": 58,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 59,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 60,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 61,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 62,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 63,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 64,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 65,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 66,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 67,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 68,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 69,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 70,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 71,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 72,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 73,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 74,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 75,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 76,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 77,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 78,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 79,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 80,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 81,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 82,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 83,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 84,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 85,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 86,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 87,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 88,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 89,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 90,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 91,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 92,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 93,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 94,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 95,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 96,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 97,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 98,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 99,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 100,
+          "kind": "ordered",
+          "key": "deep_fast:vit_pack_input"
+        },
+        {
+          "index": 101,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 102,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bout"
+        },
+        {
+          "index": 103,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 104,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 105,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb"
+        },
+        {
+          "index": 106,
+          "kind": "ordered",
+          "key": "deep:vit_gather"
+        },
+        {
+          "index": 107,
+          "kind": "ordered",
+          "key": "deep_fast:decoder_project2x_h16w_byteout_w"
+        },
+        {
+          "index": 108,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 109,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 110,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 111,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 112,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 113,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 114,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 115,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 116,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 117,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 118,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 119,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 120,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 121,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 122,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 123,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 124,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 125,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 126,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 127,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 128,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 129,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 130,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 131,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 132,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 133,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 134,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 135,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 136,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 137,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 138,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 139,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 140,
+          "kind": "ordered",
+          "key": "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16"
+        },
+        {
+          "index": 141,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 142,
+          "kind": "ordered",
+          "key": "sp:sp_init"
+        },
+        {
+          "index": 143,
+          "kind": "ordered",
+          "key": "sp:sp_run256_w16"
+        },
+        {
+          "index": 144,
+          "kind": "ordered",
+          "key": "sp:sp_recover256_w16"
+        },
+        {
+          "index": 145,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 146,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_up_lb_sh"
+        },
+        {
+          "index": 147,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 148,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 149,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 150,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 151,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 152,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_up_lb_sh"
+        },
+        {
+          "index": 153,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 154,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 155,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi"
+        },
+        {
+          "index": 156,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_up_b8_w16"
+        },
+        {
+          "index": 157,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 158,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 159,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_finish_b8_w16"
+        },
+        {
+          "index": 160,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_post_b8_w16"
+        }
+      ]
+    },
+    "trace-candidate": {
+      "profiles": [
+        "GAP_PROFILE frame=0 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1",
+        "GAP_PROFILE frame=1 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1",
+        "GAP_PROFILE frame=2 W=1920 H=1088 model=1 effective=1 compact_contract=1 compact_projection=1 contract_w16=1 projection_w16=1 contract_bstream=1 projection_bout=1 vit_contract_byte_edge=1 C512ByteStreamOk=1 VitEntryExitByteOk=1 pdl_effective=1 swin_run=1"
+      ],
+      "counts": [
+        "GAP_COUNT frame=0 dispatches=153",
+        "GAP_COUNT frame=1 dispatches=153",
+        "GAP_COUNT frame=2 dispatches=153"
+      ],
+      "dispatch": [
+        {
+          "index": 0,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_prefix_b8d_w16"
+        },
+        {
+          "index": 1,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_mapped_b8_w16"
+        },
+        {
+          "index": 2,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 3,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 4,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_finish_dcrop_b8d_w16"
+        },
+        {
+          "index": 5,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_c32_b8_out8"
+        },
+        {
+          "index": 6,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 7,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 8,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 9,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_ho"
+        },
+        {
+          "index": 10,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c64_hin_out8_f8w16"
+        },
+        {
+          "index": 11,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 12,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 13,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 14,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 15,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 16,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_ho"
+        },
+        {
+          "index": 17,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c128_hin_out8_f8w16"
+        },
+        {
+          "index": 18,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 19,
+          "kind": "ordered",
+          "key": "sp:sp_init"
+        },
+        {
+          "index": 20,
+          "kind": "ordered",
+          "key": "sp:sp_run256_w16"
+        },
+        {
+          "index": 21,
+          "kind": "ordered",
+          "key": "sp:sp_recover256_w16"
+        },
+        {
+          "index": 22,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_w16"
+        },
+        {
+          "index": 23,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c256_out8_f8w16"
+        },
+        {
+          "index": 24,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 25,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 26,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 27,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 28,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 29,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 30,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 31,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 32,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 33,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 34,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 35,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 36,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 37,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 38,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 39,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 40,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 41,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 42,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 43,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 44,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 45,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 46,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 47,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 48,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 49,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 50,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 51,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 52,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 53,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 54,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 55,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4"
+        },
+        {
+          "index": 56,
+          "kind": "ordered",
+          "key": "mh_fast:mh_pool_project_group_c512_out8_f8w16"
+        },
+        {
+          "index": 57,
+          "kind": "ordered",
+          "key": "deep_fast:vit_gather_b8"
+        },
+        {
+          "index": 58,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 59,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 60,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 61,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 62,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 63,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 64,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 65,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 66,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 67,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 68,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 69,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 70,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 71,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 72,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 73,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 74,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 75,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 76,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 77,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 78,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 79,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 80,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 81,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 82,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 83,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 84,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 85,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 86,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 87,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 88,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 89,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 90,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 91,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 92,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 93,
+          "kind": "ordered",
+          "key": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16"
+        },
+        {
+          "index": 94,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16"
+        },
+        {
+          "index": 95,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_qkv_frag_bin_w5f8"
+        },
+        {
+          "index": 96,
+          "kind": "ordered",
+          "key": "deep_fast:vit_attention_fused_640_bytein_bout"
+        },
+        {
+          "index": 97,
+          "kind": "ordered",
+          "key": "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16"
+        },
+        {
+          "index": 98,
+          "kind": "ordered",
+          "key": "deep_fast:vit_gather_b8"
+        },
+        {
+          "index": 99,
+          "kind": "ordered",
+          "key": "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16"
+        },
+        {
+          "index": 100,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 101,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 102,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 103,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 104,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 105,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 106,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 107,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 108,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 109,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 110,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 111,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 112,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 113,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 114,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 115,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 116,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 117,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 118,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 119,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 120,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 121,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 122,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 123,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 124,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 125,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 126,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 127,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 128,
+          "kind": "ordered",
+          "key": "c512_m32_deep:split_ffn_one_w2f8_w16_bin"
+        },
+        {
+          "index": 129,
+          "kind": "ordered",
+          "key": "deep_fast:split_projection_frag_w16_bskip"
+        },
+        {
+          "index": 130,
+          "kind": "ordered",
+          "key": "c512_m32_mh:c512_qkv_attention_compact_w16"
+        },
+        {
+          "index": 131,
+          "kind": "ordered",
+          "key": "mh_fast:mh_attention_project_frag_c512_w16_u4_bout"
+        },
+        {
+          "index": 132,
+          "kind": "ordered",
+          "key": "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16"
+        },
+        {
+          "index": 133,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 134,
+          "kind": "ordered",
+          "key": "sp:sp_init"
+        },
+        {
+          "index": 135,
+          "kind": "ordered",
+          "key": "sp:sp_run256_w16"
+        },
+        {
+          "index": 136,
+          "kind": "ordered",
+          "key": "sp:sp_recover256_w16"
+        },
+        {
+          "index": 137,
+          "kind": "ordered",
+          "key": "c64_wave2:c256_wave2_bi_bo_w16"
+        },
+        {
+          "index": 138,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_up_lb_sh"
+        },
+        {
+          "index": 139,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 140,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 141,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 142,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 143,
+          "kind": "ordered",
+          "key": "c64_wave2:c128_wave2_bi_bo"
+        },
+        {
+          "index": 144,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_up_lb_sh"
+        },
+        {
+          "index": 145,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 146,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi_bo"
+        },
+        {
+          "index": 147,
+          "kind": "ordered",
+          "key": "c64_wave2:c64_wave2_bi"
+        },
+        {
+          "index": 148,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_up_b8_w16"
+        },
+        {
+          "index": 149,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 150,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_chain_w16"
+        },
+        {
+          "index": 151,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_finish_b8_w16"
+        },
+        {
+          "index": 152,
+          "kind": "ordered",
+          "key": "c32_wave1:c32_wave1_post_b8_w16"
+        }
+      ]
+    }
+  }
+}

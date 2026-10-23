@@ -1,0 +1,23 @@
+{
+  "exports": 93,
+  "code_changed": [
+    "decoder_project2x_h16w_byteout_w",
+    "decoder_project2x_h16w_byteout_w_bin",
+    "decoder_project2x_h16w_byteout_w_bin_f8w16"
+  ],
+  "code_unchanged": 90,
+  "resource_changes": {
+    "decoder_project2x_h16w_byteout_w": {
+      "vgpr": [
+        85,
+        72
+      ]
+    },
+    "decoder_project2x_h16w_byteout_w_bin": {
+      "vgpr": [
+        85,
+        72
+      ]
+    }
+  }
+}

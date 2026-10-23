@@ -1,0 +1,34 @@
+{
+  "candidate_patch_sha256": "e8fc806662217e152bad82d61c95ce2e8c2342f34395533ebd747989b8d759fb",
+  "scope": "CPU enumeration of reviewed grid and source address formulas, not execution of HIP kernel",
+  "cases": [
+    {
+      "tokens": 400,
+      "groups": 416,
+      "full_groups": 384,
+      "tail_groups": 32,
+      "output_bytes": 409600,
+      "every_output_written_once": true,
+      "input_ranges_pass": true,
+      "wmma_old": 100000,
+      "wmma_new": 100000,
+      "logical_kv_requested_bytes_old": 20480000,
+      "logical_kv_requested_bytes_new": 10649600,
+      "logical_kv_reduction": 0.48
+    },
+    {
+      "tokens": 640,
+      "groups": 640,
+      "full_groups": 640,
+      "tail_groups": 0,
+      "output_bytes": 655360,
+      "every_output_written_once": true,
+      "input_ranges_pass": true,
+      "wmma_old": 256000,
+      "wmma_new": 256000,
+      "logical_kv_requested_bytes_old": 52428800,
+      "logical_kv_requested_bytes_new": 26214400,
+      "logical_kv_reduction": 0.5
+    }
+  ]
+}

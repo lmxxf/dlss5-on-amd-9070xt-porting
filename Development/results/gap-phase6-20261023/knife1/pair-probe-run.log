@@ -1,0 +1,27 @@
+DONE knife1/pair-probe
+
+PAIR_PROBE tokens=288 QKinverseDiff=0 VunchangedDiff=0 AVdiff=0 canary=0 nan=0 reuse=1 pass=1
+PAIR_PROBE tokens=400 QKinverseDiff=0 VunchangedDiff=0 AVdiff=0 canary=0 nan=0 reuse=1 pass=1
+PAIR_PROBE tokens=448 QKinverseDiff=0 VunchangedDiff=0 AVdiff=0 canary=0 nan=0 reuse=1 pass=1
+PAIR_PROBE tokens=640 QKinverseDiff=0 VunchangedDiff=0 AVdiff=0 canary=0 nan=0 reuse=1 pass=1
+{"tokens":288,"producer_groups":384,"producer_threads":160,"attention_groups":576,"attention_threads":32,"qkv_capacity_
+bytes_old":884736,"qkv_capacity_bytes_new":884736,"qk_inverse_byte_diff":0,"v_unchanged_byte_diff":0,"av_byte_diff":0,"
+canary_changed":0,"nonfinite_e4m3_bytes":0,"reuse_gate_sentinels_unchanged":true,"input_unchanged":true,"packed_weight_
+unchanged":true,"pass":true},
+{"tokens":400,"producer_groups":480,"producer_threads":160,"attention_groups":800,"attention_threads":32,"qkv_capacity_
+bytes_old":1228800,"qkv_capacity_bytes_new":1228800,"qk_inverse_byte_diff":0,"v_unchanged_byte_diff":0,"av_byte_diff":0
+,"canary_changed":0,"nonfinite_e4m3_bytes":0,"reuse_gate_sentinels_unchanged":true,"input_unchanged":true,"packed_weigh
+t_unchanged":true,"pass":true},
+{"tokens":448,"producer_groups":576,"producer_threads":160,"attention_groups":896,"attention_threads":32,"qkv_capacity_
+bytes_old":1376256,"qkv_capacity_bytes_new":1376256,"qk_inverse_byte_diff":0,"v_unchanged_byte_diff":0,"av_byte_diff":0
+,"canary_changed":0,"nonfinite_e4m3_bytes":0,"reuse_gate_sentinels_unchanged":true,"input_unchanged":true,"packed_weigh
+t_unchanged":true,"pass":true},
+{"tokens":640,"producer_groups":768,"producer_threads":160,"attention_groups":1280,"attention_threads":32,"qkv_capacity
+_bytes_old":1966080,"qkv_capacity_bytes_new":1966080,"qk_inverse_byte_diff":0,"v_unchanged_byte_diff":0,"av_byte_diff":
+0,"canary_changed":0,"nonfinite_e4m3_bytes":0,"reuse_gate_sentinels_unchanged":true,"input_unchanged":true,"packed_weig
+ht_unchanged":true,"pass":true}
+],"pass":true}
+ALL_JOBS_DONE phase6-qk-pair-probe
+LOCK_RELEASED
+
+

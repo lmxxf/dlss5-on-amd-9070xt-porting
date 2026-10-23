@@ -1,0 +1,59 @@
+{
+  "pass": true,
+  "checked_frames": 48,
+  "paired_cases": 4,
+  "mode2_all_actual_frames_compute": true,
+  "mode3_compute_and_reuse_observed": true,
+  "all_cross_arm_frame_hashes_and_full_AE_csv_same": true,
+  "pairs": {
+    "(2, 'original1088')": {
+      "baseline_route_calls": 0,
+      "candidate_route_calls": 64,
+      "states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "(2, 'small720')": {
+      "baseline_route_calls": 0,
+      "candidate_route_calls": 64,
+      "states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "(3, 'original1088')": {
+      "baseline_route_calls": 0,
+      "candidate_route_calls": 64,
+      "states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    "(3, 'small720')": {
+      "baseline_route_calls": 0,
+      "candidate_route_calls": 64,
+      "states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ]
+    }
+  },
+  "local_only": true
+}

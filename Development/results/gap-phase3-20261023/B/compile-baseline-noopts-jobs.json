@@ -1,0 +1,23 @@
+{
+  "name": "B-producer-baseline-noopts",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.baseline.generated.hip",
+      "sha256": "a7a7cd51f4b063220ee873f0967236a6f020d5114a5fbbc84ddb82dc597cf957"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "B/compile-producer-baseline-noopts",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.baseline.generated.hip\" comgr gfx1201"
+    }
+  ]
+}

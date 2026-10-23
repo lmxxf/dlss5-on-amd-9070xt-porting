@@ -1,0 +1,21 @@
+{
+  "production_header_sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8",
+  "diagnostic_header_sha256": "9f2ae3498532cc9485f0dad2fcc1c4346afb00e9ae6b7758beacab9bce807d9e",
+  "only_delta": "Immediately after actual Fn resolution and before real launch, print decoder name/context; no observer/profile/events/selection edits",
+  "source": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/up-route/source",
+  "GPU_executed": false,
+  "hosts": [
+    {
+      "path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/up-route/frame-standard.exe",
+      "sha256": "60c858138c125a2578b199603f37d689fa600fd1c09cd711e4e925729611be5b"
+    },
+    {
+      "path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife2/up-route/frame-free1072.exe",
+      "sha256": "ce1b4a08f6be5fb39db44c6db0b3942fbbed4c03fb15c5a27745cb233ba90823"
+    }
+  ],
+  "input_geometry": {
+    "standard": "1296x720 RGBA16F",
+    "free1072": "1920x1072 RGBA16F"
+  }
+}

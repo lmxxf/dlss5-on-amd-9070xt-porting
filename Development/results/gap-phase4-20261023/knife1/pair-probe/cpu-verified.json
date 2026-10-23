@@ -1,0 +1,73 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "tokens": 400,
+      "qk_exact": true,
+      "inverse_v_exact": true,
+      "av_exact": true,
+      "all_guards_intact": true,
+      "reuse_evidence": "GPU probe full-buffer equality recorded in receipt; reuse raw not separately exported"
+    },
+    {
+      "tokens": 640,
+      "qk_exact": true,
+      "inverse_v_exact": true,
+      "av_exact": true,
+      "all_guards_intact": true,
+      "reuse_evidence": "GPU probe full-buffer equality recorded in receipt; reuse raw not separately exported"
+    }
+  ],
+  "files": [
+    {
+      "path": "400/qkv-old-guard.bin",
+      "bytes": 1229312,
+      "sha256": "9f0c17520a384d7c1433540422088f9a70e4c0bd17cb1b53169f0d215becde1c"
+    },
+    {
+      "path": "400/qkv-new-guard.bin",
+      "bytes": 1229312,
+      "sha256": "1907067f7b0619914b196fbaa1c2d08db7b7d6bf71bc3e784acd1335418e3d5e"
+    },
+    {
+      "path": "400/qkv-new-inverse.bin",
+      "bytes": 1228800,
+      "sha256": "c703f6323297c129b015170bc98ccc0d6f0a655d81e9655e7945a2775a21426f"
+    },
+    {
+      "path": "400/av-old-guard.bin",
+      "bytes": 410112,
+      "sha256": "fcec7c39414285be9b53bfc1847758ee86b04b267290830e3f917012d44f24ba"
+    },
+    {
+      "path": "400/av-new-guard.bin",
+      "bytes": 410112,
+      "sha256": "fcec7c39414285be9b53bfc1847758ee86b04b267290830e3f917012d44f24ba"
+    },
+    {
+      "path": "640/qkv-old-guard.bin",
+      "bytes": 1966592,
+      "sha256": "f4a9b3608001a684c174806ada7001a92b0f87163e3f5e37ba957ff76d971f2b"
+    },
+    {
+      "path": "640/qkv-new-guard.bin",
+      "bytes": 1966592,
+      "sha256": "dd5464f4b0a9f1e068e3c353d331eb3910aa9d5ff0e33461768f73a9d5b4f558"
+    },
+    {
+      "path": "640/qkv-new-inverse.bin",
+      "bytes": 1966080,
+      "sha256": "6077c0b264928f5d74b888703a529f195ad0ada6c213317e6ea74700c02a3d3a"
+    },
+    {
+      "path": "640/av-old-guard.bin",
+      "bytes": 655872,
+      "sha256": "ce3aacf8fb7795aef663a66f2a5b19eec9f802d656765b2d8dc3632de9f6a48f"
+    },
+    {
+      "path": "640/av-new-guard.bin",
+      "bytes": 655872,
+      "sha256": "ce3aacf8fb7795aef663a66f2a5b19eec9f802d656765b2d8dc3632de9f6a48f"
+    }
+  ]
+}

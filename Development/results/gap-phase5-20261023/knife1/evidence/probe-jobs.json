@@ -1,0 +1,33 @@
+{
+  "name": "phase5-c512-helper-probe",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\probe.generated.hip",
+      "sha256": "251aff025aa15546d2881b206146a06581cf99cfa6e31d52b4f5614450825db1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\helper-probe.exe",
+      "sha256": "214c4500583d326130ab3a29861697eac1d591fbb450a08c8e24f9ce688a15a3"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-helper-probe",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\probe.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\probe.generated.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/helper-probe",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\helper-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\gap-phase5-20261023\\knife1\\compile-helper-probe\\probe.hsaco\" \"{OUT}\" 0"
+    }
+  ]
+}

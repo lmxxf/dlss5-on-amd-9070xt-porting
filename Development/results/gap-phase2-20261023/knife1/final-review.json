@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "960": {
+      "baseline_ms": 6.548211770833333,
+      "candidate_ms": 6.477251666666667,
+      "delta_ms": -0.07096010416666676,
+      "p99_delta_ms": -0.028782000000001418
+    },
+    "1088": {
+      "baseline_ms": 9.090362083333334,
+      "candidate_ms": 8.880000520833333,
+      "delta_ms": -0.21036156250000104,
+      "p99_delta_ms": -0.18131400000000042
+    },
+    "1152": {
+      "baseline_ms": 9.167038645833333,
+      "candidate_ms": 9.160298333333333,
+      "delta_ms": -0.006740312499999845,
+      "p99_delta_ms": -0.13096700000000006
+    }
+  },
+  "gold_frames": 54,
+  "final_gold_frames": 9,
+  "compat_frames": 144,
+  "compat_pairs": 24,
+  "injection_cases": [
+    {
+      "h": 960,
+      "case": "missing-contract",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 960,
+      "case": "missing-contract",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 960,
+      "case": "missing-projection",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 960,
+      "case": "missing-projection",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 960,
+      "case": "missing-bstream",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 960,
+      "case": "missing-bstream",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 960,
+      "case": "missing-bout",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 960,
+      "case": "missing-bout",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1088,
+      "case": "missing-contract",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 1088,
+      "case": "missing-contract",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1088,
+      "case": "missing-projection",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 1088,
+      "case": "missing-projection",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1088,
+      "case": "missing-bstream",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 1088,
+      "case": "missing-bstream",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1088,
+      "case": "missing-bout",
+      "arm": "baseline",
+      "logged": false
+    },
+    {
+      "h": 1088,
+      "case": "missing-bout",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-contract",
+      "arm": "baseline",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-contract",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-projection",
+      "arm": "baseline",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-projection",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-bstream",
+      "arm": "baseline",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-bstream",
+      "arm": "candidate",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-bout",
+      "arm": "baseline",
+      "logged": true
+    },
+    {
+      "h": 1152,
+      "case": "missing-bout",
+      "arm": "candidate",
+      "logged": true
+    }
+  ],
+  "final_artifact_sha_verified": true,
+  "final_header_sha_verified": true,
+  "current_header_matches_final": true
+}

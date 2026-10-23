@@ -1,0 +1,57 @@
+[
+  {
+    "module": "deep_fast-packed-fast.hsaco",
+    "symbol": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+    "present": true
+  },
+  {
+    "module": "deep_fast-packed-fast.hsaco",
+    "symbol": "decoder_project2x_h16w_w_bin_f8w16",
+    "present": true
+  },
+  {
+    "module": "deep_fast-packed-fast.hsaco",
+    "symbol": "vit_expand_blocked_fp8_frag_bytein_w16",
+    "present": true
+  },
+  {
+    "module": "deep_fast-packed-fast.hsaco",
+    "symbol": "vit_gather_b8",
+    "present": true
+  },
+  {
+    "module": "multihead-fast-padded-wave-packed.hsaco",
+    "symbol": "mh_pool_project_group_c64_hin_out8_f8w16",
+    "present": true
+  },
+  {
+    "module": "multihead-fast-padded-wave-packed.hsaco",
+    "symbol": "mh_pool_project_group_c128_hin_out8_f8w16",
+    "present": true
+  },
+  {
+    "module": "multihead-fast-padded-wave-packed.hsaco",
+    "symbol": "mh_pool_project_group_c256_out8_f8w16",
+    "present": true
+  },
+  {
+    "module": "multihead-fast-padded-wave-packed.hsaco",
+    "symbol": "mh_pool_project_group_c512_out8_f8w16",
+    "present": true
+  },
+  {
+    "module": "c512-m32-deep.hsaco",
+    "symbol": "split_ffn_one_w2f8_w16_bin",
+    "present": true
+  },
+  {
+    "module": "vit-stream-fast.hsaco",
+    "symbol": "vit_stream_contract_frag_bstream_bout_compactw_w16",
+    "present": true
+  },
+  {
+    "module": "vit-stream-fast.hsaco",
+    "symbol": "vit_stream_project_n64_bb_bout_compactw_w16",
+    "present": true
+  }
+]

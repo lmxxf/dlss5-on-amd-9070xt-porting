@@ -1,0 +1,77 @@
+{
+  "pass": true,
+  "jobs": 14,
+  "frames": 51,
+  "cases": [
+    {
+      "label": "knife1/limited-default-original1152",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-original1088",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-original960",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-small900",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-small720",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-small1080",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-default-smallfree1088",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-off-original960",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-off-small1080",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-missing-producer-original960",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-missing-consumer-small1080",
+      "frames": 3,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-ae-original900-candidate",
+      "frames": 6,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-ae-small900-candidate",
+      "frames": 6,
+      "pass": true
+    },
+    {
+      "label": "knife1/limited-ae-small1080-candidate",
+      "frames": 6,
+      "pass": true
+    }
+  ]
+}

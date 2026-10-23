@@ -1,0 +1,102 @@
+{
+  "local_only": true,
+  "host_identity_verified": true,
+  "actual_helper_cpu_result": "PASS 407 actual-helper CPU admission checks; AE policies are not executed or modified",
+  "AE_policy_body_unchanged": true,
+  "GPU_Vit_sources_unchanged": true,
+  "execution_manifests": {
+    "gold-jobs.json": {
+      "jobs": 24,
+      "same_accepted_C512_pair_for_both_arms": true,
+      "c512_sha256": "f3f37d03f6122fe8f55b104e69e3993f6e37f998008ee2b9fc100bd358a32430"
+    },
+    "ae-jobs.json": {
+      "jobs": 14,
+      "same_accepted_C512_pair_for_both_arms": true,
+      "c512_sha256": "f3f37d03f6122fe8f55b104e69e3993f6e37f998008ee2b9fc100bd358a32430"
+    },
+    "ae-default-idle-jobs.json": {
+      "jobs": 4,
+      "same_accepted_C512_pair_for_both_arms": true,
+      "c512_sha256": "f3f37d03f6122fe8f55b104e69e3993f6e37f998008ee2b9fc100bd358a32430"
+    },
+    "perf-jobs.json": {
+      "jobs": 48,
+      "same_accepted_C512_pair_for_both_arms": true,
+      "c512_sha256": "f3f37d03f6122fe8f55b104e69e3993f6e37f998008ee2b9fc100bd358a32430"
+    }
+  },
+  "correctness": {
+    "gold": {
+      "pairs": 12,
+      "checked_frames": 72,
+      "all_cross_arm_frame_hashes_equal": true,
+      "all_ae_csv_and_actual_compute_reuse_equal": null,
+      "actual_states": {}
+    },
+    "ae": {
+      "pairs": 7,
+      "checked_frames": 84,
+      "all_cross_arm_frame_hashes_equal": true,
+      "all_ae_csv_and_actual_compute_reuse_equal": true,
+      "actual_states": {
+        "('original900', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('original1088', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('original1080', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('small900', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('small720', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('small1080', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "('smallfree1088', 0)": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  }
+}

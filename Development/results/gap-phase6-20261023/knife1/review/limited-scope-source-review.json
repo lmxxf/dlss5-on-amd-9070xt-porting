@@ -1,0 +1,33 @@
+{
+  "status": "PASS isolated limited helper/identity, GPU default gates still pending",
+  "header_sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8",
+  "helper_actual_text_checked": true,
+  "cpu_scope_cases": 120,
+  "accepted_shape_count": 3,
+  "same_local_bool_pairs_producer_consumer": true,
+  "NR1_does_not_bypass_shape": true,
+  "GPU_sources_unchanged": true,
+  "hosts": [
+    {
+      "name": "frame-standard.exe",
+      "all_scope_tested_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/all-scope-tested-hosts/frame-standard.exe",
+      "all_scope_sha256": "a081278d20d1ac191d24bb4db3888c31a358ebf75ace6b2f3003e3ac5232e22f",
+      "limited_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/frame-standard.exe",
+      "limited_sha256": "5872932e479044c4b0c16c68ca3b589be43df42f05ae1334473fce9ac7421d15"
+    },
+    {
+      "name": "frame-free1072.exe",
+      "all_scope_tested_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/all-scope-tested-hosts/frame-free1072.exe",
+      "all_scope_sha256": "71169fd0e8e971c60bb4165479a3c479c5b5d148a8965ad2a9eb6af70ec62830",
+      "limited_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/frame-free1072.exe",
+      "limited_sha256": "a40dc97aed1fcb4ece0c4ce3c33c56c2746da7add9a38e32edace4eaae29a47d"
+    },
+    {
+      "name": "pure.exe",
+      "all_scope_tested_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/all-scope-tested-hosts/pure.exe",
+      "all_scope_sha256": "eab2090ed515aa38b6d65aa8a75cdce7b0e9d2d875f1432a103dabcf876384f6",
+      "limited_path": "/home/lmxxf/work/dlss5-gap-phase6-20261023/knife1/pure.exe",
+      "limited_sha256": "a2c7e1643237db6cc941774656a07bebbe1cf22c1e0c4e740f9159223725fe12"
+    }
+  ]
+}

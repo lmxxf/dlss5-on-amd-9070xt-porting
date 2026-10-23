@@ -1,0 +1,33 @@
+{
+  "cpu_symbolic_only": true,
+  "stages": [
+    {
+      "stage": 0,
+      "broadcast": "lower",
+      "all32_lanes_symbolic_equal": true
+    },
+    {
+      "stage": 1,
+      "broadcast": "upper",
+      "all32_lanes_symbolic_equal": true
+    },
+    {
+      "stage": 2,
+      "broadcast": "lower",
+      "all32_lanes_symbolic_equal": true
+    },
+    {
+      "stage": 3,
+      "broadcast": "upper",
+      "all32_lanes_symbolic_equal": true
+    }
+  ],
+  "final_order": "lo[lower] e0..7, lo[upper] e0..7, hi[lower] e0..7, hi[upper] e0..7",
+  "float_arithmetic_not_reordered": true,
+  "assumed_permlanex16_identity_selector": "lane xor16 under full EXEC; must verify actual intrinsic on GPU",
+  "production_helpers": {
+    "wechat/assets/297/hip/c512_qkv_attention_compact.inc": "9fed2d2df6bf924089519e6732b339e0881ed84608e08cfda8fe011f470ad87f",
+    "wechat/assets/297/hip/wave_owned_mh.inc": "b5b348d6fdf66fc2630aa5017e967d6a4acd90fc9eaf071b6c79545dd3269dd2",
+    "wechat/assets/297/hip/multihead_fast_padded.hip": "a6fa7c4f64887f6179a30719fd591a2ea48e71f0a1a20c4867a257b576d4fd86"
+  }
+}

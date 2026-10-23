@@ -1,0 +1,12 @@
+{
+  "status": "PASS production default/route source review",
+  "production_header_sha256": "a0a7190d1beda15681982d3b2f60318bc0f15ebc22af304050ff504279538df3",
+  "fixture_sha256": "5c8cd42fcf203572fff5d95790c83f249d39345fdbcb95be855f1eea613ac204",
+  "actual_helpers_extracted": true,
+  "grouped_cpu_cases_passed": 20,
+  "HasFn": "CPU stub, not GPU loader",
+  "gpu_by_reviewer": false,
+  "initial_fixture_compile_issue": "C++ initializer-list nullptr deduction; test fixture explicit const char* cast fixed; production untouched",
+  "source_vs_tested_header": "Only two explanatory comments and InitVitVFragment option/default parsing differ; eligibility and pair routing identical",
+  "device_sources_identical_to_tested_headmajor": true
+}

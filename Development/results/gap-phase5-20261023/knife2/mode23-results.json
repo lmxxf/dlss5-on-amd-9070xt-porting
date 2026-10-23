@@ -1,0 +1,819 @@
+{
+  "pass": true,
+  "paired_cases": 4,
+  "jobs": 8,
+  "checked_frames": 48,
+  "controlled_idle_ms": 86400000,
+  "production_idle_unchanged": true,
+  "note": "Mode2 all actual frames compute; mode3 contains compute and reuse. Per-frame cross-arm SHA plus AE CSV, never all-frames-to-first. Route counts are launches. No GPU is run by this analyzer.",
+  "cases": [
+    {
+      "label": "knife2/ae-mode2-original1088-baseline",
+      "profile": "original1088",
+      "arm": "baseline",
+      "AE_mode": 2,
+      "frames": 6,
+      "processing": "1920x1088",
+      "frame_sha256": {
+        "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      "actual_frame_states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_frame_reasons": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "compute_frames": 6,
+      "reuse_frames": 0,
+      "route_launches": 0,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode2-original1088-candidate",
+      "profile": "original1088",
+      "arm": "candidate",
+      "AE_mode": 2,
+      "frames": 6,
+      "processing": "1920x1088",
+      "frame_sha256": {
+        "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      "actual_frame_states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_frame_reasons": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "compute_frames": 6,
+      "reuse_frames": 0,
+      "route_launches": 64,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode2-small720-baseline",
+      "profile": "small720",
+      "arm": "baseline",
+      "AE_mode": 2,
+      "frames": 6,
+      "processing": "1344x768",
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "actual_frame_states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_frame_reasons": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "compute_frames": 6,
+      "reuse_frames": 0,
+      "route_launches": 0,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode2-small720-candidate",
+      "profile": "small720",
+      "arm": "candidate",
+      "AE_mode": 2,
+      "frames": 6,
+      "processing": "1344x768",
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "actual_frame_states": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual_frame_reasons": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "compute_frames": 6,
+      "reuse_frames": 0,
+      "route_launches": 64,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "0",
+          "0",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode3-original1088-baseline",
+      "profile": "original1088",
+      "arm": "baseline",
+      "AE_mode": 3,
+      "frames": 6,
+      "processing": "1920x1088",
+      "frame_sha256": {
+        "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      "actual_frame_states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "actual_frame_reasons": [
+        1,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      "compute_frames": 2,
+      "reuse_frames": 4,
+      "route_launches": 0,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "3",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode3-original1088-candidate",
+      "profile": "original1088",
+      "arm": "candidate",
+      "AE_mode": 3,
+      "frames": 6,
+      "processing": "1920x1088",
+      "frame_sha256": {
+        "0": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "1": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "2": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "3": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "4": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+        "5": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+      },
+      "actual_frame_states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "actual_frame_reasons": [
+        1,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      "compute_frames": 2,
+      "reuse_frames": 4,
+      "route_launches": 64,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "3",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode3-small720-baseline",
+      "profile": "small720",
+      "arm": "baseline",
+      "AE_mode": 3,
+      "frames": 6,
+      "processing": "1344x768",
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "actual_frame_states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "actual_frame_reasons": [
+        1,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      "compute_frames": 2,
+      "reuse_frames": 4,
+      "route_launches": 0,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "3",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "label": "knife2/ae-mode3-small720-candidate",
+      "profile": "small720",
+      "arm": "candidate",
+      "AE_mode": 3,
+      "frames": 6,
+      "processing": "1344x768",
+      "frame_sha256": {
+        "0": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "1": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "2": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "3": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "4": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+        "5": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+      },
+      "actual_frame_states": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "actual_frame_reasons": [
+        1,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      "compute_frames": 2,
+      "reuse_frames": 4,
+      "route_launches": 64,
+      "route_launches_are_not_execution_count": true,
+      "ae_csv": [
+        [
+          "1",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "0",
+          "0",
+          "1",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "3",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "4",
+          "1",
+          "2",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "5",
+          "1",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "6",
+          "0",
+          "0",
+          "3",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "7",
+          "1",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ]
+    }
+  ]
+}

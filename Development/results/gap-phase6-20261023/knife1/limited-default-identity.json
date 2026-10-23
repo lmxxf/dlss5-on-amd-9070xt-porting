@@ -1,0 +1,14 @@
+{
+  "status": "ISOLATED_LIMITED_DEFAULT_PENDING_REVIEW",
+  "header_sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8",
+  "shader_inputs_unchanged": {
+    "deep_fast-packed-fast.candidate.hip": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8",
+    "vit-stream-fast.candidate.hip": "aa199918dc7df0dcc93b9d9f3e0ba4a81eae6ee1e54ba2fdc3a6166d24931539"
+  },
+  "approved_shapes": [
+    "Original1600x960/n400",
+    "Small1600x1024/n448",
+    "Small1920x1152/n640"
+  ],
+  "switch_priority": "NR_VIT_QKFRAG nonempty > DLSS5_HIP_VIT_QKFRAG nonempty > default1; 0 disables; 1 still shape-limited"
+}

@@ -1,0 +1,24 @@
+--- production-before
++++ production-after
+@@ -887,14 +887,17 @@
+  }
+ 
+  Tensor Gather(Tensor input,U n,bool inverse,bool byte_mode=false){auto it=gather_maps[inverse].find(n);if(it==gather_maps[inverse].end()){std::vector<U>map(size_t(n)*1024);for(U t=0;t<n;t++)for(U c=0;c<1024;c++){U raster=(t&~15u)|((t&1u)<<3)|((t&14u)>>1),ch=(c&~31u)|((c&1u)<<1)|((c&2u)>>1)|((c&4u)<<2)|((c&24u)>>1),to=t*1024+c,from=raster*1024+ch;if(inverse)map[from]=to;else map[to]=from;}it=gather_maps[inverse].emplace(n,Upload(map.data(),map.size()*4,true)).first;}auto out=New(size_t(n)*(byte_mode?256:1024));if(byte_mode)Run("deep","vit_gather_b8",size_t(n)*256,P(input),P(it->second),P(out),U(n*1024));else Run("deep","vit_gather",size_t(n)*1024,P(input),P(it->second),P(out),n*1024);input.reset();return out;}
+- // Default-on only in the already verified Original/FAST1/MP1/explicit-AE0 scope below.
++ // Isolated phase5 candidate: Original/Small FAST1 single-pass, AE gated by the existing shared reuse state.
+  // NR diagnostic override > DLSS5_HIP_VIT_VFRAG > built-in 1; non-empty values other than 1 disable.
+  bool vfrag_requested=false,vfrag_available=false,vfrag_ae_off=false;unsigned long long vfrag_producer_calls=0,vfrag_consumer_calls=0;
+  void InitVitVFragment(){const char*v=std::getenv("NR_VIT_VFRAG");if(!v||!*v)v=std::getenv("DLSS5_HIP_VIT_VFRAG");vfrag_requested=!v||!*v||std::strcmp(v,"1")==0;const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");vfrag_ae_off=ae&&std::strcmp(ae,"0")==0;if(vfrag_requested)vfrag_available=HasFn("vit_stream","vit_stream_qkv_frag_bin_w5f8_vfrag")&&HasFn("deep_fast","vit_attention_fused_400_bytein_bout_vfrag")&&HasFn("deep_fast","vit_attention_fused_640_bytein_bout_vfrag");}
+  bool VitVFragmentEligible(U n){
+-  const bool shape=(W==1600&&H==960)||(W==1920&&(H==1088||H==1152));
+-  if(!vfrag_requested||!vfrag_available||!vfrag_ae_off||!shape||small_active||!fast_numeric||multi_pass!=1||adaptive_active||opt.graph||!opt.skip_blocks.empty()||!opt.dup_prefix.empty()||observer||!opt.dump_dir.empty()||opt.vit_byte_stream||opt.vit_half_stream||vit_stream_active!=3||!vit_contract_byte_edge||!opt.vit_qkv_fused||!opt.vit_qkv_frag||!opt.vit_qkv_fp8||!opt.vit_attn_fused||(n!=400&&n!=640))return false;
+-  if(HIP_VIT_ATTN_KSPLIT_HOST&&HasFn("deep_fast",std::string(n==400?"vit_attention_fused_400_bytein_bout":"vit_attention_fused_640_bytein_bout")+"_ks2"))return false;
++  // Phase5 knife2: only admission expands; reuse_gate, AE decisions/anchors and GPU byte layout stay unchanged.
++  const bool shape=small_active?
++   ((W==1600&&H==1024&&n==448)||(W==1344&&H==768&&n==288)||(W==1920&&(H==1088||H==1152)&&n==640)):
++   ((W==1600&&H==960&&n==400)||(W==1920&&(H==1088||H==1152)&&n==640));
++  if(!vfrag_requested||!vfrag_available||!shape||!fast_numeric||multi_pass!=1||opt.graph||!opt.skip_blocks.empty()||!opt.dup_prefix.empty()||observer||!opt.dump_dir.empty()||opt.vit_byte_stream||opt.vit_half_stream||vit_stream_active!=3||!vit_contract_byte_edge||!opt.vit_qkv_fused||!opt.vit_qkv_frag||!opt.vit_qkv_fp8||!opt.vit_attn_fused)return false;
++  if(HIP_VIT_ATTN_KSPLIT_HOST&&HasFn("deep_fast",std::string(n<=400?"vit_attention_fused_400_bytein_bout":"vit_attention_fused_640_bytein_bout")+"_ks2"))return false;
+   return true;
+  }
+  Tensor vit_in8; // byte stream: block input bytes produced by the previous block's vit_project_bytein_bout

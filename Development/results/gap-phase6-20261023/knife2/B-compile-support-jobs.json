@@ -1,0 +1,26 @@
+{
+  "name": "phase6-B-expected-gfx1201-rejection",
+  "expected_compile_failure": true,
+  "no_gpu_launch": true,
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife2\\tr8-support.hip",
+      "sha256": "8ee2aa721c72d9927d5b880214c877c407777fa3343b62fc9eb954645200a76c"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife2/B-compile-support",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase6-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\support.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife2\\tr8-support.hip\" comgr gfx1201"
+    }
+  ]
+}

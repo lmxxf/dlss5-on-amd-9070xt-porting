@@ -1,0 +1,51 @@
+--- stock/hip_reference_network.h
++++ trace/hip_reference_network.h
+@@ -290,6 +290,17 @@
+  unsigned diagnostic_kernel_repeats=1;
+ #endif
+  Api api;Handle stream{};HipSubmitPulseOps pulse_ops;SubmitPulseLease<HipSubmitPulseOps> pulse_lease;bool pulse_fallback_logged=false,pulse_runtime_reported=false,pulse_frame_history=false,pulse_ordered_down_c256=false,pulse_platform_scope=false,pulse_driver_validated=false,pulse_capabilities_ok=false,pulse_bridge_diagnostics=false;unsigned long long pulse_site_visits=0,pulse_record_attempts=0,pulse_record_accepted=0;unsigned pulse_last_reject_mask=0,pulse_frame_pdl_start=0;std::map<std::string,Handle>modules,functions;std::set<std::string>missing_functions;std::map<std::string,Tensor>weights,inactive_model_weights;Tensor inactive_model_gain,inactive_model_post_row;bool external_input_wait=false;unsigned long long weight_uploads=0;std::set<unsigned> prepared_input_profiles;Options opt;
++
++ // Isolated CPU dispatch receipt only; observer/dump/profile remain untouched.
++ bool gap_trace_enabled=false;unsigned gap_trace_frame=0;std::vector<std::string>gap_trace;
++ template<class F,class...A>auto GapLaunch(const char*kind,F fn,Handle h,A...a)->decltype(fn(h,a...)){
++  if(gap_trace_enabled){std::string n="UNMAPPED";for(const auto&kv:functions)if(kv.second==h){n=kv.first;break;}gap_trace.push_back(std::string(kind)+" "+n);}
++  return fn(h,a...);
++ }
++ public:
++ void GapTraceBegin(unsigned frame){gap_trace_frame=frame;gap_trace.clear();gap_trace_enabled=true;}
++ void GapTraceEnd(){gap_trace_enabled=false;std::printf("GAP_PROFILE frame=%u W=%u H=%u model=%u effective=%u compact_contract=%u compact_projection=%u contract_w16=%u projection_w16=%u contract_bstream=%u projection_bout=%u vit_contract_byte_edge=%u C512ByteStreamOk=%u VitEntryExitByteOk=%u pdl_effective=%u swin_run=%u\n",gap_trace_frame,W,H,ModelMode(),EffectiveModelMode(),unsigned(compact_contract_fn!=nullptr),unsigned(compact_projection_fn!=nullptr),unsigned(compact_contract_w16),unsigned(compact_projection_w16),unsigned(compact_contract_bstream_fn!=nullptr),unsigned(compact_projection_bout_fn!=nullptr),unsigned(vit_contract_byte_edge),unsigned(C512ByteStreamOk()),unsigned(VitEntryExitByteOk()),unsigned(pdl_effective),unsigned(SwinRunActive()));for(size_t i=0;i<gap_trace.size();++i)std::printf("GAP_DISPATCH frame=%u index=%zu %s\n",gap_trace_frame,i,gap_trace[i].c_str());std::printf("GAP_COUNT frame=%u dispatches=%zu\n",gap_trace_frame,gap_trace.size());}
++ private:
+  struct Timing{std::string name;Handle begin{},end{};};std::vector<Timing>timings;
+  std::map<std::string,std::pair<double,unsigned>>wall_timings;
+  Handle captured_graph{},graph_exec{};void*graph_input{},*graph_history{},*graph_output{};U graph_seed{};bool graph_warmed{},graph_capturing{};unsigned graph_builds{},graph_replays{};
+@@ -653,7 +664,7 @@
+ #ifdef HIP_SWIN_PERSISTENT_TRACE
+   std::printf("TOPO,%s,%s,%u,%u,%u\n",module.c_str(),kernel.c_str(),count,unsigned(groups?groups:(count+255ull)/256),threads);
+ #endif
+-  void*reuse_gate_arg=adaptive_active?P(adaptive_state):nullptr;void*argv[]={static_cast<void*>(&args)...,static_cast<void*>(&reuse_gate_arg)};Handle paired_contract_fn{};if(kernel=="vit_stream_contract_frag_bout"||kernel=="vit_stream_contract_frag_bstream_bout"){if(sizeof...(A)!=7)throw std::runtime_error("contract ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_contract_ptrs.count(wp)){Handle fn=kernel=="vit_stream_contract_frag_bstream_bout"?compact_contract_bstream_fn:compact_contract_fn;if(!fn)throw std::runtime_error("compact weight without paired function");paired_contract_fn=fn;}}if(kernel=="vit_stream_project_n64_bb"||kernel=="vit_stream_project_n64_bb_bout"){if(sizeof...(A)!=7)throw std::runtime_error("projection ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_projection_ptrs.count(wp)){Handle fn=kernel=="vit_stream_project_n64_bb_bout"?compact_projection_bout_fn:compact_projection_fn;if(!fn)throw std::runtime_error("compact projection without paired function");paired_contract_fn=fn;}}unsigned repeats_here=launch_repeats*((!opt.dup_prefix.empty()&&(opt.dup_prefix.back()=='$'?kernel==opt.dup_prefix.substr(0,opt.dup_prefix.size()-1):kernel.rfind(opt.dup_prefix,0)==0))?opt.dup_count:1u);for(unsigned repeat=0;repeat<repeats_here;repeat++){unsigned gg=unsigned(groups?groups:(count+255ull)/256);if(pdl_anyorder){++pdl_calls;api.Check(ext_launch(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg*threads,1,1,threads,1,1,0,stream,argv,nullptr,nullptr,nullptr,1u/*hipExtAnyOrderLaunch*/),name);}else api.Check(api.hipModuleLaunchKernel(paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg,1,1,threads,1,1,0,stream,argv,nullptr),name);}if(opt.profile)api.Check(api.hipEventRecord(timing.end,stream),"event end");if(!opt.pooled)api.Check(api.hipStreamSynchronize(stream),name);
++  void*reuse_gate_arg=adaptive_active?P(adaptive_state):nullptr;void*argv[]={static_cast<void*>(&args)...,static_cast<void*>(&reuse_gate_arg)};Handle paired_contract_fn{};if(kernel=="vit_stream_contract_frag_bout"||kernel=="vit_stream_contract_frag_bstream_bout"){if(sizeof...(A)!=7)throw std::runtime_error("contract ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_contract_ptrs.count(wp)){Handle fn=kernel=="vit_stream_contract_frag_bstream_bout"?compact_contract_bstream_fn:compact_contract_fn;if(!fn)throw std::runtime_error("compact weight without paired function");paired_contract_fn=fn;}}if(kernel=="vit_stream_project_n64_bb"||kernel=="vit_stream_project_n64_bb_bout"){if(sizeof...(A)!=7)throw std::runtime_error("projection ABI count");void*wp{};std::memcpy(&wp,argv[1],sizeof(wp));if(compact_projection_ptrs.count(wp)){Handle fn=kernel=="vit_stream_project_n64_bb_bout"?compact_projection_bout_fn:compact_projection_fn;if(!fn)throw std::runtime_error("compact projection without paired function");paired_contract_fn=fn;}}unsigned repeats_here=launch_repeats*((!opt.dup_prefix.empty()&&(opt.dup_prefix.back()=='$'?kernel==opt.dup_prefix.substr(0,opt.dup_prefix.size()-1):kernel.rfind(opt.dup_prefix,0)==0))?opt.dup_count:1u);for(unsigned repeat=0;repeat<repeats_here;repeat++){unsigned gg=unsigned(groups?groups:(count+255ull)/256);if(pdl_anyorder){++pdl_calls;api.Check(GapLaunch("anyorder",ext_launch,paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg*threads,1,1,threads,1,1,0,stream,argv,nullptr,nullptr,nullptr,1u/*hipExtAnyOrderLaunch*/),name);}else api.Check(GapLaunch("ordered",api.hipModuleLaunchKernel,paired_contract_fn?paired_contract_fn:Fn(module,kernel),gg,1,1,threads,1,1,0,stream,argv,nullptr),name);}if(opt.profile)api.Check(api.hipEventRecord(timing.end,stream),"event end");if(!opt.pooled)api.Check(api.hipStreamSynchronize(stream),name);
+   if(opt.wall_profile){api.Check(api.hipStreamSynchronize(stream),"wall profile completion");auto&entry=wall_timings[kernel];entry.first+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-wall_begin).count()/launch_repeats;++entry.second;}
+  }
+  void Stage(const std::string&name,const Tensor&t){if(progress)progress(name);if(observer){Synchronize();observer(name,P(t),t->bytes);}if(opt.dump_dir.empty()||(!opt.dump_only.empty()&&(","+opt.dump_only+",").find(","+name+",")==std::string::npos))return;api.Check(api.hipStreamSynchronize(stream),"before dump");std::vector<char>b(t->bytes);api.Check(api.hipMemcpy(b.data(),P(t),b.size(),2),"stage dump");std::ofstream f(opt.dump_dir+"/"+name+".f32",std::ios::binary);if(!f.write(b.data(),b.size()))throw std::runtime_error("stage dump write");}
+--- stock/swin_persistent_network.h
++++ trace/swin_persistent_network.h
+@@ -124,15 +124,15 @@
+    U ql=SpEnv("SP_TICKET_LIMIT",std::numeric_limits<U>::max());if(ql<q.total)ql=q.total;if(q.next_ticket>ql-q.total)continue;partner=&q;break;}
+  if(plan.pre_inited&&plan.pre_base==plan.next_ticket){plan.pre_inited=false;}
+  else if(partner){U*s2=static_cast<U*>(P(partner->state));U t2=partner->total,b2=partner->next_ticket,f2=partner->first;void*pargs[]={&p,&s2,&t2,&b2,&f2};
+-  api.Check(api.hipModuleLaunchKernel(Fn("sp","sp_init_pair"),U((3*size_t(std::max(plan.total,t2))+255)/256),1,1,256,1,1,0,stream,pargs,nullptr),"SP init pair");
++  api.Check(GapLaunch("ordered",api.hipModuleLaunchKernel,Fn("sp","sp_init_pair"),U((3*size_t(std::max(plan.total,t2))+255)/256),1,1,256,1,1,0,stream,pargs,nullptr),"SP init pair");
+   partner->pre_inited=true;partner->pre_base=b2;}
+- else{plan.pre_inited=false;api.Check(api.hipModuleLaunchKernel(Fn("sp","sp_init"),U((3*size_t(plan.total)+255)/256),1,1,256,1,1,0,stream,args,nullptr),"SP init");}
++ else{plan.pre_inited=false;api.Check(GapLaunch("ordered",api.hipModuleLaunchKernel,Fn("sp","sp_init"),U((3*size_t(plan.total)+255)/256),1,1,256,1,1,0,stream,args,nullptr),"SP init");}
+  const char*sfx=plan.w16?"_w16":"";
+  std::string kernel="sp_run"+std::to_string(c)+sfx;
+  auto start=std::chrono::steady_clock::now();
+- api.Check(api.hipModuleLaunchKernel(Fn("sp",kernel),plan.total,1,1,c,1,1,0,stream,args,nullptr),"SP run");
++ api.Check(GapLaunch("ordered",api.hipModuleLaunchKernel,Fn("sp",kernel),plan.total,1,1,c,1,1,0,stream,args,nullptr),"SP run");
+  std::string recovery="sp_recover"+std::to_string(c)+sfx;
+- api.Check(api.hipModuleLaunchKernel(Fn("sp",recovery),1,1,1,c,1,1,0,stream,args,nullptr),"SP bounded recovery");
++ api.Check(GapLaunch("ordered",api.hipModuleLaunchKernel,Fn("sp",recovery),1,1,1,c,1,1,0,stream,args,nullptr),"SP bounded recovery");
+  plan.next_ticket+=plan.total;sp_runs++;sp_jobs+=plan.total;
+  if(SpEnv("SP_VALIDATE")||SpEnv("SP_TRACE")){
+   api.Check(api.hipStreamSynchronize(stream),"SP diagnostic completion");

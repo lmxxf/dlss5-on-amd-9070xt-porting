@@ -1,0 +1,18 @@
+{
+  "verified_files": 80,
+  "changed": {
+    "gfx1200/c512-m32-mh.hsaco": {
+      "sha256": "9f85f0f415cc8e6b40d5027082fb859a61e3f3b045e98fb891e4a064ee0dc8ee",
+      "elf_flags": "0x48"
+    },
+    "gfx1201/c512-m32-mh.hsaco": {
+      "sha256": "8b2132d95c61c23c112eae1d465c73703f3686ad03a68c5797093dcf202403b5",
+      "elf_flags": "0x4e"
+    }
+  },
+  "unchanged_files": 78,
+  "manifest_sha256": "c8e6d3fa5c0a05688d6dca4a8d34c16392818a223fe46fcc5afa51ec89a7c237",
+  "payload": "/home/lmxxf/work/dlss5-gap-phase5-20261023/knife1/final-payload/HIP",
+  "gfx1201_text_rodata_note_equal_measured_pair": true,
+  "gfx1200_validation": "compile + ELF only; no hardware run"
+}

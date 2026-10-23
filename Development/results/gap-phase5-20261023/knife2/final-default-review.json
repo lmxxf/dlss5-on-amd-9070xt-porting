@@ -1,0 +1,70 @@
+{
+  "pass_result": true,
+  "jobs": 9,
+  "frames": 36,
+  "cases": [
+    {
+      "label": "knife2/final-default-small900",
+      "frames": 3,
+      "paired_route": 32,
+      "reference": "knife2/gold-small900-p0-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-small720",
+      "frames": 3,
+      "paired_route": 32,
+      "reference": "knife2/gold-small720-p0-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-small1080",
+      "frames": 3,
+      "paired_route": 40,
+      "reference": "knife2/gold-small1080-p0-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-smallfree1088",
+      "frames": 3,
+      "paired_route": 32,
+      "reference": "knife2/gold-smallfree1088-p0-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-ae-original900",
+      "frames": 6,
+      "paired_route": 64,
+      "reference": "knife2/ae-original900-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-ae-original1088",
+      "frames": 6,
+      "paired_route": 64,
+      "reference": "knife2/ae-original1088-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-default-ae-original1080",
+      "frames": 6,
+      "paired_route": 64,
+      "reference": "knife2/ae-original1080-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-off-small720",
+      "frames": 3,
+      "paired_route": 0,
+      "reference": "knife2/gold-small720-p0-candidate",
+      "pass_result": true
+    },
+    {
+      "label": "knife2/final-off-smallfree1088",
+      "frames": 3,
+      "paired_route": 0,
+      "reference": "knife2/gold-smallfree1088-p0-candidate",
+      "pass_result": true
+    }
+  ]
+}

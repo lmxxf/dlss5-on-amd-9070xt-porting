@@ -1,0 +1,116 @@
+{
+  "gold_frames": 63,
+  "AE_frames": 42,
+  "half_fallback_frames": 6,
+  "route_frames": 21,
+  "routes": {
+    "original1152": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "original1088": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "original960": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "small900": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "small720": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "small1080": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      }
+    ],
+    "smallfree1088": [
+      {
+        "inputs": 1024,
+        "outputs": 512,
+        "kernel": "decoder_project2x_h16w_w_bin_f8w16",
+        "calls_in_actual_model": 4
+      },
+      {
+        "inputs": 512,
+        "outputs": 256,
+        "kernel": "decoder_project2x_h16w_byteout_w",
+        "calls_in_actual_model": 4
+      }
+    ]
+  },
+  "formal_module_baseline_sha": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354",
+  "formal_module_candidate_sha": "529a77b6376a0e74c0a59cd51bec9f6addcb2204df0896aa9d6d73cf12a89a51",
+  "only_three_ByteOutput_exports_changed": [
+    "decoder_project2x_h16w_byteout_w",
+    "decoder_project2x_h16w_byteout_w_bin",
+    "decoder_project2x_h16w_byteout_w_bin_f8w16"
+  ],
+  "other_exports_code_same": 90,
+  "QK_exports_unchanged": true,
+  "no_performance_verdict": true
+}

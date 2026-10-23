@@ -1,0 +1,9 @@
+pid=22728 c512_m32_requested=1 c512_m32_active=1
+pid=22728 vit_proj_n64_requested=1 vit_proj_n64_active=1
+pid=22728 runtime=7 fast=1 packed_weights=1 packed_c32=1 fp8_normalized=1 fp8_ffn=1 fp8_av=1 fp8_deep=1 fp8_middle=1 half_c32=1 crop_c32=1 fused_qkv_norm=1 fused_mh_ffn=1 tiled_mh_ffn=1 tiled_ffn_min_c=256 mapped_c32=1 vit_blocked=1 vit_contract_blocked=1 vit_split_k=0 vit_weight_mask=1 vit_pack_input=1 elide_identity_shift=1 vit_qkv_fused=1 ffn_qkv=1 ffn_qkv_max_c=256 grouped_mh_contract=1 direct_prefix_input=1 prefix_fused=1 mh_input_mapped=1 mh_project_crop=1 vit_qkv_blocked=1 split_project_blocked=1 split_mix_blocked=1 split_ffn_fused=1 fused_ffn_project=1 post_merge_fold=1 pre_main8=1 raw_chain=1 graph=0 sparse_weights=0 processing=1920x1088 modules=D:\DLSSNR-Lab\gap-phase5-20261023\knife1\pair\modules
+pid=22728 swin_run_requested=1 swin_run_active=1
+pid=22728 vit_stream_requested=3 vit_stream_active=3
+pid=22728 wave_owned_requested=1 wave_owned_active=1
+pid=22728 hip_device=0
+pid=22728 multi_pass=1 multi_pass_predict=0 predict_active=0
+pid=22728 multi_pass=1 multi_pass_skin_protect=0 skin_active=0

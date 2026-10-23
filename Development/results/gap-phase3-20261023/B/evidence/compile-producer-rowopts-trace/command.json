@@ -1,0 +1,9 @@
+{
+    "label":  "B/compile-producer-rowopts-trace",
+    "env":  {
+                "RTC_EXTRA_OPTS":  "-mllvm=-amdgpu-sched-strategy=max-ilp"
+            },
+    "arguments":  "\"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\compile-producer-rowopts-trace\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\gap-phase3-20261023\\B\\c512-m32-deep.trace.generated.hip\" comgr gfx1201",
+    "exe":  "D:\\DLSSNR-Lab\\gap-phase3-20261023\\rtc_compile.exe",
+    "start":  "2026-10-23T10:23:08.3208363Z"
+}

@@ -1,0 +1,1084 @@
+{
+  "profiles": {
+    "small900": {
+      "processing": [
+        1600,
+        1024
+      ],
+      "tokens": 448,
+      "AE_mode": 0,
+      "baseline": {
+        "n": 960,
+        "mean_ms": 4.268004479166667,
+        "median_ms": 4.2638,
+        "p90_ms": 4.33492,
+        "p99_ms": 4.406641,
+        "max_ms": 4.4566
+      },
+      "candidate": {
+        "n": 960,
+        "mean_ms": 4.2449559375,
+        "median_ms": 4.241949999999999,
+        "p90_ms": 4.31353,
+        "p99_ms": 4.373982,
+        "max_ms": 4.4334
+      },
+      "delta_mean_ms": -0.023048541666666367,
+      "delta_p99_ms": -0.03265899999999977,
+      "rounds": [
+        {
+          "round": 1,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 4.26793,
+            "median_ms": 4.26295,
+            "p90_ms": 4.33963,
+            "p99_ms": 4.390229,
+            "max_ms": 4.4287
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 4.2369828125,
+            "median_ms": 4.2349,
+            "p90_ms": 4.30219,
+            "p99_ms": 4.370677000000001,
+            "max_ms": 4.3785
+          },
+          "delta_mean_ms": -0.030947187499999806,
+          "delta_p99_ms": -0.019551999999999126,
+          "baseline_drift_ms": -0.002243750000000766,
+          "candidate_drift_ms": -0.007829375000000027
+        },
+        {
+          "round": 2,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 4.2605134375,
+            "median_ms": 4.25505,
+            "p90_ms": 4.32567,
+            "p99_ms": 4.404548,
+            "max_ms": 4.4301
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 4.24451625,
+            "median_ms": 4.24275,
+            "p90_ms": 4.30991,
+            "p99_ms": 4.372415,
+            "max_ms": 4.4268
+          },
+          "delta_mean_ms": -0.01599718750000001,
+          "delta_p99_ms": -0.03213299999999997,
+          "baseline_drift_ms": 0.004893125000000609,
+          "candidate_drift_ms": 0.007217499999999433
+        },
+        {
+          "round": 3,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 4.27557,
+            "median_ms": 4.27185,
+            "p90_ms": 4.337829999999999,
+            "p99_ms": 4.41171,
+            "max_ms": 4.4566
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 4.25336875,
+            "median_ms": 4.25005,
+            "p90_ms": 4.31943,
+            "p99_ms": 4.400151,
+            "max_ms": 4.4334
+          },
+          "delta_mean_ms": -0.022201250000000172,
+          "delta_p99_ms": -0.011559000000000097,
+          "baseline_drift_ms": 0.0034112499999991996,
+          "candidate_drift_ms": -0.002329999999999721
+        }
+      ],
+      "all_round_means_improve": true,
+      "all_round_p99_nonregress": true,
+      "slots": [
+        {
+          "label": "knife2/perf-small900-r1-0-baseline",
+          "round": 1,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.269051875000001,
+            "median_ms": 4.267849999999999,
+            "p90_ms": 4.33237,
+            "p99_ms": 4.384322999999999,
+            "max_ms": 4.4266
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r1-1-candidate",
+          "round": 1,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.2408975,
+            "median_ms": 4.23745,
+            "p90_ms": 4.3093900000000005,
+            "p99_ms": 4.369997,
+            "max_ms": 4.3785
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r1-2-candidate",
+          "round": 1,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.233068125,
+            "median_ms": 4.228899999999999,
+            "p90_ms": 4.2928,
+            "p99_ms": 4.360683999999999,
+            "max_ms": 4.3741
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r1-3-baseline",
+          "round": 1,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.266808125,
+            "median_ms": 4.26035,
+            "p90_ms": 4.340940000000001,
+            "p99_ms": 4.396552,
+            "max_ms": 4.4287
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r2-0-baseline",
+          "round": 2,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.258066875,
+            "median_ms": 4.25675,
+            "p90_ms": 4.32204,
+            "p99_ms": 4.356974,
+            "max_ms": 4.3833
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r2-1-candidate",
+          "round": 2,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.2409075000000005,
+            "median_ms": 4.236549999999999,
+            "p90_ms": 4.30976,
+            "p99_ms": 4.377169,
+            "max_ms": 4.3948
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r2-2-candidate",
+          "round": 2,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.248125,
+            "median_ms": 4.246,
+            "p90_ms": 4.30991,
+            "p99_ms": 4.366211,
+            "max_ms": 4.4268
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r2-3-baseline",
+          "round": 2,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.2629600000000005,
+            "median_ms": 4.25505,
+            "p90_ms": 4.333729999999999,
+            "p99_ms": 4.416909,
+            "max_ms": 4.4301
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r3-0-baseline",
+          "round": 3,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.2738643750000005,
+            "median_ms": 4.268000000000001,
+            "p90_ms": 4.33826,
+            "p99_ms": 4.424419,
+            "max_ms": 4.4566
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r3-1-candidate",
+          "round": 3,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.25453375,
+            "median_ms": 4.2529,
+            "p90_ms": 4.31963,
+            "p99_ms": 4.389639,
+            "max_ms": 4.4334
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r3-2-candidate",
+          "round": 3,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.2522037500000005,
+            "median_ms": 4.2475000000000005,
+            "p90_ms": 4.3187999999999995,
+            "p99_ms": 4.370785,
+            "max_ms": 4.4309
+          }
+        },
+        {
+          "label": "knife2/perf-small900-r3-3-baseline",
+          "round": 3,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 4.277275625,
+            "median_ms": 4.27495,
+            "p90_ms": 4.3368400000000005,
+            "p99_ms": 4.402269,
+            "max_ms": 4.4181
+          }
+        }
+      ]
+    },
+    "small720": {
+      "processing": [
+        1344,
+        768
+      ],
+      "tokens": 288,
+      "AE_mode": 0,
+      "baseline": {
+        "n": 960,
+        "mean_ms": 2.994175625,
+        "median_ms": 2.9862,
+        "p90_ms": 3.05274,
+        "p99_ms": 3.148733,
+        "max_ms": 3.2656
+      },
+      "candidate": {
+        "n": 960,
+        "mean_ms": 2.989512604166667,
+        "median_ms": 2.98205,
+        "p90_ms": 3.05374,
+        "p99_ms": 3.110366,
+        "max_ms": 3.9463
+      },
+      "delta_mean_ms": -0.0046630208333331424,
+      "delta_p99_ms": -0.03836700000000004,
+      "rounds": [
+        {
+          "round": 1,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 2.996881875,
+            "median_ms": 2.9852499999999997,
+            "p90_ms": 3.05918,
+            "p99_ms": 3.150555,
+            "max_ms": 3.2656
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 2.992874375,
+            "median_ms": 2.98745,
+            "p90_ms": 3.0632,
+            "p99_ms": 3.1091100000000003,
+            "max_ms": 3.1393
+          },
+          "delta_mean_ms": -0.004007500000000164,
+          "delta_p99_ms": -0.041444999999999954,
+          "baseline_drift_ms": -0.008682499999999926,
+          "candidate_drift_ms": 0.022096249999999706
+        },
+        {
+          "round": 2,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 2.9889009375,
+            "median_ms": 2.98015,
+            "p90_ms": 3.04334,
+            "p99_ms": 3.127966,
+            "max_ms": 3.216
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 2.9912790625,
+            "median_ms": 2.98175,
+            "p90_ms": 3.05003,
+            "p99_ms": 3.124013,
+            "max_ms": 3.9463
+          },
+          "delta_mean_ms": 0.0023781249999998977,
+          "delta_p99_ms": -0.003952999999999651,
+          "baseline_drift_ms": 0.015489375000000027,
+          "candidate_drift_ms": -0.0034031249999997293
+        },
+        {
+          "round": 3,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 2.9967440625,
+            "median_ms": 2.9887,
+            "p90_ms": 3.0511899999999996,
+            "p99_ms": 3.143872,
+            "max_ms": 3.2425
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 2.9843843750000003,
+            "median_ms": 2.97735,
+            "p90_ms": 3.04508,
+            "p99_ms": 3.093063,
+            "max_ms": 3.141
+          },
+          "delta_mean_ms": -0.012359687499999605,
+          "delta_p99_ms": -0.050809000000000104,
+          "baseline_drift_ms": 0.009038124999999564,
+          "candidate_drift_ms": 0.015642500000000226
+        }
+      ],
+      "all_round_means_improve": false,
+      "all_round_p99_nonregress": true,
+      "slots": [
+        {
+          "label": "knife2/perf-small720-r1-0-baseline",
+          "round": 1,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 3.001223125,
+            "median_ms": 2.98695,
+            "p90_ms": 3.0641499999999997,
+            "p99_ms": 3.200049,
+            "max_ms": 3.2656
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r1-1-candidate",
+          "round": 1,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.98182625,
+            "median_ms": 2.9777,
+            "p90_ms": 3.0422599999999997,
+            "p99_ms": 3.0814399999999997,
+            "max_ms": 3.1083
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r1-2-candidate",
+          "round": 1,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 3.0039225,
+            "median_ms": 2.9978499999999997,
+            "p90_ms": 3.0766299999999998,
+            "p99_ms": 3.116634,
+            "max_ms": 3.1393
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r1-3-baseline",
+          "round": 1,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.992540625,
+            "median_ms": 2.98245,
+            "p90_ms": 3.0500399999999996,
+            "p99_ms": 3.118639,
+            "max_ms": 3.2306
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r2-0-baseline",
+          "round": 2,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.98115625,
+            "median_ms": 2.97445,
+            "p90_ms": 3.0325900000000003,
+            "p99_ms": 3.063066,
+            "max_ms": 3.0937
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r2-1-candidate",
+          "round": 2,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.992980625,
+            "median_ms": 2.9885,
+            "p90_ms": 3.0528,
+            "p99_ms": 3.129377,
+            "max_ms": 3.1735
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r2-2-candidate",
+          "round": 2,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.9895775,
+            "median_ms": 2.9728000000000003,
+            "p90_ms": 3.04676,
+            "p99_ms": 3.1090679999999997,
+            "max_ms": 3.9463
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r2-3-baseline",
+          "round": 2,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.996645625,
+            "median_ms": 2.99045,
+            "p90_ms": 3.0499699999999996,
+            "p99_ms": 3.177485,
+            "max_ms": 3.216
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r3-0-baseline",
+          "round": 3,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.9922250000000004,
+            "median_ms": 2.98695,
+            "p90_ms": 3.04393,
+            "p99_ms": 3.0795779999999997,
+            "max_ms": 3.1441
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r3-1-candidate",
+          "round": 3,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.9765631249999998,
+            "median_ms": 2.9652000000000003,
+            "p90_ms": 3.0261699999999996,
+            "p99_ms": 3.092143,
+            "max_ms": 3.141
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r3-2-candidate",
+          "round": 3,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 2.992205625,
+            "median_ms": 2.99005,
+            "p90_ms": 3.05128,
+            "p99_ms": 3.092137,
+            "max_ms": 3.1016
+          }
+        },
+        {
+          "label": "knife2/perf-small720-r3-3-baseline",
+          "round": 3,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 3.001263125,
+            "median_ms": 2.9924999999999997,
+            "p90_ms": 3.06305,
+            "p99_ms": 3.177575,
+            "max_ms": 3.2425
+          }
+        }
+      ]
+    },
+    "small1080": {
+      "processing": [
+        1920,
+        1152
+      ],
+      "tokens": 640,
+      "AE_mode": 0,
+      "baseline": {
+        "n": 960,
+        "mean_ms": 5.559334375000001,
+        "median_ms": 5.5369,
+        "p90_ms": 5.68712,
+        "p99_ms": 5.962619999999999,
+        "max_ms": 6.161
+      },
+      "candidate": {
+        "n": 960,
+        "mean_ms": 5.4996925,
+        "median_ms": 5.48335,
+        "p90_ms": 5.597150000000001,
+        "p99_ms": 5.884373999999999,
+        "max_ms": 7.7126
+      },
+      "delta_mean_ms": -0.05964187500000051,
+      "delta_p99_ms": -0.07824600000000004,
+      "rounds": [
+        {
+          "round": 1,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.54450375,
+            "median_ms": 5.5311,
+            "p90_ms": 5.67121,
+            "p99_ms": 5.766285,
+            "max_ms": 5.8172
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.490164999999999,
+            "median_ms": 5.4748,
+            "p90_ms": 5.592840000000001,
+            "p99_ms": 5.712233,
+            "max_ms": 7.7126
+          },
+          "delta_mean_ms": -0.054338750000000324,
+          "delta_p99_ms": -0.054051999999999545,
+          "baseline_drift_ms": -0.005221250000000843,
+          "candidate_drift_ms": -0.019188749999999644
+        },
+        {
+          "round": 2,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.546616875,
+            "median_ms": 5.52575,
+            "p90_ms": 5.66253,
+            "p99_ms": 5.85142,
+            "max_ms": 6.0214
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.492178125000001,
+            "median_ms": 5.48465,
+            "p90_ms": 5.57974,
+            "p99_ms": 5.842257,
+            "max_ms": 5.9501
+          },
+          "delta_mean_ms": -0.0544387499999992,
+          "delta_p99_ms": -0.009163000000000032,
+          "baseline_drift_ms": 0.017193749999999675,
+          "candidate_drift_ms": 0.020082500000000003
+        },
+        {
+          "round": 3,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.5868825,
+            "median_ms": 5.5504999999999995,
+            "p90_ms": 5.76119,
+            "p99_ms": 6.031716,
+            "max_ms": 6.161
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.516734375,
+            "median_ms": 5.4940999999999995,
+            "p90_ms": 5.6471599999999995,
+            "p99_ms": 5.912385,
+            "max_ms": 5.9868
+          },
+          "delta_mean_ms": -0.07014812499999934,
+          "delta_p99_ms": -0.11933100000000074,
+          "baseline_drift_ms": 0.10526999999999997,
+          "candidate_drift_ms": -8.875000000063693e-05
+        }
+      ],
+      "all_round_means_improve": true,
+      "all_round_p99_nonregress": true,
+      "slots": [
+        {
+          "label": "knife2/perf-small1080-r1-0-baseline",
+          "round": 1,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.5471143750000005,
+            "median_ms": 5.535299999999999,
+            "p90_ms": 5.676490000000001,
+            "p99_ms": 5.7524049999999995,
+            "max_ms": 5.7594
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r1-1-candidate",
+          "round": 1,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.499759375,
+            "median_ms": 5.47795,
+            "p90_ms": 5.63858,
+            "p99_ms": 5.708513,
+            "max_ms": 5.7292
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r1-2-candidate",
+          "round": 1,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.480570625,
+            "median_ms": 5.4642,
+            "p90_ms": 5.548579999999999,
+            "p99_ms": 5.670323999999999,
+            "max_ms": 7.7126
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r1-3-baseline",
+          "round": 1,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.541893125,
+            "median_ms": 5.522349999999999,
+            "p90_ms": 5.66898,
+            "p99_ms": 5.784535,
+            "max_ms": 5.8172
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r2-0-baseline",
+          "round": 2,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.53802,
+            "median_ms": 5.52175,
+            "p90_ms": 5.6451199999999995,
+            "p99_ms": 5.78092,
+            "max_ms": 5.8537
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r2-1-candidate",
+          "round": 2,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.482136875,
+            "median_ms": 5.4773,
+            "p90_ms": 5.55818,
+            "p99_ms": 5.744711,
+            "max_ms": 5.9079
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r2-2-candidate",
+          "round": 2,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.502219375,
+            "median_ms": 5.49585,
+            "p90_ms": 5.59066,
+            "p99_ms": 5.8876159999999995,
+            "max_ms": 5.9501
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r2-3-baseline",
+          "round": 2,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.55521375,
+            "median_ms": 5.52895,
+            "p90_ms": 5.69613,
+            "p99_ms": 5.998771,
+            "max_ms": 6.0214
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r3-0-baseline",
+          "round": 3,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.5342475,
+            "median_ms": 5.51445,
+            "p90_ms": 5.62927,
+            "p99_ms": 5.901815,
+            "max_ms": 6.0999
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r3-1-candidate",
+          "round": 3,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.51677875,
+            "median_ms": 5.5001,
+            "p90_ms": 5.6083799999999995,
+            "p99_ms": 5.873623,
+            "max_ms": 5.9868
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r3-2-candidate",
+          "round": 3,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.51669,
+            "median_ms": 5.4874,
+            "p90_ms": 5.65213,
+            "p99_ms": 5.914327999999999,
+            "max_ms": 5.9208
+          }
+        },
+        {
+          "label": "knife2/perf-small1080-r3-3-baseline",
+          "round": 3,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.6395175,
+            "median_ms": 5.6035,
+            "p90_ms": 5.82744,
+            "p99_ms": 6.040655,
+            "max_ms": 6.161
+          }
+        }
+      ]
+    },
+    "smallfree1088": {
+      "processing": [
+        1920,
+        1088
+      ],
+      "tokens": 640,
+      "AE_mode": 0,
+      "baseline": {
+        "n": 960,
+        "mean_ms": 5.382278125,
+        "median_ms": 5.3644,
+        "p90_ms": 5.516770000000001,
+        "p99_ms": 5.676387,
+        "max_ms": 6.3324
+      },
+      "candidate": {
+        "n": 960,
+        "mean_ms": 5.317101666666667,
+        "median_ms": 5.2988,
+        "p90_ms": 5.45132,
+        "p99_ms": 5.56694,
+        "max_ms": 5.6287
+      },
+      "delta_mean_ms": -0.06517645833333319,
+      "delta_p99_ms": -0.1094470000000003,
+      "rounds": [
+        {
+          "round": 1,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.451476250000001,
+            "median_ms": 5.449199999999999,
+            "p90_ms": 5.58279,
+            "p99_ms": 5.8667359999999995,
+            "max_ms": 6.3324
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.3848703125,
+            "median_ms": 5.38145,
+            "p90_ms": 5.51707,
+            "p99_ms": 5.593552,
+            "max_ms": 5.6287
+          },
+          "delta_mean_ms": -0.06660593750000032,
+          "delta_p99_ms": -0.27318399999999965,
+          "baseline_drift_ms": -0.04774999999999974,
+          "candidate_drift_ms": -0.016179375000000107
+        },
+        {
+          "round": 2,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.3432278125,
+            "median_ms": 5.34085,
+            "p90_ms": 5.42064,
+            "p99_ms": 5.534806000000001,
+            "max_ms": 5.5719
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.27871125,
+            "median_ms": 5.2755,
+            "p90_ms": 5.350239999999999,
+            "p99_ms": 5.4173480000000005,
+            "max_ms": 5.4897
+          },
+          "delta_mean_ms": -0.0645165625000006,
+          "delta_p99_ms": -0.11745800000000006,
+          "baseline_drift_ms": -0.003488125000000508,
+          "candidate_drift_ms": -0.0002087500000005349
+        },
+        {
+          "round": 3,
+          "baseline": {
+            "n": 320,
+            "mean_ms": 5.3521303125,
+            "median_ms": 5.34285,
+            "p90_ms": 5.444450000000001,
+            "p99_ms": 5.533587,
+            "max_ms": 5.6115
+          },
+          "candidate": {
+            "n": 320,
+            "mean_ms": 5.2877234375,
+            "median_ms": 5.27675,
+            "p90_ms": 5.3713299999999995,
+            "p99_ms": 5.487655999999999,
+            "max_ms": 5.6009
+          },
+          "delta_mean_ms": -0.06440687499999953,
+          "delta_p99_ms": -0.04593100000000039,
+          "baseline_drift_ms": 0.004189375000000162,
+          "candidate_drift_ms": 0.014738125000000046
+        }
+      ],
+      "all_round_means_improve": true,
+      "all_round_p99_nonregress": true,
+      "slots": [
+        {
+          "label": "knife2/perf-smallfree1088-r1-0-baseline",
+          "round": 1,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.47535125,
+            "median_ms": 5.464,
+            "p90_ms": 5.62504,
+            "p99_ms": 5.939969,
+            "max_ms": 6.3324
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r1-1-candidate",
+          "round": 1,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.39296,
+            "median_ms": 5.385,
+            "p90_ms": 5.53084,
+            "p99_ms": 5.582088,
+            "max_ms": 5.5953
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r1-2-candidate",
+          "round": 1,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.376780625,
+            "median_ms": 5.378,
+            "p90_ms": 5.51363,
+            "p99_ms": 5.609716,
+            "max_ms": 5.6287
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r1-3-baseline",
+          "round": 1,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.42760125,
+            "median_ms": 5.4266000000000005,
+            "p90_ms": 5.54676,
+            "p99_ms": 5.654742,
+            "max_ms": 5.736
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r2-0-baseline",
+          "round": 2,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.344971875000001,
+            "median_ms": 5.3462,
+            "p90_ms": 5.420640000000001,
+            "p99_ms": 5.478655,
+            "max_ms": 5.5353
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r2-1-candidate",
+          "round": 2,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.278815625,
+            "median_ms": 5.277950000000001,
+            "p90_ms": 5.34455,
+            "p99_ms": 5.389594,
+            "max_ms": 5.4175
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r2-2-candidate",
+          "round": 2,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.2786068749999995,
+            "median_ms": 5.27475,
+            "p90_ms": 5.3527499999999995,
+            "p99_ms": 5.434396,
+            "max_ms": 5.4897
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r2-3-baseline",
+          "round": 2,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.34148375,
+            "median_ms": 5.3378,
+            "p90_ms": 5.41954,
+            "p99_ms": 5.551178,
+            "max_ms": 5.5719
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r3-0-baseline",
+          "round": 3,
+          "slot": 0,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.350035625,
+            "median_ms": 5.34375,
+            "p90_ms": 5.43752,
+            "p99_ms": 5.524625,
+            "max_ms": 5.5511
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r3-1-candidate",
+          "round": 3,
+          "slot": 1,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.280354375,
+            "median_ms": 5.27625,
+            "p90_ms": 5.363770000000001,
+            "p99_ms": 5.434653,
+            "max_ms": 5.4734
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r3-2-candidate",
+          "round": 3,
+          "slot": 2,
+          "arm": "candidate",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.2950925,
+            "median_ms": 5.277150000000001,
+            "p90_ms": 5.38153,
+            "p99_ms": 5.552733999999999,
+            "max_ms": 5.6009
+          }
+        },
+        {
+          "label": "knife2/perf-smallfree1088-r3-3-baseline",
+          "round": 3,
+          "slot": 3,
+          "arm": "baseline",
+          "stats": {
+            "n": 160,
+            "mean_ms": 5.3542250000000005,
+            "median_ms": 5.33905,
+            "p90_ms": 5.446529999999999,
+            "p99_ms": 5.544309,
+            "max_ms": 5.6115
+          }
+        }
+      ]
+    }
+  },
+  "warmup_frames_discarded_per_slot": 80,
+  "steady_frames_per_slot": 160,
+  "quantile": "linear interpolation (type7)",
+  "note": "Current complete Frame wall time; each profile separate. small1080=1152 and smallfree1088=free input1072 are not pooled. AE1 correctness/reuse is separate, these AE0 timings do not claim steady reuse speedup."
+}

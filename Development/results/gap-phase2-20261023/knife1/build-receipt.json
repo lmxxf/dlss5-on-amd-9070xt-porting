@@ -1,0 +1,38 @@
+{
+  "gpu_executed_by_builder": false,
+  "artifacts": [
+    {
+      "name": "pure-baseline.exe",
+      "sha256": "25f5d7b66f0d7928526db0d26e88788b1de00cf0cf1fe462e0434c6e258c28bd",
+      "bytes": 3645027
+    },
+    {
+      "name": "pure-candidate.exe",
+      "sha256": "5133fb66bf70dfddc3ab8e06653892ccbf63f4e900e676165be5a6f13832ed53",
+      "bytes": 3646051
+    },
+    {
+      "name": "frame-baseline.exe",
+      "sha256": "8108f2452a3b01439812428e4d48ee9bdec4ff262d47933190eda8965f9117af",
+      "bytes": 4684843
+    },
+    {
+      "name": "frame-candidate.exe",
+      "sha256": "872aaefaf3abcb09361e5574893c083cb3a4a43e24328e810ef2fd7511a4d447",
+      "bytes": 4684843
+    },
+    {
+      "name": "trace-baseline.exe",
+      "sha256": "8aba92538d191ffea58100469aa6add3358f5c02ae042ebf57ea67663646ba05",
+      "bytes": 3643376
+    },
+    {
+      "name": "trace-candidate.exe",
+      "sha256": "50281a97bd110a27d19ae55672bc91a3055cb1766d30f84e56d7c81ccb3728af",
+      "bytes": 3643888
+    }
+  ],
+  "production_header": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/HIP/hip_reference_network.h",
+  "baseline_header_sha256": "9503ead8970c22939d6fdc294a8f011476514b4d578efa652a90ccdf2312d3c7",
+  "candidate_header_sha256": "fad85fdc3ce5b4069469406fa4cb73345591669e341954e2a1de0e86802d1a6c"
+}
