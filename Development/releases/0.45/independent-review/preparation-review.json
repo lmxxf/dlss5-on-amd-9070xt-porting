@@ -1,0 +1,56 @@
+{
+  "status": "LOCAL_PREPARATION_REVIEW_ONLY_INSTALL_AND_PACKAGES_PENDING",
+  "payload_receipt_sha256": "10073f616d4aefb46139dc4aee05807bcc1a2d34818f48a2cff5c561e7d1141d",
+  "payload_all_files_verified": 84,
+  "host_and_HIP80_SHA_ELF_verified": true,
+  "source_preparation_artifacts_verified": {
+    "re9-presr-source.tar.gz": {
+      "bytes": 44257964,
+      "sha256": "48d2843a86b6ca0f6b88cddc28fbdc3ebb7739bcf88d2886f4fc6cd27f887654"
+    },
+    "config045.zip": {
+      "bytes": 148322,
+      "sha256": "714c90db914f564cbf5db8241cd85282e16ed19ea4c896cb75daae0a4a0a5ace"
+    },
+    "source045.zip": {
+      "bytes": 129609,
+      "sha256": "aae9adb451021730bb457cf719cccb913d403cce9ca090cf52f52c43293820ae"
+    }
+  },
+  "critical_source_bytes_and_module_manifest_verified": [
+    {
+      "path": "Development/HIP/hip_reference_network.h",
+      "sha256": "6461f1a9dd02940f7f9372041c672cb96fb301585af91c37f191d3ec6da230b8"
+    },
+    {
+      "path": "hip/deep_fast.hip",
+      "sha256": "afec92b71d33e049a33af65fc249f2e550b37ca902fc0978f50e5a7ddb2444e9"
+    },
+    {
+      "path": "hip/vit_stream.inc",
+      "sha256": "7060a18496a82d0c6654d54a5791550495f356bd8b3374fc4e4c8cfd2352dd86"
+    },
+    {
+      "path": "hip/c512_qkv_attention_compact.inc",
+      "sha256": "b1e103df71eab3e0613b88666310e6bd0940a44524905d26a60ba9d7b127f583"
+    },
+    {
+      "path": "hip/build-modules.ps1",
+      "sha256": "eeb8f53303e48c56267abc49099394a930aee0c9a4b0d40066e7665a16d25225"
+    },
+    {
+      "path": "hip/SHA256SUMS",
+      "sha256": "2753bd68b7dcf185088f9c312f3d7bb231bfc59857e79e7d4c99540f70716026"
+    }
+  ],
+  "six_notes_match_repository": [
+    "package-notes/magpie-zh.txt",
+    "package-notes/magpie-en.txt",
+    "package-notes/optiscaler-zh.txt",
+    "package-notes/optiscaler-en.txt",
+    "package-notes/re9-zh.txt",
+    "package-notes/re9-en.txt"
+  ],
+  "dirty_source_marker_truthful": true,
+  "GPU_target_or_install_actions_by_reviewer": false
+}

@@ -1,0 +1,62 @@
+{
+  "version": "0.45",
+  "status": "COMPLETE",
+  "output_directory": "D:\\給網友打包",
+  "packages": [
+    {
+      "name": "Magpie-DLSS5-AMD-0.45",
+      "bytes": 491900423,
+      "sha256": "004bcae073fb76efa7f7dd1e88a8d38a4dd3c9884419bfb29722c00e2f07c473",
+      "files": 877,
+      "zip_entries": 878,
+      "verified": true,
+      "source_archive_sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c"
+    },
+    {
+      "name": "OptiScaler-DLSS5-AMD-0.45",
+      "bytes": 522098432,
+      "sha256": "96c12292cb11c8b7da026c012166745e0ca330f86d9ff16267a55163d9c367c5",
+      "files": 695,
+      "zip_entries": 696,
+      "verified": true,
+      "source_archive_sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c"
+    },
+    {
+      "name": "OptiScaler-REFramework-DLSS5-AMD-0.45",
+      "bytes": 533387409,
+      "sha256": "a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604",
+      "files": 705,
+      "zip_entries": 706,
+      "verified": true,
+      "source_archive_sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c"
+    }
+  ],
+  "phase6_payload_receipt": "Development/results/gap-phase6-20261023/final-build/receipt.json",
+  "source_archive_sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c",
+  "git_base_commit": "c24e3a97cdf596d0c997cee7deda91c981d520ce",
+  "source_dirty": true,
+  "modules_per_package": 80,
+  "shader_checks_per_package": 44,
+  "shader_checks_total": 132,
+  "runtime_smoke_exit": 0,
+  "runtime_smoke_limit_seconds": 15,
+  "full_zip_file_sha_readback": true,
+  "defaults_verified": true,
+  "no_personal_config_shipped": true,
+  "source_docs_reseal_only_four_files": true,
+  "old_044_preserved": true,
+  "installed_receipt": "Development/results/game-install-20261024/receipt.json",
+  "final_state": {
+    "version": "0.45",
+    "installed_items_verified": 169,
+    "configuration_records_unchanged": 16,
+    "runtime_smoke_exits": [
+      0,
+      0
+    ],
+    "gpu_lock_present": false,
+    "active_experiments": [],
+    "D_free_bytes": 246590996480,
+    "utc": "2026-10-23T18:08:58.3507572Z"
+  }
+}

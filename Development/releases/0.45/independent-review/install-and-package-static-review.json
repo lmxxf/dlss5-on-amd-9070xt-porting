@@ -1,0 +1,43 @@
+{
+  "status": "STATIC_REVIEW_PASS_ACTUAL_RECEIPTS_PENDING",
+  "local_only": true,
+  "installer_sha256": "c911695c9338fa4a64ee16d5d698f0ef85ec522c254288330ec1fdcd1330cd6e",
+  "frozen_package_scripts": {
+    "package-045.ps1": "2234bfa1b189ba762256ddc20dde300200fe52361dded5e53392b319a5474939",
+    "run-package.ps1": "06a0a0c94d39f044cee096807ffc57a2eb2fa61429cc87c444491123b955f081"
+  },
+  "checks": [
+    "Backup includes all overwritten existing paths and complete installed mod trees; backup SHA readback and rollback emitted before mutation",
+    "Installer changes only three host routes and HIP assets; personal default/custom/native and root/storage ini/cfg protected by existence plus SHA before/after and after both smoke runs",
+    "Onimusha root and storage runtime independently tested with pinned smoke binary and hard 15-second process timeout",
+    "Installer owns CreateNew lock and periodic game/disk checks; packaging relies on root external lock/watchdog",
+    "Package script verifies all ZIP members including checksum manifest itself and rejects duplicates/extras",
+    "Each package requires exact PASS 44 shader variants string; RE9 smoke is owned process with hard 15-second timeout",
+    "Packaging entry locks source base, source/config artifacts and smoke identity; frozen script hashes verified locally"
+  ],
+  "limits": [
+    "No local PowerShell executable available; this is source review, not parser/execution validation",
+    "Installation receipt, configuration after hashes, package output identities and actual smoke/shader logs remain to be audited after execution"
+  ],
+  "powershell_semantics_correction": {
+    "initial_review_error": "Initial static review accepted unparenthesized foreach pipeline; Windows PowerShell returned the JSON array as one object, making Join-Path ChildPath an Object[]. That acceptance was incorrect.",
+    "failure_log": "results/game-install-20261024/attempt1-preflight-failure.log",
+    "failure_before_mutation": true,
+    "fix": "Parenthesized ConvertFrom-Json results in prepare-target, installer payload validation and generated rollback manifest/plan loops; all four occurrences inspected.",
+    "status": "SOURCE_CORRECTION_VERIFIED_EXECUTION_PENDING"
+  },
+  "derived_arch_manifests": [
+    {
+      "path": "HIP/gfx1200/SHA256SUMS",
+      "entries": 40,
+      "sha256": "3c15313d1e1b922c36888e3bbb4a797764ce5ea8736bc542782b8a3e6c63bae0"
+    },
+    {
+      "path": "HIP/gfx1201/SHA256SUMS",
+      "entries": 40,
+      "sha256": "f391c3163d8be8211534feb8d827b318d4ccf9666478367b57b8d7599173492d"
+    }
+  ],
+  "execution_corrections": "Earlier File.Replace(tmp,dst,$null) acceptance was incorrect for actual Windows PowerShell binding; final uses a nonempty unique previous path. Earlier unparenthesized JSON foreach acceptance was also incorrect. Actual failures and corrections retained.",
+  "installation_actual_review": "installation-final-review.json"
+}

@@ -1,5 +1,13 @@
 Magpie-DLSS5-AMD @VERSION@ — full portable package
 
+0.45 keeps the 0.44 Small 0.5x default, F9 hotfix and MODE/AE policy. F9 still cycles 0.5→1→2→3→0.5; missing Small weights fall back to Original 1x. Fully exit the game before upgrading; preserve personal custom-config.txt/native-game-flags.txt.
+
+Adds compact byte-path coverage, V-fragment layout and C512 paired FP8. Q/K layout defaults on only for Original900 (1600×960) and Small900/1080 (1600×1024, 1920×1152); other shapes retain V-only. DLSS5_HIP_VIT_QKFRAG=0 disables it; setting 1 does not widen the scope. Rejected performance candidates are not enabled in this package.
+
+Includes 40 HIP modules per architecture (80 total). gfx1201 was GPU-tested; gfx1200 was compiled and target/checksum-checked only. Source attachments match the shipped host, kernels and configuration; rebuilding the supplied binaries is unnecessary. Timing figures below are historical, not new 0.45 game-FPS promises.
+
+--- 0.44 and earlier historical notes ---
+
 0.44 F9 hotfix: safe output ownership across model changes, resident dual-model weights and pre-wait cold preparation; F9 changes memory immediately even if configuration is read-only. Fully exit the game before upgrading.
 
 

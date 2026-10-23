@@ -721,3 +721,99 @@ HIP固定1080图31块/640 token，复用既有算子、改拓扑/shift/skip与�
 同尺寸MODE1需一起换head和blend，已补缓存两模型head、切换系数并reset，GPU32系数与冷启动history图像逐位回环通过。最终-idle-r3 cold/warm/AE/deferred/direct/history/Gold/runtime/Xbox路径全部通过，源码4764e4f1；addon4dc97d06…、runtimec10d827f…。最终双游戏重装与smoke0，Zero 实玩确认《剑星》与《鬼武者》内按 F9 切换均正常生效；备份game-install-20261018-f9fix-r3/backup-20261018-102323，rollback齐全。
 
 最终三包447,952,711B（cf812fe7…）、478,150,706B（40b4021a…）、533,121,864B（0f10b06a…），附zip.sha256；每包44shader、80模块/93Small资产、ZIP全文件回读及独立复验、RE9smoke0和源包核对通过。旧包与中间构建保留history，GPU锁释放。用户随后上传 0.44 公开镜像：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile](https://gofile.io/d/YCNT57JP)，README/CHANGELOG/releases/WorkingPlan已同步更新；详releases/0.44/README.md。初轮门禁错误已经披露修复，最终验收不采纳busy首轮数据。
+
+### 2026-10-23：1x同1088纯NN差距刷新与a9 ACO解剖，发现compact资格漏覆盖
+
+第一阶段只研究，生产/游戏/驱动/发行包未改。当前HEAD c24e3a97生成纯NN O2 host，gfx1201 40模块逐SHA同10-17最终与当前SUMS；旧HIP 044f功能基线/旧M d1185d2及SPV/plan全部锁定。1920×1088/640token、同encoded half-exact gradient、全71/MP1/FAST1/Style1/seed0/AE0/historyoff，80warm+160timed/slot：三轮NMMN当前8.533050354 vs旧M7.867127083ms，剩差0.665923271；另三轮ONNO旧H8.923111219→当前8.554250771ms，同批追回0.368860448。新旧H全输出仍153ac…47f1；M仍624d…a612且finite。旧M无逐帧p99，不编造；旧10-06绝对值不与本轮相减作优化证据。
+
+发现InitCompactContract/Projection只准1920×1152，1088仍640token却没接通compact W16/ViT byte链；独立trace三帧证当前实际161次（非原假设153），8次vit_pack_input仍在。隔离候选只将两处H门扩1088，模块不变，三帧trace153次/pack0/compact1/entryexit1，全部Gold同；三轮NCCN 8.570213292→8.354502188ms（−0.215711104ms/−2.517%），每轮均值/p99都改善，pooled p99 8.816156→8.5707569。尚未合生产/做产品兼容，候选未与M同批，不把两差直接相减宣布新剩差。PDL capability1但actual anyorder0/lifetime_pdl_calls0，SP六次launch都计入。
+
+锁版a9b13dd4/v0.0.4-win-preview完整源码与52个SPV→.nrp逐一映射/反汇编完成，0 unknown。TCHAIN移barrier不减dispatch，少派发主要来自完整持久stage；N-pair配输出N片，我W16配K片；两边已有med3/成对FP8/VOPD，新ISA候选为C32首级FMA_MIX打包常量/操作数安排、N-pair供数等。ACO并非普遍更低VGPR，静态指令不能代动态成本；整核ACO→HIP需PAL/HSA ABI适配。a9作者7.21→5.70ms是组合模式发布值，本轮未实机运行新版，不冒最新ACO已追平。初次预检误用旧调研1152输入SHA当valid，被GPU前拦住并按原input.json纠正，原失败保留。全部GPU遵game-check/≥100GB/gpu.lock/15秒看门狗，最终释放锁。完整原CSV/命令/模块身份/独立复算/候选补丁及优先清单见 [gap-refresh-20261023](results/gap-refresh-20261023/README.md)。
+
+### 2026-10-23 第二阶段刀1：1088/900 compact资格正式接通
+
+两处InitCompact资格新增Original-only1920×1088与1600×960，原1152行为及其它资格保留。完整Frame三档各3轮ABBA(240弃80/960样本每arm)：900 6.548212→6.477252ms(−0.070960)，1088 9.090362→8.880001ms(−0.210362)；两档每轮mean/p99均改善。1152 9.167039→9.160298ms按中性，R2/R3p99+0.043854/+0.035559原样保留，pooled尾下降不冒每轮全胜。三图样54帧Gold同，最终Original资格收窄后另9帧Gold同。三档default/FAST0/冷MP2/热1→2→1及四类缺导出故障注入共144帧兼容trace全对照逐位同；缺导出是API边界注入，不冒实际删export。实际1088 161→153、900165→157，1152保持153。生产源已修改，final-frame/source身份封存；未装游戏/发包。详results/gap-phase2-20261023/knife1，刀1闭环后进入刀2。
+
+### 2026-10-23 第二阶段刀2：C32 FMA_MIX数学通过，性能止负
+
+首级Horner用一SGPR打包0xab28/0x3728两个精确half常量，g与结果F32不变；LLVM MC拒直接packed literal的失败保留。MIX+ALT与MIX两模块.text完全同，只测MIX。热点代码少64–72B，资源/VOPD/VALU/WMMA/wait不变；54帧三档三图样Gold全同。基于刀1最终host完整Frame各3轮ABBA：900−0.007787ms但R2退，1088+0.010902ms/p99+0.031698ms，1152−0.000474ms近零。STOP，不合生产，不扩大到其它通道，不刷轮；失败总账已记。初次系统音频trace-agent名称误匹配在GPU前拦住，查路径后收窄实验进程名，原日志留存且没杀系统进程。见results/gap-phase2-20261023/knife2，进入刀3。
+
+### 2026-10-23 第二阶段刀3：C512 N-pair通过Gold，目标1088无收益止负
+
+在独立host/模块实现projection普通/bskip N-pair，保持逐输出K16序/skip-first/末量化，独立缓存tag且两export齐才用；CPU穷尽矩阵索引/尾区保持通过。正式COMGR baseline整HSACO同生产，candidate旧89Fn代码/资源全同，仅新增2Fn，VGPR100→80。66帧Gold含普通F32skip和实际旧模块缺导出回退全同；三档各3轮FrameABBA同host/同candidate模块仅NR0/1，candidate每slot实际3856calls。900mean+0.000909ms近零，1088三轮均值全退/pooled+0.006152ms、p99+0.021655；1152−0.011935ms但R2p99+0.036063、部分漂移较大。整体STOP，不合生产、不扫参，保1152小正值不抹。三刀结题：仅刀1资格进生产源码，刀2/3负账齐；游戏/驱动/正式包未动。详results/gap-phase2-20261023。
+
+第二阶段最终交付补记：三刀均经独立复算/源与产物身份审计，最终正式addon/runtime按仓库脚本CPU构建通过，仅含刀1生产资格改动。addon SHA e1b75a99…9b71a9，runtime c77cb78c…c1a8ca，产物/home/lmxxf/work/dlss5-gap-phase2-20261023/final-payload；源清单/日志见results/gap-phase2-20261023/final-build。原80 HSACO未重编，未另做最终DLL API smoke，完整Frame/兼容GPU门见各刀回执；未安装/发布，gpu.lock最终释放。
+
+### 2026-10-23 第三阶段A：精确QT32共享K/V，当前条件仍负
+
+纠正前提：旧10-01 M32也19 SAME，并非只限有损。本轮依用户明确授权保当前FAST1数学，真实ceil(n/32)grid、400尾编译期单链；正式COMGR旧89Fn同，新98VGPR/0LDS/private0。源/loopISA证明K/V逻辑请求−48%/−50%、WMMA同（不冒DRAM字节）。60帧Gold/缺导出回退同；三档各3轮FrameABBA，900+0.012039ms、1088+0.097277ms、1152+0.090150ms；1088/1152每轮mean/p99都退。STOP，不合生产，不扫变体，完整证据results/gap-phase3-20261023/A；开始B单边tile-counter。
+
+### 2026-10-23 第三阶段B：C512单边链化有真重叠，但九轮净负
+
+隔离FFN→Projection16条边、64bit累计counter、有界acquire/epoch极限关闭。timeout不读未完成数据、完整零写+sticky最终拒批；候选独有hold/释放计入Frame，NR0保生产。复现发现实际COMGR producer空opts才整SHA同生产，脚本可选max-ilp并非现载荷实际选项；错误组保留未上GPU。首次缺池在externalwait后被保护拦下，修NR1冷预热最多8次/连续2cycle稳定，不清counter/status，原失败保留。
+
+独立超时canary/CPU复读过、84主Gold/diagnostic帧同、carry32/64极限关闭通过，强制完整Frame错误status1/exit1正确拒批。trace三档16边全部存在consumer真WMMA完成早于末producer发布，ordered对照0；计时关trace。完整Frame三档各3轮ABBA：900+0.086410ms、1088+0.124866ms、1152+0.052815ms，九轮mean/p99全退。STOP不进生产，不单归因某种同步成本。详results/gap-phase3-20261023/B；继续C实际load/wait审计。
+
+### 2026-10-23 第三阶段C：依赖安全的末尾等待窗口，整网近零止负
+
+查C512两处/C128十一处/C256十八处wait0均真RAW，不直接放宽。仅C512 W16最后两K16步用compiler barrier将7条独立WMMA置wait0前，最后依赖两条仍受保护。正式COMGR仅目标Fn变、其它112原样，188VGPR/25SGPR/6144LDS/private0及大小/全部opcode计数同；54帧Gold同。原第三轮期间root准备后续对账文件可能CPU/I/O干扰，统计前记录排除、保原轮，仅补quiet r3。有效3轮FrameABBA900+0.004076ms、1088−0.004563ms（不稳且有尾反例）、1152+0.000788ms，STOP不合生产。证据results/gap-phase3-20261023/C；三项均已独立实现与实测，最终生产仍第二阶段刀1，正在收尾旧M同批差距刷新。
+
+第三阶段最终差距刷新：实际生产仅含第二阶段刀1，以final-pure543a、原40模块，和锁旧M d1185d2做同1088/640tokens、Style1/seed0/FAST1/full71/MP1/AE0/historyoff的三轮NMMN（80warm+160timed，每arm960）。生产8.366908281ms、M7.888277083ms，实测差0.478631198ms（6.0676%）；三轮差0.471143/0.477641/0.487110ms。各自raw同历史153ac/624d，M资产前后未变、无M逐帧p99。独立复算通过，取代约0.45跨批估计；新a9仍未本机同口径测。A/B/C均不合生产，最后源码仍仅刀1两条件；完整结题results/gap-phase3-20261023。
+
+### 2026-10-23 第四阶段刀1：ViT V-fragment成对布局采纳
+
+按用户head-major布局，producer V尾每lane16B原地写，consumer每K16直接b128读，QK/波数/数学/容量不变。先导tile-major只CPU/编译未上GPU；最终正式ISA旧89/101Fn保持，consumer loop123→91指令、84→62VALU、WMMA5同，16V-u8→1b128，producerV单b128。真实GPU QKV逆排/AV/canary/reuse门与独立CPU raw回读过，54帧三档三图样Gold同。Frame三档各3ABBA：900−0.015497ms、1088−0.058899、1152−0.051794，9mean全胜/pooled尾均好，900R3p99+4.693µs原留。默认/禁用/优先级/不对称缺export/FAST0/MP2/AE回退39帧通过。生产默认1（NR诊断优先，DLSS5_HIP_VIT_VFRAG可禁），保Original FAST1 MP1显式AE0三档，不暗扩Small/AE。
+
+1088纯NN真实旧生产vs新默认三轮：8.341779→8.305514ms，追回36.265µs，三轮mean/p99均改善，raw仍153ac。双架构80模块完整，清单仅换4项、实际ELF架构全核，gfx1200无实机。首次probe误以为物理f32存在，在CPU读文件拒绝，改用生产ReadWeights回落f16（无数学改动）并保旧日志。完整证据results/gap-phase4-20261023/knife1；游戏/发行包未改，开始Small资格刀2。
+
+### 2026-10-23 第四阶段刀2：Small900/720/free1088 compact资格采纳
+
+集中helper新增Small1600×1024/448、1344×768/288、1920×1088/640，保原Original/1152/设备/其它门，VF Small不扩。常规Small1080_ROWS1088仍重算1152；实跑1088用free输入1920×1072。72FrameGold、24帧bareRGB32F trace同：900/72095→87、free108891→83，8pack清零，attention实际640/400/640，Up39走byte-input/F32-output；每新档活动weights容量精确省120MiB。
+
+108帧public模式/direct重建/AE/静态MODE1历史兼容通过。MODE1首冷>250ms导致双方序列001011，源码规则与逐帧SHA核同，没有改历史行为。完整Frame三档各3ABBA，9004.350586→4.286140ms（−64.446µs）、7203.061927→3.007794（−54.133µs）、free10885.587080→5.341975（−245.105µs），九轮mean/p99全胜。两个初始化VF统计误门由真实预热日志纠正，原子进程exit0数据留档；不把预热Original8次算Small。采纳host资格，80模块复用刀1；最终默认回归/宿主构建随后封存，结果gap-phase4-20261023/knife2。
+
+### 第四阶段最终闭环
+
+两刀均已合入生产。最终重编标准/free1072 Frame与已测候选SHA完全一致，7档默认回归21帧全部Gold 0-diff；完整addon/runtime正式构建成功，双架构80模块与生产SHA/ELF核同。证据及最终payload身份见 [第四阶段报告](results/gap-phase4-20261023/README.md) 与 final-build/receipt.json。所有GPU作业已结束、gpu.lock已释放。gfx1200仅编译核验；游戏安装及已发布ZIP未动。
+
+### 2026-10-23 第五阶段刀1：仅采纳C512成对FP8打包
+
+正式COMGR pair-only：c512_qkv_attention_compact_w16的cvt144→72、总指令2483→2104、VALU1367→1025，VGPR188/LDS6144/private0不变；113导出仅两个compact核变化。基线/三候选三档三图样共108帧Gold、独立GPU norm/pack探针及CPU raw复核全通过；非W16三档paired18帧通过。
+
+pair-only Frame900/1088/1152分别−23.331/−11.701/−18.815µs，9mean全改善，三档pooled p99改善，分轮尾反例留；同1088纯NN8.342063→8.326007ms（−16.055µs），3mean全改善、pooledp99−6.303µs。permlanex16单项1088+4.869µs，组合虽mean略好但pure pooledp99+184.606µs，均不进生产，serial_norm保持旧实现。正式pair-only源与双架构编译完成，gfx1201最终113函数码/资源全同已测pair；gfx1200只编译核验。证据results/gap-phase5-20261023/knife1。
+
+### 2026-10-23 第五阶段刀2：V-fragment扩围Small/AE采纳
+
+Small900/720/常规1080/free1088的V-fragment成对资格已合生产，保持精确shape/token绑定；Original既有三档与Small四档AE允许，AE策略/anchor/默认idle阈值未改。72帧SmallGold、84帧受控AE1、24帧默认500ms、48帧AE2/3共228帧跨臂0-diff、完整AECSV同。mode2实际全计算，mode3为0,1,1,1,0,1；不拿AE0性能当复用帧收益。
+
+四档各3ABBA：9004.268004→4.244956ms（−23.049µs），7202.994176→2.989513（−4.663µs），11525.559334→5.499693（−59.642µs），free10885.382278→5.317102（−65.176µs）。11/12mean改善，12/12p99改善；720R2mean+2.378µs保留，该档仅微小收益。最终header/两个重编Frame复现实测候选身份；正式默认/off回归与完整构建收尾中。证据results/gap-phase5-20261023/knife2。
+
+### 第五阶段最终闭环
+
+生产最终默认/on/off 9组36帧跨臂输出与AE日志全部一致，两个Frame重编SHA复现实测候选。正式addon/runtime构建成功，双架构80模块逐SHA/ELF核验；最终payload位于`/home/lmxxf/work/dlss5-gap-phase5-20261023/final-payload`，身份见results/gap-phase5-20261023/final-build。刀1只收pair打包，刀2收Small/AE资格，permlane与combined明确STOP。gpu.lock已释放、无实验进程，剩余磁盘279784194048B；游戏安装与已发布ZIP未改。完整报告[第五阶段](results/gap-phase5-20261023/README.md)。
+
+### 2026-10-23 第六阶段刀1：QK-fragment限三档采纳
+
+新QK head-major配对：producer b128、consumer入口Q与循环K/V各b128，consumer VGPR61→60，producer78/LDS16K不增。四token GPU/CPU逆排、126帧Gold＋84AE通过；七档84slot ABBA及1088pure完成。仅默认开启Original900（−11.885µs）、Small900（−7.692µs）和Small1080（−11.083µs），pooledmean/p99均改善；所有分轮尾反例保留。其余四档继续V-only：Orig1088不稳、Orig1152和Smallfree1088尾退、Small720均值退。试验pure1088−13.577µs但p99+10.364µs，不能写成默认生产1088追回。限定默认/off/缺export33帧及三档AE18帧通过，4模块双架构更新，其他76保持。证据results/gap-phase6-20261023/knife1。刀2A Up成对打包继续测；B LDS TR本地/正式工具链均拒gfx1201，不发射不支持指令、不重刷历史负VT。
+
+### 2026-10-24 第六阶段最终裁决
+
+仅采纳QK-fragment的Original900、Small900、Small1080三个scope，分别省11.885/7.692/11.083µs；其余四档仍V-only。试验1088pure−13.577µs不是生产追回，pooled尾+10.364µs使该scope未收。刀2Up全开及最后FP16权重专用版均STOP：后者Small900mean近零、p99+22.444µs，未进一步加shape分支；控制组未执行改核，不算收益。C512 LDS TR本目标工具链不支持，CPU预期拒绝，无GPUlaunch。生产Up/recipe均与刀1后基线同，完整数据及最终80模块/宿主身份见[第六阶段报告](results/gap-phase6-20261023/README.md)。
+
+第六阶段最终产物已封口：正式宿主与80模块身份核同，production无Up实验宏；仅QK三shape。GPU锁已释放，无残留实验进程，磁盘余261992218624B。回执：results/gap-phase6-20261023/final-build/receipt.json。
+
+## 2026-10-24｜v0.45 毕业收官：双游戏安装与三包正式交付
+
+明确授权后复用gap-phase6最终宿主和80模块，未重编宿主/HIP或重跑ABBA；仅纳入此前已采纳的第二/四/五阶段及第六阶段QK三shape，所有STOP候选不入生产。
+
+《剑星》addon、《鬼武者》root/_storage_ runtime、两游戏双架构80模块及根/分架构SHA清单共169项全部SHA读回；完整备份1502文件2687928349B，rollback.ps1先于替换生成。六份default/custom/native从首次preflight到最终逐字相同，连同其他ini/cfg共16记录全部保持；两路安装runtime smoke exit0/15秒上限。安装器三次WinPS兼容问题及恢复证据保留，成功后再次核169/16；一个派生shader缓存纳入最终备份，不伪称失败恢复目录完全无新增。
+
+D:\給網友打包三个0.45完整ZIP及.sha256已生成。每包44 shader编译，共132 PASS；REFramework包内runtime smoke exit0/15秒；所有ZIP条目含清单自身SHA读回。保留旧0.44 history原ZIP/原SHA。最后源码文档38→40修正只改两README，三包仅source tar/release.json/VERSION/SUMS四文件变化，全部重新封包读回，二进制/shader/配置不变。
+
+源码归档SHA3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c；明确git_base=c24e3a97cdf596d0c997cee7deda91c981d520ce上的dirty生产快照。未推送Git/外部网盘。最终锁释放、无实验进程，D余246590996480B。
+
+- Magpie-DLSS5-AMD-0.45.zip：491900423B，SHA256 `004bcae073fb76efa7f7dd1e88a8d38a4dd3c9884419bfb29722c00e2f07c473`。
+- OptiScaler-DLSS5-AMD-0.45.zip：522098432B，SHA256 `96c12292cb11c8b7da026c012166745e0ca330f86d9ff16267a55163d9c367c5`。
+- OptiScaler-REFramework-DLSS5-AMD-0.45.zip：533387409B，SHA256 `a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604`。
+
+回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。

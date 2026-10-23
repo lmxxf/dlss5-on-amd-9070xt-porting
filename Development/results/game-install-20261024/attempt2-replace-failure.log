@@ -1,0 +1,8 @@
+LOCK_RELEASED
+Exception calling "Replace" with "3" argument(s): "The path is not of a legal form."
+At D:\DLSSNR-Lab\game-install-20261024\install.ps1:55 char:154
++ ... t-Path -LiteralPath $dst){[IO.File]::Replace($tmp,$dst,$null)}else{[I ...
++                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+    + FullyQualifiedErrorId : ArgumentException
+ 

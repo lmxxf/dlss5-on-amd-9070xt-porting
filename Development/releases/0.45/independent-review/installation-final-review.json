@@ -1,0 +1,49 @@
+{
+  "status": "PASS_COLLECTED_INSTALL_EVIDENCE",
+  "configuration_records_unchanged": 16,
+  "installed_items_matched_frozen_payload": 169,
+  "modules_each_game": 80,
+  "backup_files": 1502,
+  "backup_bytes": 2687928349,
+  "prior_attempt_1501_original_files_identical": true,
+  "additional_file": "One new shader-cache/0d6b10bf9a0e7b13.dxbc from smoke remains after attempt3 restoration and is included in final 1502-file backup; original files restored, directory state not byte-for-byte identical",
+  "runtime_smokes": [
+    "root: exit0 GPU ok",
+    "storage: exit0 GPU ok"
+  ],
+  "failures_preserved": [
+    "attempt1: JSON-array enumeration rejected before mutation",
+    "attempt2: null backup argument to File.Replace rejected; restored=true",
+    "attempt3: Hashtable bytes Measure-Object rejected at receipt generation; restored=true"
+  ],
+  "static_review_correction": "Earlier File.Replace(tmp,dst,$null) acceptance was incorrect for actual Windows PowerShell binding; final uses a nonempty unique previous path. Earlier unparenthesized JSON foreach acceptance was also incorrect. Actual failures and corrections retained.",
+  "limits": "Local audit of collected hashes/logs, not independent target reread or gameplay validation. Physical backup files remain remote; backup sets, sums and recorded readbacks audited locally.",
+  "evidence_sha256": {
+    "attempt3-smoke-root.stdout.log": "f1d7f3ecb911227610f9070799f91db03d8af11058ab744dd950b43a9e8e2161",
+    "backup-manifest.json": "d7982408c4c2b19139ab8498e18debe2322a22f6f80561402a94eddd26be9035",
+    "receipt.json": "80419390b58d22e11c6152fb055af0fc6c59ce6216d82945dc24f2a8d240103d",
+    "attempt3-smoke-storage.stdout.log": "f1d7f3ecb911227610f9070799f91db03d8af11058ab744dd950b43a9e8e2161",
+    "attempt1-preflight-failure.log": "ce7af1bfef373170438461c49b62c906627637ba14c7449bbba09d17422907cf",
+    "smoke-storage.stderr.log": "7bd2ff2a625b3472a1c3f18411ca4cd6f9b306f3c9f78f632e44be2ebbb57b55",
+    "attempt2-failure.json": "17d6b1cdf246a43366ad2b09507bc647f8796999b379cad9e34d08943ad4863c",
+    "attempt2-replace-failure.log": "5925c5c111b1d8bdafcc41ec63b3b018a25b6967106f9e2d630a51b98884997a",
+    "attempt2-backup-manifest.json": "3bdb4a6d38131828e570576a1eb7a1b451030b18b369fcb545a93d49997ee2da",
+    "attempt3-failure.json": "e1a0f1400319c394fbcb81aa1bd0b308d5683820496e034ec4387cfbd6dd533c",
+    "attempt3-backup-manifest.json": "cc1720a8ceeaf2cbee88a78a3d623eccbddced39b232553ba12fcef6f63e59ee",
+    "attempt3-receipt-failure.log": "da9d1dbb2c01420b84b380616504ed0bc29cfc964a7db5f26ed647632885688d",
+    "rollback.ps1": "c94b051a14c6b5ed397689fdb329173044a676da025400aa984e0826a58be018",
+    "smoke-root.stdout.log": "f1d7f3ecb911227610f9070799f91db03d8af11058ab744dd950b43a9e8e2161",
+    "smoke-storage.stdout.log": "f1d7f3ecb911227610f9070799f91db03d8af11058ab744dd950b43a9e8e2161",
+    "replace-probe.ps1": "20dde1bcf20c0451b16531317be9356d332d05d2f726d1cb84770bb858a6654d",
+    "config-after.json": "6926b47581f3dc870e1d28e6ee024c6f7c2a96b272e44bd44fd3adc7ea09a9d9",
+    "smoke-root.stderr.log": "7bd2ff2a625b3472a1c3f18411ca4cd6f9b306f3c9f78f632e44be2ebbb57b55",
+    "install-plan.json": "b58fcdd62af0b6d4eb75c5f503758ce860d89e7cd9f94c4ba9451dd18d60c615",
+    "preflight.log": "21332b20f74f92b56628e4f00935b5c8c183afdff7d590158db0df310bf18732",
+    "preflight.ps1": "18d1afb9ae45047d37f325b014517e6399d2b85b11dffa7d007472961a5cb75f",
+    "install.ps1": "c911695c9338fa4a64ee16d5d698f0ef85ec522c254288330ec1fdcd1330cd6e",
+    "config-before.json": "6926b47581f3dc870e1d28e6ee024c6f7c2a96b272e44bd44fd3adc7ea09a9d9",
+    "inspect.json": "cd32c0bf69552f2c88359026a9dbfafa6657f5e59a83804d38a43d8c25044e1a",
+    "inspect.ps1": "54cf411e9787f6cf2d0faf9afefc20d77a58f893cc9ca98d9519746901173d7d",
+    "install-run.log": "874e655a2c3bbdc909abad3a98f5760995abcbe24e8edf02e5dd0389210c8cc8"
+  }
+}

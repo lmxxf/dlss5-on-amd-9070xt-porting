@@ -423,3 +423,15 @@ Small权重与旧权重共存；80个双架构模块复用。F8切AE/EXACT；2x/
 修复F9切模型后的输出纹理悬垂引用和延迟producer下的权重上传死锁；同尺寸保留D3D12资源并保持FPS叠加层抑制状态，两套模型权重分表常驻并在producer wait前完成冷预热。只读配置（WindowsApps）下F9先立即更新内存态，落盘失败不撤销切换；《鬼武者》优先选择XboxGames可写配置目录。最终 `4764e4f1` 回归、双游戏部署（《剑星》《鬼武者》实机 F9 切换已验证）和三包校验全部完成，见[回执](Development/results/f9-hotfix-20261018/README.md)。
 
 同尺寸MODE1还会交换缓存的两模型history head、更新blend并reset，保持既有时序语义；GPU逐系数与图像回环已验证。
+
+## 0.45 · 2026-10-24
+
+- **默认与画面**：沿用 0.44 的 Small 0.5x、F9 热修、MODE/时序策略及 `0.5 → 1 → 2 → 3 → 0.5` 循环。本次优化在已测范围内保持基线输出，不更换训练模型，也不宣称与 NVIDIA 逐位相同；个人配置覆盖继续生效。
+- **紧凑字节路径**：补齐此前未命中的 Original 900/1088 与 Small 处理几何（1600×1024、1344×768、1920×1088）。Small 新增三形状各省八次 ViT 输入打包启动、120 MiB 活跃打包权重。普通 Small 1080 档仍实际处理 1920×1152；1920×1072 的自由输入才覆盖 Small 处理 1920×1088。
+- **ViT V 布局与 C512 打包**：V 片段由生产/消费两端配对，按 head 连续存放；已放行的 Small 与自适应复用路径保留原 reuse gate。C512 成对转换 FP8，保留乘法舍入、带符号零处理和串行归一化顺序。
+- **Q/K 布局限定范围**：仅 Original 1600×960/400 tokens、Small 1600×1024/448 tokens、Small 1920×1152/640 tokens 默认启用，仍受父 V-fragment 资格约束。其余形状保持 V-only。`DLSS5_HIP_VIT_QKFRAG=0` 可关闭，`=1` 也不能扩大这三个形状；`DLSS5_HIP_VIT_VFRAG=0` 关闭父配对布局路径。
+- **验证与边界**：记录范围内的 GPU 逐值输出、复用/canary、模型热切和回退检查通过；Frame 性能按三轮 ABBA 验证，保留单轮尾延迟反例，包括 Small900 Q/K 第二轮 mean +1.656 µs。全范围 Q/K 的纯 NN 1088 结果不算发行默认收益，因为该形状最终回退。没有新增游戏 FPS 承诺。gfx1201 做过 GPU 验证，gfx1200 仅编译、架构标记与校验和核验。
+- **不包含**：C32 MIX 激活、C512 N-pair 权重、QT32 双 query、FFN→Projection TCHAIN、尾段调度实验、permlanex16 归一化，以及最后的 Up 成对打包/half-only 候选。不夹带实验同步协议或硬件不支持的 LDS 转置指令。
+- **发行内容**：三种宿主包保持原配置默认值和双模型资产，每架构 40 个 HIP 模块。源码附件对应发行宿主、内核和配置；实验产物仅作证据，不是另一个安装版本。最终包 SHA 与安装回执由发行目录单独记录。
+
+证据：[Small 紧凑路径](Development/results/gap-phase4-20261023/knife2/README.md)、[C512 打包](Development/results/gap-phase5-20261023/knife1/README.md)、[V-fragment 资格](Development/results/gap-phase5-20261023/knife2/README.md)、[限定 Q/K 布局](Development/results/gap-phase6-20261023/knife1/README.md)、[最后一轮未采纳候选](Development/results/gap-phase6-20261023/knife2/README.md)。

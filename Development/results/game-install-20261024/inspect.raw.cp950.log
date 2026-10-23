@@ -1,0 +1,80 @@
+{
+    "out":  [
+                {
+                    "Name":  "history",
+                    "Length":  null,
+                    "FullName":  "D:\\給網友打包\\history"
+                },
+                {
+                    "Name":  "Magpie-DLSS5-AMD-0.44",
+                    "Length":  null,
+                    "FullName":  "D:\\給網友打包\\Magpie-DLSS5-AMD-0.44"
+                }
+            ],
+    "games":  [
+                  {
+                      "root":  "C:\\Program Files (x86)\\Steam\\steamapps\\common\\StellarBlade\\SB\\Binaries\\Win64",
+                      "mod_bytes":  944517243,
+                      "configs":  [
+                                      {
+                                          "sha256":  "91196bdc37bdb6298a10118f2b55216bc66eeea01f7c8d752a511a62239040f2",
+                                          "name":  "default-config.txt",
+                                          "exists":  true
+                                      },
+                                      {
+                                          "sha256":  "5597980caa5ae7ac2986885fce59ee3edf94b6af6ae96008d0e02c27b767b4b4",
+                                          "name":  "custom-config.txt",
+                                          "exists":  true
+                                      },
+                                      {
+                                          "sha256":  "9199b3409a047120c606723f734d98ea981190f0abb489c7c7d3065bc6f56c72",
+                                          "name":  "native-game-flags.txt",
+                                          "exists":  true
+                                      }
+                                  ],
+                      "storage_mod_assets":  false
+                  },
+                  {
+                      "root":  "C:\\XboxGames\\Onimusha- Way of the Sword\\Content",
+                      "mod_bytes":  873397968,
+                      "configs":  [
+                                      {
+                                          "sha256":  "81936973c5b08a76f0f8f70cd05a93c434e6d37b3c241ae6788327344eef8572",
+                                          "name":  "default-config.txt",
+                                          "exists":  true
+                                      },
+                                      {
+                                          "sha256":  "e8276ba2ad0b2f05c980182324317805740731e38a07d6d6721f508fbe195c4f",
+                                          "name":  "custom-config.txt",
+                                          "exists":  true
+                                      },
+                                      {
+                                          "sha256":  "77a4aa68f89d12e9224ef9b0e1d6df5ef89fe67c011f536ed7b7fbc49d342ca1",
+                                          "name":  "native-game-flags.txt",
+                                          "exists":  true
+                                      }
+                                  ],
+                      "storage_mod_assets":  false
+                  }
+              ],
+    "smoke":  [
+                  {
+                      "FullName":  "D:\\DLSSNR-Lab\\release-044\\payload\\runtime-smoke.exe",
+                      "Length":  649179
+                  },
+                  {
+                      "FullName":  "D:\\DLSSNR-Lab\\release-044-f9fix\\payload\\runtime-smoke.exe",
+                      "Length":  649179
+                  }
+              ],
+    "disks":  [
+                  {
+                      "Name":  "C",
+                      "Free":  144334348288
+                  },
+                  {
+                      "Name":  "D",
+                      "Free":  261991956480
+                  }
+              ]
+}

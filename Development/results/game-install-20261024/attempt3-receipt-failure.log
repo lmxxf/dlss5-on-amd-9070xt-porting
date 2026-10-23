@@ -1,0 +1,7 @@
+LOCK_RELEASED
+Measure-Object : The property "bytes" cannot be found in the input for any objects.
+At D:\DLSSNR-Lab\game-install-20261024\install.ps1:68 char:203
++ ... ifest.Count;backup_bytes=($manifest|Measure-Object bytes -Sum).Sum;ro ...
++                                         ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Measure-Object], PSArgumentException
+    + FullyQualifiedErrorId : GenericMeasurePropertyNotFound,Microsoft.PowerShell.Commands.MeasureObjectCommand

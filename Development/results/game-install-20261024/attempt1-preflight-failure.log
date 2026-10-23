@@ -1,0 +1,9 @@
+LOCK_RELEASED
+Join-Path : Cannot convert 'System.Object[]' to the type 'System.String' required by parameter 'ChildPath'. Specified m
+ethod is not supported.
+At D:\DLSSNR-Lab\game-install-20261024\install.ps1:24 char:119
++ ... vertFrom-Json){Watch;if((Hash (Join-Path $release $f.relative)) -ne $ ...
++                                                       ~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Join-Path], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : CannotConvertArgument,Microsoft.PowerShell.Commands.JoinPathCommand
+ 

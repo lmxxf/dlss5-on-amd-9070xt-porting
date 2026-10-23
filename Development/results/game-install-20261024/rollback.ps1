@@ -1,0 +1,5 @@
+﻿$ErrorActionPreference='Stop'
+$r='D:\DLSSNR-Lab\game-install-20261024';$held=$null;$next=[DateTime]::MinValue
+function Idle {& D:\DLSSNR-Lab\game-check.ps1 'Shipping SB-Win64 Onimusha re9.exe SandFall Magpie';if($LASTEXITCODE -ne 1){throw 'exit games first'};if((Get-PSDrive D).Free -lt 100GB){throw 'disk below100GB'}}
+Idle;$held=[IO.File]::Open('D:\DLSSNR-Lab\gpu.lock',[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+try{Idle;foreach($m in (Get-Content "$r\backup-manifest.json" -Raw -Encoding UTF8|ConvertFrom-Json)){if([DateTime]::UtcNow -ge $next){Idle;$next=[DateTime]::UtcNow.AddSeconds(15)};New-Item -ItemType Directory -Force (Split-Path $m.path)|Out-Null;Copy-Item -LiteralPath $m.backup -Destination $m.path -Force;if((Get-FileHash -LiteralPath $m.path).Hash.ToLower() -ne $m.sha256){throw 'rollback readback mismatch'}};foreach($plan in (Get-Content "$r\install-plan.json" -Raw -Encoding UTF8|ConvertFrom-Json)){foreach($i in $plan.items){if(!$i.existed){Remove-Item -LiteralPath $i.destination -Force -ErrorAction SilentlyContinue}}};'ROLLBACK_COMPLETE'}finally{if($held){$held.Dispose();Remove-Item D:\DLSSNR-Lab\gpu.lock}}

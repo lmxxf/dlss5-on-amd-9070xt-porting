@@ -1,0 +1,5 @@
+首次在payload身份检查处停止，未开始游戏文件备份或替换。Windows PowerShell将ConvertFrom-Json数组作为单个管道对象；已对foreach集合加括号，使其按元素遍历。prepare-target与installer/rollback同样修正，原错误日志保留。
+
+第二次完整备份成功，首个File.Replace因WindowsPS将null字符串参数绑定为非法空路径而拒绝；自动恢复并核SHA成功（attempt2-failure.json restored=true）。改用同目录唯一非空.previous临时备份名，完成后清理；完整预安装备份不删。
+
+第三次替换、读回、两路runtime smoke exit0及配置检查均完成，最终回执汇总Measure-Object无法从Hashtable管道读取bytes属性，触发自动完整恢复。改为显式投影long数值再求和，不改变安装路径或验证门；两路smoke原日志保留，重试仍执行全部门。

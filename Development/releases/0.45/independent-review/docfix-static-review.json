@@ -1,0 +1,12 @@
+{
+  "status": "LOCAL_SOURCE_AND_RESEAL_SCRIPT_REVIEW_PASS",
+  "tar_entries": 4799,
+  "changed_tar_entries": [
+    "third_party/lmxxf/README.md",
+    "third_party/lmxxf/README.zh-CN.md"
+  ],
+  "other_entry_bytes_and_metadata_same": true,
+  "new_tar_sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c",
+  "script_sha256": "0cb462234d026118135ee4729e90f8bc18907fb158e7bf80b88c351cf526b020",
+  "scope": "Script targets only 0.45 ZIPs; backs up ZIP and sidecar, verifies old/new ZIP every entry including sums, requires exactly four document/manifest changes. No host/config/shader changes or GPU compilation. Actual reseal results pending."
+}

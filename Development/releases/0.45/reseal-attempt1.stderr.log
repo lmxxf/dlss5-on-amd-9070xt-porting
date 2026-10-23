@@ -1,0 +1,32 @@
+ConvertFrom-Json : Unrecognized escape sequence. (126): {
+    "version":  "0.45",
+    "package":  "Magpie-DLSS5-AMD-0.45",
+    "kind":  "magpie",
+    "baseline":  "D:\\绲︾恫鍙嬫墦鍖匼\history\\Magpie-DLSS5-AMD-0.44.zip",
+    "baseline_sha256":  "cf812fe7909fbd53b38f54da8abd584698525f81f7ea71cab19ba14bab48e030",
+    "configuration":  "hip-magpie-flags.txt",
+    "modules":  80,
+    "small_weights":  93,
+    "default_mode":  "0.5",
+    "git_base_commit":  "c24e3a97cdf596d0c997cee7deda91c981d520ce",
+    "source_dirty":  true,
+    "source_archive_sha256":  "48d2843a86b6ca0f6b88cddc28fbdc3ebb7739bcf88d2886f4fc6cd27f887654",
+    "regular_addon_sha256":  "dcd468ed836cad86e2cf3c6cc594b13a0ad4f7a67fa3affa49b472b049e59166",
+    "host_sha256":  null,
+    "runtime_sha256":  null,
+    "input_shader_sha256":  "b871dfc5d49c9803f43e11679a770f2b9290a1a5d96cb1a7ea18daf02099d20b",
+    "gpu_smoke":  null,
+    "fit_large":  true,
+    "bit_exact_vs_previous":  false,
+    "bit_exact_scope":  "See final phase6 validation; no blanket equivalence across modes or historical releases",
+    "modules_reused":  true,
+    "payload_reused":  true,
+    "payload_validation":  "Development/results/gap-phase6-20261023/final-build",
+    "note":  "Frozen phase6 payload; limited QK three shapes; Up pair STOP; Small/default/F9 semantics preserved"
+}
+At D:\DLSSNR-Lab\release-045\reseal-docs.ps1:28 char:47
++ ... $meta=Get-Content "$stage\release.json" -Raw|ConvertFrom-Json;$meta.s ...
++                                                  ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [ConvertFrom-Json], ArgumentException
+    + FullyQualifiedErrorId : System.ArgumentException,Microsoft.PowerShell.Commands.ConvertFromJsonCommand
+ 

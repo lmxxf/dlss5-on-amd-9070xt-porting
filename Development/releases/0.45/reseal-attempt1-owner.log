@@ -1,0 +1,8 @@
+LOCK_RELEASED
+package exit=1
+At D:\DLSSNR-Lab\release-045\owner-reseal.ps1:12 char:18
++  if($p.ExitCode){throw "package exit=$($p.ExitCode)"};'RESEAL_045_COM ...
++                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (package exit=1:String) [], RuntimeException
+    + FullyQualifiedErrorId : package exit=1
+ 

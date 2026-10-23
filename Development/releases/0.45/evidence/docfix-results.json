@@ -1,0 +1,50 @@
+[
+    {
+        "name":  "Magpie-DLSS5-AMD-0.45",
+        "old_zip_sha256":  "531670774c41f951aca4dea1a48f2cfbf10f63db719ff9af1e8780d5ffd5a43c",
+        "sha256":  "004bcae073fb76efa7f7dd1e88a8d38a4dd3c9884419bfb29722c00e2f07c473",
+        "bytes":  491900423,
+        "source_archive_sha256":  "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c",
+        "changed_files":  [
+                              "SHA256SUMS.txt",
+                              "sources/re9-presr-source.tar.gz",
+                              "DLSS5-AMD-VERSION.txt",
+                              "release.json"
+                          ],
+        "files":  878,
+        "full_zip_readback":  true,
+        "unchanged_payload_files":  874
+    },
+    {
+        "name":  "OptiScaler-DLSS5-AMD-0.45",
+        "old_zip_sha256":  "ea318659df4bc863bf1ab72592341d0a8e8a2c7c6ffc098dd6856200199c4981",
+        "sha256":  "96c12292cb11c8b7da026c012166745e0ca330f86d9ff16267a55163d9c367c5",
+        "bytes":  522098432,
+        "source_archive_sha256":  "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c",
+        "changed_files":  [
+                              "SHA256SUMS.txt",
+                              "sources/re9-presr-source.tar.gz",
+                              "DLSS5-AMD-VERSION.txt",
+                              "release.json"
+                          ],
+        "files":  696,
+        "full_zip_readback":  true,
+        "unchanged_payload_files":  692
+    },
+    {
+        "name":  "OptiScaler-REFramework-DLSS5-AMD-0.45",
+        "old_zip_sha256":  "02a32bdc9f6f50d464a7f56a9abdb6bcf5a3995c12e3fe28824a1625d5c6db8b",
+        "sha256":  "a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604",
+        "bytes":  533387409,
+        "source_archive_sha256":  "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c",
+        "changed_files":  [
+                              "SHA256SUMS.txt",
+                              "sources/re9-presr-source.tar.gz",
+                              "DLSS5-AMD-VERSION.txt",
+                              "release.json"
+                          ],
+        "files":  706,
+        "full_zip_readback":  true,
+        "unchanged_payload_files":  702
+    }
+]

@@ -1,0 +1,27 @@
+{
+  "status": "LOCAL_PREPARATION_ONLY_NOT_PACKAGED",
+  "git_base_commit": "c24e3a97cdf596d0c997cee7deda91c981d520ce",
+  "source_dirty": true,
+  "source_members_compared": [
+    "Development/HIP/hip_reference_network.h",
+    "hip/deep_fast.hip",
+    "hip/vit_stream.inc",
+    "hip/c512_qkv_attention_compact.inc",
+    "hip/build-modules.ps1"
+  ],
+  "artifacts": {
+    "re9-presr-source.tar.gz": {
+      "bytes": 44257966,
+      "sha256": "3bcfa93db081f139b39170ed2d9c23da35b34759fbfb5e5593c709da971c829c"
+    },
+    "config045.zip": {
+      "bytes": 148322,
+      "sha256": "714c90db914f564cbf5db8241cd85282e16ed19ea4c896cb75daae0a4a0a5ace"
+    },
+    "source045.zip": {
+      "bytes": 129609,
+      "sha256": "aae9adb451021730bb457cf719cccb913d403cce9ca090cf52f52c43293820ae"
+    }
+  },
+  "docfix_identity": "docfix-source-identity.json"
+}
