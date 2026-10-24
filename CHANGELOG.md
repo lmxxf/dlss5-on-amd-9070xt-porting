@@ -424,6 +424,8 @@ Same-size MODE1 switching also swaps the cached history heads of both models, up
 
 ## 0.45 · 2026-10-24
 
+Download: [Quark](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile mirror](https://gofile.io/d/hmrcTjuS) (three complete packages, 80 dual-architecture modules + 93 Small weight assets; names, full hashes and verification: [0.45 release receipt](Development/releases/0.45/README.md)).
+
 - **Defaults and output**: retains 0.44 Small 0.5x, its F9 hotfix, MODE/history policy and the F9 `0.5 → 1 → 2 → 3 → 0.5` cycle. These optimizations preserve the tested baseline output; this is not a new trained model or a claim of NVIDIA bit-exactness. Personal configuration overrides remain in effect.
 - **Compact byte paths**: enable previously missed Original 900/1088 and Small processing geometries (1600×1024, 1344×768, 1920×1088). Small's newly admitted shapes eliminate eight ViT input-pack launches and save 120 MiB of active packed weights per shape. A regular Small 1080-tier request still processes 1920×1152; a 1920×1072 free input exercises Small processing 1920×1088.
 - **ViT V layout and C512 packing**: paired producer/consumer V fragments use head-major storage; the admitted Small and adaptive-reuse paths retain the same reuse gates. C512 uses paired FP8 conversion while keeping multiplication rounding, signed-zero handling and serial normalization order.

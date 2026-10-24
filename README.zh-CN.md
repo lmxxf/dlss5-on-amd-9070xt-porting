@@ -16,7 +16,7 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 | **Magpie**（便携） | 任何游戏，不需要游戏支持超分 | Magpie 抓游戏窗口；网络接在效果组的 FSR3_SR 一项里，之后 FSR4 放大到全屏（可选 XeSS 帧生成） |
 | **OptiScaler-REFramework**（只给 RE9） | 《生化危机 9》，常规路线切不开它的命令提交 | TheAutomatic 改的 OptiScaler 宿主 + 我们的 `LmxxfNrRuntime.dll`（成对使用，别和常规包混装） |
 
-**当前版本：0.45（2026-10-24）。** 保持 Small 0.5x 默认、MODE/AE 和 F9 语义，补齐紧凑字节路径，改进 V 片段布局与 C512 成对打包；Q/K 新布局仅在三个已验处理形状启用。[完整说明与验证范围](CHANGELOG.zh-CN.md#045--2026-10-24)。发行包校验与安装回执单独记录，旧 0.44 下载链接保留在下方历史表。
+**当前版本：0.45（2026-10-24）。** 下载：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS)（0.44 旧版：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP)）。保持 Small 0.5x 默认、MODE/AE 和 F9 语义，补齐紧凑字节路径，改进 V 片段布局与 C512 成对打包；Q/K 新布局仅在三个已验处理形状启用（**Small 0.5x 单帧耗时：1080 档 `5.487 ms`、900 档 `4.245 ms`、720 档 `2.990 ms`；Original 1x：900 档 `6.408 ms`、1088 档 `8.794 ms`**）。[完整说明与验证范围](CHANGELOG.zh-CN.md#045--2026-10-24)。
 
 **📖 使用与调参必看：[使用与参数配置完整说明（选包、custom-config.txt 写哪、F6～F9 热键、全部参数与抄作业配方）](使用与参数配置说明.md)**（底层全量字典见 [scripts/CONFIGURATION.zh-CN.md](scripts/CONFIGURATION.zh-CN.md)）。
 
@@ -260,7 +260,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy_fast.ps1 -Source <lab> -
 | 0.42 · [夸克](https://pan.quark.cn/s/316704620069) · [Gofile 镜像](https://gofile.io/d/HNE20Ocp) | 10-13 | 默认MODE0/1x/SKIN0；已采纳数据流、可选时序接口及狭域分配节省（省216MiB权重+33.75MiB无history缓冲），80模块；单帧耗时 1080 档约 9.65 ms。[完整说明](CHANGELOG.zh-CN.md)。 |
 | 0.43 · [夸克](https://pan.quark.cn/s/3b19c0403e3f) · [Gofile 镜像](https://gofile.io/d/hz5cDOPF) | 10-17 | W16权重访问、跨核1B E4M3字节直连（消除全部8次`vit_pack_input`）、上下采样W16 FP8与MODE2/3资源环优化；已验固定配置逐位一致，80模块；**单帧耗时 1080 档 9.12 ms（最佳单槽 8.96 ms）、900 档 6.54 ms**。[完整说明](CHANGELOG.zh-CN.md)。 |
 | 0.44 · [夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP) | 10-18 | **默认改为 `310.9.16.0` 的 31 块 Small 模型（`0.5x`）**：**单帧耗时 1080 档 5.554 ms（−39.35%）、900 档 4.377 ms（−33.26%）**，常驻权重 147.6 MiB；接通 1080/900/720/free 几何、8 块 ViT AE 复用与 MODE1 时序（`0x3A23`）；F9 按 `0.5 → 1 → 2 → 3 → 0.5` 循环（含 `4764e4f1` 热修：同尺寸零 IO 切换、双模型权重常驻、RE9/鬼武者只读虚拟盘 F9 内存即时切换）。[完整说明](CHANGELOG.zh-CN.md)。 |
-| 0.45 | 10-24 | 紧凑字节路径、V 片段布局、C512 成对 FP8；Q/K 限定 Original900、Small900/1080。保持 0.5x 默认和 MODE/F9，负候选不入包。[说明](CHANGELOG.zh-CN.md)。 |
+| 0.45 · [夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS) | 10-24 | 紧凑字节路径（Small 900/720/free1088 各省 120MiB 活动权重与 8 次输入打包）、ViT V 片段 16B 连续布局、C512 成对 FP8 打包；Q/K 限定 Original900、Small900/1080（**Small 0.5x 单帧耗时：1080 档 5.487 ms、900 档 4.245 ms、720 档 2.990 ms**）。保持 0.5x 默认和 MODE/F9，负候选不入包。[说明](CHANGELOG.zh-CN.md)。 |
 
 
 ## 权重

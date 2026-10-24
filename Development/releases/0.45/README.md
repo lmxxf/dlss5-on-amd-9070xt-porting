@@ -1,6 +1,6 @@
 # 0.45 正式发行回执（2026-10-24）
 
-**已完成安装与三包交付。** 输出目录 `D:\給網友打包`；三个ZIP及同名`.zip.sha256`均已生成，旧0.44完整ZIP保留于history且原SHA不变。
+**已完成安装与三包交付。** 公开镜像：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile](https://gofile.io/d/hmrcTjuS)。本地输出目录 `D:\給網友打包`；三个ZIP及同名`.zip.sha256`均已生成，旧0.44完整ZIP保留于history且原SHA不变。
 
 |文件|字节数|SHA256|
 |---|---:|---|

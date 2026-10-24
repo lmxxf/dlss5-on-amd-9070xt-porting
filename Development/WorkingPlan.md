@@ -1,17 +1,17 @@
 # 当前工作计划（WorkingPlan）
 
-更新：2026-10-18（0.44 F9最终热修4764e4f1：剑星/鬼武者已重装并经Zero实玩确认F9切换正常；严格空闲回归、三包校验与公开镜像 [夸克](https://pan.quark.cn/s/ea87c0ffd257) / [Gofile](https://gofile.io/d/YCNT57JP) 全部闭环）。
+更新：2026-10-24（v0.45 毕业收官版：第一至第六阶段无损优化落地，剑星/鬼武者已装机校验通过，三包及公开镜像 [夸克](https://pan.quark.cn/s/0ccb3eff675b) / [Gofile](https://gofile.io/d/hmrcTjuS) 全部闭环）。
 
 ---
 
 ## 1. 当前基线与本机状态
 
-### 1.1 当前发行与安装（0.44，2026-10-18，公开三包已交付）
+### 1.1 当前发行与安装（0.45，2026-10-24，公开三包已交付）
 
-- 正式三包在 `D:\給網友打包`，附SHA256；每包44shader/80模块/93Small资产/ZIP全文件读回，RE9 smoke通过。[发行回执](releases/0.44/README.md)。
-- **0.44 公开镜像**：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile](https://gofile.io/d/YCNT57JP)（0.43 旧镜像 [夸克](https://pan.quark.cn/s/3b19c0403e3f) / [Gofile](https://gofile.io/d/hz5cDOPF) 保留）。
-- 双游戏已装F9最终4764e4f1载荷，三层MP0.5，F9循环；《剑星》MODE0、《鬼武者》MODE1保留，Zero 实玩确认《剑星》与《鬼武者》内按 F9 切换均正常生效。备份 `D:\DLSSNR-Lab\game-install-20261018-f9fix-r3\backup-20261018-102323` 与rollback齐备，安装smoke exit0。[安装回执](results/game-install-20261018-f9fix-r3/receipt.json)。
-- 当前Small单帧：1080 **5.554ms** / 900 **4.377ms**；原71块仍可F9选择1x/2x/3x。
+- 正式三包在 `D:\給網友打包`，附SHA256；每包44shader/80模块/93Small资产/ZIP全文件读回，RE9 smoke通过。[发行回执](releases/0.45/README.md)。
+- **0.45 公开镜像**：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile](https://gofile.io/d/hmrcTjuS)（0.44 旧镜像 [夸克](https://pan.quark.cn/s/ea87c0ffd257) / [Gofile](https://gofile.io/d/YCNT57JP) 与 0.43 旧镜像 [夸克](https://pan.quark.cn/s/3b19c0403e3f) / [Gofile](https://gofile.io/d/hz5cDOPF) 保留）。
+- 双游戏已装 0.45 最终载荷（16份受保护配置记录逐字节保持，鬼武者 root 与 `_storage_` 两路 smoke exit0，备份与回滚脚本在 `D:\DLSSNR-Lab\game-install-20261024\rollback.ps1`）。[安装回执](results/game-install-20261024/README.md)。
+- 当前 Small 0.5x 单帧：1080 **5.487ms** / free1088 **5.317ms** / 900 **4.245ms** / 720 **2.990ms**；Original 1x 单帧：1152 **9.092ms** / 1088 **8.794ms**（纯NN **8.306ms**）/ 900 **6.408ms**。原71块仍可F9选择1x/2x/3x。
 
 ### 1.1a 历史发行包基线（0.43，2026-10-17，公开三包已交付）
 - 载荷源码 `10982cf4`；复用已验宿主/双架构80模块，不重跑模块编译或ABBA。
@@ -279,4 +279,4 @@ D:\給網友打包三个0.45完整ZIP及.sha256已生成。每包44 shader编译
 - OptiScaler-DLSS5-AMD-0.45.zip：522098432B，SHA256 `96c12292cb11c8b7da026c012166745e0ca330f86d9ff16267a55163d9c367c5`。
 - OptiScaler-REFramework-DLSS5-AMD-0.45.zip：533387409B，SHA256 `a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604`。
 
-回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。
+回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。用户已提供 0.45 公开下载入口：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile](https://gofile.io/d/hmrcTjuS)。

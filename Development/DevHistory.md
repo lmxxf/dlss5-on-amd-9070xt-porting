@@ -816,4 +816,4 @@ D:\給網友打包三个0.45完整ZIP及.sha256已生成。每包44 shader编译
 - OptiScaler-DLSS5-AMD-0.45.zip：522098432B，SHA256 `96c12292cb11c8b7da026c012166745e0ca330f86d9ff16267a55163d9c367c5`。
 - OptiScaler-REFramework-DLSS5-AMD-0.45.zip：533387409B，SHA256 `a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604`。
 
-回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。
+回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。用户已提供 0.45 公开下载入口：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile](https://gofile.io/d/hmrcTjuS)，README/CHANGELOG/releases/WorkingPlan已同步更新。
