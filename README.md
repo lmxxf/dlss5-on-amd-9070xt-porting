@@ -4,6 +4,8 @@ DLSS 5 (DLSSNR) on AMD RX 9070 XT / RDNA 4.
 
 [Simplified Chinese](README.zh-CN.md)
 
+> 🔗 **Sister project for NVIDIA GeForce RTX 30 series (`sm_86` Ampere): [DLSS5-RTX-3080-laptop](https://github.com/lmxxf/DLSS5-RTX-3080-laptop)** — ports the 31-block DLSS 5 Small (`310.9.16.0`) neural renderer to RTX 3060–3090 Ti & Laptop GPUs (both full-rate `O4` PTX binary patching and a standalone Ampere CUDA engine; 720p `14.1–15.8 ms`, 900p `23.5–24.5 ms`, 1080p `31.3–32.0 ms`, with ready-to-use OptiScaler, REFramework, and Magpie packages).
+
 A from-scratch re-implementation of NVIDIA's DLSS 5 neural renderer ("DLSSNR", the 71-block Swin/ViT network shipped in
 `nvngx_dlssnr.dll`) for AMD RDNA 4. The network was reverse-engineered block by block and now runs as 40 HIP modules per
 architecture (gfx1201 = RX 9070 series, gfx1200 = RX 9060 series) on the HIP 7 runtime that ships with the AMD driver. The

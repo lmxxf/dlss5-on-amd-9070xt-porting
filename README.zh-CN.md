@@ -4,6 +4,8 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 
 [English](README.md)
 
+> 🔗 **NVIDIA RTX 30 系显卡（`sm_86` 安培架构）姊妹项目：[DLSS5-RTX-3080-laptop](https://github.com/lmxxf/DLSS5-RTX-3080-laptop)** —— 将最新 `310.9.16.0` 的 31 块 DLSS 5 轻量新模型（Small `0.5x`）移植至 RTX 3060～3090 Ti 及笔记本端显卡（同时包含满血 `O4` PTX 原位二进制改写与独立 Ampere CUDA 推理引擎两条路线；RTX 3080 Laptop 实测 720p `14.1～15.8 ms`、900p `23.5～24.5 ms`、1080p `31.3～32.0 ms`，提供常规 OptiScaler、REFramework 与 Magpie 三套开箱即用发布包）。
+
 把 NVIDIA DLSS 5 的神经渲染器（`nvngx_dlssnr.dll` 里那张 71 块的 Swin/ViT 网络，"DLSSNR"）从零重做到 AMD RDNA 4 上。网络逐块逆向后，
 现在以每架构 40 个 HIP 模块的形式运行（gfx1201 = RX 9070 系，gfx1200 = RX 9060 系），跑在 AMD 驱动自带的 HIP 7 运行时上。权重是 NVIDIA 的，
 从用户自己那份 DLL 里提取；本仓库不分发任何 NVIDIA 的东西。
