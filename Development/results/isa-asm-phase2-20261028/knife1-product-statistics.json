@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.680863749999999,
+      "candidate_ms": 8.693148124999999,
+      "delta_ms": 0.012284375000000125,
+      "delta_percent": 0.14151097579431227,
+      "baseline_p99": 8.866927,
+      "candidate_p99": 8.884851999999999,
+      "p99_delta_ms": 0.017924999999998192,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.6722365625,
+          "candidate": 8.6831703125,
+          "delta_ms": 0.01093374999999952,
+          "p99_delta_ms": -0.008483000000000018,
+          "base_drift": 0.027563125000000355
+        },
+        {
+          "round": 2,
+          "base": 8.7011809375,
+          "candidate": 8.704594375,
+          "delta_ms": 0.003413437499999006,
+          "p99_delta_ms": 0.01706000000000074,
+          "base_drift": 0.007935625000001778
+        },
+        {
+          "round": 3,
+          "base": 8.66917375,
+          "candidate": 8.691679687500002,
+          "delta_ms": 0.02250593750000185,
+          "p99_delta_ms": 0.03326900000000066,
+          "base_drift": 0.01716500000000032
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "product-perf-original1088-r1-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r1-0-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.658455,
+      "p99": 8.850415,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r1-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r1-1-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.673316875000001,
+      "p99": 8.850664,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r1-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r1-2-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.693023749999998,
+      "p99": 8.878834,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r1-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r1-3-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.686018125,
+      "p99": 8.91015,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r2-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r2-0-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.697213125,
+      "p99": 8.873733,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r2-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r2-1-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.703565625,
+      "p99": 8.897742000000001,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r2-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r2-2-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.705623124999999,
+      "p99": 8.899166,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r2-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r2-3-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.705148750000001,
+      "p99": 8.88282,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r3-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r3-0-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.66059125,
+      "p99": 8.816837999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r3-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r3-1-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.683723750000002,
+      "p99": 8.843551,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r3-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r3-2-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.699635625,
+      "p99": 8.865932,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "product-perf-original1088-r3-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/product-perf-original1088-r3-3-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.67775625,
+      "p99": 8.83452,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    }
+  ]
+}

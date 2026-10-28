@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.656427395833333,
+      "candidate_ms": 8.650516145833334,
+      "delta_ms": -0.005911249999998702,
+      "delta_percent": -0.0682874092243213,
+      "baseline_p99": 8.789938,
+      "candidate_p99": 8.782115,
+      "p99_delta_ms": -0.007823000000000135,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.6229709375,
+          "candidate": 8.6201246875,
+          "delta_ms": -0.002846249999999273,
+          "p99_delta_ms": -0.04821699999999929,
+          "base_drift": 0.03878062499999935
+        },
+        {
+          "round": 2,
+          "base": 8.661185624999998,
+          "candidate": 8.6573159375,
+          "delta_ms": -0.0038696874999981645,
+          "p99_delta_ms": 0.005392999999999759,
+          "base_drift": 0.023976250000000476
+        },
+        {
+          "round": 3,
+          "base": 8.685125625,
+          "candidate": 8.6741078125,
+          "delta_ms": -0.01101781249999867,
+          "p99_delta_ms": -0.03841099999999997,
+          "base_drift": 0.008857500000001295
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "final-perf-original1088-r1-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r1-0-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.603580625000001,
+      "p99": 8.756269,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r1-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r1-1-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.614188125,
+      "p99": 8.754619,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r1-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r1-2-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.626061250000001,
+      "p99": 8.738384,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r1-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r1-3-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.64236125,
+      "p99": 8.794211,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r2-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r2-0-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.6491975,
+      "p99": 8.754827,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r2-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r2-1-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.648037500000001,
+      "p99": 8.767955,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r2-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r2-2-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.666594374999999,
+      "p99": 8.781518,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r2-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r2-3-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.67317375,
+      "p99": 8.777133000000001,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r3-0-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r3-0-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.680696874999999,
+      "p99": 8.793871,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r3-1-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r3-1-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.668339374999999,
+      "p99": 8.798474,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r3-2-candidate",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r3-2-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.67987625,
+      "p99": 8.787613,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "final-perf-original1088-r3-3-baseline",
+      "source_path": "Development/results/isa-asm-phase2-20261028/knife1/evidence/final-perf-original1088-r3-3-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.689554375,
+      "p99": 8.884499,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    }
+  ]
+}

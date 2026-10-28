@@ -1,0 +1,33 @@
+{
+  "name": "phase2-scoped-vfrag-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\scoped.hip",
+      "sha256": "6282d77771ee2101af26340710f4afd625d10093ca48b077c1f04597913ab01f"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-scoped-final-gfx1201",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\scoped.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-scoped-final-gfx1200",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\scoped.hip\" comgr gfx1200"
+    }
+  ]
+}

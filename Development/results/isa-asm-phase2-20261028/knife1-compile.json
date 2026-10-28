@@ -1,0 +1,37 @@
+{
+  "name": "phase2-v-transpose-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\baseline.hip",
+      "sha256": "2ba3e753c65cd124e2b28b35c248d8f19424d77d7d6c91c8f4c31efb0009a72e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\candidate.hip",
+      "sha256": "e071e6a802f25fd60dcd31c7757b42fbc83330c094ea041c33e872dc77748cda"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\baseline.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\candidate.hip\" comgr gfx1201"
+    }
+  ]
+}

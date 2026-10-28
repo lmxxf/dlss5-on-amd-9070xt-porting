@@ -1,0 +1,11 @@
+{
+  "elements": 2048,
+  "writes": 2048,
+  "reads": 2048,
+  "missing": 0,
+  "overlapping_writes": 0,
+  "old_V_operand_index_vs_new_fragment": 0,
+  "QK_bytes_unchanged": 4096,
+  "LDS_bytes_unchanged": 6144,
+  "scope": "logical V element identity; numeric WMMA/rounding verified separately by GPU Gold"
+}
