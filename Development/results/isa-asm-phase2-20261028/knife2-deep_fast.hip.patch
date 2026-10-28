@@ -1,0 +1,78 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -1,3 +1,6 @@
++#ifndef VIT_ORTHO_MASK
++#define VIT_ORTHO_MASK 0
++#endif
+ #ifndef VIT_CONTRACT_OCC_LDS
+ #define VIT_CONTRACT_OCC_LDS 0 /* bytes of dummy LDS on vit_contract_blocked_body (occupancy cap) */
+ #endif
+@@ -627,6 +630,11 @@
+ DEV unsigned char byte_F(float x){return static_cast<unsigned char>(__builtin_amdgcn_cvt_pk_fp8_f32(F(x),0.f,0,false));}
+ #endif
+ 
++DEV i2 ortho_pack8(f8 v){
++ _Pragma("unroll 8") for(uint e=0;e<8;e++)v[e]=__builtin_amdgcn_fmed3f(v[e]+0.f,-448.f,448.f);
++ i2 r;r[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[0],v[1],0,false);r[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[2],v[3],r[0],true);r[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[4],v[5],0,false);r[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[6],v[7],r[1],true);return r;
++}
++DEV f8 ortho_unpack8(i2 v){return f8{__builtin_amdgcn_cvt_f32_fp8(v[0],0),__builtin_amdgcn_cvt_f32_fp8(v[0],1),__builtin_amdgcn_cvt_f32_fp8(v[0],2),__builtin_amdgcn_cvt_f32_fp8(v[0],3),__builtin_amdgcn_cvt_f32_fp8(v[1],0),__builtin_amdgcn_cvt_f32_fp8(v[1],1),__builtin_amdgcn_cvt_f32_fp8(v[1],2),__builtin_amdgcn_cvt_f32_fp8(v[1],3)};}
+ WAVE void vit_expand_fp8(const float*in,const float*w,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;uint first=bid()/(outputs/16)*16,row=bid()%(outputs/16)*16;if(first>=tokens)return;f8 a{};a=dot8(in,w,first,row,inputs,0,inputs,a);for(uint e=0;e<8;e++){float v=a[e],g=clampf(v,-4.f,4.f),poly=__builtin_fmaf(g,__builtin_fmaf(absf(g),-.055908203125f,.447265625f),.89453125f);reinterpret_cast<unsigned char*>(out)[(first+gr()*8+e)*outputs+row+rc()]=byte_F(v*poly);}}
+ 
+ WAVE void vit_project_fp8(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;uint first=bid()/(outputs/16)*16,row=bid()%(outputs/16)*16;if(first>=tokens)return;f8 total{};
+@@ -731,6 +739,26 @@
+  for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){float v=accum[n][e],g=clampf(v,-4.f,4.f),poly=__builtin_fmaf(g,__builtin_fmaf(absf(g),-.055908203125f,.447265625f),.89453125f);reinterpret_cast<unsigned char*>(out)[(first+gr()*8+e)*outputs+col+n*16+rc()]=byte_F(v*poly);}
+  #endif
+ }
++DEV void vit_expand_ortho_w16(const float*in,const float*w,float*out,uint tokens){
++ constexpr uint inputs=1024,outputs=4096;
++ uint tiles=outputs/64,first=bid()/tiles*16,col=bid()%tiles*64;if(first>=tokens)return;
++ const uint*p=reinterpret_cast<const uint*>(in);f8 accum[4]{};
++ _Pragma("unroll 2")
++ for(uint k=0;k<inputs;k+=32){
++  uint off0=((first+rc())*inputs+k+gr()*8)/4;
++  i2 a0={int(p[off0]),int(p[off0+1])},a1={int(p[off0+4]),int(p[off0+5])};
++  _Pragma("unroll")
++  for(uint n=0;n<4;n++){uint row=col+n*16+rc();w16_i4 bw=vit_weight_fragment_native_w16(w,row,inputs,k);
++   i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
++   accum[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b0,a0,accum[n]);
++   accum[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b1,a1,accum[n]);}
++ }
++ _Pragma("unroll") for(uint n=0;n<4;n++){
++  f8 v;_Pragma("unroll") for(uint e=0;e<8;e++){float x=accum[n][e],g=clampf(x,-4.f,4.f),poly=__builtin_fmaf(g,__builtin_fmaf(absf(g),-.055908203125f,.447265625f),.89453125f);v[e]=x*poly;}
++  i2 packed=ortho_pack8(v);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+(first+rc())*4096+col+n*16+gr()*8,8),&packed,8);
++ }
++}
++
+ 
+ // BM token tiles per wave (host option vit_expand_m4, HLSL BLOCK_M=4 shape): every weight fragment load serves BM
+ // token tiles. Each accumulator keeps its own K-ascending order with the same a/b operands as the single-tile body, so
+@@ -807,6 +835,20 @@
+  }
+  if constexpr(!Partial)for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){uint i=(first+gr()*8+e)*1024+col+n*16+rc();if constexpr(ByteFOut)reinterpret_cast<unsigned char*>(out)[i]=vit_contract_F_byte(VIT_FAST_H(total[n][e]));else if constexpr(HalfOut)reinterpret_cast<_Float16*>(out)[i]=(_Float16)F(VIT_FAST_H(total[n][e]));else if constexpr(ByteStream)reinterpret_cast<unsigned char*>(out)[i]=byte_F(H(total[n][e]));else out[i]=F(H(total[n][e]));}
+ }
++DEV void vit_contract_ortho_w16(const float*in,const float*w,const float*skip,float*out,uint tokens){
++#if VIT_CONTRACT_OCC_LDS
++ __attribute__((shared)) volatile uint occ_pad[VIT_CONTRACT_OCC_LDS/4];
++ if(tokens==0xffffffffu){uint lane=__builtin_amdgcn_workitem_id_x();uint i=(bid()*131u+lane)%(VIT_CONTRACT_OCC_LDS/4);occ_pad[i]=i;__builtin_amdgcn_s_barrier();if(occ_pad[(i+1)%(VIT_CONTRACT_OCC_LDS/4)]==5u)out[0]=0.f;}
++#endif
++ uint first=bid()/16*16,col=bid()%16*64;if(first>=tokens)return;const uint*ip=reinterpret_cast<const uint*>(in);f8 total[4]{};
++ _Pragma("unroll") for(uint n=0;n<4;n++){uint c0=col+n*16+gr()*8;i2 sb;__builtin_memcpy(&sb,__builtin_assume_aligned(reinterpret_cast<const unsigned char*>(skip)+(first+rc())*1024+c0,8),8);f8 sv=ortho_unpack8(sb),wv;__builtin_memcpy(&wv,__builtin_assume_aligned(w+1048576+c0,16),32);_Pragma("unroll") for(uint e=0;e<8;e++)total[n][e]=VIT_FAST_H(sv[e]*wv[e]);}
++ _Pragma("clang loop unroll(disable)") for(uint part=0;part<4;part++){f8 acc[4]{};
++  _Pragma("unroll 2") for(uint k=part*1024;k<(part+1)*1024;k+=32){uint off=((first+rc())*4096+k+gr()*8)/4;i2 a0={int(ip[off]),int(ip[off+1])},a1={int(ip[off+4]),int(ip[off+5])};
++   _Pragma("unroll") for(uint n=0;n<4;n++){uint row=col+n*16+rc();w16_i4 bw=vit_weight_fragment_native_w16(w,row,4096,k);i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b0,a0,acc[n]);acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b1,a1,acc[n]);}}
++  _Pragma("unroll") for(uint n=0;n<4;n++)for(uint e=0;e<8;e++)total[n][e]+=acc[n][e];
++ }
++ _Pragma("unroll") for(uint n=0;n<4;n++){f8 v;_Pragma("unroll") for(uint e=0;e<8;e++)v[e]=VIT_FAST_H(total[n][e]);i2 packed=ortho_pack8(v);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+(first+rc())*1024+col+n*16+gr()*8,8),&packed,8);}
++}
+ // Fragment-weight twin (host option vit_contract_frag): B from the FragmentPackedMatrix tiles (one contiguous 8-byte load) as the frag expand does.
+ WAVE void vit_contract_blocked_fp8_frag(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,false,false,true>(in,w,skip,out,tokens);}
+ WAVE void vit_contract_blocked_fp8_bstream(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,true>(in,w,skip,out,tokens);}
+@@ -856,7 +898,7 @@
+ // Fixed model dimensions expose the K-loop schedule; retain the generic ABI fallback.
+ WAVE void vit_expand_blocked_fp8_frag_bytein(const float*in,const float*w,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==1024&&outputs==4096)vit_expand_blocked_body<true,true,true>(in,w,out,tokens,1024,4096);else vit_expand_blocked_body<true,true,true>(in,w,out,tokens,inputs,outputs);}
+ // Wide fragment layout (FragmentPackedMatrixW16): one 16-byte load per 32-k B fragment pair.
+-WAVE void vit_expand_blocked_fp8_frag_bytein_w16(const float*in,const float*w,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==1024&&outputs==4096)vit_expand_blocked_body_w16(in,w,out,tokens);}
++WAVE void vit_expand_blocked_fp8_frag_bytein_w16(const float*in,const float*w,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==1024&&outputs==4096)if(VIT_ORTHO_MASK&1)vit_expand_ortho_w16(in,w,out,tokens);else vit_expand_blocked_body_w16(in,w,out,tokens);}
+ // Tile-layout input (vit_pack_input_tiled) + fragment-native weights: both operands are contiguous 8-byte lane loads.
+ WAVE void vit_expand_blocked_fp8_frag_tiledin(const float*in,const float*w,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;vit_expand_blocked_body<true,true,true,true>(in,w,out,tokens,inputs,outputs);}
+ 

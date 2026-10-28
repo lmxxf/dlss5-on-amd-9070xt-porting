@@ -2757,3 +2757,7 @@ W2_FFN_QT_SMALL_MASK当前已3，补W2_FFN_W16_SMALL=3新增C64/C128 W16导出�
 ## 2026-10-29 ISA Phase2 刀1 C512 V-fragment STOP
 
 WMMA V操作数对调+天然片段LDS，64ds_load_u8消除、VGPR188→187、0spill、七档Gold同。初次仅Original1088稳定−4.978µs，资格隔离后最终真实产品before/after3ABBA反而mean+12.284µs（三轮全退）/p99+17.925µs，STOP不合生产。保所有中间正/负结果，不刷轮。详results/isa-asm-phase2-20261028/knife1-README.md。
+
+## 2026-10-29 ISA Phase2 刀2 ViT正交转置 STOP
+
+contract/project零额外LDS、u8/b8已清零，但分别113/115VGPR，超112硬门；一次短pack生命周期变体仍相同，资源门STOP未上GPU。expand77VGPR/0LDS/0spill、490→407条、32b8→4b64，七档Gold同，但四档3ABBA不稳定：Orig1088 mean+5.527µs/p99+32.674µs（3mean全退），Small900+2.474µs（3mean全退），Small1080 pooled虽正R2反例明显。全部STOP，不进生产。详results/isa-asm-phase2-20261028/knife2-README.md。

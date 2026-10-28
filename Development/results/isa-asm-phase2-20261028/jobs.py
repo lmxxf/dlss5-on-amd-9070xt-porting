@@ -1,7 +1,7 @@
 from pathlib import Path
 import json,copy,hashlib
 P=Path(__file__).parent;R=P.parents[2];remote=r'D:\DLSSNR-Lab\isa-asm-phase2-20261028';base=json.loads((P.parent/'backfeed-20261028/final-default.json').read_text())
-for role,module,local in [('knife1','c512-m32-mh',P/'work/candidate.hsaco')]:
+for role,module,local in [('knife2','deep_fast-packed-fast',P/'work/knife2-expand.hsaco')]:
  files=list(base['files']);jobs=[]
  for f in base['files']:
   if 'gap-phase6-20261023\\knife1\\modules\\' in f['path']:

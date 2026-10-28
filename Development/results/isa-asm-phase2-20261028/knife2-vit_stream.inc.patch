@@ -1,0 +1,28 @@
+--- a/hip/vit_stream.inc
++++ b/hip/vit_stream.inc
+@@ -384,7 +384,17 @@
+ WAVE void vit_stream_contract_frag_bout_compactw(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,false,false,true,true,1048576>(in,w,skip,out,tokens);}
+ WAVE void vit_stream_contract_frag_bout_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,false,false,true,true,1048576,true>(in,w,skip,out,tokens);}
+ WAVE void vit_stream_contract_frag_bstream_bout_compactw(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,true,false,true,true,1048576>(in,w,skip,out,tokens);}
+-WAVE void vit_stream_contract_frag_bstream_bout_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024)vit_contract_blocked_body<false,false,true,false,true,true,1048576,true>(in,w,skip,out,tokens);}
++DEV void vit_project_ortho_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;
++ uint first=bid()/16*16,row=bid()%16*64;if(first>=tokens)return;f8 total[4]{};const unsigned char*wf=reinterpret_cast<const unsigned char*>(w);
++ _Pragma("unroll") for(uint j=0;j<4;j++){uint c0=row+j*16+gr()*8;i2 sb;__builtin_memcpy(&sb,__builtin_assume_aligned(reinterpret_cast<const unsigned char*>(skip)+(first+rc())*1024+c0,8),8);f8 sv=ortho_unpack8(sb),wv;__builtin_memcpy(&wv,__builtin_assume_aligned(w+262144+c0,16),32);_Pragma("unroll") for(uint e=0;e<8;e++)total[j][e]=VIT_FAST_H(sv[e]*wv[e]);}
++ _Pragma("clang loop unroll(disable)") for(uint p=0;p<4;p++){f8 acc[4]{};
++  _Pragma("unroll 2") for(uint k=p*256;k<(p+1)*256;k+=32){i2 x0,x1;__builtin_memcpy(&x0,reinterpret_cast<const unsigned char*>(in)+(first+rc())*1024+k+gr()*8,8);__builtin_memcpy(&x1,reinterpret_cast<const unsigned char*>(in)+(first+rc())*1024+k+16+gr()*8,8);
++   _Pragma("unroll") for(uint j=0;j<4;j++){uint r0=row+j*16;w16_i4 yw;__builtin_memcpy(&yw,wf+((r0/16)*32+k/32)*512+(gr()*16+rc())*16,16);i2 y0={yw[0],yw[1]},y1={yw[2],yw[3]};acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y0,x0,acc[j]);acc[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(y1,x1,acc[j]);}}
++  _Pragma("unroll") for(uint j=0;j<4;j++)for(uint e=0;e<8;e++)total[j][e]+=acc[j][e];
++ }
++ _Pragma("unroll") for(uint j=0;j<4;j++){f8 v;_Pragma("unroll") for(uint e=0;e<8;e++)v[e]=VIT_FAST_H(total[j][e]);i2 packed=ortho_pack8(v);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+(first+rc())*1024+row+j*16+gr()*8,8),&packed,8);}
++}
++WAVE void vit_stream_contract_frag_bstream_bout_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(reuse_gate&&reuse_gate[0])return;if(inputs==4096&&outputs==1024){if(VIT_ORTHO_MASK&2)vit_contract_ortho_w16(in,w,skip,out,tokens);else vit_contract_blocked_body<false,false,true,false,true,true,1048576,true>(in,w,skip,out,tokens);}}
+ #endif
+ 
+ 
+@@ -392,5 +402,5 @@
+ WAVE void vit_stream_project_n64_bb_compactw(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){vit_stream_project_tiles<1,4,true,false,true,262144>(in,w,skip,out,tokens,reuse_gate);}
+ WAVE void vit_stream_project_n64_bb_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){vit_stream_project_tiles<1,4,true,false,true,262144,true>(in,w,skip,out,tokens,reuse_gate);}
+ WAVE void vit_stream_project_n64_bb_bout_compactw(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){vit_stream_project_tiles<1,4,true,false,true,262144,false,true>(in,w,skip,out,tokens,reuse_gate);}
+-WAVE void vit_stream_project_n64_bb_bout_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){vit_stream_project_tiles<1,4,true,false,true,262144,true,true>(in,w,skip,out,tokens,reuse_gate);}
++WAVE void vit_stream_project_n64_bb_bout_compactw_w16(const float*in,const float*w,const float*skip,float*out,uint tokens,uint inputs,uint outputs,const uint*reuse_gate){if(VIT_ORTHO_MASK&4)vit_project_ortho_w16(in,w,skip,out,tokens,reuse_gate);else vit_stream_project_tiles<1,4,true,false,true,262144,true,true>(in,w,skip,out,tokens,reuse_gate);}
+ #endif

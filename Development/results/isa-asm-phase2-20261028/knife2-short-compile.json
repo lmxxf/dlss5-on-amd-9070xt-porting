@@ -1,0 +1,37 @@
+{
+  "name": "phase2-pair-lifetime-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-contract-short.hip",
+      "sha256": "c219e6dcf6b1ba31a7004987d6e5f413d0f5eda757f00e453d3a19888215ed8e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-project-short.hip",
+      "sha256": "26af49d9b8e6875989646602846d6fcc7f58017232b2f259aa420dced4d07c96"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife2/compile-contract-short",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-contract-short.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife2/compile-project-short",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-project-short.hip\" comgr gfx1201"
+    }
+  ]
+}

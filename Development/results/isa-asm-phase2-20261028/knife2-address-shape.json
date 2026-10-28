@@ -1,0 +1,55 @@
+{
+  "scope": "logical lane byte-address/block-incidence model only; NOT measured cache transactions or hardware line-size claim",
+  "tiles": {
+    "1024": {
+      "old_instructions": 32,
+      "new_instructions": 4,
+      "bytes": 1024,
+      "block_model": {
+        "32": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 32,
+          "new_unique_blocks": 32
+        },
+        "64": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 16,
+          "new_unique_blocks": 16
+        },
+        "128": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 16,
+          "new_unique_blocks": 16
+        }
+      }
+    },
+    "4096": {
+      "old_instructions": 32,
+      "new_instructions": 4,
+      "bytes": 1024,
+      "block_model": {
+        "32": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 32,
+          "new_unique_blocks": 32
+        },
+        "64": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 16,
+          "new_unique_blocks": 16
+        },
+        "128": {
+          "old_per_instruction_block_incidence": 64,
+          "new_per_instruction_block_incidence": 64,
+          "old_unique_blocks": 16,
+          "new_unique_blocks": 16
+        }
+      }
+    }
+  }
+}

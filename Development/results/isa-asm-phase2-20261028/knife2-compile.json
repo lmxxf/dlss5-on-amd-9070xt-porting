@@ -1,0 +1,50 @@
+{
+  "name": "phase2-vit-orthogonal-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-expand.hip",
+      "sha256": "87df1b80e805eb5c5d07f14146b2c10494c794882cf2b6b53c0a279103eeba67"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-contract.hip",
+      "sha256": "d372c900b97f86f539cd58378f5841a6fb7ede10183568f8a58191d5ccd19671"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-project.hip",
+      "sha256": "6fb6ff2fb05e0702249d42396494e7103a521271fe05dc4db17a9b03a11c73b3"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife2/compile-expand",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-expand.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife2/compile-contract",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-contract.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife2/compile-project",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife2-project.hip\" comgr gfx1201"
+    }
+  ]
+}
