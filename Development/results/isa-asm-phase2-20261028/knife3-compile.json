@@ -1,0 +1,37 @@
+{
+  "name": "phase2-pool-split-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-pool.hip",
+      "sha256": "d1d687024e28824c4ea25e0cde1ab8b1b5dec00cd7591337fff22c2840236aa0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-split.hip",
+      "sha256": "e2bfa613420b74cfa4a774fb4e8b6c8c306f66a7f0511b206c59838a56a2ae5b"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife3/compile-pool",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\multihead-fast-padded-wave-packed.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-pool.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife3/compile-split",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-split.hip\" comgr gfx1201"
+    }
+  ]
+}

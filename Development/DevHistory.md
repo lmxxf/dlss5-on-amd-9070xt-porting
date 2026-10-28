@@ -833,3 +833,9 @@ Small900 C256全块融合采纳，87→83派发，三轮ABBA mean−87.598µs/p9
 基线b5875bfa。40模块1976导出完整拆分，六档新鲜派发覆盖56物理模块/函数对；完整.s不入Git。LLVM23 .hip→.s→cc1as(-real-true16)→lld闭环：64核代码/资源/完整metadata一致；真实C32 prefix shift→add等价.s修改后七档21帧loader/Gold通过，仅作闭环证明不进生产。C32/C64带DWARF行表重编201函数机器码/资源同，用内联调用链完成C32逐阶段构型统计。
 
 C128/C256峰值在FFN Expand/Contract共存阶段，静态live234/240而metadata242；屏障处并无242全活。三项独立候选各七档Gold逐位同、四档三轮ABBA共144slot：upwide解码组织无稳定收益；decoder尾循环禁止展开3612→2648条但无稳定净收益；FFN批宽4→2令C128242→180VGPR（occupancy估计5→8）、C256242→216（5→7），四档mean反退20.5/19.6/39.4/22.6µs。全部STOP，生产代码/模块/已装游戏/ZIP不变。真实.s修改证明不冒充提速。报告与源码diff/ISA/曲线/统计/身份回执见results/isa-asm-audit-20261028/README.md；实验大文件清理、锁释放，无push。
+
+### 2026-10-29 ISA Phase2 三刀闭环：均STOP
+
+刀1 57c6533e：C512 V天然片段转置64ds_u8→0、188→187VGPR，Gold通过；局部1088原型小正，资格隔离/缓存环境后的真实产品before-after最终mean+12.284µs/p99+17.925µs，STOP。刀2 33a4d791：contract/project113/115VGPR超112资源门；expand77不增、490→407条、32b8→4b64，Gold通过但四档性能不稳，STOP。刀3 pool/split独立：pool4b64、C64 90→89其余88、LDS不增；split100VGPR、LDS1024→0、u8及F32散写消除，均七档Gold同，分别4档3ABBA无稳定净收益，STOP。
+
+合计258帧Gold0diff/invalid0、216性能slot，实际模块路径/哈希/函数身份核验，原始分轮与中间反例保留。生产代码、双架构80模块与hip/SHA256SUMS复核未变，无新赢家需同步，未部署/改ZIP/push。报告与回执results/isa-asm-phase2-20261028。临时大文件清理、GPU锁释放，三刀已结题，无排队自动任务。

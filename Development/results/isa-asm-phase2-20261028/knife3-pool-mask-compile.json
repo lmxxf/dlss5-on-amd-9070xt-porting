@@ -1,0 +1,24 @@
+{
+  "name": "phase2-pool-eager-pack",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-pool-mask.hip",
+      "sha256": "a9aa8b37647b794e6757e9ba0fcf62c7e8db3722155fe580649601d81dd468ac"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife3/compile-pool-mask",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\multihead-fast-padded-wave-packed.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase2-20261028\\knife3-pool-mask.hip\" comgr gfx1201"
+    }
+  ]
+}

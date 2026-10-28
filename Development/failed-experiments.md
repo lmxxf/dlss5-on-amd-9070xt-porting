@@ -2761,3 +2761,7 @@ WMMA V操作数对调+天然片段LDS，64ds_load_u8消除、VGPR188→187、0sp
 ## 2026-10-29 ISA Phase2 刀2 ViT正交转置 STOP
 
 contract/project零额外LDS、u8/b8已清零，但分别113/115VGPR，超112硬门；一次短pack生命周期变体仍相同，资源门STOP未上GPU。expand77VGPR/0LDS/0spill、490→407条、32b8→4b64，七档Gold同，但四档3ABBA不稳定：Orig1088 mean+5.527µs/p99+32.674µs（3mean全退），Small900+2.474µs（3mean全退），Small1080 pooled虽正R2反例明显。全部STOP，不进生产。详results/isa-asm-phase2-20261028/knife2-README.md。
+
+## 2026-10-29 ISA Phase2 刀3 pool/split正交转置 STOP
+
+pool经打包后字掩码修正，6个out8核32b8→4b64，C64 VGPR90→89，其余88不变、LDS不增/0spill。split两核改Transposed+成对转换，VGPR100不变、LDS1024→0、u8及F32散写消除，旧_nof32保持代码/资源同。分别七档Gold同、各四档3ABBA完成。pool组合四档无稳定净收益；split Orig1088 mean+8.345µs/p99+12.989µs（3mean全退），Small1080三轮p99全退。均STOP，不叠加、不把opcode下降或某一pooled好值当产品收益。详results/isa-asm-phase2-20261028/README.md。

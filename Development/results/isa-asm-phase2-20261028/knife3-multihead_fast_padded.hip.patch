@@ -1,0 +1,36 @@
+--- a/hip/multihead_fast_padded.hip
++++ b/hip/multihead_fast_padded.hip
+@@ -1,3 +1,6 @@
++#ifndef MH_POOL_ORTHO
++#define MH_POOL_ORTHO 0
++#endif
+ #ifndef HIP_MH_SCALAR_DIAGONAL
+ #define HIP_MH_SCALAR_DIAGONAL 1
+ #endif
+@@ -407,6 +410,7 @@
+ // out[t][c] = in[raster(t)][ch(c)]), so the separate vit_gather launch disappears; values unchanged, only addresses.
+ DEV uint pg_tinv(uint r){return (r&~15u)|((r&7u)<<1)|((r>>3)&1u);}
+ DEV uint pg_cinv(uint k){return (k&~31u)|((k>>1)&1u)|((k&1u)<<1)|((k>>4)&1u)<<2|((k>>2)&1u)<<3|((k>>3)&1u)<<4;}
++DEV i2 pool_ortho_pack8(f8 v){_Pragma("unroll 8") for(uint e=0;e<8;e++)v[e]=__builtin_amdgcn_fmed3f(v[e]+0.f,-448.f,448.f);i2 r;r[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[0],v[1],0,false);r[0]=__builtin_amdgcn_cvt_pk_fp8_f32(v[2],v[3],r[0],true);r[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[4],v[5],0,false);r[1]=__builtin_amdgcn_cvt_pk_fp8_f32(v[6],v[7],r[1],true);return r;}
+ template<uint C,bool Gout=false,bool HalfIn=false,bool ByteOut=false,bool F8W16=false>
+ DEV void mh_pool_project_group_body(const float*raw,const float*wf,float*output,uint width,uint height,uint source_width,uint valid_width,uint valid_height){
+  const uint M=width*height,N=2*C,S=C+8;uint tile=__builtin_amdgcn_workgroup_id_x();if(tile>=(M+15)/16)return;
+@@ -422,8 +426,10 @@
+    using pool_i4=int __attribute__((ext_vector_type(4)));
+    i2 a0,a1;__builtin_memcpy(&a0,pooled8+rc*S+chunk*32+g*8,8);__builtin_memcpy(&a1,pooled8+rc*S+chunk*32+16+g*8,8);
+    for(uint j=0;j<4;j++){pool_i4 b;__builtin_memcpy(&b,reinterpret_cast<const unsigned char*>(wf)+(((colg/16+j)*(C/32)+chunk)*512)+(g*16+rc)*16,16);
++    if constexpr(MH_POOL_ORTHO&&ByteOut&&!Gout){sum[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(i2{b[0],b[1]},a0,sum[j]);sum[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(i2{b[2],b[3]},a1,sum[j]);}else{
+     sum[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a0,i2{b[0],b[1]},sum[j]);
+     sum[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a1,i2{b[2],b[3]},sum[j]);
++    }
+    }
+   }else{
+   for(uint half=0;half<2;half++){uint sidx=chunk*2+half;h8 a;__builtin_memcpy(&a,pooled+rc*S+sidx*16+g*8,16);
+@@ -431,6 +437,7 @@
+   }
+   for(uint j=0;j<4;j++)for(uint e=0;e<8;e++)acc[j][e]=H(acc[j][e]+sum[j][e]);
+  }
++ if constexpr(MH_POOL_ORTHO&&F8W16&&ByteOut&&!Gout){uint q=first+rc;if(q<M){bool inv=valid_width&&(q%width>=valid_width||q/width>=valid_height);_Pragma("unroll") for(uint j=0;j<4;j++){i2 v=inv?i2{}:pool_ortho_pack8(acc[j]);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(output)+q*N+colg+j*16+g*8,8),&v,8);}}return;}
+  _Pragma("unroll") for(uint e=0;e<8;e++){uint q=first+g*8+e;if(q<M){bool inv=valid_width&&(q%width>=valid_width||q/width>=valid_height);_Pragma("unroll") for(uint j=0;j<4;j++){float a=acc[j][e],ac=__builtin_amdgcn_fmed3f(a+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(ac,0.f,0,false);uint idx=Gout?pg_tinv(q)*N+pg_cinv(colg+j*16+rc):q*N+colg+j*16+rc;if constexpr(ByteOut)reinterpret_cast<unsigned char*>(output)[idx]=inv?0u:static_cast<unsigned char>(b8);else output[idx]=inv?0.f:__builtin_amdgcn_cvt_f32_fp8(b8,0);}}}
+ }
+ KERNEL __attribute__((amdgpu_flat_work_group_size(64,64))) void mh_pool_project_group_c64(const float*raw,const float*w,float*output,uint width,uint height,uint source_width,uint valid_width,uint valid_height){mh_pool_project_group_body<64>(raw,w,output,width,height,source_width,valid_width,valid_height);}

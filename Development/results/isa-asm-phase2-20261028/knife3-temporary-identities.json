@@ -1,0 +1,147 @@
+[
+  {
+    "path": "work/knife3-split.hip",
+    "bytes": 122651,
+    "sha256": "e2bfa613420b74cfa4a774fb4e8b6c8c306f66a7f0511b206c59838a56a2ae5b"
+  },
+  {
+    "path": "work/knife3-split.hsaco",
+    "bytes": 706256,
+    "sha256": "a1375a89aabfc0d73af2321271e08ca8f00f6a1d23b9febec134172897636e59"
+  },
+  {
+    "path": "work/knife3-pool.hsaco",
+    "bytes": 1266544,
+    "sha256": "ac21d73fc8cee4cfcd7de6e9fe2836723d10a4252f0570ecc02a2317fadb1295"
+  },
+  {
+    "path": "work/knife3-pool-mask.hsaco",
+    "bytes": 1266544,
+    "sha256": "4b19fccfaf2fa3529421b8f81a94cb230bb5e5b26c07dba85a0305d6e793cec3"
+  },
+  {
+    "path": "work/knife3-pool.hip",
+    "bytes": 128219,
+    "sha256": "d1d687024e28824c4ea25e0cde1ab8b1b5dec00cd7591337fff22c2840236aa0"
+  },
+  {
+    "path": "work/knife3-pool-mask.hip",
+    "bytes": 128242,
+    "sha256": "a9aa8b37647b794e6757e9ba0fcf62c7e8db3722155fe580649601d81dd468ac"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_fused_attention.hip",
+    "bytes": 54457,
+    "sha256": "e1dd323428a97315c2e415b8f16be20b8726af792fdc49b96550da93b3ee73d0"
+  },
+  {
+    "path": "work/knife3-source/hip/deep_wmma.hip",
+    "bytes": 7326,
+    "sha256": "e181ecb24036a467ac5891d774eafd3df811aff5f8460e530394d08a86d656f5"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_tiled.hip",
+    "bytes": 6408,
+    "sha256": "2f3c57727cde458a7c643f12f5f41c8f8d6eb046da9ea06cf5c68e12c84ff6c2"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_fast.hip",
+    "bytes": 7957,
+    "sha256": "f8296da6e299bdf4cef10096058deef44a20ede146d4f070f60cf86ef06d45a4"
+  },
+  {
+    "path": "work/knife3-source/hip/multi_pass_skin.hip",
+    "bytes": 2089,
+    "sha256": "fa992ef656d18799d04987f6e42f694ec5228a6e31194a936f6223216106aaf2"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_wmma.hip",
+    "bytes": 8333,
+    "sha256": "7b580fb2327970def7e698dfe70b14c7093d99863acedd21f3d7d40c296f91e3"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_reference.hip",
+    "bytes": 11460,
+    "sha256": "cdc6e06f5e23231a3c73ccd6affc3612bc22f49b4c3f427aed7b2d8fb7561a27"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_wmma.hip",
+    "bytes": 9806,
+    "sha256": "913732b3b307ce1b336cac5099397b0d2f8c3652240d7b19d742446a522eb06a"
+  },
+  {
+    "path": "work/knife3-source/hip/wave_pointwise.hip",
+    "bytes": 2512,
+    "sha256": "ec8a3cf001bfe3f43352732e0ef58aefa54a9344695ae47d36e6dbe915223d17"
+  },
+  {
+    "path": "work/knife3-source/hip/deep_reference.hip",
+    "bytes": 10956,
+    "sha256": "0be0b196fe90eeed4c6acd3214898a79ff79c8f3ee51bcda9ae6fb31363bdc85"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_reference.hip",
+    "bytes": 7619,
+    "sha256": "6c6c3078a9b7893e58dd8b9732dbe74b01e23edb275ba0a43761acf8bad4fcc9"
+  },
+  {
+    "path": "work/knife3-source/hip/prefix_reference.hip",
+    "bytes": 3087,
+    "sha256": "5bf953b7d1bba026b846ebd30c56139af00b717af095e218fb00201fddc6e977"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_fast_attention.hip",
+    "bytes": 7644,
+    "sha256": "516fdd90f22b8549aa1258949f04415544b9ea2a9ce7c5924bfbc25c5b06645a"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_fused_attention_packed.hip",
+    "bytes": 7277,
+    "sha256": "4c4347888e6c8c11a5a5522b23687def54daafc1a85632c6530cb929f68ad090"
+  },
+  {
+    "path": "work/knife3-source/hip/prefix_fast.hip",
+    "bytes": 9475,
+    "sha256": "fbc42aa84c0c56739a8531da0d5d39b0983848a21c167df001667d208c2cee06"
+  },
+  {
+    "path": "work/knife3-source/hip/boundary_reference.hip",
+    "bytes": 4431,
+    "sha256": "29cfe6378b966f8b7bbd30d04ebd3f927e95bc75845e6d3e5a6540dca44244dd"
+  },
+  {
+    "path": "work/knife3-source/hip/c32_fused_ffn_attention.hip",
+    "bytes": 49971,
+    "sha256": "5d94a10aecc1421e2a74fba0f1c052631df4ce1704910eb993de1585a7b06a1e"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_tiled.hip",
+    "bytes": 8587,
+    "sha256": "a6ec115d90f99e9e8cc52d48259cdc71e31f38cf989b74c1ff75a1a6d347060e"
+  },
+  {
+    "path": "work/knife3-source/hip/boundary_fast.hip",
+    "bytes": 4036,
+    "sha256": "c8439f7999f5431afbac7b6b0251e417d9beb80d222644d4aae3fa7e58a203cf"
+  },
+  {
+    "path": "work/knife3-source/hip/multi_pass_predict.hip",
+    "bytes": 3441,
+    "sha256": "8edcaaf2e363b52f7c8fb6c0c4fbfdb3b4442718a44160599e35bac88d0bd061"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_fast.hip",
+    "bytes": 16821,
+    "sha256": "70741bfd16bf633b1a176b1751d24ff19811b47582e278d9dc198d8b364fb579"
+  },
+  {
+    "path": "work/knife3-source/hip/multihead_fast_padded.hip",
+    "bytes": 126541,
+    "sha256": "c1a0b2f62674aec6341c7160339b78b998212e2f89b756dbd0c82012b87ea743"
+  },
+  {
+    "path": "work/knife3-source/hip/deep_fast.hip",
+    "bytes": 122279,
+    "sha256": "320f3d67f4f69c380bbda72cec08df82716c38c63896aa26a02d64952f24f6e0"
+  }
+]

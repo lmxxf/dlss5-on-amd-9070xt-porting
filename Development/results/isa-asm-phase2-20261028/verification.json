@@ -1,0 +1,28 @@
+{
+  "gold_frames": 258,
+  "gold_groups": {
+    "knife1/gold-": 42,
+    "knife1/final-gold-": 42,
+    "knife1/cached-gold-": 42,
+    "knife2/gold-": 42,
+    "knife3-pool/gold-": 42,
+    "knife3-split/gold-": 42,
+    "final-fallback-original1088": 3,
+    "cached-default-original1088": 3
+  },
+  "performance_slots": 216,
+  "performance_groups": {
+    "knife1": 48,
+    "knife1-final": 12,
+    "knife1-product": 12,
+    "knife2": 48,
+    "knife3-pool": 48,
+    "knife3-split": 48
+  },
+  "all_GPU_tested_changes_gold_bitdiff": 0,
+  "invalid": 0,
+  "production_modules_verified_unchanged": 80,
+  "unmodified_production_source_base": "d78b688e",
+  "GPU_guard": "game-check, process gate, >=100GB, atomic gpu.lock, 15s watchdog",
+  "benchmark": "3x4 ABBA per profile; independent serial process each slot; 240 discard80; 960/arm; NET0 edges_only1"
+}
