@@ -827,3 +827,9 @@ Small900 C256全块融合采纳，87→83派发，三轮ABBA mean−87.598µs/p9
 刀2 ec91bd4a：contract/project实现LDS转置宽写但VGPR112→113，资源门STOP；qkv_vfrag资源不增、六档Gold全同，72slot三轮ABBA无稳定净收益，STOP。可选expand未执行。刀3 7fbba898：QT_SMALL_MASK本已3，仅补W16_SMALL=3，正式LLVM23基线整SHA同，新增导出零spill、七档Gold同；48slot四档ABBA中Small900 mean+8.466µs/p99+15.439µs，其余档也不稳定，STOP。生产优化仍为刀1a71f5d72的限定shape。
 
 刀4：常规OptiScaler模板补DlssNr 1.0/1.0，实际打包合并函数验证通过。最终双架构80模块复用未变化的已验载荷，逐SHA/ELF核对hip/SHA256SUMS并生成分架构清单；正式O2 addon/runtime/frame构建通过，frame同刀1最终SHA。独立runtime smoke显式Small0.5/skip0/vit_stream3通过，前两次目录缺资源失败留档。交付目录Development/results/backfeed-20261028/final-payload，回执knife4/receipt.json。gfx1200仅ELF/构建核验；未装游戏、未改0.45ZIP、未push。全部四刀结题，无排队自动实验。
+
+### 2026-10-28 gfx1201 汇编审计 Phase1：三项手术全STOP，闭环完成
+
+基线b5875bfa。40模块1976导出完整拆分，六档新鲜派发覆盖56物理模块/函数对；完整.s不入Git。LLVM23 .hip→.s→cc1as(-real-true16)→lld闭环：64核代码/资源/完整metadata一致；真实C32 prefix shift→add等价.s修改后七档21帧loader/Gold通过，仅作闭环证明不进生产。C32/C64带DWARF行表重编201函数机器码/资源同，用内联调用链完成C32逐阶段构型统计。
+
+C128/C256峰值在FFN Expand/Contract共存阶段，静态live234/240而metadata242；屏障处并无242全活。三项独立候选各七档Gold逐位同、四档三轮ABBA共144slot：upwide解码组织无稳定收益；decoder尾循环禁止展开3612→2648条但无稳定净收益；FFN批宽4→2令C128242→180VGPR（occupancy估计5→8）、C256242→216（5→7），四档mean反退20.5/19.6/39.4/22.6µs。全部STOP，生产代码/模块/已装游戏/ZIP不变。真实.s修改证明不冒充提速。报告与源码diff/ISA/曲线/统计/身份回执见results/isa-asm-audit-20261028/README.md；实验大文件清理、锁释放，无push。

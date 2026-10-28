@@ -2749,3 +2749,7 @@ contract/project尾部LDS转置均消除32条b8，但VGPR112→113，不满足�
 ## 2026-10-28 backfeed 刀3 STOP
 
 W2_FFN_QT_SMALL_MASK当前已3，补W2_FFN_W16_SMALL=3新增C64/C128 W16导出。正式LLVM23两baseline整SHA同、旧函数同、新函数0spill、七档Gold逐位同。但Small900三轮mean全退（pooled+8.466µs/p99+15.439µs）；Original900+2.263µs/p99+14.066µs；Small1080轻微均值收益但三轮p99全退；Original1088近零且不稳。整刀STOP，生产配方保持。详results/backfeed-20261028/knife3。
+
+## 2026-10-28 ISA Phase1：upwide/dectail/ffnb2 STOP
+
+三候选隔离在b5875bfa基线上，均七档Gold0diff/invalid0、各四档3×4 ABBA（240弃80）。upwide原LowByte已是b64，改显式打包解码不能收稳定收益；dectail缩静态代码3612→2648，Small1080三轮mean全退，其他档不稳；ffnb2 C128242→180VGPR、C256242→216、LDS不增/零spill，四档mean三轮全退（pooled+20.487/+19.600/+39.429/+22.612µs）。全部STOP不合生产，不继续刷轮/换名扫参。物理VGPR/CFGliveness、汇编差异、原统计与证据身份见results/isa-asm-audit-20261028。

@@ -1,0 +1,34 @@
+{
+  "kernel": "c32_wave1_prefix_b8d_w16",
+  "old": "v_lshlrev_b32_e32 v3, 1, v3",
+  "new": "v_add_nc_u32_e32 v3, v3, v3",
+  "proof": "uint32(x << 1) == uint32(x+x), both opcodes have no VCC/SCC result; same 4-byte instruction size",
+  "purpose": "real assembly edit/reassembly/loader proof only, not claimed speedup",
+  "sha256": "a1a6b2ba73de3e8b2a32c627f85aeae9a0a9c37cd6eb31ddd8a12a2582747098",
+  "commands": [
+    [
+      "/home/lmxxf/work/llvm-build-23/bin/clang",
+      "-cc1as",
+      "-triple",
+      "amdgcn-amd-amdhsa",
+      "-target-cpu",
+      "gfx1201",
+      "-target-feature",
+      "-real-true16",
+      "-filetype",
+      "obj",
+      "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/isa-asm-audit-20261028/work/roundtrip/patched.s",
+      "-o",
+      "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/isa-asm-audit-20261028/work/roundtrip/patched.o"
+    ],
+    [
+      "/home/lmxxf/work/llvm-build-23/bin/ld.lld",
+      "--no-undefined",
+      "-shared",
+      "-plugin-opt=mcpu=gfx1201",
+      "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/isa-asm-audit-20261028/work/roundtrip/patched.o",
+      "-o",
+      "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/isa-asm-audit-20261028/work/roundtrip/patched.hsaco"
+    ]
+  ]
+}

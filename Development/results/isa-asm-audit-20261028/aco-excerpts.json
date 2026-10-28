@@ -1,0 +1,148 @@
+{
+  "fswin32": {
+    "partial_wait": {
+      "line": 230,
+      "text": "\tbuffer_load_b128 v[40:43], v21, s[36:39], null offen offset:2048// 000000000428: C405C07C 40804828 00080015\n\tbuffer_load_b128 v[44:47], v21, s[36:39], null offen offset:2560// 000000000434: C405C07C 4080482C 000A0015\n\ts_movk_i32 s27, 0x400                                      // 000000000440: B01B0400\n\ts_wait_loadcnt 0xd                                         // 000000000444: BFC0000D\n\tv_dual_mov_b32 v23, v13 :: v_dual_mov_b32 v22, v12         // 000000000448: CA10010D 1716010C\n\ts_wait_loadcnt 0xc                                         // 000000000450: BFC0000C\n\tv_dual_mov_b32 v49, v5 :: v_dual_mov_b32 v48, v4           // 000000000454: CA100105 31300104\n\ts_wait_loadcnt 0xb                                         // 00000000045C: BFC0000B"
+    },
+    "normalization_rsqrt": {
+      "line": 1540,
+      "text": "\ts_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 000000003130: BF870121\n\tv_cvt_f32_f16_e32 v91, v89.l                               // 000000003134: 7EB61759\n\tv_cvt_f32_f16_e32 v89, v89.h                               // 000000003138: 7EB217D9\n\tv_rsq_f32_e32 v91, v91                                     // 00000000313C: 7EB65D5B\n\tv_rsq_f32_e32 v89, v89                                     // 000000003140: 7EB25D59\n\ts_wait_kmcnt 0x0                                           // 000000003144: BFC70000\n\ts_delay_alu instid0(TRANS32_DEP_2) | instskip(NEXT) | instid1(TRANS32_DEP_1)// 000000003148: BF870296\n\tv_mul_f32_e32 v91, s10, v91                                // 00000000314C: 10B6B60A"
+    },
+    "packed_fp8": {
+      "line": 277,
+      "text": "\tv_dual_mul_f32 v67, v67, v63 :: v_dual_mul_f32 v66, v66, v28// 00000000058C: C8C67F43 43423942\n\tv_maxmin_num_f32 v130, -4.0, v72, 4.0                      // 000000000594: D6690082 03DA90F7\n\tv_fma_mix_f32 v129, 0xab28, |v128|, 0xab28 op_sel:[0,0,1] op_sel_hi:[1,0,1]// 00000000059C: CC206281 0BFF00FF 3728AB28\n\tv_cvt_pk_fp8_f32 v24.l, v64, v65                           // 0000000005A8: D7690018 02028340\n\tv_maxmin_num_f32 v64, -4.0, v68, 4.0                       // 0000000005B0: D6690040 03DA88F7\n\tv_cvt_pk_fp8_f32 v24.h, v66, v67 op_sel:[0,0,1]            // 0000000005B8: D7694018 02028742\n\tv_maxmin_num_f32 v66, -4.0, v69, 4.0                       // 0000000005C0: D6690042 03DA8AF7\n\tv_maxmin_num_f32 v132, -4.0, v73, 4.0                      // 0000000005C8: D6690084 03DA92F7"
+    },
+    "paired_valu": {
+      "line": 231,
+      "text": "\tbuffer_load_b128 v[44:47], v21, s[36:39], null offen offset:2560// 000000000434: C405C07C 4080482C 000A0015\n\ts_movk_i32 s27, 0x400                                      // 000000000440: B01B0400\n\ts_wait_loadcnt 0xd                                         // 000000000444: BFC0000D\n\tv_dual_mov_b32 v23, v13 :: v_dual_mov_b32 v22, v12         // 000000000448: CA10010D 1716010C\n\ts_wait_loadcnt 0xc                                         // 000000000450: BFC0000C\n\tv_dual_mov_b32 v49, v5 :: v_dual_mov_b32 v48, v4           // 000000000454: CA100105 31300104\n\ts_wait_loadcnt 0xb                                         // 00000000045C: BFC0000B\n\tv_dual_mov_b32 v51, v15 :: v_dual_mov_b32 v50, v14         // 000000000460: CA10010F 3332010E"
+    }
+  },
+  "fswin64": {
+    "partial_wait": {
+      "line": 166,
+      "text": "\ts_delay_alu instid0(SALU_CYCLE_1) | instskip(NEXT) | instid1(SALU_CYCLE_1)// 000000000348: BF870499\n\ts_or_b32 s53, s53, s51                                     // 00000000034C: 8C353335\n\ts_mov_b32 s54, src_scc                                     // 000000000350: BEB600FD\n\ts_wait_loadcnt 0xf                                         // 000000000354: BFC0000F\n\tv_cndmask_b32_e64 v68, v16, 0, s43                         // 000000000358: D5010044 00AD0110\n\tv_cndmask_b32_e64 v69, v17, 0, s43                         // 000000000360: D5010045 00AD0111\n\ts_wait_loadcnt 0xe                                         // 000000000368: BFC0000E\n\tv_cndmask_b32_e64 v17, v19, 0, s43                         // 00000000036C: D5010011 00AD0113"
+    },
+    "normalization_rsqrt": {
+      "line": 1902,
+      "text": "\ts_delay_alu instid0(VALU_DEP_2) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 000000003C14: BF870122\n\tv_cvt_f32_f16_e32 v42, v40.l                               // 000000003C18: 7E541728\n\tv_dual_fmac_f32 v44, v74, v74 :: v_dual_fmac_f32 v43, v72, v72// 000000003C1C: C800954A 2C2A9148\n\tv_rsq_f32_e32 v42, v42                                     // 000000003C24: 7E545D2A\n\tv_dual_fmac_f32 v44, v106, v106 :: v_dual_fmac_f32 v43, v104, v104// 000000003C28: C800D56A 2C2AD168\n\ts_delay_alu instid0(TRANS32_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 000000003C30: BF870125\n\tv_mul_f32_e32 v42, v42, v54                                // 000000003C34: 10546D2A\n\tv_dual_fmac_f32 v44, v78, v78 :: v_dual_fmac_f32 v43, v76, v76// 000000003C38: C8009D4E 2C2A994C"
+    },
+    "packed_fp8": {
+      "line": 344,
+      "text": "\tv_dual_mul_f32 v92, v92, v56 :: v_dual_mul_f32 v91, v91, v55// 000000000864: C8C6715C 5C5A6F5B\n\tv_maxmin_num_f32 v72, -4.0, v123, 4.0                      // 00000000086C: D6690048 03DAF6F7\n\tv_fma_mix_f32 v69, 0xab28, |v68|, 0xab28 op_sel:[0,0,1] op_sel_hi:[1,0,1]// 000000000874: CC206245 0BFE88FF 3728AB28\n\tv_cvt_pk_fp8_f32 v22.l, v88, v89                           // 000000000880: D7690016 0202B358\n\tv_maxmin_num_f32 v74, -4.0, v124, 4.0                      // 000000000888: D669004A 03DAF8F7\n\tv_fma_mix_f32 v71, 0xab28, |v70|, 0xab28 op_sel:[0,0,1] op_sel_hi:[1,0,1]// 000000000890: CC206247 0BFE8CFF 3728AB28\n\tv_dual_fmaak_f32 v60, v60, v61, 0x3f650000 :: v_dual_fmaak_f32 v59, v59, v58, 0x3f650000// 00000000089C: C8427B3C 3C3A753B 3F650000\n\tv_dual_fmaak_f32 v66, v66, v67, 0x3f650000 :: v_dual_fmaak_f32 v63, v63, v62, 0x3f650000// 0000000008A8: C8428742 423E7D3F 3F650000"
+    },
+    "paired_valu": {
+      "line": 215,
+      "text": "\tds_load_b64 v[66:67], v66 offset:3840                      // 000000000498: D9D80F00 42000042\n\tv_add_nc_u32_e32 v83, 4, v24                               // 0000000004A0: 4AA63084\n\tv_mov_b32_e32 v85, v7                                      // 0000000004A4: 7EAA0307\n\tv_dual_mov_b32 v25, v28 :: v_dual_mov_b32 v26, v31         // 0000000004A8: CA10011C 191A011F\n\tv_mad_u32_u24 v82, s55, 0x50, v31                          // 0000000004B0: D60B0052 047DFE37 00000050\n\ts_wait_loadcnt_dscnt 0x70f                                 // 0000000004BC: BFC8070F\n\tv_wmma_f32_16x16x16_fp8_fp8 v[96:103], v[34:35], v[8:9], 0 // 0000000004C0: CC464060 1A021122\n\ts_wait_dscnt 0xe                                           // 0000000004C8: BFC6000E"
+    }
+  },
+  "fswin128": {
+    "partial_wait": {
+      "line": 172,
+      "text": "\ts_delay_alu instid0(SALU_CYCLE_1) | instskip(NEXT) | instid1(SALU_CYCLE_1)// 000000000380: BF870499\n\ts_or_b32 s53, s53, s51                                     // 000000000384: 8C353335\n\ts_mov_b32 s54, src_scc                                     // 000000000388: BEB600FD\n\ts_wait_loadcnt 0x12                                        // 00000000038C: BFC00012\n\tv_cndmask_b32_e64 v82, v16, 0, s43                         // 000000000390: D5010052 00AD0110\n\tv_cndmask_b32_e64 v83, v17, 0, s43                         // 000000000398: D5010053 00AD0111\n\ts_wait_loadcnt 0x11                                        // 0000000003A0: BFC00011\n\tv_cndmask_b32_e64 v17, v19, 0, s43                         // 0000000003A4: D5010011 00AD0113"
+    },
+    "normalization_rsqrt": {
+      "line": 2291,
+      "text": "\ts_delay_alu instid0(VALU_DEP_2) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 000000004794: BF870122\n\tv_cvt_f32_f16_e64 v141, v175.l                             // 000000004798: D58B008D 020101AF\n\tv_dual_fmac_f32 v143, v58, v58 :: v_dual_fmac_f32 v142, v56, v56// 0000000047A0: C800753A 8F8E7138\n\tv_rsq_f32_e32 v141, v141                                   // 0000000047A8: 7F1A5D8D\n\tv_dual_fmac_f32 v143, v98, v98 :: v_dual_fmac_f32 v142, v96, v96// 0000000047AC: C800C562 8F8EC160\n\ts_delay_alu instid0(TRANS32_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 0000000047B4: BF870125\n\tv_mul_f32_e32 v141, v141, v163                             // 0000000047B8: 111B478D\n\tv_dual_fmac_f32 v143, v62, v62 :: v_dual_fmac_f32 v142, v60, v60// 0000000047BC: C8007D3E 8F8E793C"
+    },
+    "packed_fp8": {
+      "line": 457,
+      "text": "\tv_maxmin_num_f32 v69, -4.0, v120, 4.0                      // 000000000B84: D6690045 03DAF0F7\n\tv_maxmin_num_f32 v71, -4.0, v121, 4.0                      // 000000000B8C: D6690047 03DAF2F7\n\ts_delay_alu instid0(VALU_DEP_4)                            // 000000000B94: BF870004\n\tv_cvt_pk_fp8_f32 v22.l, v88, v89                           // 000000000B98: D7690016 0202B358\n\tv_maxmin_num_f32 v88, -4.0, v92, 4.0                       // 000000000BA0: D6690058 03DAB8F7\n\tv_cvt_pk_fp8_f32 v22.h, v90, v91 op_sel:[0,0,1]            // 000000000BA8: D7694016 0202B75A\n\tv_maxmin_num_f32 v90, -4.0, v93, 4.0                       // 000000000BB0: D669005A 03DABAF7\n\tv_fmaak_f32 v68, v68, v26, 0x3f650000                      // 000000000BB8: 5A883544 3F650000"
+    },
+    "paired_valu": {
+      "line": 214,
+      "text": "\tds_load_b64 v[82:83], v80 offset:512                       // 000000000498: D9D80200 52000050\n\tv_mov_b32_e32 v81, v7                                      // 0000000004A0: 7EA20307\n\tv_mov_b32_e32 v25, v28                                     // 0000000004A4: 7E32031C\n\tv_dual_mov_b32 v85, v31 :: v_dual_mov_b32 v84, v29         // 0000000004A8: CA10011F 5554011D\n\ts_wait_loadcnt_dscnt 0xa08                                 // 0000000004B0: BFC80A08\n\tv_wmma_f32_16x16x16_fp8_fp8 v[96:103], v[34:35], v[8:9], 0 // 0000000004B4: CC464060 1A021122\n\tv_wmma_f32_16x16x16_fp8_fp8 v[88:95], v[32:33], v[8:9], 0  // 0000000004BC: CC464058 1A021120\n\ts_wait_dscnt 0x7                                           // 0000000004C4: BFC60007"
+    }
+  },
+  "fswin256": {
+    "partial_wait": {
+      "line": 172,
+      "text": "\ts_delay_alu instid0(SALU_CYCLE_1) | instskip(NEXT) | instid1(SALU_CYCLE_1)// 000000000380: BF870499\n\ts_or_b32 s53, s53, s51                                     // 000000000384: 8C353335\n\ts_mov_b32 s54, src_scc                                     // 000000000388: BEB600FD\n\ts_wait_loadcnt 0x12                                        // 00000000038C: BFC00012\n\tv_cndmask_b32_e64 v82, v16, 0, s43                         // 000000000390: D5010052 00AD0110\n\tv_cndmask_b32_e64 v83, v17, 0, s43                         // 000000000398: D5010053 00AD0111\n\ts_wait_loadcnt 0x11                                        // 0000000003A0: BFC00011\n\tv_cndmask_b32_e64 v17, v19, 0, s43                         // 0000000003A4: D5010011 00AD0113"
+    },
+    "normalization_rsqrt": {
+      "line": 3068,
+      "text": "\tv_max_num_f16_e32 v69.l, s59, v69.l                        // 000000005EF8: 628A8A3B\n\tv_cvt_f32_f16_e32 v71, v69.l                               // 000000005EFC: 7E8E1745\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(TRANS32_DEP_1)// 000000005F00: BF870291\n\tv_rsq_f32_e32 v71, v71                                     // 000000005F04: 7E8E5D47\n\tv_mul_f32_e32 v71, v71, v9                                 // 000000005F08: 108E1347\n\ts_delay_alu instid0(VALU_DEP_1)                            // 000000005F0C: BF870001\n\tv_dual_mul_f32 v74, v74, v71 :: v_dual_mul_f32 v75, v75, v71// 000000005F10: C8C68F4A 4A4A8F4B\n\tv_dual_mul_f32 v72, v72, v71 :: v_dual_mul_f32 v73, v73, v71// 000000005F18: C8C68F48 48488F49"
+    },
+    "packed_fp8": {
+      "line": 666,
+      "text": "\tv_maxmin_num_f32 v73, -4.0, v120, 4.0                      // 0000000011C4: D6690049 03DAF0F7\n\tv_fma_mix_f32 v72, 0xab28, |v59|, 0xab28 op_sel:[0,0,1] op_sel_hi:[1,0,1]// 0000000011CC: CC206248 0BFE76FF 3728AB28\n\tv_maxmin_num_f32 v75, -4.0, v121, 4.0                      // 0000000011D8: D669004B 03DAF2F7\n\tv_cvt_pk_fp8_f32 v50.l, v88, v89                           // 0000000011E0: D7690032 0202B358\n\tv_maxmin_num_f32 v88, -4.0, v92, 4.0                       // 0000000011E8: D6690058 03DAB8F7\n\tv_cvt_pk_fp8_f32 v50.h, v90, v91 op_sel:[0,0,1]            // 0000000011F0: D7694032 0202B75A\n\tv_maxmin_num_f32 v90, -4.0, v93, 4.0                       // 0000000011F8: D669005A 03DABAF7\n\tv_fma_mix_f32 v74, 0xab28, |v73|, 0xab28 op_sel:[0,0,1] op_sel_hi:[1,0,1]// 000000001200: CC20624A 0BFE92FF 3728AB28"
+    },
+    "paired_valu": {
+      "line": 214,
+      "text": "\tds_load_b64 v[82:83], v80 offset:512                       // 000000000498: D9D80200 52000050\n\tv_mov_b32_e32 v81, v7                                      // 0000000004A0: 7EA20307\n\tv_mov_b32_e32 v25, v28                                     // 0000000004A4: 7E32031C\n\tv_dual_mov_b32 v85, v31 :: v_dual_mov_b32 v84, v29         // 0000000004A8: CA10011F 5554011D\n\ts_wait_loadcnt_dscnt 0xa08                                 // 0000000004B0: BFC80A08\n\tv_wmma_f32_16x16x16_fp8_fp8 v[96:103], v[34:35], v[8:9], 0 // 0000000004B4: CC464060 1A021122\n\tv_wmma_f32_16x16x16_fp8_fp8 v[88:95], v[32:33], v[8:9], 0  // 0000000004BC: CC464058 1A021120\n\ts_wait_dscnt 0x7                                           // 0000000004C4: BFC60007"
+    }
+  },
+  "attn": {
+    "partial_wait": {
+      "line": 484,
+      "text": "\tbuffer_load_b128 v[232:235], v112, s[48:51], null offen offset:3584// 0000000009F4: C405C07C 408060E8 000E0070\n\tbuffer_load_b128 v[236:239], v113, s[48:51], null offen offset:3584// 000000000A00: C405C07C 408060EC 000E0071\n\ts_addk_co_i32 s19, 0x80                                    // 000000000A0C: B7930080\n\ts_wait_loadcnt 0x25                                        // 000000000A10: BFC00025\n\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[116:117], v[12:13], v[16:23]// 000000000A14: CC464010 1C421974\n\tv_wmma_f32_16x16x16_fp8_fp8 v[24:31], v[118:119], v[12:13], v[24:31]// 000000000A1C: CC464018 1C621976\n\tv_wmma_f32_16x16x16_fp8_fp8 v[64:71], v[116:117], v[14:15], v[64:71]// 000000000A24: CC464040 1D021D74\n\tv_wmma_f32_16x16x16_fp8_fp8 v[72:79], v[118:119], v[14:15], v[72:79]// 000000000A2C: CC464048 1D221D76"
+    },
+    "normalization_rsqrt": {
+      "line": 776,
+      "text": "\tv_cvt_f32_f16_e32 v149, v112.l                             // 0000000011F8: 7F2A1770\n\tv_cvt_f32_f16_e32 v112, v112.h                             // 0000000011FC: 7EE017F0\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(SKIP_1) | instid1(TRANS32_DEP_2)// 000000001200: BF870322\n\tv_rsq_f32_e32 v149, v149                                   // 000000001204: 7F2A5D95\n\tv_rsq_f32_e32 v112, v112                                   // 000000001208: 7EE05D70\n\tv_cvt_f16_f32_e64 v150.l, v149                             // 00000000120C: D58A0096 02010195\n\ts_delay_alu instid0(TRANS32_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 000000001214: BF870095\n\tv_cvt_f16_f32_e64 v150.h, v112 op_sel:[0,1]                // 000000001218: D58A4096 02010170"
+    },
+    "packed_fp8": {
+      "line": 631,
+      "text": "\tv_cvt_f32_f16_e32 v10, v10.l                               // 000000000DF0: 7E14170A\n\tv_cvt_f16_f32_e32 v48.l, v52                               // 000000000DF4: 7E601534\n\tv_cvt_f16_f32_e32 v48.h, v60                               // 000000000DF8: 7F60153C\n\tv_cvt_pk_fp8_f32 v6.l, v4, v5                              // 000000000DFC: D7690006 02020B04\n\tv_cvt_f32_f16_e32 v14, v13.h                               // 000000000E04: 7E1C178D\n\tv_cvt_f32_f16_e32 v13, v13.l                               // 000000000E08: 7E1A170D\n\tv_cvt_pk_fp8_f32 v9.l, v7, v8                              // 000000000E0C: D7690009 02021107\n\tv_cvt_pk_fp8_f32 v12.l, v10, v11                           // 000000000E14: D769000C 0202170A"
+    },
+    "paired_valu": {
+      "line": 370,
+      "text": "\ts_or_b32 s42, s42, s43                                     // 000000000620: 8C2A2B2A\n\ts_cmp_eq_i32 s42, 3                                        // 000000000624: BF00832A\n\ts_cbranch_scc0 1704                                        // 000000000628: BFA106A8 <.text+0x20cc>\n\tv_dual_mov_b32 v17, 0 :: v_dual_mov_b32 v16, 0             // 00000000062C: CA100080 11100080\n\tv_dual_mov_b32 v19, 0 :: v_dual_mov_b32 v18, 0             // 000000000634: CA100080 13120080\n\tv_dual_mov_b32 v21, 0 :: v_dual_mov_b32 v20, 0             // 00000000063C: CA100080 15140080\n\tv_dual_mov_b32 v23, 0 :: v_dual_mov_b32 v22, 0             // 000000000644: CA100080 17160080\n\tv_dual_mov_b32 v25, 0 :: v_dual_mov_b32 v24, 0             // 00000000064C: CA100080 19180080"
+    }
+  },
+  "vitattn": {
+    "partial_wait": {
+      "line": 186,
+      "text": "\ts_bfm_b32 vcc_lo, 16, 0                                    // 00000000043C: 956A8090\n\ts_mov_b32 s25, 0x76543210                                  // 000000000440: BE9900FF 76543210\n\ts_mov_b32 s26, 0xfedcba98                                  // 000000000448: BE9A00FF FEDCBA98\n\ts_wait_loadcnt 0xf                                         // 000000000450: BFC0000F\n\tv_wmma_f32_16x16x16_fp8_fp8 v[88:95], v[18:19], v[8:9], 0  // 000000000454: CC464058 1A021112\n\ts_wait_loadcnt 0xe                                         // 00000000045C: BFC0000E\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 000000000460: BF870091\n\tv_wmma_f32_16x16x16_fp8_fp8 v[88:95], v[20:21], v[10:11], v[88:95]// 000000000464: CC464058 1D621514"
+    },
+    "packed_fp8": {
+      "line": 228,
+      "text": "\tv_cvt_f32_f16_e32 v83, v83.h                               // 00000000054C: 7EA617D3\n\tv_cvt_f32_f16_e32 v93, v85.l                               // 000000000550: 7EBA1755\n\tv_cvt_f32_f16_e32 v85, v85.h                               // 000000000554: 7EAA17D5\n\tv_cvt_pk_fp8_f32 v89.l, v82, v88                           // 000000000558: D7690059 0202B152\n\tv_cvt_pk_fp8_f32 v92.l, v91, v84                           // 000000000560: D769005C 0202A95B\n\tv_cvt_pk_fp8_f32 v89.h, v90, v83 op_sel:[0,0,1]            // 000000000568: D7694059 0202A75A\n\ts_delay_alu instid0(VALU_DEP_4) | instskip(NEXT) | instid1(VALU_DEP_1)// 000000000570: BF870094\n\tv_cvt_pk_fp8_f32 v92.h, v93, v85 op_sel:[0,0,1]            // 000000000574: D769405C 0202AB5D"
+    },
+    "paired_valu": {
+      "line": 80,
+      "text": "\tbuffer_load_b64 v[12:13], v6, s[8:11], null offen          // 000000000154: C405407C 4080100C 00000006\n\tbuffer_load_b64 v[6:7], v7, s[8:11], null offen            // 000000000160: C405407C 40801006 00000007\n\tv_and_b32_e32 v15, 3, v0                                   // 00000000016C: 361E0083\n\tv_dual_mov_b32 v3, 0 :: v_dual_and_b32 v14, 4, v0          // 000000000170: CA240080 030E0084\n\tv_dual_mov_b32 v25, 0 :: v_dual_mov_b32 v24, 0             // 000000000178: CA100080 19180080\n\tv_dual_mov_b32 v27, 0 :: v_dual_mov_b32 v26, 0             // 000000000180: CA100080 1B1A0080\n\tv_dual_mov_b32 v29, 0 :: v_dual_mov_b32 v28, 0             // 000000000188: CA100080 1D1C0080\n\tv_dual_mov_b32 v31, 0 :: v_dual_mov_b32 v30, 0             // 000000000190: CA100080 1F1E0080"
+    }
+  },
+  "decups": {
+    "partial_wait": {
+      "line": 100,
+      "text": "\tv_lshlrev_b32_e32 v10, 1, v10                              // 0000000001D4: 30141481\n\tbuffer_load_d16_b16 v20, v10, s[16:19], null offen         // 0000000001D8: C408007C 40802014 0000000A\n\tv_add_nc_u32_e32 v12, s3, v12                              // 0000000001E4: 4A181803\n\ts_wait_loadcnt 0x2                                         // 0000000001E8: BFC00002\n\tv_cvt_f32_fp8_e32 v21, v15                                 // 0000000001EC: 7E2AD90F\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_1)// 0000000001F0: BF8700A1\n\tv_cvt_f16_f32_e32 v22.l, v21                               // 0000000001F4: 7E2C1515\n\ts_wait_loadcnt 0x0                                         // 0000000001F8: BFC00000"
+    },
+    "packed_fp8": {
+      "line": 110,
+      "text": "\tv_maxmin_num_f16 v20.l, 0xdf00, v20.l, neg(0xdf00)         // 000000000204: D66B0014 83FE28FF 0000DF00\n\tv_cvt_f32_f16_e32 v23, v20.l                               // 000000000210: 7E2E1714\n\ts_delay_alu instid0(VALU_DEP_1)                            // 000000000214: BF870001\n\tv_cvt_pk_fp8_f32 v24.l, v23, 0                             // 000000000218: D7690018 02010117\n\tbuffer_store_b8 v24, v12, s[20:23], null offen             // 000000000220: C406007C 40802818 0000000C\n\ts_mov_b32 exec_lo, -1                                      // 00000000022C: BEFE00C1\n\ts_lshr_b32 s7, s7, 4                                       // 000000000230: 85078407\n\ts_wait_alu 0xfffe                                          // 000000000234: BF88FFFE"
+    },
+    "address64": {
+      "line": 51,
+      "text": "\tv_and_b32_e32 v13, 15, v0                                  // 0000000000BC: 361A008F\n\tv_and_b32_e32 v10, 0x1ff, v0                               // 0000000000C0: 361400FF 000001FF\n\tv_cndmask_b32_e32 v1, v1, v4, vcc_lo                       // 0000000000C8: 02020901\n\tv_add_co_ci_u32_e32 v2, vcc_lo, 0, v2, vcc_lo              // 0000000000CC: 40040480\n\ts_delay_alu instid0(VALU_DEP_3) | instskip(NEXT) | instid1(VALU_DEP_3)// 0000000000D0: BF870193\n\tv_lshrrev_b32_e32 v11, 4, v10                              // 0000000000D4: 32161484\n\tv_cmp_le_u32_e64 s10, s6, v1                               // 0000000000D8: D44B000A 02020206\n\tv_subrev_nc_u32_e32 v5, s6, v1                             // 0000000000E0: 4E0A0206"
+    }
+  },
+  "gemmvnores": {
+    "partial_wait": {
+      "line": 201,
+      "text": "\tbuffer_load_b64 v[160:161], v160, s[20:23], null offen     // 0000000004E0: C405407C 408028A0 000000A0\n\tbuffer_load_b64 v[156:157], v156, s[20:23], null offen     // 0000000004EC: C405407C 4080289C 0000009C\n\ts_add_co_u32 s1, s1, 1                                     // 0000000004F8: 80018101\n\ts_wait_loadcnt 0xb                                         // 0000000004FC: BFC0000B\n\tv_wmma_f32_16x16x16_fp8_fp8 v[80:87], v[150:151], v[164:165], v[80:87]// 000000000500: CC464050 1D434996\n\tv_wmma_f32_16x16x16_fp8_fp8 v[112:119], v[152:153], v[164:165], v[112:119]// 000000000508: CC464070 1DC34998\n\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[146:147], v[164:165], v[16:23]// 000000000510: CC464010 1C434992\n\tv_wmma_f32_16x16x16_fp8_fp8 v[48:55], v[148:149], v[164:165], v[48:55]// 000000000518: CC464030 1CC34994"
+    },
+    "packed_fp8": {
+      "line": 275,
+      "text": "\tv_maxmin_num_f16 v148.l, 0xdf00, v148.l, neg(0xdf00)       // 0000000006DC: D66B0094 83FF28FF 0000DF00\n\tv_add_lshl_u32 v154, s9, v2, 8                             // 0000000006E8: D647009A 02220409\n\tv_cvt_f32_f16_e32 v20, v19.l                               // 0000000006F0: 7E281713\n\tv_cvt_pk_fp8_f32 v8.l, v7, 0                               // 0000000006F4: D7690008 02010107\n\tv_cvt_f32_f16_e64 v146, v145.l                             // 0000000006FC: D58B0092 02010191\n\tv_maxmin_num_f16 v151.l, 0xdf00, v151.l, neg(0xdf00)       // 000000000704: D66B0097 83FF2EFF 0000DF00\n\tv_cvt_pk_fp8_f32 v12.l, v11, 0                             // 000000000710: D769000C 0201010B\n\tv_cvt_pk_fp8_f32 v15.l, v14, 0                             // 000000000718: D769000F 0201010E"
+    },
+    "paired_valu": {
+      "line": 38,
+      "text": "\tv_add_nc_u32_e32 v13, v13, v12                             // 000000000080: 4A1A190D\n\ts_mul_i32 s19, s18, s7                                     // 000000000084: 96130712\n\tv_add_nc_u32_e32 v14, v14, v12                             // 000000000088: 4A1C190E\n\tv_dual_mov_b32 v16, 0 :: v_dual_mov_b32 v17, 0             // 00000000008C: CA100080 10100080\n\ts_lshl_b32 s19, s19, 8                                     // 000000000094: 84138813\n\ts_lshl_b32 s20, ttmp7, 8                                   // 000000000098: 84148873\n\tv_add3_u32 v10, v10, s1, s19                               // 00000000009C: D655000A 004C030A\n\tv_lshl_add_u32 v1, v1, 6, s20                              // 0000000000A4: D6460001 00510D01"
+    }
+  },
+  "gemmvproj": {
+    "partial_wait": {
+      "line": 201,
+      "text": "\tbuffer_load_b64 v[160:161], v161, s[28:31], null offen     // 0000000004E0: C405407C 408038A0 000000A1\n\tbuffer_load_b64 v[156:157], v157, s[28:31], null offen     // 0000000004EC: C405407C 4080389C 0000009D\n\ts_add_co_u32 s1, s1, 1                                     // 0000000004F8: 80018101\n\ts_wait_loadcnt 0xb                                         // 0000000004FC: BFC0000B\n\tv_wmma_f32_16x16x16_fp8_fp8 v[80:87], v[152:153], v[166:167], v[80:87]// 000000000500: CC464050 1D434D98\n\tv_wmma_f32_16x16x16_fp8_fp8 v[112:119], v[154:155], v[166:167], v[112:119]// 000000000508: CC464070 1DC34D9A\n\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[148:149], v[166:167], v[16:23]// 000000000510: CC464010 1C434D94\n\tv_wmma_f32_16x16x16_fp8_fp8 v[48:55], v[150:151], v[166:167], v[48:55]// 000000000518: CC464030 1CC34D96"
+    },
+    "packed_fp8": {
+      "line": 320,
+      "text": "\tv_cvt_f32_f16_e64 v171, v170.l                             // 000000000838: D58B00AB 020101AA\n\ts_wait_loadcnt 0x3                                         // 000000000840: BFC00003\n\tv_cvt_f32_fp8_e32 v185, v147                               // 000000000844: 7F72D993\n\tv_cvt_pk_fp8_f32 v160.l, v159, 0                           // 000000000848: D76900A0 0201019F\n\tv_fma_mixlo_f16 v182, v5, v181, v22 op_sel_hi:[1,0,0]      // 000000000850: CC2100B6 0C5B6B05\n\tv_cvt_f32_f16_e64 v175, v174.l                             // 000000000858: D58B00AF 020101AE\n\tv_maxmin_num_f16 v178.l, 0xdf00, v178.l, neg(0xdf00)       // 000000000860: D66B00B2 83FF64FF 0000DF00\n\tv_cvt_pk_fp8_f32 v164.l, v163, 0                           // 00000000086C: D76900A4 020101A3"
+    },
+    "paired_valu": {
+      "line": 38,
+      "text": "\ts_lshr_b32 s20, s19, 4                                     // 000000000080: 85148413\n\ts_delay_alu instid0(SALU_CYCLE_1)                          // 000000000084: BF870009\n\ts_mul_i32 s21, s20, s9                                     // 000000000088: 96150914\n\tv_dual_mov_b32 v16, 0 :: v_dual_mov_b32 v17, 0             // 00000000008C: CA100080 10100080\n\tv_add_nc_u32_e32 v15, v15, v13                             // 000000000094: 4A1E1B0F\n\ts_lshl_b32 s21, s21, 8                                     // 000000000098: 84158815\n\ts_lshl_b32 s22, ttmp7, 8                                   // 00000000009C: 84168873\n\tv_add3_u32 v11, v11, s1, s21                               // 0000000000A0: D655000B 0054030B"
+    }
+  }
+}

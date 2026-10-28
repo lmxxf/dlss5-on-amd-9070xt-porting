@@ -1,0 +1,10 @@
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -549,6 +549,7 @@
+  for(uint e=0;e<8;e++)tl[(gr()*8+e)*17+rc()]=H(total[e]);
+  WG_FENCE(3);__builtin_amdgcn_s_barrier();WG_FENCE(2);
+  const uint lane=__builtin_amdgcn_workitem_id_x();
++ _Pragma("clang loop unroll(disable)")
+  for(uint it=0;it<2;it++){const uint seg=it*32+lane,tk=seg>>2,dx=seg&1u,dy=(seg>>1)&1u,token=first+tk;
+   if(!FullTile&&token>=iw*ih)continue;uint x=(token%iw)*2+dx,y=(token/iw)*2+dy;if(x>=ow||y>=oh)continue;
+   const uint base=(y*ow+x)*outputs+row;float sk[16],sc[16];

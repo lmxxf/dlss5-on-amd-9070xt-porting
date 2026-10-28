@@ -1,0 +1,146 @@
+[
+  {
+    "module": "c512-m32-deep.hsaco",
+    "kernel": "split_ffn_one_w2f8_w16_bin",
+    "vgpr": 95,
+    "lds": 0,
+    "wait_count": 18,
+    "narrow_lds_count": 0,
+    "excerpts": [
+      {
+        "line": 99,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[64:65], v[76:77], v[9:16]// 00000008CD9C: CC464009 1C269940\n\ts_wait_loadcnt 0x1                                         // 00000008CDA4: BFC00001\n\tv_wmma_f32_16x16x16_fp8_fp8 v[1:8], v[68:69], v[76:77], v[1:8]// 00000008CDA8: CC464001 1C069944\n\ts_wait_loadcnt 0x0                                         // 00000008CDB0: BFC00000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[25:32], v[58:59], v[78:79], v[25:32]// 00000008CDB4: CC464019 1C669D3A\n\tv_wmma_f32_16x16x16_fp8_fp8 v[17:24], v[62:63], v[78:79], v[17:24]// 00000008CDBC: CC464011 1C469D3E\n\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[66:67], v[78:79], v[9:16]// 00000008CDC4: CC464009 1C269D42"
+      },
+      {
+        "line": 459,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[44:45], v[78:79], v[16:23]// 00000008D8AC: CC464010 1C429D2C\n\ts_wait_loadcnt 0x1                                         // 00000008D8B4: BFC00001\n\tv_wmma_f32_16x16x16_fp8_fp8 v[8:15], v[44:45], v[82:83], v[8:15]// 00000008D8B8: CC464008 1C22A52C\n\ts_wait_loadcnt 0x0                                         // 00000008D8C0: BFC00000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[0:7], v[44:45], v[86:87], v[0:7]// 00000008D8C4: CC464000 1C02AD2C\n\tv_wmma_f32_16x16x16_fp8_fp8 v[24:31], v[46:47], v[76:77], v[24:31]// 00000008D8CC: CC464018 1C62992E\n\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[46:47], v[80:81], v[16:23]// 00000008D8D4: CC464010 1C42A12E"
+      }
+    ]
+  },
+  {
+    "module": "c512-m32-mh.hsaco",
+    "kernel": "c512_qkv_attention_compact_w16",
+    "vgpr": 188,
+    "lds": 6144,
+    "wait_count": 103,
+    "narrow_lds_count": 64,
+    "excerpts": [
+      {
+        "line": 886,
+        "text": "\ts_wait_loadcnt 0x1                                         // 0000000FB460: BFC00001\n\tv_wmma_f32_16x16x16_fp8_fp8 v[25:32], v[120:121], v[107:108], v[25:32]// 0000000FB464: CC464019 1C66D778\n\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[120:121], v[109:110], v[9:16]// 0000000FB46C: CC464009 1C26DB78\n\ts_wait_loadcnt 0x0                                         // 0000000FB474: BFC00000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[17:24], v[128:129], v[107:108], v[17:24]// 0000000FB478: CC464011 1C46D780\n\tv_wmma_f32_16x16x16_fp8_fp8 v[1:8], v[128:129], v[109:110], v[1:8]// 0000000FB480: CC464001 1C06DB80\n\tv_wmma_f32_16x16x16_fp8_fp8 v[89:96], v[100:101], v[107:108], v[89:96]// 0000000FB488: CC464059 1D66D764"
+      },
+      {
+        "line": 971,
+        "text": "\tv_add_f32_e32 v25, 0, v25                                  // 0000000FB698: 06323280\n\tv_add_f32_e32 v7, 0, v7                                    // 0000000FB69C: 060E0E80\n\tv_med3_num_f32 v31, v31, s3, 0x43e00000                    // 0000000FB6A0: D631001F 03FC071F 43E00000\n\ts_wait_dscnt 0x0                                           // 0000000FB6AC: BFC60000\n\tv_dual_add_f32 v103, v103, v111 :: v_dual_add_f32 v100, v100, v108// 0000000FB6B0: C908DF67 6764D964\n\tv_add_f32_e32 v124, v123, v124                             // 0000000FB6B8: 06F8F97B\n\tv_med3_num_f32 v23, v23, s3, 0x43e00000                    // 0000000FB6BC: D6310017 03FC0717 43E00000"
+      },
+      {
+        "line": 1019,
+        "text": "\tv_mul_f32_e32 v121, v68, v68                               // 0000000FB7A0: 10F28944\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(SKIP_1) | instid1(VALU_DEP_1)// 0000000FB7A4: BF8700A2\n\tv_dual_add_f32 v107, v122, v107 :: v_dual_mul_f32 v122, v69, v69// 0000000FB7A8: C906D77A 6B7A8B45\n\ts_wait_dscnt 0x0                                           // 0000000FB7B0: BFC60000\n\tv_dual_add_f32 v107, v123, v107 :: v_dual_add_f32 v100, v110, v100// 0000000FB7B4: C908D77B 6B64C96E\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 0000000FB7BC: BF870091\n\tv_dual_add_f32 v129, v126, v127 :: v_dual_add_f32 v100, v111, v100// 0000000FB7C0: C908FF7E 8164C96F"
+      },
+      {
+        "line": 1075,
+        "text": "\tv_add_f32_e32 v102, v122, v102                             // 0000000FB8D4: 06CCCD7A\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_2) | instid1(VALU_DEP_2)// 0000000FB8D8: BF870131\n\tv_add_f32_e32 v102, v124, v102                             // 0000000FB8DC: 06CCCD7C\n\ts_wait_dscnt 0x0                                           // 0000000FB8E0: BFC60000\n\tv_add_f32_e32 v126, v126, v129                             // 0000000FB8E4: 06FD037E\n\tv_add_f32_e32 v102, v123, v102                             // 0000000FB8E8: 06CCCD7B\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_1)// 0000000FB8EC: BF870092"
+      }
+    ]
+  },
+  {
+    "module": "c64-wave2-fast.hsaco",
+    "kernel": "c128_wave2_bi_bo",
+    "vgpr": 242,
+    "lds": 16384,
+    "wait_count": 200,
+    "narrow_lds_count": 0,
+    "excerpts": [
+      {
+        "line": 210,
+        "text": "\ts_wait_loadcnt 0x1                                         // 00000013D02C: BFC00001\n\tv_cndmask_b32_e64 v79, 0, v60, s0                          // 00000013D030: D501004F 00027880\n\tv_cndmask_b32_e64 v80, 0, v61, s0                          // 00000013D038: D5010050 00027A80\n\ts_wait_loadcnt 0x0                                         // 00000013D040: BFC00000\n\tv_cndmask_b32_e64 v95, 0, v62, s0                          // 00000013D044: D501005F 00027C80\n\tv_cndmask_b32_e64 v97, 0, v63, s0                          // 00000013D04C: D5010061 00027E80\n\tv_add_nc_u32_e32 v60, 0x1010101, v78                       // 00000013D054: 4A789CFF 01010101"
+      },
+      {
+        "line": 236,
+        "text": "\tds_store_2addr_b64 v73, v[61:62], v[63:64] offset1:32      // 00000013D10C: D9382000 003F3D49\n\tds_store_2addr_b64 v74, v[65:66], v[67:68] offset1:32      // 00000013D114: D9382000 0043414A\n\tds_store_2addr_b64 v77, v[69:70], v[71:72] offset1:32      // 00000013D11C: D9382000 0047454D\n\ts_wait_dscnt 0x0                                           // 00000013D124: BFC60000\n\ts_barrier_signal -1                                        // 00000013D128: BE804EC1\n\tv_dual_mov_b32 v57, v1 :: v_dual_mov_b32 v58, v1           // 00000013D12C: CA100101 393A0101\n\tv_dual_mov_b32 v59, v1 :: v_dual_mov_b32 v60, v1           // 00000013D134: CA100101 3B3C0101"
+      },
+      {
+        "line": 311,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[101:108], v[213:214], v[149:150], v[101:108]// 00000013D350: CC464065 1D972BD5\n\ts_wait_dscnt 0xc                                           // 00000013D358: BFC6000C\n\tv_wmma_f32_16x16x16_fp8_fp8 v[125:132], v[65:66], v[159:160], 0// 00000013D35C: CC46407D 1A033F41\n\ts_wait_loadcnt 0x0                                         // 00000013D364: BFC00000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[133:140], v[211:212], v[147:148], 0// 00000013D368: CC464085 1A0327D3\n\ts_wait_dscnt 0xb                                           // 00000013D370: BFC6000B\n\tv_wmma_f32_16x16x16_fp8_fp8 v[101:108], v[217:218], v[163:164], v[101:108]// 00000013D374: CC464065 1D9747D9"
+      },
+      {
+        "line": 381,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[109:116], v[233:234], v[199:200], v[109:116]// 00000013D584: CC46406D 1DB78FE9\n\ts_wait_dscnt 0x1                                           // 00000013D58C: BFC60001\n\tv_wmma_f32_16x16x16_fp8_fp8 v[117:124], v[233:234], v[203:204], v[117:124]// 00000013D590: CC464075 1DD797E9\n\ts_wait_dscnt 0x0                                           // 00000013D598: BFC60000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[125:132], v[233:234], v[207:208], v[125:132]// 00000013D59C: CC46407D 1DF79FE9\n\tv_wmma_f32_16x16x16_fp8_fp8 v[133:140], v[235:236], v[195:196], v[133:140]// 00000013D5A4: CC464085 1E1787EB\n\tv_wmma_f32_16x16x16_fp8_fp8 v[141:148], v[235:236], v[199:200], v[141:148]// 00000013D5AC: CC46408D 1E378FEB"
+      }
+    ]
+  },
+  {
+    "module": "c64-wave2-fast.hsaco",
+    "kernel": "c256_wave2_bi_bo_w16",
+    "vgpr": 242,
+    "lds": 32768,
+    "wait_count": 443,
+    "narrow_lds_count": 0,
+    "excerpts": [
+      {
+        "line": 212,
+        "text": "\ts_wait_loadcnt 0x1                                         // 00000017A83C: BFC00001\n\tv_cndmask_b32_e64 v115, 0, v76, s2                         // 00000017A840: D5010073 000A9880\n\tv_cndmask_b32_e64 v116, 0, v77, s2                         // 00000017A848: D5010074 000A9A80\n\ts_wait_loadcnt 0x0                                         // 00000017A850: BFC00000\n\tv_cndmask_b32_e64 v117, 0, v78, s2                         // 00000017A854: D5010075 000A9C80\n\tv_cndmask_b32_e64 v118, 0, v79, s2                         // 00000017A85C: D5010076 000A9E80\n\tv_and_b32_e32 v72, 0x7f7f7f7f, v91                         // 00000017A864: 3690B6FF 7F7F7F7F"
+      },
+      {
+        "line": 246,
+        "text": "\tds_store_2addr_b64 v82, v[69:70], v[71:72] offset1:32      // 00000017A968: D9382000 00474552\n\tds_store_2addr_b64 v83, v[73:74], v[75:76] offset1:32      // 00000017A970: D9382000 004B4953\n\tds_store_2addr_b64 v86, v[77:78], v[79:80] offset1:32      // 00000017A978: D9382000 004F4D56\n\ts_wait_dscnt 0x0                                           // 00000017A980: BFC60000\n\ts_barrier_signal -1                                        // 00000017A984: BE804EC1\n\tv_lshl_or_b32 v112, v100, 15, v108                         // 00000017A988: D6560070 05B11F64\n\tv_or3_b32 v113, v108, v109, v81                            // 00000017A990: D6580071 0546DB6C"
+      },
+      {
+        "line": 297,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[67:68], v[79:80], v[69:76]// 00000017AAE8: CC464045 1D169F43\n\ts_delay_alu instid0(VALU_DEP_3) | instskip(SKIP_1) | instid1(VALU_DEP_3)// 00000017AAF0: BF8701A3\n\tv_wmma_f32_16x16x16_fp8_fp8 v[132:139], v[67:68], v[212:213], v[132:139]// 00000017AAF4: CC464084 1E13A943\n\ts_wait_dscnt 0x0                                           // 00000017AAFC: BFC60000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[140:147], v[67:68], v[220:221], v[140:147]// 00000017AB00: CC46408C 1E33B943\n\ts_wait_loadcnt 0x6                                         // 00000017AB08: BFC00006\n\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[89:90], v[156:157], v[69:76]// 00000017AB0C: CC464045 1D173959"
+      },
+      {
+        "line": 325,
+        "text": "\ts_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 00000017AB94: BF870091\n\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[192:193], v[200:201], v[69:76]// 00000017AB98: CC464045 1D1791C0\n\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[194:195], v[202:203], v[69:76]// 00000017ABA0: CC464045 1D1795C2\n\ts_wait_loadcnt 0x0                                         // 00000017ABA8: BFC00000\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 00000017ABAC: BF870091\n\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[196:197], v[204:205], v[69:76]// 00000017ABB0: CC464045 1D1799C4\n\tv_wmma_f32_16x16x16_fp8_fp8 v[69:76], v[198:199], v[206:207], v[69:76]// 00000017ABB8: CC464045 1D179DC6"
+      }
+    ]
+  },
+  {
+    "module": "vit-stream-fast.hsaco",
+    "kernel": "vit_stream_qkv_frag_bin_w5f8_qkfrag",
+    "vgpr": 78,
+    "lds": 16384,
+    "wait_count": 29,
+    "narrow_lds_count": 16,
+    "excerpts": [
+      {
+        "line": 85,
+        "text": "\ts_and_not1_saveexec_b32 s13, s13                           // 00000009A888: BE8D300D\n\ts_cbranch_execz 12                                         // 00000009A88C: BFA5000C <vit_stream_qkv_frag_bin_w5f8_qkfrag+0x1c0>\n\tv_mov_b32_e32 v2, 0                                        // 00000009A890: 7E040280\n\ts_wait_loadcnt 0x0                                         // 00000009A894: BFC00000\n\ts_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_1)// 00000009A898: BF8700A1\n\tv_dual_mov_b32 v19, v2 :: v_dual_mov_b32 v20, v2           // 00000009A89C: CA100102 13140102\n\tv_dual_mov_b32 v17, v2 :: v_dual_mov_b32 v18, v2           // 00000009A8A4: CA100102 11120102"
+      },
+      {
+        "line": 151,
+        "text": "\tv_lshl_add_u32 v36, s16, 12, v31                           // 00000009A9FC: D6460024 047D1810\n\ts_wait_loadcnt 0x1                                         // 00000009AA04: BFC00001\n\tds_store_b128 v36, v[21:24]                                // 00000009AA08: DB7C0000 00001524\n\ts_wait_loadcnt 0x0                                         // 00000009AA10: BFC00000\n\tds_store_b128 v36, v[17:20] offset:2048                    // 00000009AA14: DB7C0800 00001124\n\ts_wait_alu 0xfffe                                          // 00000009AA1C: BF88FFFE\n\ts_or_b32 exec_lo, exec_lo, s1                              // 00000009AA20: 8C7E017E"
+      },
+      {
+        "line": 222,
+        "text": "\ts_wait_loadcnt_dscnt 0x101                                 // 00000009ABD8: BFC80101\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(SKIP_1) | instid1(VALU_DEP_2)// 00000009ABDC: BF870122\n\tv_wmma_f32_16x16x16_fp8_fp8 v[1:8], v[72:73], v[36:37], v[1:8]// 00000009ABE0: CC464001 1C064948\n\ts_wait_dscnt 0x0                                           // 00000009ABE8: BFC60000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[72:73], v[40:41], v[9:16]// 00000009ABEC: CC464009 1C265148\n\ts_wait_loadcnt 0x0                                         // 00000009ABF4: BFC00000\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_2)// 00000009ABF8: BF870112"
+      },
+      {
+        "line": 224,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[1:8], v[72:73], v[36:37], v[1:8]// 00000009ABE0: CC464001 1C064948\n\ts_wait_dscnt 0x0                                           // 00000009ABE8: BFC60000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[72:73], v[40:41], v[9:16]// 00000009ABEC: CC464009 1C265148\n\ts_wait_loadcnt 0x0                                         // 00000009ABF4: BFC00000\n\ts_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_2)// 00000009ABF8: BF870112\n\tv_wmma_f32_16x16x16_fp8_fp8 v[1:8], v[74:75], v[38:39], v[1:8]// 00000009ABFC: CC464001 1C064D4A\n\tv_wmma_f32_16x16x16_fp8_fp8 v[9:16], v[74:75], v[42:43], v[9:16]// 00000009AC04: CC464009 1C26554A"
+      }
+    ]
+  },
+  {
+    "module": "vit-stream-fast.hsaco",
+    "kernel": "vit_stream_contract_frag_bstream_bout_compactw_w16",
+    "vgpr": 112,
+    "lds": 4096,
+    "wait_count": 30,
+    "narrow_lds_count": 0,
+    "excerpts": [
+      {
+        "line": 123,
+        "text": "\tv_cvt_f32_fp8_e32 v10, v11                                 // 00000009F8A0: 7E14D90B\n\ts_wait_loadcnt 0x2                                         // 00000009F8A4: BFC00002\n\tv_cvt_f32_fp8_e32 v11, v12                                 // 00000009F8A8: 7E16D90C\n\ts_wait_loadcnt 0x0                                         // 00000009F8AC: BFC00000\n\tv_mul_f32_e32 v69, v14, v3                                 // 00000009F8B0: 108A070E\n\tv_mul_f32_e32 v59, v14, v9                                 // 00000009F8B4: 1076130E\n\ts_clause 0x1                                               // 00000009F8B8: BF850001"
+      },
+      {
+        "line": 200,
+        "text": "\tv_cvt_f32_fp8_e32 v22, v36                                 // 00000009FAA4: 7E2CD924\n\ts_wait_loadcnt 0x1                                         // 00000009FAA8: BFC00001\n\tv_cvt_f32_fp8_e32 v23, v37                                 // 00000009FAAC: 7E2ED925\n\ts_wait_loadcnt 0x0                                         // 00000009FAB0: BFC00000\n\tv_cvt_f32_fp8_e32 v24, v25                                 // 00000009FAB4: 7E30D919\n\tv_add_co_u32 v32, vcc_lo, 0x30200, v0                      // 00000009FAB8: D7006A20 000200FF 00030200\n\tv_dual_mul_f32 v62, v16, v1 :: v_dual_mul_f32 v47, v17, v11// 00000009FAC4: C8C60310 3E2E1711"
+      },
+      {
+        "line": 281,
+        "text": "\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[108:109], v[92:93], v[16:23]// 00000009FCE4: CC464010 1C42B96C\n\tv_wmma_f32_16x16x16_fp8_fp8 v[8:15], v[108:109], v[96:97], v[8:15]// 00000009FCEC: CC464008 1C22C16C\n\tv_wmma_f32_16x16x16_fp8_fp8 v[0:7], v[108:109], v[100:101], v[0:7]// 00000009FCF4: CC464000 1C02C96C\n\ts_wait_loadcnt 0x0                                         // 00000009FCFC: BFC00000\n\tv_wmma_f32_16x16x16_fp8_fp8 v[24:31], v[110:111], v[90:91], v[24:31]// 00000009FD00: CC464018 1C62B56E\n\tv_wmma_f32_16x16x16_fp8_fp8 v[16:23], v[110:111], v[94:95], v[16:23]// 00000009FD08: CC464010 1C42BD6E\n\tv_wmma_f32_16x16x16_fp8_fp8 v[8:15], v[110:111], v[98:99], v[8:15]// 00000009FD10: CC464008 1C22C56E"
+      }
+    ]
+  }
+]

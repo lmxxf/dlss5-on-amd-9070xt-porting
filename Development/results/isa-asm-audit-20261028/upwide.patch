@@ -1,0 +1,20 @@
+--- a/hip/wave_owned_mh.inc
++++ b/hip/wave_owned_mh.inc
+@@ -299,7 +299,7 @@
+    _Pragma("unroll") for(uint ci=0;ci<2;ci++)__builtin_memcpy(&b[ci],reinterpret_cast<const _Float16*>(upw)+(head*32+ci*16+rc)*IC+k+gr*8,16);
+    _Pragma("unroll") for(uint qt=0;qt<4;qt++){
+     const uint L=qt*4+(rc%8)/2;const int lx=x0/2+int(L%4),ly=y0/2+int(L/4);h8 a{};
+-    {const bool ok=lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih);const uint base=ok?(uint(ly)*iw+uint(lx))*IC:0u;for(uint e=0;e<8;e++){float v;if constexpr(LowByte)v=__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(in)[base+k+gr*8+e]),0);else v=in[base+k+gr*8+e];a[e]=ok?(_Float16)v:(_Float16)0.f;}}
++    {const bool ok=lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih);const uint base=ok?(uint(ly)*iw+uint(lx))*IC:0u;uint packed[2];if constexpr(LowByte)__builtin_memcpy(packed,reinterpret_cast<const unsigned char*>(in)+base+k+gr*8,8);for(uint e=0;e<8;e++){float v;if constexpr(LowByte)v=__builtin_amdgcn_cvt_f32_fp8(int((packed[e/4]>>(8*(e%4)))&255u),0);else v=in[base+k+gr*8+e];a[e]=ok?(_Float16)v:(_Float16)0.f;}}
+     _Pragma("unroll") for(uint ci=0;ci<2;ci++)tq[qt][ci]=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(b[ci],a,tq[qt][ci]);
+    }
+   }
+@@ -327,7 +327,7 @@
+   f8 totals[2]{};
+   for(uint k=0;k<IC;k+=16){h8 a{},b{};
+ #if W2_HOIST_LOADS&4
+-   {const bool ok=lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih);const uint base=ok?(uint(ly)*iw+uint(lx))*IC:0u;for(uint e=0;e<8;e++){float v;if constexpr(LowByte)v=__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(in)[base+k+gr*8+e]),0);else v=in[base+k+gr*8+e];a[e]=ok?(_Float16)v:(_Float16)0.f;}}
++   {const bool ok=lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih);const uint base=ok?(uint(ly)*iw+uint(lx))*IC:0u;uint packed[2];if constexpr(LowByte)__builtin_memcpy(packed,reinterpret_cast<const unsigned char*>(in)+base+k+gr*8,8);for(uint e=0;e<8;e++){float v;if constexpr(LowByte)v=__builtin_amdgcn_cvt_f32_fp8(int((packed[e/4]>>(8*(e%4)))&255u),0);else v=in[base+k+gr*8+e];a[e]=ok?(_Float16)v:(_Float16)0.f;}}
+ #else
+    if(lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih))for(uint e=0;e<8;e++){const uint i=(uint(ly)*iw+uint(lx))*IC+k+gr*8+e;if constexpr(LowByte)a[e]=(_Float16)__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(in)[i]),0);else a[e]=(_Float16)in[i];}
+ #endif

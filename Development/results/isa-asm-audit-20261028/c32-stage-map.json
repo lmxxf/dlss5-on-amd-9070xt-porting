@@ -1,0 +1,2692 @@
+{
+  "identity": "debug line-table builds have identical code and resources for all64 C32/137 C64 functions",
+  "ranges": [
+    [
+      "input/staging",
+      970,
+      1001
+    ],
+    [
+      "FFN",
+      1002,
+      1151
+    ],
+    [
+      "FFN residual/quant",
+      1152,
+      1159
+    ],
+    [
+      "QKV",
+      1160,
+      1178
+    ],
+    [
+      "Norm/QKV storage/query setup",
+      1179,
+      1201
+    ],
+    [
+      "Score/Exp",
+      1202,
+      1206
+    ],
+    [
+      "Sum/prob",
+      1207,
+      1209
+    ],
+    [
+      "AV",
+      1210,
+      1210
+    ],
+    [
+      "OutProj/residual",
+      1211,
+      1232
+    ],
+    [
+      "Post/Down/tail",
+      1233,
+      1380
+    ]
+  ],
+  "method": "DWARF source line attribution; shared helpers stay separate, no guessed stage attribution",
+  "kernels": {
+    "c32_wave1_chain_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b32": 1,
+          "s_clause": 8,
+          "s_load_b256": 1,
+          "s_load_b128": 1,
+          "s_load_b96": 1,
+          "v_and_b32_e32": 3,
+          "s_mov_b32": 6,
+          "v_lshrrev_b32_e32": 9,
+          "v_dual_mov_b32": 17,
+          "v_mov_b32_e32": 18,
+          "s_wait_kmcnt": 1,
+          "s_lshl1_add_u32": 1,
+          "s_lshr_b32": 1,
+          "s_cvt_f32_u32": 1,
+          "s_delay_alu": 16,
+          "v_s_rcp_f32": 1,
+          "s_mul_f32": 1,
+          "s_wait_alu": 12,
+          "s_cvt_u32_f32": 1,
+          "s_sub_co_i32": 3,
+          "s_mul_i32": 2,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 3,
+          "s_cmp_ge_u32": 2,
+          "s_cselect_b32": 3,
+          "v_subrev_nc_u32_e32": 1,
+          "s_and_saveexec_b32": 2,
+          "s_cbranch_execz": 2,
+          "global_load_b64": 3,
+          "s_or_b32": 2,
+          "global_load_b128": 18,
+          "v_add_co_u32": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "v_med3_num_f32": 16,
+          "s_setreg_imm32_b32": 36,
+          "v_cvt_pk_fp8_f32": 72,
+          "v_cvt_pk_rtz_f16_f32_e32": 16,
+          "global_load_b32": 3,
+          "v_dual_max_num_f32": 32,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_cndmask_b32_e32": 1,
+          "v_cndmask_b32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "v_fma_mix_f32": 16,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 1,
+          "s_cmp_ge_u32": 1,
+          "s_cbranch_scc1": 1,
+          "v_add_co_u32": 5,
+          "s_wait_alu": 7,
+          "s_mul_i32": 1,
+          "s_sub_co_i32": 2,
+          "v_lshl_add_u32": 1,
+          "v_add_co_ci_u32_e64": 3,
+          "s_delay_alu": 5,
+          "v_add_nc_u32_e32": 3,
+          "v_cmp_lt_i32_e32": 1,
+          "v_cmp_gt_i32_e64": 2,
+          "v_lshrrev_b32_e32": 3,
+          "v_and_b32_e32": 2,
+          "s_lshl_b32": 2,
+          "s_lshr_b32": 1,
+          "v_lshl_or_b32": 3,
+          "v_lshlrev_b32_e32": 4,
+          "v_and_or_b32": 1,
+          "v_mad_co_u64_u32": 1,
+          "v_cmp_lt_i32_e64": 1,
+          "v_mov_b32_e32": 2,
+          "s_and_b32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "s_mov_b32": 2,
+          "s_mov_b64": 1
+        },
+        "FFN": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 6,
+          "v_add_co_ci_u32_e64": 1,
+          "s_and_b32": 2,
+          "s_wait_loadcnt": 7,
+          "v_wmma_f32_16x16x16_fp8_fp8": 14,
+          "s_delay_alu": 11,
+          "s_mov_b32": 1,
+          "s_lshl_b32": 2,
+          "v_fma_f32": 16,
+          "v_dual_fmaak_f32": 8,
+          "v_dual_mul_f32": 8,
+          "v_or_b32_e32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Norm/QKV storage/query setup": {
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 11,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "s_lshl_b32": 1,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_lshl_or_b32": 1,
+          "s_wait_alu": 5,
+          "v_add_co_ci_u32_e64": 6,
+          "v_or3_b32": 1,
+          "v_add_co_u32": 4,
+          "s_mov_b32": 4,
+          "v_movrels_b32_e32": 4,
+          "s_add_co_i32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_lg_u32": 1,
+          "s_cbranch_scc1": 1
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 32,
+          "v_dual_mul_f32": 16,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 8,
+          "s_delay_alu": 2,
+          "global_store_b64": 2
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "000000070600",
+            "instruction": "s_load_b32 s2, s[0:1], 0x20                                // 000000070600: F4000080 F8000020"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000070614",
+            "instruction": "s_clause 0x2                                               // 000000070614: BF850002"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000070618",
+            "instruction": "s_load_b256 s[4:11], s[0:1], 0x0                           // 000000070618: F4006100 F8000000"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000070620",
+            "instruction": "s_load_b128 s[12:15], s[0:1], 0x2c                         // 000000070620: F4004300 F800002C"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "000000070608",
+            "instruction": "s_wait_kmcnt 0x0                                           // 000000070608: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000007060C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s2                                     // 00000007060C: BF090275"
+          },
+          {
+            "source_line": 970,
+            "pc": "000000070610",
+            "instruction": "s_cbranch_scc1 1806                                        // 000000070610: BFA2070E <c32_wave1_chain_w16+0x1c4c>"
+          },
+          {
+            "source_line": 995,
+            "pc": "0000000707A4",
+            "instruction": "v_add_co_u32 v79, s2, s4, v78                              // 0000000707A4: D700024F 02029C04"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1002,
+            "pc": "000000070888",
+            "instruction": "v_add_co_u32 v49, s1, v79, v49                             // 000000070888: D7000131 0202634F"
+          },
+          {
+            "source_line": 1002,
+            "pc": "000000070890",
+            "instruction": "s_wait_alu depctr_va_sdst(0)                               // 000000070890: BF88F19F"
+          },
+          {
+            "source_line": 1002,
+            "pc": "000000070894",
+            "instruction": "v_add_co_ci_u32_e64 v50, null, 0, v80, s1                  // 000000070894: D5207C32 0006A080"
+          },
+          {
+            "source_line": 1002,
+            "pc": "00000007089C",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000007089C: BF88FF9E"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "000000070CA0",
+            "instruction": "v_lshl_or_b32 v61, s3, 10, v74                             // 000000070CA0: D656003D 05291403"
+          },
+          {
+            "source_line": 1155,
+            "pc": "000000070CC8",
+            "instruction": "v_cvt_f32_f16_e32 v62, v57.l                               // 000000070CC8: 7E7C1739"
+          },
+          {
+            "source_line": 1155,
+            "pc": "000000070CCC",
+            "instruction": "v_cvt_f32_f16_e32 v63, v58.l                               // 000000070CCC: 7E7E173A"
+          },
+          {
+            "source_line": 1155,
+            "pc": "000000070CD0",
+            "instruction": "v_cvt_f32_f16_e32 v64, v59.l                               // 000000070CD0: 7E80173B"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "000000070DB0",
+            "instruction": "s_wait_loadcnt 0x2                                         // 000000070DB0: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "000000070DB4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[49:56], v[70:71], v[98:99], 0// 000000070DB4: CC464031 1A02C546"
+          },
+          {
+            "source_line": 1171,
+            "pc": "000000070DBC",
+            "instruction": "s_wait_loadcnt 0x1                                         // 000000070DBC: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "000000070DC0",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[57:64], v[82:83], v[98:99], 0// 000000070DC0: CC464039 1A02C552"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1179,
+            "pc": "000000070DD4",
+            "instruction": "v_dual_mov_b32 v73, s19 :: v_dual_mov_b32 v72, s18         // 000000070DD4: CA100013 49480012"
+          },
+          {
+            "source_line": 1179,
+            "pc": "000000070DDC",
+            "instruction": "v_dual_mov_b32 v71, s17 :: v_dual_mov_b32 v70, s16         // 000000070DDC: CA100011 47460010"
+          },
+          {
+            "source_line": 1179,
+            "pc": "000000070DF0",
+            "instruction": "v_fma_mixlo_f16 v90, v49, v49, 0                           // 000000070DF0: CC21005A 02026331"
+          },
+          {
+            "source_line": 1179,
+            "pc": "000000070DF8",
+            "instruction": "v_fma_mixlo_f16 v91, v51, v51, 0                           // 000000070DF8: CC21005B 02026733"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "0000000713B0",
+            "instruction": "v_add_co_u32 v56, vcc_lo, v0, s34                          // 0000000713B0: D7006A38 02004500"
+          },
+          {
+            "source_line": 1205,
+            "pc": "0000000713B8",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 0000000713B8: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "0000000713BC",
+            "instruction": "v_add_co_ci_u32_e64 v57, null, s35, v55, vcc_lo            // 0000000713BC: D5207C39 01AA6E23"
+          },
+          {
+            "source_line": 1205,
+            "pc": "0000000713C4",
+            "instruction": "s_clause 0x7                                               // 0000000713C4: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "000000071470",
+            "instruction": "v_dual_mov_b32 v130, s39 :: v_dual_mov_b32 v129, s38       // 000000071470: CA100027 82800026"
+          },
+          {
+            "source_line": 1208,
+            "pc": "000000071478",
+            "instruction": "v_dual_mov_b32 v128, s37 :: v_dual_mov_b32 v127, s36       // 000000071478: CA100025 807E0024"
+          },
+          {
+            "source_line": 1208,
+            "pc": "000000071C58",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[127:130], v[67:70], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 000000071C58: CC404238 5A02877F"
+          },
+          {
+            "source_line": 1208,
+            "pc": "000000071C90",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[127:130], v[75:78], v[56:63] neg_lo:[0,1,0] neg_hi:[0,1,0]// 000000071C90: CC404238 5CE2977F"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "000000071E3C",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[17:18], v[67:68], 0// 000000071E3C: CC464038 1A028711"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000071E44",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[75:82], v[19:20], v[67:68], 0// 000000071E44: CC46404B 1A028713"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000071E80",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[21:22], v[67:68], v[56:63]// 000000071E80: CC464038 1CE28715"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000071E88",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[75:82], v[23:24], v[67:68], v[75:82]// 000000071E88: CC46404B 1D2E8717"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "000000071FB8",
+            "instruction": "ds_load_b128 v[79:82], v74                                 // 000000071FB8: DBFC0000 4F00004A"
+          },
+          {
+            "source_line": 1215,
+            "pc": "000000071FC0",
+            "instruction": "s_wait_loadcnt 0x4                                         // 000000071FC0: BFC00004"
+          },
+          {
+            "source_line": 1215,
+            "pc": "000000071FC4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[67:68], v[71:72], 0// 000000071FC4: CC464038 1A028F43"
+          },
+          {
+            "source_line": 1220,
+            "pc": "000000071FCC",
+            "instruction": "s_wait_loadcnt_dscnt 0x300                                 // 000000071FCC: BFC80300"
+          }
+        ]
+      }
+    },
+    "c32_wave1_prefix_b8d_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b32": 3,
+          "s_clause": 6,
+          "s_load_b256": 1,
+          "s_load_b128": 1,
+          "s_load_b64": 1,
+          "v_and_b32_e32": 3,
+          "v_lshrrev_b32_e32": 20,
+          "s_and_b32": 1,
+          "s_mov_b32": 7,
+          "v_lshl_or_b32": 4,
+          "v_dual_mov_b32": 21,
+          "v_mov_b32_e32": 21,
+          "v_cmp_eq_u32_e32": 1,
+          "v_lshlrev_b32_e32": 1,
+          "s_wait_kmcnt": 2,
+          "s_lshr_b32": 1,
+          "s_cvt_f32_u32": 1,
+          "s_wait_alu": 19,
+          "v_s_rcp_f32": 1,
+          "s_delay_alu": 28,
+          "s_mul_f32": 1,
+          "s_cvt_u32_f32": 1,
+          "s_sub_co_i32": 4,
+          "s_mul_i32": 4,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 3,
+          "s_cmp_ge_u32": 2,
+          "s_cselect_b32": 4,
+          "s_lshl_b32": 1,
+          "s_cmp_lg_u32": 1,
+          "s_getpc_b64": 1,
+          "s_sext_i32_i16": 1,
+          "s_add_co_u32": 1,
+          "s_add_co_ci_u32": 1,
+          "v_cndmask_b32_e64": 32,
+          "v_cndmask_b32_e32": 6,
+          "v_add_co_u32": 3,
+          "s_cvt_f16_f32": 1,
+          "v_mul_lo_u32": 4,
+          "v_add_co_ci_u32_e64": 3,
+          "v_add_nc_u32_e32": 3,
+          "v_xor_b32_e32": 4,
+          "v_xad_u32": 2,
+          "v_cvt_f32_u32_e32": 2,
+          "v_mul_f32_e32": 2,
+          "v_cvt_pk_rtz_f16_f32_e32": 24,
+          "ds_bpermute_b32": 1,
+          "s_branch": 1,
+          "s_setreg_imm32_b32": 56,
+          "v_cvt_pk_fp8_f32": 112,
+          "v_dual_max_num_f32": 35,
+          "v_med3_num_f32": 32,
+          "global_load_b128": 16,
+          "global_load_b32": 1,
+          "v_max_num_f32_e32": 10,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 1,
+          "s_cmp_ge_u32": 1,
+          "s_cbranch_scc1": 1,
+          "v_xor3_b32": 1,
+          "s_add_co_i32": 1,
+          "s_wait_alu": 2,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "v_lshlrev_b32_e32": 2,
+          "s_delay_alu": 2,
+          "v_and_or_b32": 1,
+          "s_mov_b64": 1,
+          "s_mov_b32": 2,
+          "v_dual_mov_b32": 1,
+          "v_add_co_u32": 1,
+          "v_add_co_ci_u32_e64": 1
+        },
+        "FFN": {
+          "v_pack_b32_f16": 9,
+          "s_mov_b32": 4,
+          "v_lshl_or_b32": 1,
+          "s_delay_alu": 19,
+          "v_lshrrev_b32_e32": 1,
+          "v_add_nc_u32_e32": 1,
+          "v_mul_lo_u32": 2,
+          "v_add_lshl_u32": 1,
+          "v_lshlrev_b64_e32": 1,
+          "v_add_co_u32": 2,
+          "s_wait_alu": 5,
+          "v_add_co_ci_u32_e64": 2,
+          "global_load_b96": 2,
+          "v_xor_b32_e32": 1,
+          "v_mad_co_u64_u32": 2,
+          "v_log_f32_e32": 1,
+          "v_mul_f32_e32": 10,
+          "v_dual_mul_f32": 17,
+          "v_cos_f32_e32": 1,
+          "v_sqrt_f32_e32": 1,
+          "v_sin_f32_e32": 1,
+          "s_and_b32": 1,
+          "s_wait_loadcnt": 12,
+          "v_dual_add_f32": 2,
+          "v_add_f32_e32": 2,
+          "s_cselect_b32": 1,
+          "s_cmp_lg_u32": 1,
+          "s_cbranch_scc1": 1,
+          "s_clause": 3,
+          "global_load_b128": 8,
+          "v_cndmask_b32_e32": 1,
+          "v_dual_cndmask_b32": 2,
+          "s_wait_dscnt": 1,
+          "v_cndmask_b32_e64": 1,
+          "v_perm_b32": 3,
+          "v_cvt_f16_f32_e32": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "v_fma_f32": 16,
+          "v_fmaak_f32": 4,
+          "v_dual_fmaak_f32": 6,
+          "s_lshl_b32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Norm/QKV storage/query setup": {
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 9,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "s_lshl_b32": 1,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_add_co_u32": 1,
+          "s_wait_alu": 2,
+          "v_add_co_ci_u32_e64": 1,
+          "s_mov_b32": 4,
+          "s_add_co_i32": 4,
+          "v_movrels_b32_e32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 30,
+          "v_add_f32_e32": 4,
+          "v_dual_mul_f32": 15,
+          "v_mul_f32_e32": 2,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 4,
+          "v_nop": 1,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 7,
+          "v_add_f32_e32": 2,
+          "ds_store_b128": 2
+        },
+        "Post/Down/tail": {
+          "s_mul_hi_u32": 1,
+          "s_wait_alu": 36,
+          "s_mul_i32": 10,
+          "s_sub_co_i32": 3,
+          "s_add_co_i32": 9,
+          "s_cmp_ge_u32": 2,
+          "s_cselect_b32": 3,
+          "v_and_b32_e32": 4,
+          "v_lshrrev_b32_e32": 6,
+          "v_lshlrev_b32_e32": 4,
+          "s_lshl_b32": 2,
+          "s_cmp_eq_u64": 2,
+          "s_wait_dscnt": 13,
+          "s_cbranch_scc1": 2,
+          "s_delay_alu": 25,
+          "v_or_b32_e32": 4,
+          "v_lshl_or_b32": 3,
+          "ds_load_b128": 16,
+          "v_fma_mix_f32": 96,
+          "v_add_co_u32": 12,
+          "v_add_lshl_u32": 10,
+          "v_add_co_ci_u32_e64": 12,
+          "global_store_b64": 10,
+          "v_and_or_b32": 3,
+          "s_lshr_b32": 1,
+          "v_add_nc_u32_e32": 2,
+          "v_add_f32_e32": 2,
+          "v_dual_add_f32": 15,
+          "v_dual_mul_f32": 8,
+          "v_mul_lo_u32": 2
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "000000087800",
+            "instruction": "s_load_b32 s2, s[0:1], 0x30                                // 000000087800: F4000080 F8000030"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000087814",
+            "instruction": "s_clause 0x3                                               // 000000087814: BF850003"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000087818",
+            "instruction": "s_load_b256 s[4:11], s[0:1], 0x0                           // 000000087818: F4006100 F8000000"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000087820",
+            "instruction": "s_load_b128 s[36:39], s[0:1], 0x20                         // 000000087820: F4004900 F8000020"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "000000087808",
+            "instruction": "s_wait_kmcnt 0x0                                           // 000000087808: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008780C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s2                                     // 00000008780C: BF090275"
+          },
+          {
+            "source_line": 970,
+            "pc": "000000087810",
+            "instruction": "s_cbranch_scc1 2679                                        // 000000087810: BFA20A77 <c32_wave1_prefix_b8d_w16+0x29f0>"
+          },
+          {
+            "source_line": 995,
+            "pc": "000000087AEC",
+            "instruction": "v_xor3_b32 v92, 0x243f6a88, s0, v50                        // 000000087AEC: D640005C 04C800FF 243F6A88"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1020,
+            "pc": "000000087AF8",
+            "instruction": "v_pack_b32_f16 v72, v49.l, v55.l                           // 000000087AF8: D7110048 02026F31"
+          },
+          {
+            "source_line": 1020,
+            "pc": "000000087B00",
+            "instruction": "s_mov_b32 s17, s16                                         // 000000087B00: BE910010"
+          },
+          {
+            "source_line": 1020,
+            "pc": "000000087B04",
+            "instruction": "s_mov_b32 s18, s16                                         // 000000087B04: BE920010"
+          },
+          {
+            "source_line": 1020,
+            "pc": "000000087B08",
+            "instruction": "s_mov_b32 s19, s16                                         // 000000087B08: BE930010"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "00000008839C",
+            "instruction": "v_lshl_or_b32 v61, s12, 10, v85                            // 00000008839C: D656003D 0555140C"
+          },
+          {
+            "source_line": 1155,
+            "pc": "0000000883C4",
+            "instruction": "v_cvt_f32_f16_e32 v62, v57.l                               // 0000000883C4: 7E7C1739"
+          },
+          {
+            "source_line": 1155,
+            "pc": "0000000883C8",
+            "instruction": "v_cvt_f32_f16_e32 v63, v58.l                               // 0000000883C8: 7E7E173A"
+          },
+          {
+            "source_line": 1155,
+            "pc": "0000000883CC",
+            "instruction": "v_cvt_f32_f16_e32 v64, v59.l                               // 0000000883CC: 7E80173B"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "0000000884AC",
+            "instruction": "s_wait_loadcnt 0x2                                         // 0000000884AC: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "0000000884B0",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[49:56], v[93:94], v[69:70], 0// 0000000884B0: CC464031 1A028B5D"
+          },
+          {
+            "source_line": 1171,
+            "pc": "0000000884B8",
+            "instruction": "s_wait_loadcnt 0x1                                         // 0000000884B8: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "0000000884BC",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[57:64], v[97:98], v[69:70], 0// 0000000884BC: CC464039 1A028B61"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1179,
+            "pc": "0000000884D0",
+            "instruction": "v_dual_mov_b32 v104, s19 :: v_dual_mov_b32 v103, s18       // 0000000884D0: CA100013 68660012"
+          },
+          {
+            "source_line": 1179,
+            "pc": "0000000884D8",
+            "instruction": "v_dual_mov_b32 v102, s17 :: v_dual_mov_b32 v101, s16       // 0000000884D8: CA100011 66640010"
+          },
+          {
+            "source_line": 1179,
+            "pc": "0000000884EC",
+            "instruction": "v_fma_mixlo_f16 v105, v49, v49, 0                          // 0000000884EC: CC210069 02026331"
+          },
+          {
+            "source_line": 1179,
+            "pc": "0000000884F4",
+            "instruction": "v_fma_mixlo_f16 v106, v51, v51, 0                          // 0000000884F4: CC21006A 02026733"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "000000088A5C",
+            "instruction": "v_add_co_u32 v54, vcc_lo, v52, s34                         // 000000088A5C: D7006A36 02004534"
+          },
+          {
+            "source_line": 1205,
+            "pc": "000000088A64",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 000000088A64: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "000000088A68",
+            "instruction": "v_add_co_ci_u32_e64 v55, null, s35, v53, vcc_lo            // 000000088A68: D5207C37 01AA6A23"
+          },
+          {
+            "source_line": 1205,
+            "pc": "000000088A70",
+            "instruction": "s_clause 0x7                                               // 000000088A70: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "000000088B20",
+            "instruction": "v_dual_mov_b32 v129, s43 :: v_dual_mov_b32 v128, s42       // 000000088B20: CA10002B 8180002A"
+          },
+          {
+            "source_line": 1208,
+            "pc": "000000088B28",
+            "instruction": "v_dual_mov_b32 v127, s41 :: v_dual_mov_b32 v126, s40       // 000000088B28: CA100029 7F7E0028"
+          },
+          {
+            "source_line": 1208,
+            "pc": "000000089314",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[54:61], v[126:129], v[62:65], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 000000089314: CC404236 5A027D7E"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008934C",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[54:61], v[126:129], v[66:69], v[54:61] neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000008934C: CC404236 5CDA857E"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "0000000894F8",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[54:61], v[17:18], v[70:71], 0// 0000000894F8: CC464036 1A028D11"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000089500",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[62:69], v[19:20], v[70:71], 0// 000000089500: CC46403E 1A028D13"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008953C",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[54:61], v[21:22], v[70:71], v[54:61]// 00000008953C: CC464036 1CDA8D15"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000089544",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[62:69], v[23:24], v[70:71], v[62:69]// 000000089544: CC46403E 1CFA8D17"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "000000089680",
+            "instruction": "ds_load_b128 v[94:97], v51                                 // 000000089680: DBFC0000 5E000033"
+          },
+          {
+            "source_line": 1220,
+            "pc": "000000089688",
+            "instruction": "ds_load_b128 v[98:101], v51 offset:512                     // 000000089688: DBFC0200 62000033"
+          },
+          {
+            "source_line": 1215,
+            "pc": "000000089690",
+            "instruction": "s_wait_loadcnt 0x5                                         // 000000089690: BFC00005"
+          },
+          {
+            "source_line": 1215,
+            "pc": "000000089694",
+            "instruction": "v_nop                                                      // 000000089694: 7E000000"
+          }
+        ],
+        "Post/Down/tail": [
+          {
+            "source_line": 1342,
+            "pc": "0000000897E0",
+            "instruction": "s_mul_hi_u32 s0, ttmp9, s44                                // 0000000897E0: 96802C75"
+          },
+          {
+            "source_line": 1342,
+            "pc": "0000000897E4",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 0000000897E4: BF88FF9E"
+          },
+          {
+            "source_line": 1342,
+            "pc": "0000000897E8",
+            "instruction": "s_mul_i32 s1, s0, s33                                      // 0000000897E8: 96012100"
+          },
+          {
+            "source_line": 1342,
+            "pc": "0000000897EC",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 0000000897EC: BF88FF9E"
+          }
+        ]
+      }
+    },
+    "c32_wave1_mapped_b8_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b32": 1,
+          "s_clause": 7,
+          "s_load_b256": 1,
+          "s_load_b128": 1,
+          "v_and_b32_e32": 2,
+          "s_mov_b32": 8,
+          "v_lshrrev_b32_e32": 9,
+          "v_dual_mov_b32": 17,
+          "v_mov_b32_e32": 17,
+          "s_wait_kmcnt": 1,
+          "s_lshl1_add_u32": 1,
+          "s_lshr_b32": 1,
+          "s_cvt_f32_u32": 1,
+          "s_delay_alu": 18,
+          "v_s_rcp_f32": 1,
+          "s_mul_f32": 1,
+          "s_wait_alu": 12,
+          "s_cvt_u32_f32": 1,
+          "s_sub_co_i32": 4,
+          "s_mul_i32": 3,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 3,
+          "s_cmp_ge_u32": 2,
+          "s_cselect_b32": 3,
+          "v_lshlrev_b32_e32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "v_add_co_u32": 2,
+          "v_lshl_add_u32": 1,
+          "v_add_co_ci_u32_e64": 2,
+          "v_cmp_lt_i32_e32": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_lshl_b32": 1,
+          "s_setreg_imm32_b32": 40,
+          "v_cvt_pk_fp8_f32": 80,
+          "v_dual_max_num_f32": 35,
+          "v_med3_num_f32": 24,
+          "v_lshl_or_b32": 1,
+          "global_load_b128": 15,
+          "v_cvt_pk_rtz_f16_f32_e32": 16,
+          "global_load_b32": 3,
+          "v_max_num_f32_e32": 2,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_cndmask_b32_e32": 1,
+          "v_cndmask_b32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "global_load_b64": 1,
+          "v_fma_mix_f32": 16,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 1,
+          "s_cmp_ge_u32": 1,
+          "s_cbranch_scc1": 1,
+          "s_wait_alu": 2,
+          "s_sub_co_i32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "v_and_b32_e32": 1,
+          "s_lshl_b32": 1,
+          "v_lshlrev_b32_e32": 2,
+          "v_lshl_or_b32": 1,
+          "s_mov_b32": 2,
+          "s_mov_b64": 1,
+          "v_add_co_u32": 2
+        },
+        "FFN": {
+          "v_lshl_or_b32": 1,
+          "s_delay_alu": 11,
+          "v_lshrrev_b32_e32": 5,
+          "s_wait_alu": 11,
+          "v_add_nc_u32_e32": 1,
+          "v_mov_b32_e32": 4,
+          "v_mul_lo_u32": 1,
+          "v_dual_mov_b32": 6,
+          "v_cmp_lt_i32_e64": 1,
+          "v_add_lshl_u32": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_and_b32": 3,
+          "v_add_co_u32": 3,
+          "v_add_co_ci_u32_e64": 3,
+          "s_and_saveexec_b32": 2,
+          "s_cbranch_execz": 2,
+          "global_load_b64": 2,
+          "s_wait_loadcnt": 9,
+          "v_and_b32_e32": 4,
+          "v_bfe_u32": 8,
+          "v_cvt_f32_fp8_e32": 16,
+          "s_or_b32": 2,
+          "s_clause": 2,
+          "global_load_b128": 4,
+          "v_dual_max_num_f32": 4,
+          "v_med3_num_f32": 8,
+          "v_dual_mul_f32": 16,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "v_fma_f32": 16,
+          "v_dual_fmaak_f32": 8,
+          "s_lshl_b32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Norm/QKV storage/query setup": {
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 11,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "s_lshl_b32": 1,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_lshl_or_b32": 1,
+          "s_wait_alu": 5,
+          "v_add_co_ci_u32_e64": 6,
+          "v_or3_b32": 1,
+          "v_add_co_u32": 4,
+          "s_mov_b32": 4,
+          "v_movrels_b32_e32": 4,
+          "s_add_co_i32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_lg_u32": 1,
+          "s_cbranch_scc1": 1
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 30,
+          "v_add_f32_e32": 4,
+          "v_dual_mul_f32": 15,
+          "v_mul_f32_e32": 2,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 7,
+          "v_add_f32_e32": 2,
+          "global_store_b64": 2,
+          "s_delay_alu": 1
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "00000008A200",
+            "instruction": "s_load_b32 s2, s[0:1], 0x20                                // 00000008A200: F4000080 F8000020"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008A214",
+            "instruction": "s_clause 0x1                                               // 00000008A214: BF850001"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008A218",
+            "instruction": "s_load_b256 s[4:11], s[0:1], 0x0                           // 00000008A218: F4006100 F8000000"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008A220",
+            "instruction": "s_load_b128 s[12:15], s[0:1], 0x2c                         // 00000008A220: F4004300 F800002C"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "00000008A208",
+            "instruction": "s_wait_kmcnt 0x0                                           // 00000008A208: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008A20C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s2                                     // 00000008A20C: BF090275"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008A210",
+            "instruction": "s_cbranch_scc1 1950                                        // 00000008A210: BFA2079E <c32_wave1_mapped_b8_w16+0x1e8c>"
+          },
+          {
+            "source_line": 995,
+            "pc": "00000008A3FC",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008A3FC: BF88FF9E"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1062,
+            "pc": "00000008A404",
+            "instruction": "v_lshl_or_b32 v49, s3, 4, v74                              // 00000008A404: D6560031 05290803"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008A40C",
+            "instruction": "s_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_1)// 00000008A40C: BF8700A1"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008A410",
+            "instruction": "v_lshrrev_b32_e32 v49, 3, v49                              // 00000008A410: 32626283"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008A414",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008A414: BF88FF9E"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "00000008AAD8",
+            "instruction": "v_lshl_or_b32 v61, s3, 10, v73                             // 00000008AAD8: D656003D 05251403"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008AB00",
+            "instruction": "v_cvt_f32_f16_e32 v62, v57.l                               // 00000008AB00: 7E7C1739"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008AB04",
+            "instruction": "v_cvt_f32_f16_e32 v63, v58.l                               // 00000008AB04: 7E7E173A"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008AB08",
+            "instruction": "v_cvt_f32_f16_e32 v64, v59.l                               // 00000008AB08: 7E80173B"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "00000008ABE8",
+            "instruction": "s_wait_loadcnt 0x2                                         // 00000008ABE8: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008ABEC",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[49:56], v[69:70], v[95:96], 0// 00000008ABEC: CC464031 1A02BF45"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008ABF4",
+            "instruction": "s_wait_loadcnt 0x1                                         // 00000008ABF4: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008ABF8",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[57:64], v[79:80], v[95:96], 0// 00000008ABF8: CC464039 1A02BF4F"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1179,
+            "pc": "00000008AC0C",
+            "instruction": "v_dual_mov_b32 v72, s19 :: v_dual_mov_b32 v71, s18         // 00000008AC0C: CA100013 48460012"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008AC14",
+            "instruction": "v_dual_mov_b32 v70, s17 :: v_dual_mov_b32 v69, s16         // 00000008AC14: CA100011 46440010"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008AC28",
+            "instruction": "v_fma_mixlo_f16 v87, v49, v49, 0                           // 00000008AC28: CC210057 02026331"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008AC30",
+            "instruction": "v_fma_mixlo_f16 v88, v51, v51, 0                           // 00000008AC30: CC210058 02026733"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "00000008B1E8",
+            "instruction": "v_add_co_u32 v56, vcc_lo, v0, s34                          // 00000008B1E8: D7006A38 02004500"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008B1F0",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 00000008B1F0: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008B1F4",
+            "instruction": "v_add_co_ci_u32_e64 v57, null, s35, v55, vcc_lo            // 00000008B1F4: D5207C39 01AA6E23"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008B1FC",
+            "instruction": "s_clause 0x7                                               // 00000008B1FC: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "00000008B2A8",
+            "instruction": "v_dual_mov_b32 v129, s39 :: v_dual_mov_b32 v128, s38       // 00000008B2A8: CA100027 81800026"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008B2B0",
+            "instruction": "v_dual_mov_b32 v127, s37 :: v_dual_mov_b32 v126, s36       // 00000008B2B0: CA100025 7F7E0024"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008BA9C",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[126:129], v[67:70], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000008BA9C: CC404238 5A02877E"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008BAD4",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[126:129], v[74:77], v[56:63] neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000008BAD4: CC404238 5CE2957E"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "00000008BC80",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[17:18], v[67:68], 0// 00000008BC80: CC464038 1A028711"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008BC88",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[74:81], v[19:20], v[67:68], 0// 00000008BC88: CC46404A 1A028713"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008BCC4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[21:22], v[67:68], v[56:63]// 00000008BCC4: CC464038 1CE28715"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008BCCC",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[74:81], v[23:24], v[67:68], v[74:81]// 00000008BCCC: CC46404A 1D2A8717"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "00000008BDFC",
+            "instruction": "ds_load_b128 v[78:81], v73                                 // 00000008BDFC: DBFC0000 4E000049"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000008BE04",
+            "instruction": "s_wait_loadcnt 0x4                                         // 00000008BE04: BFC00004"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000008BE08",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[67:68], v[71:72], 0// 00000008BE08: CC464038 1A028F43"
+          },
+          {
+            "source_line": 1220,
+            "pc": "00000008BE10",
+            "instruction": "s_wait_loadcnt_dscnt 0x300                                 // 00000008BE10: BFC80300"
+          }
+        ]
+      }
+    },
+    "c32_wave1_finish_b8_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b32": 1,
+          "s_clause": 7,
+          "s_load_b256": 1,
+          "s_load_b64": 1,
+          "s_load_b128": 1,
+          "s_load_b96": 1,
+          "v_and_b32_e32": 3,
+          "s_mov_b32": 6,
+          "v_lshrrev_b32_e32": 9,
+          "v_dual_mov_b32": 17,
+          "v_mov_b32_e32": 18,
+          "s_wait_kmcnt": 1,
+          "s_lshl1_add_u32": 1,
+          "s_lshr_b32": 1,
+          "s_cvt_f32_u32": 1,
+          "s_delay_alu": 16,
+          "v_s_rcp_f32": 1,
+          "s_mul_f32": 1,
+          "s_wait_alu": 13,
+          "s_cvt_u32_f32": 1,
+          "s_sub_co_i32": 3,
+          "s_mul_i32": 3,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 3,
+          "s_cmp_ge_u32": 2,
+          "s_cselect_b32": 3,
+          "v_subrev_nc_u32_e32": 1,
+          "s_and_saveexec_b32": 2,
+          "s_cbranch_execz": 2,
+          "global_load_b64": 3,
+          "s_or_b32": 2,
+          "global_load_b128": 18,
+          "v_add_co_u32": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "v_med3_num_f32": 16,
+          "s_setreg_imm32_b32": 52,
+          "v_cvt_pk_fp8_f32": 104,
+          "v_cvt_pk_rtz_f16_f32_e32": 16,
+          "global_load_b32": 3,
+          "v_dual_max_num_f32": 32,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_cndmask_b32_e32": 1,
+          "v_cndmask_b32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 1,
+          "s_cmp_ge_u32": 1,
+          "s_cbranch_scc1": 1,
+          "v_add_co_u32": 5,
+          "s_wait_alu": 5,
+          "s_sub_co_i32": 2,
+          "s_lshl_b32": 2,
+          "v_add_nc_u32_e32": 4,
+          "v_add_co_ci_u32_e64": 3,
+          "s_delay_alu": 6,
+          "v_cmp_lt_i32_e32": 1,
+          "v_cmp_gt_i32_e64": 2,
+          "v_lshrrev_b32_e32": 3,
+          "v_and_b32_e32": 1,
+          "s_lshr_b32": 1,
+          "v_lshl_or_b32": 3,
+          "v_lshlrev_b32_e32": 4,
+          "v_and_or_b32": 2,
+          "v_mad_co_u64_u32": 1,
+          "v_cmp_lt_i32_e64": 1,
+          "v_mov_b32_e32": 3,
+          "s_and_b32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "s_mov_b64": 1,
+          "s_mov_b32": 2
+        },
+        "FFN": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 6,
+          "v_add_co_ci_u32_e64": 1,
+          "s_and_b32": 2,
+          "s_wait_loadcnt": 7,
+          "v_wmma_f32_16x16x16_fp8_fp8": 14,
+          "s_delay_alu": 11,
+          "s_mov_b32": 1,
+          "s_lshl_b32": 2,
+          "v_fma_f32": 16,
+          "v_dual_fmaak_f32": 8,
+          "v_dual_mul_f32": 8,
+          "v_or_b32_e32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Norm/QKV storage/query setup": {
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 9,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "s_lshl_b32": 1,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_lshlrev_b32_e32": 1,
+          "s_wait_alu": 4,
+          "v_add_co_ci_u32_e64": 3,
+          "v_add_co_u32": 1,
+          "s_mov_b32": 4,
+          "s_add_co_i32": 4,
+          "v_movrels_b32_e32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 32,
+          "v_dual_mul_f32": 16,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "s_wait_alu": 1,
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 8,
+          "ds_store_b128": 2
+        },
+        "Post/Down/tail": {
+          "v_and_b32_e32": 3,
+          "v_lshrrev_b32_e32": 6,
+          "s_delay_alu": 34,
+          "v_lshlrev_b32_e32": 5,
+          "s_cmp_eq_u64": 2,
+          "s_wait_dscnt": 13,
+          "s_cbranch_scc1": 2,
+          "v_or_b32_e32": 12,
+          "v_lshl_or_b32": 13,
+          "ds_load_b128": 16,
+          "v_subrev_nc_u32_e32": 1,
+          "s_cmp_lt_i32": 8,
+          "v_cmp_gt_i32_e32": 1,
+          "v_cmp_lt_i32_e64": 8,
+          "v_fma_mix_f32": 96,
+          "s_cselect_b32": 8,
+          "s_wait_alu": 42,
+          "s_and_b32": 16,
+          "s_and_saveexec_b32": 8,
+          "s_cbranch_execz": 8,
+          "v_mad_co_u64_u32": 10,
+          "global_store_b64": 8,
+          "s_or_b32": 8,
+          "v_or3_b32": 4,
+          "s_add_co_i32": 7,
+          "v_and_or_b32": 3,
+          "v_add_nc_u32_e32": 2,
+          "s_lshr_b32": 1,
+          "v_mov_b32_e32": 1,
+          "v_add_f32_e32": 4,
+          "v_dual_add_f32": 14,
+          "v_dual_mul_f32": 8,
+          "v_lshlrev_b64_e32": 2,
+          "v_add_co_u32": 2,
+          "v_add_co_ci_u32_e64": 2,
+          "v_cvt_f32_fp8_e32": 4,
+          "v_cvt_f32_fp8_e64": 12,
+          "s_clause": 2,
+          "global_store_b128": 4
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "00000008C100",
+            "instruction": "s_load_b32 s2, s[0:1], 0x28                                // 00000008C100: F4000080 F8000028"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008C114",
+            "instruction": "s_clause 0x3                                               // 00000008C114: BF850003"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008C118",
+            "instruction": "s_load_b256 s[36:43], s[0:1], 0x0                          // 00000008C118: F4006900 F8000000"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008C120",
+            "instruction": "s_load_b64 s[34:35], s[0:1], 0x20                          // 00000008C120: F4002880 F8000020"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "00000008C108",
+            "instruction": "s_wait_kmcnt 0x0                                           // 00000008C108: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008C10C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s2                                     // 00000008C10C: BF090275"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008C110",
+            "instruction": "s_cbranch_scc1 2475                                        // 00000008C110: BFA209AB <c32_wave1_finish_b8_w16+0x26c0>"
+          },
+          {
+            "source_line": 995,
+            "pc": "00000008C2B4",
+            "instruction": "v_add_co_u32 v79, s2, s36, v78                             // 00000008C2B4: D700024F 02029C24"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1002,
+            "pc": "00000008C38C",
+            "instruction": "v_add_co_u32 v49, s1, v79, v49                             // 00000008C38C: D7000131 0202634F"
+          },
+          {
+            "source_line": 1002,
+            "pc": "00000008C394",
+            "instruction": "s_wait_alu depctr_va_sdst(0)                               // 00000008C394: BF88F19F"
+          },
+          {
+            "source_line": 1002,
+            "pc": "00000008C398",
+            "instruction": "v_add_co_ci_u32_e64 v50, null, 0, v80, s1                  // 00000008C398: D5207C32 0006A080"
+          },
+          {
+            "source_line": 1002,
+            "pc": "00000008C3A0",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008C3A0: BF88FF9E"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "00000008C7A4",
+            "instruction": "v_lshl_or_b32 v61, s3, 10, v74                             // 00000008C7A4: D656003D 05291403"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008C7CC",
+            "instruction": "v_cvt_f32_f16_e32 v62, v57.l                               // 00000008C7CC: 7E7C1739"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008C7D0",
+            "instruction": "v_cvt_f32_f16_e32 v63, v58.l                               // 00000008C7D0: 7E7E173A"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008C7D4",
+            "instruction": "v_cvt_f32_f16_e32 v64, v59.l                               // 00000008C7D4: 7E80173B"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "00000008C8B4",
+            "instruction": "s_wait_loadcnt 0x2                                         // 00000008C8B4: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008C8B8",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[49:56], v[70:71], v[98:99], 0// 00000008C8B8: CC464031 1A02C546"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008C8C0",
+            "instruction": "s_wait_loadcnt 0x1                                         // 00000008C8C0: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008C8C4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[57:64], v[82:83], v[98:99], 0// 00000008C8C4: CC464039 1A02C552"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1179,
+            "pc": "00000008C8D8",
+            "instruction": "v_dual_mov_b32 v73, s7 :: v_dual_mov_b32 v72, s6           // 00000008C8D8: CA100007 49480006"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008C8E0",
+            "instruction": "v_dual_mov_b32 v71, s5 :: v_dual_mov_b32 v70, s4           // 00000008C8E0: CA100005 47460004"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008C8F4",
+            "instruction": "v_fma_mixlo_f16 v90, v49, v49, 0                           // 00000008C8F4: CC21005A 02026331"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008C8FC",
+            "instruction": "v_fma_mixlo_f16 v91, v51, v51, 0                           // 00000008C8FC: CC21005B 02026733"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "00000008CE88",
+            "instruction": "v_add_co_u32 v56, vcc_lo, v54, s48                         // 00000008CE88: D7006A38 02006136"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008CE90",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 00000008CE90: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008CE94",
+            "instruction": "v_add_co_ci_u32_e64 v57, null, s49, v55, vcc_lo            // 00000008CE94: D5207C39 01AA6E31"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008CE9C",
+            "instruction": "s_clause 0x7                                               // 00000008CE9C: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "00000008CF4C",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008CF4C: BF88FF9E"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008CF50",
+            "instruction": "v_dual_mov_b32 v130, s39 :: v_dual_mov_b32 v129, s38       // 00000008CF50: CA100027 82800026"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008CF58",
+            "instruction": "v_dual_mov_b32 v128, s37 :: v_dual_mov_b32 v127, s36       // 00000008CF58: CA100025 807E0024"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008D738",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[127:130], v[67:70], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000008D738: CC404238 5A02877F"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "00000008D91C",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[17:18], v[67:68], 0// 00000008D91C: CC464038 1A028711"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008D924",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[75:82], v[19:20], v[67:68], 0// 00000008D924: CC46404B 1A028713"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008D960",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[21:22], v[67:68], v[56:63]// 00000008D960: CC464038 1CE28715"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000008D968",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[75:82], v[23:24], v[67:68], v[75:82]// 00000008D968: CC46404B 1D2E8717"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "00000008DABC",
+            "instruction": "ds_load_b128 v[79:82], v53                                 // 00000008DABC: DBFC0000 4F000035"
+          },
+          {
+            "source_line": 1220,
+            "pc": "00000008DAC4",
+            "instruction": "ds_load_b128 v[95:98], v53 offset:512                      // 00000008DAC4: DBFC0200 5F000035"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000008DACC",
+            "instruction": "s_wait_loadcnt 0x7                                         // 00000008DACC: BFC00007"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000008DAD0",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[67:68], v[71:72], 0// 00000008DAD0: CC464038 1A028F43"
+          }
+        ],
+        "Post/Down/tail": [
+          {
+            "source_line": 1300,
+            "pc": "00000008DC20",
+            "instruction": "v_and_b32_e32 v1, 3, v0                                    // 00000008DC20: 36020083"
+          },
+          {
+            "source_line": 1300,
+            "pc": "00000008DC24",
+            "instruction": "v_lshrrev_b32_e32 v6, 2, v0                                // 00000008DC24: 320C0082"
+          },
+          {
+            "source_line": 1300,
+            "pc": "00000008DC28",
+            "instruction": "s_delay_alu instid0(VALU_DEP_2)                            // 00000008DC28: BF870002"
+          },
+          {
+            "source_line": 1300,
+            "pc": "00000008DC2C",
+            "instruction": "v_lshrrev_b32_e32 v5, 1, v1                                // 00000008DC2C: 320A0281"
+          }
+        ]
+      }
+    },
+    "c32_wave1_post_b8_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b128": 1,
+          "s_clause": 6,
+          "s_load_b64": 1,
+          "s_load_b512": 1,
+          "v_and_b32_e32": 3,
+          "s_lshl1_add_u32": 1,
+          "s_mov_b32": 8,
+          "v_lshrrev_b32_e32": 10,
+          "v_dual_mov_b32": 18,
+          "v_mov_b32_e32": 14,
+          "s_lshr_b32": 2,
+          "s_cvt_f32_u32": 1,
+          "s_sub_co_i32": 4,
+          "v_subrev_nc_u32_e32": 1,
+          "v_s_rcp_f32": 1,
+          "s_delay_alu": 18,
+          "s_mul_f32": 1,
+          "s_wait_alu": 9,
+          "s_cvt_u32_f32": 1,
+          "s_mul_i32": 3,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 3,
+          "s_cmp_ge_u32": 2,
+          "v_lshlrev_b32_e32": 1,
+          "s_cselect_b32": 3,
+          "s_wait_kmcnt": 1,
+          "v_add_co_u32": 3,
+          "s_lshl_b32": 2,
+          "v_add_co_ci_u32_e64": 3,
+          "v_add_nc_u32_e32": 1,
+          "v_cmp_lt_i32_e32": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_setreg_imm32_b32": 36,
+          "v_cvt_pk_fp8_f32": 72,
+          "v_dual_max_num_f32": 36,
+          "v_med3_num_f32": 24,
+          "v_lshl_or_b32": 1,
+          "global_load_b128": 15,
+          "v_cvt_pk_rtz_f16_f32_e32": 16,
+          "global_load_b32": 3,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_cndmask_b32_e32": 1,
+          "v_cndmask_b32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "global_load_b64": 1,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 1,
+          "s_cmp_ge_u32": 1,
+          "s_cbranch_scc1": 1,
+          "s_wait_alu": 2,
+          "s_sub_co_i32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "v_lshlrev_b32_e32": 2,
+          "v_lshl_or_b32": 1,
+          "s_mov_b64": 1,
+          "s_mov_b32": 2,
+          "v_mov_b32_e32": 1,
+          "v_and_or_b32": 1,
+          "v_add_co_u32": 2,
+          "s_delay_alu": 1
+        },
+        "FFN": {
+          "v_lshl_or_b32": 1,
+          "s_delay_alu": 13,
+          "v_lshrrev_b32_e32": 10,
+          "s_wait_alu": 14,
+          "v_add_nc_u32_e32": 1,
+          "v_dual_mov_b32": 7,
+          "v_mov_b32_e32": 2,
+          "v_mul_lo_u32": 2,
+          "v_cmp_lt_i32_e64": 1,
+          "v_add_lshl_u32": 2,
+          "v_cmp_gt_i32_e64": 1,
+          "s_and_b32": 3,
+          "v_add_co_u32": 6,
+          "v_add_co_ci_u32_e64": 6,
+          "s_and_saveexec_b32": 2,
+          "s_cbranch_execz": 2,
+          "global_load_b64": 4,
+          "s_clause": 4,
+          "global_load_b128": 12,
+          "s_wait_loadcnt": 19,
+          "v_and_b32_e32": 8,
+          "v_bfe_u32": 16,
+          "v_cvt_f32_fp8_e32": 32,
+          "v_mul_f32_e32": 14,
+          "v_dual_mul_f32": 25,
+          "v_dual_add_f32": 7,
+          "s_or_b32": 2,
+          "v_add_f32_e32": 2,
+          "v_dual_max_num_f32": 4,
+          "v_med3_num_f32": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "v_fma_f32": 16,
+          "v_dual_fmaak_f32": 8,
+          "s_lshl_b32": 1,
+          "v_subrev_nc_u32_e32": 1,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Norm/QKV storage/query setup": {
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 9,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "s_lshl_b32": 1,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_lshlrev_b32_e32": 1,
+          "s_wait_alu": 4,
+          "v_add_co_ci_u32_e64": 3,
+          "v_add_co_u32": 1,
+          "s_mov_b32": 4,
+          "s_add_co_i32": 4,
+          "v_movrels_b32_e32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 32,
+          "v_dual_mul_f32": 16,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "s_wait_alu": 1,
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 7,
+          "v_add_f32_e32": 2,
+          "ds_store_b128": 2
+        },
+        "Post/Down/tail": {
+          "s_wait_dscnt": 1,
+          "s_mov_b32": 2,
+          "v_cmpx_gt_u32_e32": 1,
+          "s_cbranch_execz": 3,
+          "v_lshrrev_b32_e32": 1,
+          "s_delay_alu": 59,
+          "v_add_nc_u32_e32": 8,
+          "v_subrev_nc_u32_e32": 3,
+          "v_mul_lo_u32": 1,
+          "s_wait_alu": 14,
+          "s_lshl_b32": 3,
+          "v_add3_u32": 1,
+          "s_sub_co_i32": 1,
+          "v_and_b32_e32": 1,
+          "v_or_b32_e32": 2,
+          "v_mov_b32_e32": 2,
+          "v_mad_co_u64_u32": 1,
+          "v_lshlrev_b32_e32": 2,
+          "v_cmp_gt_i32_e32": 1,
+          "s_mul_i32": 1,
+          "s_branch": 2,
+          "s_or_b32": 2,
+          "v_add_co_u32": 5,
+          "s_xor_b32": 1,
+          "s_and_b32": 3,
+          "s_and_not1_b32": 1,
+          "v_cmp_lt_i32_e64": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_and_saveexec_b32": 1,
+          "s_clause": 3,
+          "global_load_b128": 24,
+          "v_lshlrev_b64_e32": 4,
+          "v_add_co_ci_u32_e64": 4,
+          "global_load_b32": 3,
+          "v_and_or_b32": 1,
+          "ds_load_b128": 4,
+          "s_wait_loadcnt_dscnt": 4,
+          "v_fma_mix_f32": 96,
+          "v_add_f32_e32": 99,
+          "s_wait_loadcnt": 15,
+          "v_mul_f32_e32": 6,
+          "v_dual_mul_f32": 2,
+          "v_add_f32_e64": 3,
+          "global_store_b32": 3,
+          "v_dual_add_f32": 2
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "00000008E800",
+            "instruction": "s_load_b128 s[52:55], s[0:1], 0x40                         // 00000008E800: F4004D00 F8000040"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008E814",
+            "instruction": "s_clause 0x1                                               // 00000008E814: BF850001"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008E818",
+            "instruction": "s_load_b64 s[34:35], s[0:1], 0x50                          // 00000008E818: F4002880 F8000050"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000008E820",
+            "instruction": "s_load_b512 s[36:51], s[0:1], 0x0                          // 00000008E820: F4008900 F8000000"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "00000008E808",
+            "instruction": "s_wait_kmcnt 0x0                                           // 00000008E808: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008E80C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s52                                    // 00000008E80C: BF093475"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000008E810",
+            "instruction": "s_cbranch_scc1 2624                                        // 00000008E810: BFA20A40 <c32_wave1_post_b8_w16+0x2914>"
+          },
+          {
+            "source_line": 995,
+            "pc": "00000008EA08",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008EA08: BF88FF9E"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1062,
+            "pc": "00000008EA10",
+            "instruction": "v_lshl_or_b32 v49, s3, 4, v77                              // 00000008EA10: D6560031 05350803"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008EA18",
+            "instruction": "s_delay_alu instid0(VALU_DEP_1) | instskip(SKIP_1) | instid1(VALU_DEP_1)// 00000008EA18: BF8700A1"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008EA1C",
+            "instruction": "v_lshrrev_b32_e32 v49, 3, v49                              // 00000008EA1C: 32626283"
+          },
+          {
+            "source_line": 1062,
+            "pc": "00000008EA20",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008EA20: BF88FF9E"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "00000008F354",
+            "instruction": "v_lshl_or_b32 v61, s3, 10, v76                             // 00000008F354: D656003D 05311403"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008F37C",
+            "instruction": "v_cvt_f32_f16_e32 v62, v57.l                               // 00000008F37C: 7E7C1739"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008F380",
+            "instruction": "v_cvt_f32_f16_e32 v63, v58.l                               // 00000008F380: 7E7E173A"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000008F384",
+            "instruction": "v_cvt_f32_f16_e32 v64, v59.l                               // 00000008F384: 7E80173B"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "00000008F464",
+            "instruction": "s_wait_loadcnt 0x2                                         // 00000008F464: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008F468",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[49:56], v[71:72], v[99:100], 0// 00000008F468: CC464031 1A02C747"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008F470",
+            "instruction": "s_wait_loadcnt 0x1                                         // 00000008F470: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000008F474",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[57:64], v[83:84], v[99:100], 0// 00000008F474: CC464039 1A02C753"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1179,
+            "pc": "00000008F488",
+            "instruction": "v_dual_mov_b32 v74, s7 :: v_dual_mov_b32 v73, s6           // 00000008F488: CA100007 4A480006"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008F490",
+            "instruction": "v_dual_mov_b32 v72, s5 :: v_dual_mov_b32 v71, s4           // 00000008F490: CA100005 48460004"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008F4A4",
+            "instruction": "v_fma_mixlo_f16 v91, v49, v49, 0                           // 00000008F4A4: CC21005B 02026331"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000008F4AC",
+            "instruction": "v_fma_mixlo_f16 v92, v51, v51, 0                           // 00000008F4AC: CC21005C 02026733"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "00000008FA38",
+            "instruction": "v_add_co_u32 v56, vcc_lo, v54, s40                         // 00000008FA38: D7006A38 02005136"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008FA40",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 00000008FA40: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008FA44",
+            "instruction": "v_add_co_ci_u32_e64 v57, null, s41, v55, vcc_lo            // 00000008FA44: D5207C39 01AA6E29"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000008FA4C",
+            "instruction": "s_clause 0x7                                               // 00000008FA4C: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "00000008FAFC",
+            "instruction": "s_wait_alu depctr_sa_sdst(0)                               // 00000008FAFC: BF88FF9E"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008FB00",
+            "instruction": "v_dual_mov_b32 v128, s39 :: v_dual_mov_b32 v127, s38       // 00000008FB00: CA100027 807E0026"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000008FB08",
+            "instruction": "v_dual_mov_b32 v126, s37 :: v_dual_mov_b32 v125, s36       // 00000008FB08: CA100025 7E7C0024"
+          },
+          {
+            "source_line": 1208,
+            "pc": "0000000902E8",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[125:128], v[67:70], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 0000000902E8: CC404238 5A02877D"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "0000000904CC",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[17:18], v[77:78], 0// 0000000904CC: CC464038 1A029B11"
+          },
+          {
+            "source_line": 1210,
+            "pc": "0000000904D4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[67:74], v[19:20], v[77:78], 0// 0000000904D4: CC464043 1A029B13"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000090510",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[21:22], v[77:78], v[56:63]// 000000090510: CC464038 1CE29B15"
+          },
+          {
+            "source_line": 1210,
+            "pc": "000000090518",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[67:74], v[23:24], v[77:78], v[67:74]// 000000090518: CC464043 1D0E9B17"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "00000009066C",
+            "instruction": "ds_load_b128 v[71:74], v53                                 // 00000009066C: DBFC0000 47000035"
+          },
+          {
+            "source_line": 1220,
+            "pc": "000000090674",
+            "instruction": "ds_load_b128 v[93:96], v53 offset:512                      // 000000090674: DBFC0200 5D000035"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000009067C",
+            "instruction": "s_wait_loadcnt 0x7                                         // 00000009067C: BFC00007"
+          },
+          {
+            "source_line": 1215,
+            "pc": "000000090680",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[77:78], v[97:98], 0// 000000090680: CC464038 1A02C34D"
+          }
+        ],
+        "Post/Down/tail": [
+          {
+            "source_line": 1263,
+            "pc": "0000000907D0",
+            "instruction": "s_wait_dscnt 0x0                                           // 0000000907D0: BFC60000"
+          },
+          {
+            "source_line": 1265,
+            "pc": "0000000907D4",
+            "instruction": "s_mov_b32 s0, exec_lo                                      // 0000000907D4: BE80007E"
+          },
+          {
+            "source_line": 1265,
+            "pc": "0000000907D8",
+            "instruction": "v_cmpx_gt_u32_e32 64, v0                                   // 0000000907D8: 7D9800C0"
+          },
+          {
+            "source_line": 1265,
+            "pc": "0000000907DC",
+            "instruction": "s_cbranch_execz 589                                        // 0000000907DC: BFA5024D <c32_wave1_post_b8_w16+0x2914>"
+          }
+        ]
+      }
+    },
+    "c32_wave1_up_b8_w16": {
+      "stages": {
+        "shared helper/prologue or unmapped": {
+          "s_load_b128": 2,
+          "s_load_b32": 1,
+          "s_load_b256": 1,
+          "s_and_b32": 1,
+          "v_and_b32_e32": 2,
+          "s_delay_alu": 21,
+          "v_cndmask_b32_e32": 2,
+          "v_mov_b32_e32": 5,
+          "v_or_b32_e32": 1,
+          "s_mov_b32": 5,
+          "v_bfe_u32": 1,
+          "v_lshlrev_b32_e32": 1,
+          "v_dual_mov_b32": 23,
+          "v_and_or_b32": 1,
+          "v_add_co_u32": 2,
+          "s_wait_kmcnt": 1,
+          "ds_bpermute_b32": 16,
+          "s_wait_dscnt": 16,
+          "v_cvt_f16_f32_e32": 32,
+          "v_cvt_f32_f16_e32": 32,
+          "s_setreg_imm32_b32": 40,
+          "v_cvt_pk_fp8_f32": 80,
+          "v_dual_max_num_f32": 40,
+          "v_med3_num_f32": 32,
+          "s_wait_alu": 3,
+          "v_lshl_or_b32": 1,
+          "global_load_b128": 15,
+          "s_clause": 6,
+          "v_cvt_pk_rtz_f16_f32_e32": 16,
+          "v_lshrrev_b32_e32": 8,
+          "global_load_b32": 3,
+          "v_cmp_gt_f32_e32": 1,
+          "v_cmp_gt_f32_e64": 31,
+          "v_cndmask_b32_e64": 31,
+          "v_rcp_f32_e32": 8,
+          "global_load_b64": 1,
+          "v_fma_mix_f32": 16,
+          "s_nop": 1,
+          "s_sendmsg": 1,
+          "s_endpgm": 1
+        },
+        "input/staging": {
+          "s_wait_kmcnt": 3,
+          "s_cmp_ge_u32": 3,
+          "s_cbranch_scc1": 1,
+          "s_lshl1_add_u32": 1,
+          "s_delay_alu": 12,
+          "s_lshr_b32": 5,
+          "s_cvt_f32_u32": 1,
+          "v_s_rcp_f32": 1,
+          "s_mul_f32": 1,
+          "s_wait_alu": 16,
+          "s_cvt_u32_f32": 1,
+          "s_sub_co_i32": 6,
+          "s_mul_i32": 3,
+          "s_mul_hi_u32": 2,
+          "s_add_co_i32": 6,
+          "s_cselect_b32": 3,
+          "v_bfe_u32": 1,
+          "s_lshl_b32": 3,
+          "s_ashr_i32": 2,
+          "v_add_nc_u32_e32": 2,
+          "v_and_b32_e32": 2,
+          "v_mul_lo_u32": 1,
+          "v_cmp_gt_u32_e32": 1,
+          "v_cmp_gt_u32_e64": 1,
+          "v_lshrrev_b32_e32": 1,
+          "v_add_lshl_u32": 1,
+          "v_lshlrev_b64_e32": 4,
+          "v_add_co_u32": 8,
+          "v_add_co_ci_u32_e64": 10,
+          "v_mov_b32_e32": 2,
+          "v_or_b32_e32": 4,
+          "global_load_b128": 16,
+          "s_clause": 3,
+          "v_lshlrev_b32_e32": 4,
+          "v_subrev_nc_u32_e32": 1,
+          "s_wait_loadcnt": 16,
+          "v_cvt_f16_f32_e32": 29,
+          "v_dual_cndmask_b32": 14,
+          "v_cvt_f16_f32_e64": 3,
+          "v_pack_b32_f16": 16,
+          "v_cndmask_b32_e32": 4,
+          "v_wmma_f32_16x16x16_f16": 8,
+          "v_cmp_lt_i32_e32": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_mov_b32": 3,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1,
+          "v_lshl_or_b32": 1
+        },
+        "FFN": {
+          "v_lshl_or_b32": 1,
+          "s_delay_alu": 15,
+          "v_lshrrev_b32_e32": 5,
+          "v_or_b32_e32": 1,
+          "v_subrev_nc_u32_e32": 2,
+          "v_mul_lo_u32": 1,
+          "v_cmp_lt_i32_e64": 1,
+          "v_cmp_gt_i32_e64": 1,
+          "s_and_b32": 3,
+          "v_add_lshl_u32": 2,
+          "s_wait_alu": 7,
+          "v_cndmask_b32_e64": 21,
+          "v_add_co_u32": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "global_load_b64": 2,
+          "s_clause": 4,
+          "global_load_b128": 8,
+          "s_lshl_b32": 2,
+          "s_wait_loadcnt": 14,
+          "v_and_b32_e32": 4,
+          "v_bfe_u32": 8,
+          "v_cvt_f32_fp8_e32": 16,
+          "v_dual_mul_f32": 23,
+          "v_dual_add_f32": 8,
+          "v_mul_f32_e32": 2,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "v_fma_f32": 16,
+          "v_dual_fmaak_f32": 8,
+          "s_add_co_i32": 1,
+          "s_cmp_eq_u32": 1,
+          "s_cbranch_scc0": 1
+        },
+        "Norm/QKV storage/query setup": {
+          "s_mov_b32": 7,
+          "v_dual_mov_b32": 2,
+          "v_fma_mixlo_f16": 16,
+          "v_fma_mixhi_f16": 16,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 10,
+          "v_rsq_f32_e32": 16,
+          "s_wait_loadcnt": 2,
+          "v_dual_mul_f32": 23,
+          "v_movreld_b32_e32": 12,
+          "global_load_b32": 1,
+          "v_mul_f32_e32": 2,
+          "v_add_lshl_u32": 1,
+          "s_mov_b64": 1,
+          "v_add_co_u32": 6,
+          "s_wait_alu": 6,
+          "v_or3_b32": 1,
+          "v_add_co_ci_u32_e64": 6,
+          "v_movrels_b32_e32": 4,
+          "s_add_co_i32": 4,
+          "s_add_nc_u64": 1,
+          "v_add_nc_u32_e32": 1,
+          "s_cmp_lg_u32": 1,
+          "s_cbranch_scc1": 1
+        },
+        "FFN residual/quant": {
+          "v_lshl_or_b32": 1,
+          "v_cvt_f32_f16_e32": 16,
+          "ds_store_b128": 2
+        },
+        "QKV": {
+          "s_wait_loadcnt": 6,
+          "v_wmma_f32_16x16x16_fp8_fp8": 12,
+          "s_delay_alu": 5
+        },
+        "Score/Exp": {
+          "v_add_co_u32": 1,
+          "s_wait_alu": 1,
+          "v_add_co_ci_u32_e64": 1,
+          "s_clause": 1,
+          "global_load_b128": 8,
+          "v_wmma_f32_16x16x16_fp8_fp8": 8,
+          "s_delay_alu": 1,
+          "s_wait_loadcnt": 8,
+          "v_dual_add_f32": 32,
+          "v_dual_mul_f32": 16,
+          "v_lshrrev_b32_e32": 32,
+          "v_and_b32_e32": 32,
+          "v_perm_b32": 16
+        },
+        "Sum/prob": {
+          "v_dual_mov_b32": 2,
+          "v_wmma_f32_16x16x16_f16": 4,
+          "s_delay_alu": 3,
+          "v_fma_mix_f32": 32
+        },
+        "AV": {
+          "v_wmma_f32_16x16x16_fp8_fp8": 8
+        },
+        "OutProj/residual": {
+          "ds_load_b128": 2,
+          "s_wait_loadcnt": 6,
+          "v_nop": 1,
+          "v_wmma_f32_16x16x16_fp8_fp8": 4,
+          "s_wait_loadcnt_dscnt": 2,
+          "v_fma_mix_f32": 16,
+          "v_dual_add_f32": 8,
+          "s_delay_alu": 2,
+          "global_store_b64": 2
+        }
+      },
+      "examples": {
+        "shared helper/prologue or unmapped": [
+          {
+            "source_line": 223,
+            "pc": "000000099200",
+            "instruction": "s_load_b128 s[12:15], s[0:1], 0x30                         // 000000099200: F4004300 F8000030"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000099258",
+            "instruction": "s_load_b32 s3, s[0:1], 0x40                                // 000000099258: F40000C0 F8000040"
+          },
+          {
+            "source_line": 223,
+            "pc": "00000009931C",
+            "instruction": "s_load_b256 s[4:11], s[0:1], 0x0                           // 00000009931C: F4006100 F8000000"
+          },
+          {
+            "source_line": 223,
+            "pc": "000000099324",
+            "instruction": "s_and_b32 vcc_lo, s2, vcc_lo                               // 000000099324: 8B6A6A02"
+          }
+        ],
+        "input/staging": [
+          {
+            "source_line": 970,
+            "pc": "000000099208",
+            "instruction": "s_wait_kmcnt 0x0                                           // 000000099208: BFC70000"
+          },
+          {
+            "source_line": 970,
+            "pc": "00000009920C",
+            "instruction": "s_cmp_ge_u32 ttmp9, s12                                    // 00000009920C: BF090C75"
+          },
+          {
+            "source_line": 970,
+            "pc": "000000099210",
+            "instruction": "s_cbranch_scc1 2404                                        // 000000099210: BFA20964 <c32_wave1_up_b8_w16+0x25a4>"
+          },
+          {
+            "source_line": 976,
+            "pc": "000000099214",
+            "instruction": "s_lshl1_add_u32 s2, s15, s13                               // 000000099214: 87020D0F"
+          }
+        ],
+        "FFN": [
+          {
+            "source_line": 1033,
+            "pc": "000000099850",
+            "instruction": "v_lshl_or_b32 v65, s20, 4, v95                             // 000000099850: D6560041 057D0814"
+          },
+          {
+            "source_line": 1033,
+            "pc": "000000099858",
+            "instruction": "s_delay_alu instid0(VALU_DEP_1) | instskip(NEXT) | instid1(VALU_DEP_1)// 000000099858: BF870091"
+          },
+          {
+            "source_line": 1034,
+            "pc": "00000009985C",
+            "instruction": "v_lshrrev_b32_e32 v65, 3, v65                              // 00000009985C: 32828283"
+          },
+          {
+            "source_line": 1034,
+            "pc": "000000099860",
+            "instruction": "v_or_b32_e32 v65, s12, v65                                 // 000000099860: 3882820C"
+          }
+        ],
+        "Norm/QKV storage/query setup": [
+          {
+            "source_line": 1187,
+            "pc": "00000009A1E8",
+            "instruction": "s_mov_b32 m0, s2                                           // 00000009A1E8: BEFD0002"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000009A330",
+            "instruction": "v_dual_mov_b32 v91, s19 :: v_dual_mov_b32 v90, s18         // 00000009A330: CA100013 5B5A0012"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000009A338",
+            "instruction": "v_dual_mov_b32 v89, s17 :: v_dual_mov_b32 v88, s16         // 00000009A338: CA100011 59580010"
+          },
+          {
+            "source_line": 1179,
+            "pc": "00000009A34C",
+            "instruction": "v_fma_mixlo_f16 v108, v65, v65, 0                          // 00000009A34C: CC21006C 02028341"
+          }
+        ],
+        "FFN residual/quant": [
+          {
+            "source_line": 1154,
+            "pc": "00000009A1FC",
+            "instruction": "v_lshl_or_b32 v88, s20, 10, v92                            // 00000009A1FC: D6560058 05711414"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000009A224",
+            "instruction": "v_cvt_f32_f16_e32 v77, v65.l                               // 00000009A224: 7E9A1741"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000009A228",
+            "instruction": "v_cvt_f32_f16_e32 v78, v66.l                               // 00000009A228: 7E9C1742"
+          },
+          {
+            "source_line": 1155,
+            "pc": "00000009A22C",
+            "instruction": "v_cvt_f32_f16_e32 v79, v67.l                               // 00000009A22C: 7E9E1743"
+          }
+        ],
+        "QKV": [
+          {
+            "source_line": 1171,
+            "pc": "00000009A30C",
+            "instruction": "s_wait_loadcnt 0x2                                         // 00000009A30C: BFC00002"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000009A310",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[65:72], v[88:89], v[116:117], 0// 00000009A310: CC464041 1A02E958"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000009A318",
+            "instruction": "s_wait_loadcnt 0x1                                         // 00000009A318: BFC00001"
+          },
+          {
+            "source_line": 1171,
+            "pc": "00000009A31C",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[73:80], v[100:101], v[116:117], 0// 00000009A31C: CC464049 1A02E964"
+          }
+        ],
+        "Score/Exp": [
+          {
+            "source_line": 1205,
+            "pc": "00000009A904",
+            "instruction": "v_add_co_u32 v56, vcc_lo, v0, s34                          // 00000009A904: D7006A38 02004500"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000009A90C",
+            "instruction": "s_wait_alu depctr_va_vcc(0)                                // 00000009A90C: BF88FF9D"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000009A910",
+            "instruction": "v_add_co_ci_u32_e64 v57, null, s35, v55, vcc_lo            // 00000009A910: D5207C39 01AA6E23"
+          },
+          {
+            "source_line": 1205,
+            "pc": "00000009A918",
+            "instruction": "s_clause 0x7                                               // 00000009A918: BF850007"
+          }
+        ],
+        "Sum/prob": [
+          {
+            "source_line": 1208,
+            "pc": "00000009A9C4",
+            "instruction": "v_dual_mov_b32 v128, s39 :: v_dual_mov_b32 v127, s38       // 00000009A9C4: CA100027 807E0026"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000009A9CC",
+            "instruction": "v_dual_mov_b32 v126, s37 :: v_dual_mov_b32 v125, s36       // 00000009A9CC: CA100025 7E7C0024"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000009B1AC",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[125:128], v[64:67], 0 neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000009B1AC: CC404238 5A02817D"
+          },
+          {
+            "source_line": 1208,
+            "pc": "00000009B1E4",
+            "instruction": "v_wmma_f32_16x16x16_f16 v[56:63], v[125:128], v[68:71], v[56:63] neg_lo:[0,1,0] neg_hi:[0,1,0]// 00000009B1E4: CC404238 5CE2897D"
+          }
+        ],
+        "AV": [
+          {
+            "source_line": 1210,
+            "pc": "00000009B390",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[17:18], v[72:73], 0// 00000009B390: CC464038 1A029111"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000009B398",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[64:71], v[19:20], v[72:73], 0// 00000009B398: CC464040 1A029113"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000009B3D4",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[21:22], v[72:73], v[56:63]// 00000009B3D4: CC464038 1CE29115"
+          },
+          {
+            "source_line": 1210,
+            "pc": "00000009B3DC",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[64:71], v[23:24], v[72:73], v[64:71]// 00000009B3DC: CC464040 1D029117"
+          }
+        ],
+        "OutProj/residual": [
+          {
+            "source_line": 1220,
+            "pc": "00000009B50C",
+            "instruction": "ds_load_b128 v[72:75], v92                                 // 00000009B50C: DBFC0000 4800005C"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000009B514",
+            "instruction": "s_wait_loadcnt 0x4                                         // 00000009B514: BFC00004"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000009B518",
+            "instruction": "v_nop                                                      // 00000009B518: 7E000000"
+          },
+          {
+            "source_line": 1215,
+            "pc": "00000009B51C",
+            "instruction": "v_wmma_f32_16x16x16_fp8_fp8 v[56:63], v[64:65], v[83:84], 0// 00000009B51C: CC464038 1A02A740"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "asm-audit-decoder-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-audit-20261028\\deepbaseline.hip",
+      "sha256": "7c1d0ad9b0264c2513af07af502d1726114fc65840920005db5b47dd7d6e0ac8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-audit-20261028\\dectail.hip",
+      "sha256": "05e7b5a5260720afaf12ba3747a581e5c9a0ac7d60f11e7079af4d38bfab882d"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/deepbaseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-audit-20261028\\deepbaseline.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/dectail",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-audit-20261028\\dectail.hip\" comgr gfx1201"
+    }
+  ]
+}

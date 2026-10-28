@@ -1,0 +1,61 @@
+{
+  "candidates": {
+    "upwide": {
+      "gold_profiles": [
+        "original1088",
+        "original1152",
+        "original960",
+        "small1080",
+        "small720",
+        "small900",
+        "smallwindow"
+      ],
+      "gold_frames": 42,
+      "invalid": 0,
+      "steady_samples_per_arm_per_profile": 960,
+      "perf_slots": 48,
+      "decision": "STOP",
+      "production_changed": false
+    },
+    "dectail": {
+      "gold_profiles": [
+        "original1088",
+        "original1152",
+        "original960",
+        "small1080",
+        "small720",
+        "small900",
+        "smallwindow"
+      ],
+      "gold_frames": 42,
+      "invalid": 0,
+      "steady_samples_per_arm_per_profile": 960,
+      "perf_slots": 48,
+      "decision": "STOP",
+      "production_changed": false
+    },
+    "ffnb2": {
+      "gold_profiles": [
+        "original1088",
+        "original1152",
+        "original960",
+        "small1080",
+        "small720",
+        "small900",
+        "smallwindow"
+      ],
+      "gold_frames": 42,
+      "invalid": 0,
+      "steady_samples_per_arm_per_profile": 960,
+      "perf_slots": 48,
+      "decision": "STOP",
+      "production_changed": false
+    }
+  },
+  "assembly_patch_loader_gold_profiles": 7,
+  "assembly_patch_gold_frames": 21,
+  "assembly_patch_is_performance_candidate": false,
+  "fresh_trace_profiles": 6,
+  "actual_active_pairs": 56,
+  "GPU_protocol": "game-check/process/D>=100GB/CreateNew gpu.lock/15s watchdog; 3x4 ABBA, slot240 discard80, NET0 edges_only1; strictly serial"
+}

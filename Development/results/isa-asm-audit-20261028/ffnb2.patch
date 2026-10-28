@@ -1,0 +1,11 @@
+--- a/hip/wave_owned_mh.inc
++++ b/hip/wave_owned_mh.inc
+@@ -419,7 +419,7 @@
+  if constexpr(C==256 || (C==64 && (W2_FFN_QT_SMALL_MASK&1)) || (C==128 && (W2_FFN_QT_SMALL_MASK&2))){
+  // Reuse each weight fragment across independent token tiles. Each accumulator keeps
+  // the original kt or ht/tile order, including activation, FP8 and RTZ boundaries.
+- constexpr uint B=W2_FFN_QT_BATCH;
++ constexpr uint B=C==64?W2_FFN_QT_BATCH:2;
+  constexpr uint T=W2_HIDDEN_TILES;
+  _Pragma("clang loop unroll(disable)") for(uint qb=0;qb<4;qb+=B){
+   f8 contract[B][2]{};
