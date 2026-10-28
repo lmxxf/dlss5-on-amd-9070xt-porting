@@ -1,0 +1,1407 @@
+{
+  "case": "knife3C",
+  "removed": [
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 821568,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32-wave1-fast-norm900.hsaco"
+    },
+    {
+      "bytes": 835904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32-wave1-fast.hsaco"
+    },
+    {
+      "bytes": 867648,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32-wave1-rtz.hsaco"
+    },
+    {
+      "bytes": 862272,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32-wave1.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 1898560,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c64-wave2-fast.hsaco"
+    },
+    {
+      "bytes": 1792320,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\c64-wave2.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 696480,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 712344,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\modules\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1152-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original1088-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-original960-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small900-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small720-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-small1080-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\gold-smallwindow-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small900-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-small1080-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original960-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3C\\perf-original1088-r3-3-baseline\\out.ppm"
+    }
+  ],
+  "gpu_lock_present": false,
+  "D_free_bytes": 242255659008
+}

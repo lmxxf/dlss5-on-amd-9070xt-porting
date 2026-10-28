@@ -839,3 +839,8 @@ C128/C256峰值在FFN Expand/Contract共存阶段，静态live234/240而metadata
 刀1 57c6533e：C512 V天然片段转置64ds_u8→0、188→187VGPR，Gold通过；局部1088原型小正，资格隔离/缓存环境后的真实产品before-after最终mean+12.284µs/p99+17.925µs，STOP。刀2 33a4d791：contract/project113/115VGPR超112资源门；expand77不增、490→407条、32b8→4b64，Gold通过但四档性能不稳，STOP。刀3 pool/split独立：pool4b64、C64 90→89其余88、LDS不增；split100VGPR、LDS1024→0、u8及F32散写消除，均七档Gold同，分别4档3ABBA无稳定净收益，STOP。
 
 合计258帧Gold0diff/invalid0、216性能slot，实际模块路径/哈希/函数身份核验，原始分轮与中间反例保留。生产代码、双架构80模块与hip/SHA256SUMS复核未变，无新赢家需同步，未部署/改ZIP/push。报告与回执results/isa-asm-phase2-20261028。临时大文件清理、GPU锁释放，三刀已结题，无排队自动任务。
+
+
+### 2026-10-29 ISA Phase3 四刀闭环
+
+1f780a34（成对打包/预取）、cb5a59d2（保持B复用折叠/预取）、98ba6985（serial_norm缓存）均按四档3ABBA或资源门STOP，生产数学和核代码未采用新改动。全部80双架构模块实际重编、ELF/函数代码/资源复核，更新容器SHA；正式addon/runtime/frame O2构建、七档Gold0bit-diff/invalid0、七档3ABBA及runtime烟测完成。最新1088纯NN三轮NMMN：HIP 8.321360ms、锁版Mochizuki d1185d2 7.864895ms，差0.456466ms（+5.80%）；旧0.478631198ms为跨批历史，不能归因本轮。完整逐轮/负结果/配方身份见results/isa-asm-phase3-20261029/README.md。临时大文件清理、保留隔离payload，不部署、不改ZIP、不push。

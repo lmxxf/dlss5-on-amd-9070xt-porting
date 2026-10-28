@@ -1,0 +1,279 @@
+{
+  "case": "full",
+  "removed": [
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_prefix_reference\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_prefix_reference\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-reference\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-reference\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-deep_reference\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-deep_reference\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-boundary_reference\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-boundary_reference\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_wmma\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_wmma\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-wmma\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-wmma\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-deep_wmma\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-deep_wmma\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-wave-pointwise\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-wave-pointwise\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_tiled\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_tiled\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-tiled\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-tiled\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_fast\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_fast\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_fast_attention\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_fast_attention\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-boundary-fast\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-boundary-fast\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_fused_attention\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_fused_attention\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_fused_ffn_attention\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_fused_ffn_attention\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c32_fused_ffn_attention-packed\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c32_fused_ffn_attention-packed\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-prefix_fast\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-prefix_fast\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-fast\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-fast\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-fast-padded-wave\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-fast-padded-wave\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead_fused_attention\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead_fused_attention\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-deep_fast\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-deep_fast\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-deep_fast-packed\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-deep_fast-packed\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-fast-packed\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-fast-packed\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multihead-fast-padded-wave-packed\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multihead-fast-padded-wave-packed\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-deep_fast-packed-fast\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-deep_fast-packed-fast\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-vit-stream-fast\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-vit-stream-fast\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c512-m32-mh\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c512-m32-mh\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-c512-m32-deep\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-c512-m32-deep\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-vit-stream\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-vit-stream\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-vit-wide-deep\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-vit-wide-deep\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multi-pass-skin\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multi-pass-skin\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-multi-pass-predict\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-multi-pass-predict\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-swin-persistent\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-swin-persistent\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1200-swin-persistent-fast\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\full\\compile-gfx1201-swin-persistent-fast\\swin-persistent-fast.hsaco"
+    }
+  ],
+  "gpu_lock_present": false,
+  "D_free_bytes": 238645936128
+}

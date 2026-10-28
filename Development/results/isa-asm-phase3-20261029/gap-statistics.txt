@@ -1,0 +1,137 @@
+{
+  "hip_ms": 8.321360447916668,
+  "mochi_ms": 7.864894791666667,
+  "gap_ms": 0.4564656562500007,
+  "relative_percent": 5.803836775205862,
+  "rounds": [
+    {
+      "round": 1,
+      "hip_ms": 8.303606437500001,
+      "mochi_ms": 7.861115625,
+      "gap_ms": 0.4424908125000009
+    },
+    {
+      "round": 2,
+      "hip_ms": 8.32052475,
+      "mochi_ms": 7.863059375,
+      "gap_ms": 0.45746537500000084
+    },
+    {
+      "round": 3,
+      "hip_ms": 8.33995015625,
+      "mochi_ms": 7.870509374999999,
+      "gap_ms": 0.4694407812500003
+    }
+  ],
+  "slots": [
+    {
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.2992468125,
+      "cpu_ms": 8.415187499999998,
+      "p99_ms": 8.4254616
+    },
+    {
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 7.8576,
+      "cpu_ms": 8.0191125,
+      "p99_ms": null
+    },
+    {
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 7.8646312499999995,
+      "cpu_ms": 8.01811875,
+      "p99_ms": null
+    },
+    {
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.3079660625,
+      "cpu_ms": 8.424156250000001,
+      "p99_ms": 8.4589046
+    },
+    {
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.316485125,
+      "cpu_ms": 8.431925000000001,
+      "p99_ms": 8.4649574
+    },
+    {
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 7.86870625,
+      "cpu_ms": 8.008162500000001,
+      "p99_ms": null
+    },
+    {
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 7.8574125,
+      "cpu_ms": 8.02885,
+      "p99_ms": null
+    },
+    {
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.324564375,
+      "cpu_ms": 8.43795625,
+      "p99_ms": 8.459833999999999
+    },
+    {
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.334819375,
+      "cpu_ms": 8.45580625,
+      "p99_ms": 8.4621466
+    },
+    {
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 7.8676812499999995,
+      "cpu_ms": 8.032237499999999,
+      "p99_ms": null
+    },
+    {
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 7.8733375,
+      "cpu_ms": 8.018550000000001,
+      "p99_ms": null
+    },
+    {
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.345080937499999,
+      "cpu_ms": 8.46463125,
+      "p99_ms": 8.569923
+    }
+  ],
+  "samples_per_arm": 960,
+  "mochi_commit": "d1185d2",
+  "mochi_p99_available": false,
+  "raw_sha": {
+    "N": [
+      "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    ],
+    "M": [
+      "624d9d1a2f5cedb300182bb7766df1c3b421d57555c9edc20220baa14431a612"
+    ]
+  },
+  "old_gap_ms": 0.478631198,
+  "cross_batch_change_not_an_optimization_measurement": true
+}
