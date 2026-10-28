@@ -2765,3 +2765,7 @@ contract/project零额外LDS、u8/b8已清零，但分别113/115VGPR，超112硬
 ## 2026-10-29 ISA Phase2 刀3 pool/split正交转置 STOP
 
 pool经打包后字掩码修正，6个out8核32b8→4b64，C64 VGPR90→89，其余88不变、LDS不增/0spill。split两核改Transposed+成对转换，VGPR100不变、LDS1024→0、u8及F32散写消除，旧_nof32保持代码/资源同。分别七档Gold同、各四档3ABBA完成。pool组合四档无稳定净收益；split Orig1088 mean+8.345µs/p99+12.989µs（3mean全退），Small1080三轮p99全退。均STOP，不叠加、不把opcode下降或某一pooled好值当产品收益。详results/isa-asm-phase2-20261028/README.md。
+
+## 2026-10-29 ISA Phase3 刀1 STOP
+
+C512 W16 Stage2成对打包1A：_bin684→646条、95VGPR不变，非byte119→112，0spill/Gold七档同；四档ABBA无稳定净收益（Orig1088+17.239µs、Small900+7.476µs）。跨阶段/跨h2预取完整版本资源跨档，受限1B只非byte-in启用，Gold同但Orig1088+16.878/Orig900+11.089µs均三mean全退。额外Hrtz位掩码原型资源失败且误送Gold被首帧SHA不一致拒绝，不采纳不算通过。详results/isa-asm-phase3-20261029/knife1-README.md。

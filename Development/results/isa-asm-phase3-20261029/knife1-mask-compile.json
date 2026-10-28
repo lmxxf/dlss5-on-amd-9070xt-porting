@@ -1,0 +1,24 @@
+{
+  "name": "phase3-pair-mask-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\mask.hip",
+      "sha256": "95d3fd731677f365ee12524ece2c2a068fc1703dd46f074091fb0584e9406cea"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-mask",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\mask.hip\" comgr gfx1201"
+    }
+  ]
+}

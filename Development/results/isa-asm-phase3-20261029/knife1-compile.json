@@ -1,0 +1,50 @@
+{
+  "name": "phase3-ffn-pack-prefetch-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\baseline.hip",
+      "sha256": "e7477b3baf036a96b1e88b3e23bce04d32915c6ee4fe93f2855578981d2a7b75"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\pair.hip",
+      "sha256": "31862e4e2ff2f4b4208a308771bc21d7cf8383b13a5a3f1d4c043435f5d2ae8f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\prefetch.hip",
+      "sha256": "35f19d5d5c88af169fc813c89ac9db3e0e2825c6d59273ca80476de3e43f0678"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\baseline.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-pair",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\pair.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife1/compile-prefetch",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\prefetch.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+--- a/hip/c512_m32_deep.inc
++++ b/hip/c512_m32_deep.inc
+@@ -1,3 +1,9 @@
++#ifndef C512_ACT_PAIR
++#define C512_ACT_PAIR 0
++#endif
++#ifndef C512_FFN_PREFETCH
++#define C512_FFN_PREFETCH 0
++#endif
+ #ifndef C512_MIX_OCC_LDS
+ #define C512_MIX_OCC_LDS 0 /* bytes of dummy LDS on split_mix_blocked_h16w_m32 (occupancy cap) */
+ #endif
+@@ -294,6 +300,11 @@
+     i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
+     m[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b0,a0,m[j]);
+     m[j]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b1,a1,m[j]);}}
++#if C512_FFN_PREFETCH
++  w16_i4 pref_c[2][4],pref_e[2][2][2];
++  auto prefetch=[&](uint h){uint slot=h&1;_Pragma("unroll") for(uint ob=0;ob<4;ob++)__builtin_memcpy(&pref_c[slot][ob],wc+(ob*8+h)*512+(gr()*16+rc())*16,16);_Pragma("unroll") for(uint hp=0;hp<2;hp++)for(uint k=0;k<2;k++)__builtin_memcpy(&pref_e[slot][hp][k],we+(((h*2+hp)*2+k)*512)+(gr()*16+rc())*16,16);};
++  prefetch(0);__builtin_amdgcn_sched_barrier(0);
++#endif
+   i2 x8[4];
+ #if C512_DIRECT_PACK&1
+   for(uint j=0;j<4;j++){float xv[8];for(uint e=0;e<8;e++)xv[e]=fp8_add0(c512_hq(m[j][e]));x8[j]=c5d_pack8f(xv);}
+@@ -303,16 +314,32 @@
+   f8 r[4]{};
+   for(uint h2=0;h2<8;h2++){
+    w16_i4 cbw[4];
++#if C512_FFN_PREFETCH
++   _Pragma("unroll") for(uint ob=0;ob<4;ob++)cbw[ob]=pref_c[h2&1][ob];
++#else
+    _Pragma("unroll") for(uint ob=0;ob<4;ob++)__builtin_memcpy(&cbw[ob],wc+(ob*8+h2)*512+(gr()*16+rc())*16,16);
++#endif
+    _Pragma("unroll") for(uint hp=0;hp<2;hp++){
+     const uint hb=h2*2+hp;
+     f8 ex{};
+     _Pragma("unroll") for(uint ks2=0;ks2<2;ks2++){
+-     w16_i4 ebw;__builtin_memcpy(&ebw,we+(hb*2+ks2)*512+(gr()*16+rc())*16,16);
++     w16_i4 ebw;
++#if C512_FFN_PREFETCH
++     ebw=pref_e[h2&1][hp][ks2];
++#else
++     __builtin_memcpy(&ebw,we+(hb*2+ks2)*512+(gr()*16+rc())*16,16);
++#endif
+      i2 eb0={ebw[0],ebw[1]},eb1={ebw[2],ebw[3]};
+      ex=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(eb0,x8[ks2*2],ex);
+      ex=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(eb1,x8[ks2*2+1],ex);}
++#if C512_FFN_PREFETCH
++    if(hp==1&&h2+1<8){prefetch(h2+1);__builtin_amdgcn_sched_barrier(0);}
++#endif
++#if C512_ACT_PAIR
++    float av[8];_Pragma("unroll") for(uint e=0;e<8;e++){float v=Hrtz(ex[e]),gate=clampf(v,-4.f,4.f),poly=__builtin_fmaf(gate,__builtin_fmaf(absf(gate),-.055908203125f,.447265625f),.89453125f);av[e]=fp8_add0(v*poly);}i2 a=c5d_pack8f(av);
++#else
+     i2 a{};for(uint e=0;e<8;e++){float v=Hrtz(ex[e]),gate=clampf(v,-4.f,4.f),poly=__builtin_fmaf(gate,__builtin_fmaf(absf(gate),-.055908203125f,.447265625f),.89453125f);a[e/4]=int(uint(a[e/4])|(uint(byte_F(v*poly))<<(8*(e%4))));}
++#endif
+     _Pragma("unroll") for(uint ob=0;ob<4;ob++){
+      i2 cb=hp?i2{cbw[ob][2],cbw[ob][3]}:i2{cbw[ob][0],cbw[ob][1]};
+      r[ob]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,cb,r[ob]);}}}

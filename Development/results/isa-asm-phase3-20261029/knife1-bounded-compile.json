@@ -1,0 +1,24 @@
+{
+  "name": "phase3-bounded-prefetch",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\bounded.hip",
+      "sha256": "77baedde70a2a8bf77312bce1fc19da22c30ed6aa633dfead4a9988530c97545"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife1/compile-bounded",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\bounded.hip\" comgr gfx1201"
+    }
+  ]
+}

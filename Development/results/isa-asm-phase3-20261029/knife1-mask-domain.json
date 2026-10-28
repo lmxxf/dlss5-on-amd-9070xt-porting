@@ -1,0 +1,14 @@
+{
+  "dot_terms": 64,
+  "operand_bound": 448,
+  "absolute_dot_bound": 12845056,
+  "lattice_step": "2^-18",
+  "normal_half_domain": "clear low13 bits equals Hrtz",
+  "subnormal_half_domain": "E4M3 product-sum lattice is coarser than FP16 subnormal spacing; small values exactly representable",
+  "overflow_domain": "positive activation saturated to FP8 +448; negative clamp gate -4 gives exact polynomial0, then canonical byte0",
+  "scope": "Unproven domain hypothesis, invalidated by actual model Gold; do not use as equivalence proof",
+  "status": "REJECTED_BY_RESOURCE_AND_GPU_GOLD",
+  "gold_expected": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+  "gold_actual": "bd1314bbfbdb39a28a25317732c440b50262745fed68b975dca2afc7cfba812e",
+  "cause": "not isolated; preserve original Hrtz"
+}
