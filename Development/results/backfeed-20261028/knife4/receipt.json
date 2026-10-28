@@ -1,0 +1,46 @@
+{
+  "status": "COMPLETE",
+  "production_base": "a71f5d72",
+  "knife2_commit": "ec91bd4a",
+  "knife3_commit": "7fbba898",
+  "knife2": "STOP: contract/project VGPR gate; qkv performance gate",
+  "knife3": "STOP: no stable net gain",
+  "modules": "80 unchanged accepted v0.45 modules; SHA/ELF verified, not recompiled",
+  "gfx1200_hardware_validated": false,
+  "host_build": "formal O2 addon/runtime/frame",
+  "frame_matches_knife1_validated_binary": true,
+  "runtime_smoke": "exit0, explicit final flags, Small0.5/skip0/vit_stream3",
+  "configuration": "regular OptiScaler [DlssNr] TransferStrength=1.0 ColourStrength=1.0; merge test passed",
+  "payload": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/backfeed-20261028/final-payload",
+  "artifacts": [
+    {
+      "path": "LmxxfNrRuntime.dll",
+      "sha256": "4c5bd8517ac1d6d2a472954dd60cacc6ffe21089d743be4db180c3663313bbd5",
+      "bytes": 4351715
+    },
+    {
+      "path": "LmxxfNrRuntime.dll.a",
+      "sha256": "802e123fcba16f78dd7e0b1915afe5cafeeaf0fd413280ff250d8262474f0311",
+      "bytes": 1626
+    },
+    {
+      "path": "OptiScaler-regular.ini",
+      "sha256": "9dd99a8d8edbbbd83cd72c3ed928d0838b2c3a364fbc5d5b9280c20bbe7a1d94",
+      "bytes": 81
+    },
+    {
+      "path": "dlss5-amd.addon64",
+      "sha256": "5108ff5156b7f45527d25a8875f8b2ae1a6c191824444e27955838161c5221e3",
+      "bytes": 4666133
+    },
+    {
+      "path": "frame.exe",
+      "sha256": "323408442935367b9d7609e3989922c4fb55d51946befb176a2f67d01652d587",
+      "bytes": 4693375
+    }
+  ],
+  "production_header_sha256": "a3fa4c3a2101958331c9acff1b5198297ed12f8c0c2b1d8960d85ccd040ee8d4",
+  "game_installation_changed": false,
+  "release_zips_changed": false,
+  "push": false
+}

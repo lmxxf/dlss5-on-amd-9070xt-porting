@@ -821,3 +821,9 @@ D:\給網友打包三个0.45完整ZIP及.sha256已生成。每包44 shader编译
 ### 2026-10-28 backfeed 刀1闭环；刀2～4待执行
 
 Small900 C256全块融合采纳，87→83派发，三轮ABBA mean−87.598µs/p99−79.872µs；Small896×512自由小窗采用C256+400桶/V-fragment组合，mean−81.966µs/p99−90.334µs。720同样少四次派发但mean+0.405µs/p99+15.896µs，STOP并保留旧默认。默认仅限已测获益shape；Original保持原路由。六档及小窗Gold、裸网trace逐位通过，最终默认七档21帧Gold全部0diff。模块未重编，未安装/改发行包。细节results/backfeed-20261028/knife1；下一步刀2独立尾部向量化候选。
+
+### 2026-10-28 backfeed 刀2→3→4全部闭环
+
+刀2 ec91bd4a：contract/project实现LDS转置宽写但VGPR112→113，资源门STOP；qkv_vfrag资源不增、六档Gold全同，72slot三轮ABBA无稳定净收益，STOP。可选expand未执行。刀3 7fbba898：QT_SMALL_MASK本已3，仅补W16_SMALL=3，正式LLVM23基线整SHA同，新增导出零spill、七档Gold同；48slot四档ABBA中Small900 mean+8.466µs/p99+15.439µs，其余档也不稳定，STOP。生产优化仍为刀1a71f5d72的限定shape。
+
+刀4：常规OptiScaler模板补DlssNr 1.0/1.0，实际打包合并函数验证通过。最终双架构80模块复用未变化的已验载荷，逐SHA/ELF核对hip/SHA256SUMS并生成分架构清单；正式O2 addon/runtime/frame构建通过，frame同刀1最终SHA。独立runtime smoke显式Small0.5/skip0/vit_stream3通过，前两次目录缺资源失败留档。交付目录Development/results/backfeed-20261028/final-payload，回执knife4/receipt.json。gfx1200仅ELF/构建核验；未装游戏、未改0.45ZIP、未push。全部四刀结题，无排队自动实验。
