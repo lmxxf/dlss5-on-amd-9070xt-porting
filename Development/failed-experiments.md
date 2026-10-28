@@ -2745,3 +2745,7 @@ Small31禁PDL/SP的新条件重测：87→83 dispatch且Gold 0diff，但三轮AB
 ## 2026-10-28 backfeed 刀2 STOP
 
 contract/project尾部LDS转置均消除32条b8，但VGPR112→113，不满足资源门，未上GPU。qkv_vfrag原地norm LDS转置资源不增、Gold六档全同，三轮ABBA却无稳定收益：Orig1088 p99+8.805µs、1152 mean+5.726µs/p99+13.560µs、Small720 mean+0.192µs；_qkfrag三档未执行改核不算收益。全部回退，详results/backfeed-20261028/knife2。
+
+## 2026-10-28 backfeed 刀3 STOP
+
+W2_FFN_QT_SMALL_MASK当前已3，补W2_FFN_W16_SMALL=3新增C64/C128 W16导出。正式LLVM23两baseline整SHA同、旧函数同、新函数0spill、七档Gold逐位同。但Small900三轮mean全退（pooled+8.466µs/p99+15.439µs）；Original900+2.263µs/p99+14.066µs；Small1080轻微均值收益但三轮p99全退；Original1088近零且不稳。整刀STOP，生产配方保持。详results/backfeed-20261028/knife3。

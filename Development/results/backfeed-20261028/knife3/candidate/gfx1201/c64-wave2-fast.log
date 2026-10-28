@@ -1,0 +1,191 @@
+["/home/lmxxf/work/llvm-build-23/bin/clang", "--target=x86_64-pc-windows-msvc", "--offload-arch=gfx1201", "-O3", "-x", "hip", "--offload-device-only", "-cuid=3EC265BB0A8C460D94EA7EB0066D6912F0EDDE8D8E70F9D960E2E6DBB7D752B3", "-c", "-emit-llvm", "-fshort-wchar", "-std=c++14", "-fms-compatibility-version=19.44.35229", "-nogpuinc", "-nogpulib", "-Xclang", "-target-feature", "-Xclang", "-real-true16", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip", "-o", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.bc"]
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:231:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  231 |   if constexpr(!ByteInput){if(p<M&&(!valid_width||(p%width<valid_width&&p/width<valid_height))){uint off=p*K+k;a0=input[off];a1=input[off+1];a2=input[off+2];a3=input[off+3];}}
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:235:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  235 |   if constexpr(ByteInput){sa[row*9+word]=(p<M&&(!valid_width||(p%width<valid_width&&p/width<valid_height)))?reinterpret_cast<const uint*>(input)[(p*K+k)/4]:0u;}else sa[row*9+word]=pack4(a0,a1,a2,a3);
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:256:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  256 |  if constexpr(Normalize){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:298:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  298 |   if constexpr(Crop){uint x=p%workw,y=p/workw;if(x<sx||y<sy||x>=sx+cropw||y>=sy+croph)continue;dest=((y-sy)*cropw+x-sx)*N+n;}
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:299:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  299 |   if constexpr(ByteOutput)reinterpret_cast<unsigned char*>(output)[dest]=static_cast<unsigned char>(q8(v));else output[dest]=v;
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:444:208: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  444 |  for(uint k=0;k<16;k++){uint p=first+k,c=t;float v=0.f;if(p<M&&!(valid_width&&(p%width>=valid_width||p/width>=valid_height))){uint base=((p/width)*2*source_width+(p%width)*2)*C;auto rd=[&](uint i)->float{if constexpr(HalfIn)return float(reinterpret_cast<const _Float16*>(raw)[i]);else return raw[i];};float top=H(rd(base+c)+rd(base+C+c)),bottom=H(rd(base+source_width*C+c)+rd(base+(source_width+1)*C+c));v=F(H(H(top+bottom)*.25f));}if constexpr(F8W16)pooled8[k*S+c]=static_cast<unsigned char>(__builtin_amdgcn_cvt_pk_fp8_f32(v,0.f,0,false));else pooled[k*S+c]=(_Float16)v;}
+      |                                                                                                                                                                                                                ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:444:436: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  444 |  for(uint k=0;k<16;k++){uint p=first+k,c=t;float v=0.f;if(p<M&&!(valid_width&&(p%width>=valid_width||p/width>=valid_height))){uint base=((p/width)*2*source_width+(p%width)*2)*C;auto rd=[&](uint i)->float{if constexpr(HalfIn)return float(reinterpret_cast<const _Float16*>(raw)[i]);else return raw[i];};float top=H(rd(base+c)+rd(base+C+c)),bottom=H(rd(base+source_width*C+c)+rd(base+(source_width+1)*C+c));v=F(H(H(top+bottom)*.25f));}if constexpr(F8W16)pooled8[k*S+c]=static_cast<unsigned char>(__builtin_amdgcn_cvt_pk_fp8_f32(v,0.f,0,false));else pooled[k*S+c]=(_Float16)v;}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:449:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  449 |   if constexpr(F8W16){
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:462:366: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  462 |  _Pragma("unroll") for(uint e=0;e<8;e++){uint q=first+g*8+e;if(q<M){bool inv=valid_width&&(q%width>=valid_width||q/width>=valid_height);_Pragma("unroll") for(uint j=0;j<4;j++){float a=acc[j][e],ac=__builtin_amdgcn_fmed3f(a+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(ac,0.f,0,false);uint idx=Gout?pg_tinv(q)*N+pg_cinv(colg+j*16+rc):q*N+colg+j*16+rc;if constexpr(ByteOut)reinterpret_cast<unsigned char*>(output)[idx]=inv?0u:static_cast<unsigned char>(b8);else output[idx]=inv?0.f:__builtin_amdgcn_cvt_f32_fp8(b8,0);}}}
+      |                                                                                                                                                                                                                                                                                                                                                                              ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:617:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  617 |  if constexpr(FB8){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:636:7: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  636 |    if constexpr(ByteOut){
+      |       ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:652:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  652 |  if constexpr(Unroll==4){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:671:211: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  671 |   _Pragma("unroll") for(uint n=0;n<4;n++){uint c=col+n*16+rc;float a=acc[n][e],h=Hrtz(a),hi=post==4?a:h,hc=__builtin_amdgcn_fmed3f(hi+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(hc,0.f,0,false);if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[p*C+c]=static_cast<unsigned char>(b8);else{float f=__builtin_amdgcn_cvt_f32_fp8(b8,0),v=post==3?h:f;out[p*C+c]=v;}}}}
+      |                                                                                                                                                                                                                   ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:897:99: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  897 |   for(uint tile=0;tile<4;tile++){uint row=wave*64+tile*16+rc,offset=(row*C+k+group*8)/4;i2 b{};if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w);uint off=((row/16)*(C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};expand[tile]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,expand[tile]);}
+      |                                                                                                   ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:907:154: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  907 |  for(uint k=first_k;k<last_k;k+=16){i2 a;__builtin_memcpy(&a,hidden+rc*(4*C+4)+k+group*8,8);uint offset=4*C*C+((wave*16+rc)*(4*C)+k+group*8)/4;i2 b{};if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w+4*C*C);uint row=wave*16+rc,off=((row/16)*(4*C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};accum=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,accum);}
+      |                                                                                                                                                          ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:908:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  908 |  if constexpr(Project){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:861:133: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  861 | template<uint C,bool Mapped> DEV float ffn_input(const float*in,uint p,uint c,uint width,uint height,uint workw,uint sx,uint sy){if constexpr(Mapped){int x=int(p%workw)-int(sx),y=int(p/workw)-int(sy);return x>=0&&y>=0&&x<int(width)&&y<int(height)?in[(uint(y)*width+uint(x))*C+c]:0.f;}return in[p*C+c];}
+      |                                                                                                                                     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1003:46: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1003 |  auto load_in=[&](uint row,uint k)->float{if constexpr(ByteIn)return ffn_input8<C,Mapped>(in8,row,k,width,height,workw,sx,sy);else return ffn_input<C,Mapped>(in,row,k,width,height,workw,sx,sy);};
+      |                                              ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1004:49: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1004 |  auto load_in_nb=[&](uint row,uint k)->float{if constexpr(ByteIn)return ffn_input8_nb<C,Mapped>(in8,row,k,width,height,workw,sx,sy);else return ffn_input_nb<C,Mapped>(in,row,k,width,height,workw,sx,sy);};
+      |                                                 ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1010:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1010 |  if constexpr((C==128||C==256)&&Mapped){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1017:37: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1017 |    for(uint i=tid;i<16*C;i+=2*C){if constexpr(ByteFeature)out[first*C+i]=0;else reinterpret_cast<float*>(out)[first*C+i]=0.f;}
+      |                                     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1037:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1037 |  if constexpr(!ByteIn){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1041:91: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1041 |  for(uint i=tid;i<16*(C/4+1);i+=2*C){uint row=i/(C/4+1),k=(i%(C/4+1))*4,word=0;if(k<C){if constexpr(ByteIn)word=ffn_input8_word<C,Mapped>(in8,first+row,k,width,height,workw,sx,sy);else word=pack4(load_in_nb(first+row,k),load_in_nb(first+row,k+1),load_in_nb(first+row,k+2),load_in_nb(first+row,k+3));}__builtin_memcpy(hidden+i*4,&word,4);}
+      |                                                                                           ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1054:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1054 |   if constexpr(ByteIn)a=ffn_input8_fragment<C,Mapped>(in8,first+rc,k+group*8,width,height,workw,sx,sy);else __builtin_memcpy(&a,hidden+rc*(C+4)+k+group*8,8);
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1058:99: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1058 |   for(uint tile=0;tile<4;tile++){uint row=wave*64+tile*16+rc,offset=(row*C+k+group*8)/4;i2 b{};if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(w),row,C,k,group);else if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w);uint off=((row/16)*(C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};expand[tile]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,expand[tile]);}
+      |                                                                                                   ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1058:188: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1058 |   for(uint tile=0;tile<4;tile++){uint row=wave*64+tile*16+rc,offset=(row*C+k+group*8)/4;i2 b{};if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(w),row,C,k,group);else if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w);uint off=((row/16)*(C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};expand[tile]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,expand[tile]);}
+      |                                                                                                                                                                                            ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1062:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1062 |  if constexpr(!ByteIn)__builtin_amdgcn_s_barrier();
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1083:154: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1083 |  for(uint k=first_k;k<last_k;k+=16){i2 a;__builtin_memcpy(&a,hidden+rc*(4*C+4)+k+group*8,8);uint offset=4*C*C+((wave*16+rc)*(4*C)+k+group*8)/4;i2 b{};if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(w+4*C*C),wave*16+rc,4*C,k,group);else if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w+4*C*C);uint row=wave*16+rc,off=((row/16)*(4*C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};accum=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,accum);}
+      |                                                                                                                                                          ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1083:258: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1083 |  for(uint k=first_k;k<last_k;k+=16){i2 a;__builtin_memcpy(&a,hidden+rc*(4*C+4)+k+group*8,8);uint offset=4*C*C+((wave*16+rc)*(4*C)+k+group*8)/4;i2 b{};if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(w+4*C*C),wave*16+rc,4*C,k,group);else if constexpr(Tiled){const unsigned char*wb=reinterpret_cast<const unsigned char*>(w+4*C*C);uint row=wave*16+rc,off=((row/16)*(4*C/32)+k/32)*512+(k%32+group*8)*16+row%16;for(uint e=0;e<8;e++)b[e/4]=int(uint(b[e/4])|(uint(wb[off+e*16])<<(8*(e%4))));}else b={int(pw[offset]),int(pw[offset+1])};accum=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,accum);}
+      |                                                                                                                                                                                                                                                                  ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1084:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1084 |  if constexpr(Project){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1091:71: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1091 |    for(uint e=0;e<8;e++){uint c=wave*16+group*8+e;rs[e]=w[9*C*C+c];if constexpr(ByteIn)rv[e]=ffn_input8_nb<C,Mapped>(in8,first+rc,c,width,height,workw,sx,sy);else rv[e]=ffn_input_nb<C,Mapped>(in,first+rc,c,width,height,workw,sx,sy);}
+      |                                                                       ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1106:130: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1106 |   for(uint k=0;k<C;k+=16){i2 a,b;__builtin_memcpy(&a,hidden+rc*(C+4)+k+group*8,8);uint off=8*C*C+((wave*16+rc)*C+k+group*8)/4;if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(w+8*C*C),wave*16+rc,C,k,group);else b={int(pw[off]),int(pw[off+1])};result=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,a,result);}
+      |                                                                                                                                  ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1111:139: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1111 |   for(uint e=0;e<8;e++){uint byte=q8_fused_round(result[e]);float v=__builtin_amdgcn_cvt_f32_fp8(int(byte),0);uint c=wave*16+group*8+e;if constexpr(ByteFeature){
+      |                                                                                                                                           ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1124:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1124 |   if constexpr(BatchNorm){
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1126:164: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1126 |    for(uint part=0;part<3;part++)for(uint k=0;k<C;k+=16){i2 a,b;__builtin_memcpy(&a,qfeature+rc*(C+4)+k+group*8,8);uint off=((part*C+wave*16+rc)*C+k+group*8)/4;if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(aw),part*C+wave*16+rc,C,k,group);else b={int(aq[off]),int(aq[off+1])};q[part]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a,b,q[part]);}
+      |                                                                                                                                                                    ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1146:134: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1146 |    for(uint k=0;k<C;k+=16){i2 a,b;__builtin_memcpy(&a,qfeature+rc*(C+4)+k+group*8,8);uint off=((part*C+wave*16+rc)*C+k+group*8)/4;if constexpr(Frag)b=frag_b(reinterpret_cast<const unsigned char*>(aw),part*C+wave*16+rc,C,k,group);else b={int(aq[off]),int(aq[off+1])};q=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,a,q);}
+      |                                                                                                                                      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:873:136: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  873 | template<uint C,bool Mapped> DEV float ffn_input_nb(const float*in,uint p,uint c,uint width,uint height,uint workw,uint sx,uint sy){if constexpr(Mapped){int x=int(p%workw)-int(sx),y=int(p/workw)-int(sy);bool ok=x>=0&&y>=0&&x<int(width)&&y<int(height);uint xi=ok?uint(x):0u,yi=ok?uint(y):0u;float v=in[(yi*width+xi)*C+c];return ok?v:0.f;}return in[p*C+c];}
+      |                                                                                                                                        ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:980:142: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  980 | template<uint C,bool Mapped> DEV float ffn_input8(const unsigned char*in,uint p,uint c,uint width,uint height,uint workw,uint sx,uint sy){if constexpr(Mapped){int x=int(p%workw)-int(sx),y=int(p/workw)-int(sy);return x>=0&&y>=0&&x<int(width)&&y<int(height)?__builtin_amdgcn_cvt_f32_fp8(int(in[(uint(y)*width+uint(x))*C+c]),0):0.f;}return __builtin_amdgcn_cvt_f32_fp8(int(in[p*C+c]),0);}
+      |                                                                                                                                              ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:874:145: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  874 | template<uint C,bool Mapped> DEV float ffn_input8_nb(const unsigned char*in,uint p,uint c,uint width,uint height,uint workw,uint sx,uint sy){if constexpr(Mapped){int x=int(p%workw)-int(sx),y=int(p/workw)-int(sy);bool ok=x>=0&&y>=0&&x<int(width)&&y<int(height);uint xi=ok?uint(x):0u,yi=ok?uint(y):0u;float v=__builtin_amdgcn_cvt_f32_fp8(int(in[(yi*width+xi)*C+c]),0);return ok?v:0.f;}return __builtin_amdgcn_cvt_f32_fp8(int(in[p*C+c]),0);}
+      |                                                                                                                                                 ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:991:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+  991 |  if constexpr(Mapped){int x=int(p%workw)-int(sx),y=int(p/workw)-int(sy);ok=x>=0&&y>=0&&x<int(width)&&y<int(height);uint xi=ok?uint(x):0u,yi=ok?uint(y):0u;index=(yi*width+xi)*C+c;}
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1556:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1556 |   if constexpr(Up){
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1568:14: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1568 |   float v;if constexpr(ByteIn)v=__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(in)[idx]),0);else v=in[idx];
+      |              ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1572:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1572 |  if constexpr(Up){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1613:137: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1613 |    {const bool ok=lx>=0&&ly>=0&&lx<int(iw)&&ly<int(ih);const uint base=ok?(uint(ly)*iw+uint(lx))*IC:0u;for(uint e=0;e<8;e++){float v;if constexpr(LowByte)v=__builtin_amdgcn_cvt_f32_fp8(int(reinterpret_cast<const unsigned char*>(in)[base+k+gr*8+e]),0);else v=in[base+k+gr*8+e];a[e]=ok?(_Float16)v:(_Float16)0.f;}}
+      |                                                                                                                                         ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1640:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1640 |     if constexpr(SkipByte){uint wv[2];__builtin_memcpy(wv,reinterpret_cast<const unsigned char*>(skip)+base+c0,8);_Pragma("unroll") for(uint e=0;e<8;e++)sk[e]=__builtin_amdgcn_cvt_f32_fp8(int((wv[e/4]>>(8*(e%4)))&255u),0);}
+      |        ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1641:13: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1641 |     else if constexpr(SkipHalf){h8 v;__builtin_memcpy(&v,reinterpret_cast<const _Float16*>(skip)+base+c0,16);_Pragma("unroll") for(uint e=0;e<8;e++)sk[e]=float(v[e]);}
+      |             ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1690:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1690 |   if constexpr(ByteIn){a=(W2_HOIST_LOADS&1)?w2_input_bytes_nb<C>(in,win,qt*16+rc,head*32+ci*16+gr*8,workw,width,height,sx,sy):w2_input_bytes<C>(in,win,qt*16+rc,head*32+ci*16+gr*8,workw,width,height,sx,sy);a[0]=int(w2_canonical_byte_word(uint(a[0])));a[1]=int(w2_canonical_byte_word(uint(a[1])));}
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1702:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1702 |  if constexpr(C==256 || (C==64 && (W2_FFN_QT_SMALL_MASK&1)) || (C==128 && (W2_FFN_QT_SMALL_MASK&2))){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1711:7: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1711 |    if constexpr(W16){
+      |       ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1730:7: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1730 |    if constexpr(W16){
+      |       ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1811:7: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1811 |    if constexpr(Up){
+      |       ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1813:13: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1813 |    }else if constexpr(ByteIn&&W2_BYTE_INPUT_LOADS)ib=(W2_HOIST_LOADS&2)?w2_input_bytes_nb<C>(in,win,qt*16+rc,head*32+ci*16+gr*8,workw,width,height,sx,sy):w2_input_bytes<C>(in,win,qt*16+rc,head*32+ci*16+gr*8,workw,width,height,sx,sy);
+      |             ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1814:65: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1814 |    for(uint e=0;e<8;e++){uint c=head*32+ci*16+gr*8+e;float v;if constexpr(ByteIn&&W2_BYTE_INPUT_LOADS)v=__builtin_amdgcn_cvt_f32_fp8(int((uint(ib[e/4])>>(8*(e%4)))&255u),0);else v=input(qt*16+rc,c);products[e]=v*fw[9*C*C+c];}
+      |                                                                 ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1824:6: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1824 |   if constexpr(W16){
+      |      ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1852:5: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1852 |  if constexpr(W2QkvFuse){
+      |     ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2044:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2044 |     if constexpr(ByteOut){W2_Q8_DECL(a);for(uint e=0;e<8;e++){float v=result[ci][e];W2_Q8_SET(a,e,post==0?(W2_Q8_MASK?w2_hmask(v):Hrtz(v)):v);}W2_Q8_END(a);__builtin_memcpy(reinterpret_cast<unsigned char*>(out_any)+dest+ci*16,&a,8);}
+      |        ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2045:13: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2045 |     else if constexpr(W2HalfTail){for(uint e=0;e<8;e++){float v=result[ci][e];static_cast<_Float16*>(out_any)[dest+ci*16+e]=(_Float16)Hrtz(v);}if constexpr(W2SkipB8){i2 sb{};for(uint e=0;e<8;e++)w2_bits(sb,e,w2_skip_byte(Hrtz(result[ci][e])));__builtin_memcpy(static_cast<unsigned char*>(w2_sb)+dest+ci*16,&sb,8);}}
+      |             ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2045:147: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2045 |     else if constexpr(W2HalfTail){for(uint e=0;e<8;e++){float v=result[ci][e];static_cast<_Float16*>(out_any)[dest+ci*16+e]=(_Float16)Hrtz(v);}if constexpr(W2SkipB8){i2 sb{};for(uint e=0;e<8;e++)w2_bits(sb,e,w2_skip_byte(Hrtz(result[ci][e])));__builtin_memcpy(static_cast<unsigned char*>(w2_sb)+dest+ci*16,&sb,8);}}
+      |                                                                                                                                                   ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:1535:52: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 1535 | template<bool Byte> DEV float w2_skipF(float v){if constexpr(Byte)return v;else return w2_up_F(v);}
+      |                                                    ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2329:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2329 |     if constexpr(ByteOut){W2_Q8_DECL(a);for(uint e=0;e<8;e++){float v=result[ci][e];W2_Q8_SET(a,e,post==0?(W2_Q8_MASK?w2_hmask(v):Hrtz(v)):v);}W2_Q8_END(a);__builtin_memcpy(reinterpret_cast<unsigned char*>(out_any)+dest+ci*16,&a,8);}
+      |        ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2330:13: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2330 |     else if constexpr(W2HalfTail){for(uint e=0;e<8;e++){float v=result[ci][e];static_cast<_Float16*>(out_any)[dest+ci*16+e]=(_Float16)Hrtz(v);}if constexpr(W2SkipB8){i2 sb{};for(uint e=0;e<8;e++)w2_bits(sb,e,w2_skip_byte(Hrtz(result[ci][e])));__builtin_memcpy(static_cast<unsigned char*>(w2_sb)+dest+ci*16,&sb,8);}}
+      |             ^
+Development/results/backfeed-20261028/knife3/candidate/gfx1201/sources/c64-wave2-fast/probe.hip:2330:147: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+ 2330 |     else if constexpr(W2HalfTail){for(uint e=0;e<8;e++){float v=result[ci][e];static_cast<_Float16*>(out_any)[dest+ci*16+e]=(_Float16)Hrtz(v);}if constexpr(W2SkipB8){i2 sb{};for(uint e=0;e<8;e++)w2_bits(sb,e,w2_skip_byte(Hrtz(result[ci][e])));__builtin_memcpy(static_cast<unsigned char*>(w2_sb)+dest+ci*16,&sb,8);}}
+      |                                                                                                                                                   ^
+62 warnings generated when compiling for gfx1201.
+["/home/lmxxf/work/llvm-build-23/bin/clang", "-target", "amdgcn-amd-amdhsa", "-mcpu=gfx1201", "-O3", "-nogpulib", "-Xclang", "-target-feature", "-Xclang", "-real-true16", "-S", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.bc", "-o", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.hsaco.s"]
+["/home/lmxxf/work/llvm-build-23/bin/clang", "-target", "amdgcn-amd-amdhsa", "-mcpu=gfx1201", "-O3", "-nogpulib", "-Xclang", "-target-feature", "-Xclang", "-real-true16", "-c", "-mllvm", "-amdgpu-internalize-symbols", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.bc", "-o", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.o"]
+["/home/lmxxf/work/llvm-build-23/bin/ld.lld", "--no-undefined", "-shared", "-plugin-opt=mcpu=gfx1201", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.o", "-o", "Development/results/backfeed-20261028/knife3/candidate/gfx1201/c64-wave2-fast.hsaco"]

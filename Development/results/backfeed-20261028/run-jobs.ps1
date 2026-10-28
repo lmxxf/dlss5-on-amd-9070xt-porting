@@ -8,7 +8,7 @@ function Idle {
 }
 function HashCheck($path,$sha){if((Get-FileHash $path -Algorithm SHA256).Hash.ToLower() -ne $sha.ToLower()){throw "SHA drift $path"}}
 Idle
-if(Get-Process|Where-Object {$_.ProcessName -match '^(benchmark|candidate|trace|candidate-trace|nr_graph|rtc_compile|frame|compat|probe|pure|frame-baseline|frame-candidate|pure-baseline|pure-candidate|trace-baseline|trace-candidate|final-frame|final-pure|final-trace|timeout-probe|frame-warmed|pair-probe|pair-probe-loader)$'}){throw 'GPU/RTC job already present'}
+if(Get-Process|Where-Object {$_.ProcessName -match '^(benchmark|candidate|trace|candidate-trace|nr_graph|rtc_compile.*|frame|compat|probe|pure|frame-baseline|frame-candidate|pure-baseline|pure-candidate|trace-baseline|trace-candidate|final-frame|final-pure|final-trace|timeout-probe|frame-warmed|pair-probe|pair-probe-loader)$'}){throw 'GPU/RTC job already present'}
 $m=Get-Content $Manifest -Raw|ConvertFrom-Json
 foreach($f in $m.files){HashCheck $f.path $f.sha256}
 $owner=[IO.File]::Open($lock,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None);$p=$null
