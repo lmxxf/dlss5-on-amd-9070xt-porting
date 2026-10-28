@@ -817,3 +817,7 @@ D:\給網友打包三个0.45完整ZIP及.sha256已生成。每包44 shader编译
 - OptiScaler-REFramework-DLSS5-AMD-0.45.zip：533387409B，SHA256 `a46fee43bfc67e8fe367e3a4593ddd71dfbcd8afb9c91c330effa012e8857604`。
 
 回执：[双游戏安装](results/game-install-20261024/README.md)、[0.45发行](releases/0.45/README.md)。用户已提供 0.45 公开下载入口：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile](https://gofile.io/d/hmrcTjuS)，README/CHANGELOG/releases/WorkingPlan已同步更新。
+
+### 2026-10-28 backfeed 刀1闭环；刀2～4待执行
+
+Small900 C256全块融合采纳，87→83派发，三轮ABBA mean−87.598µs/p99−79.872µs；Small896×512自由小窗采用C256+400桶/V-fragment组合，mean−81.966µs/p99−90.334µs。720同样少四次派发但mean+0.405µs/p99+15.896µs，STOP并保留旧默认。默认仅限已测获益shape；Original保持原路由。六档及小窗Gold、裸网trace逐位通过，最终默认七档21帧Gold全部0diff。模块未重编，未安装/改发行包。细节results/backfeed-20261028/knife1；下一步刀2独立尾部向量化候选。

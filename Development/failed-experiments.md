@@ -2737,3 +2737,7 @@ ByteOutput出口每4值4次单输入换2次pair，正式W16核总指令3612→34
 ### 2026-10-24｜Up ByteOutput仅FP16权重pair｜STOP
 
 最后!W8候选仅2halfFn变且等fullA，余91Fn全等基线，21freshGold通过。4profile各3ABBA：Small720−5.874µs/p99−64.665，free1088−7.860/p99−7.414，但Small900mean−0.459µs近零、p99+22.444µs（R2/R3尾+35.843/+44.571），未过受影响全范围门，停止，不加分辨率条件、不再变体。Original1088控制不执行改核，其−4.224µs读数仅作为噪声控制，不宣优化收益。生产无刀2变更。证据gap-phase6-20261023/knife2/half-statistics.json。
+
+## 2026-10-28 backfeed 刀1 Small720 C256融合 STOP
+
+Small31禁PDL/SP的新条件重测：87→83 dispatch且Gold 0diff，但三轮ABBA pooled mean +0.405µs、p99 +15.896µs，R3 mean +29.607µs。保留旧门控，不将该档混入下一刀基线。详 results/backfeed-20261028/knife1/tier-statistics.json。900与896×512窗口另有正收益，不能据此泛化720。

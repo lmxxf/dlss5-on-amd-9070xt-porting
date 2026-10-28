@@ -1,0 +1,11 @@
+{
+    "label":  "knife1/perf-smallwindow-r2-3-baseline",
+    "exe":  "D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\perf-smallwindow-r2-3-baseline\\frame.exe",
+    "arguments":  "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\perf-smallwindow-r2-3-baseline\\same.flags\" \"D:\\DLSSNR-Lab\\backfeed-20261028\\window.f16\" \"D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\perf-smallwindow-r2-3-baseline\\out\" 240 0 \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\modules\" 0 1 0 0",
+    "source_exe":  "D:\\DLSSNR-Lab\\backfeed-20261028\\frame-smallwindow.exe",
+    "start":  "2026-10-28T13:53:03.8629226Z",
+    "env":  {
+                "NR_BACKFEED_SMALL_C256":  "0",
+                "NR_BACKFEED_VIT400":  "0"
+            }
+}

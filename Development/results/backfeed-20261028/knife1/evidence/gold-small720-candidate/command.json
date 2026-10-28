@@ -1,0 +1,11 @@
+{
+    "label":  "knife1/gold-small720-candidate",
+    "exe":  "D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\gold-small720-candidate\\frame.exe",
+    "arguments":  "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\gold-small720-candidate\\same.flags\" \"D:\\DLSSNR-Lab\\combined-vs041-20261006\\input.f16\" \"D:\\DLSSNR-Lab\\backfeed-20261028\\knife1\\gold-small720-candidate\\out\" 3 0 \"D:\\DLSSNR-Lab\\gap-phase6-20261023\\knife1\\modules\" 0 0 0 0",
+    "source_exe":  "D:\\DLSSNR-Lab\\backfeed-20261028\\frame-standard.exe",
+    "start":  "2026-10-28T13:49:54.0002109Z",
+    "env":  {
+                "NR_BACKFEED_SMALL_C256":  "1",
+                "NR_BACKFEED_VIT400":  "1"
+            }
+}
