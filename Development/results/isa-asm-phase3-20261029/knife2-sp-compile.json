@@ -1,0 +1,24 @@
+{
+  "name": "phase3-fold-sp-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife2-sp.hip",
+      "sha256": "6671043956de1d6e5f16294d6ce40be9c142f4b49df9580f6e98f88b3c22d764"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife2/compile-sp",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife2-sp.hip\" comgr gfx1201"
+    }
+  ]
+}

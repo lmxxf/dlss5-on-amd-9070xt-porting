@@ -2769,3 +2769,7 @@ pool经打包后字掩码修正，6个out8核32b8→4b64，C64 VGPR90→89，其
 ## 2026-10-29 ISA Phase3 刀1 STOP
 
 C512 W16 Stage2成对打包1A：_bin684→646条、95VGPR不变，非byte119→112，0spill/Gold七档同；四档ABBA无稳定净收益（Orig1088+17.239µs、Small900+7.476µs）。跨阶段/跨h2预取完整版本资源跨档，受限1B只非byte-in启用，Gold同但Orig1088+16.878/Orig900+11.089µs均三mean全退。额外Hrtz位掩码原型资源失败且误送Gold被首帧SHA不一致拒绝，不采纳不算通过。详results/isa-asm-phase3-20261029/knife1-README.md。
+
+## 2026-10-29 ISA Phase3 刀2 STOP
+
+B4保持、按两tile折叠expanded的普通C256各CPU实现仍spill（10/139/6），资源门STOP未上GPU。独立非W16提前Contract P与SP B2不变折叠S均七档Gold同、4档3ABBA。P无稳定全档净收益；S run184→153VGPR/0spill但Orig1088 mean+58.954µs（三轮全退）/p99+89.374µs，STOP，不以权重复用保持或VGPR下降推导性能。详results/isa-asm-phase3-20261029/knife2-README.md。

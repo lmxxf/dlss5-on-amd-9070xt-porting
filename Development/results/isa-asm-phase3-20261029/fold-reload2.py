@@ -1,0 +1,4 @@
+from pathlib import Path
+import subprocess
+R=Path.cwd();P=R/'Development/results/isa-asm-phase3-20261029';S=P/'work/knife2-source';p=S/'hip/wave_owned_mh.inc';s=p.read_text();pos=s.index('template<uint C> DEV i2 w2_load(');s=s[:pos]+'''template<uint C> DEV i2 w2_fold_load(const unsigned char*p,uint qt,uint ct,uint lane=w2_lane()){return *reinterpret_cast<const volatile i2*>(p+((qt*(C/16)+ct)*32+lane)*8);}
+'''+s[pos:];a=s.index('   if constexpr(W2_FOLD_EXPANDED&&W16&&T==2)');b=s.index('   }else{\n   f8 expanded[B][T]',a);block=s[a:b].replace('w2_load<C>','w2_fold_load<C>');s=s[:a]+block+s[b:];p.write_text(s);(P/'knife2-reload.patch').write_text(subprocess.run(['diff','-u','--label','a/hip/wave_owned_mh.inc','--label','b/hip/wave_owned_mh.inc',str(R/'hip/wave_owned_mh.inc'),str(p)],capture_output=True,text=True).stdout)
