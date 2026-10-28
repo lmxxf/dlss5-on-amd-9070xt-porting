@@ -2741,3 +2741,7 @@ ByteOutput出口每4值4次单输入换2次pair，正式W16核总指令3612→34
 ## 2026-10-28 backfeed 刀1 Small720 C256融合 STOP
 
 Small31禁PDL/SP的新条件重测：87→83 dispatch且Gold 0diff，但三轮ABBA pooled mean +0.405µs、p99 +15.896µs，R3 mean +29.607µs。保留旧门控，不将该档混入下一刀基线。详 results/backfeed-20261028/knife1/tier-statistics.json。900与896×512窗口另有正收益，不能据此泛化720。
+
+## 2026-10-28 backfeed 刀2 STOP
+
+contract/project尾部LDS转置均消除32条b8，但VGPR112→113，不满足资源门，未上GPU。qkv_vfrag原地norm LDS转置资源不增、Gold六档全同，三轮ABBA却无稳定收益：Orig1088 p99+8.805µs、1152 mean+5.726µs/p99+13.560µs、Small720 mean+0.192µs；_qkfrag三档未执行改核不算收益。全部回退，详results/backfeed-20261028/knife2。

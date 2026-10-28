@@ -1,0 +1,64 @@
+diff --git a/hip/deep_fast.hip b/hip/deep_fast.hip
+index 1a364692..5144f7a5 100644
+--- a/hip/deep_fast.hip
++++ b/hip/deep_fast.hip
+@@ -1,3 +1,6 @@
++#ifndef VIT_BACKFEED_TAIL
++#define VIT_BACKFEED_TAIL 0
++#endif
+ #ifndef VIT_CONTRACT_OCC_LDS
+ #define VIT_CONTRACT_OCC_LDS 0 /* bytes of dummy LDS on vit_contract_blocked_body (occupancy cap) */
+ #endif
+@@ -805,6 +808,15 @@ DEV void vit_contract_blocked_body(const float*in,const float*w,const float*skip
+    for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){if constexpr(Partial)out[(part*tokens+first+gr()*8+e)*1024+col+n*16+rc()]=acc[n][e];else total[n][e]+=acc[n][e];}
+   }
+  }
++#if (VIT_BACKFEED_TAIL & 1) && VIT_CONTRACT_OCC_LDS >= 1024
++ if constexpr(!Partial && W16 && ByteStream && ByteFOut){
++  unsigned char*tile=reinterpret_cast<unsigned char*>(const_cast<uint*>(occ_pad));
++  for(uint n=0;n<4;n++)for(uint e=0;e<8;e++)tile[(gr()*8+e)*64+n*16+rc()]=vit_contract_F_byte(VIT_FAST_H(total[n][e]));
++  WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
++  for(uint j=0;j<2;j++){uint offset=(gr()*16+rc())*16+j*512;w16_i4 v;__builtin_memcpy(&v,tile+offset,16);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+(first+offset/64)*1024+col+offset%64,16),&v,16);}
++  return;
++ }
++#endif
+  if constexpr(!Partial)for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){uint i=(first+gr()*8+e)*1024+col+n*16+rc();if constexpr(ByteFOut)reinterpret_cast<unsigned char*>(out)[i]=vit_contract_F_byte(VIT_FAST_H(total[n][e]));else if constexpr(HalfOut)reinterpret_cast<_Float16*>(out)[i]=(_Float16)F(VIT_FAST_H(total[n][e]));else if constexpr(ByteStream)reinterpret_cast<unsigned char*>(out)[i]=byte_F(H(total[n][e]));else out[i]=F(H(total[n][e]));}
+ }
+ // Fragment-weight twin (host option vit_contract_frag): B from the FragmentPackedMatrix tiles (one contiguous 8-byte load) as the frag expand does.
+diff --git a/hip/vit_stream.inc b/hip/vit_stream.inc
+index c373ebfd..b63f40d1 100644
+--- a/hip/vit_stream.inc
++++ b/hip/vit_stream.inc
+@@ -62,6 +62,15 @@ DEV void vit_stream_project_tiles(const float*in,const float*w,const float*skip,
+ #pragma unroll
+    for(uint j=0;j<TN;j++)for(uint e=0;e<8;e++)total[t][j][e]=p?total[t][j][e]+a[t][j][e]:a[t][j][e];}
+  }
++#if VIT_BACKFEED_TAIL & 2
++ if constexpr(W16 && ByteOut && TM==1 && TN==4){
++  __attribute__((shared)) unsigned char tile[1024];
++  for(uint j=0;j<4;j++)for(uint e=0;e<8;e++)tile[(gr()*8+e)*64+j*16+rc()]=byte_F(VIT_FAST_H(total[0][j][e]));
++  WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
++  for(uint j=0;j<2;j++){uint offset=(gr()*16+rc())*16+j*512;w16_i4 v;__builtin_memcpy(&v,tile+offset,16);__builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+(first+offset/64)*OUT+row+offset%64,16),&v,16);}
++  return;
++ }
++#endif
+ #pragma unroll
+  for(uint t=0;t<TM;t++){if(t>=live)continue;for(uint j=0;j<TN;j++)for(uint e=0;e<8;e++){if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[(first+t*16+gr()*8+e)*OUT+row+j*16+rc()]=byte_F(VIT_FAST_H(total[t][j][e]));else out[(first+t*16+gr()*8+e)*OUT+row+j*16+rc()]=F(VIT_FAST_H(total[t][j][e]));}}
+ }
+@@ -309,8 +318,16 @@ KERNEL __attribute__((amdgpu_flat_work_group_size(160,160))) void vit_stream_qkv
+   const size_t off=size_t(2)*tokens*1024+(size_t(row/32)*(tokens/16)+first/16)*512+lane*16;
+   __builtin_memcpy(__builtin_assume_aligned(out+off,16),&packed,16);
+  }else{
++#if VIT_BACKFEED_TAIL & 4
++  WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
++  unsigned char*tile=reinterpret_cast<unsigned char*>(raw);
++  for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)tile[(gr()*8+e)*32+j*16+rc()]=byte_F(acc[j][e]);
++  WG_FENCE(3);__builtin_amdgcn_wave_barrier();WG_FENCE(2);
++  uint offset=lane*16;w16_i4 v;__builtin_memcpy(&v,tile+offset,16);__builtin_memcpy(__builtin_assume_aligned(out+(part*tokens+first+offset/32)*1024+row+offset%32,16),&v,16);
++#else
+   #pragma unroll
+   for(uint j=0;j<2;j++)for(uint e=0;e<8;e++)out[(part*tokens+first+gr()*8+e)*1024+row+j*16+rc()]=byte_F(acc[j][e]);
++#endif
+  }
+ }
+ // QK fragment variant must be paired with attention *_qkfrag.
