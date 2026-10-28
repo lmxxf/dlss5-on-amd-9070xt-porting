@@ -9,3 +9,6 @@ for ax,(name,d) in zip(axs,data.items()):
  for x in d['barriers']:ax.axvline(x,color='red',alpha=.25,linewidth=.6)
  ax.axhline(192,color='orange',linestyle='--',linewidth=.7);ax.set_title(name+' | CFG may-live peak '+str(d['peak_registers'])+' / max physical '+str(d['allocated_max_register']),fontsize=9);ax.set_ylabel('VGPR count');ax.set_xlabel('Disassembly line')
 fig.tight_layout();fig.savefig(P/'vgpr-liveness.svg');plt.close(fig)
+
+svg=P/"vgpr-liveness.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines())+"\n")
