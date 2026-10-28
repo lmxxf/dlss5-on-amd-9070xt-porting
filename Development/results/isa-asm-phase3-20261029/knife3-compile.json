@@ -1,0 +1,37 @@
+{
+  "name": "phase3-norm-square-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3-c512-m32-mh.hip",
+      "sha256": "32ea8db1f1ea42209b90d5cb6ffc9388da9a9f64d9e73cec344202391c1009fd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3-swin-persistent.hip",
+      "sha256": "d754b4779beda21892f01f740efd6c7e11549d5844955663830b5038b62ea6bd"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "knife3/compile-c512-m32-mh",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3-c512-m32-mh.hip\" comgr gfx1201"
+    },
+    {
+      "label": "knife3/compile-swin-persistent",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\isa-asm-phase3-20261029\\knife3-swin-persistent.hip\" comgr gfx1201"
+    }
+  ]
+}

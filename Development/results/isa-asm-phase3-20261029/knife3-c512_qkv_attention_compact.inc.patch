@@ -1,0 +1,34 @@
+--- a/hip/c512_qkv_attention_compact.inc
++++ b/hip/c512_qkv_attention_compact.inc
+@@ -1,3 +1,6 @@
++#ifndef SERIAL_NORM_SQUARE_CACHE
++#define SERIAL_NORM_SQUARE_CACHE 0
++#endif
+ // Paired FP8 conversion preserves the path-specific float operations before packing.
+ #ifndef C512_PAIR_PACK
+ #define C512_PAIR_PACK 0
+@@ -67,6 +70,15 @@
+ DEV uint c5c_pixel(uint win,uint tok,uint width){return ((win/(width/8))*8+tok/8)*width+(win%(width/8))*8+tok%8;}
+ DEV float c5c_shuffle(float v,uint src){return __builtin_bit_cast(float,__builtin_amdgcn_ds_bpermute(src*4,__builtin_bit_cast(int,v)));}
+ DEV float c5c_serial_norm(f8 lo,f8 hi){
++#if SERIAL_NORM_SQUARE_CACHE
++#pragma clang fp contract(off)
++ uint row=__builtin_amdgcn_workitem_id_x()&15u;f8 lsq,hsq;_Pragma("unroll 8")for(uint e=0;e<8;e++){lsq[e]=lo[e]*lo[e];hsq[e]=hi[e]*hi[e];}float sum=0.f;
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=lsq[e];sum=c5c_shuffle(sum,row);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=lsq[e];sum=c5c_shuffle(sum,row+16);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=hsq[e];sum=c5c_shuffle(sum,row);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=hsq[e];return c5c_shuffle(sum,row+16);
++#else
++
+  // Channel order is 0..7,8..15,16..23,24..31, as in the production raw-LDS loop.
+  // Both half-waves execute, but only the correct prefix is carried to the next half.
+  uint row=__builtin_amdgcn_workitem_id_x()&15u;float s=0.f;
+@@ -86,6 +98,8 @@
+ 
+  return c5c_shuffle(s,row+16);
+ 
++
++#endif
+ }
+ // Keep C512 attention's own clamp/F/byte semantics (not the C256 bounded reciprocal).
+ DEV float c5c_clamp(float a,float lo,float hi){float b=a>lo?a:lo;return b<hi?b:hi;}

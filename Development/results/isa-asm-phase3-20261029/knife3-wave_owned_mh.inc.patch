@@ -1,0 +1,34 @@
+--- a/hip/wave_owned_mh.inc
++++ b/hip/wave_owned_mh.inc
+@@ -1,3 +1,6 @@
++#ifndef SERIAL_NORM_SQUARE_CACHE
++#define SERIAL_NORM_SQUARE_CACHE 0
++#endif
+ // The exponent bit map bounds each term to [2^-14, 9.75]; either
+ // fixed WMMA sum order therefore stays in [1/256,624]. Keep both correction
+ // steps from C32's exhaustively checked norm_inverse; never use bare rcp.
+@@ -203,6 +206,15 @@
+ #endif
+ DEV float w2_shuffle(float v,uint src){return __builtin_bit_cast(float,__builtin_amdgcn_ds_bpermute(src*4,__builtin_bit_cast(int,v)));}
+ DEV float w2_serial_norm(f8 lo,f8 hi){
++#if SERIAL_NORM_SQUARE_CACHE
++#pragma clang fp contract(off)
++ uint row=w2_rc();f8 lsq,hsq;_Pragma("unroll 8")for(uint e=0;e<8;e++){lsq[e]=lo[e]*lo[e];hsq[e]=hi[e]*hi[e];}float sum=0.f;
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=lsq[e];sum=w2_shuffle(sum,row);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=lsq[e];sum=w2_shuffle(sum,row+16);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=hsq[e];sum=w2_shuffle(sum,row);
++ _Pragma("unroll 8")for(uint e=0;e<8;e++)sum+=hsq[e];return w2_shuffle(sum,row+16);
++#else
++
+  // Same 32 scalar products/adds in channel order as production. Both halves execute;
+  // each shuffle carries the correct prefix to the half owning the next eight channels.
+  float s=0.f;
+@@ -214,6 +226,8 @@
+  s=w2_shuffle(s,w2_rc());
+  _Pragma("unroll 8") for(uint e=0;e<8;e++)s+=hi[e]*hi[e];
+  return w2_shuffle(s,w2_rc()+16);
++
++#endif
+ }
+ 
+ #ifndef W2_UP_FUSED

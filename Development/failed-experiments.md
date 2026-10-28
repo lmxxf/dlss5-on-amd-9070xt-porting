@@ -2773,3 +2773,7 @@ C512 W16 Stage2成对打包1A：_bin684→646条、95VGPR不变，非byte119→1
 ## 2026-10-29 ISA Phase3 刀2 STOP
 
 B4保持、按两tile折叠expanded的普通C256各CPU实现仍spill（10/139/6），资源门STOP未上GPU。独立非W16提前Contract P与SP B2不变折叠S均七档Gold同、4档3ABBA。P无稳定全档净收益；S run184→153VGPR/0spill但Orig1088 mean+58.954µs（三轮全退）/p99+89.374µs，STOP，不以权重复用保持或VGPR下降推导性能。详results/isa-asm-phase3-20261029/knife2-README.md。
+
+## 2026-10-29 ISA Phase3 刀3 STOP
+
+serial_norm 显式平方缓存：原编译器已复用，C64 fast 137函数及SP全部代码/资源同；C512平方数仍64，compact W162104→2096条/188VGPR/0spill仅调度搬运改变。七档Gold同，四档3ABBA均值全部退步（Orig1088+10.295、Orig900+30.115、Small1080+13.538、Small900+1.672µs），STOP保生产。详results/isa-asm-phase3-20261029/knife3-README.md。
