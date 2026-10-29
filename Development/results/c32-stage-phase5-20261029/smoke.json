@@ -1,0 +1,460 @@
+{
+  "name": "final-runtime-smoke",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\release-044-f9fix\\payload\\runtime-smoke.exe",
+      "sha256": "2ffe128b6d1c24b1aab33f851ee47d2b2abe62fce10364bd628fc3ca23f13014"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\LmxxfNrRuntime.dll",
+      "sha256": "4c5bd8517ac1d6d2a472954dd60cacc6ffe21089d743be4db180c3663313bbd5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\README.md",
+      "sha256": "5f4d4392d096847631a78bdc9dcad735912f2c8a8b595fab2629e013eb9837a5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_temporal_feed.hlsl",
+      "sha256": "5ef04843e70a0a99d872c04bc90c687857c8470c4d0e0cfe195c7855a9a22816"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_history_guard.hlsl",
+      "sha256": "cde301afbaff19d7fe13bf6bf05e4c21f9bf92c9527b5cd6b7542f23b608355c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_codec_decode.hlsl",
+      "sha256": "13579fe28192027c14d0b1cbb1799360cb1f91275ae829a16272a8489f9a14bf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_rgb_texture.hlsl",
+      "sha256": "14ce16148f06f335be42f4a5bfc09272fe5ffb5b60f84b12517c96f9514a54df"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_black_probe.hlsl",
+      "sha256": "946c78f25c4ded8b75f39b0bbfb10e4da5e5a885d25225c8ac15b552df2ca85a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_temporal_coordinates.hlsl",
+      "sha256": "2998ab49537743717b787eb4f747e648c819c9c515aaf5186c424a660801ecb3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_game_rgb_input.hlsl",
+      "sha256": "b871dfc5d49c9803f43e11679a770f2b9290a1a5d96cb1a7ea18daf02099d20b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_rgb_reflect.hlsl",
+      "sha256": "d6bd50976f44c4bbb5c1f2fbd42b95de0757e1c259b7e1ba8c872b2389a953b6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_text_overlay.hlsl",
+      "sha256": "8d20c7f5d9c08d4cc50ad726c4e31ba1dbf0b7281f5ecafeec8196defc997423"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_format_convert.hlsl",
+      "sha256": "35a1973fc558d7a934cc1190c91f026734405935113568c81e4c7b19c0627b90"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_output_smooth.hlsl",
+      "sha256": "b6c45bcc7e9d8cc2751399a9edd95cccafafb8dbf325cff2339cb9d4a3027215"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_temporal_sample.hlsl",
+      "sha256": "fd45f677b2f425f076751eca7fb5d610001bf80a321187d54f4fe68cdc67a629"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\native_codec_encode.hlsl",
+      "sha256": "a758f19abf27f0f4f03966bb2dc50a4a9cc02c1eda81ada79f140438e60d97fd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_qkv_normalize.hlsl",
+      "sha256": "0e55894c268c4cadc45ff914767d6222b359e6ca829afafb00081fd465cc95ba"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_ffn_blocked.hlsl",
+      "sha256": "53265b59ebfa8dfb0705d12c6f6c78cc9e533658f48455f27ba998866fd853b0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_reduce.hlsl",
+      "sha256": "3c4e7f53209c6c8391917d54cb8e6af5592536c6d27906f1bba5f9cdb9544bbe"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_contract.hlsl",
+      "sha256": "e13f9f9b2564abca01068b1a95dc5973346765b4103d11c5316b029f229bd9f4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_attention_direct.hlsl",
+      "sha256": "30cdd2a9890b84d1989418bfe957ff6c239cc875f20e9f5f0128c512baa23280"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_attention_half.hlsl",
+      "sha256": "11f7c7a9085ea166d7db8c65c465ad2fbe7a23666f0f8cf82743beddcf1db42e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_attention.hlsl",
+      "sha256": "144c0260d6f2970dc493507d35899cf462f737f83a39ecb98611242fcaee7ef2"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_split.hlsl",
+      "sha256": "84a422a8d2b92750de3241a6f859849c3840fbff3a30d85ff294c390f31d5c08"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_expand.hlsl",
+      "sha256": "636a1e750b840d87bc6ff386b50d3d905fe5b8eaf7142acff712c4d9afdc64c6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c64.hlsl",
+      "sha256": "efb60cd42b882825ff6fd027d77d35cba90e93efe32c5e6efe49bbcd15a94d96"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_qkv.hlsl",
+      "sha256": "10700e73a63ea49caaa996292d29c13c05e05b72e88200d6f091222dda062358"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_fp8_fast.hlsli",
+      "sha256": "dc04b0fac0ce3d80be147c5ff5c6c97fabee8691d25ac67ef033f66b91f7c5b7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_matrix_expand.hlsl",
+      "sha256": "5f731484ecbdfe0ad775bdc5fea7040325df36896944d55d3fa05891b7f0e4bc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c32_ds.hlsl",
+      "sha256": "566fbc274c9d4fe9d6e094e186870f7642bce282686cb5f9039df902cba5756a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_ffn_fused.hlsl",
+      "sha256": "ccd244b842fb37bb1deef8a3eed53ac54cdf51153fef72135c2f0a2be4d37254"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_head_project.hlsl",
+      "sha256": "5c7b49867e55796a08536c7459c0777595629b278ebdc7a972021e2f3cb7299d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_vit_qkv.hlsl",
+      "sha256": "05f11f152db441466f6fb26eec4508022a97e683d559173c0bbce422034508f8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c64_ds.hlsl",
+      "sha256": "1d7087115a893aefab6500c1b61a142f02ae3c42d13fc0eb6d9d13d1921705fd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_c32_ffn_blocked.hlsl",
+      "sha256": "4aa4439a930a84008152a4d13df94758aa3503b37fc8342ec0bc0ca14896fb29"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_ffn_fused.hlsl",
+      "sha256": "329a63031874c6d039cc1e260b96799e14ab35d4804554edc7723b13875f7669"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_blocked.hlsl",
+      "sha256": "3a97910e02b4a0c2eabc0f9075d4f8169f356b6b01bef5426c9998962209fed0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\preblock_attention_core.hlsl",
+      "sha256": "e67915791df4a2011012d695b7bade70879095a69b38765a4b62e345f04386a0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\preblock_attention_four_wave.hlsl",
+      "sha256": "ae97737ab877700f913f590f625bc95d3eb5950080d495ec7736c62347f68f44"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_vit_pack.hlsl",
+      "sha256": "b78a889afa5a7a851ae9c1ec5fbca141cc76ec9855856f82cf735acd0c0349dc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_c32_ds.hlsl",
+      "sha256": "87b49a034b6eeaea44603f98973e4a361eedb9b530891294692ee0cce0257d7d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_expand.hlsl",
+      "sha256": "19045b550720a05ab44275ab0b9c95ec6aefc18e24243dbe27e2556b19c33a12"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_sat_cast.hlsli",
+      "sha256": "c6b4cd56af79d3646082d06214aeb32bfba1160cceb17be2547134cb28a21fb2"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_attention_fused_qkv.hlsl",
+      "sha256": "501492be980260678ad1d1d5111fffb8e38693f220abd05a5ebe3778edd722e3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_vit_linear.hlsl",
+      "sha256": "13c1ecd8737144975a850b5378fff97ad7ce2a97db99c0942f2e7c312fc4f631"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_post70.hlsl",
+      "sha256": "fc2d18f313de670d78750937060b4a57cc81ebb149a63dbe384c06b26cffad3c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_vit_attention.hlsl",
+      "sha256": "1618c27f2a10d753941cbd1b8b0a5e3301fe6ec769ae9c130ce5a61feeabcaca"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c64_shift.hlsl",
+      "sha256": "75c9e3982ac6bca504ac781badc16be7070ba62613e07abada668918e48c02e1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c32_ffn_fused.hlsli",
+      "sha256": "8398dd3cbfb4ab450e772dac561e94e5f7084daacac818b721509d28620f46b0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_c32_reframe.hlsl",
+      "sha256": "261edc63a479c05f794e4b8e288e166407e46c1572b81fa831781604d4621080"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_decoder_entry.hlsl",
+      "sha256": "f8c63e707f0f5546561d53ad84a11d9d6e2afad1801bc16d090c8f8b736b3715"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_split_window.hlsl",
+      "sha256": "1509a41b265367d824fde264fef5ef18a1409a73e9888eec7d218684c1ebb3ac"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_c32_split_attention.hlsl",
+      "sha256": "783d56fccd51345234ff49e465cadfae263b324ec71a097e6e76074601625efc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_ffn_proj0_fused.hlsl",
+      "sha256": "145ff958b6055301fd9370cb8db5f870bc7790eedcd1daf6224ec426d3dd5168"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_project.hlsl",
+      "sha256": "fb26d68791407ee91e7f49d72f60a8720a59e377d6a326dcd875d7db4623d981"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_prefix.hlsl",
+      "sha256": "52be40d309975ac6de780758931a52f0ff1c38cdcfba7e32508600f380a93a24"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_vit_gather.hlsl",
+      "sha256": "9db00368be0e1120fd882199fbe32614dd82acff90839a16172a7b74878c9534"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_attention_fp8.hlsl",
+      "sha256": "0e1c6f7272b973f4e64ecbe6bcb2503df80ecc69918ae6e4a3515413c9e328c0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_matrix_qkv.hlsl",
+      "sha256": "1300b10ffed96248455ebb4404aa40b7e45ad5e940e6763fdf0fca658e53085f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_vit_qkv.hlsl",
+      "sha256": "73a2387a4f4962e0fcbf6bd13db568ca97348ffef3d8a73e2944d154710cb9b1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_half_square.hlsli",
+      "sha256": "e2b806fc8dc6934439db12219fe819b3912e88fa13ba8be2e72e0a615ad0e1d5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_c32_ffn_local.hlsl",
+      "sha256": "a6ba3df867d13fdcd0372194e4a70a2d047d2382505e464ebd8eb5a7454809ee"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_half_corrected.hlsli",
+      "sha256": "46d539d9b461a30f925893afc0e4a6dfad4c1ff0a66e36e677f2391b5516e05b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\preblock_input_mix.hlsl",
+      "sha256": "64ef6ba687b1c61cd88328c6ae589aa2ba63c9e5b9e376ccce9e91cc915261a9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_matrix_pack.hlsl",
+      "sha256": "7c8029f75c8532d3d6289712a578004603bd183cee6f8d0f8778dca8ac3f926a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_wave_split_ffwd_parallel.hlsl",
+      "sha256": "ee52271b114bb09672eecf97088e940f8b89745d50058737e741360be45aa1b9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_head_pool.hlsl",
+      "sha256": "85583b5509f4e19dbf40bfcac206517e7799a0f576fde7a03685c7bd018194e9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\preblock_finish.hlsl",
+      "sha256": "55d689a19ec22a07688d307ffcd5d9e05e5578d844bcd205e7dc6b959ca1f6e6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders\\dx12-network\\native_scaled_integer_half.hlsli",
+      "sha256": "4ea8d0640b66cb506f60faf68ecf87513656b884149cb38f836b152a593eca41"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "smoke/runtime-final",
+      "exe": "D:\\DLSSNR-Lab\\release-044-f9fix\\payload\\runtime-smoke.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\LmxxfNrRuntime.dll\" \"D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\HIP\" 32",
+      "env": {
+        "LMXXF_WEIGHTS_DIR": "D:\\DLSSNR-Lab\\small-model-20261018\\assets",
+        "LMXXF_SHADER_DIR": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\shaders",
+        "DLSS5_TEST_BLOCKED_C32_FFN": "1",
+        "DLSS5_TEST_BLOCKED_FFN": "1",
+        "DLSS5_TEST_BLOCKED_VIT": "1",
+        "DLSS5_TEST_C32_FFN_RAW_STORE": "1",
+        "DLSS5_TEST_CACHE_C32_INPUT": "1",
+        "DLSS5_TEST_COALESCED_FINISH": "1",
+        "DLSS5_TEST_COALESCED_MULTIHEAD_SHIFT": "1",
+        "DLSS5_TEST_DIRECT_ATTENTION": "1",
+        "DLSS5_TEST_FUSED_SHIFT": "1",
+        "DLSS5_TEST_LOCAL_C32_ATTENTION": "1",
+        "DLSS5_TEST_MATRIX_C128": "1",
+        "DLSS5_TEST_MATRIX_C256": "1",
+        "DLSS5_TEST_MATRIX_C64": "1",
+        "DLSS5_TEST_MATRIX_SPLIT_ATTENTION": "1",
+        "DLSS5_TEST_MULTIHEAD_EIGHT_WAVES": "1",
+        "DLSS5_TEST_MULTIHEAD_FOUR_WAVES": "1",
+        "DLSS5_TEST_PARALLEL_MULTIHEAD_NORM": "0",
+        "DLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX": "1",
+        "DLSS5_TEST_PAD_C32_LDS": "1",
+        "DLSS5_TEST_PAD_MULTIHEAD_LDS": "1",
+        "DLSS5_TEST_PARALLEL_SPLIT_FFWD": "1",
+        "DLSS5_TEST_RESIDENT_NOISE": "1",
+        "DLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND": "1",
+        "DLSS5_TEST_RESIDENT_WEIGHTS": "1",
+        "DLSS5_TEST_SHARED_C32": "1",
+        "DLSS5_TEST_SHARED_C32_SCRATCH": "1",
+        "DLSS5_TEST_SHARED_MATRIX_WORKSPACE": "1",
+        "DLSS5_TEST_SHARED_SCRATCH": "1",
+        "DLSS5_TEST_SPLIT_C32_ATTENTION": "1",
+        "DLSS5_TEST_SPLIT_FFWD": "1",
+        "DLSS5_TEST_SPLIT_PREBLOCK_FFN": "1",
+        "DLSS5_TEST_SPLIT_PROJECTION": "1",
+        "DLSS5_TEST_TILED_C64": "1",
+        "DLSS5_TEST_TILED_QKV": "1",
+        "DLSS5_TEST_VIT_EXPAND_CHUNK2": "1",
+        "DLSS5_TEST_WAVE_C128": "1",
+        "DLSS5_TEST_WAVE_C256": "1",
+        "DLSS5_TEST_WAVE_C32_AV": "1",
+        "DLSS5_TEST_WAVE_C32_FFN": "1",
+        "DLSS5_TEST_WAVE_C32_FFN_LOCAL": "1",
+        "DLSS5_TEST_WAVE_C32_PROJECTION": "1",
+        "DLSS5_TEST_WAVE_C32_QKV": "1",
+        "DLSS5_TEST_WAVE_C32_SCORES": "1",
+        "DLSS5_TEST_WAVE_C64": "1",
+        "DLSS5_TEST_WAVE_DECODER_LINEAR": "1",
+        "DLSS5_TEST_WAVE_DOWNSAMPLE": "1",
+        "DLSS5_TEST_WAVE_HEAD": "1",
+        "DLSS5_TEST_WAVE_MULTIHEAD_AV": "1",
+        "DLSS5_TEST_WAVE_PROJECT": "1",
+        "DLSS5_TEST_WAVE_SPLIT_FFWD": "0",
+        "DLSS5_TEST_WAVE_SPLIT_PROJECT": "1",
+        "DLSS5_TEST_WAVE_VIT_ATTENTION": "1",
+        "DLSS5_TEST_WAVE_VIT_ATTENTION_HALF": "1",
+        "DLSS5_TEST_WAVE_VIT_EXPAND": "1",
+        "DLSS5_TEST_WAVE_VIT_QKV": "1",
+        "DLSS5_TEST_WAVE_VIT_REDUCE": "1",
+        "DLSS5_FP8_OPERANDS": "1",
+        "DLSS5_FP8_QKV": "1",
+        "DLSS5_FP8_HIDDEN": "1",
+        "DLSS5_FP8_LDS": "1",
+        "DLSS5_FAST_TEMPORAL": "1",
+        "DLSS5_FUSED_QKV_NORMALIZE": "1",
+        "DLSS5_FUSED_FFN": "1",
+        "DLSS5_FP8_ACTIVATIONS": "1",
+        "DLSS5_FP8_QKV_NORM": "1",
+        "DLSS5_FAST_PREFIX": "1",
+        "DLSS5_C32_FUSED_ATTENTION": "1",
+        "DLSS5_VIT_SPLIT_K": "1",
+        "DLSS5_VIT_PACKED_INPUT": "1",
+        "DLSS5_VIT_BLOCK_M": "4",
+        "DLSS5_C32_MAPPED_INPUT": "1",
+        "DLSS5_FP8_STREAM": "1",
+        "DLSS5_SPLIT_DIRECT_ATTENTION": "1",
+        "DLSS5_FFN_TILED_WEIGHTS": "1",
+        "DLSS5_TILED_WEIGHTS": "1",
+        "DLSS5_C32_FFN_FAST3": "1",
+        "DLSS5_C32_ATTN_FAST2": "1",
+        "DLSS5_POST70_DIRECT": "1",
+        "DLSS5_C32_CHAIN_RAW": "1",
+        "DLSS5_WAVE_C32_DS": "1",
+        "DLSS5_VIT_ATTN_FP8": "1",
+        "DLSS5_POST70_MERGE_FOLD": "1",
+        "DLSS5_C32_ATTN_FAST3": "1",
+        "DLSS5_INLINE_PREFIX": "1",
+        "DLSS5_BATCH_SUBMITS": "2",
+        "DLSS5_C32_ATTN_FAST4": "1",
+        "DLSS5_VIT_QKV_FUSED": "1",
+        "DLSS5_OUTPUT_SMOOTH": "10,0.8",
+        "DLSS5_PREBLOCK_MAIN8": "1",
+        "DLSS5_RESIDENCY_PRIORITY": "maximum",
+        "DLSS5_MAKE_RESIDENT_EVERY": "60",
+        "DLSS5_C32_SKIP8": "1",
+        "DLSS5_POST70_LOW_RAW": "2",
+        "DLSS5_C32_HALF_STREAM": "1",
+        "DLSS5_C32_EPILOGUE": "1",
+        "DLSS5_C32_FUSED_FFN": "1",
+        "DLSS5_VIT_TILED": "1",
+        "DLSS5_SPLIT_TILED": "1",
+        "DLSS5_DECODER_TILED": "1",
+        "DLSS5_SPLIT_FFWD_TILED": "1",
+        "DLSS5_SPLIT_STREAM8": "1",
+        "DLSS5_DECODER_OUT16": "1",
+        "DLSS5_SKIP_BLOCKS": "",
+        "DLSS5_NETWORK_HEIGHT": "1080",
+        "DLSS5_NETWORK_1080_ROWS": "1152",
+        "DLSS5_NETWORK_FREE_RES": "0",
+        "DLSS5_FAST_NUMERIC": "1",
+        "DLSS5_MULTI_PASS": "0.5",
+        "DLSS5_MULTI_PASS_SKIN_PROTECT": "0",
+        "DLSS5_MULTI_PASS_PREDICT": "0",
+        "DLSS5_MULTI_PASS_SKIP_BLOCKS": "",
+        "DLSS5_MULTI_PASS_HOTKEY": "0",
+        "DLSS5_FIT_INPUT": "1",
+        "DLSS5_FIT_LARGE": "1",
+        "DLSS5_CODEC_SRGB": "0",
+        "DLSS5_SHOW_FPS": "0",
+        "DLSS5_HIP_FAST": "1",
+        "DLSS5_TEST_ASYNC_SUBMIT": "1",
+        "DLSS5_UPSCALER": "ffx",
+        "DLSS5_HIP_MH_BYTE_STREAM": "1",
+        "DLSS5_HIP_MH_FFN_FRAG256": "1",
+        "DLSS5_HIP_MH_FEATURE_BYTE": "1",
+        "DLSS5_PRE_UPSCALE_ASYNC": "auto",
+        "DLSS5_STRENGTH": "auto",
+        "DLSS5_HIP_DECODER_BYTE": "1",
+        "DLSS5_HIP_MH_PROJ_DIAG_FB": "1",
+        "DLSS5_PRE_UPSCALE": "auto",
+        "DLSS5_VIT_ADAPTIVE": "0",
+        "DLSS5_VIT_REUSE_PERIOD": "4",
+        "DLSS5_VIT_REUSE_GLOBAL": "0.22",
+        "DLSS5_VIT_REUSE_LOCAL": "1.0",
+        "DLSS5_VIT_REUSE_IMAGE": "0.35",
+        "DLSS5_VIT_REUSE_HOTKEY": "0",
+        "DLSS5_HIP_GRAPH": "0",
+        "DLSS5_HIP_PDL": "1",
+        "DLSS5_HIP_WAVE_OWNED": "1",
+        "DLSS5_HIP_C512_M32": "1",
+        "DLSS5_HIP_VIT_PROJ_N64": "1",
+        "DLSS5_HIP_VIT_BYTE_STREAM": "0",
+        "DLSS5_HIP_VIT_STREAM": "3",
+        "DLSS5_FRAME_STATS": "0",
+        "DLSS5_DIRECT_IO": "1",
+        "DLSS5_HIP_SWIN_RUN": "1",
+        "DLSS5_FORMAT_FALLBACK": "1",
+        "DLSS5_HOT_RELOAD": "0",
+        "DLSS5_STYLE": "1",
+        "DLSS5_TEMPORAL_HISTORY_EXPERIMENT": "0",
+        "DLSS5_TEMPORAL_MV_UNJITTERED": "0",
+        "DLSS5_OVERLAP": "0",
+        "DLSS5_HIP_SUBMIT_PULSE": "auto",
+        "DLSS5_TEMPORAL_MODE": "0",
+        "DLSS5_FAST_HISTORY": "0",
+        "DLSS5_TEST_SUBMISSION_TIMING": "0",
+        "DLSS5_HIP_MEMORY": "0",
+        "DLSS5_GAME_PROBE": "0",
+        "DLSS5_HIP_NET_TIMING": "0",
+        "DLSS5_HIP_NET_SPAN": "0",
+        "DLSS5_HIP_INPUT_POLL": "0",
+        "DLSS5_BENCH_PLAIN": "1",
+        "DLSS5_RESIDUAL_SEQUENCE": "0",
+        "DLSS5_RESIDUAL_RGB": "0",
+        "DLSS5_NET_TIMING": "0",
+        "DLSS5_HIP_SPAN_PROBE": "0",
+        "DLSS5_HIP_VIT_VFRAG": "1",
+        "DLSS5_VIT_ADAPTIVE_IDLE_MS": "86400000"
+      },
+      "flags": "DLSS5_TEST_BLOCKED_C32_FFN=1\nDLSS5_TEST_BLOCKED_FFN=1\nDLSS5_TEST_BLOCKED_VIT=1\nDLSS5_TEST_C32_FFN_RAW_STORE=1\nDLSS5_TEST_CACHE_C32_INPUT=1\nDLSS5_TEST_COALESCED_FINISH=1\nDLSS5_TEST_COALESCED_MULTIHEAD_SHIFT=1\nDLSS5_TEST_DIRECT_ATTENTION=1\nDLSS5_TEST_FUSED_SHIFT=1\nDLSS5_TEST_LOCAL_C32_ATTENTION=1\nDLSS5_TEST_MATRIX_C128=1\nDLSS5_TEST_MATRIX_C256=1\nDLSS5_TEST_MATRIX_C64=1\nDLSS5_TEST_MATRIX_SPLIT_ATTENTION=1\nDLSS5_TEST_MULTIHEAD_EIGHT_WAVES=1\nDLSS5_TEST_MULTIHEAD_FOUR_WAVES=1\nDLSS5_TEST_PARALLEL_MULTIHEAD_NORM=0\nDLSS5_TEST_PARALLEL_MULTIHEAD_SOFTMAX=1\nDLSS5_TEST_PAD_C32_LDS=1\nDLSS5_TEST_PAD_MULTIHEAD_LDS=1\nDLSS5_TEST_PARALLEL_SPLIT_FFWD=1\nDLSS5_TEST_RESIDENT_NOISE=1\nDLSS5_TEST_RESIDENT_WAVE_VIT_EXPAND=1\nDLSS5_TEST_RESIDENT_WEIGHTS=1\nDLSS5_TEST_SHARED_C32=1\nDLSS5_TEST_SHARED_C32_SCRATCH=1\nDLSS5_TEST_SHARED_MATRIX_WORKSPACE=1\nDLSS5_TEST_SHARED_SCRATCH=1\nDLSS5_TEST_SPLIT_C32_ATTENTION=1\nDLSS5_TEST_SPLIT_FFWD=1\nDLSS5_TEST_SPLIT_PREBLOCK_FFN=1\nDLSS5_TEST_SPLIT_PROJECTION=1\nDLSS5_TEST_TILED_C64=1\nDLSS5_TEST_TILED_QKV=1\nDLSS5_TEST_VIT_EXPAND_CHUNK2=1\nDLSS5_TEST_WAVE_C128=1\nDLSS5_TEST_WAVE_C256=1\nDLSS5_TEST_WAVE_C32_AV=1\nDLSS5_TEST_WAVE_C32_FFN=1\nDLSS5_TEST_WAVE_C32_FFN_LOCAL=1\nDLSS5_TEST_WAVE_C32_PROJECTION=1\nDLSS5_TEST_WAVE_C32_QKV=1\nDLSS5_TEST_WAVE_C32_SCORES=1\nDLSS5_TEST_WAVE_C64=1\nDLSS5_TEST_WAVE_DECODER_LINEAR=1\nDLSS5_TEST_WAVE_DOWNSAMPLE=1\nDLSS5_TEST_WAVE_HEAD=1\nDLSS5_TEST_WAVE_MULTIHEAD_AV=1\nDLSS5_TEST_WAVE_PROJECT=1\nDLSS5_TEST_WAVE_SPLIT_FFWD=0\nDLSS5_TEST_WAVE_SPLIT_PROJECT=1\nDLSS5_TEST_WAVE_VIT_ATTENTION=1\nDLSS5_TEST_WAVE_VIT_ATTENTION_HALF=1\nDLSS5_TEST_WAVE_VIT_EXPAND=1\nDLSS5_TEST_WAVE_VIT_QKV=1\nDLSS5_TEST_WAVE_VIT_REDUCE=1\nDLSS5_FP8_OPERANDS=1\nDLSS5_FP8_QKV=1\nDLSS5_FP8_HIDDEN=1\nDLSS5_FP8_LDS=1\nDLSS5_FAST_TEMPORAL=1\nDLSS5_FUSED_QKV_NORMALIZE=1\nDLSS5_FUSED_FFN=1\nDLSS5_FP8_ACTIVATIONS=1\nDLSS5_FP8_QKV_NORM=1\nDLSS5_FAST_PREFIX=1\nDLSS5_C32_FUSED_ATTENTION=1\nDLSS5_VIT_SPLIT_K=1\nDLSS5_VIT_PACKED_INPUT=1\nDLSS5_VIT_BLOCK_M=4\nDLSS5_C32_MAPPED_INPUT=1\nDLSS5_FP8_STREAM=1\nDLSS5_SPLIT_DIRECT_ATTENTION=1\nDLSS5_FFN_TILED_WEIGHTS=1\nDLSS5_TILED_WEIGHTS=1\nDLSS5_C32_FFN_FAST3=1\nDLSS5_C32_ATTN_FAST2=1\nDLSS5_POST70_DIRECT=1\nDLSS5_C32_CHAIN_RAW=1\nDLSS5_WAVE_C32_DS=1\nDLSS5_VIT_ATTN_FP8=1\nDLSS5_POST70_MERGE_FOLD=1\nDLSS5_C32_ATTN_FAST3=1\nDLSS5_INLINE_PREFIX=1\nDLSS5_BATCH_SUBMITS=2\nDLSS5_C32_ATTN_FAST4=1\nDLSS5_VIT_QKV_FUSED=1\nDLSS5_OUTPUT_SMOOTH=10,0.8\nDLSS5_PREBLOCK_MAIN8=1\nDLSS5_RESIDENCY_PRIORITY=maximum\nDLSS5_MAKE_RESIDENT_EVERY=60\nDLSS5_C32_SKIP8=1\nDLSS5_POST70_LOW_RAW=2\nDLSS5_C32_HALF_STREAM=1\nDLSS5_C32_EPILOGUE=1\nDLSS5_C32_FUSED_FFN=1\nDLSS5_VIT_TILED=1\nDLSS5_SPLIT_TILED=1\nDLSS5_DECODER_TILED=1\nDLSS5_SPLIT_FFWD_TILED=1\nDLSS5_SPLIT_STREAM8=1\nDLSS5_DECODER_OUT16=1\nDLSS5_SKIP_BLOCKS=\nDLSS5_NETWORK_HEIGHT=1080\nDLSS5_NETWORK_1080_ROWS=1152\nDLSS5_NETWORK_FREE_RES=0\nDLSS5_FAST_NUMERIC=1\nDLSS5_MULTI_PASS=0.5\nDLSS5_MULTI_PASS_SKIN_PROTECT=0\nDLSS5_MULTI_PASS_PREDICT=0\nDLSS5_MULTI_PASS_SKIP_BLOCKS=\nDLSS5_MULTI_PASS_HOTKEY=0\nDLSS5_FIT_INPUT=1\nDLSS5_FIT_LARGE=1\nDLSS5_CODEC_SRGB=0\nDLSS5_SHOW_FPS=0\nDLSS5_HIP_FAST=1\nDLSS5_TEST_ASYNC_SUBMIT=1\nDLSS5_UPSCALER=ffx\nDLSS5_HIP_MH_BYTE_STREAM=1\nDLSS5_HIP_MH_FFN_FRAG256=1\nDLSS5_HIP_MH_FEATURE_BYTE=1\nDLSS5_PRE_UPSCALE_ASYNC=auto\nDLSS5_STRENGTH=auto\nDLSS5_HIP_DECODER_BYTE=1\nDLSS5_HIP_MH_PROJ_DIAG_FB=1\nDLSS5_PRE_UPSCALE=auto\nDLSS5_VIT_ADAPTIVE=0\nDLSS5_VIT_REUSE_PERIOD=4\nDLSS5_VIT_REUSE_GLOBAL=0.22\nDLSS5_VIT_REUSE_LOCAL=1.0\nDLSS5_VIT_REUSE_IMAGE=0.35\nDLSS5_VIT_REUSE_HOTKEY=0\nDLSS5_HIP_GRAPH=0\nDLSS5_HIP_PDL=1\nDLSS5_HIP_WAVE_OWNED=1\nDLSS5_HIP_C512_M32=1\nDLSS5_HIP_VIT_PROJ_N64=1\nDLSS5_HIP_VIT_BYTE_STREAM=0\nDLSS5_HIP_VIT_STREAM=3\nDLSS5_FRAME_STATS=0\nDLSS5_DIRECT_IO=1\nDLSS5_HIP_SWIN_RUN=1\nDLSS5_FORMAT_FALLBACK=1\nDLSS5_HOT_RELOAD=0\nDLSS5_STYLE=1\nDLSS5_TEMPORAL_HISTORY_EXPERIMENT=0\nDLSS5_TEMPORAL_MV_UNJITTERED=0\nDLSS5_OVERLAP=0\nDLSS5_HIP_SUBMIT_PULSE=auto\nDLSS5_TEMPORAL_MODE=0\nDLSS5_FAST_HISTORY=0\nDLSS5_TEST_SUBMISSION_TIMING=0\nDLSS5_HIP_MEMORY=0\nDLSS5_GAME_PROBE=0\nDLSS5_HIP_NET_TIMING=0\nDLSS5_HIP_NET_SPAN=0\nDLSS5_HIP_INPUT_POLL=0\nDLSS5_BENCH_PLAIN=1\nDLSS5_RESIDUAL_SEQUENCE=0\nDLSS5_RESIDUAL_RGB=0\nDLSS5_NET_TIMING=0\nDLSS5_HIP_SPAN_PROBE=0\nDLSS5_HIP_VIT_VFRAG=1\nDLSS5_VIT_ADAPTIVE_IDLE_MS=86400000\n",
+      "required_stderr": [],
+      "startup_compile": true
+    }
+  ]
+}

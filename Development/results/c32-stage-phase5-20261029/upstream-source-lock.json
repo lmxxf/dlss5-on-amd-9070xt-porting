@@ -1,0 +1,3434 @@
+[
+  {
+    "path": ".github/workflows/packages.yml",
+    "sha256": "6b1d110fd747a3ec410d1d3afdee2e88b94e907b999a044a6e65dc35f96f1334"
+  },
+  {
+    "path": ".gitignore",
+    "sha256": "c6ec64e8ddec9c1d075243e5b823ebdb5232220773dd1d86fc656722c37dee80"
+  },
+  {
+    "path": "CLAUDE.md",
+    "sha256": "d41fe29c600d0895800b13752ab7764e3585cae217f6602684f71a0031e6336c"
+  },
+  {
+    "path": "LICENSE",
+    "sha256": "729c77c3b5ca38587835df4c18803dcfa1dff7ab5c207e22d88aa333a5703592"
+  },
+  {
+    "path": "README.md",
+    "sha256": "6b6612e6171da109ffcac4ea7efb7dbe15c84b562e3844b5179c2a0f60b53f3a"
+  },
+  {
+    "path": "THIRD_PARTY.md",
+    "sha256": "39e821b11e85af28e421517fd88384e56168b06675a91e8b73a75797c380a9bf"
+  },
+  {
+    "path": "docs/ARCHITECTURE.md",
+    "sha256": "f093db5f3d4e4c0c6f890e5b665159f799cf6803e4201ef0790e96c288359bc3"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/NGX-VERIFICATION.md",
+    "sha256": "3c086731fe8f1956cade57c6d6e14114f730e81c26bb15d455651c412d5a891b"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/moving-sequence-results.json",
+    "sha256": "db2b58c29d252bfdf69f5076ec85bfed2583fcd91259f6c8ac4ad6503f620ebd"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/1920x1080_face.png",
+    "sha256": "705993ca185200a3f16ab54a1dcbb56fcf2b8d63c82056943a291db89c093d6a"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/1920x1080_full.png",
+    "sha256": "e3c7a6dcc6aaf81750bc940184228e174dcda37eb4f0cb0c5fc4da1b4829891b"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/2560x1440_face.png",
+    "sha256": "93d545bc570202857dc642961e34021ef8781d2ec4bb4880b4eb4709ba7d2a25"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/2560x1440_full.png",
+    "sha256": "026556d7e4f8c2d361debf70cfbb2a6e90b321306bc37bfa7eb6ce55e07e1c77"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/3840x2160_face.png",
+    "sha256": "4d35f57d93f99cc3399cc17652166b0082a52569721a1f1249f7fdfee3eb50fb"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-images/3840x2160_full.png",
+    "sha256": "2474614519cb3af659af6ca46010501c55a8a371c15f16a854b6caeed1d7e344"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-inputs/1920x1080.png",
+    "sha256": "2958569275cb995a79b492bcb8871cf2f7cf3e4e852c5630e420497ee56e3470"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-inputs/2560x1440.png",
+    "sha256": "d4f82eb79989dcf459c54b60c15c3424302e5eb2e55b4f48010745223c16f5b5"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-inputs/3840x2160.png",
+    "sha256": "ea44669f2d42f5258563288727cff503661371895e608e15f70a47fbff020a51"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/1920x1080_dlssnr-amd.png",
+    "sha256": "0e62cad68cc2358a76aceb29e017d5b827cb7311c31b94210970ff0059218abd"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/1920x1080_nvidia.png",
+    "sha256": "8d5cb3cc1f3c5e47f8191a155c7c94e3eee1111739c403a54aae2a54f7f477b2"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/2560x1440_dlssnr-amd.png",
+    "sha256": "e1e4cfe8a7d42ee0b4f6ae3034e3b71a429b5e0e8006bf5bc6bbc19faf7b42b0"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/2560x1440_nvidia.png",
+    "sha256": "a0d55e69f7af46c45aac8ba2939d2e020dfd1e5b9f08a2a0ce0b07c2c8b52baa"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/3840x2160_dlssnr-amd.png",
+    "sha256": "c74f2866487d87f7a2e3705fb534d738c0d2ac40e87a25354099099807068c03"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-outputs/3840x2160_nvidia.png",
+    "sha256": "fb7ff8b620d78e6c3d2e0f28e57b1edfb30e621a6a43f7c16ae610deb33522ff"
+  },
+  {
+    "path": "docs/ngx-verification/310.8.0/single-frame-results.json",
+    "sha256": "39723a7884ab434457b3cd51704799d61a25bfb49bdc41b14b83806f05369339"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/NGX-VERIFICATION.md",
+    "sha256": "f8300da6e88bc65323109d2da286f5c2c53f39833ae31eae5e3be48899b1a0bf"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/moving-sequence-results.json",
+    "sha256": "dd6db23899dec1c8845d11e97e403c7c961e088bbb0a0cbdf7016cc5301a383c"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/input/witcher3_1920x1080.png",
+    "sha256": "fa8868ed7fa078bb285560837a676f5b167479b78156f7c24d6322a34ee11100"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_cinematic_1pass.jpg",
+    "sha256": "89e720cd1b120b7d3c2a7c61da52677e5b21a63736c2b3d1fe52ddde48e46715"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_cinematic_2pass.jpg",
+    "sha256": "e483fce105e21bb8118aa10a376c166758af6b4627f930ea6ba680e15d9c8558"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_cinematic_3pass.jpg",
+    "sha256": "1fcf2cea62e466c443c4eb46da156ac2647bd72279569948ee16bb490c603759"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_natural_1pass.jpg",
+    "sha256": "3057218aac3616fed7401ab2f3fae22415cc7d9d33296f62e88754c4dab3bb7a"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_natural_2pass.jpg",
+    "sha256": "50daab2caa80e435c34db4df2fa97ff864502d360c0c5d98f080279af51f5783"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_natural_3pass.jpg",
+    "sha256": "5a2cf4b6e8b0062c9c0a98d5a418e0ac6bb92686467bb8b78cda93e0fb2c764b"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_standard_1pass.jpg",
+    "sha256": "dfeb3a6f97a2fe1f6f62561895a2d803bc60a73ddf52a3ae0097ccdc52aba453"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_standard_2pass.jpg",
+    "sha256": "b1a8b130528ed5ba0dc4435610289eae8a402c39f0b110774a0d452bde02db52"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/renodx-style-stack/witcher3_standard_3pass.jpg",
+    "sha256": "f9ce10f629404461d5bb4e70dede3a5bcea00e3f99e92c80c5e9d21b69a521e1"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/1920x1080_face.png",
+    "sha256": "c6e2be37433c8f4fe8ed900e06ac8626899931325ef09e0479ef917e78f78749"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/1920x1080_full.png",
+    "sha256": "1f96f2930cf598515a3d029d8d5c6ec28bb26b7000e5e634d9ddbe17dbd35dd7"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/2560x1440_face.png",
+    "sha256": "7ff303dd791dc6955d5cb6b7cad9d8920ccf799973ecb411e795854b1e904ac1"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/2560x1440_full.png",
+    "sha256": "bef8e14db38feda43c9beae79c91bc24cf176976b43b83f8350040561a843bb8"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/3840x2160_face.png",
+    "sha256": "a34b97acbdf304535dc1a5a8433c6b764837e7f20e5e8b229ed8322cd17e457f"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-images/3840x2160_full.png",
+    "sha256": "39846ca98f09ce20ab53ea08a71fb4400e1379d3a078ca7a0bcb01cae1fabb14"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/1920x1080_dlssnr-amd.png",
+    "sha256": "7c6a2720e0743a834e18f00be08febabd57e464d03aa3f9d3160691ce4079cde"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/1920x1080_nvidia.png",
+    "sha256": "8fdaf826def6beacdd9de4da4bff00ee8a8c682a31a0fad6dac5775f30fc58b2"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/2560x1440_dlssnr-amd.png",
+    "sha256": "2296e38c9ad2dd7d9aa133c5fa2f8cc8148d082166313f33a968a67a57f0d2b9"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/2560x1440_nvidia.png",
+    "sha256": "6a5884cd5ad2651854b6569860be15fbe4e50ae4ca7879cf293bfa4a8f1c8e48"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/3840x2160_dlssnr-amd.png",
+    "sha256": "adce38cedeed505971812ed89191609aa8c41aaf15ef788376c117e2984853f4"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-outputs/3840x2160_nvidia.png",
+    "sha256": "5aede14a3ff7e2c966292c66d408dd4cdac87ba09445b9277ca53e018627818b"
+  },
+  {
+    "path": "docs/ngx-verification/310.9.16/single-frame-results.json",
+    "sha256": "d1944eb54de7b0f532cd0cc846d2e9a95279d3c5caf9717020759d16bf726c23"
+  },
+  {
+    "path": "docs/ngx-verification/NGX-VERIFICATION.md",
+    "sha256": "2f7262c3a84f43716562f46673787a2205b93967f93d6cafd2a2738c7aa505c8"
+  },
+  {
+    "path": "fetch_deps.sh",
+    "sha256": "be6eb0f25bb01166459f41d08baa4fe81ca91ef183a2a78d9e6129f788abddb3"
+  },
+  {
+    "path": "linux/build/arch/rdna4.sh",
+    "sha256": "f955106994137eb503ffa50fce8e9acafc1efeb3987cbaf2f604d5d853d4215e"
+  },
+  {
+    "path": "linux/build/assemble_product_data.sh",
+    "sha256": "09a01ece9342326974d0645b692f61606c4a0153988a86fe8e9d28b7d8825c33"
+  },
+  {
+    "path": "linux/build/build_asi.sh",
+    "sha256": "3f46d3e2f74d003d6a80330989c273413bd9c5b33906000e229481005885ec67"
+  },
+  {
+    "path": "linux/build/build_int4.sh",
+    "sha256": "ff915382ac701658d8f8cab5e4ecd88974041c406c06e92c5a99a50ee4656806"
+  },
+  {
+    "path": "linux/build/build_network.py",
+    "sha256": "c7161a17dd371030aee6f301b223ab275c1bf72097233f9eb9b960166b419b8a"
+  },
+  {
+    "path": "linux/build/build_optiscaler_nr.sh",
+    "sha256": "3c67287ddf36a182f0fd1b2333dd3ae04af35fca9b3e7581bc4e507a2d937616"
+  },
+  {
+    "path": "linux/build/build_package.sh",
+    "sha256": "87a7513e250ee7dccb7ec058f742c97b838f38891c2b3915f87bf5e4d07ec4d6"
+  },
+  {
+    "path": "linux/build/build_renodx.sh",
+    "sha256": "bc6b6094359f6eb58e002d70c697d875beb2dd832eb052d15c671d716794d44f"
+  },
+  {
+    "path": "linux/build/build_vulkan_loader.sh",
+    "sha256": "5f5cbcff944caa64c656fc28ee6e489f1c0b60d0f92af45a3d009edef7b647db"
+  },
+  {
+    "path": "linux/build/build_wilsjo2.sh",
+    "sha256": "883530d4cb9399679a0f6c80511277da941c892bd8422434eb8ff9153a50f90c"
+  },
+  {
+    "path": "linux/build/embed_font.py",
+    "sha256": "5a01673bb3333aca4067c017ef12ba1bd231200895f6aea82abdc8b5c8eeb4ea"
+  },
+  {
+    "path": "linux/build/experimental_weights.py",
+    "sha256": "3c485ca04870e4cd460a6253975e438eb35aae738b7749da684767299a53e8a2"
+  },
+  {
+    "path": "linux/build/generate_device_chain.py",
+    "sha256": "e292d43e229878a98e1cdd9e7ae9b69df85538b4c20e0c9b40ed8a1b7a4d2fd4"
+  },
+  {
+    "path": "linux/build/patch_reshade_effects.py",
+    "sha256": "f2e9c1a68aa01d61c8f029d53f33e542607841d715b3690de5a77f79b7cb3e53"
+  },
+  {
+    "path": "linux/build/version.sh",
+    "sha256": "ae62dcc5a16707254af530427d9b7215ee5544daad8ef0225a3cd5ff715784ce"
+  },
+  {
+    "path": "linux/data/experimental/dlssnr-small-experimental.delta",
+    "sha256": "8a2e7a655d2b6564357d31d56471607b60f467656a368a26960f138d1c961ac9"
+  },
+  {
+    "path": "linux/data/experimental/dlssnr-small-experimental.sha256",
+    "sha256": "915cc4d6f5ac3c7938eb50974f2f3ecd92452b82dafb05e33a6928bfea467b32"
+  },
+  {
+    "path": "linux/data/int4/rdna4/dlssnr-int4.sha256",
+    "sha256": "9407a295e59a87f642086156bbb98427cd449aecaef8dc1a9890d8cd5b76e054"
+  },
+  {
+    "path": "linux/data/int4/rdna4/settings.txt",
+    "sha256": "bf6262a000c5f00a04e3a42e0099595cbcf83df8b834cd06527a8619b17ae52a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.ex.fix.bin",
+    "sha256": "899a1a21bbe6f16976dca38b7629745a4cc88475fd42025b959c9c78e5b85a2a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.ex.mu.bin",
+    "sha256": "585580f30d07737ac2f9639f384c9f41decb5230cdcb1c806803d8693aa8d124"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.qkv.fix.bin",
+    "sha256": "a5a34dd506ee81ef75076aca9876e260ccbd658e589c72b60a8389960558f44d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.qkv.mu.bin",
+    "sha256": "1642df9ac707356496bbc334bf8b1d269a092074af5d4f17eddbc1b9502eede6"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.x.aq.bin",
+    "sha256": "0cfb79a51db3075f563310b2341491b1d7309c17d2bb247d848fdedab686c3c4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b15l0.y.aq.bin",
+    "sha256": "b124c5211bb8d3caa4df73e6e3304caa05c0591a4b72e5e23dbd63f0390febe5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.ex.fix.bin",
+    "sha256": "c94e4c6fec64b0c71d66e39f3efdfcb455c04496d8bb1b79adda2a16a1dcd79d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.ex.mu.bin",
+    "sha256": "2fbe734b507b3453078bb151bdd48ecb2ccc44cfd0e2e5f6bef552ed93845088"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.qkv.fix.bin",
+    "sha256": "a358474d1969e7a6d82000ce0bde23ea19c22cab7c68e3950ff188d002b659ef"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.qkv.mu.bin",
+    "sha256": "37f2d75ab9110317a4e021428be2f3902c46824069171b181b613447fd25d671"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.x.aq.bin",
+    "sha256": "c56940f95780b9408e663674a075dd89aeb7671038fc15d7a95cd527dc31ce57"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b16l0.y.aq.bin",
+    "sha256": "cf01d2324e26742344249c4cb28d193d3cebf321a3d0c410c9fcab4b09c0b1d8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.ex.fix.bin",
+    "sha256": "3ec8927acfd154aecb415a52fb67e0dee51751c465c7bd17d49f981fe81f2870"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.ex.mu.bin",
+    "sha256": "355617e0796ed5c36ed0995873e92520acc3379dac43aefbd72c6d05f6d75f8c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.qkv.fix.bin",
+    "sha256": "eaa5cb3e92a470e638c75d089366e32cb0a53e6608089e8e637c4256147fed6d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.qkv.mu.bin",
+    "sha256": "ca983a967e09af32d046b9474762598555989b909fb1b0c1cb303e4b86737ffa"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.x.aq.bin",
+    "sha256": "416b54102d50e4fb42efb8897ff8e53c0515afff3507db5c0068ef64b206dffc"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b17l0.y.aq.bin",
+    "sha256": "8a718a3c17e1118f5bec27fac765ca6a09792384fdeba80fb66b899de2879b92"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.ex.fix.bin",
+    "sha256": "4dc20c46ffe638c5995480e052a9e804e3e4fd6ccb187a22827e1ebc060223c9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.ex.mu.bin",
+    "sha256": "16c2978e173fd7854a589d48b1bfdaf69234838472573788ed3096af66269b54"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.qkv.fix.bin",
+    "sha256": "3c5bbe8151eb55ff9e5c49cff0a0b762f958aa683ce3c5b2a4fc53ade591fc1c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.qkv.mu.bin",
+    "sha256": "46bcc448d615f47e375d6d3e49722ef64026d13ec33269ef0c77a88a7dfb8c6d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.x.aq.bin",
+    "sha256": "cd076f1fc0b52aa24800b156125ca16286761bd3c5a29b30ca0e210d400196b8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b18l0.y.aq.bin",
+    "sha256": "f1f6d982bfda0eedd7a4f33cbbb11f2af3dac4aa14ae2fb28bd6979e48cb2d0f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.ex.fix.bin",
+    "sha256": "6ee69297bdc2809fedaa9429f3d8f191c145ec317c3be476716ee7771c426bbe"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.ex.mu.bin",
+    "sha256": "6e13967365ab2b099130e365bb6f8aa8bf6f0ffcb387dac9764c5ee02c3beccb"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.qkv.fix.bin",
+    "sha256": "2cb8776f193e59f197442ad8dbe3581655205720b960798828a1e55aa188b367"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.qkv.mu.bin",
+    "sha256": "759c2f9ea2d1262ab5383082dad0b900e5d9b8ffe9c1e954a1e74ca83dfef746"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.x.aq.bin",
+    "sha256": "851a7fb8d1257dd38bb0e467e00179f138c00abf9cb51678bd8b9c9a0834617c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b19l0.y.aq.bin",
+    "sha256": "4df505c6b940bfef43d744d80d1a54bd9f0201ab2c0afac5370ce1f6c032cd1d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.ex.fix.bin",
+    "sha256": "88f0eae413038d9858101168caa43d437036f474d68d43b0506e7e1ba259f755"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.ex.mu.bin",
+    "sha256": "f6caad02827b5cffa5958fca9c94ff61db598191826edd9ef451f0a83cc70316"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.qkv.fix.bin",
+    "sha256": "30dc1d7b54a790f974f1e1a11a2c10b45c30ebdf89da61741256001ad4e05c50"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.qkv.mu.bin",
+    "sha256": "cea9ef416ace8e4a6490ce6d3b1ed49b010a70e3435e5c1f0a3de4f7086c5a99"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.x.aq.bin",
+    "sha256": "481585f2df4abed67bd5737169c6abb06d0085a94ab4fd76e33ed4e30a2ca8fc"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b20l0.y.aq.bin",
+    "sha256": "590a260afb44defe1de1f5acfc5ef2437065f31adf6392b26cdbf556d3f94e6e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.ex.fix.bin",
+    "sha256": "e9dae08db93645e1ab254ab82bcf59a373b15580a20f0b89425fb47703c6b463"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.ex.mu.bin",
+    "sha256": "02ba3cce8564c56b9296a820fefc3820cdd04af3c368ca152d12d5751974f83f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.qkv.fix.bin",
+    "sha256": "add65d57698f3efef84faf205c87bcf430aad700f0678df1cdfc847075212db7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.qkv.mu.bin",
+    "sha256": "40ca6c02940a567d197f7d78d2fc457122d5093e35638e40eecda650d67163f2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.x.aq.bin",
+    "sha256": "90acc10f2605c0689191f132186656ac4dd33ed98049060ca59951640a70fe8d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b21l0.y.aq.bin",
+    "sha256": "f70d253cc3c3cccc900e02ea267d44b04d96704f3c587564c0820b16c60705aa"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.ex.fix.bin",
+    "sha256": "3bf8e56f08b3b964d0cdf6f87339366f6a32bdd58546e65acba5bba899a455ca"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.ex.mu.bin",
+    "sha256": "1f795f5b2c4b42724f99b51e91044e0d4baa04018f614f7d1593746a230c98aa"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.qkv.fix.bin",
+    "sha256": "dbad1ee8c9ffba17fa4ff4fe000df8962c641c686207e666073d83cd75d423a2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.qkv.mu.bin",
+    "sha256": "2119d112abd0b26b02d9fc6e5a6881b091e8dad80c45fc5a1c65c81346a8e750"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.x.aq.bin",
+    "sha256": "d4c41590cda8949560e79b4b8eb4b6184a3a7e3d28f0600ece1c359dbac7bca0"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b22l0.y.aq.bin",
+    "sha256": "ddd55291cdfecf2c85a92f2f384d7f9e6c28b35480090857e36d2cb5e9926c49"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.ex.fix.bin",
+    "sha256": "c999095e650176a900c3c325ea1358c3d3e87a0498a901bd3130bc3087d79978"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.ex.mu.bin",
+    "sha256": "611e4b2a2a75dc097f41cd18d34ffeba03bd6cf400c447276bbbf6ebead90a11"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.qkv.fix.bin",
+    "sha256": "877eb6427482e1b31891969f58c6dd058a648c3d640b13a10fd2e74edb540fc8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.qkv.mu.bin",
+    "sha256": "51875b0857f47817cc1622727d29b0a0eb38f9a489ff4bf0eacf6a345465c49b"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.x.aq.bin",
+    "sha256": "c4ae719e336d2f7d954fd2662211f9d3e1c9bade1d1841b7619c35d2dc5c5c2d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b48l0.y.aq.bin",
+    "sha256": "b712c77aa31199f9e569a83910ea8886ae128547b7fb2290c949cc80c7c5d8f7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.ex.fix.bin",
+    "sha256": "ef2eef195a78c112dfe36e88475510868276dbc466d868227eab23bdc6f42820"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.ex.mu.bin",
+    "sha256": "464a1174ecab5556d17513c1baf868ef5b0ba652faa123d4283aca7188413b1d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.qkv.fix.bin",
+    "sha256": "e3e5666e9b677ca97efd0421cecb490b37d03d06c236f5278422f623706b0d60"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.qkv.mu.bin",
+    "sha256": "b32621a92e518f12fa98b4e74a0f9667e0f1ff508f510b935717bb829046dd5c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.x.aq.bin",
+    "sha256": "b617562746901e7ccdaa08e6ee109badf27e19383c8cb39b7390f9fe2f24a91e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b49l0.y.aq.bin",
+    "sha256": "a1b25d9c3d9f67dac2c87eb91e80a7e22182ac4582ad500a03b76f810699f730"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.ex.fix.bin",
+    "sha256": "2f215fc2bf45ff5275ee4bec3e13eafebf49d088c6fb2b4dc623afc6501034d9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.ex.mu.bin",
+    "sha256": "4a94a05eb025fac25f895f25dcbab35c8527963ce841f44240f80b1e422a9e2a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.qkv.fix.bin",
+    "sha256": "e5e05fb5a716b2f08a4f193f3b1f5d1084669f738f13d4536bc0b014fbf1a1b1"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.qkv.mu.bin",
+    "sha256": "2ea0c0733a90808b4d777302edcec939b7f3d8d1e6326532dc5f6e3d4587787b"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.x.aq.bin",
+    "sha256": "d83a212341e8f9a8f27327853337338a574b89d1f15bdeb2b247cf8e900535ce"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b50l0.y.aq.bin",
+    "sha256": "d27eefb0d33281acd424ed1db012fe19fa1ccb68955223bed82c65fdb5147b45"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.ex.fix.bin",
+    "sha256": "fceaed15108f3ca3394745d6f634339600df6b07f9ba42d4bd0759def3e4ffaf"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.ex.mu.bin",
+    "sha256": "a0c45154b139c6e1b9b86a890dd1c892f612c1f9c774a0c1c2758e6eff44caf7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.qkv.fix.bin",
+    "sha256": "ab6d70f8bf6229d133a170876f1c19617444b419b641862ee634ed7ddc9f74d7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.qkv.mu.bin",
+    "sha256": "8fcc688cbb2ba89a9d6fb21cd8270a7cdf4d33d7bdea6d423e8e7d146e7218d5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.x.aq.bin",
+    "sha256": "2f1a9b06f8da8706431b746082e42ac3dc711a1517277814444d5c096fd60f6e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b51l0.y.aq.bin",
+    "sha256": "499fd74c14499f4e5e6b6a8caa7b56aa0eeda3a60f02c78e9d1ed94b87a82c2e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.ex.fix.bin",
+    "sha256": "3267246f83a40b16457ed9b3c5cbd4e4fefedbeaeae46d3fd854fb64f74310f4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.ex.mu.bin",
+    "sha256": "2e094258dd5be41401dce3861dfe6972dc33e9fdedcb477598f24234379c6271"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.qkv.fix.bin",
+    "sha256": "066f6efdc0f80c0adeab66480d60fc17e704efe32f9f35ce339387e30c60fa75"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.qkv.mu.bin",
+    "sha256": "6289ef529ee56e1478137fb065d19f5e0110309f2de79e43d103c66cd62f5e35"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.x.aq.bin",
+    "sha256": "ba400244a757f35ad1abec0f0cd27ec1701d54316388162410f25e6286e6f663"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b52l0.y.aq.bin",
+    "sha256": "fe89095817dc2743e0bc3f847c79ca3676c8f14a6c9a5fd35e78b05543286ad9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.ex.fix.bin",
+    "sha256": "bc2048b6f4622d72d3e1cd320d3b9e30018e6693b3032993bd8d2049f08acee8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.ex.mu.bin",
+    "sha256": "b29271449d64b8e2734461788af40d646eeea0fc53b813665fd784ec57b7ab13"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.qkv.fix.bin",
+    "sha256": "ccd4b8f20e4492cdeb38aa7911ada5596ec95382248181aa4f2fd8dca390387d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.qkv.mu.bin",
+    "sha256": "f05f02334bd262f543de07f5281136e4f24b7217682de24059e08b1d465618a7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.x.aq.bin",
+    "sha256": "0b35866fdfb711f93b43937c6e8ad95381b4d39658a49943d2699e87904145c3"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b53l0.y.aq.bin",
+    "sha256": "5f11a3211bba8c1d9de43084e445d060d918fef55a2d1acd0f8390f8d7f1041a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.ex.fix.bin",
+    "sha256": "517e232570ed36bd1950a0f4e7f900867353e1119cd5ba9177ec1033b05c53a8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.ex.mu.bin",
+    "sha256": "901d6ae1f711c9a9eb09d424662e2e6bd1556c4c3465410c7ba99df89a0d29f6"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.qkv.fix.bin",
+    "sha256": "335236f1f58126992e34ffbe60e4b16e2299efa915f9fb36563b630e07b6e4f7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.qkv.mu.bin",
+    "sha256": "1b08f35d9d6b500b3fe57ec85bd6f5548fbcfba8754aef4b29b7011a19d0b752"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.x.aq.bin",
+    "sha256": "13911b4dc3bc3479aa972707064905f1f48a6e0fc0892b8a35782d5bffc86c3d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b54l0.y.aq.bin",
+    "sha256": "20f2ac64ebc797a7021e425faf3878074de693f6ef19dfc22d4569bde1facc44"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.ex.fix.bin",
+    "sha256": "c887f0026018f599b2cc199c179309fdce35a5e71a1310f4c07a9b418a38a276"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.ex.mu.bin",
+    "sha256": "691985206d1ae3375cae62ed0768014b7b1c0af0064956c277b2826100cc03fe"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.perm.bin",
+    "sha256": "c4f0b81e5da6fe4c38bb5326ac7a8bf591c8a4fba28044d3e05d7aeab6b8e33c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.qkv.fix.bin",
+    "sha256": "84ecdc1b3c6239ca0ef0cd289bb0c49cd4612ee1f65f38c65e048e8aded12495"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.qkv.mu.bin",
+    "sha256": "aa5c4d8187d021fcd269ce8cdeb8c0c62813d6ebd0795a8e2d62a2861e8abac7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.x.aq.bin",
+    "sha256": "04d9bf8f2561514076b34e4d358ea75ffbadf89c52d85afad65f24bdd2b5c6b3"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b55l0.y.aq.bin",
+    "sha256": "b754876ed1df03055f77c084b5521a9b65d43a21f714f3270e094f7faa59d7f2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.ex.fix.bin",
+    "sha256": "237dd7c3693d733770324aa14179cd32f39e69b85efa992ecd63dededf1f69da"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.ex.mu.bin",
+    "sha256": "25b00ca3218d48ed7e39c9600a46d6a6d1e0b8b8ce4a986f374921801556b9c9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.qkv.fix.bin",
+    "sha256": "29b977046eca9ee21406f5314a62bd3cb2f3a63b1bc1dbba0fc02881ee2f9b24"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.qkv.mu.bin",
+    "sha256": "5476d0d44bc8804d76def5c32041edeca18d1f7e0029cc249afe5c410cac1cd4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.x.aq.bin",
+    "sha256": "d3cc30d654536be1144309d813e111e86ff38640fe7c135123a5533db2b71299"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b56l0.y.aq.bin",
+    "sha256": "e7b0b4a9344aaeb7ec9b30afe2c7e92ecf10be67a555327ed3842e2becc1b1a3"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.ex.fix.bin",
+    "sha256": "1bf755b933300ab4e247a90f0ee7ea22579b407c89c6f88dfbc33b9b4b72f53f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.ex.mu.bin",
+    "sha256": "8974b5fc62cf3447d9f9255f1e942021d8d8b5511cd55016ebeef2d949a3e21d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.qkv.fix.bin",
+    "sha256": "d0cc5947ae23c9455d0d13007499ea4e38bdebb81815f9e1555c4370e9b9019a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.qkv.mu.bin",
+    "sha256": "a12d63040e10a10efe69c7427dc7f398b98049eac529e281959d362e3b906dc3"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.x.aq.bin",
+    "sha256": "1bff71d0d4e8536b29b14e6d0141491733cbeb563a0a86f3a899acd7b6ccc8e1"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b57l0.y.aq.bin",
+    "sha256": "947f26bdd875fb6fcda6bf60bd8536c666a9dff05a1cf4e6c829726aca7a75eb"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.ex.fix.bin",
+    "sha256": "2051442947b54bf2522e0b6f604733e4859128ce6c9599652ebf223e79227f92"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.ex.mu.bin",
+    "sha256": "d23eb1ab7976b910d52d3c62acff9098078ffe619c4bff618c2132c684e75027"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.qkv.fix.bin",
+    "sha256": "98713d040ae66deb23474be1d3c9b628780efbe89d09e69d0213501e443f7ae5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.qkv.mu.bin",
+    "sha256": "454d233b9638edbcde0155876e829e7a53abfc1e77b741b42236d0a256f97cc8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.x.aq.bin",
+    "sha256": "3b68613fc4d8f19f0d3d0a7d6219bfc869ac06011f7270392a8e2cff4d114936"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b58l0.y.aq.bin",
+    "sha256": "29b6dca26cc360c8542a70cf5aae5218a1b3306de0d1e67c529c1fbfcb5df500"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.ex.fix.bin",
+    "sha256": "0830c49be3d7fdb7c8bfd2b5287b53a4289b277771bd85be20f8a43e1678f029"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.ex.mu.bin",
+    "sha256": "05cf5291ed0ebba1a999cb5ef3c86416fd812b471f67cb5ffba1ce386d5cd35b"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.qkv.fix.bin",
+    "sha256": "0bd89c4d79c13696c095f7785bbdde8b1b237bec9f7ed61832108f884bf2841f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.qkv.mu.bin",
+    "sha256": "e4d035f46d184bfaaa63995be0eae1c4173a2068183a5af84f882402466c06cd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.x.aq.bin",
+    "sha256": "1e5acf61b6c2db12fe336a6c63e325b7f2d114e9d72ce6cc1ae59f5154ab8156"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b59l0.y.aq.bin",
+    "sha256": "4c84bc771d665866dc697a61a0b06f23943944c15062f8736256a78cbf124da5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.ex.fix.bin",
+    "sha256": "72a5d2deadaaa270087275e8a72768162a456099597506345031a286d0c9d391"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.ex.mu.bin",
+    "sha256": "942fd153c9c4100ae3d69e312a7059969ef47885095cd2986872444e902b940d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.qkv.fix.bin",
+    "sha256": "903804443f692717351f51d45fbea2d450a624480923137bdd6dc4626fdc5a80"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.qkv.mu.bin",
+    "sha256": "2b004440924566ac8fbf18f71c01f6d55d9a6ee1428d680e718ccceb1931b09a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.x.aq.bin",
+    "sha256": "83b68a2d708ea98047c3276e22df24aa0d3ef5aaae29eb47b5dc0d71d53ccc3a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b60l0.y.aq.bin",
+    "sha256": "e47c36eee6d7c26862340d2af7dd11c2def14054ac8e9104db9a1e570e96dddd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.ex.fix.bin",
+    "sha256": "2a429112b59afa31dda5aa852bbeea259d27d73664bde9e22fae4cdceaec1773"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.ex.mu.bin",
+    "sha256": "eb18d57ad28441339cd59dc1b92d497179da442f1177dda39b8261a2f8824ebb"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.perm.bin",
+    "sha256": "407715b8ded48be4426df98401cecd0e7ad61b9ad742649eb844de452d1c5f91"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.qkv.fix.bin",
+    "sha256": "15e3380046e025d3c679f1fe4ed6793177bdefb6f7348f22f27738e5017c6440"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.qkv.mu.bin",
+    "sha256": "2f415fb529ae9c660ecf1a62874d8ecf40cdf49e813551e1b948ba0b0ff3af78"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.x.aq.bin",
+    "sha256": "e6603d07afeafbf7cf2ee8da19fc9d725643b9d0d21e7f4b8b39d998bb90877d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/swin/b61l0.y.aq.bin",
+    "sha256": "070e8e69140f0fc30b0fd7ca44fb02317343309a6a7ca8d232920354353a3dcd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b23.attn.aq.bin",
+    "sha256": "19c15dc3532f2e2670a07715fc3d144b4f7905a39e79554e014a1d96fd89f539"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b23.attn.fix.bin",
+    "sha256": "5b65f5a9f541c284c38d8acb246b0bfd97b77eb36254e5be1dabd86803833cf6"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b23.attn.mu.bin",
+    "sha256": "66480153e60841c2bacf152570eed5ba6d9f5797b1cae2e732040dfade83ba5a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b24.attn.aq.bin",
+    "sha256": "94ea3493d736399a042f71a74626c6d66055f0c17222fad0f55ebd3c8dd04404"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b24.attn.fix.bin",
+    "sha256": "383e721e6db5bf8c1fa9ecbe691226e0d47c657ffb245120f101576cd5d9afaa"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b24.attn.mu.bin",
+    "sha256": "26d591b9a1a285b38148eb69308c07a546f4d1a80ab1fdbeeba8d5ee51732521"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b25.attn.aq.bin",
+    "sha256": "b17f692d22602e87ccb02bcd923e58f547a9e92e362686f76ff2960c649063e2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b25.attn.fix.bin",
+    "sha256": "dfd16b5bcc95c0502ba101347e7b58ed0cce8e25257956c4a0f114f9b48570bd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b25.attn.mu.bin",
+    "sha256": "6b11e6391cb1d673a8157437f58dbbe85ef00a35f51b7bab8f23216a21c14644"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b26.attn.aq.bin",
+    "sha256": "aa80aadfba9ebc95672dc5b439bc9954c997e197b005feb3c1630b120efe3265"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b26.attn.fix.bin",
+    "sha256": "4951dec074d1526f6b506c0fa09bbc922bffa56951e1a4979c682c1d5689b660"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b26.attn.mu.bin",
+    "sha256": "671e1533990f6bfed16e8f123eeb3d9b2a2276cc71d3af71af4993c0e7e9abc6"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b27.attn.aq.bin",
+    "sha256": "ee0fad381c62c1113da96931b111cb526d645f21c6e90e108b946fb1e26aa1a2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b27.attn.fix.bin",
+    "sha256": "3a8579b7c7bf1cf8428f6af6968278c162ae3166ace6a4a470e51770690f0fd1"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b27.attn.mu.bin",
+    "sha256": "90fc8be8ea9462d009c6c60bde558ac86e0a92ad3f55edce6112c1e2d3992d08"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b28.attn.aq.bin",
+    "sha256": "87e72fea620975ce23f35ab9bebcbd49211bcd020d9c5bf7ac4cc9e446e784ec"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b28.attn.fix.bin",
+    "sha256": "1cc1b7279814644ba6d1c0d71b4b4251d81e2da63090d7d56fe7ccd8137cebe7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b28.attn.mu.bin",
+    "sha256": "57ce52e38b8fb9cc4b1ed308e648824c64e84f78af1e8738b15dd69d00888a1c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b29.attn.aq.bin",
+    "sha256": "0a8010a58bc6cdcf626a259fd4fd4a404a2282506601dd8b9d639aeff7d56389"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b29.attn.fix.bin",
+    "sha256": "3a80150d7aec37a2750e70c4820aff34f49608f69a4e53e13d1b51528765e9d5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b29.attn.mu.bin",
+    "sha256": "6195451b47857ffe20d7b42d838511e5d482949d216434e3cf545589ee145313"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b30.attn.aq.bin",
+    "sha256": "d878d87303f7661511c1776bbffb0e22bb7f6599edbe899dd0c32fb01f451a9f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b30.attn.fix.bin",
+    "sha256": "b45fd23867766e64ec554c513d7688d362af046dab4530f7d48492dd013f478e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b30.attn.mu.bin",
+    "sha256": "4e19c8ee9d1105af6094a7e32f6321319f0cb60e629ff73261e95d127c1f9d20"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.aq.bin",
+    "sha256": "22d09938fffc384df72ab7044ddd23b7c0b4f383c15e640b52214af7a3e6ecf7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.fix.bin",
+    "sha256": "a686a28c588fbdbfde9bfeb99e9d9209a76835fd8156697157da1422977f15b0"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.mu.bin",
+    "sha256": "0fed67a8664ff62cc2b2e708f476ca956d6d7409e2368448ff70d652c0ce8810"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.perm.bin",
+    "sha256": "49ed1a1d9c3ab03367f0d97efd6ce1abf45b3dbf01526bee07d79b92646642e5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.qkv.aq.bin",
+    "sha256": "a971047a8f141fcfc8a0d11a65bcc2fa8f17ca9c9dec299f859362c8a28e94c0"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.qkv.fix.bin",
+    "sha256": "ffd28604ea637f7130a0c69f29124f5bd1ef57445de25855b41bc83e98d8de09"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b31.qkv.mu.bin",
+    "sha256": "93836db71b3acfde3c17a020aa517a7e43398281f740fe0165e9045132efd15d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.aq.bin",
+    "sha256": "dabfc5e0be405e9d67882c79614fc7ee349daa4e587f566a66cab1ff00f26c32"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.ex.aq.bin",
+    "sha256": "c39bf7b0e0c2f72b0a0604fecbad16b2f1f23e2f28e7967ba7e6d91888bc5217"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.ex.fix.bin",
+    "sha256": "393efd23231fb18e0726cf2ed27e30dc8f5db599681aee2e1113de6851562c8c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.ex.mu.bin",
+    "sha256": "730ea16025d586b23af0fad2fb9b266ab5cd5b8fc980a0e68424b7220d706a48"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.fix.bin",
+    "sha256": "c965bb29e755af12ae0ca01354138e6a083c9c6c4e64a9db8c097d5894c5ef31"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.mu.bin",
+    "sha256": "4bd5844cf28b8e375867a945cc8e08433aabe09c2cd2c13c22ed15fff6c4184e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.perm.bin",
+    "sha256": "fb739f56d8972fd45ed2a7da52e86fe40392a8c376e4d29dcfae86bf59f64c2e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.qkv.aq.bin",
+    "sha256": "2d707e7c31558d3e4ac86a80f899a85b90e6d04a67966a703b062e8905bba8de"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.qkv.fix.bin",
+    "sha256": "72f4e8df4aecfc1c08f99b7a1f5df9c72ce2931829751dd5dba8922ecd5b93e0"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b32.qkv.mu.bin",
+    "sha256": "59ad73700fb4cb3d45efc98407891541a36b119f65c49ca65e09619609f10c2a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.aq.bin",
+    "sha256": "c9f40d40821499f768ff5b421224f3c83ff5d38b6ac7bbe5078000f965fc0066"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.ex.aq.bin",
+    "sha256": "1da7f9e247b849a78c43edaf727a28f6186f6acec17e86eef1f2e0c0d4ac1522"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.ex.fix.bin",
+    "sha256": "fb2dc0b7e8590122c595a3aa25125e8b131f9e2830883d2813fe554752832b3d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.ex.mu.bin",
+    "sha256": "ec09d9a40fa8285bd6af5f63d85e4a1d526c0de60487191e9d598d43d138623b"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.fix.bin",
+    "sha256": "24bba84d856357462221c1b1a422a10174f07c994c27da9d1cb9b2e7a3bc5282"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.mu.bin",
+    "sha256": "00ffed4a7687952e3b6a75904f3b65d69a407e4c0bd50004439231e4604c722e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.perm.bin",
+    "sha256": "0c0149c0369400c89326dd3d6f6549af52f46d5530a04baa15c2def98414d012"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.qkv.aq.bin",
+    "sha256": "41e752cc2e1f3b619e01e4cbc987c20057987f41aff6800bcdff1e7f1afd704f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.qkv.fix.bin",
+    "sha256": "79833fde23a739fe625ec8c0ef4cced2b3abd910bd51732ff4304ca0ae06593c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b33.qkv.mu.bin",
+    "sha256": "6dc9e0918cba89de52006057b7ee8883352384df2f109e1abfd309521eb81a8d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.aq.bin",
+    "sha256": "dae78cf328239ad573e89153e3e1000f2ad12f091592026d5c975d3bbfd85f60"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.ex.aq.bin",
+    "sha256": "041afbf2e075a3042b24a19eef42c65c54fbfeb9fa42a350a94773fff147ba2d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.ex.fix.bin",
+    "sha256": "df837dbdff92125bd32d6127aee7f5e8037e1735c6cbe3cdf47c173851107972"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.ex.mu.bin",
+    "sha256": "9dcc499217a49c1d9c78954b22e363adc07c2f8aebde8349c722db904c8752fe"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.fix.bin",
+    "sha256": "2c43b1c32618bd2ca3deb63d7ad70be6bcd12224bbffd85a3781b161425fa927"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.mu.bin",
+    "sha256": "1346c4eae3eaf54fc445310983df15e3007ce86b2ccdc7dd94cc86e260e77710"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.perm.bin",
+    "sha256": "96217b28fe41edf4d92b8acc5e7352ee6ef7688437e9e363d5e2cf94c6e37fd9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.qkv.aq.bin",
+    "sha256": "19211fb816cf0ba7d58d0c26b8bb397b65ebd837053b1f733d3e9b4b2b81a431"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.qkv.fix.bin",
+    "sha256": "f7ef036a08e28e50758748a080e6d41c423840e87358269a4dfa4c8336cd543f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b34.qkv.mu.bin",
+    "sha256": "dce68bf78d3459f1f1b046ab924698d4b90fe9260de31bf1c3b84d465e0370f8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.aq.bin",
+    "sha256": "d622e1f3b270951626446506ced17234e826c0d9a6930ff16bca5a405c9138b2"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.ex.aq.bin",
+    "sha256": "61d9651a70647da69c74af806819d8c7fa2a7a2bc2b6697c9c2216e9eb13525a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.ex.fix.bin",
+    "sha256": "0323a0656fea823676d7bc97946e1a986e12f56fd091221cedc6ad0ca2d67462"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.ex.mu.bin",
+    "sha256": "aef9b77edba320041d14ffc441cd6fa6b8e516545368ad2abbe862fea8a1a065"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.fix.bin",
+    "sha256": "fe2a87e867d1ef89a522a7933d7abe693ea1f4210a380dca4bb14d969a649457"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.mu.bin",
+    "sha256": "704bc014965f49a58418630320faa945dfb0b1f877e387fdd02608d175f0bc54"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.perm.bin",
+    "sha256": "cf59ebf0059773112929dd7dd6705036e7f97450b3c4c54225dfa23a0b5bdbe7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.qkv.aq.bin",
+    "sha256": "dd003cc5fccf32b40b8579140de3f5107254f16d6b8ef05f23e3585c133ba429"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.qkv.fix.bin",
+    "sha256": "531f23bb6de493dd2c9e9e69bb750dabc179ef17b32efb4c48ae7eab2e70453f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b35.qkv.mu.bin",
+    "sha256": "ebf289353597a9f67fb34b7910e3ac93492ded3166b383266b464ad489a1199a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.aq.bin",
+    "sha256": "3ecf98b97e04b96635ca2a858adbd5b719a78e5c74a321bad7213b9cf2b65b2e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.ex.aq.bin",
+    "sha256": "dac914fe5475464de2a4b43c17d369a6f3d46e102f0921439d9e6a573766f8e3"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.ex.fix.bin",
+    "sha256": "5d2fb9b68273ef764c358cb57f5334b9490aa57fe6a702f0e1d0d191d472935e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.ex.mu.bin",
+    "sha256": "85ea040fc0038b13d1c8409f5930915cf20b001d2dac1d1070827e811f74c713"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.fix.bin",
+    "sha256": "440d2fae2791576d659809e1bd4bc6b5762d322c399f6916944891471c22add7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.mu.bin",
+    "sha256": "ebefee88b6526e183ff192d26843cb1988db9c325cbb6f539a554c50c93167d4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.perm.bin",
+    "sha256": "a25eecb01172a55b9f68550589fbcf88d293728e79b4c5b30c2aa37c4eee0fff"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.qkv.aq.bin",
+    "sha256": "f8371d720900464fb5e1cda4a1c1254afe1e97ceebba6f7cdc87aaedb838fbe8"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.qkv.fix.bin",
+    "sha256": "58a0ece09e93238e66b07e0b121347997648025af9ef6a7e251f918272d6c30e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b36.qkv.mu.bin",
+    "sha256": "25c6d584df3e0dad2ed20396328e30315374c52ac5b32f432a0767442df9475d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.aq.bin",
+    "sha256": "fdc30873b68adabda8ce7f3bf4587ff59952dc6fb77963379f018c33915adbb4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.ex.aq.bin",
+    "sha256": "cbae9e0a88d8e424d358281a25ab869f995c9520e708728533a4792a7064cfc5"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.ex.fix.bin",
+    "sha256": "2b09d15cbb2d24443408e0dd810fa49263683848b0d69d9d1d760b841765a6b1"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.ex.mu.bin",
+    "sha256": "5141f226169442013eeec0e6c201f16fdf6bfcd4ff6fb81bd44be2c168ff232a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.fix.bin",
+    "sha256": "03100a9e37ecca4050ff5656c23732a90cd9b813d733c682bbf8fba2d5c85d20"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.mu.bin",
+    "sha256": "a68b9074ac12e6945c51ca03250d8033471afc9ebdfbca96b6fa0c7b7e238660"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.perm.bin",
+    "sha256": "3d2367986263ebe97ee0a0be450e359973fa498364773c5284ff605864073e69"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.qkv.aq.bin",
+    "sha256": "b73bd8f16240fd83cabd8a48cddfb2d15c5aeb9a92fefbe434154b2fe0b51578"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.qkv.fix.bin",
+    "sha256": "9dc757c5998f706ea4be1c116cc2804207ea5a31aef1c866c53d7b3228d1dae9"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b37.qkv.mu.bin",
+    "sha256": "a1f478247890f5e2ae7f07895f6c410ea898d6ca2bc43fbdb13aa4bd233c8b75"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.aq.bin",
+    "sha256": "382c22ef0c0f79c9e076a374149ffd3f67dbb6e152d8ee53fbe8855e5219cd6e"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.ex.aq.bin",
+    "sha256": "947a64e6f84b865a4b3b58061bdefe89b87fbc25f64e51b88683797b675ce7ba"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.ex.fix.bin",
+    "sha256": "118fec3e98c5030271d649315b668e0eb8c7561adabaf468cf2b0050977aef13"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.ex.mu.bin",
+    "sha256": "482b49123ff6bee8a1521011cf9aa3827bb839ea2c23278ff6d02ef8d45e86d4"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.fix.bin",
+    "sha256": "d464bbba81fb808d7c2b8825e84cd918dc6930aa762debed90f8e9b7c41d2257"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.mu.bin",
+    "sha256": "cd7cf7cac01b6eaf5504bd21ed0a4d9fe4bc1f054d8e440e09a9e425c9eab7cf"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.perm.bin",
+    "sha256": "e55f277fb77c551a82b57d4d370105a9fa89db64eca320018fa5fe8cec7d52e6"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.qkv.aq.bin",
+    "sha256": "e7f904d3d7191d28ebce291eb26189dba524874950c3415c4e5fa020e5da8822"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.qkv.fix.bin",
+    "sha256": "23a99835877451b31bb4130ca63561bbe33b6c2b4e3b57ffdfd0634780e768ee"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b38.qkv.mu.bin",
+    "sha256": "1a58e33adea078b4d9a3d2db7b650c235351dcf42acc995977afda946c593400"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b40.attn.aq.bin",
+    "sha256": "27c8418224318f6ec17a434c6d48eeca5d8b1d2e33bc79aacf74c0d24c9c3dcd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b40.attn.fix.bin",
+    "sha256": "a5a0eceaf6f5f31fe5a34595672819f0ea6feb4fffe3503e1bb1b9471832d8bd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b40.attn.mu.bin",
+    "sha256": "593433549d3d955be32588e5a587b021960398b97d56cf5aaacf841edc4dc0bd"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b41.attn.aq.bin",
+    "sha256": "4ecc27419a350c04345b98061575978e4ad8f11c02c554dafdbc92367e263399"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b41.attn.fix.bin",
+    "sha256": "c0338193b6fed0a6e4bb1bec5360da354d57cd8f7b11c84e0fb0be1f9150f52f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b41.attn.mu.bin",
+    "sha256": "d7b2eba7b0925e7c6f02c73462b399039bb2d06b730d12ea1ed7c2799bb7cb38"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b42.attn.aq.bin",
+    "sha256": "4839226574eb4c8fbb1d9d915ba43407b159fb4bc76d8e021b433ac08820364a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b42.attn.fix.bin",
+    "sha256": "899f7ebda69cb6d3746f0edfd780b2d22b7714ecbc83c6f11bfaf2a507b34447"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b42.attn.mu.bin",
+    "sha256": "f61c3d9e2846889bf138d54353b6fe320e8c56cdeb89e22c137ea5d5272fdced"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b43.attn.aq.bin",
+    "sha256": "b0748398d143e26b1939e214ba0b425ee02dfebdf6942b151561150a170b4d7a"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b43.attn.fix.bin",
+    "sha256": "4e591655819d52a12d39079d0c72ab03a54dc3c0133a86b063b53e828da9ca43"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b43.attn.mu.bin",
+    "sha256": "6fd456370626f80f59f1304b7b8190d482bb58f342cb68e2096ab81a5a9bbd3c"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b44.attn.aq.bin",
+    "sha256": "868cd900334c76dffd40aa1ede11e8177fe107cc4e3fe78544d9fcff62c1f581"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b44.attn.fix.bin",
+    "sha256": "2699f74c1134a78dcc1582724aafe39eebf3f3f2c8b448c46097c8ec545af5a7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b44.attn.mu.bin",
+    "sha256": "03a5d19bf4cd5ac64ae235be2bae890a1c528e9cca815c8205e73e1c38d7ef08"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b45.attn.aq.bin",
+    "sha256": "1850a769325123ddef2dd8ac0c6afd903dfa07170892c6efff3e722950fdd32d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b45.attn.fix.bin",
+    "sha256": "3131d3cafde6292faf366842a92ffb49ad0588d5910502675e73c09e6483b131"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b45.attn.mu.bin",
+    "sha256": "8dd20904e07697de7677c44bfba2bc729ae310e5d409869740ad1504865f7716"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b46.attn.aq.bin",
+    "sha256": "b76369e22c4ac1adf8a845e769bdffe000c21641b6c549448df2bbb58d00e54f"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b46.attn.fix.bin",
+    "sha256": "a45005475be794144546be237f9da93d7a3b75fdbb5571e849d8d8e99d224f1d"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b46.attn.mu.bin",
+    "sha256": "0e7860007c1bb20d9cb3cd9c3b277399aed6f50093adc91e521206920da647e7"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b47.attn.aq.bin",
+    "sha256": "8d23859e2b2f78abc6650989166b1a395a420c7f8a960949de8693cb7461e310"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b47.attn.fix.bin",
+    "sha256": "56b4d66fdc85ff15bb1cf6a5735c1de32bce5ed2057010794998498719ba76fa"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/b47.attn.mu.bin",
+    "sha256": "af0eed2f9d63fd1e670e8a56bc6811b3d16055104b677385b18d940d6d6d45ac"
+  },
+  {
+    "path": "linux/data/int4/rdna4/vit/rot.txt",
+    "sha256": "913f5d1da2feaf4deeccc9e55cbb350a20f12b3f507e87be85dbb77fdd3cb9bc"
+  },
+  {
+    "path": "linux/package/README.txt",
+    "sha256": "e2c3b7ae73e95cf2064dce6d2c4b76d61b44a86372104047bd828637f9dee286"
+  },
+  {
+    "path": "linux/package/install.sh",
+    "sha256": "6ad0b75a50257451bd4c7c3f5eaeffda5becbb0ad5be1aa2a4f03a7d48ad921c"
+  },
+  {
+    "path": "linux/package/lumenite.py",
+    "sha256": "305057fc2b2e2544a72dc02743e313c8d78d2b9b8ca2a040d5b6cf9e9aeda7cc"
+  },
+  {
+    "path": "linux/package/make_ini.py",
+    "sha256": "f36a192ff882cece148a254a7ced1608c8e7aa9c7a117fda81df4c781b9eb579"
+  },
+  {
+    "path": "linux/package/model-tools/descriptor-small.json",
+    "sha256": "417da96c40b4ba72d61b779acebb4be90d9f7924f946b5667085c256558760ba"
+  },
+  {
+    "path": "linux/package/model-tools/descriptor.json",
+    "sha256": "fa8dd12b1ba4047f1b6bea1184a71a8c94b8a9bf3f836bcf97da7e23d953d8ff"
+  },
+  {
+    "path": "linux/package/model-tools/extract_model.sh",
+    "sha256": "ae11e859771a71cd9efdb66034d210459e0008e006962fc703b7960c1d264e29"
+  },
+  {
+    "path": "linux/package/model-tools/inspect_nr.py",
+    "sha256": "9b0e05cc792643847fdb7a9fbc790fbbd7b5c0e4578f1cc2a0f49fb9d9cf5023"
+  },
+  {
+    "path": "linux/package/model-tools/model-files-small.sha256",
+    "sha256": "0d9e8e2500a460270ac14e33583b58fcae5d401b0f0ff22597a51b2aff34ac80"
+  },
+  {
+    "path": "linux/package/model-tools/model-files-small.txt",
+    "sha256": "bf4fcf70da5791d7f6f45ed3ccf3e93ff65588747d42bc097df2110e60dbdd0a"
+  },
+  {
+    "path": "linux/package/model-tools/model-files.sha256",
+    "sha256": "e0bedcd56d7aac5639c71749abb521b08de1a84e86d0ac532d1eae3de5870d56"
+  },
+  {
+    "path": "linux/package/model-tools/model-files.txt",
+    "sha256": "c07dcb2cab91a7270847f60dede38d01e6deb3757afbf2dab3ad203f06757e49"
+  },
+  {
+    "path": "linux/package/model-tools/pack_model.py",
+    "sha256": "7c4c3f314077484dc6a6c53b82b091218712599f4b5105fd22bdf213756f2369"
+  },
+  {
+    "path": "linux/package/model-tools/unpack_postblock.py",
+    "sha256": "c019bd7e4e6fa8ce65e922daea591f0a5ffb9d3806d4f1c250ddfb0f34d67ff4"
+  },
+  {
+    "path": "linux/package/model-tools/unpack_preblock.py",
+    "sha256": "fca425cf388a564d3f478ab6f35e7d2490427af68369e49a7486f135cd27562f"
+  },
+  {
+    "path": "linux/package/model-tools/unpack_splitswin.py",
+    "sha256": "1715f3bd453485745301336d79c9f161be008863bc4c323ae9e67f3577769569"
+  },
+  {
+    "path": "linux/package/model-tools/unpack_swin_family.py",
+    "sha256": "90f11283d20d3c51c1800d9a3a59ef20d4305f1bf6a9997c6a856a10b36ba1f6"
+  },
+  {
+    "path": "linux/package/model-tools/unpack_vit.py",
+    "sha256": "cb7cb0520b743d5d8b2a5e0c4f2cb8e1b80143f4eff4eb034b1ac5d322bdbfb3"
+  },
+  {
+    "path": "linux/package/optiscaler/README.md",
+    "sha256": "027319846a92fc9c3dac9eb2789a3e8e06f2cfe26bd5ea63dd99c09295f98f83"
+  },
+  {
+    "path": "linux/package/optiscaler/extract_release.py",
+    "sha256": "07f5f9e981a502d67095512da8b1920196332c4daaeb48b72e8e1ecc7caed3ef"
+  },
+  {
+    "path": "linux/package/optiscaler/patch_ini.py",
+    "sha256": "ae3c434d297fffbedfd9bfc85cf55b4006801c5c9bf4637f9d7f12b7d2854c83"
+  },
+  {
+    "path": "linux/shaders/control/menu_compose.frag",
+    "sha256": "4e1331e5295ac2dcefad1bc1a0eac737c095f9dfb307ede08402b55ec17f7a8a"
+  },
+  {
+    "path": "linux/shaders/control/menu_compose.vert",
+    "sha256": "6d2e291ccb26540a4d2485a0a62c01cf9b82c803a9f01ef5bdba41435052c274"
+  },
+  {
+    "path": "linux/shaders/passes/include/fsr1/LICENSE.txt",
+    "sha256": "db089274ce766da70f5b7d791029c3486f9f9e27c8c79c652689603d3192e802"
+  },
+  {
+    "path": "linux/shaders/passes/include/fsr1/ffx_a.h",
+    "sha256": "f60e2722fcd13989523b9164d776ab382b3692791767f3bf8bb19967f763f3fb"
+  },
+  {
+    "path": "linux/shaders/passes/include/fsr1/ffx_fsr1.h",
+    "sha256": "93c3922362ea7fc99cbcc698ca30c98de4f8c246d1fbb0b09e015ddef38ce3a5"
+  },
+  {
+    "path": "linux/shaders/passes/motion_estimate.comp",
+    "sha256": "fd47363b60229cf6cff8f779ff5dbb463e5da6e6e058dd84b324f37475c00fdb"
+  },
+  {
+    "path": "linux/shaders/passes/motion_luma.comp",
+    "sha256": "deddfa736c810e93195ea0b8d3579c46edc136168291dfa70fede6ee4b72a846"
+  },
+  {
+    "path": "linux/shaders/passes/runtime_alpha.comp",
+    "sha256": "42139693083ce4caf7bfc5f95a589d9b6d7282e80551804664696097251a9865"
+  },
+  {
+    "path": "linux/shaders/passes/runtime_depth.comp",
+    "sha256": "23383bc5099524883a620c7e820dd4b538d5813074d90f04840af2f26945c01a"
+  },
+  {
+    "path": "linux/shaders/rdna4/attn.comp",
+    "sha256": "5a086bb05dbd2aadde06f0c513202380be4dac048f6f1d6208f0c4b059f4d6d2"
+  },
+  {
+    "path": "linux/shaders/rdna4/decoder_upsample.comp",
+    "sha256": "3b0d997a1387cdf4a26c3d037ddaebb254240f45f122033a919c3aeb2786d50e"
+  },
+  {
+    "path": "linux/shaders/rdna4/ffwd3_t.comp",
+    "sha256": "12f29834b7c1f565c9b306b54b5bbe8a0872fd9fbfd153cf78ae862dbefaeeba"
+  },
+  {
+    "path": "linux/shaders/rdna4/fswin_t.comp",
+    "sha256": "4f26281794193b55514d607f038ccc0c32311b79e74c5221b5339e690fa410fb"
+  },
+  {
+    "path": "linux/shaders/rdna4/gemm1x1.comp",
+    "sha256": "843ee69b498f94eabc76bda6e19918a8280a1074771f49c6d7273e92ef468504"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/attn_qkv_epi.glsl",
+    "sha256": "d3c58e591c4b782abb1678594b8a7dd39f762366ceac1c0ac5e965bbbd1e46b1"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/coherent_act.glsl",
+    "sha256": "2c20818d305450341004cb9e24c191bf290aaba8fa462137df4f880f785c6bdb"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/coopmm.glsl",
+    "sha256": "0bd83899a7f8bc7a8726d62caba513e80bf821ef55e744869fef154e9add2e82"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/fswin_body.glsl",
+    "sha256": "d1da486a8f08d01de93ffaef3b586fac1d5ba149b28b45b0dc7c9acef03dd769"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/fswin_hw_attn.glsl",
+    "sha256": "451cccec4cd71e2929a9c8e83ddc47d6c0de9d62651821edef26391c82c53c12"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/image_input.glsl",
+    "sha256": "57d4244393c6182f23347e24866094b161f51a97f239c2b8700f14823ce999ed"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/image_noise.glsl",
+    "sha256": "29e308e0f9ae7a6fe228b933814fada1167f2706af065e6e403da8add33b05c1"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/nr_chain.glsl",
+    "sha256": "5d5d1d8076f3f0d13115ad4b9aa83f0ec1b9164fca04b955dc0a70dd8d136317"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/nr_prof.glsl",
+    "sha256": "f8f3275deb205773d60ab1ea5996f824f8b0b9dd40cc243331b4019ce74aef5d"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/nr_style_grade.glsl",
+    "sha256": "0cd4f7ea620cfa96896f07b7fba817bfb6456d3bbfa1cef2586f6f21f93d9115"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/occ_pad.glsl",
+    "sha256": "81878d2f80bd6459cc6b0268836a5cc5889646e0a15bc5d407c39be9905fccb5"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/swin_math.glsl",
+    "sha256": "15e25376b2694471da3fad728e12dc188dd98122c2e219867f18eaa8aab51833"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/temporal_history.glsl",
+    "sha256": "c467ff5fe489bfc0b6fa9b1bca742a8216f57606a048a370f9edbc7251eff3fe"
+  },
+  {
+    "path": "linux/shaders/rdna4/include/vit_attn_vt_chunk.glsl",
+    "sha256": "14536bb3d6c22b5386e23cddf1da1111f147ba0772995d16031b98d6a1ba0cf3"
+  },
+  {
+    "path": "linux/shaders/rdna4/noise_field.comp",
+    "sha256": "46a199e1385beac03573a40dc2527e7512763fd33e644290883223299fcb1f1f"
+  },
+  {
+    "path": "linux/shaders/rdna4/pipelines-experimental.json",
+    "sha256": "bc25abc780ad5abe1ace30c6b74425e6bd3958b26715b5cfaa7243c989c256a3"
+  },
+  {
+    "path": "linux/shaders/rdna4/pipelines-int4.json",
+    "sha256": "21d85a45df617b8ee39482a346e828acf8a50a6b6af4943024c0afcbec90f6bf"
+  },
+  {
+    "path": "linux/shaders/rdna4/pipelines.json",
+    "sha256": "7aac4c3f782c086c8cf57faeac974f88cc73eecbe96a9ce8dcb9390d8dc14826"
+  },
+  {
+    "path": "linux/shaders/rdna4/repack_tokens.comp",
+    "sha256": "0606f553ae12e47f8b18b4e97f32b606501be7bed5dbae17f39310fa49dcdd7a"
+  },
+  {
+    "path": "linux/shaders/rdna4/upsample_view.comp",
+    "sha256": "98b7c773a9043f88ce443dbd6111132614ccc0749fdea01aba23e5f7ab8da3fc"
+  },
+  {
+    "path": "linux/shaders/rdna4/vit_attn.comp",
+    "sha256": "00f929cfa53f7404269e135b7e23cf1f643e0c50af11c6cc3fb1245b667d1b9e"
+  },
+  {
+    "path": "linux/shaders/renodx/LICENSE",
+    "sha256": "e9e2da3991a48d9c09b710c9ddbf5673275b6d569c976bcffab3111d0c509d51"
+  },
+  {
+    "path": "linux/shaders/renodx/README.txt",
+    "sha256": "e6999f820aa66fc3e129910dbf8a3c9ac4e22531f2bedded854da46495888eff"
+  },
+  {
+    "path": "linux/shaders/renodx/codec_math.hlsli",
+    "sha256": "69eddf0a29a142491c5ff850ebc40d9ba23e973463b4a990aa851881c27adf50"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_apply.cs_5_1.hlsl",
+    "sha256": "dc659d2d96233d414cb8fd0876fad837c701bc2be7f9eb0f0cda6be88e5fc25f"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_common.hlsli",
+    "sha256": "11ec3c0f454b74b7cc2876ec9d9f82ace81e80e6a47de02ab95c788f0d063172"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_decode.cs_5_1.hlsl",
+    "sha256": "f5386626c521d41f8f297d4aebdc2118caedbeb17bed6238b50db72adeb0a690"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_decode_reduce.cs_5_1.hlsl",
+    "sha256": "8d54d4bf9998b88cd44d536d5a958d10085f6daf8621cffad243c76a195e205d"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_encode.cs_5_1.hlsl",
+    "sha256": "9ec3eeb50d8172d3bd9b6475c5a0a8491e9023cdd8d30904a1ef51c55b3293e4"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_reduce.cs_5_1.hlsl",
+    "sha256": "df72a2bd36c0568dcbe177f924dceeb379835e1bc11c67af16b20928c700ac85"
+  },
+  {
+    "path": "linux/shaders/renodx/legacy_reduce_unshaped.cs_5_1.hlsl",
+    "sha256": "f9453f5180fde65291adf38f176e480e101997ad5e8d01133b7a708218a5a3a1"
+  },
+  {
+    "path": "linux/shaders/renodx/look_band.cs_5_1.hlsl",
+    "sha256": "7450d83dfe4aaf40c9718aeaf39beee625cef4a9424fc07cb169f1e0ed9fb4b8"
+  },
+  {
+    "path": "linux/shaders/renodx/look_common.hlsli",
+    "sha256": "ccade19295d4119b7c5ab9bdb456bd13f7fc538a941e7fd98003f41a41258c70"
+  },
+  {
+    "path": "linux/shaders/renodx/look_compose.cs_5_1.hlsl",
+    "sha256": "42b1ae38283c47221037be0a299be24e299f17f10e22e70dfd098314886e9bbb"
+  },
+  {
+    "path": "linux/shaders/renodx/look_upsample.cs_5_1.hlsl",
+    "sha256": "59a9d660848d1a9a1477f55d60853dd79817f1933cefb0969ee58be2dd785c63"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_autoscale.cs_5_1.hlsl",
+    "sha256": "2581c7c0957b0e40f66dbad0d7a2f6fc1524e2e0c35ac9d988d2624d9d314d60"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_commit.cs_5_1.hlsl",
+    "sha256": "12b648b0e710e69ded595eb103a5d6ac65464b6aa07f320cf5b6c056435b9bb9"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_commit_exposure.cs_5_1.hlsl",
+    "sha256": "85151449e632deba184c24cd2d99dc0602312366a3d0f6417f655598ccfeaf41"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_common.hlsli",
+    "sha256": "272787cb6678ecd2a416afec20601268f8fb548570677d4161e7ab2d6d5e903a"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_encode.cs_5_1.hlsl",
+    "sha256": "a6ee88e03c2ecaddbf2427ea4175ed79bbd1e0859f2b90d95256c733607048a3"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_exposure_scale.cs_5_1.hlsl",
+    "sha256": "cb6b7e38e9a2a657c785c63ce77a9aca427cc30dc4f3c56e1e9adccefe73054e"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_linearize.cs_5_1.hlsl",
+    "sha256": "e56f16d0e5ab5e0f555f7a1e2b9ab7924a5b87e7685fb23ebc1226f8e186f6aa"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_pedestal_reduce.cs_5_1.hlsl",
+    "sha256": "4b6c764e24a687abd65eef648dbc4767588cbb7b095a6641443874eb35a7de38"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_pedestal_reduce_unshaped.cs_5_1.hlsl",
+    "sha256": "51d0b627f1a7e0a0c8742247c2719dfd6a540c5e6bc799a30bbd5e52de1f4c49"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_resolve.cs_5_1.hlsl",
+    "sha256": "1bb59df5575ee733c9b01a465ff145218c228aee16e289a28cde6be40778811d"
+  },
+  {
+    "path": "linux/shaders/renodx/v6_resolve_commit.cs_5_1.hlsl",
+    "sha256": "0ee3f64ae55f8a1b4a281f29fcb71391e65c98341eb7dc7d31045a188af163d0"
+  },
+  {
+    "path": "linux/shaders/renodx/vk_binding.hlsli",
+    "sha256": "000e9c79d467e4eac15860c0033d813519e36196afda38ddcad062fe703a72a6"
+  },
+  {
+    "path": "linux/shaders/renodx-fast/st_apply.comp",
+    "sha256": "823e1e2209f52c11779cd6174ae8f095262e71b6672e24d05ac16102e472f1ad"
+  },
+  {
+    "path": "linux/shaders/renodx-fast/st_box.comp",
+    "sha256": "dff809c3ab0ae3aeba9035eb32d97ff188fc981f6f4ef2d83e3e273b731a55c8"
+  },
+  {
+    "path": "linux/shaders/renodx-fast/st_fb_in.comp",
+    "sha256": "65d7b02320aa6029f8223b531ba5dc5b54f3d32348e715e5a7cad3de35774b5f"
+  },
+  {
+    "path": "linux/shaders/renodx-fast/st_math.glsl",
+    "sha256": "89ca6b890a068984188de8fdf6f42c9ab35d07f711b272f6286d5193c942c146"
+  },
+  {
+    "path": "linux/shaders/renodx-fast/st_prep.comp",
+    "sha256": "ff2529d37af50ed1ee769748710c9065fe3ec435b02f005222bbcb06e4e6539f"
+  },
+  {
+    "path": "linux/shaders/renodx-prep/prep_math.glsl",
+    "sha256": "3b6dc15c28acbaf8d2961d108ea4f56eacdba3f2bb09a57ed30d0346e1d51ce4"
+  },
+  {
+    "path": "linux/shaders/renodx-prep/prep_resolve.hlsli",
+    "sha256": "b581f96d575fa5115489ad9ac708d1a47e979838e530a758c038a10d8ee27100"
+  },
+  {
+    "path": "linux/shaders/renodx-prep/renodx_debug.comp",
+    "sha256": "2e6b123a92d7d3140471c0501cab81c624cc86e46d7fc1802c23fb76e8a50d42"
+  },
+  {
+    "path": "linux/shaders/renodx-prep/renodx_prep.comp",
+    "sha256": "7f83b5e7efb6db435dd4db93e784e1659062668ac189069cc7853ae29d1de94f"
+  },
+  {
+    "path": "linux/shaders/renodx-prep/renodx_prep_encode.comp",
+    "sha256": "1560ab975ab5b116e75628cf3041a0fa844a6dd567ff220ed75648866652c101"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_autoexposure.comp",
+    "sha256": "a7d9752826d98227cfca84f8a6c4ee086791b21042b91d68aab69274a8797f54"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_clamp.comp",
+    "sha256": "46046050818b0b7f5ce6a4689946a130a07ea6e0dffc3265cd8cc28c104566c4"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_classic.comp",
+    "sha256": "8784b41cb94fa8d7616d6fd84b8aa618d44411111ad2ecc270a45d08abbe5c42"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_common.glsl",
+    "sha256": "a32c6b4629c98294cd599449bf48e11217b4a04d6629d5459147e46bd60adde9"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_copy.comp",
+    "sha256": "0b8048ac29c3dd583c228be543794a44e57c5083f8d981053aa1286a0ecba955"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_downsample.comp",
+    "sha256": "56f304196b1f31ef345d3037431f588886d5e97bb616055d55a26c2117cdbee4"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_encode.comp",
+    "sha256": "5e913e84b4039c6fafd22fb3d116b2ca9197ce240a5e439c4aebfa4471191e55"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_finished.comp",
+    "sha256": "0f24554e4d59ba12b16c80845b4eb5327ca665116eef94da0f9fe56c3b9a76e5"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_half_copy.comp",
+    "sha256": "d98d1c981ed0e60cde26fd6f2661b5550b6db3275d772d952c041379ea92a0c3"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_hudfix.comp",
+    "sha256": "fc99806722983e422e00f832a3c99923499139012e041ac851ace32bd130973b"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_inspect.comp",
+    "sha256": "b918246ea044b1df1b859ed9920407dc446623724526392117906e2f01003380"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_light.comp",
+    "sha256": "e10ecbe7467163b5eb63a72b47b69762db11dd792de882f1fea81cc63505ee09"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_meter.comp",
+    "sha256": "7c5b5d300f3270fbbf2f094a36cc665266416a26b478e4571d40365ab6e5c11e"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_os.comp",
+    "sha256": "87733ac66a8a8ccfc764141207475113e46f07211b0e1bacca8c2c23a196211a"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_prep.comp",
+    "sha256": "bd0a32e94f3903c9da7eea4ea262e8904b1e1957254cb8ba152f656cede9b5cc"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_resolve.comp",
+    "sha256": "7ed28acf234ae52c418749f082164322e150f9e38abf80793caf06a4d5f0d081"
+  },
+  {
+    "path": "linux/shaders/wilsjo2/wilsjo2_spatial.comp",
+    "sha256": "e9691da97f0e7243e59a084333e4272a67b5a15a8d7532191127c3e584b881f0"
+  },
+  {
+    "path": "linux/src/core/nr_activation_lut.hpp",
+    "sha256": "cf289d3fed9bba211fa5b7b49e0699aa2eaf168c4c180f654acb8f4806def193"
+  },
+  {
+    "path": "linux/src/core/nr_build_cfg.hpp",
+    "sha256": "d86a3ab80634b7a51fde853e9acd6c0364ca8c00c9427de912b8b2618ab90902"
+  },
+  {
+    "path": "linux/src/core/nr_control_shared.hpp",
+    "sha256": "0018b5c89ca5bebb0a7431ad52abd98f8c873e0c9f6bb7f0dfb2dadaf43828a5"
+  },
+  {
+    "path": "linux/src/core/nr_device_features.hpp",
+    "sha256": "89f8f0d64d6e2d3ee5342391954779800f53236f0434a01132a819601fe4a37e"
+  },
+  {
+    "path": "linux/src/core/nr_fast_passes.hpp",
+    "sha256": "a65e73a73753a53f81d69671e2407ddfab5a8a5fa643d532597247d1519645ab"
+  },
+  {
+    "path": "linux/src/core/nr_frame.txt",
+    "sha256": "7e00807181c1f8ad62abe64087cb65a3993ec25f45d423e4c3def48e27c1cb80"
+  },
+  {
+    "path": "linux/src/core/nr_gpu_completion.hpp",
+    "sha256": "2ab1231a0aa992dd4acb3f4f5391551da0a8129756e7105946c754942098820d"
+  },
+  {
+    "path": "linux/src/core/nr_graph.cpp",
+    "sha256": "b16d4dc8633bff5cc0a1770371c2df53843be84a265c0561443876ce7c344475"
+  },
+  {
+    "path": "linux/src/core/nr_ini_int4.hpp",
+    "sha256": "615a400a332aed1a715b5df32cf1a301ed3fa602fc68069be692fb06473e6e36"
+  },
+  {
+    "path": "linux/src/core/nr_ini_network.hpp",
+    "sha256": "980a7c4fd1956f35c1b18a02d505aad01b6ab0ec0531b480f04e6992cd94fb7d"
+  },
+  {
+    "path": "linux/src/core/nr_input_check.hpp",
+    "sha256": "344840dd9c2169a2facbd120932574bdc9775db3321f9eca77c16aeece8c358c"
+  },
+  {
+    "path": "linux/src/core/nr_log.hpp",
+    "sha256": "67bfbbb4d55ec64937210ab43401fbf2ed9d6caf277d6a37cb71306e8c42b73f"
+  },
+  {
+    "path": "linux/src/core/nr_native_plan.cpp",
+    "sha256": "533ed89baef86344e317ab505646e414633ec0d63357b45a6bce619c5ca9341f"
+  },
+  {
+    "path": "linux/src/core/nr_native_plan.hpp",
+    "sha256": "5137de2a2a227de7de16bef1c657b904a09b85c4464e4026df13b8abeaa58c0b"
+  },
+  {
+    "path": "linux/src/core/nr_native_plan_data.hpp",
+    "sha256": "e7327c0615a46ef94762e41ea4919c60c3f029f0b90e58b603e879ca8ce1f4ad"
+  },
+  {
+    "path": "linux/src/core/nr_native_plan_data_small.hpp",
+    "sha256": "b3ca6c1774fe46cf7ce2d852ccfe3d819dd1a3f43d1989b3c20f655782577e5f"
+  },
+  {
+    "path": "linux/src/core/nr_number.hpp",
+    "sha256": "8c720c559c3170fd676f5a421d2443208470f16c0c19a033109ff5f7cfb715c3"
+  },
+  {
+    "path": "linux/src/core/nr_renodx.cpp",
+    "sha256": "29efa70cd782d3468f1358f331bdd2d5b15a8440b9532374f451b2a7bf4b58e3"
+  },
+  {
+    "path": "linux/src/core/nr_renodx.hpp",
+    "sha256": "01384f49f5561b8d88e2f88157ee282b9c538565798cebf21e3062b6b6ce7e00"
+  },
+  {
+    "path": "linux/src/core/nr_renodx_keys.hpp",
+    "sha256": "4497ba17eef2cb7a1189dea980ec0496b294ba97a1856b92e40f06d3fd49db1d"
+  },
+  {
+    "path": "linux/src/core/nr_runtime.cpp",
+    "sha256": "70f192b6ab093fa231eac5cfa0c2ec127e7932c31b61641834fba467f740cb3a"
+  },
+  {
+    "path": "linux/src/core/nr_runtime.hpp",
+    "sha256": "377f578a5942da3cbc0c7275b7d5156338e07ac076dd57439150f6597b5375f5"
+  },
+  {
+    "path": "linux/src/core/nr_runtime_dispatch.hpp",
+    "sha256": "13f40b179dfc53811ba98c1136df16a63f2fdee127651d578514fde803d3612c"
+  },
+  {
+    "path": "linux/src/core/nr_shader_manifest.hpp",
+    "sha256": "71c8951e183e4fecafa79014686aa717b93beb71567ad31b8dd7ee63fda851f6"
+  },
+  {
+    "path": "linux/src/core/nr_vram_tag.hpp",
+    "sha256": "7f08e3a249af25e89afaca65eee85819b1f688452ef4df748cac1ce9c66d7b9e"
+  },
+  {
+    "path": "linux/src/core/nr_wilsjo2.cpp",
+    "sha256": "b0136d5931b712c00d4c7021960675a1aae8942f9703b43e683a84cfc0fbfe6e"
+  },
+  {
+    "path": "linux/src/core/nr_wilsjo2.hpp",
+    "sha256": "3916182cba3215fa23168e62da72411fa2eca820713aeda90765ee9d8205778b"
+  },
+  {
+    "path": "linux/src/core/nr_wilsjo2_flow.hpp",
+    "sha256": "c231b7e5067135d193dd0ccf6a083ac6bf3323874b0dbab74eac000ab148bdd0"
+  },
+  {
+    "path": "linux/src/core/nrvk.hpp",
+    "sha256": "2252034ac3fd13189c2f9aefee683f373b013ceee992928a73f69b8c39b4a348"
+  },
+  {
+    "path": "linux/src/core/renodx/LICENSE",
+    "sha256": "e9e2da3991a48d9c09b710c9ddbf5673275b6d569c976bcffab3111d0c509d51"
+  },
+  {
+    "path": "linux/src/core/renodx/codec_gain.hpp",
+    "sha256": "0fd86d5637086c77cef0215763c50c9171e23f6cbcc3c260bdfe9c3bcf82b4af"
+  },
+  {
+    "path": "linux/src/core/telemetry.hpp",
+    "sha256": "9c0f9d9f791aaed5fc52280a81aa55ac976ce76d5f3b5a0db5df8fb9a897fb2d"
+  },
+  {
+    "path": "linux/src/core/tinlayout.hpp",
+    "sha256": "f3e30cdca8b31ac13c982178dd0fdfa399c4cd3432df0a3a6be484ba68f6b8cc"
+  },
+  {
+    "path": "linux/src/layer/VkLayer_dlssnr_int4.json",
+    "sha256": "86e659e28e9c57c2fcb9a898258b528f719ec377dcd9930fc304c19cb7e0e2d6"
+  },
+  {
+    "path": "linux/src/layer/nr_int4_layer.cpp",
+    "sha256": "e24f4de3fd88222c63040942590a3e7403cb9bff81cbc96662aa9f98921a51e7"
+  },
+  {
+    "path": "linux/src/pe/mingw_d3d12_compat.h",
+    "sha256": "d657e36f5032da6334c0580208cb68e7b9d96ad28c502f0b596a7611acc5f8ae"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_hudcap.cpp",
+    "sha256": "2ab312e166a13f98722f7610fa59c021786414ccc5b26bd13e8178beed1f2662"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_hudcap.hpp",
+    "sha256": "59eba2b3b5f93f15758e9bff089972208a8bfbe0c3dd169ae814cd39333d9381"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_main.cpp",
+    "sha256": "fa1c2d59616846480bf75ff4f1b25749dce8dce5a378430ce376f8a1558225b1"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_wilsjo2.cpp",
+    "sha256": "dfe933e978e22ee72d9152d0323b4510289e9ee216ae724d866402010a8308a7"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_wilsjo2.hpp",
+    "sha256": "607d2815a7e2107a8fbb42e2a2ebbd905103d9f7a2b78bb99b53c1ef474792b4"
+  },
+  {
+    "path": "linux/src/pe/nr_asi_wilsjo2_vk.cpp",
+    "sha256": "ca6934633f7f926a77de82f5acb8244cd2de8123bac774bd9f6c1f1ed1b9793b"
+  },
+  {
+    "path": "linux/src/pe/nr_dlssnr_forwarder.cpp",
+    "sha256": "1e7e8286b55990a0ecb507681d6bab15ba1a99835354ea316aadf8351c902c94"
+  },
+  {
+    "path": "linux/src/pe/nr_dlssnr_model.cpp",
+    "sha256": "fffb226923a0b640209e32abe7bcfe7076d771e5127e4cddf018b90bee70af90"
+  },
+  {
+    "path": "linux/src/pe/nr_dlssnr_model.hpp",
+    "sha256": "6d678aadd0aedaad363ae65e0532b385d0988b1f24f0bc8c3185f114e1aa3a5b"
+  },
+  {
+    "path": "linux/src/pe/nr_engine_panel.hpp",
+    "sha256": "f54ba3ce5bfb392facad4e14ffbdd44a53e4cfd42d7a239a2c0ce21889e77ef1"
+  },
+  {
+    "path": "linux/src/pe/nr_hud_capture.hpp",
+    "sha256": "65c7dff8eb33b8da72cbfa87c50a92c7a4dd1f31cdb617956a28c9631bbaeb25"
+  },
+  {
+    "path": "linux/src/pe/nr_ngx_abi.hpp",
+    "sha256": "df62293a1205e1030cd7e507780df280d6597ef7cdfbacf8345aaf8ff062067d"
+  },
+  {
+    "path": "linux/src/pe/nr_ngx_core.cpp",
+    "sha256": "ec45062e90d120c1ef41851a29896c75ad4bcd1c081256aba51b19c26df1f4b8"
+  },
+  {
+    "path": "linux/src/pe/nr_ngx_slots.hpp",
+    "sha256": "5bba0f981a93d2eb9d73ccaf8dc8f7d5a19fcea1fc7f2d69e40ba15427efa52c"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_config.cpp",
+    "sha256": "00fea1f422d85b25175fa0803de9043afdd6b4f924b827725b5917f8008642ab"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_config.hpp",
+    "sha256": "3f4e9357136d7953f029c9a92d387ecbc3227756a8d1d557c5e9451a3b3322f5"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_control.cpp",
+    "sha256": "06252308277ac7f428739dbe22211a05aab272fe7b079e5d1ea0a6fdd2316a08"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_control.hpp",
+    "sha256": "37e78f5fa01a6091d939f1dd3467c0d79e83c3690d038e0447a378aaf6add31f"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_events.hpp",
+    "sha256": "f90adfde18fc023023c7aa1c8f29eea6ab20e0af986e0f28f493bdcbcbfe7d1b"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_interop.cpp",
+    "sha256": "e683b877822a6aff41ef08a5ebe7ec4e635fcc39f50a9afcd33462882a814214"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_interop.hpp",
+    "sha256": "65c0048665326928a9449f54c255c6fdfbe3f22519029264569c110f95cab27b"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_log.cpp",
+    "sha256": "8ce2f50486e72b8d4b75ca1302999fcb9f1ee2e7190ece6c5fc37f998d970612"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_log.hpp",
+    "sha256": "58b0068aca73d2c0998a5b05341332e4fd4b926326bb49151a553e5dfbddd704"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_menu.cpp",
+    "sha256": "d8ec478e9fddd05493e10856be7bd66d20e21fb3d3f611f43442b599946861ff"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_menu.hpp",
+    "sha256": "8e02a2723e60088bca4c14e82388f0e09a197bae8c5deae8ccfcebee512aa451"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_menu_vk.inl",
+    "sha256": "47f0df17a0ae98684108e171e7bc6cb95aa2a06138d315d10ad52ea4993c6283"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_optifix.cpp",
+    "sha256": "719161f4e95a7232fddacbf3aeba40648c9efdf356622763e813b9fdb962677c"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_optifix.hpp",
+    "sha256": "6256cd5b7d9550ad0f2345cbeac78a09b5d11f65f8856d13d06f9034758ecd88"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_renodx_route.cpp",
+    "sha256": "cafc370ba7634a622416dcfbb6d2ab31071ea5103bebfc0514c839abf5d8b8a6"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_renodx_route.hpp",
+    "sha256": "d044d7200248186809ac3a0cbd4ac95c8cb287ade5d8336ab83d5cbd760d90aa"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_session.cpp",
+    "sha256": "4fa7fbd93440df86db14c12321440264c05f858b1a86c60bd7ca9357b56f8f92"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_session.hpp",
+    "sha256": "a5604972a04bf42dbdb1d586c4b06fbd538cb39cdbcb61ed4d464415d6e0cd77"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_vkdevice.cpp",
+    "sha256": "343c3e9ea9407761717806dca7ec87410b3b0971e12038ed3406d1c13e3b79ab"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_vkdevice.hpp",
+    "sha256": "c2ea66cc2558e22bb3932fb358d25b6ef89a36b7d409eb9307de433024ecf4d8"
+  },
+  {
+    "path": "linux/src/pe/nr_pe_watchdog.hpp",
+    "sha256": "cb25dda5b719f4aafd09850705bba313e4aabf0a8986c74537f6e71f8f3c6ebe"
+  },
+  {
+    "path": "linux/src/pe/nr_present_cadence.hpp",
+    "sha256": "db0a7d7261bd3c8b6b5c42c8442f6c850789e77dd47a1d4be5fb4e9e912780a6"
+  },
+  {
+    "path": "linux/src/pe/nr_present_probe.cpp",
+    "sha256": "12cdaf095d107cc611e14be66239b99eadf6e405426494ce7b621955cf6abac3"
+  },
+  {
+    "path": "linux/src/pe/nr_reshade_addon.cpp",
+    "sha256": "22a81a3f813b40909de9fa56ce13304d5bcc95f31b80fd0b7fcb52e8133c3996"
+  },
+  {
+    "path": "linux/src/pe/nr_screenshot.cpp",
+    "sha256": "043a437bffb4adc28ae028bef154a458c6860ed07ba0e73231e39f01b3cfb1dd"
+  },
+  {
+    "path": "linux/src/pe/nr_screenshot.hpp",
+    "sha256": "a7b4c931169000646aa734764f81a820a3ad7b1681a4118339aaa1a03f94c35d"
+  },
+  {
+    "path": "linux/src/pe/nr_test_fault.hpp",
+    "sha256": "dfc9888e9d5d3afd197e4a3ec7e1f2b7afc5527c40dc007de4bd7401e409d2cf"
+  },
+  {
+    "path": "linux/src/pe/nr_vk_receipts.hpp",
+    "sha256": "7856df661f715ef36b310324c9858467c89857dc84d884ff56e8a2cdef4d1f69"
+  },
+  {
+    "path": "linux/src/pe/nr_vram_ledger.cpp",
+    "sha256": "0954ebce38d226c2cef63b9003a33c3663e4d0d7b1bfdb856292487376f28261"
+  },
+  {
+    "path": "linux/src/pe/nr_vram_ledger.hpp",
+    "sha256": "04ea57679cd5bd46e45fe7afac9f6204a04f23f15584e6980f4b5f1250370d2d"
+  },
+  {
+    "path": "linux/src/pe/pch.h",
+    "sha256": "bf02eb01ae58249aa1f74b0eb50700fcb2318921460be8d4366c0eff4176c71a"
+  },
+  {
+    "path": "linux/src/pe/reshade_compat/Windows.h",
+    "sha256": "a5912ff5dd5445bf6952988bcb2fa5dfe1cf86148f3e78558a2fea8c8bfd041e"
+  },
+  {
+    "path": "linux/src/tools/nr_int4_weights.cpp",
+    "sha256": "d74f2bdb3df039ae2ced1565e9553469fd156873e41e90d3a8fd2f942fd74ef2"
+  },
+  {
+    "path": "linux/src/ui/nr_control_pages.hpp",
+    "sha256": "a59e541b2cfba99a540042857bd6f04a47b5c61531d2abb8541fd6b8ea11ffdd"
+  },
+  {
+    "path": "linux/src/ui/nr_control_ui.hpp",
+    "sha256": "e2ea61d242832d3dd544e2e07f22b066fdc517bb652f4b91dad0c86f0b8e30fe"
+  },
+  {
+    "path": "linux/src/ui/nr_ini_edit.hpp",
+    "sha256": "c50aeb790e46f3d1c8ff827209a36c5827649796efb05f30a5ff697ef0a1d690"
+  },
+  {
+    "path": "linux/src/ui/nr_reshade_layer_keys.hpp",
+    "sha256": "079562a1349ac2cfdff1b6161c36a2cb55405569c25e84142e471331693ba098"
+  },
+  {
+    "path": "linux/src/ui/nr_wilsjo2_keys.hpp",
+    "sha256": "b87c3a158d94594e835c12f4485642c351b929a7598f36f80d7041456e5e9fb4"
+  },
+  {
+    "path": "linux/src/ui/nr_wilsjo2_shared_keys.hpp",
+    "sha256": "cd50d630d4c1a009cec23489172e107f1db861f621fe2948efe972c8f417d24c"
+  },
+  {
+    "path": "linux/vulkan-loader/patch-local-override.py",
+    "sha256": "fdb3c654ffa6adb5fb4e2eb83a26e99fbfffd9fd6a0ec34624dbe9284c5f0753"
+  },
+  {
+    "path": "linux/vulkan-loader/patch-no-dxgi.py",
+    "sha256": "b237dbd9e2394713d1a8916aa257d4b3296d3b3945080e8bc31578a3a73068fb"
+  },
+  {
+    "path": "linux/vulkan-loader/patch-queue-info.py",
+    "sha256": "9d5007d57f500cd0da6f6cf64162991b0ca6470568b1a70d6dfa19f36ed46fc4"
+  },
+  {
+    "path": "linux/vulkan-loader/toolchain-i686.cmake",
+    "sha256": "d26f6044f57797aff3751b6aa3ac1565a22d1788afde48a5577ade34d6b3420f"
+  },
+  {
+    "path": "linux/vulkan-loader/toolchain-x86_64.cmake",
+    "sha256": "0419b7db9d0fa296d41201da8dbc406adcbdcc2fc7fb8153217bde15c9785201"
+  },
+  {
+    "path": "linux/vulkan-loader/vulkan1_forwarder.c",
+    "sha256": "ddc0d092fb78d11c67610f0490d531c763c8a5229ead20cadfc8f9b3fa58cd3a"
+  },
+  {
+    "path": "linux/vulkan-loader/vulkan1_forwarder.def",
+    "sha256": "dd4f7ea3f3ab3497b2ef0f6f76b9840b3d453a42448bb815d72efb80ad5ad2ba"
+  },
+  {
+    "path": "linux/vulkan-loader/winevulkan_forwarder.c",
+    "sha256": "66bb9f882424310dfe721ed897e0b8dd92ef6b76e1b312b268bc5bf3d480afee"
+  },
+  {
+    "path": "linux/vulkan-loader/winevulkan_forwarder.def",
+    "sha256": "39af4a879d445241ea261e15acfbf10c06dde1597f162e4831681347216a374e"
+  },
+  {
+    "path": "windows/build/arch/rdna4.sh",
+    "sha256": "52ce3ce1737095ddb7dd91684a9ca3389842aaa743f35a803262709330fecd50"
+  },
+  {
+    "path": "windows/build/assemble_product_data.sh",
+    "sha256": "8bc8857fd903c0725e11c3dfe070221b3dff6504a071adbe6dc2356289b7a475"
+  },
+  {
+    "path": "windows/build/build_network.py",
+    "sha256": "68354df41249039e1b25bc20d2cb5720e04f474ae6500cc3f34813c4c889f19d"
+  },
+  {
+    "path": "windows/build/build_optiscaler_nr.sh",
+    "sha256": "af3093522e60bd38fdf77d4b07f978d20e20896c4e01398b68bfa0a645672bf7"
+  },
+  {
+    "path": "windows/build/build_package.sh",
+    "sha256": "7b6544bc72ece3abbd11b61b15d98a8b8696f12b6591f116198f7741eebcb72d"
+  },
+  {
+    "path": "windows/build/build_renodx.sh",
+    "sha256": "2496fa77ef9c00a2527d3c136e8203662d272f1b0616ddab7add84da3e202a0b"
+  },
+  {
+    "path": "windows/build/build_vulkan_loader.sh",
+    "sha256": "36d8980916b6af5dc7868c83543884474086078334916601ee696cbed9e50596"
+  },
+  {
+    "path": "windows/build/generate_device_chain.py",
+    "sha256": "e292d43e229878a98e1cdd9e7ae9b69df85538b4c20e0c9b40ed8a1b7a4d2fd4"
+  },
+  {
+    "path": "windows/build/quad_quant_glsl.py",
+    "sha256": "68e05fe0b7795dd5ec5b46aa35fbef2b39d34a69c84a040bb689e8551a852d08"
+  },
+  {
+    "path": "windows/build/spirv_precise.py",
+    "sha256": "99513591a4203fca777a2cbb698416cb54091a21d2029d6b27b39ebdc75672ca"
+  },
+  {
+    "path": "windows/build/unroll_glsl.py",
+    "sha256": "f46f9b9b8482826d25b5577ecf9a36b78dba28e9595a0f46d3646434441e2f4d"
+  },
+  {
+    "path": "windows/build/version.sh",
+    "sha256": "ae62dcc5a16707254af530427d9b7215ee5544daad8ef0225a3cd5ff715784ce"
+  },
+  {
+    "path": "windows/data/aco/int4/records/0401a3f73822ebd4.nrp",
+    "sha256": "5fe5f4c2223288cdb092e7861173fb07ddae59c4f0b3ae1242c8a38f0ae721d0"
+  },
+  {
+    "path": "windows/data/aco/int4/records/05a24ec73dacc552.nrp",
+    "sha256": "c7cb96933af624b86f7b38a51b9a01c189b122dd53d178dba6264a6aa7c59458"
+  },
+  {
+    "path": "windows/data/aco/int4/records/0bd6ef5056a9272e.nrp",
+    "sha256": "1d09595402600ee02d8dfedff96c3ae5fc6d62a864d92c5fae7507e8adba86fb"
+  },
+  {
+    "path": "windows/data/aco/int4/records/0ce5f9fec200145d.nrp",
+    "sha256": "273bbda70b432a283104f8d96d347f1ee28b188f5ca9c9ffbd4e3df9de91ed23"
+  },
+  {
+    "path": "windows/data/aco/int4/records/0f3bacdf885335ba.nrp",
+    "sha256": "f6e3c7c86ba3d516bcd917801c4964ae419d97f89232b33bdba1ef920ff41730"
+  },
+  {
+    "path": "windows/data/aco/int4/records/11c230e9c49594f9.nrp",
+    "sha256": "13459536a4a917ad5a21a255a67c4b38b665cf57a022def2df836cf4acc9d5b3"
+  },
+  {
+    "path": "windows/data/aco/int4/records/1521eab08271d0f8.nrp",
+    "sha256": "c26c7d51fb576d6606795e9cd2d2eb78ebf0d9d13c43279a48a45a420de2b049"
+  },
+  {
+    "path": "windows/data/aco/int4/records/191b6c179065a652.nrp",
+    "sha256": "6fbe89f6e62dc8817e2ecfe4ed3caef4f22627f515fbac3780e5904a056e88e9"
+  },
+  {
+    "path": "windows/data/aco/int4/records/1b43601f61e3cba8.nrp",
+    "sha256": "f09301de082593bed780af7f8acb83adf88bae76d9e6beb2489045b90b1453b1"
+  },
+  {
+    "path": "windows/data/aco/int4/records/1c8ae32a756aed98.nrp",
+    "sha256": "121fbee4d773944ddff996082bbf6cdf7b8417e58f8183185dce1c5294d223bb"
+  },
+  {
+    "path": "windows/data/aco/int4/records/209d440f0f2abc1b.nrp",
+    "sha256": "3eec97d7e622247432a4a0e0fa85dc6613c29e37ecc0d5383a35baac81f5e28f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/23e705c7810d635c.nrp",
+    "sha256": "d675a09ea1a8cd439df09d3a53d7ec137aafb26dca6695d3e953af684e48d5e5"
+  },
+  {
+    "path": "windows/data/aco/int4/records/26228a0dd1bc496a.nrp",
+    "sha256": "b927d0a530395600303f862215501e16e56c7f5816ea2ed4695628ec81b67991"
+  },
+  {
+    "path": "windows/data/aco/int4/records/271b75d18c07ad4a.nrp",
+    "sha256": "d39daeebfcc90246e496e49a93785df056c2fd97a280f6b5990b5c237f0368f7"
+  },
+  {
+    "path": "windows/data/aco/int4/records/2cc6bc17d5fd0b48.nrp",
+    "sha256": "f1d6c471d824ffab2f8d20aedfe8f76b651c2c7764795b2a896ee2d6af4e69a5"
+  },
+  {
+    "path": "windows/data/aco/int4/records/2d190dc551d0d36b.nrp",
+    "sha256": "f7a3d50402e9bdf1d5f80e53c88d07430ddac10b451bfbd29983ef13bbf1eb05"
+  },
+  {
+    "path": "windows/data/aco/int4/records/34a1f23f76d42b2f.nrp",
+    "sha256": "e114bdc7f6fe8621be0633733b0ea885fb0b7e90acec812fd6eacb4c11b49c60"
+  },
+  {
+    "path": "windows/data/aco/int4/records/38a4fa7be1135f89.nrp",
+    "sha256": "9d55635088f696196d13530a852adf83385e97a6c974eed99518b71bb75fadc2"
+  },
+  {
+    "path": "windows/data/aco/int4/records/3a032646783b2087.nrp",
+    "sha256": "81804aa688ea19a17e5a27ef3be4dfd88ab8c25fc65789e806e8c1183bbc1640"
+  },
+  {
+    "path": "windows/data/aco/int4/records/3bf643fc0182357f.nrp",
+    "sha256": "1b9a618fa1d043cda537c5d82b02aebcf3f115eb72ea8799a66b5c46ec26c8e2"
+  },
+  {
+    "path": "windows/data/aco/int4/records/453f258d611dac93.nrp",
+    "sha256": "7c34920f7a35809839341e96a7f6cd06e3d0e20cad6f6ca6aa454a88193da608"
+  },
+  {
+    "path": "windows/data/aco/int4/records/4d0bc431ad1304f7.nrp",
+    "sha256": "89f91b81b054d43e9763c5c383cc844dd1256cfe1d1676ff4b30c09a2438f23d"
+  },
+  {
+    "path": "windows/data/aco/int4/records/5b36dbdf9c3144b8.nrp",
+    "sha256": "7ee9a9bbd407e5ba42ba510b742e0bb3936117e882b1dcdaccbb3128f9f506ae"
+  },
+  {
+    "path": "windows/data/aco/int4/records/6291e9c7853dae3f.nrp",
+    "sha256": "0acf7baa79d1f28d3e3120f2c524282f8d96347d189e0454ebc458d138785c64"
+  },
+  {
+    "path": "windows/data/aco/int4/records/640b7c2e989cd1a5.nrp",
+    "sha256": "8abbc93b9a2b3b41a204f12675e8aada138a818ab763bf3d9d0cd2d6c2ee9d42"
+  },
+  {
+    "path": "windows/data/aco/int4/records/65c655c35b29e9b8.nrp",
+    "sha256": "790822aa6e3d976450add08a09644936421bb080900002b0e8109327bc2efcfb"
+  },
+  {
+    "path": "windows/data/aco/int4/records/65c6a55c752c619e.nrp",
+    "sha256": "617b2094730b1fd9f6a765686425a5f0d11ef856a03bb3eebfd7dba7d22cd4a1"
+  },
+  {
+    "path": "windows/data/aco/int4/records/685c0581b22885d8.nrp",
+    "sha256": "b48f39f70ff4e67bde9963dd54dd9dac211b9c0ca835d330596d946b529e092b"
+  },
+  {
+    "path": "windows/data/aco/int4/records/6d71d6d4b52e2c2d.nrp",
+    "sha256": "d303a670b68d7987ca6faba35b259030338c70a015dfad716f09b3d710eeb92f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/7645181bf21ac57c.nrp",
+    "sha256": "180a7c878330211763d91cc7396b652d03fcd34edf4c50045f85639e29fe0453"
+  },
+  {
+    "path": "windows/data/aco/int4/records/77fc12a51fc5876a.nrp",
+    "sha256": "ce74f28a2061509adba1a7046b9fc2f2ffc1a35b5cd71c0867e5db5748095ea5"
+  },
+  {
+    "path": "windows/data/aco/int4/records/7e834eae5218ce88.nrp",
+    "sha256": "d3bf01f97c7ad78f7e8bc0ca2e49f650ae13028a1a5f0f2e355cd8004e6dcce4"
+  },
+  {
+    "path": "windows/data/aco/int4/records/8326a938ee855132.nrp",
+    "sha256": "93d40f97df9f4eba7898b82e1717b90ce07a6ae425f02751fa75ea87ea252dbc"
+  },
+  {
+    "path": "windows/data/aco/int4/records/84c4457012fde6ef.nrp",
+    "sha256": "b489b39088cbde9d484f389e387af50ec09343eb93efcee1327b7cd231b6162d"
+  },
+  {
+    "path": "windows/data/aco/int4/records/8a91ab73352799e7.nrp",
+    "sha256": "c72087f2acb479648be120dd0e12353c24cfe6cae188408ad2079edc7a56347a"
+  },
+  {
+    "path": "windows/data/aco/int4/records/8ce605d0cc4a9e52.nrp",
+    "sha256": "5b18ed1ff95fdf9bd322e2906d0ede7ec492f38cfc2529b9309c73f87b800064"
+  },
+  {
+    "path": "windows/data/aco/int4/records/961ca3a350b6b064.nrp",
+    "sha256": "8fdc23a384295a990acbbafb2b77cd5f90695677908f8bd1ab40ddaad7021cb9"
+  },
+  {
+    "path": "windows/data/aco/int4/records/97174de7ced214b0.nrp",
+    "sha256": "e38b788eca09cda84c056b25d85ff32a079dae414c966f9d477bf668b576ed2d"
+  },
+  {
+    "path": "windows/data/aco/int4/records/99b8b3cb85e8b743.nrp",
+    "sha256": "ba5efd4b6c7bef3c6dec0f5952fc6cd4124b77b92073069477008fa06d9cfeae"
+  },
+  {
+    "path": "windows/data/aco/int4/records/9a5a4f3e8e96c5e6.nrp",
+    "sha256": "1e3897f2878db1c1c31f62c48c07823f71118b7c7f25c0caec6e9607e0ac399a"
+  },
+  {
+    "path": "windows/data/aco/int4/records/9c0501011456830d.nrp",
+    "sha256": "08e9a1807fcf5b28c164be6deadf83106c5275cefa7c46da3f06f75a3b81b2a4"
+  },
+  {
+    "path": "windows/data/aco/int4/records/9d7787da683bb1fb.nrp",
+    "sha256": "a449a9001ca31457bd5178be184a035288fa49ff7bfbc5349bfe0cb4fa2a0a9f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/9e7ca05cf4553d16.nrp",
+    "sha256": "f672437c1e5397bbd5538962a0e9486ed81c208cf352351eee561c47411c67be"
+  },
+  {
+    "path": "windows/data/aco/int4/records/a75c1374f0e9f530.nrp",
+    "sha256": "aed83e232c17814919cab6f273ec84820068656e9a4df4445fa0e3b0b0e66b42"
+  },
+  {
+    "path": "windows/data/aco/int4/records/a8b0ca43a87b1f5d.nrp",
+    "sha256": "68dda8b9820ae7a56cba2b1c31d828115abe166a4b164054f6ee555b33a8d8c8"
+  },
+  {
+    "path": "windows/data/aco/int4/records/b67eaa29a9185311.nrp",
+    "sha256": "769114349bd31f4e65f6493d8eac0a02da8f5efeef3939c357c1027b7efd6933"
+  },
+  {
+    "path": "windows/data/aco/int4/records/b829cfa5b536da41.nrp",
+    "sha256": "de8755039c95b21b93b24210f3f7a366a7f5dd368d15a05c4fdca79cb2a43b28"
+  },
+  {
+    "path": "windows/data/aco/int4/records/b9e8b38c0b3f5dd8.nrp",
+    "sha256": "f975b6178a7898efe3a0f4e30b30dd0723d29b85e5f18547b8c9c582c406dc78"
+  },
+  {
+    "path": "windows/data/aco/int4/records/bab81efd95afe7d7.nrp",
+    "sha256": "e049804b413a30c4acf8ee4f72326db6f2ae723d3d35df13af19b8a6686b6949"
+  },
+  {
+    "path": "windows/data/aco/int4/records/bcd9a8e070babfa3.nrp",
+    "sha256": "f86eae1bc53c3f18f72d24aff85e02168d681bcec94e052831ad210c1ea037d6"
+  },
+  {
+    "path": "windows/data/aco/int4/records/bdb6ad55674b26ea.nrp",
+    "sha256": "4e22e2971e27a0cefaca306047aef6199b57c30d395033cbf8046ceb163c5e8b"
+  },
+  {
+    "path": "windows/data/aco/int4/records/bffdbc02e2a406ab.nrp",
+    "sha256": "02aa15707914857871883c520403de07924eabe3265418603b895fad9e199d9b"
+  },
+  {
+    "path": "windows/data/aco/int4/records/c4d25daf4ceae715.nrp",
+    "sha256": "9d419ef2246ec148e889d5345f1a5cb680d0eeeffa67a7a4ed5b92a1a6fa73e5"
+  },
+  {
+    "path": "windows/data/aco/int4/records/c69d3d1c64f3f93b.nrp",
+    "sha256": "ba1a36f5a36e921e569a9bd7465c2bee2f049004f57d72829ed9eb7eba8d8761"
+  },
+  {
+    "path": "windows/data/aco/int4/records/cfc631125558b4f5.nrp",
+    "sha256": "2d9df0fe2f8278a0556be089906094acf6a2a0543d0a3e08c76b09d086973fd3"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d103fc21369cf513.nrp",
+    "sha256": "746973400c7648575cac661e350fe3f247b916a75a7e8fd911f1ddefb1748c4a"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d1992a1096597431.nrp",
+    "sha256": "dedd512cb7f53f019a9bfa0f43bd31622936ab1071c6deaa531599e71b8f6349"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d1e9757782569394.nrp",
+    "sha256": "b31fe5974584b199f4eabd0cffbc61e824e7ae18ffdd4b1ad2bf3316ec6ddd58"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d37c39c6bb6283ea.nrp",
+    "sha256": "a1700c89d798ef7b2127f5136337495f728bb0b675e9079f427b996a2bc71dc9"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d408e5e174e5cea3.nrp",
+    "sha256": "b18abcec237d24f9108fa6199c85f4ce233686b348af7a9ba754e743b1ceb2ba"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d4deb21a15baeb8e.nrp",
+    "sha256": "099fda9e49d2c72fd17f3c3154442ae452a0297ee1656f6e5f14f8e2b9188104"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d653b3f490d2640e.nrp",
+    "sha256": "52fa912b59e7fe7f1fe1e3ba62aeb50130d1aea8d03c834e7bbb9e3ddf9d9dea"
+  },
+  {
+    "path": "windows/data/aco/int4/records/d754efa73483c836.nrp",
+    "sha256": "6e9c357b7fb373f00672804a38b7f3cf50bca94abba28f7638aeabb6b5dcb41f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/db7a0a2d3882f91e.nrp",
+    "sha256": "06f2e47ac59ca538c1420dab531701ac3697809b77fa57fddbad3a51dde45d9f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/e4d148943732c2a0.nrp",
+    "sha256": "844d8ee338e64ad90f0d02b8d9f81fc68cc1551b516db5fb421c2dd1137e111e"
+  },
+  {
+    "path": "windows/data/aco/int4/records/e53ddd3ddf6bb8d5.nrp",
+    "sha256": "f7fce6858ad041449131ed52edadf5b63ce6d2a7073cc3d0e851e49beae32f17"
+  },
+  {
+    "path": "windows/data/aco/int4/records/ecd8255d32aa4a01.nrp",
+    "sha256": "72c1d9fa6c9eda6cec0716af460d788aa4b09b80edc20a459c9765df68fb712b"
+  },
+  {
+    "path": "windows/data/aco/int4/records/ed043908eeb94f7e.nrp",
+    "sha256": "44daacff9311e1a23c57b137f23e58ae0fcda9a42dbff94b7cc586adeb5a4bc9"
+  },
+  {
+    "path": "windows/data/aco/int4/records/f1ead854e47b7cc6.nrp",
+    "sha256": "0b1429cfd87f1d01a09b296413646df12d35f2f1827fbcb921bbb52ada39ac5f"
+  },
+  {
+    "path": "windows/data/aco/int4/records/f7064ad41be8c60b.nrp",
+    "sha256": "b43dc5b708d327c4dca7d967bd954f900cf8d0ec75a0d9356996733dd99e4261"
+  },
+  {
+    "path": "windows/data/aco/int4/records/f7aba9aacafa1dd2.nrp",
+    "sha256": "1fd2ba96161e3aa069d03169b2529c203ab54e2699cb0746069667c9d8145480"
+  },
+  {
+    "path": "windows/data/aco/int4/records/f857bc16911ffb14.nrp",
+    "sha256": "39057a9dadbe9b47764620a1ee764473dd9e4eee6c72efd212086b7908a471eb"
+  },
+  {
+    "path": "windows/data/aco/int4/records/f99a8347534f0a18.nrp",
+    "sha256": "a733e01b913938856622a6e2d18b4bdc3b142e8f8813f894a4c9ceab6521142c"
+  },
+  {
+    "path": "windows/data/aco/int4/records/fd132fc31534d6a9.nrp",
+    "sha256": "8c698161a5806f814169c7758dbd4e537b3ab93c2c0e234cbc48c18b345a92be"
+  },
+  {
+    "path": "windows/data/aco/int4/records/fe7321388bc32684.nrp",
+    "sha256": "f56327b13aa351fd6f7d3df6443522527cc09be4f698e69ad847c059064b66f3"
+  },
+  {
+    "path": "windows/data/aco/int4/shell-aliases.txt",
+    "sha256": "7cda25265897117e7e513ba773513401cdff50b9b196a37dc08261d8043f878d"
+  },
+  {
+    "path": "windows/data/aco/records/03aef996aaf9f54a.nrp",
+    "sha256": "360a6bd537ff09bb1da628cfc276dd2cc91d7cdbd4a5436e28686ee804d5a92b"
+  },
+  {
+    "path": "windows/data/aco/records/0401a3f73822ebd4.nrp",
+    "sha256": "f38d24ecb613b6911c0f519065a6754fa9712d62c11041a07159e98cac0979b2"
+  },
+  {
+    "path": "windows/data/aco/records/05a24ec73dacc552.nrp",
+    "sha256": "b03a5dd3113fb8543a9d147f56dd2beb1d3f8c5c1192126206c5a2383e3f796c"
+  },
+  {
+    "path": "windows/data/aco/records/0acf7df46748d5ec.nrp",
+    "sha256": "d387eee141e0a01333e416affc38b8b33ee8764c9b18aa47f0487dec879ae3db"
+  },
+  {
+    "path": "windows/data/aco/records/0d231a01bbc316bd.nrp",
+    "sha256": "b07afb3e77aa6c9b650f0ecef9bdc0f15d5d5860fe01a4583f8bbef84b725758"
+  },
+  {
+    "path": "windows/data/aco/records/1824cf2dd7287efc.nrp",
+    "sha256": "8158db3a87615ce39cd83ce8efc81c09de37a68fea4073e51247553673267a61"
+  },
+  {
+    "path": "windows/data/aco/records/191b6c179065a652.nrp",
+    "sha256": "3608d152820d17dcfce6777ba1d3b5798e94ecbd3bb8e308c6600d2589c51939"
+  },
+  {
+    "path": "windows/data/aco/records/1f3fa643968995ef.nrp",
+    "sha256": "f02a33104b35963e6281d40879d46b44de7dac2faa27bfea0e3cf3ec36647c8a"
+  },
+  {
+    "path": "windows/data/aco/records/23e705c7810d635c.nrp",
+    "sha256": "d675a09ea1a8cd439df09d3a53d7ec137aafb26dca6695d3e953af684e48d5e5"
+  },
+  {
+    "path": "windows/data/aco/records/271b75d18c07ad4a.nrp",
+    "sha256": "d39daeebfcc90246e496e49a93785df056c2fd97a280f6b5990b5c237f0368f7"
+  },
+  {
+    "path": "windows/data/aco/records/399487a02b8aed02.nrp",
+    "sha256": "d9e847ff27b5704725eb0c1d42d684eb798459fb9661270eadc6440675e4fec9"
+  },
+  {
+    "path": "windows/data/aco/records/3bf643fc0182357f.nrp",
+    "sha256": "bb37d252e85a2bcd4fee854d0a7e7007bf94887a50acb6e160e30875875b1f6e"
+  },
+  {
+    "path": "windows/data/aco/records/3ccbc35ad9ececb3.nrp",
+    "sha256": "c10cad101f331ccd500e3778a32aabd783e171e5632ef9c03feaccbee87a194c"
+  },
+  {
+    "path": "windows/data/aco/records/42ee56abf055d7e7.nrp",
+    "sha256": "0836a1037dbe1e0ff2f7c62b92fe0af86ab12c736eb7b1eb00ab4bfa319a812b"
+  },
+  {
+    "path": "windows/data/aco/records/48d26770c4227eeb.nrp",
+    "sha256": "66a933f91b8d928e9d74cec9e53d2c4cafd7c766f83ad3cd703a23f6326d4720"
+  },
+  {
+    "path": "windows/data/aco/records/4d0bc431ad1304f7.nrp",
+    "sha256": "89f91b81b054d43e9763c5c383cc844dd1256cfe1d1676ff4b30c09a2438f23d"
+  },
+  {
+    "path": "windows/data/aco/records/568ce13800d89558.nrp",
+    "sha256": "1848d904e56c7d2abc4bea90d428d9f577753fb285cc12d5f22a3fd6080b5dd9"
+  },
+  {
+    "path": "windows/data/aco/records/5a0671ae3613cfe0.nrp",
+    "sha256": "6b32824fafaa40045a64dd642a6daf5b368fa4f0528bed85a7531e3bb3994d38"
+  },
+  {
+    "path": "windows/data/aco/records/5ab57e05dfef9901.nrp",
+    "sha256": "5a9e8bd8248d279915486ec7b7713ab0cacf0ae076cfb0f976e28cf37fc65a29"
+  },
+  {
+    "path": "windows/data/aco/records/5b36dbdf9c3144b8.nrp",
+    "sha256": "04c14091d05d0093c129836ae53ce4d72cf44bd29344021d75d8780338b0a8ae"
+  },
+  {
+    "path": "windows/data/aco/records/63b7c2a6d79723dd.nrp",
+    "sha256": "aed1f82ff2c98cf2b60ef4f8c251ab0cca35a137cae4dfc81147f34756a5601e"
+  },
+  {
+    "path": "windows/data/aco/records/640b7c2e989cd1a5.nrp",
+    "sha256": "8abbc93b9a2b3b41a204f12675e8aada138a818ab763bf3d9d0cd2d6c2ee9d42"
+  },
+  {
+    "path": "windows/data/aco/records/699a7a1b80d8c93c.nrp",
+    "sha256": "60d5fa7f756ed2049593b8147880c7266696d55516fef94d37686c9787752708"
+  },
+  {
+    "path": "windows/data/aco/records/6ee4eaf741ee90db.nrp",
+    "sha256": "9f14303b3f94b933a89931bc11cf5ddc3e2cd6eb4c8937ae8b4213f8e066bf37"
+  },
+  {
+    "path": "windows/data/aco/records/70dcbb254afae32b.nrp",
+    "sha256": "e56383e1fb94c82c542a0402d4b9544fcdfc97c419eb891580172b395e46af2f"
+  },
+  {
+    "path": "windows/data/aco/records/773d8efe51bf0b41.nrp",
+    "sha256": "cbc6447047d32a178f191fa98ee19b9d4a02f2b24b8b5faaa2dbbf553116b329"
+  },
+  {
+    "path": "windows/data/aco/records/77fc12a51fc5876a.nrp",
+    "sha256": "ce74f28a2061509adba1a7046b9fc2f2ffc1a35b5cd71c0867e5db5748095ea5"
+  },
+  {
+    "path": "windows/data/aco/records/7cbcb6a4dab19e3a.nrp",
+    "sha256": "ec33130ea0e8c837d0b7a5f29f37180070ebf18795a2dd20d4fe63884137bc3e"
+  },
+  {
+    "path": "windows/data/aco/records/8094c187f45650a2.nrp",
+    "sha256": "618fee4dff511c7802760e2d5ea7df088a23d4df284bf12060828e0ba064ebbe"
+  },
+  {
+    "path": "windows/data/aco/records/820e9417845a6e7a.nrp",
+    "sha256": "f8cbbfd2feb414e1b1525fa40367f7842bd608eeb667f909e0336decb8414e86"
+  },
+  {
+    "path": "windows/data/aco/records/846f1b9f35747aad.nrp",
+    "sha256": "e6b87be13c2aec194a3a4c8f1d87ab3b9843130644ea913c96567df4e74c20d7"
+  },
+  {
+    "path": "windows/data/aco/records/93ac870d9c5fa3a9.nrp",
+    "sha256": "48594dc93ace95ab65c1263961dbb03b1a3e2713fbbc91379746c322bfbbe1cd"
+  },
+  {
+    "path": "windows/data/aco/records/961ca3a350b6b064.nrp",
+    "sha256": "3d5289b7e8f3e03748e540eb59001cc2e9d502127468b8c53e26729a82d28620"
+  },
+  {
+    "path": "windows/data/aco/records/96ae7cc20ac7f56e.nrp",
+    "sha256": "91bd3f03bca90c4ce05e01d5381f97abae09dd92a09916bb3c2d43d27ae0b47c"
+  },
+  {
+    "path": "windows/data/aco/records/9a5a4f3e8e96c5e6.nrp",
+    "sha256": "1e3897f2878db1c1c31f62c48c07823f71118b7c7f25c0caec6e9607e0ac399a"
+  },
+  {
+    "path": "windows/data/aco/records/9c0501011456830d.nrp",
+    "sha256": "042ccbfa9df512f8e585255806497e1c0b5737eba6f7c2640db9c7a30d20e34b"
+  },
+  {
+    "path": "windows/data/aco/records/9e7ca05cf4553d16.nrp",
+    "sha256": "44caad76c8d2542d16857cd418292c675905661bf38fe37a06bafbbfb10756c0"
+  },
+  {
+    "path": "windows/data/aco/records/a05da2a11b2369db.nrp",
+    "sha256": "6fad35b8cf94d047dce2e2a345f58627533c6eed594b81b437f1c979153447d9"
+  },
+  {
+    "path": "windows/data/aco/records/a394ec5059b6fdef.nrp",
+    "sha256": "46e0f9b422244eaee1541b89c80585075782ae3dace4b049dda824717bed0cc6"
+  },
+  {
+    "path": "windows/data/aco/records/a569ebdb55ae39ab.nrp",
+    "sha256": "88b34005b9aa733c8e995ecf795393ced3c013411eb45440c84559fbfb0e0c12"
+  },
+  {
+    "path": "windows/data/aco/records/a8b0ca43a87b1f5d.nrp",
+    "sha256": "867e8784c1a44111da216be842ae6e510abd3f6c9dc4c5d4cb9718c7ada8f230"
+  },
+  {
+    "path": "windows/data/aco/records/b00fdd3684a499f1.nrp",
+    "sha256": "ef2b96d2dd7600cfd4ff8cdfc3981121a6814d8151cd841ccc74360fd3f89960"
+  },
+  {
+    "path": "windows/data/aco/records/b1ef84de2cfc87e1.nrp",
+    "sha256": "1deecf3949f929e1c35c7e62d0b2831a3fd9586d279ed90af984667014ac25a2"
+  },
+  {
+    "path": "windows/data/aco/records/b389a30783b4fd8e.nrp",
+    "sha256": "1428069550a75ebc1dd3b114c5a9ae3f9b625adec3a376f03404db45c12fd944"
+  },
+  {
+    "path": "windows/data/aco/records/b67eaa29a9185311.nrp",
+    "sha256": "769114349bd31f4e65f6493d8eac0a02da8f5efeef3939c357c1027b7efd6933"
+  },
+  {
+    "path": "windows/data/aco/records/b829cfa5b536da41.nrp",
+    "sha256": "8846f40163d4218d940b7feda55a18ba5c9567c78b783cacf201b849fa51b373"
+  },
+  {
+    "path": "windows/data/aco/records/bf0a7579978f2676.nrp",
+    "sha256": "6b318d9f5a80156c3eb8fef64b9bdf2c045e3656e3db1f919cde91b6a3509bd0"
+  },
+  {
+    "path": "windows/data/aco/records/c18cf12acd712ec8.nrp",
+    "sha256": "3411fbecf786d58a7318e2c2878b590321a90528f8a499df020441810cc91002"
+  },
+  {
+    "path": "windows/data/aco/records/c198644c44ae4f8b.nrp",
+    "sha256": "b4b9509b0c17b8ff23791ec6698995e7353640541abb3719c3eba5dbd68e992c"
+  },
+  {
+    "path": "windows/data/aco/records/cd1625f92084d55b.nrp",
+    "sha256": "e6f08c3c6f09eb98d775779a052ff19fe509d676aeb21fa90b1fde54ef9c4e37"
+  },
+  {
+    "path": "windows/data/aco/records/cfc631125558b4f5.nrp",
+    "sha256": "7123e39c0e25740acfb8f4c4dcc97527e80c5104ea20b987c14edf67b80fcaa5"
+  },
+  {
+    "path": "windows/data/aco/records/d37c39c6bb6283ea.nrp",
+    "sha256": "a1700c89d798ef7b2127f5136337495f728bb0b675e9079f427b996a2bc71dc9"
+  },
+  {
+    "path": "windows/data/aco/records/db7a0a2d3882f91e.nrp",
+    "sha256": "06f2e47ac59ca538c1420dab531701ac3697809b77fa57fddbad3a51dde45d9f"
+  },
+  {
+    "path": "windows/data/aco/records/dfe6cfe562db9ccd.nrp",
+    "sha256": "f7bc47208ebff795728291639b2bfeee0b09675f521d7cf8bfa2621e2b9bbcaa"
+  },
+  {
+    "path": "windows/data/aco/records/e4d148943732c2a0.nrp",
+    "sha256": "844d8ee338e64ad90f0d02b8d9f81fc68cc1551b516db5fb421c2dd1137e111e"
+  },
+  {
+    "path": "windows/data/aco/records/e53ddd3ddf6bb8d5.nrp",
+    "sha256": "f7fce6858ad041449131ed52edadf5b63ce6d2a7073cc3d0e851e49beae32f17"
+  },
+  {
+    "path": "windows/data/aco/records/e5c897313d3bab71.nrp",
+    "sha256": "93a8db567f6dde2d4baf1cb580d362da277d664ce568240dc074194597cb3c18"
+  },
+  {
+    "path": "windows/data/aco/records/eae2df7e8feaaea4.nrp",
+    "sha256": "8f815841b34c2891977d31877eea585f75319336e14d4581c1b5620203ed24e8"
+  },
+  {
+    "path": "windows/data/aco/records/ed043908eeb94f7e.nrp",
+    "sha256": "44daacff9311e1a23c57b137f23e58ae0fcda9a42dbff94b7cc586adeb5a4bc9"
+  },
+  {
+    "path": "windows/data/aco/records/f7aba9aacafa1dd2.nrp",
+    "sha256": "35bc1df45983a3bfa600ecfccb972899d6c7f7c1e0ee8868b002bb94ff3a1d1c"
+  },
+  {
+    "path": "windows/data/aco/records/f99a8347534f0a18.nrp",
+    "sha256": "e6fc0c331f0b664ad0759c5593e35f205614760516e1edf65e7c0ed3956e3172"
+  },
+  {
+    "path": "windows/data/aco/records/fe7321388bc32684.nrp",
+    "sha256": "f56327b13aa351fd6f7d3df6443522527cc09be4f698e69ad847c059064b66f3"
+  },
+  {
+    "path": "windows/data/aco/shell-aliases.txt",
+    "sha256": "cf42abeda90e5fee9e2ed37b46c85a9b8c7f6560bc5f04051f6d6faa5eeb4883"
+  },
+  {
+    "path": "windows/package/README.txt",
+    "sha256": "304ed014e96d2761e39c3dbfd6a447efd0e85843224c83148f890a7b813762ee"
+  },
+  {
+    "path": "windows/package/install.bat",
+    "sha256": "76970192d373fe6bf1f3ea0a0bd2e14448905c6a0112303fd3db52851df62f18"
+  },
+  {
+    "path": "windows/package/install.ps1",
+    "sha256": "5b9f538af9a05ae577b6a573ef20355c6321ff246290141fc377407ea34da52f"
+  },
+  {
+    "path": "windows/package/make_ini.py",
+    "sha256": "a5a178f0f82bc1133fe65863fef1626ae193f0d58267f87cdb73868360d6c3e8"
+  },
+  {
+    "path": "windows/package/model-tools/build_extract_model.sh",
+    "sha256": "dbc132184037cfe046ad9540b6ba00317d73b174704114e94aa17c2a63a45e61"
+  },
+  {
+    "path": "windows/package/model-tools/dlssnr_extract_model.cpp",
+    "sha256": "475ba19f03346dd48208880d9cffc8780c037a57a3f3aa6fa10ea15f07ca2af7"
+  },
+  {
+    "path": "windows/package/model-tools/dlssnr_extract_small_tables.hpp",
+    "sha256": "14ef95a60538e218e275a050aa795444593d737ecdc150137ef630766ef49f15"
+  },
+  {
+    "path": "windows/package/model-tools/dlssnr_extract_tables.hpp",
+    "sha256": "c40b1540c3d8bb100ccb7cb3e7bb6a113981724c6098f7ae30133626952f999e"
+  },
+  {
+    "path": "windows/package/model-tools/gen_extract_tables.py",
+    "sha256": "8782ac194172a52ad2b4395babf147e962a523282f763264903662b1001f4528"
+  },
+  {
+    "path": "windows/shaders/passes/cascade_blur.comp",
+    "sha256": "e4b9f8b18ad9b8a0f5508d5b04b5bd695725fba639131afa85920779cc105cd6"
+  },
+  {
+    "path": "windows/shaders/passes/cascade_feed.comp",
+    "sha256": "ff4049ff6639fa15e5762aee78cba9805b4673f9841b42637e571bd561eb7b08"
+  },
+  {
+    "path": "windows/shaders/passes/cascade_lograt.comp",
+    "sha256": "39c6fa44456a25da182012500fdc687400e77d45baad29cb961e6372ac9a5065"
+  },
+  {
+    "path": "windows/shaders/passes/include/fsr1/LICENSE.txt",
+    "sha256": "db089274ce766da70f5b7d791029c3486f9f9e27c8c79c652689603d3192e802"
+  },
+  {
+    "path": "windows/shaders/passes/include/fsr1/ffx_a.h",
+    "sha256": "f60e2722fcd13989523b9164d776ab382b3692791767f3bf8bb19967f763f3fb"
+  },
+  {
+    "path": "windows/shaders/passes/include/fsr1/ffx_fsr1.h",
+    "sha256": "93c3922362ea7fc99cbcc698ca30c98de4f8c246d1fbb0b09e015ddef38ce3a5"
+  },
+  {
+    "path": "windows/shaders/passes/motion_estimate.comp",
+    "sha256": "fd47363b60229cf6cff8f779ff5dbb463e5da6e6e058dd84b324f37475c00fdb"
+  },
+  {
+    "path": "windows/shaders/passes/motion_luma.comp",
+    "sha256": "deddfa736c810e93195ea0b8d3579c46edc136168291dfa70fede6ee4b72a846"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_alpha.comp",
+    "sha256": "aa951a7c4e66b37a8acc88f80eadd1f075bc26c31dfba27795be2e231e3d3f68"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_depth.comp",
+    "sha256": "23383bc5099524883a620c7e820dd4b538d5813074d90f04840af2f26945c01a"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_downscale.comp",
+    "sha256": "2128442e72ff6160cc57701a3e42b42b32a68ffeacd0a0e2fb82623689b46b5d"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_encode.comp",
+    "sha256": "184d118ac861ced065d215e8256b5f410cc05d755545696dffe20b7dc3efeb36"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_prep.comp",
+    "sha256": "6388fa0ec32c0ffafdcee250d51bc2dcdbc91f2dd35ae010ca44f6138bf42c94"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_taps.comp",
+    "sha256": "6e30143eea41f50ca41968c7816b9025ec2066c2cc65f6f0e200e6c814423a47"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_transfer.comp",
+    "sha256": "e7e2ba7653a4cc0c1e0f6556896232f1e25bce8276ecd5dd9710bdf575bacdfe"
+  },
+  {
+    "path": "windows/shaders/passes/runtime_upscale.comp",
+    "sha256": "f604c3eb8a3bd77f908eccf7c43b56fd838319aee6caaab429431d34c6d586c3"
+  },
+  {
+    "path": "windows/shaders/rdna4/attn.comp",
+    "sha256": "da0f090c0ad3b1ddec4f169dcb42c0bf32b1826e7bbc8ea2a6ec9ca38f012bea"
+  },
+  {
+    "path": "windows/shaders/rdna4/decoder_upsample.comp",
+    "sha256": "3b0d997a1387cdf4a26c3d037ddaebb254240f45f122033a919c3aeb2786d50e"
+  },
+  {
+    "path": "windows/shaders/rdna4/ffwd3_t.comp",
+    "sha256": "7d7d211166ef69a20eb62dccb21906d019331204938b9318b7a166882961cc16"
+  },
+  {
+    "path": "windows/shaders/rdna4/fswin_t.comp",
+    "sha256": "920a4bac20373844d8e735e622fa8203759162c3c517e38df78b7f3a402eee9f"
+  },
+  {
+    "path": "windows/shaders/rdna4/gemm1x1.comp",
+    "sha256": "7ace760a83dec017b96341dcc33dda1d68ca0a4ba8fda2a86291e5963780ffc9"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/attn_qkv_epi.glsl",
+    "sha256": "d3c58e591c4b782abb1678594b8a7dd39f762366ceac1c0ac5e965bbbd1e46b1"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/coherent_act.glsl",
+    "sha256": "2c20818d305450341004cb9e24c191bf290aaba8fa462137df4f880f785c6bdb"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/coopmm.glsl",
+    "sha256": "3aa76515f1fcc9ab928d2d11660be0c5f40568a2bb19d6d514be0da073d43121"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/fswin_body.glsl",
+    "sha256": "0e0231a1751e15b33b4ad6b2b622677ab1dd5e74392157b62cef08a3845added"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/image_input.glsl",
+    "sha256": "b460b0e0db82dfd52e7ea04515f925c4f6c1b8053cfbec20495dc4ea62b23356"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/image_noise.glsl",
+    "sha256": "29e308e0f9ae7a6fe228b933814fada1167f2706af065e6e403da8add33b05c1"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/nr_chain.glsl",
+    "sha256": "5d5d1d8076f3f0d13115ad4b9aa83f0ec1b9164fca04b955dc0a70dd8d136317"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/nr_prof.glsl",
+    "sha256": "f682fd11e98a5cca66763f23318419310bebf513bc42ca038dacaf861edfb5bf"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/nr_style_grade.glsl",
+    "sha256": "0cd4f7ea620cfa96896f07b7fba817bfb6456d3bbfa1cef2586f6f21f93d9115"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/occ_pad.glsl",
+    "sha256": "81878d2f80bd6459cc6b0268836a5cc5889646e0a15bc5d407c39be9905fccb5"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/swin_math.glsl",
+    "sha256": "69b3b9da75af256a09fe73b593b8f078543449e9fbf26f09b1e281ccf552f888"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/temporal_history.glsl",
+    "sha256": "c467ff5fe489bfc0b6fa9b1bca742a8216f57606a048a370f9edbc7251eff3fe"
+  },
+  {
+    "path": "windows/shaders/rdna4/include/vit_attn_vt_chunk.glsl",
+    "sha256": "6581bdee11438ad12eab5cb52c0a7aba2a7ed57420f30d624b8da53a305afdf7"
+  },
+  {
+    "path": "windows/shaders/rdna4/noise_field.comp",
+    "sha256": "46a199e1385beac03573a40dc2527e7512763fd33e644290883223299fcb1f1f"
+  },
+  {
+    "path": "windows/shaders/rdna4/pipelines.json",
+    "sha256": "373017e7492e85a22dee098a94dcd94d64adde9ab38bf017d71c0bee6caf2708"
+  },
+  {
+    "path": "windows/shaders/rdna4/repack_tokens.comp",
+    "sha256": "4511f76b2a62329eedd121e2cee97cec8e34b6ed3fd14f969bc66f72252b07dd"
+  },
+  {
+    "path": "windows/shaders/rdna4/upsample_view.comp",
+    "sha256": "98b7c773a9043f88ce443dbd6111132614ccc0749fdea01aba23e5f7ab8da3fc"
+  },
+  {
+    "path": "windows/shaders/rdna4/vit_attn.comp",
+    "sha256": "1cf5ef645f15d5af84dc0b68dbddf989eec60b8109baaa887dc697d23bf50d6d"
+  },
+  {
+    "path": "windows/shaders/renodx/LICENSE",
+    "sha256": "e9e2da3991a48d9c09b710c9ddbf5673275b6d569c976bcffab3111d0c509d51"
+  },
+  {
+    "path": "windows/shaders/renodx/README.txt",
+    "sha256": "d726899f359e095176282b67a7159fa24fc1ac983b3aafcc821b7dcb66d51556"
+  },
+  {
+    "path": "windows/shaders/renodx/codec_math.hlsli",
+    "sha256": "69eddf0a29a142491c5ff850ebc40d9ba23e973463b4a990aa851881c27adf50"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_apply.cs_5_1.hlsl",
+    "sha256": "dc659d2d96233d414cb8fd0876fad837c701bc2be7f9eb0f0cda6be88e5fc25f"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_common.hlsli",
+    "sha256": "11ec3c0f454b74b7cc2876ec9d9f82ace81e80e6a47de02ab95c788f0d063172"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_decode.cs_5_1.hlsl",
+    "sha256": "f5386626c521d41f8f297d4aebdc2118caedbeb17bed6238b50db72adeb0a690"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_encode.cs_5_1.hlsl",
+    "sha256": "9ec3eeb50d8172d3bd9b6475c5a0a8491e9023cdd8d30904a1ef51c55b3293e4"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_reduce.cs_5_1.hlsl",
+    "sha256": "0c6c3f69fcf2c7e629ebfc6a31a6c8760abef9cb2d29535a3d04ab1274936614"
+  },
+  {
+    "path": "windows/shaders/renodx/legacy_reduce_unshaped.cs_5_1.hlsl",
+    "sha256": "f9453f5180fde65291adf38f176e480e101997ad5e8d01133b7a708218a5a3a1"
+  },
+  {
+    "path": "windows/shaders/renodx/look_band.cs_5_1.hlsl",
+    "sha256": "7450d83dfe4aaf40c9718aeaf39beee625cef4a9424fc07cb169f1e0ed9fb4b8"
+  },
+  {
+    "path": "windows/shaders/renodx/look_common.hlsli",
+    "sha256": "ccade19295d4119b7c5ab9bdb456bd13f7fc538a941e7fd98003f41a41258c70"
+  },
+  {
+    "path": "windows/shaders/renodx/look_compose.cs_5_1.hlsl",
+    "sha256": "0e0fca96671eae19e7233157f3eceb4ad631eeb588b28dbda848641f39dfd422"
+  },
+  {
+    "path": "windows/shaders/renodx/look_upsample.cs_5_1.hlsl",
+    "sha256": "59a9d660848d1a9a1477f55d60853dd79817f1933cefb0969ee58be2dd785c63"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_autoscale.cs_5_1.hlsl",
+    "sha256": "2581c7c0957b0e40f66dbad0d7a2f6fc1524e2e0c35ac9d988d2624d9d314d60"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_commit.cs_5_1.hlsl",
+    "sha256": "12b648b0e710e69ded595eb103a5d6ac65464b6aa07f320cf5b6c056435b9bb9"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_commit_exposure.cs_5_1.hlsl",
+    "sha256": "85151449e632deba184c24cd2d99dc0602312366a3d0f6417f655598ccfeaf41"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_common.hlsli",
+    "sha256": "60f92d9de0ba77f48b82231dd76a3991218c0875bf237236e7b9cae736a0c3e8"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_encode.cs_5_1.hlsl",
+    "sha256": "a6ee88e03c2ecaddbf2427ea4175ed79bbd1e0859f2b90d95256c733607048a3"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_exposure_scale.cs_5_1.hlsl",
+    "sha256": "cb6b7e38e9a2a657c785c63ce77a9aca427cc30dc4f3c56e1e9adccefe73054e"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_linearize.cs_5_1.hlsl",
+    "sha256": "e56f16d0e5ab5e0f555f7a1e2b9ab7924a5b87e7685fb23ebc1226f8e186f6aa"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_pedestal_reduce.cs_5_1.hlsl",
+    "sha256": "c2845096d4d93b896df12be42228c933435b7c2db62300b1d564ed497372c370"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_pedestal_reduce_unshaped.cs_5_1.hlsl",
+    "sha256": "51d0b627f1a7e0a0c8742247c2719dfd6a540c5e6bc799a30bbd5e52de1f4c49"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_resolve.cs_5_1.hlsl",
+    "sha256": "1bb59df5575ee733c9b01a465ff145218c228aee16e289a28cde6be40778811d"
+  },
+  {
+    "path": "windows/shaders/renodx/v6_resolve_commit.cs_5_1.hlsl",
+    "sha256": "0ee3f64ae55f8a1b4a281f29fcb71391e65c98341eb7dc7d31045a188af163d0"
+  },
+  {
+    "path": "windows/shaders/renodx/vk_binding.hlsli",
+    "sha256": "000e9c79d467e4eac15860c0033d813519e36196afda38ddcad062fe703a72a6"
+  },
+  {
+    "path": "windows/shaders/renodx-prep/prep_math.glsl",
+    "sha256": "49629bad248df32ff75eb451ae57685ccdafaa890476df3abced16120f9a1fee"
+  },
+  {
+    "path": "windows/shaders/renodx-prep/renodx_prep.comp",
+    "sha256": "c1a45a332203e5d6a95e911a6dc2e5c7a0aa6d3207423ce0fa3075c8ee5afff0"
+  },
+  {
+    "path": "windows/shaders/renodx-prep/renodx_prep_encode.comp",
+    "sha256": "1560ab975ab5b116e75628cf3041a0fa844a6dd567ff220ed75648866652c101"
+  },
+  {
+    "path": "windows/src/core/nr_activation_lut.hpp",
+    "sha256": "cf289d3fed9bba211fa5b7b49e0699aa2eaf168c4c180f654acb8f4806def193"
+  },
+  {
+    "path": "windows/src/core/nr_build_cfg.hpp",
+    "sha256": "d86a3ab80634b7a51fde853e9acd6c0364ca8c00c9427de912b8b2618ab90902"
+  },
+  {
+    "path": "windows/src/core/nr_control_shared.hpp",
+    "sha256": "ba9bbe36b77479246579b92e0a18c52f1186b41293746616590d3494ed15c26b"
+  },
+  {
+    "path": "windows/src/core/nr_device_features.hpp",
+    "sha256": "e3677d0efe8900fd3ee4c9fd0403b7469a4127c4a3eb7c478a17fa73a368c291"
+  },
+  {
+    "path": "windows/src/core/nr_driver_identity.hpp",
+    "sha256": "5658bd406a4ce61c869f9ed07324c2776b5f2344cd84de6b60fd706f3ed405fb"
+  },
+  {
+    "path": "windows/src/core/nr_frame.txt",
+    "sha256": "7e00807181c1f8ad62abe64087cb65a3993ec25f45d423e4c3def48e27c1cb80"
+  },
+  {
+    "path": "windows/src/core/nr_graph.cpp",
+    "sha256": "f3e8db92ba029b7587a4888cdf10cc15201cd1c565d97b6e9450c8cc3425df27"
+  },
+  {
+    "path": "windows/src/core/nr_ini_int4.hpp",
+    "sha256": "95ccc7507200f8b7cf42c0b64f85a130e6e8db67780bc3d854f6b5409e123d82"
+  },
+  {
+    "path": "windows/src/core/nr_ini_network.hpp",
+    "sha256": "1a8a7bfe2cf7974e839b7a86e113077af23361bb61d8b37d5556146a3ad0de9a"
+  },
+  {
+    "path": "windows/src/core/nr_input_check.hpp",
+    "sha256": "344840dd9c2169a2facbd120932574bdc9775db3321f9eca77c16aeece8c358c"
+  },
+  {
+    "path": "windows/src/core/nr_log.hpp",
+    "sha256": "735c33066eadbef9eadf064574f2d6adc9a16f097d5638465ac144377c4f279d"
+  },
+  {
+    "path": "windows/src/core/nr_native_plan.cpp",
+    "sha256": "533ed89baef86344e317ab505646e414633ec0d63357b45a6bce619c5ca9341f"
+  },
+  {
+    "path": "windows/src/core/nr_native_plan.hpp",
+    "sha256": "5137de2a2a227de7de16bef1c657b904a09b85c4464e4026df13b8abeaa58c0b"
+  },
+  {
+    "path": "windows/src/core/nr_native_plan_data.hpp",
+    "sha256": "e7327c0615a46ef94762e41ea4919c60c3f029f0b90e58b603e879ca8ce1f4ad"
+  },
+  {
+    "path": "windows/src/core/nr_native_plan_data_small.hpp",
+    "sha256": "b3ca6c1774fe46cf7ce2d852ccfe3d819dd1a3f43d1989b3c20f655782577e5f"
+  },
+  {
+    "path": "windows/src/core/nr_pal_binary.hpp",
+    "sha256": "9bc9f8e4149479783f6ef269483d4d82405a7d21bbfaa303de79490c36477094"
+  },
+  {
+    "path": "windows/src/core/nr_pipeline_binary.hpp",
+    "sha256": "6f314d658b3cae9738c1b6e534428527152368a0ae451144be1f93b808697c89"
+  },
+  {
+    "path": "windows/src/core/nr_renodx.cpp",
+    "sha256": "cf5e23c5e194c9da1959552137da8119466258730377581fd06d6dcd6ef3e9ea"
+  },
+  {
+    "path": "windows/src/core/nr_renodx.hpp",
+    "sha256": "399241b739e4faf659fe605961c6af2fefac79aafee7862b55d3252eac634630"
+  },
+  {
+    "path": "windows/src/core/nr_renodx_keys.hpp",
+    "sha256": "6e5795265e5ea337bafebd2eb0392c527dd2c86f044ad9e4fd3e7108b9a81418"
+  },
+  {
+    "path": "windows/src/core/nr_runtime.cpp",
+    "sha256": "e976ba4b5691b59f92137d51eda347035507e7e9823210ff1fabdc7594af1dbb"
+  },
+  {
+    "path": "windows/src/core/nr_runtime.hpp",
+    "sha256": "868bb25dc54e9a4877a7403efa02d5deddd44ce633b2e3133be9db941c0534ac"
+  },
+  {
+    "path": "windows/src/core/nr_runtime_dispatch.hpp",
+    "sha256": "13f40b179dfc53811ba98c1136df16a63f2fdee127651d578514fde803d3612c"
+  },
+  {
+    "path": "windows/src/core/nr_shader_manifest.hpp",
+    "sha256": "71c8951e183e4fecafa79014686aa717b93beb71567ad31b8dd7ee63fda851f6"
+  },
+  {
+    "path": "windows/src/core/nrvk.hpp",
+    "sha256": "f00c15104f76156ef475b165a738a0d2ccc27033635ce63f6ed671a8882b5015"
+  },
+  {
+    "path": "windows/src/core/renodx/LICENSE",
+    "sha256": "e9e2da3991a48d9c09b710c9ddbf5673275b6d569c976bcffab3111d0c509d51"
+  },
+  {
+    "path": "windows/src/core/renodx/codec_gain.hpp",
+    "sha256": "0fd86d5637086c77cef0215763c50c9171e23f6cbcc3c260bdfe9c3bcf82b4af"
+  },
+  {
+    "path": "windows/src/core/telemetry.hpp",
+    "sha256": "9c0f9d9f791aaed5fc52280a81aa55ac976ce76d5f3b5a0db5df8fb9a897fb2d"
+  },
+  {
+    "path": "windows/src/core/tinlayout.hpp",
+    "sha256": "f3e30cdca8b31ac13c982178dd0fdfa399c4cd3432df0a3a6be484ba68f6b8cc"
+  },
+  {
+    "path": "windows/src/pe/mingw_d3d12_compat.h",
+    "sha256": "d657e36f5032da6334c0580208cb68e7b9d96ad28c502f0b596a7611acc5f8ae"
+  },
+  {
+    "path": "windows/src/pe/nr_dlssnr_forwarder.cpp",
+    "sha256": "3981692be97755e20619324fba448e693e4eedf8524dbda6f8193060a7e9e8d2"
+  },
+  {
+    "path": "windows/src/pe/nr_dlssnr_model.cpp",
+    "sha256": "bbb9d451acea6405793766e6e9ca58f20ce5f65f8d31266db60b9084724f7d4a"
+  },
+  {
+    "path": "windows/src/pe/nr_dlssnr_model.hpp",
+    "sha256": "978238be6ce99c6ad617036ca9aef95ca4030d5cd1988d0f0fc1fdec45d104a8"
+  },
+  {
+    "path": "windows/src/pe/nr_dxgi_split.cpp",
+    "sha256": "d3d988edb0cd0b55c89451ded991b283c0e791336f0dec3bacdc31060d20872a"
+  },
+  {
+    "path": "windows/src/pe/nr_engine_panel.hpp",
+    "sha256": "5328a20f1a708aa70eeefe3117ffee5953caa24bde18a8d54f8a9223e6891fd4"
+  },
+  {
+    "path": "windows/src/pe/nr_ngx_abi.hpp",
+    "sha256": "df62293a1205e1030cd7e507780df280d6597ef7cdfbacf8345aaf8ff062067d"
+  },
+  {
+    "path": "windows/src/pe/nr_ngx_core.cpp",
+    "sha256": "6ef3c1f14335ce926ecdc16a5b32a683c4d6ec24b23b2252557e91d7185ad582"
+  },
+  {
+    "path": "windows/src/pe/nr_ngx_slots.hpp",
+    "sha256": "5bba0f981a93d2eb9d73ccaf8dc8f7d5a19fcea1fc7f2d69e40ba15427efa52c"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_bridge.cpp",
+    "sha256": "ff2c5b20a97c650198044d36cb327ccffbf64e24e72780f59481949407d4ab13"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_bridge.hpp",
+    "sha256": "846fe864bb272507e98ee4936ffba3847c3f4c8845335c37a9150a7b3ff07700"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_config.cpp",
+    "sha256": "fc2c7e99eb86b795513295132f7a82bea4808af833f6fce67bed2bc244d9901f"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_config.hpp",
+    "sha256": "62185df995a73997108b25f7bc3651d94bca46ca84cf0a34a6361b691c1592dc"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_control.cpp",
+    "sha256": "681ea6ebe682a9db147f32289095abe176d047dbacb36528d6c703326e2d5c38"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_control.hpp",
+    "sha256": "6fca2e0815d457d9ad969f6b4efde60507e8f2ca381f5103f3eaff1676f2a5fd"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_crash.cpp",
+    "sha256": "bd6914d8b333c762c4b4a3e7074f221759b56cbba4f3a560b5d7a6f4c498e4d4"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_crash.hpp",
+    "sha256": "4b9c919de1e23ae1b4fbc0635af2f532f1e9325f8ac5267b988381aa22803cb6"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_d3d12split.cpp",
+    "sha256": "ba59471e67b89f1bd70c9fb962d826054db9ad7aeb6e44bd7772354a17aed106"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_d3d12split.hpp",
+    "sha256": "e107ce94c43a650a1f1fd972e19fff01323b6ebf3ec524037450acb5c2739f43"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_interop.cpp",
+    "sha256": "90b7453c7f6da8f7d3af5c43d90eeabb8db4fb638683889685f73126da521bdf"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_interop.hpp",
+    "sha256": "a4e0a8e1ed4b186f80f8497cf7c803fa1d4247d9b4ed2d92f38928b266c7821e"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_log.cpp",
+    "sha256": "4fdb8588256359fea545675060ed0562d1c30746926f22c381d3abbdd6c498e9"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_log.hpp",
+    "sha256": "58b0068aca73d2c0998a5b05341332e4fd4b926326bb49151a553e5dfbddd704"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_menu.cpp",
+    "sha256": "12b0e5cf412322da8798e5ebb6387a07f478288681a19c665feb2b4f59b70e24"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_menu.hpp",
+    "sha256": "480d90e11d670a3d67d515217a1469088b4341051e4740f8672e70d94c9cc3a9"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_optifix.cpp",
+    "sha256": "719161f4e95a7232fddacbf3aeba40648c9efdf356622763e813b9fdb962677c"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_optifix.hpp",
+    "sha256": "6256cd5b7d9550ad0f2345cbeac78a09b5d11f65f8856d13d06f9034758ecd88"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_renodx_route.cpp",
+    "sha256": "90ea09f7a85430f67a82d5ca80ad108fda6a0eba2c524dd787f1e57eda13fdc1"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_renodx_route.hpp",
+    "sha256": "b4fb625ebcb791e093c8abd77809d1104606acf5a2316c2675b80eaff66ce072"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_session.cpp",
+    "sha256": "77a247ef428af3e84bd11e6c06c0c222d851a62b4784188dbe972163e968bf1e"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_session.hpp",
+    "sha256": "8f8ebae365c856f263b2144f0a77063a407e3d9f10db4cc1794d9badbd2e6c5c"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_vkdevice.cpp",
+    "sha256": "18ae902f2c252c9617b92f9339fe2c51beded63136e2c203f3105aa5dfc12ca7"
+  },
+  {
+    "path": "windows/src/pe/nr_pe_vkdevice.hpp",
+    "sha256": "a389bb3e7a846222ad24ac8d6a02d846ea0ab49cc43292d786433b35d61e9857"
+  },
+  {
+    "path": "windows/src/pe/nr_present_probe.cpp",
+    "sha256": "12cdaf095d107cc611e14be66239b99eadf6e405426494ce7b621955cf6abac3"
+  },
+  {
+    "path": "windows/src/pe/nr_reshade_addon.cpp",
+    "sha256": "cd154888278473f5e9bba972e6ab50d47617ae4eebbdade3cb94ecf31f098253"
+  },
+  {
+    "path": "windows/src/pe/nr_screenshot.cpp",
+    "sha256": "c42b3fa537ac48df5201438ecb5636dc6363ead25f19ccba9c12515f8dc192c0"
+  },
+  {
+    "path": "windows/src/pe/nr_screenshot.hpp",
+    "sha256": "507ee5666bc0f978a66c2dadfb54d5689cdad500bf141af4dcca6d8671dc0a2f"
+  },
+  {
+    "path": "windows/src/pe/pch.h",
+    "sha256": "bf02eb01ae58249aa1f74b0eb50700fcb2318921460be8d4366c0eff4176c71a"
+  },
+  {
+    "path": "windows/src/pe/reshade_compat/Windows.h",
+    "sha256": "a5912ff5dd5445bf6952988bcb2fa5dfe1cf86148f3e78558a2fea8c8bfd041e"
+  },
+  {
+    "path": "windows/src/tools/nr_int4_weights.cpp",
+    "sha256": "d3d0312de4478c80ebf3cef3ae6a1659e40c2ac519abaff31f5c7b6e8ba1c20f"
+  },
+  {
+    "path": "windows/src/ui/nr_control_ui.hpp",
+    "sha256": "089fa3b4a6a58d9f13b671e86362d4878473990fdc9391a2d204ec304956695b"
+  },
+  {
+    "path": "windows/vulkan-loader/patch-local-override.py",
+    "sha256": "846ba273b4ecb1c75199d5b1782bde2394016cb8c592591ce379b17ce75b2bf4"
+  },
+  {
+    "path": "windows/vulkan-loader/patch-no-dxgi.py",
+    "sha256": "12bf7a529c02a76838106de30d5dff423316d3a35dfdb395db43d592cfb30e3b"
+  },
+  {
+    "path": "windows/vulkan-loader/toolchain-x86_64.cmake",
+    "sha256": "0419b7db9d0fa296d41201da8dbc406adcbdcc2fc7fb8153217bde15c9785201"
+  }
+]

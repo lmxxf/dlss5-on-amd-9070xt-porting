@@ -1,0 +1,1189 @@
+{
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.741901458333333,
+      "candidate_ms": 8.754795,
+      "delta_ms": 0.012893541666667119,
+      "delta_percent": 0.14749127210049728,
+      "baseline_p99": 8.95651,
+      "candidate_p99": 8.970751,
+      "p99_delta_ms": 0.01424100000000017,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.6883975,
+          "candidate": 8.694595625,
+          "delta_ms": 0.006198124999999166,
+          "p99_delta_ms": 0.06660500000000091,
+          "base_drift": -0.004650000000001597
+        },
+        {
+          "round": 2,
+          "base": 8.74118125,
+          "candidate": 8.746226875000001,
+          "delta_ms": 0.005045625000001053,
+          "p99_delta_ms": 0.018697000000001296,
+          "base_drift": 0.08538375000000009
+        },
+        {
+          "round": 3,
+          "base": 8.796125624999998,
+          "candidate": 8.8235625,
+          "delta_ms": 0.027436875000001137,
+          "p99_delta_ms": 0.027827000000000268,
+          "base_drift": 0.027721250000000808
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    },
+    "original1152": {
+      "baseline_ms": 9.0245275,
+      "candidate_ms": 9.017090625,
+      "delta_ms": -0.007436874999999787,
+      "delta_percent": -0.08240736149344174,
+      "baseline_p99": 9.197227,
+      "candidate_p99": 9.166632,
+      "p99_delta_ms": -0.030594999999999928,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 9.0366078125,
+          "candidate": 9.002459374999999,
+          "delta_ms": -0.03414843750000074,
+          "p99_delta_ms": -0.11232299999999995,
+          "base_drift": -0.07340562499999947
+        },
+        {
+          "round": 2,
+          "base": 9.009731562499999,
+          "candidate": 9.016046875,
+          "delta_ms": 0.006315312500001724,
+          "p99_delta_ms": 0.01655799999999985,
+          "base_drift": 0.01918312500000141
+        },
+        {
+          "round": 3,
+          "base": 9.027243125000002,
+          "candidate": 9.032765625,
+          "delta_ms": 0.005522499999997876,
+          "p99_delta_ms": 0.04843400000000031,
+          "base_drift": 0.0007262500000013716
+        }
+      ],
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "samples_per_arm": 960
+    },
+    "original960": {
+      "baseline_ms": 6.413016875,
+      "candidate_ms": 6.4124671875,
+      "delta_ms": -0.0005496875000003953,
+      "delta_percent": -0.008571433862014644,
+      "baseline_p99": 6.570645,
+      "candidate_p99": 6.5920119999999995,
+      "p99_delta_ms": 0.021366999999999692,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.4165553125,
+          "candidate": 6.4118553125,
+          "delta_ms": -0.004699999999999704,
+          "p99_delta_ms": -0.023450999999999667,
+          "base_drift": -0.0038068749999995433
+        },
+        {
+          "round": 2,
+          "base": 6.405975000000001,
+          "candidate": 6.420057499999999,
+          "delta_ms": 0.014082499999998,
+          "p99_delta_ms": 0.11881300000000028,
+          "base_drift": -0.01489500000000099
+        },
+        {
+          "round": 3,
+          "base": 6.416520312499999,
+          "candidate": 6.405488750000001,
+          "delta_ms": -0.011031562499998593,
+          "p99_delta_ms": -0.019122999999999557,
+          "base_drift": 0.005529375000000947
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "samples_per_arm": 960
+    },
+    "small1080": {
+      "baseline_ms": 5.4578503125,
+      "candidate_ms": 5.453888020833333,
+      "delta_ms": -0.003962291666666395,
+      "delta_percent": -0.07259802742467514,
+      "baseline_p99": 5.5762789999999995,
+      "candidate_p99": 5.554882,
+      "p99_delta_ms": -0.021396999999999444,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.4583224999999995,
+          "candidate": 5.4561925,
+          "delta_ms": -0.002129999999999299,
+          "p99_delta_ms": 0.036266000000000354,
+          "base_drift": 0.007072500000000481
+        },
+        {
+          "round": 2,
+          "base": 5.45681,
+          "candidate": 5.4547815625,
+          "delta_ms": -0.0020284374999999244,
+          "p99_delta_ms": -0.03867200000000004,
+          "base_drift": 0.001154999999999795
+        },
+        {
+          "round": 3,
+          "base": 5.4584184375,
+          "candidate": 5.45069,
+          "delta_ms": -0.007728437499999963,
+          "p99_delta_ms": -0.020369999999999777,
+          "base_drift": -0.0038118750000011303
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+      "samples_per_arm": 960
+    },
+    "small720": {
+      "baseline_ms": 2.92180125,
+      "candidate_ms": 2.9200516666666667,
+      "delta_ms": -0.0017495833333334154,
+      "delta_percent": -0.05988029929596683,
+      "baseline_p99": 3.0586599999999997,
+      "candidate_p99": 3.0618339999999993,
+      "p99_delta_ms": 0.003173999999999566,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 2.9230225,
+          "candidate": 2.9234125,
+          "delta_ms": 0.00038999999999989043,
+          "p99_delta_ms": 0.0064470000000000915,
+          "base_drift": 0.005364999999999398
+        },
+        {
+          "round": 2,
+          "base": 2.9201853125,
+          "candidate": 2.916874375,
+          "delta_ms": -0.0033109375000002217,
+          "p99_delta_ms": -0.029668999999999723,
+          "base_drift": -0.01011437500000012
+        },
+        {
+          "round": 3,
+          "base": 2.9221959375,
+          "candidate": 2.919868125,
+          "delta_ms": -0.002327812500000359,
+          "p99_delta_ms": 0.06556500000000032,
+          "base_drift": 0.000129374999999321
+        }
+      ],
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+      "samples_per_arm": 960
+    },
+    "small900": {
+      "baseline_ms": 4.158904375,
+      "candidate_ms": 4.154524791666666,
+      "delta_ms": -0.00437958333333377,
+      "delta_percent": -0.10530618014831239,
+      "baseline_p99": 4.322782,
+      "candidate_p99": 4.3119819999999995,
+      "p99_delta_ms": -0.010800000000000587,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 4.1559890625,
+          "candidate": 4.152141562500001,
+          "delta_ms": -0.0038474999999991155,
+          "p99_delta_ms": 0.013247999999999927,
+          "base_drift": 0.0034706249999993943
+        },
+        {
+          "round": 2,
+          "base": 4.16388125,
+          "candidate": 4.1506734375,
+          "delta_ms": -0.013207812500000138,
+          "p99_delta_ms": -0.02832400000000046,
+          "base_drift": -0.01988874999999979
+        },
+        {
+          "round": 3,
+          "base": 4.1568428125,
+          "candidate": 4.1607593750000005,
+          "delta_ms": 0.003916562500000609,
+          "p99_delta_ms": 0.08533700000000088,
+          "base_drift": 0.011943125000000165
+        }
+      ],
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+      "samples_per_arm": 960
+    },
+    "smallwindow": {
+      "baseline_ms": 1.8906622916666664,
+      "candidate_ms": 1.8901609375000001,
+      "delta_ms": -0.0005013541666663013,
+      "delta_percent": -0.02651738329346731,
+      "baseline_p99": 2.007104,
+      "candidate_p99": 2.0067429999999997,
+      "p99_delta_ms": -0.00036100000000027777,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 1.8856581250000002,
+          "candidate": 1.8950600000000002,
+          "delta_ms": 0.009401875000000004,
+          "p99_delta_ms": 0.027122999999999564,
+          "base_drift": -0.0018650000000000055
+        },
+        {
+          "round": 2,
+          "base": 1.8932759375,
+          "candidate": 1.8931809375,
+          "delta_ms": -9.499999999995623e-05,
+          "p99_delta_ms": -0.007175999999999849,
+          "base_drift": 0.0006931249999999611
+        },
+        {
+          "round": 3,
+          "base": 1.8930528125000001,
+          "candidate": 1.8822418749999996,
+          "delta_ms": -0.010810937500000506,
+          "p99_delta_ms": -0.04222499999999996,
+          "base_drift": -0.0021781250000001418
+        }
+      ],
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-original1088-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r1-0-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.690722500000001,
+      "p99": 8.815066999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r1-1-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.68925,
+      "p99": 8.785223,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r1-2-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.69994125,
+      "p99": 8.901373999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r1-3-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.6860725,
+      "p99": 8.784284000000001,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r2-0-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.698489375,
+      "p99": 8.8492,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r2-1-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.687962500000001,
+      "p99": 8.792328,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r2-2-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.804491250000002,
+      "p99": 8.984574,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r2-3-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.783873125,
+      "p99": 8.974038,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r3-0-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.782264999999999,
+      "p99": 8.95651,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r3-1-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.819835625,
+      "p99": 8.964874,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r3-2-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.827289375000001,
+      "p99": 9.009722,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1088-r3-3-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.80998625,
+      "p99": 8.97035,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1152-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r1-0-baseline",
+      "height": "original1152",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.073310625,
+      "p99": 9.239316,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r1-1-candidate",
+      "height": "original1152",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.002177499999998,
+      "p99": 9.115205000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r1-2-candidate",
+      "height": "original1152",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.00274125,
+      "p99": 9.123772,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r1-3-baseline",
+      "height": "original1152",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.999905,
+      "p99": 9.156789999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r2-0-baseline",
+      "height": "original1152",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.000139999999998,
+      "p99": 9.168274,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r2-1-candidate",
+      "height": "original1152",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.017665000000001,
+      "p99": 9.153774,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r2-2-candidate",
+      "height": "original1152",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.014428749999999,
+      "p99": 9.192349,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r2-3-baseline",
+      "height": "original1152",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.019323125,
+      "p99": 9.156102,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r3-0-baseline",
+      "height": "original1152",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.02688,
+      "p99": 9.139797,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r3-1-candidate",
+      "height": "original1152",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 9.0318225,
+      "p99": 9.176219000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r3-2-candidate",
+      "height": "original1152",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 9.033708749999999,
+      "p99": 9.183917,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original1152-r3-3-baseline",
+      "height": "original1152",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.027606250000002,
+      "p99": 9.121154,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original960-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r1-0-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.418458749999999,
+      "p99": 6.613068999999999,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r1-1-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.406791874999999,
+      "p99": 6.561002,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r1-2-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.416918750000001,
+      "p99": 6.6084,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r1-3-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.414651875,
+      "p99": 6.574991,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r2-0-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.413422500000001,
+      "p99": 6.528005,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r2-1-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.417493124999998,
+      "p99": 6.588884999999999,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r2-2-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.422621875,
+      "p99": 6.649591,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r2-3-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.3985275,
+      "p99": 6.499941,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r3-0-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.4137556249999985,
+      "p99": 6.555643,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r3-1-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.405080624999999,
+      "p99": 6.545207,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r3-2-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.405896875000001,
+      "p99": 6.511934,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-original960-r3-3-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.4192849999999995,
+      "p99": 6.564139,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-small1080-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r1-0-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.45478625,
+      "p99": 5.563126,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r1-1-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.45954625,
+      "p99": 5.539169,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r1-2-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.45283875,
+      "p99": 5.621997,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r1-3-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.46185875,
+      "p99": 5.563305,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r2-0-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.4562325000000005,
+      "p99": 5.589196,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r2-1-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.455495625,
+      "p99": 5.574208,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r2-2-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.4540675,
+      "p99": 5.53142,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r2-3-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.4573875,
+      "p99": 5.554632,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r3-0-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.460324375000001,
+      "p99": 5.627814999999999,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r3-1-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.457206875,
+      "p99": 5.548803,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r3-2-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.444173125,
+      "p99": 5.541135,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small1080-r3-3-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.4565125,
+      "p99": 5.545027,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small720-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r1-0-baseline",
+      "height": "small720",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.9203400000000004,
+      "p99": 3.005466,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r1-1-candidate",
+      "height": "small720",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.923776875,
+      "p99": 3.042609,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r1-2-candidate",
+      "height": "small720",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.923048125,
+      "p99": 3.0431899999999996,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r1-3-baseline",
+      "height": "small720",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.925705,
+      "p99": 3.078389,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r2-0-baseline",
+      "height": "small720",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.9252425,
+      "p99": 3.095713,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r2-1-candidate",
+      "height": "small720",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.918021875,
+      "p99": 3.04147,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r2-2-candidate",
+      "height": "small720",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.915726875,
+      "p99": 3.0326750000000002,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r2-3-baseline",
+      "height": "small720",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.915128125,
+      "p99": 3.026374,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r3-0-baseline",
+      "height": "small720",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.9221312500000005,
+      "p99": 3.053987,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r3-1-candidate",
+      "height": "small720",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.918525,
+      "p99": 3.072494,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r3-2-candidate",
+      "height": "small720",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.92121125,
+      "p99": 3.107212,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small720-r3-3-baseline",
+      "height": "small720",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.922260625,
+      "p99": 3.006553,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small900-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r1-0-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.15425375,
+      "p99": 4.27843,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r1-1-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.153525,
+      "p99": 4.302551,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r1-2-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.150758125,
+      "p99": 4.282789,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r1-3-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.157724374999999,
+      "p99": 4.284541,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r2-0-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.173825625,
+      "p99": 4.338751,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r2-1-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.150701875,
+      "p99": 4.312537,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r2-2-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.150645,
+      "p99": 4.302864,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r2-3-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.153936875,
+      "p99": 4.302097,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r3-0-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.15087125,
+      "p99": 4.297648,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r3-1-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.1655175,
+      "p99": 4.45196,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r3-2-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.156001250000001,
+      "p99": 4.258064,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-small900-r3-3-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.162814375,
+      "p99": 4.341646,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-smallwindow-r1-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r1-0-baseline",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.8865906250000002,
+      "p99": 1.9866679999999999,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r1-1-candidate",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.886508125,
+      "p99": 1.985323,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r1-2-candidate",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.903611875,
+      "p99": 2.0505269999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r1-3-baseline",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.8847256250000002,
+      "p99": 1.9890709999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r2-0-baseline",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.892929375,
+      "p99": 2.018827,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r2-1-candidate",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.898903125,
+      "p99": 1.949109,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r2-2-candidate",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.8874587499999997,
+      "p99": 2.000756,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r2-3-baseline",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.8936225,
+      "p99": 1.9733159999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-0-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r3-0-baseline",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.894141875,
+      "p99": 1.9954919999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-1-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r3-1-candidate",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.890755625,
+      "p99": 2.014656,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-2-candidate",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r3-2-candidate",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.873728125,
+      "p99": 1.934992,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-3-baseline",
+      "source_path": "Development/results/c32-stage-phase5-20261029/final/evidence/perf-smallwindow-r3-3-baseline",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.89196375,
+      "p99": 2.0254659999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    }
+  ]
+}

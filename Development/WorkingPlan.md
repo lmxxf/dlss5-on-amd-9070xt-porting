@@ -322,3 +322,8 @@ Step1 4a260061：新版v0.0.8 ACO在32.0.31007.2048原样pipeline-binary导入�
 Step2 a8103346：拒用负值/不闭合HIP短事件，改gfx1201硬件实时钟（100MHz设备属性、0.8µs邻接stamp校正），完整153/83业务dispatch，重构闭合0.7–1.0%。Original Top C1280.819/SP0.809/C32post0.728ms；Small C32post/prefix0.762/0.737ms。对手123/71 pass时间同列，未据此编造峰值利用率。
 
 Step3：C128 3A Contract深预取保持B4，VGPR242→248但硬件分配桶不变、0spill；单核微正但整网不稳，STOP。3B严格安全的一条b64移动，136其他函数及metadata全同，单核/整网无稳定收益，STOP。各七档Gold42帧与四档3ABBA完成，不叠加/刷轮、不改生产80/SHA。全部报告/源码/ISA证明/逐轮数据见results/aco-hotspot-phase4-20261029/README.md。临时大文件清理、锁释放，无游戏/ZIP修改、无push；不宣称接近硬件上限或.s唯一路径。
+
+
+### 2026-10-29 C32专项 Phase5 闭环
+
+bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（mean−42.863µs/p99−43.602µs），最终集成合并p99+24.228µs（R1+65.243µs）撤销；0cc4a90a融合首档Gold不符STOP，8b8dbb7b寄存器Post七档Gold同但单核/整网退步STOP。双架构80模块实际重编、ELF/函数/metadata/SHA核验及正式O2 addon/runtime/frame/pure完成，最终七档Gold/七档3ABBA/三档新版v008纯NN3NMMN闭环。 最新同批Original1088 NN HIP8.299856/ACO5.694142ms（+45.76%），不宣称硬件上限。完整结果results/c32-stage-phase5-20261029/README.md；临时大文件清理、锁释放，无游戏/ZIP/上游源码修改，无push。

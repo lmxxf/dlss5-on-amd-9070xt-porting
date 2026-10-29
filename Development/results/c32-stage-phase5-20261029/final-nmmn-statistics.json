@@ -1,0 +1,447 @@
+{
+  "nmmn": {
+    "original1088": {
+      "hip_ms": 8.29985584375,
+      "aco_ms": 5.694141666666667,
+      "gap_ms": 2.6057141770833336,
+      "hip_slower_percent": 45.761316272426185,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 8.291202625,
+          "aco_ms": 5.688640625,
+          "gap_ms": 2.6025620000000007
+        },
+        {
+          "round": 2,
+          "hip_ms": 8.30706778125,
+          "aco_ms": 5.694353125,
+          "gap_ms": 2.6127146562499997
+        },
+        {
+          "round": 3,
+          "hip_ms": 8.301297125,
+          "aco_ms": 5.69943125,
+          "gap_ms": 2.6018658749999997
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small1080": {
+      "hip_ms": 5.015832166666667,
+      "aco_ms": 3.4518447916666664,
+      "gap_ms": 1.5639873750000004,
+      "hip_slower_percent": 45.30873980127175,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 5.01881371875,
+          "aco_ms": 3.4538124999999997,
+          "gap_ms": 1.56500121875
+        },
+        {
+          "round": 2,
+          "hip_ms": 5.0211494375,
+          "aco_ms": 3.45103125,
+          "gap_ms": 1.5701181874999999
+        },
+        {
+          "round": 3,
+          "hip_ms": 5.0075333437500005,
+          "aco_ms": 3.450690625,
+          "gap_ms": 1.5568427187500005
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small900": {
+      "hip_ms": 3.8633292291666663,
+      "aco_ms": 2.639965625,
+      "gap_ms": 1.2233636041666665,
+      "hip_slower_percent": 46.34013384801805,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 3.8664680312499997,
+          "aco_ms": 2.64006875,
+          "gap_ms": 1.2263992812499995
+        },
+        {
+          "round": 2,
+          "hip_ms": 3.8608575937499996,
+          "aco_ms": 2.64035625,
+          "gap_ms": 1.2205013437499996
+        },
+        {
+          "round": 3,
+          "hip_ms": 3.8626620625,
+          "aco_ms": 2.639471875,
+          "gap_ms": 1.2231901875000002
+        }
+      ],
+      "steady_samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.2857180625,
+      "cpu_ms": 8.404735624999999,
+      "p99_ms": 8.4248055,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.68870625,
+      "cpu_ms": 5.7892375000000005,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.688575,
+      "cpu_ms": 5.7935125,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.2966871875,
+      "cpu_ms": 8.42177875,
+      "p99_ms": 8.4431319,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.3060280625,
+      "cpu_ms": 8.4249075,
+      "p99_ms": 8.4634421,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.69325,
+      "cpu_ms": 5.8065125,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.69545625,
+      "cpu_ms": 5.796143750000001,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.3081075,
+      "cpu_ms": 8.4322375,
+      "p99_ms": 8.4329417,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.301155937499999,
+      "cpu_ms": 8.435295625,
+      "p99_ms": 8.4410452,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.70005625,
+      "cpu_ms": 5.8014875,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.69880625,
+      "cpu_ms": 5.79755625,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.3014383125,
+      "cpu_ms": 8.420245,
+      "p99_ms": 8.445286099999999,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 5.02608825,
+      "cpu_ms": 5.15324375,
+      "p99_ms": 5.236275,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.45270625,
+      "cpu_ms": 3.5488500000000003,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.45491875,
+      "cpu_ms": 3.54975625,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 5.0115391875,
+      "cpu_ms": 5.140418125,
+      "p99_ms": 5.1898599,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 5.016612125,
+      "cpu_ms": 5.138708124999999,
+      "p99_ms": 5.1614074,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.4520625000000003,
+      "cpu_ms": 3.5501312499999997,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.45,
+      "cpu_ms": 3.5479999999999996,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 5.02568675,
+      "cpu_ms": 5.160145625,
+      "p99_ms": 5.3128067,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 5.0070010625000005,
+      "cpu_ms": 5.1283075,
+      "p99_ms": 5.1867998,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.44850625,
+      "cpu_ms": 3.5529312500000003,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.452875,
+      "cpu_ms": 3.54850625,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 5.008065625,
+      "cpu_ms": 5.13966,
+      "p99_ms": 5.2016231,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.8676029375,
+      "cpu_ms": 3.982939375,
+      "p99_ms": 4.0393346999999995,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.64055,
+      "cpu_ms": 2.73848125,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.6395875,
+      "cpu_ms": 2.7375374999999997,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.8653331249999994,
+      "cpu_ms": 3.9800987500000007,
+      "p99_ms": 4.0947569,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.85932775,
+      "cpu_ms": 3.97732375,
+      "p99_ms": 4.0234689999999995,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.64028125,
+      "cpu_ms": 2.73584375,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.64043125,
+      "cpu_ms": 2.7357625,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.8623874375,
+      "cpu_ms": 3.9891850000000004,
+      "p99_ms": 3.9752499,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.8655786250000004,
+      "cpu_ms": 3.983290625,
+      "p99_ms": 4.0967582,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.638975,
+      "cpu_ms": 2.7338062499999998,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.63996875,
+      "cpu_ms": 2.73786875,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.8597455000000003,
+      "cpu_ms": 3.981049375,
+      "p99_ms": 4.0228868,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    }
+  ]
+}

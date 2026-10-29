@@ -1,0 +1,21 @@
+{
+  "production_source_unchanged_from_phase5_start": true,
+  "production_c32_changes_accepted": false,
+  "normhoist_qualification_revoked_by_integration": true,
+  "modules": 80,
+  "formal_host_source_and_binary_sha256_verified": true,
+  "gold_profiles": 7,
+  "gold_frames": 42,
+  "gold_bitdiff": 0,
+  "invalid": 0,
+  "frame_abba_profiles": 7,
+  "frame_samples_per_arm": 960,
+  "nn_nmmn_profiles": 3,
+  "nn_samples_per_arm": 960,
+  "runtime_smoke_exit": 0,
+  "all_formal_modules_preserve_baseline_function_code_and_resources": true,
+  "note": "gfx1200 build/ELF identity verification only; GPU tests gfx1201. Failed Knife3 remains rejected.",
+  "gpu_lock_released": true,
+  "D_free_bytes": 237686882304,
+  "locked_mochi_and_native_assets_unchanged": true
+}

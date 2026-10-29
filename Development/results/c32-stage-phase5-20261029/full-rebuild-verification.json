@@ -1,0 +1,568 @@
+{
+  "count": 80,
+  "all_architectures_verified": true,
+  "accepted_knife4": false,
+  "modules": [
+    {
+      "path": "gfx1200/boundary-fast.hsaco",
+      "sha256": "71afc8157c410d849b57a9823feb7a7107013306ae6f9adb55c51eb2a5888c6f",
+      "elf_flags": 72,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/boundary_reference.hsaco",
+      "sha256": "693547dec3c6e47900aba1e85f220304f2bfb19313f2b1d7403561f46cf3d6cf",
+      "elf_flags": 72,
+      "kernels": 5,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32-wave1-fast-norm900.hsaco",
+      "sha256": "8baa6c390005b2124a8eaee3f57865e302a20b667cf5ef5ffdd5f84429ed672f",
+      "elf_flags": 72,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32-wave1-fast.hsaco",
+      "sha256": "5b6d5d80e09befdf2f4ae9e211fea2de6f89bc2e6a3ab8923a3d1b06840ec3be",
+      "elf_flags": 72,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32-wave1-rtz.hsaco",
+      "sha256": "0be2193a3d9f4ec0a4c552fa76df023579bfff15e33d808f73f9cdfcf8aea3c0",
+      "elf_flags": 72,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32-wave1.hsaco",
+      "sha256": "c082056f859f9a9129b328d886f8711036cbae53a6bfc6f2f280a585c108ce74",
+      "elf_flags": 72,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_fast.hsaco",
+      "sha256": "fff987b9ada5af154b3862cc2d2b8b0474a2aa82c6271e7ea378fc473b2ff617",
+      "elf_flags": 72,
+      "kernels": 3,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_fast_attention.hsaco",
+      "sha256": "169de549aa946cbba505260de2d7a0b228ed93f2e2806d005f874c4009c18b6c",
+      "elf_flags": 72,
+      "kernels": 6,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_fused_attention.hsaco",
+      "sha256": "2b66deb6c8c17bde5e27734f49d205da2651222a860a9183d5f1b88b41f893a6",
+      "elf_flags": 72,
+      "kernels": 1,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_fused_ffn_attention-packed.hsaco",
+      "sha256": "75229a63ddd075e2ba536b360bfb5c30aff45ee1b12d579e4319ace90ac1b66d",
+      "elf_flags": 72,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_fused_ffn_attention.hsaco",
+      "sha256": "911c7e6ccb0d9e879cd02c75aaddea74af01de7b948fa7974f76c36ed6829bfe",
+      "elf_flags": 72,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_prefix_reference.hsaco",
+      "sha256": "c3b01c905b7b20ac357fd97d1baa9d6c4ea7616af0431543b41617c7324cbff8",
+      "elf_flags": 72,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_tiled.hsaco",
+      "sha256": "9a2b98313a62611fee3ab230dcd44ac794c1cbb1a2cccc3598939612ca8a995a",
+      "elf_flags": 72,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c32_wmma.hsaco",
+      "sha256": "576afa15b5e76b2ff10eec95ff585e60ab8b7055f0f3ee3df41478a3feef46a7",
+      "elf_flags": 72,
+      "kernels": 6,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c512-m32-deep.hsaco",
+      "sha256": "d1605cfe1e15c2da985a53f46e6af1810685ece8b3932e2f059eb26feca99047",
+      "elf_flags": 72,
+      "kernels": 91,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c512-m32-mh.hsaco",
+      "sha256": "2c66b8ffdbca9241c510282a18f93062e6726eed54fe4b2eb6d906f4142955b9",
+      "elf_flags": 72,
+      "kernels": 113,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c64-wave2-fast.hsaco",
+      "sha256": "dc10c540748ad40725a1ee7241da69857a0680046099ccb121a951c0616705b3",
+      "elf_flags": 72,
+      "kernels": 137,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/c64-wave2.hsaco",
+      "sha256": "cb98c2fad00cbf3c98d5adbb3da4d8269dbf241ed00d363399d40797e4436638",
+      "elf_flags": 72,
+      "kernels": 137,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/deep_fast-packed-fast.hsaco",
+      "sha256": "1e19af79bfef2b761ccf29c854d5274a8c3d4f4d6c34c81b23efbf82b187571a",
+      "elf_flags": 72,
+      "kernels": 93,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/deep_fast-packed.hsaco",
+      "sha256": "cb6d54898d44d79bc0485020ac10f0a72fac1de4b2bae8ad0da2490aed9f5765",
+      "elf_flags": 72,
+      "kernels": 93,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/deep_fast.hsaco",
+      "sha256": "65ef5748eac1118daaac8035ac462866a5a54e32efd4138ee6ecdea00545ed1c",
+      "elf_flags": 72,
+      "kernels": 83,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/deep_reference.hsaco",
+      "sha256": "c2779cdff408360721e5cd1312d945ae1951cffc955893821efd75724c67852e",
+      "elf_flags": 72,
+      "kernels": 16,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/deep_wmma.hsaco",
+      "sha256": "6b708483d0a9fcee96967862e92aa5895be969ab2316749eb5860cfe39be0af1",
+      "elf_flags": 72,
+      "kernels": 8,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multi-pass-predict.hsaco",
+      "sha256": "68fa718edd874ccfc14633fcabb57963f7eea309896c60984b91c466a09ba2dc",
+      "elf_flags": 72,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multi-pass-skin.hsaco",
+      "sha256": "c33dcd30746f7de2e7bd442322cadf183c87eaa29e6c086acf8757767cd26c53",
+      "elf_flags": 72,
+      "kernels": 3,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-fast-packed.hsaco",
+      "sha256": "8d602696b3d97d6dbac759350951d744d4aa37578abcdde52bee681ef68718c4",
+      "elf_flags": 72,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-fast-padded-wave-packed.hsaco",
+      "sha256": "c9c4b021be277801fbc9af7c06012f68570b0e34124ecb398cabd11aca4a5123",
+      "elf_flags": 72,
+      "kernels": 129,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-fast-padded-wave.hsaco",
+      "sha256": "266db0f4f386c21590bcfa4c570ac3a1c5e99c7aef25e1b0f3d4234560ae9328",
+      "elf_flags": 72,
+      "kernels": 121,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-fast.hsaco",
+      "sha256": "04d80a8cf63d5b0d908ecfbc3d25d12a3e4087be5fbc0ecb962d8e7fe8d6aeba",
+      "elf_flags": 72,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-reference.hsaco",
+      "sha256": "4b02890caad85a42c185180cfd65b5051cd01d8402f8ec21536d9779ba3144d6",
+      "elf_flags": 72,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-tiled.hsaco",
+      "sha256": "10aa32a6735464d21f37e197423942e7d33333c667b035f8300b9819a8fcc88e",
+      "elf_flags": 72,
+      "kernels": 7,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead-wmma.hsaco",
+      "sha256": "8c1a097bfa170eba0c0ce51e44cc8f6f7521e2b64d6eff3e07230deb64d419ad",
+      "elf_flags": 72,
+      "kernels": 9,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/multihead_fused_attention.hsaco",
+      "sha256": "5b1cad8f5b5061fbdf9d26c98c68785f4a57e359bfdaab6b0a330e51f59db10b",
+      "elf_flags": 72,
+      "kernels": 28,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/prefix_fast.hsaco",
+      "sha256": "724cf9a7329b8fe2ff8846d0cda97e51d01a775b2cdbef90f2f67286294ffdb7",
+      "elf_flags": 72,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/swin-persistent-fast.hsaco",
+      "sha256": "f56edfafc74cca3ea7a793cf5e1ab8f2b31967a20096443af34250b39784e00b",
+      "elf_flags": 72,
+      "kernels": 118,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/swin-persistent.hsaco",
+      "sha256": "3bea7eaf652890b74e2688ad949e81320e3624319b4ada06f90ad4f5be44fa39",
+      "elf_flags": 72,
+      "kernels": 118,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/vit-stream-fast.hsaco",
+      "sha256": "08ebae642bba863e29d8b27939ec02fb707db41e52ab5856be37a317596bf345",
+      "elf_flags": 72,
+      "kernels": 103,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/vit-stream.hsaco",
+      "sha256": "d427466b3d757a963a6e2aaca3939c8707a169fe85d5d7cd609a5351b412cb3c",
+      "elf_flags": 72,
+      "kernels": 103,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/vit-wide-deep.hsaco",
+      "sha256": "eba4296003d5e956b0489700821ec13313e8ee991b0143671e2c67a9b28e8d9d",
+      "elf_flags": 72,
+      "kernels": 84,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1200/wave-pointwise.hsaco",
+      "sha256": "1cff01355f32152834286c303d38efd05628757c6d4e0fd7f1c0a0f3db9e701f",
+      "elf_flags": 72,
+      "kernels": 13,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/boundary-fast.hsaco",
+      "sha256": "40fa66062eca6bbe654e480944783c27b9bd93970696e1ffca9bbc8773ca9700",
+      "elf_flags": 78,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/boundary_reference.hsaco",
+      "sha256": "1b1a514743924d43542ed9ac30e4ca50ec6e84e62d2bafab1960aaf061e0adc8",
+      "elf_flags": 78,
+      "kernels": 5,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32-wave1-fast-norm900.hsaco",
+      "sha256": "337a4e13c9a1242666e530cd43a49bbf278cd9927df3fa0c792966ec5252db85",
+      "elf_flags": 78,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32-wave1-fast.hsaco",
+      "sha256": "8a5d9ddc139cfd44c242acade1b684810af6a40633a0ebc378209cd510818e83",
+      "elf_flags": 78,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32-wave1-rtz.hsaco",
+      "sha256": "5519be636d94e97855e75665740af3f2322494ae4797ad245903223310f08554",
+      "elf_flags": 78,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32-wave1.hsaco",
+      "sha256": "4e6132a537447bfe7b29ba77597da015d7866d7d9f3e9bdd91ba7919783d3d01",
+      "elf_flags": 78,
+      "kernels": 64,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_fast.hsaco",
+      "sha256": "a639601561123594f6d8b335f884f4e229338875f460213af1396bc2f28c90ec",
+      "elf_flags": 78,
+      "kernels": 3,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_fast_attention.hsaco",
+      "sha256": "b3abd5620764f5a5ba4d86fb439e0a57688e346afdd5945f6f1d9067da6d032c",
+      "elf_flags": 78,
+      "kernels": 6,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_fused_attention.hsaco",
+      "sha256": "5091d35e5ac53e4a8d16de2f5fb1c8c057159c72d6605faeb5a5ca7daa65aacd",
+      "elf_flags": 78,
+      "kernels": 1,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_fused_ffn_attention-packed.hsaco",
+      "sha256": "c0634176bf9e0a79ffb0e28fb120df310a646d4dedcaad69c34f7185718d2155",
+      "elf_flags": 78,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_fused_ffn_attention.hsaco",
+      "sha256": "aedb066c95a76aa60fe67c91443c2cf8189c5e4f8e849356695cb5cd9fdc9870",
+      "elf_flags": 78,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_prefix_reference.hsaco",
+      "sha256": "65103d0c3930dd22d7ec40e282e38285d68169c9c8860df7d561a7c04fef7640",
+      "elf_flags": 78,
+      "kernels": 10,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_tiled.hsaco",
+      "sha256": "6e7db748fbd492cd566f208a1aa3b7e48a42a9c0d8b31022148469bb46d01e8f",
+      "elf_flags": 78,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c32_wmma.hsaco",
+      "sha256": "4d239ca134400ee2b42c60f99dc24202f9a4fd38c21a471c01a98217df04b294",
+      "elf_flags": 78,
+      "kernels": 6,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c512-m32-deep.hsaco",
+      "sha256": "c2bd170088809e71938db979e60ce2c97824ab3ef7487aac0c1cb4085160e745",
+      "elf_flags": 78,
+      "kernels": 91,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c512-m32-mh.hsaco",
+      "sha256": "24244b0c2f62321d4d2a1ff4e4c6a3ab6ac0376d301eb0a595ec1f72be661dd4",
+      "elf_flags": 78,
+      "kernels": 113,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c64-wave2-fast.hsaco",
+      "sha256": "475f515fe8d5fa2d1dc679fc74017adfd35b7ba38be1fb6c56dc67f9ce7690e0",
+      "elf_flags": 78,
+      "kernels": 137,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/c64-wave2.hsaco",
+      "sha256": "3b5273abc6afc577bc4fd4fbbf7fee6667f2288f2b9cb21ad9e4a288821af69c",
+      "elf_flags": 78,
+      "kernels": 137,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/deep_fast-packed-fast.hsaco",
+      "sha256": "ba1a29dbdbef5b13964e6e689846fc9d76828229ab7f10d2a2f6661ba25ea354",
+      "elf_flags": 78,
+      "kernels": 93,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/deep_fast-packed.hsaco",
+      "sha256": "2af0bd40a8a89095578074558e16754a3f733160bcc1a2fff0d49bbe2ed29628",
+      "elf_flags": 78,
+      "kernels": 93,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/deep_fast.hsaco",
+      "sha256": "938c8c76ce74a61b7326e0cd0e2fb4c435bcf08b17463e750b386556b757271b",
+      "elf_flags": 78,
+      "kernels": 83,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/deep_reference.hsaco",
+      "sha256": "0d2e3e9658a8abc53be68b6fc108ce57594784d3ed56f237bedd9766d86db895",
+      "elf_flags": 78,
+      "kernels": 16,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/deep_wmma.hsaco",
+      "sha256": "b562c8986300b0517818ae54a46108e725e1ecc6c6b6c88a3b7fa14c749a5b2f",
+      "elf_flags": 78,
+      "kernels": 8,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multi-pass-predict.hsaco",
+      "sha256": "133f0975e39e7e716e146dab15f05573d6767c8c1c99e01528f3c11509293900",
+      "elf_flags": 78,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multi-pass-skin.hsaco",
+      "sha256": "5ff15f49135beef3bc68d744b9d33f615812ce293d13c0783c88b0a3d9aaa011",
+      "elf_flags": 78,
+      "kernels": 3,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-fast-packed.hsaco",
+      "sha256": "31e258756683b9a60e455c1c315c7b22b9605d90ae784891073fb6c74ba8ead7",
+      "elf_flags": 78,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-fast-padded-wave-packed.hsaco",
+      "sha256": "71d2375cc719f151ca01c36cfd93d30574159d677f6c460c70e11adf476ff2da",
+      "elf_flags": 78,
+      "kernels": 129,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-fast-padded-wave.hsaco",
+      "sha256": "85149ee55b0bb52365fc3f15ac0d7e8b54917d1610319b5d87e4e31866d070a7",
+      "elf_flags": 78,
+      "kernels": 121,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-fast.hsaco",
+      "sha256": "3493fb0ede45f233a5d09472bd7a76d7532387f1fd6b0c835d46c20c0d196c9a",
+      "elf_flags": 78,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-reference.hsaco",
+      "sha256": "1cfa639e9f37b7872c69d738c7332b58eaaf0539caf720cc29a844e770fc8cbe",
+      "elf_flags": 78,
+      "kernels": 14,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-tiled.hsaco",
+      "sha256": "3799ae40ecec89796132bf6464a76faf1adfffe65df2f5e6406f47a86f67aa81",
+      "elf_flags": 78,
+      "kernels": 7,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead-wmma.hsaco",
+      "sha256": "bfc99774435fcf89985a795ea6e1c20de3335053097b40206839adf687d0e226",
+      "elf_flags": 78,
+      "kernels": 9,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/multihead_fused_attention.hsaco",
+      "sha256": "f7f23560d490868eacb161d7e49c958548faaa1d61384014ea0859b5e8cef1b9",
+      "elf_flags": 78,
+      "kernels": 28,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/prefix_fast.hsaco",
+      "sha256": "81b3facda5a1512af3940d7a82c5a2f6f2e5cc7a0f2428194f4420fc8b68a57c",
+      "elf_flags": 78,
+      "kernels": 4,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/swin-persistent-fast.hsaco",
+      "sha256": "9b58cab4e4859645aa79c61d67972906d8dd76eb4d94c9491894461af6bbec39",
+      "elf_flags": 78,
+      "kernels": 118,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/swin-persistent.hsaco",
+      "sha256": "ad4600c9f824762baf6f898988225a2c1169caf88ec57b1e9c25ca0b03039ab8",
+      "elf_flags": 78,
+      "kernels": 118,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/vit-stream-fast.hsaco",
+      "sha256": "bf1dd632743a0792a76832e436229c1faee68999801a565e62c9f66145522836",
+      "elf_flags": 78,
+      "kernels": 103,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/vit-stream.hsaco",
+      "sha256": "63194c36226a49e807d004d44dd2bac3363de2960bd6ea391770859f08d0bfc7",
+      "elf_flags": 78,
+      "kernels": 103,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/vit-wide-deep.hsaco",
+      "sha256": "e4790b31fcfbeef2ec96bd4bb2f147e9d1423d7037969d189bcf80db065bcd0c",
+      "elf_flags": 78,
+      "kernels": 84,
+      "changed_functions": 0
+    },
+    {
+      "path": "gfx1201/wave-pointwise.hsaco",
+      "sha256": "5e65693da46044b697218194bb17ec8453952fa4a4a684c6ecc59df1cecf12aa",
+      "elf_flags": 78,
+      "kernels": 13,
+      "changed_functions": 0
+    }
+  ],
+  "all_container_sha256_match_locked_baseline": true
+}

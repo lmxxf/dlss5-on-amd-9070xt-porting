@@ -1,0 +1,46 @@
+{
+  "qualification_commit": "3b7d0a03",
+  "qualification_mask": 1,
+  "final_production_mask": 0,
+  "rejected_at": "independent final integration Small1080 round1",
+  "round1_mean_delta_us": -25.650937500000914,
+  "round1_p99_delta_us": 65.24299999999971,
+  "action": "Restore exact ba057a5d production header; rebuild formal hosts. Archive first integration batch without selecting additional winning rounds.",
+  "integration_small1080": {
+    "baseline_ms": 5.436370729166667,
+    "candidate_ms": 5.394461354166666,
+    "delta_ms": -0.04190937500000036,
+    "delta_percent": -0.7709072299862174,
+    "baseline_p99": 5.537741,
+    "candidate_p99": 5.561969,
+    "p99_delta_ms": 0.024228000000000804,
+    "rounds": [
+      {
+        "round": 1,
+        "base": 5.4376359375000005,
+        "candidate": 5.411985,
+        "delta_ms": -0.025650937500000914,
+        "p99_delta_ms": 0.06524299999999972,
+        "base_drift": 0.0009618749999997789
+      },
+      {
+        "round": 2,
+        "base": 5.4361734375,
+        "candidate": 5.383789375,
+        "delta_ms": -0.05238406249999983,
+        "p99_delta_ms": -0.061982000000000426,
+        "base_drift": 0.0060243749999990825
+      },
+      {
+        "round": 3,
+        "base": 5.4353028125,
+        "candidate": 5.3876096875,
+        "delta_ms": -0.04769312499999945,
+        "p99_delta_ms": -0.03753699999999949,
+        "base_drift": 0.0032906249999999915
+      }
+    ],
+    "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+    "samples_per_arm": 960
+  }
+}

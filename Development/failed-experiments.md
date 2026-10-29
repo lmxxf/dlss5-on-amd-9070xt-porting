@@ -2802,3 +2802,8 @@ small900, small720, smallwindow, original1088 未满足三轮mean/p99及单核�
 ## 2026-10-29 C32 Phase5 刀4 STOP
 
 Post寄存器尾部h2成对交换145VGPR/0spill/七档Gold同，静态1510→1488，尾部LDS改为8条ds_bpermute；两档单核与四档3ABBA无稳定全网净收益，STOP保刀2。原两qt177/单qtF32 161VGPR版本资源STOP未上GPU。详results/c32-stage-phase5-20261029/knife4-README.md。
+
+
+## 2026-10-29 C32 Phase5 刀2 最终集成撤销
+
+资格Small1080三轮mean/p99均赢，但独立最终集成R1 mean−25.651µs/p99+65.243µs，稳定性反例成立；不按资格批美化最终结论，撤销mask1，恢复ba057a5d原生产头文件。原资格、最终反例均保留，之后原基线收口不是刷轮救候选。详results/c32-stage-phase5-20261029/2-final-revocation.json。
