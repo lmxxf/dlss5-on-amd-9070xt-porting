@@ -46,7 +46,7 @@ C128本来没有显式waves下限；3A编码分配资源不变，不能把本试
 
 - [Step1原始统计、输入/输出/兼容边界](step1-README.md)：4a260061。
 - [Step2校准、完整逐核/对手stage账本](step2-README.md)：a8103346。
-- [Step3安全证明、资源与全部逐轮结果](step3-README.md)：本阶段独立提交。
+- [Step3安全证明、资源与全部逐轮结果](step3-README.md)：bd1d2168。
 
 数据表分别为step1-statistics.json、step2-hotspot-breakdown.json、3a/3b-statistics.json与3a/3b-kernel-statistics.json。原始命令/log/CSV在各case/evidence（不进Git），SHA索引入库；大体积反汇编、编译中间文件、raw图像和失败候选二进制清理。可复现的宿主/输入/shader payload保留在忽略Git的payload目录；模型私有数据不入Git。
 

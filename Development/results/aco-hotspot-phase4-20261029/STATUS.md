@@ -24,3 +24,5 @@ Step3 CPU：3A源码prefetch4个i2 Contract权重至Expand前，B4/T2/数学顺�
 当前终端step3-sequence.sh session86949：3B Gold已完成，正串行跑3A-kernel（Original306/Small166测量，3轮ABBA）、3A四档48slot性能，再3B同样kernel/perf。始终同一baseline模块，不叠加。脚本每role跑完自动collect并用analyze.py生成wall统计；还需手动python3 analyze3-kernel.py 3a/3b。不要重复启动。有赢才合并双架构80/SHA并重新评估，负则STOP/failed-experiments/保留归因/清理并Step3独立commit。最终README+WorkingPlan/DevHistory、锁版树/原M源码hash复核，清理全部临时大文件（保留必要payload），不得push/amend/Coauthor，不动游戏/ZIP。
 
 最终状态：Step1 4a260061、Step2 a8103346完成；Step3两候选全部闭环并均STOP。3A Original单核−0.521µs/次但整网1088+2.481µs/p99+15.682；3B单核不稳，整网900三轮均值全退+4.544µs/p99+15.587。每候选Gold42帧、4档48性能slot、2档24诊断slot均完成；共84/96/48。生产源码和80模块/SHA相对41c28059完全未变，原M源和d1185树未变。全部临时编译/反汇编/raw输出/失败二进制/隔离M构建树已清，payload保留复现输入/宿主/shader；锁和进程已确认释放。README/step3-README/WorkingPlan/DevHistory/failed-experiments已更新；等待最后git格式检查与Stage3独立commit。无待跑GPU/RTC作业。
+
+提交完成：Step3 bd1d2168。最后格式检查针对unified diff上下文的空格+原始ASM tab误报，单独修正*.patch检查属性并保留可应用补丁；不amend、不改实验数据。全部工作完成，无在跑任务。
