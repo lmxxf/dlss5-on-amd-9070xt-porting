@@ -2787,3 +2787,8 @@ serial_norm 显式平方缓存：原编译器已复用，C64 fast 137函数及SP
 ## 2026-10-29 C32 Phase5 刀1 STOP
 
 OutProj/scales跨4qt预读1A：147/148VGPR、4096LDS/0spill/最大驻留同、7Gold同、C32族Orig−30.45µs/Small−13.33µs；全网mean虽改善，Small900 p99+14.965µs，Orig1088 R3尾反例，STOP。双qt批处理1B保持K序共享权重；Prefix/Up超160资源拒绝，一次Prefix生命周期改写仍超，最终mask31热核151–156/0spill/7Gold同；4档mean各三轮全退，STOP。不把负候选混下刀、不加路由救微收益。详results/c32-stage-phase5-20261029/knife1-README.md。
+
+
+## 2026-10-29 C32 Phase5 刀2 未通过扩围档位
+
+small900, small720, smallwindow, original1088 未满足三轮mean/p99及单核稳定改善，保持旧路由；实际数值与每轮反例见results/c32-stage-phase5-20261029/knife2-README.md、2-statistics.json。只收mask=1，无性能刷轮。

@@ -1,0 +1,3 @@
+from pathlib import Path
+import json,ntpath,hashlib,copy,numpy as np
+p=Path(__file__).parent;r=r'D:\DLSSNR-Lab\c32-stage-phase5-20261029';files=[{'path':ntpath.join(r,'payload',n),'sha256':hashlib.sha256((p/'payload'/n).read_bytes()).hexdigest()}for n in ['2-frame.exe','2-frame-window.exe','2-profile.exe']];cfg={'role':'2','modules':{},'same_host':True,'frame_exe':ntpath.join(r,'payload','2-frame.exe'),'frame_window_exe':ntpath.join(r,'payload','2-frame-window.exe'),'profile_exe':ntpath.join(r,'payload','2-profile.exe'),'env':{'NR_C32_NORM_EXPAND_MASK':'31'},'profiles':['small1080','small900','small720','smallwindow','original1088'],'files':files};(p/'2-config.json').write_text(json.dumps(cfg,indent=2))

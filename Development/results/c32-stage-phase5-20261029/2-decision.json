@@ -1,0 +1,41 @@
+{
+  "accepted_mask": 1,
+  "profiles": {
+    "small1080": {
+      "accept": true,
+      "bit": 1,
+      "frame_mean_delta_us": -42.86270833333283,
+      "frame_p99_delta_us": -43.60199999999992,
+      "c32_stage_delta_us": -45.753333333333316
+    },
+    "small900": {
+      "accept": false,
+      "bit": 2,
+      "frame_mean_delta_us": -34.26177083333393,
+      "frame_p99_delta_us": -69.7789999999996,
+      "c32_stage_delta_us": -33.21666666666653
+    },
+    "small720": {
+      "accept": false,
+      "bit": 4,
+      "frame_mean_delta_us": -7.694583333332616,
+      "frame_p99_delta_us": -3.8000000000000256,
+      "c32_stage_delta_us": -13.956666666666543
+    },
+    "smallwindow": {
+      "accept": false,
+      "bit": 8,
+      "frame_mean_delta_us": -9.618020833333185,
+      "frame_p99_delta_us": -12.249999999999872,
+      "c32_stage_delta_us": -8.786666666666628
+    },
+    "original1088": {
+      "accept": false,
+      "bit": 16,
+      "frame_mean_delta_us": -46.37375000000077,
+      "frame_p99_delta_us": -54.255000000001274,
+      "c32_stage_delta_us": -54.70000000000012
+    }
+  },
+  "gate": "All three paired round mean and p99 improve; aggregate mean/p99 improve; device-clock C32 stage improves each round. No rerun for outcome selection."
+}

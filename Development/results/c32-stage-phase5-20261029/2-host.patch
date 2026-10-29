@@ -1,0 +1,27 @@
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -550,7 +550,14 @@
+ #endif
+  /* Optional export probe: modules without the symbol keep the old launch shape. */
+  bool HasFn(const std::string&m,const std::string&name){std::string key=m+":"+name;if(functions.count(key))return true;if(missing_functions.count(key))return false;auto mi=modules.find(m);if(mi==modules.end())return false;Handle f{};if(api.hipModuleGetFunction(&f,mi->second,name.c_str())){missing_functions.insert(key);return false;}functions.emplace(key,f);return true;} /* 2026-10-01 rebuild-baseline: misses are cached too -- per-frame probes (ViT _ks2, ...) otherwise call hipModuleGetFunction every frame (+0.01..0.02ms ABBA) */
+- bool C32Norm900Active()const{return c32_norm900_loaded&&fast_numeric&&W==1600&&H==960&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal;}
++ static unsigned C32NormExpandMask(){static const unsigned m=[]{const char*v=std::getenv("NR_C32_NORM_EXPAND_MASK");return v?unsigned(std::strtoul(v,nullptr,0)):0u;}();return m;}
++ bool C32NormExtraScope(bool active)const{
++  const bool sm=active?small_active:requested_mode==0;unsigned bit=0;
++  if(sm){if(W==1920&&H==1152)bit=1;else if(W==1600&&H==1024)bit=2;else if(W==1344&&H==768)bit=4;else if(W==896&&H==512)bit=8;}
++  else if(W==1920&&H==1088&&multi_pass==1)bit=16;
++  return (C32NormExpandMask()&bit)!=0;
++ }
++ bool C32Norm900Active()const{return c32_norm900_loaded&&fast_numeric&&((W==1600&&H==960)||C32NormExtraScope(true))&&multi_pass==1&&!opt.graph&&!opt.experimental_temporal;}
+  Handle Fn(const std::string&m,const std::string&name){
+   static const std::string normkey="c32_norm900";
+   const std::string&actual=m=="c32_wave1"&&C32Norm900Active()?normkey:m;
+@@ -979,7 +986,7 @@
+  for(auto&entry:extra){entry[1]+=".hsaco";Handle m{};
+   api.Check(api.LoadModule(&m,(opt.modules+"/"+entry[1]).c_str()),entry[1].c_str());modules[entry[0]]=m;
+   if(entry[0]=="c32_wave1"){
+-   const bool geometry=fast_numeric&&W==1600&&H==960&&!opt.graph&&!opt.experimental_temporal;
++   const bool geometry=fast_numeric&&((W==1600&&H==960)||C32NormExtraScope(false))&&!opt.graph&&!opt.experimental_temporal;
+    const char*norm900="c32-wave1-fast-norm900.hsaco";Handle candidate{};
+    if(geometry&&std::ifstream(std::filesystem::u8path(opt.modules+"/"+norm900),std::ios::binary).good()){
+     int ec=api.LoadModule(&candidate,(opt.modules+"/"+norm900).c_str());bool complete=!ec;const char*missing=nullptr;

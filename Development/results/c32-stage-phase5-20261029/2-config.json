@@ -1,0 +1,32 @@
+{
+  "role": "2",
+  "modules": {},
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-frame.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-profile.exe",
+  "env": {
+    "NR_C32_NORM_EXPAND_MASK": "31"
+  },
+  "profiles": [
+    "small1080",
+    "small900",
+    "small720",
+    "smallwindow",
+    "original1088"
+  ],
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-frame.exe",
+      "sha256": "85f187816c61369e7dedfb346c49bef85f12442eedf14e345574ed1204b28192"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-frame-window.exe",
+      "sha256": "74e1eb5ec6d350cc81a19608f932cb3a681c36e1b42476b87b5e387844a41152"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\2-profile.exe",
+      "sha256": "adb5f7bd7b70a6c9db64f96200568e776ba16c539db9055461bed10ec24b040c"
+    }
+  ]
+}
