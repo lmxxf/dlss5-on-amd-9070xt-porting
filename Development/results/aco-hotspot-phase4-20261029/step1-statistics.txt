@@ -1,0 +1,159 @@
+{
+  "nmmn": {
+    "original1088": {
+      "hip_ms": 8.301702916666665,
+      "aco_ms": 5.670746874999999,
+      "gap_ms": 2.630956041666666,
+      "hip_slower_percent": 46.39522975827883,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 8.30147834375,
+          "aco_ms": 5.671859375,
+          "gap_ms": 2.62961896875
+        },
+        {
+          "round": 2,
+          "hip_ms": 8.29456603125,
+          "aco_ms": 5.67060625,
+          "gap_ms": 2.62395978125
+        },
+        {
+          "round": 3,
+          "hip_ms": 8.309064375,
+          "aco_ms": 5.669775,
+          "gap_ms": 2.6392893750000006
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small1080": {
+      "hip_ms": 5.0050960729166665,
+      "aco_ms": 3.430510416666666,
+      "gap_ms": 1.5745856562500005,
+      "hip_slower_percent": 45.89945707787655,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 5.00971909375,
+          "aco_ms": 3.437075,
+          "gap_ms": 1.5726440937500001
+        },
+        {
+          "round": 2,
+          "hip_ms": 5.0077228125,
+          "aco_ms": 3.436065625,
+          "gap_ms": 1.5716571875
+        },
+        {
+          "round": 3,
+          "hip_ms": 4.9978463125,
+          "aco_ms": 3.418390625,
+          "gap_ms": 1.5794556875000003
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small900": {
+      "hip_ms": 3.8412173437499995,
+      "aco_ms": 2.607886458333333,
+      "gap_ms": 1.2333308854166662,
+      "hip_slower_percent": 47.29235360211472,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 3.84954153125,
+          "aco_ms": 2.616253125,
+          "gap_ms": 1.2332884062499998
+        },
+        {
+          "round": 2,
+          "hip_ms": 3.84082434375,
+          "aco_ms": 2.600309375,
+          "gap_ms": 1.24051496875
+        },
+        {
+          "round": 3,
+          "hip_ms": 3.83328615625,
+          "aco_ms": 2.607096875,
+          "gap_ms": 1.22618928125
+        }
+      ],
+      "steady_samples_per_arm": 960
+    }
+  },
+  "small_frame_split": {
+    "small900": {
+      "means_ms": {
+        "frame_wall_ms": 4.314635520833334,
+        "nn_gpu_ms": 3.7077802687916668,
+        "encode_ms": 0.014622166666666665,
+        "input_ms": 0.03713508333333334,
+        "bridge_network_ms": 3.9282959583333334,
+        "neural_ms": 0.056957291666666666,
+        "decode_ms": 0.04034379166666667,
+        "copy_ms": 0.008064708333333333
+      },
+      "pre_post_gpu_ms": 0.15712304166666669,
+      "handoff_and_submission_gap_ms": 0.22051568954166667,
+      "frame_wall_minus_nn_gpu_ms": 0.606855252041667,
+      "control_frame_wall_ms": 4.147896979166666,
+      "diagnostic_wall_delta_ms": 0.16673854166666757,
+      "rounds": [
+        {
+          "round": 1,
+          "control_frame_wall_ms": 4.143646875,
+          "diagnostic_frame_wall_ms": 4.3001409375
+        },
+        {
+          "round": 2,
+          "control_frame_wall_ms": 4.144861874999999,
+          "diagnostic_frame_wall_ms": 4.3205906249999995
+        },
+        {
+          "round": 3,
+          "control_frame_wall_ms": 4.1551821875,
+          "diagnostic_frame_wall_ms": 4.323175
+        }
+      ],
+      "samples_per_arm": 960,
+      "warning": "Frame-wall residual includes CPU/cross-API synchronization; not all GPU pre/post work. Matched capture split is separate from synthetic NMMN fixture."
+    },
+    "small1080": {
+      "means_ms": {
+        "frame_wall_ms": 5.577622604166667,
+        "nn_gpu_ms": 4.768867653120834,
+        "encode_ms": 0.020872541666666668,
+        "input_ms": 0.06240516666666666,
+        "bridge_network_ms": 5.092026114583333,
+        "neural_ms": 0.09160558333333334,
+        "decode_ms": 0.05881241666666667,
+        "copy_ms": 0.007902291666666667
+      },
+      "pre_post_gpu_ms": 0.241598,
+      "handoff_and_submission_gap_ms": 0.3231584614624987,
+      "frame_wall_minus_nn_gpu_ms": 0.8087549510458327,
+      "control_frame_wall_ms": 5.414077291666667,
+      "diagnostic_wall_delta_ms": 0.16354531250000015,
+      "rounds": [
+        {
+          "round": 1,
+          "control_frame_wall_ms": 5.408649375,
+          "diagnostic_frame_wall_ms": 5.567539062500001
+        },
+        {
+          "round": 2,
+          "control_frame_wall_ms": 5.4107884375,
+          "diagnostic_frame_wall_ms": 5.574920625
+        },
+        {
+          "round": 3,
+          "control_frame_wall_ms": 5.4227940625,
+          "diagnostic_frame_wall_ms": 5.590408125000001
+        }
+      ],
+      "samples_per_arm": 960,
+      "warning": "Frame-wall residual includes CPU/cross-API synchronization; not all GPU pre/post work. Matched capture split is separate from synthetic NMMN fixture."
+    }
+  }
+}
