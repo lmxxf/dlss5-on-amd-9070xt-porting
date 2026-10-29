@@ -1,0 +1,207 @@
+{
+  "case": "3",
+  "removed": [
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 862272,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32-wave1.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 1792320,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c64-wave2.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 1898560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c64-wave2-fast.hsaco"
+    },
+    {
+      "bytes": 848576,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32-wave1-fast.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 833856,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32-wave1-fast-norm900.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 867648,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32-wave1-rtz.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\modules\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 4716158,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4716158,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\3\\gold-original1152-candidate\\out.ppm"
+    }
+  ],
+  "gpu_lock_present": false,
+  "D_free_bytes": 239022899200
+}

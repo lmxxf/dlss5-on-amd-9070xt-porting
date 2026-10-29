@@ -1,0 +1,29 @@
+{
+  "role": "3",
+  "modules": {
+    "c32-wave1-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5-20261029/work/3-build/gfx1201/c32-wave1-fast.hsaco",
+    "c32-wave1-fast-norm900.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5-20261029/work/3-build/gfx1201/c32-wave1-fast-norm900.hsaco"
+  },
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-frame.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-profile.exe",
+  "env": {
+    "NR_C32_POOL": "1",
+    "NR_C32_NORM_EXPAND_MASK": "1"
+  },
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-frame.exe",
+      "sha256": "dc96e798edab58d7f808ca943efb173ddb3bcfe12636f8cd284b8434e9cdad21"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-frame-window.exe",
+      "sha256": "668991413ab7e319da924458691afd7245df31044bd3baa835e8d57b0f7de105"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\3-profile.exe",
+      "sha256": "3412bb3cb4c1fea468b1842c283f84a06824fe556a1175cf60306a5c77c2c04e"
+    }
+  ]
+}

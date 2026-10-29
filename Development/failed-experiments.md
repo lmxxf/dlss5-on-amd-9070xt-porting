@@ -2792,3 +2792,8 @@ OutProj/scales跨4qt预读1A：147/148VGPR、4096LDS/0spill/最大驻留同、7G
 ## 2026-10-29 C32 Phase5 刀2 未通过扩围档位
 
 small900, small720, smallwindow, original1088 未满足三轮mean/p99及单核稳定改善，保持旧路由；实际数值与每轮反例见results/c32-stage-phase5-20261029/knife2-README.md、2-statistics.json。只收mask=1，无性能刷轮。
+
+
+## 2026-10-29 C32 Phase5 刀3 Gold STOP
+
+实际数据流要求融合Block4 finish_dcrop→pool而非Block1 mapped。新核134VGPR/4096LDS/0spill，但首个Original1152 Gold SHA不符，立即STOP，未跑性能、未混入下刀基线；未定位中间张量前不猜WMMA/裁剪/舍入根因。详results/c32-stage-phase5-20261029/knife3-README.md。
