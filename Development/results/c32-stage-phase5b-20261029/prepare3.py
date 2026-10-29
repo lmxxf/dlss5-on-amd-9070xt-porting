@@ -1,0 +1,48 @@
+from pathlib import Path
+import shutil,difflib
+p=Path(__file__).parent;d=p/'work/3-source';assert not d.exists();shutil.copytree('hip',d,ignore=shutil.ignore_patterns('*.hsaco','*.exe','*.dll'));shared=d.parent/'Development/HIP';shared.mkdir(parents=True,exist_ok=True);shutil.copyfile('Development/HIP/swin_persistent_types.h',shared/'swin_persistent_types.h');f=d/'wave_owned_c32.inc';old=f.read_text();s='#ifndef CW_POOL_FUSE\n#define CW_POOL_FUSE 0\n#endif\n'+old;s=s.replace('uint W16=0>','uint W16=0,bool PoolFusion=false>',1);key='float*logit=nullptr){fp8_sat_mode();';assert key in s;s=s.replace(key,'float*logit=nullptr,const float*poolw=nullptr,unsigned char*poolout=nullptr){fp8_sat_mode();',1)
+key='\n#if CW_POST_HEAD_VEC || CW_POST_FULL_TILE\n';assert s.count(key)==1
+code='''
+ if constexpr(PoolFusion){
+  static_assert(Finish&&DownCrop&&DownByte&&Byte&&!Prefix,"pool fusion contract");
+  WG_FENCE(3);WG_FENCE(2);
+  const uint lane=__builtin_amdgcn_workitem_id_x(),rc=lane&15u,g=lane>>4,ww=width+2*sx,tx=(win%(ww/8))*8,ty=(win/(ww/8))*8;
+  {uint cg=lane&3u,sl=lane>>2;
+   for(uint i=0;i<8;i++){uint t=i*8+sl;int x=int(tx+t%8)-int(sx),y=int(ty+t/8)-int(sy);h8 v;__builtin_memcpy(&v,residual+((t/16*2+cg/2)*32+((cg&1u)*16+t%16))*8,16);float q[8];for(uint e=0;e<8;e++)q[e]=float(v[e])+0.f;i2 packed=cw_pack8<0,cw_kind>(q);if(main&&x>=0&&y>=0&&x<int(width)&&y<int(height))__builtin_memcpy(reinterpret_cast<unsigned char*>(main)+((uint(y)*width+uint(x))*32+cg*8),&packed,8);}
+  }
+  i2 pooled[2];const uint t=(rc/4)*16+(rc%4)*2;
+  const int cx=int((tx+t%8)/2)-int(sx/2),cy=int((ty+t/8)/2)-int(sy/2);bool valid=cx>=0&&cy>=0&&cx<int(width/2)&&cy<int(height/2);
+  for(uint half=0;half<2;half++){
+   auto row=[&](uint tok)->h8{h8 v;__builtin_memcpy(&v,residual+((tok/16*2+half)*32+(g*16+tok%16))*8,16);return v;};
+   h8 a0=row(t),a1=row(t+1),b0=row(t+8),b1=row(t+9);float q[8];for(uint e=0;e<8;e++){float top=Hrtz(float(a0[e])+float(a1[e])),bottom=Hrtz(float(b0[e])+float(b1[e]));q[e]=valid?Hrtz(Hrtz(top+bottom)*.25f)+0.f:0.f;}pooled[half]=cw_pack8<0,cw_kind>(q);
+  }
+  _Pragma("clang loop unroll(disable)") for(uint col=0;col<64;col+=16){f8 sum{};
+   for(uint half=0;half<2;half++){i2 b;__builtin_memcpy(&b,reinterpret_cast<const unsigned char*>(poolw)+(col+rc)*32+half*16+g*8,8);sum=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(pooled[half],b,sum);}
+   for(uint e=0;e<8;e++){uint tok=g*8+e;int x=int(tx/2+tok%4)-int(sx/2),y=int(ty/2+tok/4)-int(sy/2);if(x>=0&&y>=0&&x<int(width/2)&&y<int(height/2)){float v=float(__builtin_amdgcn_cvt_pkrtz(0.f+sum[e],0.f)[0]);float cv=__builtin_amdgcn_fmed3f(v+0.f,-448.f,448.f);float fv=__builtin_amdgcn_cvt_f32_fp8(__builtin_amdgcn_cvt_pk_fp8_f32(cv,0.f,0,false),0);fv=fv+0.f;poolout[(uint(y)*(width/2)+uint(x))*64+col+rc]=static_cast<unsigned char>(uint(__builtin_amdgcn_cvt_pk_fp8_f32(fv,fv,0,false))&255u);}}
+  }
+  return;
+ }
+'''
+s=s.replace(key,'\n'+code+key)
+args=['in','fw','aw','nullptr','windows','mode','raw','width','height','sx','sy','prevw','px','py','reinterpret_cast<float*>(main)']+['nullptr']*6+['0.f','nullptr','0','0','nullptr','nullptr','nullptr','nullptr','poolw','poolout'];assert len(args)==31
+s+='\n#if CW_POOL_FUSE\nCW_ENTRY void c32_wave1_finish_dcrop_pool_b8d_w16(const unsigned char*in,const float*fw,const float*aw,unsigned char*main,unsigned char*poolout,const float*poolw,uint windows,uint mode,uint raw,uint width,uint height,uint sx,uint sy,uint prevw,uint px,uint py){cw_body<true,true,true,false,false,false,true,true,false,false,false,false,1,true>('+','.join(args)+');}\n#endif\n';f.write_text(s);(p/'3-kernel.patch').write_text(''.join(difflib.unified_diff(old.splitlines(True),s.splitlines(True),fromfile='a/hip/wave_owned_c32.inc',tofile='b/hip/wave_owned_c32.inc')))
+f=d/'build-modules.ps1';s=f.read_text()
+for name in ['c32-wave1-fast','c32-wave1-fast-norm900']:
+ key="@{ name = '"+name+"'; defines = @(";assert key in s;s=s.replace(key,key+"'CW_POOL_FUSE 1',")
+f.write_text(s)
+# Private host clone from current accepted baseline.
+h=p/'work/3-host';(h/'src').mkdir(parents=True);(h/'Development/HIP').mkdir(parents=True)
+for folder in ['src','Development/HIP']:
+ for f in Path(folder).iterdir():
+  if f.is_file()and f.suffix in ['.h','.hpp','.cpp','.inc']:shutil.copyfile(f,h/folder/f.name)
+f=h/'Development/HIP/hip_reference_network.h';old=f.read_text();s=old.replace('bool down_byte=false;};','bool down_byte=false;Tensor projected64;};',1);key=' C32Result C32Chain(';i=s.index(key);s=s[:i]+' unsigned long long c32_pool_fused_calls=0;\n'+s[i:]
+key='auto main=New(size_t(w)*h*8),pooled=New(size_t(w/2)*(h/2)*(db?8:32));';assert s.count(key)==1
+rep='''if(db&&pool64_byte_available&&opt.skip_blocks.empty()&&!observer&&opt.dump_dir.empty()&&!opt.experimental_temporal&&!opt.temporal_feature_tap&&std::getenv("NR_C32_POOL")&&std::string(std::getenv("NR_C32_POOL"))=="1"&&HasFn("c32_wave1","c32_wave1_finish_dcrop_pool_b8d_w16")){
+   auto main=New(size_t(w)*h*8),projected=New(size_t(w/2)*(h/2)*16);
+   Run("c32_wave1","c32_wave1_finish_dcrop_pool_b8d",windows,P(prev->raw),PackedC32Weight(fw,false),PackedC32Weight(aw,true),P(main),P(projected),PackedDsWeightCast("block4-ds.f32",32),windows,U(3),U(1),w,h,sx,sy,prev->workw,prev->sx,prev->sy);
+   ++c32_pool_fused_calls;C32Result r{main,Tensor{},Tensor{},ww,hh,sx,sy,true};r.down_byte=true;r.projected64=projected;return r;
+  }
+  '''+key
+s=s.replace(key,rep);s=s.replace('kernel=="c32_wave1_finish_dcrop_b8d"||','kernel=="c32_wave1_finish_dcrop_b8d"||kernel=="c32_wave1_finish_dcrop_pool_b8d"||',1)
+a=s.index('Tensor poolcrop;',s.index(' Tensor RunGraph('));b=s.index('poolcrop.reset();last={};',a)+len('poolcrop.reset();last={};');oldpool=s[a:b];decl='const bool pool64_byte=pool64_byte_available&&last.down_byte&&last.down_cropped;';assert decl in oldpool;oldpool=oldpool.replace(decl,'');s=s[:a]+'const bool pool64_byte=bool(last.projected64)||(pool64_byte_available&&last.down_byte&&last.down_cropped);if(last.projected64){source=last.projected64;last={};}else{'+oldpool+'}'+s[b:]
+key='~Network(){';assert key in s;s=s.replace(key,key+'std::fprintf(stderr,"C32_POOL_FUSED calls=%llu\\n",c32_pool_fused_calls);',1);f.write_text(s);(p/'3-host.patch').write_text(''.join(difflib.unified_diff(old.splitlines(True),s.splitlines(True),fromfile='a/Development/HIP/hip_reference_network.h',tofile='b/Development/HIP/hip_reference_network.h')));shutil.copyfile('Development/HIP/benchmark_live_capture.cpp',h/'frame.cpp')

@@ -1,0 +1,318 @@
+{
+  "valid_width_argument_in_actual_call": 0,
+  "note": "This producer/caller uses a cropped tensor with valid_width=valid_height=0. No valid output is left unwritten; invalid padded local rows are never stored. Row permutation preserves each pixel K32 order.",
+  "cases": [
+    {
+      "processing": [
+        1920,
+        1152
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 138240,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1152
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 138240,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1152
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 138240,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1152
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 138240,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1088
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 130560,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1088
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 130560,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1088
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 130560,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1920,
+        1088
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 130560,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        960
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 96000,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        960
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 96000,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        960
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 96000,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        960
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 96000,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        1024
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 102400,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        1024
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 102400,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        1024
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 102400,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1600,
+        1024
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 102400,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1344,
+        768
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 64512,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1344,
+        768
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 64512,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1344,
+        768
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 64512,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        1344,
+        768
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 64512,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        896,
+        512
+      ],
+      "shift": [
+        0,
+        0
+      ],
+      "valid_pooled_pixels": 28672,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        896,
+        512
+      ],
+      "shift": [
+        4,
+        0
+      ],
+      "valid_pooled_pixels": 28672,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        896,
+        512
+      ],
+      "shift": [
+        0,
+        4
+      ],
+      "valid_pooled_pixels": 28672,
+      "coverage_min": 1,
+      "coverage_max": 1
+    },
+    {
+      "processing": [
+        896,
+        512
+      ],
+      "shift": [
+        4,
+        4
+      ],
+      "valid_pooled_pixels": 28672,
+      "coverage_min": 1,
+      "coverage_max": 1
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "accepted": true,
+  "gate": "User-calibrated: pooled mean improves, with hardware stage confirming the direction; round mean counts are disclosed, not an extra veto; pooled p99 nonregressing OR majority p99 rounds support; hardware C32+pool stage confirms improvement. Do not label isolated tails as proven system interrupts without counters.",
+  "frame": {
+    "original1088": {
+      "mean_improves": true,
+      "mean_rounds_improve": 2,
+      "p99_support": true
+    },
+    "original960": {
+      "mean_improves": true,
+      "mean_rounds_improve": 3,
+      "p99_support": true
+    },
+    "small1080": {
+      "mean_improves": true,
+      "mean_rounds_improve": 1,
+      "p99_support": true
+    },
+    "small900": {
+      "mean_improves": true,
+      "mean_rounds_improve": 3,
+      "p99_support": true
+    }
+  },
+  "device_clock": {
+    "original1088": {
+      "delta_ms": -0.007306666666666868,
+      "rounds_improve": 2
+    },
+    "small1080": {
+      "delta_ms": -0.005246666666666548,
+      "rounds_improve": 3
+    }
+  }
+}
