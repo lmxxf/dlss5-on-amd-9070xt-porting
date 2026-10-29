@@ -1,0 +1,70 @@
+{
+  "role": "final",
+  "modules": {
+    "multihead_fused_attention.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead_fused_attention.hsaco",
+    "c32_wmma.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_wmma.hsaco",
+    "c32_fused_attention.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_fused_attention.hsaco",
+    "c32-wave1.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32-wave1.hsaco",
+    "multihead-reference.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-reference.hsaco",
+    "c64-wave2.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c64-wave2.hsaco",
+    "wave-pointwise.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/wave-pointwise.hsaco",
+    "vit-stream-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/vit-stream-fast.hsaco",
+    "boundary-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/boundary-fast.hsaco",
+    "prefix_fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/prefix_fast.hsaco",
+    "c64-wave2-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c64-wave2-fast.hsaco",
+    "c32-wave1-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32-wave1-fast.hsaco",
+    "multihead-wmma.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-wmma.hsaco",
+    "swin-persistent.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/swin-persistent.hsaco",
+    "c32_prefix_reference.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_prefix_reference.hsaco",
+    "multi-pass-skin.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multi-pass-skin.hsaco",
+    "vit-stream.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/vit-stream.hsaco",
+    "c32_fast_attention.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_fast_attention.hsaco",
+    "c32_tiled.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_tiled.hsaco",
+    "multihead-tiled.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-tiled.hsaco",
+    "c512-m32-deep.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c512-m32-deep.hsaco",
+    "c512-m32-mh.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c512-m32-mh.hsaco",
+    "c32-wave1-fast-norm900.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32-wave1-fast-norm900.hsaco",
+    "deep_fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/deep_fast.hsaco",
+    "boundary_reference.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/boundary_reference.hsaco",
+    "c32_fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_fast.hsaco",
+    "vit-wide-deep.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/vit-wide-deep.hsaco",
+    "multihead-fast-padded-wave.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-fast-padded-wave.hsaco",
+    "deep_wmma.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/deep_wmma.hsaco",
+    "swin-persistent-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/swin-persistent-fast.hsaco",
+    "c32_fused_ffn_attention.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_fused_ffn_attention.hsaco",
+    "multi-pass-predict.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multi-pass-predict.hsaco",
+    "c32-wave1-rtz.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32-wave1-rtz.hsaco",
+    "multihead-fast-padded-wave-packed.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-fast-padded-wave-packed.hsaco",
+    "c32_fused_ffn_attention-packed.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/c32_fused_ffn_attention-packed.hsaco",
+    "deep_fast-packed-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/deep_fast-packed-fast.hsaco",
+    "multihead-fast-packed.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-fast-packed.hsaco",
+    "deep_fast-packed.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/deep_fast-packed.hsaco",
+    "multihead-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/multihead-fast.hsaco",
+    "deep_reference.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/c32-stage-phase5b-20261029/payload/HIP/gfx1201/deep_reference.hsaco"
+  },
+  "frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+  "profiles": [
+    "original1152",
+    "original1088",
+    "original960",
+    "small1080",
+    "small900",
+    "small720",
+    "smallwindow"
+  ],
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\pure.exe",
+      "sha256": "497d09deb9b6837160de77cd7428da2012b4f535370c147de07414d7ce924170"
+    }
+  ]
+}

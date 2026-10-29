@@ -1,0 +1,22 @@
+{
+  "modules": 80,
+  "formal_hosts_sha256_verified": true,
+  "gold_profiles": 7,
+  "gold_frames": 42,
+  "gold_bitdiff": 0,
+  "invalid": 0,
+  "frame_abba_profiles": 7,
+  "steady_samples_per_arm": 960,
+  "nmmn_profiles": 3,
+  "hardware_clock_profiles": 2,
+  "default_fusion_route_verified": true,
+  "runtime_smoke_exit": 0,
+  "production_w16_vgpr_max": 158,
+  "all_export_private_and_spill_zero": true,
+  "legacy_resource_exceptions": "Seven unchanged nondefault exports per fast module already >160 VGPR at baseline; no resource regression; listed in resource-gates JSON.",
+  "new_export_per_fast_module": "c32_wave1_finish_dcrop_pool_b8d_w16",
+  "legacy_constant_relocations_proven": 4,
+  "gpu_lock_released": true,
+  "D_free_bytes": 236575522816,
+  "locked_mochi_tree_unchanged": true
+}

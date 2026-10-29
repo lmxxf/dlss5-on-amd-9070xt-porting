@@ -1,0 +1,3039 @@
+{
+  "gpu_lock_present": false,
+  "removed": [
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_prefix_reference\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_prefix_reference\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-reference\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-reference\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-deep_reference\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-deep_reference\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-boundary_reference\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-boundary_reference\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_wmma\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_wmma\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-wmma\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-wmma\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-deep_wmma\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-deep_wmma\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-wave-pointwise\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-wave-pointwise\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_tiled\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_tiled\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-tiled\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-tiled\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_fast\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_fast\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_fast_attention\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_fast_attention\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-boundary-fast\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-boundary-fast\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_fused_attention\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_fused_attention\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_fused_ffn_attention\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_fused_ffn_attention\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c32_fused_ffn_attention-packed\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c32_fused_ffn_attention-packed\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-prefix_fast\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-prefix_fast\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-fast\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-fast\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-fast-padded-wave\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-fast-padded-wave\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead_fused_attention\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead_fused_attention\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-deep_fast\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-deep_fast\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-deep_fast-packed\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-deep_fast-packed\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-fast-packed\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-fast-packed\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multihead-fast-padded-wave-packed\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multihead-fast-padded-wave-packed\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-deep_fast-packed-fast\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-deep_fast-packed-fast\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-vit-stream-fast\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-vit-stream-fast\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c512-m32-mh\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c512-m32-mh\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 636024,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-c512-m32-deep\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-c512-m32-deep\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-vit-stream\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-vit-stream\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-vit-wide-deep\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-vit-wide-deep\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multi-pass-skin\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multi-pass-skin\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-multi-pass-predict\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-multi-pass-predict\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-swin-persistent\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-swin-persistent\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1200-swin-persistent-fast\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full\\compile-gfx1201-swin-persistent-fast\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_wmma.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 862272,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32-wave1.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-reference.hsaco"
+    },
+    {
+      "bytes": 1792320,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c64-wave2.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\boundary-fast.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\prefix_fast.hsaco"
+    },
+    {
+      "bytes": 1898560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c64-wave2-fast.hsaco"
+    },
+    {
+      "bytes": 831808,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32-wave1-fast.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\swin-persistent.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\vit-stream.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_tiled.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 831808,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32-wave1-fast-norm900.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\deep_fast.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\boundary_reference.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_fast.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\deep_wmma.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 867648,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32-wave1-rtz.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\multihead-fast.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\modules\\deep_reference.hsaco"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1152-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original1088-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-original960-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small900-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small720-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-small1080-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\gold-smallwindow-candidate\\out.ppm"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r1-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r2-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-original1088-r3-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r1-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r2-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-0-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-0-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-1-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-1-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-2-candidate\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-2-candidate\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-3-baseline\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\kernel-small1080-r3-3-baseline\\last.rgb32f"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1152-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original1088-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-original960-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small1080-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small900-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713963,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 7464960,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 2799448,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-small720-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r1-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r2-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-0-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-0-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-0-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-0-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-0-baseline\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-1-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-1-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-1-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-1-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-1-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4713451,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-2-candidate\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-2-candidate\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-2-candidate\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-2-candidate\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-2-candidate\\out.ppm"
+    },
+    {
+      "bytes": 4693375,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-3-baseline\\frame.exe"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-3-baseline\\out-first.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-3-baseline\\out-first.ppm"
+    },
+    {
+      "bytes": 3279360,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-3-baseline\\out.f16"
+    },
+    {
+      "bytes": 1229847,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final\\perf-smallwindow-r3-3-baseline\\out.ppm"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r1-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r2-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 25067520,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\original1088-r3-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r1-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r2-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 33177600,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 26542080,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small1080-r3-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r1-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r2-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-0-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-0-N\\last.rgb32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-1-M\\final.rgba32f"
+    },
+    {
+      "bytes": 23040000,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-2-M\\final.rgba32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-3-N\\first.rgb32f"
+    },
+    {
+      "bytes": 19660800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn\\small900-r3-3-N\\last.rgb32f"
+    },
+    {
+      "bytes": 0,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\cache"
+    },
+    {
+      "bytes": 0,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\aco-cache"
+    },
+    {
+      "bytes": 0,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\baseline"
+    },
+    {
+      "bytes": 0,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full-binaries"
+    },
+    {
+      "bytes": 0,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full-generated"
+    },
+    {
+      "bytes": 4712754,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\3-frame-window.exe"
+    },
+    {
+      "bytes": 4712754,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\3-frame.exe"
+    },
+    {
+      "bytes": 3842340,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\3-profile.exe"
+    },
+    {
+      "bytes": 834112,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\3-c32-wave1-fast-norm900.hsaco"
+    },
+    {
+      "bytes": 848704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\3-c32-wave1-fast.hsaco"
+    },
+    {
+      "bytes": 3844034,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-profile.exe"
+    },
+    {
+      "bytes": 50904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-boundary-fast.hsaco"
+    },
+    {
+      "bytes": 17832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-boundary_reference.hsaco"
+    },
+    {
+      "bytes": 831808,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32-wave1-fast-norm900.hsaco"
+    },
+    {
+      "bytes": 831808,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32-wave1-fast.hsaco"
+    },
+    {
+      "bytes": 867648,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32-wave1-rtz.hsaco"
+    },
+    {
+      "bytes": 862272,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32-wave1.hsaco"
+    },
+    {
+      "bytes": 38056,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_fast.hsaco"
+    },
+    {
+      "bytes": 29568,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_fast_attention.hsaco"
+    },
+    {
+      "bytes": 39472,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_fused_attention.hsaco"
+    },
+    {
+      "bytes": 219328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_fused_ffn_attention-packed.hsaco"
+    },
+    {
+      "bytes": 286528,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_fused_ffn_attention.hsaco"
+    },
+    {
+      "bytes": 35784,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_prefix_reference.hsaco"
+    },
+    {
+      "bytes": 31536,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_tiled.hsaco"
+    },
+    {
+      "bytes": 66504,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c32_wmma.hsaco"
+    },
+    {
+      "bytes": 647800,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c512-m32-deep.hsaco"
+    },
+    {
+      "bytes": 1114696,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c512-m32-mh.hsaco"
+    },
+    {
+      "bytes": 1898560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c64-wave2-fast.hsaco"
+    },
+    {
+      "bytes": 1792320,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-c64-wave2.hsaco"
+    },
+    {
+      "bytes": 708560,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-deep_fast-packed-fast.hsaco"
+    },
+    {
+      "bytes": 711632,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-deep_fast-packed.hsaco"
+    },
+    {
+      "bytes": 609144,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-deep_fast.hsaco"
+    },
+    {
+      "bytes": 70312,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-deep_reference.hsaco"
+    },
+    {
+      "bytes": 82616,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-deep_wmma.hsaco"
+    },
+    {
+      "bytes": 14328,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multi-pass-predict.hsaco"
+    },
+    {
+      "bytes": 12888,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multi-pass-skin.hsaco"
+    },
+    {
+      "bytes": 104904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-fast-packed.hsaco"
+    },
+    {
+      "bytes": 1278832,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-fast-padded-wave-packed.hsaco"
+    },
+    {
+      "bytes": 1222008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-fast-padded-wave.hsaco"
+    },
+    {
+      "bytes": 106952,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-fast.hsaco"
+    },
+    {
+      "bytes": 66824,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-reference.hsaco"
+    },
+    {
+      "bytes": 49072,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-tiled.hsaco"
+    },
+    {
+      "bytes": 93264,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead-wmma.hsaco"
+    },
+    {
+      "bytes": 366880,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-multihead_fused_attention.hsaco"
+    },
+    {
+      "bytes": 77496,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-prefix_fast.hsaco"
+    },
+    {
+      "bytes": 1465736,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-swin-persistent-fast.hsaco"
+    },
+    {
+      "bytes": 1296904,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-swin-persistent.hsaco"
+    },
+    {
+      "bytes": 734240,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-vit-stream-fast.hsaco"
+    },
+    {
+      "bytes": 722976,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-vit-stream.hsaco"
+    },
+    {
+      "bytes": 617008,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-vit-wide-deep.hsaco"
+    },
+    {
+      "bytes": 46704,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\final-wave-pointwise.hsaco"
+    },
+    {
+      "bytes": 802774,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\3-evidence.zip"
+    },
+    {
+      "bytes": 7503955,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full-binaries.zip"
+    },
+    {
+      "bytes": 52,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\native-cache.bin"
+    },
+    {
+      "bytes": 1113646,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-evidence.zip"
+    },
+    {
+      "bytes": 116217,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\final-nmmn-evidence.zip"
+    },
+    {
+      "bytes": 6107,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\smoke-evidence.zip"
+    },
+    {
+      "bytes": 78596,
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\full-evidence.zip"
+    }
+  ],
+  "formal_payload_retained": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload",
+  "D_free_bytes": 236575522816
+}

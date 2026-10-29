@@ -8,11 +8,14 @@ for arch in ['gfx1200','gfx1201']:
  for f in(p/'work/full-llvm'/arch).glob('*.hsaco'):shutil.copyfile(f,out/arch/f.name)
 sp=importlib.util.spec_from_file_location('compare','Development/tools/llvm-fork/compare-kernels.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m);stock=p.parent/'isa-asm-phase3-20261029/payload/HIP';mods=[];changed=[]
 for f in sorted(out.glob('*/*.hsaco')):
- n=f.relative_to(out).as_posix();arch=f.parent.name;b=f.read_bytes();flags=struct.unpack_from('<I',b,48)[0];headers=subprocess.check_output(['/home/lmxxf/work/llvm-build-23/bin/llvm-readobj','--file-headers',str(f)],text=True);assert 'EF_AMDGPU_MACH_AMDGCN_'+arch.upper() in headers,(n,headers);_,a,sa=m.elf(stock/n);_,c,sc=m.elf(f);assert set(a)==set(c),(n,'exports')
+ n=f.relative_to(out).as_posix();arch=f.parent.name;b=f.read_bytes();flags=struct.unpack_from('<I',b,48)[0];headers=subprocess.check_output(['/home/lmxxf/work/llvm-build-23/bin/llvm-readobj','--file-headers',str(f)],text=True);assert 'EF_AMDGPU_MACH_AMDGCN_'+arch.upper() in headers,(n,headers);_,a,sa=m.elf(stock/n);_,c,sc=m.elf(f);assert set(a)<=set(c),(n,'removed exports');added=set(c)-set(a);assert not added or f.name in ['c32-wave1-fast.hsaco','c32-wave1-fast-norm900.hsaco']and added=={'c32_wave1_finish_dcrop_pool_b8d_w16'},(n,added)
  diffs=[]
  for k in a:
   code=hashlib.sha256(sa[k][2]).hexdigest()!=hashlib.sha256(sc[k][2]).hexdigest();md=a[k]!=c[k]
   if code or md:diffs.append({'kernel':k,'code_changed':code,'metadata_changed':md,'baseline_vgpr':a[k]['.vgpr_count'],'candidate_vgpr':c[k]['.vgpr_count'],'candidate_private':c[k]['.private_segment_fixed_size'],'candidate_spill':c[k].get('.vgpr_spill_count',0)})
+ for k in added:
+  assert c[k]['.vgpr_count']<=160 and c[k]['.private_segment_fixed_size']==0 and c[k].get('.vgpr_spill_count',0)==0,(n,k)
+  diffs.append({'kernel':k,'new_export':True,'code_changed':True,'metadata_changed':True,'baseline_vgpr':None,'candidate_vgpr':c[k]['.vgpr_count'],'candidate_private':c[k]['.private_segment_fixed_size'],'candidate_spill':c[k].get('.vgpr_spill_count',0)})
  if diffs:changed.append({'module':n,'changed':diffs})
  mods.append({'path':n,'sha256':hashlib.sha256(b).hexdigest(),'elf_flags':flags,'kernels':len(c),'changed_functions':len(diffs)})
 assert len(mods)==80
@@ -20,8 +23,8 @@ assert len(mods)==80
 for row in changed:
  assert row['module'].split('/')[1]in['c32-wave1-fast.hsaco','c32-wave1-fast-norm900.hsaco'],row
  for x in row['changed']:
-  assert x['kernel'].startswith('c32_wave1_'),x
+  assert x['kernel'].startswith('c32_wave1_')or x['kernel']=='c32_fast_ffn_attention_fused_half_prefix_finish_main8'and not x['metadata_changed'],x
   assert x['candidate_private']==0 and x['candidate_spill']==0,x
   if x['kernel'].endswith('_w16'):assert x['candidate_vgpr']<=160,x
-accepted4=False
-(p/'full-code-comparison.json').write_text(json.dumps(changed,indent=2));(p/'full-rebuild-verification.json').write_text(json.dumps({'count':80,'all_architectures_verified':True,'accepted_knife4':accepted4,'modules':mods},indent=2));s=''.join(x['sha256']+'  '+x['path']+'\n'for x in mods);Path('hip/SHA256SUMS').write_text(s);(out/'SHA256SUMS').write_text(s);(p/'full-binaries.zip').unlink();print('80 ELF architectures and full function/metadata comparison verified')
+subprocess.run(['python3',str(p/'prove-legacy-relocation.py')],check=True)
+(p/'full-code-comparison.json').write_text(json.dumps(changed,indent=2));(p/'full-rebuild-verification.json').write_text(json.dumps({'count':80,'all_architectures_verified':True,'accepted_optimizations':['norm-hoist-default','outproj-hoist','finish-pool-fusion'],'modules':mods},indent=2));s=''.join(x['sha256']+'  '+x['path']+'\n'for x in mods);Path('hip/SHA256SUMS').write_text(s);(out/'SHA256SUMS').write_text(s);(p/'full-binaries.zip').unlink();print('80 ELF architectures and full function/metadata comparison verified')

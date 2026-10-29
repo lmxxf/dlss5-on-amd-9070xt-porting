@@ -858,3 +858,8 @@ Step3：C128 3A Contract深预取保持B4，VGPR242→248但硬件分配桶不�
 ### 2026-10-29 C32专项 Phase5 闭环
 
 bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（mean−42.863µs/p99−43.602µs），最终集成合并p99+24.228µs（R1+65.243µs）撤销；0cc4a90a融合首档Gold不符STOP，8b8dbb7b寄存器Post七档Gold同但单核/整网退步STOP。双架构80模块实际重编、ELF/函数/metadata/SHA核验及正式O2 addon/runtime/frame/pure完成，最终七档Gold/七档3ABBA/三档新版v008纯NN3NMMN闭环。 最新同批Original1088 NN HIP8.299856/ACO5.694142ms（+45.76%），不宣称硬件上限。完整结果results/c32-stage-phase5-20261029/README.md；临时大文件清理、锁释放，无游戏/ZIP/上游源码修改，无push。
+
+
+### 2026-10-29 C32 Phase5B 收网
+
+修通finish→pool的跨文件Hrtz/FP8零边界，d510bb69独立7Gold42全同，四档合并mean/p99全赢；按Zero校准门进入组合。最终生产保留全档fast norm-hoist+OutProj外提+默认融合，七档Gold42帧0diff/invalid0，七档三轮ABBA mean/p99全部改善、mean各三轮均赢。 Original1152/1088 mean-101.146/-86.825µs，Small1080/900 -51.945/-62.368µs；C32+pool硬件时钟Orig/Small -92.903/-69.280µs。 双架构80模块实际重编、ELF/SHA/metadata核验及正式O2 addon/runtime/frame/pure、runtime-smoke完成。生产W16max158、全部private/spill0，旧7项非默认>160资源例外原样保留清单。 新版v008三轮NMMN Original1088 HIP8.214575/ACO5.685226ms（+44.49%）。 细节results/c32-stage-phase5b-20261029/README.md；已清理、锁释放，无游戏/ZIP/上游源码修改、无push。

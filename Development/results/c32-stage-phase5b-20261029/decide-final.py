@@ -1,0 +1,6 @@
+from pathlib import Path
+import json
+p=Path(__file__).parent;a=json.loads((p/'final-statistics.json').read_text())['tiers'];k=json.loads((p/'final-c32-statistics.json').read_text())['profiles'];rows={}
+for name,x in a.items():
+ pooled_p99=x['p99_delta_ms']<=0;majority=sum(r['p99_delta_ms']<=0 for r in x['rounds'])>=2;rows[name]={'mean_delta_us':x['delta_ms']*1000,'pooled_p99_delta_us':x['p99_delta_ms']*1000,'mean_supporting_rounds':sum(r['delta_ms']<0 for r in x['rounds']),'p99_supporting_rounds':sum(r['p99_delta_ms']<=0 for r in x['rounds']),'accept':x['delta_ms']<0 and(pooled_p99 or majority),'p99_basis':'pooled'if pooled_p99 else'majority rounds'if majority else'unsupported'}
+clock={n:x['delta_stage_ms']*1000 for n,x in k.items()};win=all(x['accept']for x in rows.values())and all(x<0 for x in clock.values());(p/'final-decision.json').write_text(json.dumps({'accepted':win,'profiles':rows,'hardware_c32_plus_pool_delta_us':clock,'rule':'Zero calibration: pooled mean improves, hardware confirms acceleration, pooled p99 nonregression OR majority of paired rounds support. A single round p99 is not an automatic veto. No unmeasured interrupt attribution.'},indent=2));print(json.dumps({'accepted':win,'profiles':rows,'hardware_clock':clock},indent=2))

@@ -1,0 +1,447 @@
+{
+  "nmmn": {
+    "original1088": {
+      "hip_ms": 8.214574791666665,
+      "aco_ms": 5.685226041666667,
+      "gap_ms": 2.5293487499999987,
+      "hip_slower_percent": 44.48985372723195,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 8.2050135625,
+          "aco_ms": 5.6722906250000005,
+          "gap_ms": 2.532722937499999
+        },
+        {
+          "round": 2,
+          "hip_ms": 8.21474321875,
+          "aco_ms": 5.687475000000001,
+          "gap_ms": 2.527268218749999
+        },
+        {
+          "round": 3,
+          "hip_ms": 8.223967593749999,
+          "aco_ms": 5.6959125,
+          "gap_ms": 2.528055093749998
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small1080": {
+      "hip_ms": 4.946637281249999,
+      "aco_ms": 3.450389583333333,
+      "gap_ms": 1.4962476979166661,
+      "hip_slower_percent": 43.364601642205855,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 4.94785496875,
+          "aco_ms": 3.451478125,
+          "gap_ms": 1.4963768437499998
+        },
+        {
+          "round": 2,
+          "hip_ms": 4.94425071875,
+          "aco_ms": 3.448315625,
+          "gap_ms": 1.49593509375
+        },
+        {
+          "round": 3,
+          "hip_ms": 4.94780615625,
+          "aco_ms": 3.4513749999999996,
+          "gap_ms": 1.4964311562500008
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small900": {
+      "hip_ms": 3.7954107291666666,
+      "aco_ms": 2.6401302083333333,
+      "gap_ms": 1.1552805208333332,
+      "hip_slower_percent": 43.75846756295558,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 3.7968892812499995,
+          "aco_ms": 2.640115625,
+          "gap_ms": 1.1567736562499995
+        },
+        {
+          "round": 2,
+          "hip_ms": 3.79739709375,
+          "aco_ms": 2.63984375,
+          "gap_ms": 1.15755334375
+        },
+        {
+          "round": 3,
+          "hip_ms": 3.7919458125,
+          "aco_ms": 2.64043125,
+          "gap_ms": 1.1515145625
+        }
+      ],
+      "steady_samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.198801312499999,
+      "cpu_ms": 8.315914375,
+      "p99_ms": 8.3210689,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.66149375,
+      "cpu_ms": 5.8204125,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.6830875,
+      "cpu_ms": 5.7868,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.2112258125,
+      "cpu_ms": 8.32198,
+      "p99_ms": 8.3379748,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.204329875,
+      "cpu_ms": 8.311751875,
+      "p99_ms": 8.3189014,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.6871625,
+      "cpu_ms": 5.78750625,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.687787500000001,
+      "cpu_ms": 5.78911875,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.225156562499999,
+      "cpu_ms": 8.336316875,
+      "p99_ms": 8.3378461,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.224476999999998,
+      "cpu_ms": 8.329816875,
+      "p99_ms": 8.3262124,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.69601875,
+      "cpu_ms": 5.7982625,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.6958062499999995,
+      "cpu_ms": 5.797725,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.223458187499999,
+      "cpu_ms": 8.3324325,
+      "p99_ms": 8.3443273,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.949460312499999,
+      "cpu_ms": 5.066749375,
+      "p99_ms": 5.163344299999999,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.4517125,
+      "cpu_ms": 3.55129375,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.4512437499999997,
+      "cpu_ms": 3.5468312500000003,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.946249625,
+      "cpu_ms": 5.065333125,
+      "p99_ms": 5.1006652,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.939207874999999,
+      "cpu_ms": 5.056518124999999,
+      "p99_ms": 5.1063496,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.45118125,
+      "cpu_ms": 3.54663125,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.44545,
+      "cpu_ms": 3.5562562499999997,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.9492935625,
+      "cpu_ms": 5.068115000000001,
+      "p99_ms": 5.2042732,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.954843375,
+      "cpu_ms": 5.078219375,
+      "p99_ms": 5.1372168,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.4526499999999998,
+      "cpu_ms": 3.55131875,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.4501,
+      "cpu_ms": 3.5484875000000002,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.940768937500001,
+      "cpu_ms": 5.058525,
+      "p99_ms": 5.0953391,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.798413625,
+      "cpu_ms": 3.9189431249999997,
+      "p99_ms": 4.0021618,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.63885,
+      "cpu_ms": 2.73825,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.64138125,
+      "cpu_ms": 2.7386624999999998,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.7953649374999996,
+      "cpu_ms": 3.9187087499999995,
+      "p99_ms": 3.9745643,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.7966150625,
+      "cpu_ms": 3.9182,
+      "p99_ms": 3.983822,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.6395125,
+      "cpu_ms": 2.738475,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.640175,
+      "cpu_ms": 2.73635,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.798179125,
+      "cpu_ms": 3.9230393749999997,
+      "p99_ms": 4.0301924,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.7883683749999997,
+      "cpu_ms": 3.915128125,
+      "p99_ms": 3.9530499,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.64053125,
+      "cpu_ms": 2.7392875,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.64033125,
+      "cpu_ms": 2.7391562499999997,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.79552325,
+      "cpu_ms": 3.9176393750000003,
+      "p99_ms": 3.9813115000000003,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    }
+  ]
+}

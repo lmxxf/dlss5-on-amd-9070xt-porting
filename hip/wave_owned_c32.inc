@@ -1,3 +1,9 @@
+#ifndef CW_OUTPROJ_HOIST
+#define CW_OUTPROJ_HOIST 0
+#endif
+#ifndef CW_POOL_FUSE
+#define CW_POOL_FUSE 0
+#endif
 // small-wins-20260930 (from mochizuki-022 I/P): exact representation changes only; every arithmetic rounding kept, its half bits reused.
 #ifndef CW_INPUT_HALF
 #define CW_INPUT_HALF 0 /* bit0: post Hrtz value; bit1: mapped input (half/FP8 producers); bit2: Up H() value -- skip float((_Float16)v) */
@@ -209,8 +215,8 @@ DEV cw_i2_pair cw_matrix16(const float*w,uint byte_offset){
  cw_i4 v;__builtin_memcpy(&v,__builtin_assume_aligned(p,16),16);
  return {i2{v[0],v[1]},i2{v[2],v[3]}};
 }
-template<bool Chain,bool Finish=false,bool DownCrop=false,bool Post=false,bool Prefix=false,bool Up=false,bool Byte=false,bool DownByte=false,bool InByte=false,bool UpLowByte=false,bool PostRGBA=false,bool PostTap=false,uint W16=0>
-DEV void cw_body(const unsigned char*in,const float*fw,const float*w,unsigned char*out,uint windows,uint mode,uint raw,uint width,uint height,uint sx,uint sy,uint prevw,uint px,uint py,float*main=nullptr,float*down=nullptr,const unsigned char*skip=nullptr,const float*scales=nullptr,const float*color=nullptr,const float*headw=nullptr,float*rgb=nullptr,float rgbscale=0.f,const float*history=nullptr,uint seed=0,uint temporal=0,const float*upw=nullptr,_Float16*post_features=nullptr,const float*logitw=nullptr,float*logit=nullptr){fp8_sat_mode();
+template<bool Chain,bool Finish=false,bool DownCrop=false,bool Post=false,bool Prefix=false,bool Up=false,bool Byte=false,bool DownByte=false,bool InByte=false,bool UpLowByte=false,bool PostRGBA=false,bool PostTap=false,uint W16=0,bool PoolFusion=false>
+DEV void cw_body(const unsigned char*in,const float*fw,const float*w,unsigned char*out,uint windows,uint mode,uint raw,uint width,uint height,uint sx,uint sy,uint prevw,uint px,uint py,float*main=nullptr,float*down=nullptr,const unsigned char*skip=nullptr,const float*scales=nullptr,const float*color=nullptr,const float*headw=nullptr,float*rgb=nullptr,float rgbscale=0.f,const float*history=nullptr,uint seed=0,uint temporal=0,const float*upw=nullptr,_Float16*post_features=nullptr,const float*logitw=nullptr,float*logit=nullptr,const float*poolw=nullptr,unsigned char*poolout=nullptr){fp8_sat_mode();
  constexpr uint cw_kind=Prefix?5:Post?4:Finish?(DownCrop?3:2):Chain?0:1;
  uint win=bid();if(win>=windows)return;
  __attribute__((shared)) _Float16 residual[4*2*32*8];
@@ -437,6 +443,14 @@ CW_Q8_SET(a,e,v);}CW_Q8_END_SITE(a,3);
   }
   __builtin_amdgcn_sched_barrier(0);
  }
+ cw_i2_pair proj_hoisted[2];float skip_hoisted[2][8];
+ if constexpr(CW_OUTPROJ_HOIST && W16>0){
+  const uint pl=__builtin_amdgcn_workitem_id_x(),pr=pl&15u,pg=pl>>4;
+  _Pragma("unroll") for(uint ci=0;ci<2;ci++){
+   proj_hoisted[ci]=cw_matrix16(w,3072+ci*512+(pg*16+pr)*16);
+   __builtin_memcpy(skip_hoisted[ci],w+8193+ci*16+pg*8,32);
+  }
+ }
  _Pragma("clang loop unroll(disable)") for(uint qt=0;qt<4;qt++){
   uint lane=__builtin_amdgcn_workitem_id_x();
 #if CW_LAUNDER
@@ -456,23 +470,44 @@ CW_Q8_SET(a,e,v);}CW_Q8_END_SITE(a,3);
   for(uint ci=0;ci<2;ci++){
    f8 acc{};
    if constexpr(W16>0){
-    cw_i2_pair bp=cw_matrix16(w,3072+ci*512+(g*16+r)*16);
+    cw_i2_pair bp;if constexpr(CW_OUTPROJ_HOIST)bp=proj_hoisted[ci];else bp=cw_matrix16(w,3072+ci*512+(g*16+r)*16);
     acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.lo,av[0],acc);
     acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.hi,av[1],acc);
    }else for(uint kt=0;kt<2;kt++){i2 b=matrix8(w,3072+(ci*16+r)*32+kt*16+g*8);acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,av[kt],acc);}
    CW_Q8_DECL(a);
 #if CW_RTZ_PAIR
-   f8 summed;for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*w[8193+ci*16+g*8+e];summed[e]=acc[e]+prod;}
+   f8 summed;for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*((CW_OUTPROJ_HOIST&&W16>0)?skip_hoisted[ci][e]:w[8193+ci*16+g*8+e]);summed[e]=acc[e]+prod;}
    h8 rounded=cw_rtz_half8(summed);
    if constexpr(Finish||Post)__builtin_memcpy(residual+((qt*2+ci)*32+(g*16+r))*8,&rounded,16);
    else for(uint e=0;e<8;e++)CW_Q8_SET(a,e,cw_output_value(float(rounded[e])));
 #else
-   for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*w[8193+ci*16+g*8+e],v=Hrtz(acc[e]+prod);if constexpr(Finish||Post)residual[((qt*2+ci)*32+(g*16+r))*8+e]=(_Float16)v;else CW_Q8_SET(a,e,cw_output_value(v));}
+   for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*((CW_OUTPROJ_HOIST&&W16>0)?skip_hoisted[ci][e]:w[8193+ci*16+g*8+e]),v=Hrtz(acc[e]+prod);if constexpr(Finish||Post)residual[((qt*2+ci)*32+(g*16+r))*8+e]=(_Float16)v;else CW_Q8_SET(a,e,cw_output_value(v));}
 #endif
    if constexpr(!Finish&&!Post)CW_Q8_END_SITE(a,6);
    if constexpr(!Finish&&!Post)__builtin_memcpy(out+(win*64+qt*16+r)*32+ci*16+g*8,&a,8);
   }
   __builtin_amdgcn_sched_barrier(0);
+ }
+
+
+ if constexpr(PoolFusion){
+  static_assert(Finish&&DownCrop&&DownByte&&Byte&&!Prefix,"pool fusion contract");
+  WG_FENCE(3);WG_FENCE(2);
+  const uint lane=__builtin_amdgcn_workitem_id_x(),rc=lane&15u,g=lane>>4,ww=width+2*sx,tx=(win%(ww/8))*8,ty=(win/(ww/8))*8;
+  {uint cg=lane&3u,sl=lane>>2;
+   for(uint i=0;i<8;i++){uint t=i*8+sl;int x=int(tx+t%8)-int(sx),y=int(ty+t/8)-int(sy);h8 v;__builtin_memcpy(&v,residual+((t/16*2+cg/2)*32+((cg&1u)*16+t%16))*8,16);float q[8];for(uint e=0;e<8;e++)q[e]=float(v[e])+0.f;i2 packed=cw_pack8<0,cw_kind>(q);if(main&&x>=0&&y>=0&&x<int(width)&&y<int(height))__builtin_memcpy(reinterpret_cast<unsigned char*>(main)+((uint(y)*width+uint(x))*32+cg*8),&packed,8);}
+  }
+  i2 pooled[2];const uint t=(rc/4)*16+(rc%4)*2;
+  const int cx=int((tx+t%8)/2)-int(sx/2),cy=int((ty+t/8)/2)-int(sy/2);bool valid=cx>=0&&cy>=0&&cx<int(width/2)&&cy<int(height/2);
+  for(uint half=0;half<2;half++){
+   auto row=[&](uint tok)->h8{h8 v;__builtin_memcpy(&v,residual+((tok/16*2+half)*32+(g*16+tok%16))*8,16);return v;};
+   h8 a0=row(t),a1=row(t+1),b0=row(t+8),b1=row(t+9);float q[8];for(uint e=0;e<8;e++){float top=Hrtz(float(a0[e])+float(a1[e])),bottom=Hrtz(float(b0[e])+float(b1[e]));q[e]=valid?Hrtz(Hrtz(top+bottom)*.25f)+0.f:0.f;}pooled[half]=cw_pack8<0,cw_kind>(q);
+  }
+  _Pragma("clang loop unroll(disable)") for(uint col=0;col<64;col+=16){f8 sum{};
+   for(uint half=0;half<2;half++){i2 b;__builtin_memcpy(&b,reinterpret_cast<const unsigned char*>(poolw)+(col+rc)*32+half*16+g*8,8);sum=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(pooled[half],b,sum);}
+   for(uint e=0;e<8;e++){uint tok=g*8+e;int x=int(tx/2+tok%4)-int(sx/2),y=int(ty/2+tok/4)-int(sy/2);if(x>=0&&y>=0&&x<int(width/2)&&y<int(height/2)){float v=float(__builtin_amdgcn_cvt_pkrtz(0.f+sum[e],0.f)[0]);float cv=__builtin_amdgcn_fmed3f(v+0.f,-448.f,448.f);float fv=__builtin_amdgcn_cvt_f32_fp8(__builtin_amdgcn_cvt_pk_fp8_f32(cv,0.f,0,false),0);fv=fv+0.f;poolout[(uint(y)*(width/2)+uint(x))*64+col+rc]=static_cast<unsigned char>(uint(__builtin_amdgcn_cvt_pk_fp8_f32(fv,fv,0,false))&255u);}}
+  }
+  return;
  }
 
 #if CW_POST_HEAD_VEC || CW_POST_FULL_TILE
@@ -696,3 +731,7 @@ CW_EXPORT_ALL(,0)
 CW_EXPORT_ALL(_w16,1)
 CW_EXPORT_ALL(_w16h,2)
 
+
+#if CW_POOL_FUSE
+CW_ENTRY void c32_wave1_finish_dcrop_pool_b8d_w16(const unsigned char*in,const float*fw,const float*aw,unsigned char*main,unsigned char*poolout,const float*poolw,uint windows,uint mode,uint raw,uint width,uint height,uint sx,uint sy,uint prevw,uint px,uint py){cw_body<true,true,true,false,false,false,true,true,false,false,false,false,1,true>(in,fw,aw,nullptr,windows,mode,raw,width,height,sx,sy,prevw,px,py,reinterpret_cast<float*>(main),nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,0.f,nullptr,0,0,nullptr,nullptr,nullptr,nullptr,poolw,poolout);}
+#endif

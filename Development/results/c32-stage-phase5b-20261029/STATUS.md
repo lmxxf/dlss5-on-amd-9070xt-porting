@@ -1,1 +1,1 @@
-Step1融合修复：七档42帧Gold全同，134VGPR/0spill，四档合并mean/p99全赢，硬件C32+pool两档加速。按校准门禁ACCEPT进入组合；Small1080整网收益仅0.655us，不能夸大。Step2正在编译norm-hoist+OutProj+融合组合，尚未最终生产采纳。
+Phase5B全部闭环，最终三项组合已获胜留生产。Step1 d510bb69；最终7Gold42、7ABBA、2档硬件clock、3NN NMMN、runtime-smoke通过；80实际重编与正式O2宿主完成。按校准门七档合并mean/p99全赢，不再按单轮p99否决。资源旧回退>160例外列明；不改游戏/ZIP、不push。详README及final-verification。

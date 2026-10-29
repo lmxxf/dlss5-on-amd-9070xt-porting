@@ -35,3 +35,26 @@ for j in d['jobs']:
 for f in Path('shaders').rglob('*'):
  if f.is_file():d['files'].append({'path':ntpath.join(r,'payload','shaders',str(f.relative_to('shaders')).replace('/',chr(92))),'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
 (p/'smoke.json').write_text(json.dumps(d,indent=2))
+
+# Prove the production-default fusion route for every final model/geometry.
+for name in ['final-gold.json','final-perf.json']:
+ f=p/name;d=json.loads(f.read_text())
+ for j in d['jobs']:
+  if j['label'].endswith('-candidate'):j['required_stderr']=[r'C32_POOL_FUSED calls=[1-9]\d*']
+ f.write_text(json.dumps(d,indent=2))
+f=p/'final-nmmn.json';d=json.loads(f.read_text())
+for j in d['jobs']:
+ if j['kind']=='N':j['required_stderr']=[r'C32_POOL_FUSED calls=[1-9]\d*']
+f.write_text(json.dumps(d,indent=2))
+f=p/'smoke.json';d=json.loads(f.read_text())
+for j in d['jobs']:j['required_stderr']=[r'C32_POOL_FUSED calls=[1-9]\d*']
+f.write_text(json.dumps(d,indent=2))
+# Same diagnostic host in both arms; baseline is the locked stock module set.
+f=p/'final-kernel.json';d=json.loads(f.read_text());profile_exe=ntpath.join(r,'payload','final-profile.exe');d['files'].append({'path':profile_exe,'sha256':hashlib.sha256((p/'payload/final-profile.exe').read_bytes()).hexdigest()})
+for x in d['files']:
+ if '\\baseline\\modules\\'in x['path']:x['sha256']=stock['gfx1201/'+ntpath.basename(x['path'])]
+for j in d['jobs']:
+ candidate=j['label'].endswith('-candidate');j['exe']=profile_exe;j['env']['NR_C32_POOL']='1'if candidate else'0'
+ if candidate:
+  count=int(j['env']['PHASE4_DISPATCHES']);j['env']['PHASE4_DISPATCHES']=str(count-1);j['arguments']=j['arguments'].replace(f'80 {count*2} ',f'80 {(count-1)*2} ');j['required_stderr']=[r'C32_POOL_FUSED calls=[1-9]\d*']
+f.write_text(json.dumps(d,indent=2))

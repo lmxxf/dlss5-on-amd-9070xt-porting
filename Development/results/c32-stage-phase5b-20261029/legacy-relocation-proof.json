@@ -1,0 +1,78 @@
+[
+  {
+    "arch": "gfx1200",
+    "module": "c32-wave1-fast",
+    "kernel": "c32_fast_ffn_attention_fused_half_prefix_finish_main8",
+    "all_other_instructions_identical": true,
+    "full_metadata_identical": true,
+    "baseline": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3588",
+      "getpc_next": 197560,
+      "target_va": 80192,
+      "target_4_bytes": "0000003c"
+    },
+    "candidate": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3608",
+      "getpc_next": 198840,
+      "target_va": 81600,
+      "target_4_bytes": "0000003c"
+    }
+  },
+  {
+    "arch": "gfx1200",
+    "module": "c32-wave1-fast-norm900",
+    "kernel": "c32_fast_ffn_attention_fused_half_prefix_finish_main8",
+    "all_other_instructions_identical": true,
+    "full_metadata_identical": true,
+    "baseline": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3588",
+      "getpc_next": 197560,
+      "target_va": 80192,
+      "target_4_bytes": "0000003c"
+    },
+    "candidate": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3608",
+      "getpc_next": 198840,
+      "target_va": 81600,
+      "target_4_bytes": "0000003c"
+    }
+  },
+  {
+    "arch": "gfx1201",
+    "module": "c32-wave1-fast",
+    "kernel": "c32_fast_ffn_attention_fused_half_prefix_finish_main8",
+    "all_other_instructions_identical": true,
+    "full_metadata_identical": true,
+    "baseline": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3588",
+      "getpc_next": 197560,
+      "target_va": 80192,
+      "target_4_bytes": "0000003c"
+    },
+    "candidate": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3608",
+      "getpc_next": 198840,
+      "target_va": 81600,
+      "target_4_bytes": "0000003c"
+    }
+  },
+  {
+    "arch": "gfx1201",
+    "module": "c32-wave1-fast-norm900",
+    "kernel": "c32_fast_ffn_attention_fused_half_prefix_finish_main8",
+    "all_other_instructions_identical": true,
+    "full_metadata_identical": true,
+    "baseline": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3588",
+      "getpc_next": 197560,
+      "target_va": 80192,
+      "target_4_bytes": "0000003c"
+    },
+    "candidate": {
+      "instruction": "s_add_co_u32 s2, s2, 0xfffe3608",
+      "getpc_next": 198840,
+      "target_va": 81600,
+      "target_4_bytes": "0000003c"
+    }
+  }
+]

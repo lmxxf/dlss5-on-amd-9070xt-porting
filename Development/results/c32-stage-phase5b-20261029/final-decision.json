@@ -1,0 +1,66 @@
+{
+  "accepted": true,
+  "profiles": {
+    "original1088": {
+      "mean_delta_us": -86.82531250000025,
+      "pooled_p99_delta_us": -67.21800000000044,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 3,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "original1152": {
+      "mean_delta_us": -101.14572916666908,
+      "pooled_p99_delta_us": -96.26200000000118,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 3,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "original960": {
+      "mean_delta_us": -18.245104166666692,
+      "pooled_p99_delta_us": -0.828000000000273,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 2,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "small1080": {
+      "mean_delta_us": -51.944895833332616,
+      "pooled_p99_delta_us": -48.671000000000575,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 3,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "small720": {
+      "mean_delta_us": -32.52874999999955,
+      "pooled_p99_delta_us": -70.10800000000029,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 3,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "small900": {
+      "mean_delta_us": -62.368437499999985,
+      "pooled_p99_delta_us": -58.0740000000004,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 3,
+      "accept": true,
+      "p99_basis": "pooled"
+    },
+    "smallwindow": {
+      "mean_delta_us": -6.962083333333258,
+      "pooled_p99_delta_us": -15.31799999999972,
+      "mean_supporting_rounds": 3,
+      "p99_supporting_rounds": 1,
+      "accept": true,
+      "p99_basis": "pooled"
+    }
+  },
+  "hardware_c32_plus_pool_delta_us": {
+    "original1088": -92.90333333333311,
+    "small1080": -69.28
+  },
+  "rule": "Zero calibration: pooled mean improves, hardware confirms acceleration, pooled p99 nonregression OR majority of paired rounds support. A single round p99 is not an automatic veto. No unmeasured interrupt attribution."
+}

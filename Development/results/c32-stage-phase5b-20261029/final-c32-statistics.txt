@@ -1,0 +1,141 @@
+{
+  "original1088": {
+    "baseline_stage_ms": 2.827526666666666,
+    "candidate_stage_ms": 2.7346233333333334,
+    "delta_stage_ms": -0.09290333333333312,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.81218,
+        "candidate_ms": 2.7259700000000002,
+        "delta_ms": -0.0862099999999999
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.83283,
+        "candidate_ms": 2.74186,
+        "delta_ms": -0.09097
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.8375699999999995,
+        "candidate_ms": 2.73604,
+        "delta_ms": -0.10152999999999945
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_chain_w16": {
+        "baseline_ms": 0.6741333333333333,
+        "candidate_ms": 0.6536766666666667,
+        "delta_ms": -0.020456666666666568
+      },
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.1690233333333333,
+        "candidate_ms": 0.16510666666666665,
+        "delta_ms": -0.003916666666666652
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.16996999999999998,
+        "candidate_ms": 0.0,
+        "delta_ms": -0.16996999999999998
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_pool_b8d_w16": {
+        "baseline_ms": 0.0,
+        "candidate_ms": 0.18065333333333333,
+        "delta_ms": 0.18065333333333333
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.16682666666666665,
+        "candidate_ms": 0.16382,
+        "delta_ms": -0.0030066666666666575
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.7313166666666667,
+        "candidate_ms": 0.7059733333333335,
+        "delta_ms": -0.025343333333333273
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.70637,
+        "candidate_ms": 0.6814866666666667,
+        "delta_ms": -0.02488333333333337
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.1892633333333333,
+        "candidate_ms": 0.18390666666666666,
+        "delta_ms": -0.0053566666666666485
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.02062333333333333,
+        "candidate_ms": 0.0,
+        "delta_ms": -0.02062333333333333
+      }
+    }
+  },
+  "small1080": {
+    "baseline_stage_ms": 2.24958,
+    "candidate_stage_ms": 2.1803,
+    "delta_stage_ms": -0.06928000000000001,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.2466999999999997,
+        "candidate_ms": 2.18164,
+        "delta_ms": -0.0650599999999999
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.25101,
+        "candidate_ms": 2.1846300000000003,
+        "delta_ms": -0.06637999999999966
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.25103,
+        "candidate_ms": 2.1746299999999996,
+        "delta_ms": -0.07640000000000047
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.1778033333333333,
+        "candidate_ms": 0.17296999999999998,
+        "delta_ms": -0.004833333333333328
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.18055333333333334,
+        "candidate_ms": 0.0,
+        "delta_ms": -0.18055333333333334
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_pool_b8d_w16": {
+        "baseline_ms": 0.0,
+        "candidate_ms": 0.18995666666666666,
+        "delta_ms": 0.18995666666666666
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.17567,
+        "candidate_ms": 0.17167333333333334,
+        "delta_ms": -0.003996666666666648
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.75983,
+        "candidate_ms": 0.7390166666666667,
+        "delta_ms": -0.02081333333333335
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.7358333333333333,
+        "candidate_ms": 0.7131966666666667,
+        "delta_ms": -0.02263666666666664
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.1985,
+        "candidate_ms": 0.19348666666666667,
+        "delta_ms": -0.005013333333333342
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.021390000000000003,
+        "candidate_ms": 0.0,
+        "delta_ms": -0.021390000000000003
+      }
+    }
+  }
+}

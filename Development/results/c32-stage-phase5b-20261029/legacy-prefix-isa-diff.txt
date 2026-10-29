@@ -1,0 +1,17 @@
+# Legacy prefix: the only difference is a PC-relative read of the same float 1/128.
+gfx1200 / c32-wave1-fast
+- s_add_co_u32 s2, s2, 0xfffe3588
++ s_add_co_u32 s2, s2, 0xfffe3608
+  targets 0x13940 -> 0x13ec0; bytes 0000003c == 0000003c
+gfx1200 / c32-wave1-fast-norm900
+- s_add_co_u32 s2, s2, 0xfffe3588
++ s_add_co_u32 s2, s2, 0xfffe3608
+  targets 0x13940 -> 0x13ec0; bytes 0000003c == 0000003c
+gfx1201 / c32-wave1-fast
+- s_add_co_u32 s2, s2, 0xfffe3588
++ s_add_co_u32 s2, s2, 0xfffe3608
+  targets 0x13940 -> 0x13ec0; bytes 0000003c == 0000003c
+gfx1201 / c32-wave1-fast-norm900
+- s_add_co_u32 s2, s2, 0xfffe3588
++ s_add_co_u32 s2, s2, 0xfffe3608
+  targets 0x13940 -> 0x13ec0; bytes 0000003c == 0000003c
