@@ -1,1 +1,1 @@
-Phase5刀1已commit bc8cb62a，均STOP。刀2五档Gold/单核/Frame ABBA完成，结论见2-decision.json和knife2-README.md；原始失败诊断与整轮重跑保留。刀3/4候选本地已过VGPR<=160、0spill，后续按序GPU验证。最终80实际重编与正式宿主/7Gold/7ABBA/3NMMN待完成。
+刀1 bc8cb62a STOP；刀2 3b7d0a03仅Small1080 norm-hoist扩围；刀3 0cc4a90a首档Gold失败STOP；刀4七档Gold/两档单核/四档ABBA均完成，性能退步STOP。生产只保刀2。正式O2宿主已构建；双架构12 LLVM模块已重编，68 COMGR待串行远端执行，之后最终7Gold/7ABBA/3NMMN。

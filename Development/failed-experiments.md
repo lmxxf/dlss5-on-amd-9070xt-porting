@@ -2797,3 +2797,8 @@ small900, small720, smallwindow, original1088 未满足三轮mean/p99及单核�
 ## 2026-10-29 C32 Phase5 刀3 Gold STOP
 
 实际数据流要求融合Block4 finish_dcrop→pool而非Block1 mapped。新核134VGPR/4096LDS/0spill，但首个Original1152 Gold SHA不符，立即STOP，未跑性能、未混入下刀基线；未定位中间张量前不猜WMMA/裁剪/舍入根因。详results/c32-stage-phase5-20261029/knife3-README.md。
+
+
+## 2026-10-29 C32 Phase5 刀4 STOP
+
+Post寄存器尾部h2成对交换145VGPR/0spill/七档Gold同，静态1510→1488，尾部LDS改为8条ds_bpermute；两档单核与四档3ABBA无稳定全网净收益，STOP保刀2。原两qt177/单qtF32 161VGPR版本资源STOP未上GPU。详results/c32-stage-phase5-20261029/knife4-README.md。

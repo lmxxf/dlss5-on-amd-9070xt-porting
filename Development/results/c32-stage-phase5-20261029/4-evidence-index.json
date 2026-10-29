@@ -1,0 +1,4562 @@
+[
+  {
+    "path": "4/evidence/gold-original1088-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "499e42d7cbec1ecdb7c0c7a6d2902146144ebe9d3383ea27327262593f6c3776"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "b87b5777d6fee91f401acb3aa6c93f9ead28a0cdfe8a19fd7e92f1aa422fc405"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "e8eaef6559d8852ab32b83619de731480dde754f435fa744efd2aed74e416803"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "1a690336626c88952c3b5194b655fb7e071724c2e41047d6f2915d098279c433"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/command.json",
+    "bytes": 788,
+    "sha256": "acf8e7ef99efff893ae89738ac9dba45c7c62074537e6a4f99b02c6e6d40abb3"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "0ac75e9d32987fbaee9f2588c2e43e17deb753c5127e2fbdaf785eb8fa2bbd40"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/out.csv",
+    "bytes": 371,
+    "sha256": "1eac1ff1e72ee2947f657b340e52a31fd37a79d896b1bedc73c6add00c9fb358"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/stderr.log",
+    "bytes": 3374,
+    "sha256": "91a5c3b15d3ab4ad954fcd8aa53bd61c91c65b29fd47c4a03e7df8e58d177c74"
+  },
+  {
+    "path": "4/evidence/gold-original1088-baseline/stdout.log",
+    "bytes": 897,
+    "sha256": "90da702245a4148b419b8307cd8b683ebc3cf4ead5326bf219b15b82818767a5"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "2779d632220c75df3a56b89945b0f2751e219cbaf65daca9193635c917b34260"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "6ccd9273bba6b6aa5ecea81e9bc5c6ba0a1e5bcf6b7782d74f0d6fe316b02fd7"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "fcdfbcf97db5dd54df93a2aa8966b2b6b70d71a171eb678560924ddaa240bebe"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "f36644373e19e53ed235d1afefb750f5460a33644d675606913a1e561b83f26f"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/command.json",
+    "bytes": 785,
+    "sha256": "c15443c1cccea657d6a3400c9ab8e00522df48fc1668902313d9c4e6bf914f6a"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "c17f799c27b7751553f8d16f7b30f19f5af79a733bfa9ad12b2a0ba177030001"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/out.csv",
+    "bytes": 371,
+    "sha256": "796abfdee85dac81dd4fae749ac4e47187f97a2213c8ab45d4f3d8928f565a63"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/stderr.log",
+    "bytes": 3374,
+    "sha256": "91a5c3b15d3ab4ad954fcd8aa53bd61c91c65b29fd47c4a03e7df8e58d177c74"
+  },
+  {
+    "path": "4/evidence/gold-original1088-candidate/stdout.log",
+    "bytes": 897,
+    "sha256": "58bad74ad7f5d62f4ea83778ac959a3674416ddf930e3382450676265eb7b5d6"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "cb9bb5f2828abe6ef70fe57dc2187cffa82312c6772be405b2b8087787b40227"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "ccbd30d8282d504c4ebc3838e6b8a01c8f67cae106008341e3900cb843a2ab9b"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "95f532bbf9a88b083c5d1a3cae5f6a0aa774f9da4781dbc23875e44f591d4160"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "e45c66e8577793710f5297ca12dc53ac16a81f3d6d7ff5e2d29d66e9ad49f35c"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "c19f41ee25b1109346dec578872dd8f360f6d84f10962bbbcadf5f1f37c97c28"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/command.json",
+    "bytes": 788,
+    "sha256": "a399a0114c71c4ab55d1a9cedd664e267ccb18a371af3caa90beb1ad205170ea"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "ffe7ae8c91a8b6df142959c593ac35e2d9b0c6725dcd7c91e70b6cc8057ed520"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/out.csv",
+    "bytes": 380,
+    "sha256": "312d9b1644c904713c2317f7e8f92962b4da254cecde7bc3131faf69447294d4"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "15b5f1406a0a8326eab3e04a92d2b8a2a9757aec77c5034f6a9720eae5ecca04"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "c19f41ee25b1109346dec578872dd8f360f6d84f10962bbbcadf5f1f37c97c28"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/stderr.log",
+    "bytes": 3636,
+    "sha256": "ddb7f2a24216ffe4c45a34680e4b0436d8f99e6968e2d914512d2c54c45e0079"
+  },
+  {
+    "path": "4/evidence/gold-original1152-baseline/stdout.log",
+    "bytes": 897,
+    "sha256": "eac7076d77ab902d4c9dd72db31febf5c297eb47b2032637414445770df363eb"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "d8222a028a577d26b0dfc9b05e668d39683e5bf79c5ae761bd49283e008cee6a"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "2f54c9e9d5bdd27616a5b58d2cd05343a2b76e2253526c30a9b18dbacb8ec55c"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "e3fdc9eab0a5c1895cb6f620c7085016dc98f3be89cbb4ac591cb8a52441489c"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "091e3aca44f2c053da63daefd6ee41ca222c00b36db23462f5a014174161ef8b"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "c19f41ee25b1109346dec578872dd8f360f6d84f10962bbbcadf5f1f37c97c28"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/command.json",
+    "bytes": 785,
+    "sha256": "fb9b65933da01c86c482cde0bdfeb0b136fb516b00db21629921457969fbf4ea"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "edc8e10628184fc2bd5bdac3765e0e2aa6b7be50d0a05a264a8942ba7065624a"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/out.csv",
+    "bytes": 380,
+    "sha256": "52517d47924831df6126abda68440ff14e215a575ab0148debf2d373ccfb73d7"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "15b5f1406a0a8326eab3e04a92d2b8a2a9757aec77c5034f6a9720eae5ecca04"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "c19f41ee25b1109346dec578872dd8f360f6d84f10962bbbcadf5f1f37c97c28"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/stderr.log",
+    "bytes": 3636,
+    "sha256": "ddb7f2a24216ffe4c45a34680e4b0436d8f99e6968e2d914512d2c54c45e0079"
+  },
+  {
+    "path": "4/evidence/gold-original1152-candidate/stdout.log",
+    "bytes": 897,
+    "sha256": "43aff8075c79ecb0afadbe16bd8ec84bc456e1379493014da0fc53d0884f3aed"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "5297393b673a03243151bcf5ef842b4cb5ebdabd8822b5a4ad9bca5f5aded4a7"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "ea84c128be66d42aa479a76569ec6f9fbebf45aa79d5bd08728d1d0f66e67423"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "673fccd3501a4771ba1c654e3b38d223c3716615a7e3dbaea0c9ca65d2a2f1b5"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "26419770e117f2ae17c2bfb5a21aaf1f9c91b5f2f4eba004630ac5cce14b7c72"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/command.json",
+    "bytes": 784,
+    "sha256": "d5302a2eca6d7c1344abb65600e5edd6b45ffeb5f38bbc18875ed1593a67df69"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "04d135f1785a6941bb98558d1b498d037060aafb01be69e4d7f0f3454e21e4c9"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/out.csv",
+    "bytes": 369,
+    "sha256": "f6595776141efdacccbc938fdc412626e42bc33e7c47929d602aa9b6bd504583"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/stderr.log",
+    "bytes": 3646,
+    "sha256": "a35fda8ae42becae1de94564f761b544be6216dc9b11d233552d5fc74808dfde"
+  },
+  {
+    "path": "4/evidence/gold-original960-baseline/stdout.log",
+    "bytes": 893,
+    "sha256": "7c2575ab94658461956a44c357bb1e680d5c1a8baf560000190a389685eb6fcb"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "0cbf7f56a94fcd82f4b2f7db05c8a73e32a091d1817ac59c0b5b075c0cc931d8"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "3e4a07a43f084a161522b20d3fc083b376b6e723953c995e8a8c2db5d768f881"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "2ad5af7703cc1fa7dea2ebd61b4370bc27aa825f3b1e61f6dec02ee85b1a2726"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "4b1bd2211ea59224436ed194f1bc9233d527f854fa56f5c8d222e0d8a4a5913b"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/command.json",
+    "bytes": 781,
+    "sha256": "f08e1ea5b671042b39e1ea6cc66733b15cb11ed1d80c32d7433851ba65074c5f"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "6cd164c36286c7521a893379c9f5f4914236f706420e462d3a1b97bfb00d210c"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/out.csv",
+    "bytes": 369,
+    "sha256": "88226a7d112ea2bcb90c1dd6f26c3eca6114005cf63b6898a20a852dddf5f13c"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/stderr.log",
+    "bytes": 3646,
+    "sha256": "a35fda8ae42becae1de94564f761b544be6216dc9b11d233552d5fc74808dfde"
+  },
+  {
+    "path": "4/evidence/gold-original960-candidate/stdout.log",
+    "bytes": 893,
+    "sha256": "c7292b0eb6bfe44c691276b7569df44a4f5732156310199cc2a4ff404b807ff1"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "35fb5ae94a10b34e6363a730b2317f9cb606b26ae4d2c490b9132dffcdb1b7f4"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "764216fe7b410328c14fae1b296b56114d048ec82a6ec41c2815b84eb5851f61"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "c5a7d4ed8a7b473bb3d96d26ec6d7c92a530a33c24aa9e60a76418c5eaef128e"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "81fa992c3e4c1046e307b526d65862f49f628da6ecd0e285615213560e4ba1a8"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/command.json",
+    "bytes": 766,
+    "sha256": "de6b7e932c8ff45da4b50b70249f6c5937bd4b81095260e20b7bc40a7bab1d9f"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "c5c8a89398f23743418805560fb08805dd32db69adbb8d8c9868ba06db09956b"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/out.csv",
+    "bytes": 359,
+    "sha256": "29c41a0485a646842b58940a91d21dde41114d8249b789bc760aa4aa733b746e"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/stderr.log",
+    "bytes": 4950,
+    "sha256": "1287e1f3c8c2185e774fab78f21d9e5399f914dd214cee37169f0181a01e8313"
+  },
+  {
+    "path": "4/evidence/gold-small1080-baseline/stdout.log",
+    "bytes": 893,
+    "sha256": "f7ec2a42d1efca21c21f5fa7df6a42262f9c71e09ba5214e9633e1dcd14e1187"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1749,
+    "sha256": "1654d6353ff24282cd43a9cfa0cc67482fae6d309a53ab621c6e729072179491"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 137,
+    "sha256": "b965b57b346f4b1719ee83575a1763ebc0965a15dbe09d175e71280368ad406b"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1112,
+    "sha256": "b8eff7eca12462b671457bdbd1ecc658846404407a06ff17e20d780bf966cf56"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "6a1b72ecf401ea2e5717094dd238697fb5154fcfad739db35bbe5b1e5f323801"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/command.json",
+    "bytes": 763,
+    "sha256": "9ec3f2b90255a52ed41b27103387b109ac54bbb1495c52114952e396e5012bd7"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "32c520633e67f2b4c0f80f151bf47f35645aa95167a2120ceb6759bafa853b05"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/out.csv",
+    "bytes": 358,
+    "sha256": "eb182c01d6c17002fb2ba8059a70c645d425083ac9cc4b2cf8a50e14cf516f19"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/stderr.log",
+    "bytes": 4950,
+    "sha256": "1287e1f3c8c2185e774fab78f21d9e5399f914dd214cee37169f0181a01e8313"
+  },
+  {
+    "path": "4/evidence/gold-small1080-candidate/stdout.log",
+    "bytes": 891,
+    "sha256": "17126de8eeb8077375bfdf6d25f49a668e8bd7deb3f9e2070d3f829698511895"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "f30cbea9ab58627bf8a0f6a062a69618e2ebffe0f6250f0b1e314383591d6e0b"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "1583278934c2fd796c6d42ca988dbe870b188bbfbdd2de69027e74e2fc3d4bfd"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "42b34e561f7e12ec1c66af2f88d08643bd0dcf90329ebddaf0fc10dc7a97b7d8"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "b6f3ebe54537d14700585d584fc53d9a60e0830e924f2461d914a726c7e4dfef"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ffa3e499cc66bd552835be6fdafab8b6df05aebccc5ad3db39af13cb38d90d9c"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/command.json",
+    "bytes": 762,
+    "sha256": "4a8ffa1efd89fae7abf852bbf297ec60da3612508a4cbd8c4acbc79f0f401dca"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "c15a8c8cbc51da88f95b0f56031f015cf925d29025711f68da3bbb6bbb0e394d"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/out.csv",
+    "bytes": 377,
+    "sha256": "7e207a7099e255e789910055f35f47c02472915d092c069925deeef3e414143f"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "0d637248e6a70302ab35b9017ce0dea63a85402d4b854b9bded4a09c9bf4dfb7"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ffa3e499cc66bd552835be6fdafab8b6df05aebccc5ad3db39af13cb38d90d9c"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/stderr.log",
+    "bytes": 2966,
+    "sha256": "e339c5de99349d47f5846e549ce53c32fb9578339fa65d7b5c4881acb8c00ad0"
+  },
+  {
+    "path": "4/evidence/gold-small720-baseline/stdout.log",
+    "bytes": 733,
+    "sha256": "545e714800bdb6b9307c222d8f42a590ef01e554d7ea79492b91c51043430cbd"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "a5fd62419a27148293dc620e45b573e579d34a3c2b8edd8099acc18f50d919c0"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "c2320573221d497c02e5842e04e40c1e689cc1a4822de935eeaf29ffc098ca8e"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "30bb2b90fe9ce4a9ab000cfeef5185df4c250179e0911ee01258e10f4513c49a"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "169f99d0cc9875c9950a6416557089d64d7bd1514b3cd8e273de99d3bfb084bf"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ffa3e499cc66bd552835be6fdafab8b6df05aebccc5ad3db39af13cb38d90d9c"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/command.json",
+    "bytes": 759,
+    "sha256": "88032c68a885cfc08b320e573d069173cd8a99bb8fc1f4c940af8f2ff7740b54"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "fc0319cfa987cb26b7d87d723b5a393ed386cd7d90f2400933878a364c4ec495"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/out.csv",
+    "bytes": 378,
+    "sha256": "fced227ede630d9bd4657734951ed59a317a97412932909bfbb5a8127cda21e4"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "0d637248e6a70302ab35b9017ce0dea63a85402d4b854b9bded4a09c9bf4dfb7"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ffa3e499cc66bd552835be6fdafab8b6df05aebccc5ad3db39af13cb38d90d9c"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/stderr.log",
+    "bytes": 2966,
+    "sha256": "e339c5de99349d47f5846e549ce53c32fb9578339fa65d7b5c4881acb8c00ad0"
+  },
+  {
+    "path": "4/evidence/gold-small720-candidate/stdout.log",
+    "bytes": 734,
+    "sha256": "22158196d926124ddd1cd178e086f2ee75ccb4cb321d8e545ea74e5f85385ff7"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "a5d3498ab625170131f724ced710179b4372872911e29204478a32682bbdb1d4"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "2339b96b93a906d6d4b4f0a9b601583f2f98d76f40c4d946c0a92239cdcfa598"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "3af7545d83d6fb8af42d99cbd9cbaeefe176b912fd675b139ab848a55284f0a9"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "2454b46b2b4bf2221f7a5a40fa84efcc64846e068a3ad04667d7d89aa180c02c"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/command.json",
+    "bytes": 762,
+    "sha256": "13dbffa694f43151315e74e0218128794e7667617020bd44b60f8d6529a2fd2b"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "0e3af997e5e37191d2a954fd78dfd265a101c9d28044d389beb538d29222d2a6"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/out.csv",
+    "bytes": 375,
+    "sha256": "aecf0530f0e37a6a2907d086e6bbf695e422115663df274a656ae0c5322ae977"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/stderr.log",
+    "bytes": 2966,
+    "sha256": "02197308718f178961c20bdd422bd14cd7edb442eec5ae560c56eabe982cb538"
+  },
+  {
+    "path": "4/evidence/gold-small900-baseline/stdout.log",
+    "bytes": 731,
+    "sha256": "a72ffcf5a7dc5d76f1c666cd17320881555a95de63dbdd33aaa72c43cde8d95e"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "42b607e776265c00a3b6b3e8d62cca3b1fd775aa5c7903ffb07e8b62bfff6547"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "c9d24057246347934719637905d1cbf3022c659254ecd9c702cac7aa27787a1d"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "60f2161b7b5d89c2d11275e7fdd7faecb4d4fea9f0a0d1f8936449e3dfb4d18f"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "ac1965a670e29049175820e9e31f71838ebda29bd77e82ed2048406595df9fbd"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/command.json",
+    "bytes": 759,
+    "sha256": "82bf88f229c921e0a9bb20fcd17cd45e9f61d641b3ce80320abacc1b29fdaa3a"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "516f67d4a6f16e3ac027e2d2954b7754d4824b9b69e2a4a91bf365816efccdfd"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/out.csv",
+    "bytes": 374,
+    "sha256": "2cf358588ffd4ace6c130a4be3094ad52eed2ee3a6afa608ba61cfa1c1e1a080"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/stderr.log",
+    "bytes": 2966,
+    "sha256": "02197308718f178961c20bdd422bd14cd7edb442eec5ae560c56eabe982cb538"
+  },
+  {
+    "path": "4/evidence/gold-small900-candidate/stdout.log",
+    "bytes": 730,
+    "sha256": "82446291cf7468f7fae9bcefb9faa385c460c7e11b1243678390e0a74809a376"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1743,
+    "sha256": "ad20ee2c660259eb185a0ebec1250db0b24302920e452cb0601573b3aea62f9a"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 144,
+    "sha256": "3b867a95fb8f3f8ecc1ba77eaadb33314afddeb84c24c62d87ea93e1dc49c8d5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1117,
+    "sha256": "3803964c771a7cc647398ab9c035e4693f6945f1a01ad6f9c2920e2763ba37e1"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 66,
+    "sha256": "2ced75074accbf9afc93981729a9e7fdbd5a8491480c9fdcd15bdac7776c11db"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4190,
+    "sha256": "db8d0787253e89ea3c560f0dbfd3e43499ce70240875d6213dd14d78c7ade8b5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/command.json",
+    "bytes": 776,
+    "sha256": "aa3a0ea4afa3f60fc41342f635a62248e78ed190b7760f25b759f7045ed7e551"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "ca202b7c2a0cb45abbc0b10b8392f0b88379c2f9d7f0c75bb032d63d4beae9ec"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/out.csv",
+    "bytes": 363,
+    "sha256": "212f8209b03fde434c2306baea241ef40271acafe242cf52c09a259183e3bb9b"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "daab55aed892cbdf35ed6b22b2f6ea18ce12bd1efbd8bbc273485b9207c41b13"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/same.flags",
+    "bytes": 4190,
+    "sha256": "db8d0787253e89ea3c560f0dbfd3e43499ce70240875d6213dd14d78c7ade8b5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/stderr.log",
+    "bytes": 1322,
+    "sha256": "efbff6df542b5390d23820325b7b9648ea79d1a7bac78a73b9fea4defd1a52c1"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-baseline/stdout.log",
+    "bytes": 696,
+    "sha256": "c29cf86ef2370e9d00355455d0c29cb5eb5e10cb60bac1f6c2980c0a5843d15c"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1765,
+    "sha256": "1bdeb054fa522dbbbbbb3aa0418ad85b9f36d72a795dee53e2c351fb44ee5caa"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "33c957d8697df993b88453692a338edeb708c246418758716581998a2a13bbf0"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1119,
+    "sha256": "7e0f4d480c1d857d9c6c8d81f65ffaf5b7337eb9cb90d3acda3aa274dc405d99"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "58d488d420561045d70cbe60bc6e678a38d51b359b0b406cedf81fe21942952e"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4190,
+    "sha256": "db8d0787253e89ea3c560f0dbfd3e43499ce70240875d6213dd14d78c7ade8b5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/command.json",
+    "bytes": 773,
+    "sha256": "d77e9683611c05243cf8be61e2a0f6f952567063aefbe651c9d33ff3c90bd6d1"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "c0706eb95225860adb9defc51e1508869bb54b72dcfd731fcc922e5ebd3222a5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/out.csv",
+    "bytes": 362,
+    "sha256": "f3ae2bfe932f23431bd1d5e64fdf65bb8244e880f87868ea465a9d4ecce4bded"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "daab55aed892cbdf35ed6b22b2f6ea18ce12bd1efbd8bbc273485b9207c41b13"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/same.flags",
+    "bytes": 4190,
+    "sha256": "db8d0787253e89ea3c560f0dbfd3e43499ce70240875d6213dd14d78c7ade8b5"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/stderr.log",
+    "bytes": 1322,
+    "sha256": "efbff6df542b5390d23820325b7b9648ea79d1a7bac78a73b9fea4defd1a52c1"
+  },
+  {
+    "path": "4/evidence/gold-smallwindow-candidate/stdout.log",
+    "bytes": 695,
+    "sha256": "2579fe51dc31152ee2eabc60dfec09cff685be9b28180e6b97fe5adf3891d0f3"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/command.json",
+    "bytes": 998,
+    "sha256": "1aad8f826dcb2a5e7dacb9d772c3595655e296789adaa387ddb026d7d98f60d6"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "c60a8a97d82df390f040d628e944618e117dd1bd96d6732ca36da9b7c897ea1e"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "de0e5ff9dbd52f2564c371bd4bb9f512d2856e558b27445b7803705cfffd4f47"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "4506373370e8ad0f83e53cca5c2ec18a00363d3f0ebd2c87ad0ea92268fd67ee"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-0-baseline/timing.csv",
+    "bytes": 5960,
+    "sha256": "0dc3afde64bc0732d6b134f09744d14616fa49aaf2edc93bb3b430ddcdaec89a"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/command.json",
+    "bytes": 993,
+    "sha256": "21cdcb2b07b8174859c1c03d0bda3e3bb44bcc8b63e0067df044cdea6b3e8152"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "9d24989a7d1e5595874a36dd92017f73918fe2f29d57d17e77c5af6728117435"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "ddf8b70ba2b7339db459fbd7d2c402e2379a2e74afec4bb62676166fc73a7e08"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "37644dd41fc0766ab35440df12d6dbba591c41a2e00e7be695e0d3a54c12bb4a"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-1-candidate/timing.csv",
+    "bytes": 5947,
+    "sha256": "e62a5727f171a1aae506e4cc385fc9519b2247181a7d15d779a6ab34f14479a0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/command.json",
+    "bytes": 993,
+    "sha256": "85135d486c0a570947ba4920cdb075a651dae8c99a60ea6670490e96935274e9"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "7fb8ac04840c60bd11cb5c657b0c7661a592d5f76d50678caac319c7fc1f49a8"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "9dc745499b8f1d1b93fa264789bea300ec987997d52e6ff8aa633463003d2b9f"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "9bb66ba5f3d3a80f9e82c921516a3fc038c1344775841b36f36e450b9a3651d4"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-2-candidate/timing.csv",
+    "bytes": 5952,
+    "sha256": "6c1ff213da46696476cbc1f9d1f59859e2c161e8968d2146f8c326a54f2e1f51"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/command.json",
+    "bytes": 998,
+    "sha256": "936d956cef69a6fe52a7d49af203d6b9fe0f708754b1271f69457be85f57878c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "621d802d9f91afb27bf408fed3c3a34428e8e2aa1b4bc51b840b3411c12c41f4"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "f731988e0d16eb8ec29457c20e04d19f0398f550dc4fbf090f8dd6553cce231b"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "173cb829f2616c607404e22808db8f2040dd7242e91b952d808cb978c94e9e3e"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r1-3-baseline/timing.csv",
+    "bytes": 5952,
+    "sha256": "3c464b9d7db4647a58d75cd95784d1e82c5b11fc906d59356d496826bd2a12e2"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/command.json",
+    "bytes": 998,
+    "sha256": "4093fbf48b1daff3a42ca6f9291ec1493dfa0938e9f8b7ec597139207be48968"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "fc996fbdc11a741a4f803c10a758c02bda866f3b592f428e4c303fc6f2d3e590"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "f87a53a744dabab73becfe34ed879a0b8f3f2492a17200239cefa66b4a77a2a4"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "b2d04f3cf1e8cd3d429d8fd489e8690ba790318d43a7e254b2de170c56f82a3c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-0-baseline/timing.csv",
+    "bytes": 5967,
+    "sha256": "98389322b12741db96e1527d35c3d8dedef29cb308d1c244f499ad7654d8c7fc"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/command.json",
+    "bytes": 993,
+    "sha256": "ea98d3b7fb87b319798dfdf03ea6785375a78445589597b0e7522c2f999a7f0c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "5597f9f733e9f9d3986162c59ec23eb63ec62860cd1e2e9649783227782c1557"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "d9ac4b71378c2afaccd35f311d914427e3b37ef30402305142f237f8f588c288"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "9614749df592193dcf639c53fd079bbd37d07687eb0384c6f83aa32ee2c32c6d"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-1-candidate/timing.csv",
+    "bytes": 5948,
+    "sha256": "0e8a04d1f85a23dddaf1dab8e060eaee01b3eff8a23c7eb72be027bb7f8a7e2d"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/command.json",
+    "bytes": 993,
+    "sha256": "bac8d77cb0a11c9a4996809038828d022f1c8e4de34220419cf69e0cd43535e5"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "1a0b30b8f3a8f7c4f82d807bd9c9733a60430c8a7f499e2088a64e520dfdfb6a"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "4b81e982d05b1c68f53ddacf37da0fe85662b487d04b43925a30d4bfe7f5f22c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "20e87f33d1c3a91a51a50b2b173a5c8273c1786ffad456be3d49c3ee4a1187e4"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-2-candidate/timing.csv",
+    "bytes": 5943,
+    "sha256": "af88249f4592cdc5254bd69911a90469e277e43da24a2d81027e9aa13ebc9e8b"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/command.json",
+    "bytes": 998,
+    "sha256": "05e5c16b11f0fc0293f3363f36e61507812699bc9f4557ef490d5feec6f4d880"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "9969c1c6e9213f0b3d96df89ed259f4b2c0b4bcfa052db16ce6056cb97b5cf07"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "a248f5cde3835184d1a99897c32cc87940913eaaf5abeffc506eb596b03d252a"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "c551541ab540f9a8ec9b688bf5c7b6cc7ee48aa3ac4a6c6ba7d9f25db98d1dad"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r2-3-baseline/timing.csv",
+    "bytes": 5944,
+    "sha256": "ae94f8edfe21e2fd6e78aa115a774e9086eae789c4980b0f1c7962fff654092e"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/command.json",
+    "bytes": 998,
+    "sha256": "f6cc276e86b73c74ba389924479d557d2adec83d116d318c4ef079ded6cb1cf0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "78848a6add37400e4e367d783a107f7b032eef10146e1a3614de9a94ad0530a6"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "b94c82574a201d7481588cb6a6d207254265f855230d8a26742b9d9e95c60e8f"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "834ddde24295a75da692530bb0b54c287d60be2b82d1e4db59a1e76c18cbaf23"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-0-baseline/timing.csv",
+    "bytes": 5960,
+    "sha256": "3fd501d3180a2998abeec1addbbc70b82d82bc73c3fe0d76a2649ee7cc24fce8"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/command.json",
+    "bytes": 993,
+    "sha256": "ae2e0ceae20d66f4e7f6d41e68b8140fc2e0171755b8e69a789699f121fe0356"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "ee5d04f155112aa5a70b603e31be85ba2aefa111d46c7fce7252d122c6f7d423"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "4b6b3c43b083789ef686f0bac18a1440e19f668e19b403ecae18459868dd224e"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "2f3062150fc8f3334e8d81b574602aeb9d7d02d9538f0bd0f13e02efa08f6ad1"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-1-candidate/timing.csv",
+    "bytes": 5956,
+    "sha256": "221a62dfe84fa5acccf595e319b82ded2608735d2538b3cb5837031a42d95d3d"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/command.json",
+    "bytes": 993,
+    "sha256": "a3bcd8517a9be1f3c163c39a1768fd855bbac5b8fc315f0508c9d5ba74a6eb9c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "2b67a4d1510d9386daba0d9d3e0aefc065451e1ac71b7824076f656bf7621843"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/kernels.csv",
+    "bytes": 34597,
+    "sha256": "79b1eb4a0d397d15e0dcd0cd161cf65c2a327f20926419a5fc59e62fd2cf3a34"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/stdout.log",
+    "bytes": 868,
+    "sha256": "4f4ae70ec0b8d2e5c9dde3127038ba18860e3d4e3c92b18bdfb1306dd8b80d58"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-2-candidate/timing.csv",
+    "bytes": 5957,
+    "sha256": "b67def24f3015e40e77cc117c2b505c3cd5b916d78e5d756cdac853d5b45dce4"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/command.json",
+    "bytes": 998,
+    "sha256": "350f113fb44662837b3b23f368fd49d7f7679838ed2cd13fbb0fc775a0ed0fe7"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "580fa91179fba1d882cc61b5a7b1711830afd4ce7b2cff875523daa4cdf60f5c"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/kernels.csv",
+    "bytes": 34597,
+    "sha256": "fb2006f4c826382cae863c7e9e3f42fa1ad6f860b29899e9f19c480b267d984a"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "e6aa4921261ebf56b3a5661929ec9e9b5764046371c56c73c2d2d9f501fa5464"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/stderr.log",
+    "bytes": 2802,
+    "sha256": "c1f7755733d729f8dcbde8ca6fe032c6bba712737928ef91487a01721b79d2f0"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/stdout.log",
+    "bytes": 868,
+    "sha256": "60e7898811f40007d13a4634cf5557d9cc0a44693acef8cec3780f5d3f405447"
+  },
+  {
+    "path": "4/evidence/kernel-original1088-r3-3-baseline/timing.csv",
+    "bytes": 5963,
+    "sha256": "c56ba4831226d9d7e5bb03a110239d528ce27e8ed3070227b02c9723a28baf59"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/command.json",
+    "bytes": 984,
+    "sha256": "fbab7fab81d10fdb3d8d5d7b07e24ae5322ac0727c9822174dafcc3afae6879c"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "200adc8fc33fe79334e8ac6cd7a778a3161bd73daf7072599520e617481d864a"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "d1d5bc50d9b335ea7eb499d76b43e6f4d31ed3dc6122fca9538b4ebbdc83e26d"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "2af0ea9b32b8fe53aed46b4d5f39aea2999b3fd1df30172540fd8ec75fc57389"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-0-baseline/timing.csv",
+    "bytes": 3189,
+    "sha256": "8847efffafc81fa638d4ade989fe86e616d805b1abfef19533b0dee0fcf33276"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/command.json",
+    "bytes": 979,
+    "sha256": "98c33bd1e765af7d4b7d373cae6a48a47078eb69a059582e7916b790c2e0dc0a"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "ff075a80d74eece38a9eaeee33de2b547148c48d4f4dd8654d7493157254bce7"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "c4aecdcf75a1336304d9ead01ecd97b6a41bab211d2fc7e6078f4844cacf9f83"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "9cf967a63504ed4e594ceca967d282681c0b740c77d438fb136884a648dfa284"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-1-candidate/timing.csv",
+    "bytes": 3186,
+    "sha256": "ac653bcf60ecc387f480a0f3080e740bb3e297e71e91562d6cc49ff890b134b7"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/command.json",
+    "bytes": 979,
+    "sha256": "6db0a25c3e0ab9547139610b4d084b7c827d420ac2b05466ac109b8efa63b9a7"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "97dc8dae23346a66d54b8e41b956038e11946a6a2df1d5e5a6f69796eb4638a7"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "02dd7c73a6bde07be2016a294c11ccfc76bc72a95d58fbf23f46507ea6c89c90"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "36e81822c93797b11b26eff467f8aea3492ea2bc205fec32449907fd87aaa833"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-2-candidate/timing.csv",
+    "bytes": 3191,
+    "sha256": "09a110802b76495b5548ce8d0be7be1c8b1b2f4abef6e9e769bd0cb0ea86ba16"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/command.json",
+    "bytes": 984,
+    "sha256": "2a280f4f66033fb41c2b71a9ecc1d58913e0a7fb33ab6dd4a5a0a37b64c2c803"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "1f00dbe0d3e8e871236b3ca8922ea8333f8ba3d15e66a1e3f35bf87de15a9ee5"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "ec371f83151a80d7091b36ba7cc872fd392f2afc7fdcca057e3ca84167ff015c"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "7f36b11b670a030e8befd2ecb4634f3dd6da8c672436c9fe21aab4f6d47a437f"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r1-3-baseline/timing.csv",
+    "bytes": 3196,
+    "sha256": "a8d060ca2ec94920f6eeec755695fd6c4901495a1cf9f70c9db7923c1ecc01dc"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/command.json",
+    "bytes": 984,
+    "sha256": "e86b154591a308c925115a396dad7920dd38447028c39446270622125abbd5b9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "10e3db4429bfe512520671a8373b14ddabbdde8adcbbf8ae0ef41e2a45db8f64"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "f310bdeda031fb1ba1838c60797149ad3c185d13d80d0bacd2f2c1b736132fef"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "3da8749f152c27f7ec2d0469a29037af2d3d713bc6cc5379de578cb5b9e57f8b"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-0-baseline/timing.csv",
+    "bytes": 3200,
+    "sha256": "cd37a7d71517619da9b0f6efdcc3cd762e7f782a2b540bf614319630f532efad"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/command.json",
+    "bytes": 979,
+    "sha256": "0f2480061c2490fa71d199ee098043e318acf7c841a683404bc634726e30427b"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "bebc5dd593a5dc769cce0e17b138fedcf22082a3c302e5a8f3c091b642084e9b"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "4c4cd94f722d2dad94ce0e6146164273d09d0785be61fbc39dbb37af1b90e363"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "7824df527e802af334dc304279ad04741aa15beb5f4f9b0177b2abc1e3e801ef"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-1-candidate/timing.csv",
+    "bytes": 3189,
+    "sha256": "78326a0d0b2f7b0395b9568d7d31999b11edb33490f69951267a9aad48494021"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/command.json",
+    "bytes": 979,
+    "sha256": "06299f77e227ac66a5487ca827079b0493f028e78700b0790dc2f13ad8f15b48"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "75d07e7231211e0c37b7a3fe56a94ceec976be75c613c78254e636f56ab3df96"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "622d4f9f324ffc2d0d3b8ba749c03fc77994ef82751fc0e0f9b7dd0bb7ab800e"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "a5188a25ca9b1b180db72d5cc82a64c690924b4b73f4665a91a6b3369c7e4ad5"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-2-candidate/timing.csv",
+    "bytes": 3202,
+    "sha256": "3116b42e1fa587ac2c3a0499ca99d24b7994b7cc0e4e5f1b7dc7a93c5f6c6dde"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/command.json",
+    "bytes": 984,
+    "sha256": "1ad6e75c8c498cf8a9e1f4325689cb1bae8c4e52e6e538261e67658fcd60124a"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "bb2fa38dbeebb45662d03ff3a81c14af7ec5264e4ce36c70dc1af02bf00f795b"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "bfa64f070b5771a8ea3704fa830d03b2aefef29de5da6bd6a91779af95600b7b"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "e00febe90713f605dcacf0da22f968e3b19f104e0ed69403d8c2942627d3962d"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r2-3-baseline/timing.csv",
+    "bytes": 3188,
+    "sha256": "1c0fa37c21904946147f4469da332e81c787372b867a0f299e65cebd53072aa0"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/command.json",
+    "bytes": 984,
+    "sha256": "27706e12da0e3404a885dce70eb570153e8a34bc67879825676e238508a4de86"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "ea9713013c1607e38f72b9d361ee92b887001aad5a3bcfa43d96e7b25184d14e"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "80e0472bf32fed64f9bf2c1f261eff21691569d8d567f668e090298605d37d28"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "5fd25b592623ea7fe98ec7b157959eac913c8ea9033c42372d0ab602a3f07a19"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-0-baseline/timing.csv",
+    "bytes": 3196,
+    "sha256": "25591d3be73df630273a115ea2ea26d6ea8b04b358fb6a12226f22ce3fc206e5"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/command.json",
+    "bytes": 979,
+    "sha256": "f8e3cc1246c57e1636cb61ac2d5b2574ea0609f9d5935e5c9a04dadbad547ffe"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "dfb24ff9c7f45b612643db20a0bd4ed2a5149aebb7326a6dfa447a35c729a806"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "c8f3718a08b16d6e73c450f191257204ee8c9deeb3622f84eb25efe2df1deafe"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "8f8721e6d930d3d94c7859237e01ee9d87b090449aeb717ccdee797a7b014eb2"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-1-candidate/timing.csv",
+    "bytes": 3204,
+    "sha256": "a4f54f73261be2ac7142a5d1961d96bad302f10fa8046e74ce08df9596c9425a"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/command.json",
+    "bytes": 979,
+    "sha256": "3211c788231fad96c794cbea0d37ba0acd7b68a35010c2c75da8ba41eb28769a"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "e37f32baa3f88cf0772709e1f82b15e9bb4a23b1eec4d64cf7d678e8a5a37a25"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/kernels.csv",
+    "bytes": 19117,
+    "sha256": "c28acf67a7dc8fe9df739265b24f3979d5c9bcb52a0e05ddc8f9979e4c3e91c2"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/stdout.log",
+    "bytes": 475,
+    "sha256": "225edafc4d54862a00fa147bf26cb2e35ae5df6a1ae9f7dc277c4d4a62c4a9ae"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-2-candidate/timing.csv",
+    "bytes": 3192,
+    "sha256": "187a5237fee9d44f679e7df7d056cb36ed0b2d1f666087d8ecf9ca309dc8d411"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/command.json",
+    "bytes": 984,
+    "sha256": "44148d1d6458559b478b23860d8e7db7a54d613f0140c31ad2e1eda445f7f381"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "49a446b720334abfa75428e6cb4efc2c59529d68f82dbfab1d6bbd0a95687cb9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/kernels.csv",
+    "bytes": 19117,
+    "sha256": "34262edac6890007e9d1cf9b17b93800b6be239a3201af94367b91a89b609f25"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/raw-hashes.json",
+    "bytes": 334,
+    "sha256": "153ffc34c49f312d3ef5f49833aa8b59f00db62e1fc51972917e0da201d3d2e9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/stderr.log",
+    "bytes": 2818,
+    "sha256": "ca088ac8e66686d2817667328ef17a302b39c4977b6ce79dc8aa8c0c33e006c9"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/stdout.log",
+    "bytes": 475,
+    "sha256": "588d21cdbd633dc134e0c4cd42c17d30a6d4c48e1c1c9854433055047b8e3dfc"
+  },
+  {
+    "path": "4/evidence/kernel-small1080-r3-3-baseline/timing.csv",
+    "bytes": 3175,
+    "sha256": "155020cce888f36f5594679084ae82c58c62ff7b7d764e264a75d2a64b035ec7"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "5415f979555a9916dc71e4ce86010ae4993521b451663e545ec4233ee369f9e8"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "9f3ccd43821469b6b77a0dfae282d30273858f19834852b185691ea92397c2ee"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "38ef51277d04e0822ae94bf03489a9d8e7b881aecd524bee129143cbf84e62b6"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "a56695ea21fc9410b1684e13bf4be6e1b1b71e5bf92f5fdc55b6b0ea18b223e1"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/command.json",
+    "bytes": 810,
+    "sha256": "9994d157f424001aadd360a206fb9c6eab13003ed8cd2c3383434039313cf238"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "c23d2a73f9b13cc56995a5b8590d86f87951cf8cde108d8395819c8eb737f541"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/out.csv",
+    "bytes": 6382,
+    "sha256": "67e5d2e52b0fb13c44cb5615c97c097034f8b2c0b5d9b51e50e2edaa09b7d93f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-0-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "b8405cc27b6c23e40217ef08673ff133db16b55fcc1809eb05b7935378f2fb6a"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "8a9585d473f798740931f0e2c36b353b53808c8151bf3ba8a4617e5ee6f10de4"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "a4d6470b847786301564de8a2eeec090150e482bfda27cfc7bf0d82f1a617668"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "9cc053376d13f2b05542fd3f82f8243c1bd9734f50e68dae5b557dbe5efe96aa"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "3f021018c36f7f93f56a59fe1f0d8f5be7a94b14cc435f50a89ba765131674bd"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/command.json",
+    "bytes": 807,
+    "sha256": "69e0b0f2bfb177f3f5273ff033cf594e6c5bad260d6a9784795267d00a9dbe85"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "839f226aa1d4e006a574b6c64b3c74f2c3b664d38b90bc6748a1dd89a8666074"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "9d7254ab48ca9cc7494349a61c2ed1df31bafaa8b501e6e2a2efa2533c95e0d5"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-1-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "6198e66bf3339a98651badaf6c2e126e280b03e44e709389a60881cc85047339"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "5a25c89a65f17f68695705a2f6d75024ad10de2baa5e25546ba97d1a75d2249b"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "a62bd3a1ab54993506ada5d0d9c4012b6e2b0883c4caedd7536fc9e52f8c5b89"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "14807e71203983ad6ceb7d5d420a8f8b2591a6b0c8b98f931db069b2a88d2617"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "c0b183c575033eb6d44feb404a5495748a778f0a1f8983dafa2cdcbda0923a78"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/command.json",
+    "bytes": 807,
+    "sha256": "93309392f07832563954d93bfddb7a811ad59b56cf7fc51ff587efc12768a272"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "35af44a6fa331fce58c29e348d5808bedb6b7bc5df13a8786bdf6a697024c73d"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "61f6a4b0b4f2302bab0f752723335e7c7f5e8da4693dd49d5fe073b3ff4e66ed"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-2-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "9058817de86d261808cf30e0727b35343497909ceca747feaa8c867efcbccf0d"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "973685ee24513e57ab8c48c23debff43d4d7e17560cb3037458d40112f7aaa03"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "d4bab5ebe4f13be48a33f4c8e997a76854b4b93aeb244918bbd4ce6743d70feb"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "a16984084f34ade194491a321f55f8aa7339244f3ed08d69a23ae3ad7c61be7d"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "4d12edb913ab04bc11d2e2da2ab4c4909047b59960829ebaefe5bf38abbdd9a0"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/command.json",
+    "bytes": 810,
+    "sha256": "040f47a372e43a6d7ba905f7403cc63f9bab6eb61d56246769b0c05c3e8f5575"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "64dab209321bb0810db2d6f489d9f279dcaeedb054b4ed83d89ffba43697d9c5"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/out.csv",
+    "bytes": 6381,
+    "sha256": "95257a471b6a5cff01a4011ec5d36ef4f3c0124637970809b3e464adae3cf2f8"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r1-3-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "4c68133e698302ca34e91feec8792f8622e9963d8586a8d39c37bd60e087a16f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "8e10565bfce696c45f07ea4f21470784bfb316d653a014d297d3d59465b91449"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "05e0b97bf55ffe3a1e2ee899f7e7f9370a02ce39da5e1e54359b6f26575a6c3f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "4cca51e90c136f28745c11df1248b0850e2f71db429c08622fb258a3bacb7beb"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "2f7b0d9cfab39fc0fd54d1dfeec10f2358391755eb46bb1335831984b15f27e9"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/command.json",
+    "bytes": 810,
+    "sha256": "9a07b1179dd2fd75af184dcc06d4ca478815e2d328693b1fced4dd9f73fcc59d"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "f3bb6f4880f501765fa5c1c0b601a7ef955a147116d179cae03bbe8638ce4544"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/out.csv",
+    "bytes": 6381,
+    "sha256": "2fe4d452363a7f76a11ab70ca13a474d848df2d8d69467d8989d20cd6b549f27"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-0-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "22a8c86f443afe9f79a7ee1eb40f62f7d821d6d3f2e35560b5f97e88c2ea3a5a"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "61430dc0e7b9860630655e46898b141556e5f3af27396dd4645f335c303e7206"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "ab511b8cecc2fafe7c8c37d2edf2087226edb921919ac9019f3a0c10965632a5"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "124ad9afa90faf54652223fedd085f9815f369b294b7063d3bc4256d5f6db640"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "01fc422a2933a65a62c69e3d400e58bc335d942a02efa95898000758ea9f21c4"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/command.json",
+    "bytes": 807,
+    "sha256": "08bc94895d8978559f09da6e143f3d2d5bfbb2f76e7a97706de4314b2253af37"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "a96ccc427062ef44e901d3a80bed56777ed7f4cfc44b8b94e7ce2c2455578ffc"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "9d948f1189682245fec483776f51f70b0d96e060b10fdb221ab435d52e6c7105"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-1-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "24293cdefab252caf14a6e6611b5b91fdbc66b807dd624e8ec0ba392650a43b1"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "35f9d214589a0a838050ed83fd6a6119f7e5b90accd3a886857e5a3b03f2e0bd"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "0aa0628174ff161d4c5c2fd31e9f1dccb54fe9a26d2d0ac528cfa2bf97458841"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "b137509f268a0902a84d7ef5d1a360eee5543fc1b638164c2a602f86462dea0b"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "45d3e7c155156229e5396f944a4ae5cf0ddd3798b36d205cf94071d0747d652f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/command.json",
+    "bytes": 807,
+    "sha256": "e07c2dc37a09f8cf3ae5e45f9db6c4feefe6cff942a818dcc15c6c898787c469"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "99affaaae0c970147ad4c7d7a69d3cca0f667d83fda2ab46bef4dbaaeb2ff560"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "e5946badb3bc28547149fae05c63286ea3d27282a94e584c5a6e6b9dcf68fc2d"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-2-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "1190b0a2939eeb5af237ead8cf99bbb497108e8f46634b3237b7ee9283c76a4e"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "f3106be80e538e77ccb25b018ab484d45ef030a70bc91d2816aba399974b71f0"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "5e4dd68a5036e83014439150397192cf1eac37f75e8f31490115317f2528eb13"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "2dd9fba22f4247c2f54158d921e1a5ff8541b0acaaee1367be2115f48a37177c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "dbbb9986ab74a7f534ba04f49d20fd314bc5075e39abb5056afb959204feee3b"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/command.json",
+    "bytes": 810,
+    "sha256": "450bab4554fe80b0caab808e9520ac85a80c05c580222ea0abd9670086effec3"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "b30d976b20fa7e6e19c86c66cdbeb44c6700ef98a1e5fe35d0fc7d2f64440584"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/out.csv",
+    "bytes": 6381,
+    "sha256": "d18598597b8ddac492d07c6965bd217c77c80a6da13d9f0e9f3de686480e5f2f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r2-3-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "6360449d809dd988bac5ce7e8c148e32e14fcf07b4c3f69668d4aad383338731"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1749,
+    "sha256": "b5f48f4ab8811e113bb098c9929c4babd96573630ee3e15d5bf61ec5b78edd00"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 144,
+    "sha256": "19d934866c049da0f2625920422fb3a75b37c12e422bf4907b2201ce8d816032"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1119,
+    "sha256": "9cd7896538f5a3d4960b3b27c4a8662a084f42bad752ab125d6e4d641e00d16a"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "64c66125b28b056bc2a086dd2d71bc16505ab316a7dd86c6f5684c31c9ecfd0f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/command.json",
+    "bytes": 810,
+    "sha256": "3a0de366ec4c36e494f06ea9cf8353768f737a222120fc18dd176e95876ee7ba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "24896fd16570bbaf57e79e687992af60370ffd47205513beafd3cf7166859e8c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/out.csv",
+    "bytes": 6381,
+    "sha256": "da2030a95cb4c82b884ef4b01aeae26d6480c2d0cf95cae7f8119bc5390da686"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-0-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "18c3948e3cbae6e852530e4b58444311755a3e358d36d5e92c5e69ab16790eef"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "f1df176337170a2c782791ad1904e2c82c0d2dcd7ad81b8833aa4200aabd5615"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "89ddc0da9b8d7c66bd0927bd5ba696d332627d8980f6ebbed3e025425f929252"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "0f52ba9cc19adbd87b7397ed8e7bab62220e54fdb65a469d715cab644adf0bf6"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "16c9f2228ac19287ac02d9db3616725e203645db7533ae06f24f92508c6b57fe"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/command.json",
+    "bytes": 807,
+    "sha256": "079f9276d9e466690c18b548d4a5d0581d4d2dde0f1bb3bd0ffc35dca40d6476"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "444efae823fd63edc2ca4daf9ba37b7e57f043edb866856c5815e0231110bcb4"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "b1b224414afbdb4c7207fa632983cdafb8f2284c6da6cf0061f18e20f1e36291"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-1-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "591d4ea88dac1cb2d869c30a0f897e2ab5260fb3fce9a65e2a00560d5d73f980"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "99138ddb8767144ec47c7dbe05eb12312ecba45c0ee77cbd9133694b7321a647"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "da5818744bcf273380e11b2ae7323436e03a2919be7c34dab9e074d0d8b5e639"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "e099624455e815f1c09b8da32e382bb11f52174c8a713fbaa1a7796a4a6d2381"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "cb8ca5f7d6901cd2ff51bf2604ba10cc9ddc91bef12e16a148fa2cd3132319d8"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/command.json",
+    "bytes": 807,
+    "sha256": "47ad5422c5384e2d8dc02e805b3498971b1e4789747a35ac1e4db301bfc58211"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "8bc176d0fbe9c25639bce47669e9086b3644af37e149a03f9e300c9a219f9897"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/out.csv",
+    "bytes": 6381,
+    "sha256": "216a34bfe29c59b7d375e95f59fd0ba2c28977a3642e53dc7b7801e358bddbe8"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-2-candidate/stdout.log",
+    "bytes": 771,
+    "sha256": "9c88a6f8773f1a4962398e35e1e2c604e29f8249c7d1a63cd9b178f27702dca8"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "536b4b3b143a9e3d8281244620fb8b02ca776e72debe698b3b031c459f0f1811"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "73fb45d90af159645c500ac73e10cd4665856d52165c35fa0ce72694884c6700"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "5f7fa0cdda8ee844920cdb1c93b9233fa2d837c02fd53c00447661293996a34f"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "68b5a7e5ed18a4cfb367516c0651655dde79febd020244e00ed0d3ca0fa94b5e"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/command.json",
+    "bytes": 810,
+    "sha256": "068d373bb00b7a403b41a3455787671bb9f39a328a4a3e9fffa6c19a03fb6f9a"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "bd8ed8c84733751ed5686cf3768bc6f14f9a671b2278b1a698bee130a5248363"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/out.csv",
+    "bytes": 6381,
+    "sha256": "376bba4e5a9e8725b56caa7739c972a867fcf969be9dad54a213e1ee40d28e9b"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "3e9721fb3d3c54f4f7773e23cbbd8ff044f2364824ab39777bdc037d20191019"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/same.flags",
+    "bytes": 4436,
+    "sha256": "f0e692d08196182fe69b81346b91c4e6e5753563ebcb8e3e7656e8c92e3fbc3c"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/stderr.log",
+    "bytes": 3387,
+    "sha256": "3f8551824ef2fdf859cd21fcf6dcb86ac8d23e81095ca730a7b20b1bd6312fba"
+  },
+  {
+    "path": "4/evidence/perf-original1088-r3-3-baseline/stdout.log",
+    "bytes": 771,
+    "sha256": "67b2475cc03e95236fc1918b3e6f161c27b994368aee07c847fa3c1d8455c642"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "a044ae1b722d1d3d6f2c12e840f3f809d6dbbb1b0eb6afe67385045bb39684d5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "afbd920148a83556d96332efce38bb06bdb87c6cc61802053f98929c923d3042"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "ab4830f74d1fe3b1ace84cf01234fb18b93a820a79a615d468c769cca12ae42a"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "3b205a5d3ec330fbccd93a808c16286e1fecdba193affef8e67e8265d661dfe3"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/command.json",
+    "bytes": 806,
+    "sha256": "74d8e5be871a477745e0102f7a3dcee4ffce09f3d28ed017e2fd7e8cb07130d9"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "a1a9d18cc6531c4e04215cc57b1a2c04b9a91e68ebc78df71d70d074641ee142"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "07731600967ae0b97ee9400de032087de31d4f7e4b291a0b7b8b974dc4e4ab64"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-0-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "fa5054048eda02ff4f6e0afb814648f6129fb0166aeab9a4bc43026845c86a6d"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "b27c391d6838101503a0f005b7156cd64bbff0ebf4484ba715791584f84b90a2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "6879b9aff5f494cc154be292ce719aff30719d2bb7103649f5fd31675f2975d9"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "c7860d3eaf59195e245e65c57dd902f8831e9a506fdbdabeca1fc5d147373a49"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "60867725f585aafb27dfc1dbad7afa1d8c4c67a3bb8720d1888a0818d2280ba0"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/command.json",
+    "bytes": 803,
+    "sha256": "5898560ef6e1970e6b838aea1435c6143fc5d7e9ab42461dfa552a3aa7dde345"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "3a44fadd1949d19480671bc200699b95029f4cf271bbd15435c250f9b723be31"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "5ef5c7eeca3cd31098b3f4bc9caac0cfa6bfb82b215a5d1646651f54954b5054"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-1-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "128793777dd1a463b5bcb5c6ff56e216040c4f927ebe3620770f832cd88b4493"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "d694f87020a15ff8d9c2bab8a71e342a21615fdec80cb460a0efbd1831044421"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "7abbecdd350aed43527c7af948e8cb531092df1cdc7b45e05a18cbb4fa66b0ca"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "3a4756d1a7d777762f8242ba42bb40c6f3820d5bd1ce67ec24b859049738c4d3"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "dc0d9ead1508a1e8f0c68fecf6fb4af7caf83659937a5699d4280e15c4682ca7"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/command.json",
+    "bytes": 803,
+    "sha256": "c5c7f8897ac735c2227f5f3682b62bbc8fabb5eea8f9839fb5f06a331928891a"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "fedc903810427a18add6a7e470f46c92356ada960a536e721a7c7255a9162dc4"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "8497f91f13bca8b49fa87764d9887dedd6cdc5f2871bd21946dbe0efa522599b"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-2-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "ef9812bae9d7b24db15b67d61dd8faa628d77bdad2bb49bc124231ef9ff0fbc5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1747,
+    "sha256": "01482e8e755a9d88021d43085550f37fa80a1e31256e87e3e1d4fe947236130b"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 144,
+    "sha256": "08a747930cb66d1f45017f68f79cd5af057741fdfbfd93675160c12b28645bec"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1118,
+    "sha256": "a4d8ae4cc6344161504db4cdd4c3405c44ef2cd9c638371906239d8a8c4e3cf6"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "a975af82d8cbb8718b8169577c50a53ff207731e9059c8a3150679f55d4c9aff"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/command.json",
+    "bytes": 806,
+    "sha256": "ed1bfbda29a2eda82369edc6947e83bad1b52ca542f92540f3507c5cbe58ddfb"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "2fbdaf682177d45fe7f17c4b22731b3b1c8dd32fa883603cc586bfbbb1e155a5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "572017fac7700a1ade44be9dda8560758385a766326c746ea5a1bb552df6f200"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r1-3-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "268c406adce29e3d3dc1fec74c04019fe510996ab75e0d6aa4f9e0bbc7b0143d"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "53727407c381d976f1ec7e791dc839bb96a258989b97cd35d8d6eb7f97db7d7d"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "9321a25dd6e11c9a6efefa7b7576792a496ac7822ea4c08dd84f088534c98010"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "aaeecd12941db3bda67b36384e945eb411227783e3d43b0431f1a1d002fec961"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "45f46ec51a9fc6428bccbd71881865e7a052c77e05ec00d08d165ce786af47d1"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/command.json",
+    "bytes": 806,
+    "sha256": "1def3025f65bf648219edee194b4b96477901d556f110039cfa4cd5a8b1a0941"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "b386f2485ed5b89f0845319bee0658e1955805dc6575022f6fd1c08d084e4b42"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "6890b4a5ec81ec05dfcd513ffba9b0a73383eb933736e6267257cee2d81efa0f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-0-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "bb977679cfb29fb17b229e75afbd44192961eba56e67eef6314a226d305d6cba"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "948360d8d1cec5bd5757e267f7f93ca1ccb50976ea28a2afee97aab605e38fc8"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "4b61f50c266d253b9a520630271131e4e75d12ba18c3533a821dcc68a4b3b8de"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "6533b7fcbbc43e4314cffe1245fdf8c3c98ce87bb4941806eda3d157cfcd55f8"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "358ffe2d4946c7b3561a056e66296a0bcc33f3a74eb25ddc25f90d96d61c5391"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/command.json",
+    "bytes": 803,
+    "sha256": "809afe2d7ee3f7a1cd018586c7d4a8d6d6340030fe6b6e56f33cd4ac7400c95e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "53f31783133ad6c6975f8e804bcfe5e7115f4a10296251d0124779a1ff1aa536"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "8f542665c8c27e2ba49bd68b994c57dd76668a99d7585c2be588c7e7eeb37370"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-1-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "334be7ac85a71f7c6f525b7ff313e9f63a2a8e8593d5f081a0ce7833fd27d33a"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "57e5d46d8938fd1033bf4ca0d1477d552fba1649dbc698c5a062dfbc330473a2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "fc76ac3a11b9924d8a76621f426ac2e6108c41fce69458a7d77146a057b47c1e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "5627688d34af8ef447f8fbe0b98a99aa50cf6462f363b8aaf1341b89983b5585"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "616ee90601af4ac30d2b81321679a76f0a9ddc5fcb74b8dd891e17f96bb5a3e0"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/command.json",
+    "bytes": 803,
+    "sha256": "248398c730647c9b59e4ec2fdd3a607a3cff2c63f80e0976d0efb1a0d7517c2b"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "46bec548c6433450ac985f723c38687024dcdc2e855c9092542b2ce76a48b520"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "2f6e8a5e8a727167f46eee02f135775f7cecd22d0a0365edd56d420abfcbf85f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-2-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "dc9768792db1f26d38c466df0236d2c92b516d9de84e776c9a1fe1e550a4c536"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1747,
+    "sha256": "8c5ad7eb7debff6aba8f627c1e9ad957f452056d417b965e2f1d2cc82511e60d"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 144,
+    "sha256": "34590e482875d3e65d3c686f5dc3af5f439031ea2d6cfb5133a458cb4b223cf1"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1118,
+    "sha256": "d5e2d6f52b80a88b6d843dd49396071cff9f47ac9e7a9f897d74eed05f9e4948"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "2390d13de4b26e5815f94242821d78d0629c73a981c222e68add55b35a383536"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/command.json",
+    "bytes": 806,
+    "sha256": "daaa3653efdd26167f74bff6240c66bcbac49b093c1a778dee36497eec2dadc4"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "cea2daf3cc24ebaf4948d53342f1e57d6270f050c47d0fe28a00f7da41e3ac41"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "0e4cf9c6122ff6772ccb1cf308aecab572db8e4a7ce8c0eceabced2b08c474e5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r2-3-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "7b7fe360a6dec567131ca1d7c6e6fab50b9d3a557f4348b4f9b2882669a9e652"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "59f0721c3990a9ed19b2492d935676e9c8dfbf43315fef27f665d9cf96d86349"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "74cbe9c22f12f5d85d43e7ceb6adef32d7ab0e2beb32e5341095e45b39183e31"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "7dc6835dfa66eb04bbf397eb91ddb7284dba11fe7a2af4a8ac79e4d47c7fb695"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "36fbdd803ee63ffb090b7bce37407540358959c399b33073816d4eb98817d9cf"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/command.json",
+    "bytes": 806,
+    "sha256": "09816d6661d12b04f1197b142ac9d5616f999059915d94214286fd806393fd04"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "19e98b6e7909d9347b85adbf95c40956723518de2d1818c7bff876df17879ec3"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "afc71cb29c8630337a782acd883b1c11f353a3825d10f3faa914c7c2d6dad631"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-0-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "a389b57bee694ebc5dc919cf8e9ab4a176c9f014b4f3ea696aebe38a9797457f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1747,
+    "sha256": "3238672ed78b5b7ce07ef9a76d319e957736fa3cc2054adf5029113f7049ebb0"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 137,
+    "sha256": "bda88d0934da3dc218cc2c992d232da59a9e22843fccb9202d14772f6fb0e1aa"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1111,
+    "sha256": "468b6be8fb38a89fa471204c9a142f9d13a4467911644c2191f5d720cdde4e0a"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "05b701cd4471718ceda099dd41cb6c82d767ef80b59130006a49a818e07f34a0"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/command.json",
+    "bytes": 803,
+    "sha256": "355349acc5a9fa369f7a292b9e5e194a586957f96e9a6bbf4d016900b5c2fcbb"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "e66f72b115de15ebc6f78d7e3a448a90a6200df079037d1d1ce9e39da1d1fef5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "347d7fdf4664f81059f0a14213f8f8ade587c2c8212b77253abce1c4f6370bf4"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-1-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "3c1f38648f516ec154dd72a18fbd26e767a080c7fbed419cb5ecf4360c854176"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "f3180a759568979e9561ac52b4813c12a18a78986aea3eaa667956927132da3f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "45dd5f74057169ad9e114a43b80bcdd13077678d9416d7398d2aaa9f27ce8ae9"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1120,
+    "sha256": "0d21f7d29ce3cfc0e0d4372705236c8ef0d5f179e919a850a01c29a9a098c888"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "26419770e117f2ae17c2bfb5a21aaf1f9c91b5f2f4eba004630ac5cce14b7c72"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/command.json",
+    "bytes": 803,
+    "sha256": "b552e7ca32765a76b1a0a4740c345e746f165525387b3e0faa37a7901dc2a1c5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "691d2f542c57747f631e25830934373817b1d5373995e670612af8c3b6c006e8"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/out.csv",
+    "bytes": 6380,
+    "sha256": "7a9c5943b634c12356a96c77651dee3648f962667cfe1d2974c6ccbcc8863c74"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-2-candidate/stdout.log",
+    "bytes": 769,
+    "sha256": "74e9b0be47636208f261e9c197c8b636687047c2527d24c4396961f745c9e571"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "84a8fcf487a8cc748f586cd7aa4499487b7b25d2ef338fa3a83b6a862e3aee81"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "c640b3e44f164f2333ada39344dc66bfdba665ecde7919147e29174f0cd3a917"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1127,
+    "sha256": "cbb4e8a24cb4a692a9e5abeb6cbf7c9e169014d704213db3c50784bebb5e3441"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "648bae7fc828d2762d2d312c88050ee60c3e8008a0eebb34673c59369390a49a"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/command.json",
+    "bytes": 806,
+    "sha256": "35fb0d2547052b22de4622699b30933af3c5de3fe223aeca077d3b64041bdfce"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "f7845d98a5cb1a785fbbe2497e0345c309995e617b0381394a5fcbf6090de130"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/out.csv",
+    "bytes": 6380,
+    "sha256": "d37a32b8bb1ec520ff68ab74e4a17de3cf216c59ac068d1926b9c59473038bf5"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "e52e736b77f67cbc3856aba74156b03fa4c0dd1ac603f3ae5a30ecf748a1d1f2"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/same.flags",
+    "bytes": 4435,
+    "sha256": "9ce75c6c20fa8a9073f1082948f43d7310f768c8ac8f7b88cd638af83c88606f"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/stderr.log",
+    "bytes": 3672,
+    "sha256": "12cb118ba6739091f99b79282bdb25bf01930089b72e562470f15479fef62e0e"
+  },
+  {
+    "path": "4/evidence/perf-original960-r3-3-baseline/stdout.log",
+    "bytes": 769,
+    "sha256": "aa2f1749c177ead4e303628a6599cff7e95030b8dbb233e75e153e57ce061d40"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "ab8d7450922a0c0f26d141c7b2afe83737984540fd3b0c4ca8d6828448ffcc58"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "52104e565abfdc9422fa032c3453c6f06dc2abcd6e323f628492d66aec9fcfb4"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "0dc14e6f8d2c1cb9ef40e872b3877ae444bf57f26b952e6b3cf35cf4857e8ed6"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "d36ac050b6e3d1e5accf326d5f8a5ac9e40afa622285b7899ec39518418d2e2b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/command.json",
+    "bytes": 788,
+    "sha256": "61d8e80d2c3ca6c9252467fc265a7947d49bbddf2445ce837355d0dc5998cd7b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "8cfa7dd8eb1bfef68ce04df368af6101b29e6079b6beafdf0bb905b8c1a0f833"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "754e6033ad2d7f2a554e26542eb7522069a7b10925786eacfff17f852a0d1ef5"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-0-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "563e197e854f9e7067f0e2b6f1f4c5801ab4bf13ed75a561374826cc6efbff4e"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1749,
+    "sha256": "0e612921f0291c18d32b519132d846b19a6f628d25ad83e8152500383402f928"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 137,
+    "sha256": "b965b57b346f4b1719ee83575a1763ebc0965a15dbe09d175e71280368ad406b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1112,
+    "sha256": "b8eff7eca12462b671457bdbd1ecc658846404407a06ff17e20d780bf966cf56"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "6a1b72ecf401ea2e5717094dd238697fb5154fcfad739db35bbe5b1e5f323801"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/command.json",
+    "bytes": 785,
+    "sha256": "b3cb816a86ba9204585aed179122f99ba3dafc422f2aa113d57f51c6b468f11a"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "d12d0938194dc983a899334e3d5420c4f1b089f78eef3fb4d69acb846fbab343"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/out.csv",
+    "bytes": 6372,
+    "sha256": "ee2364bded2c8ceef9450b5acf06278a9ff870475b8ca15fe1912188ffd45a21"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-1-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "44e55a535ab4ca9c45a99f8328184cba3ad3bab317b92c8e0aefd5dc342a5850"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "d8c30d968798362e62f25b60ea3cbdaf3bfc14663e44158cb7f622fb881f0788"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "3d302ec24673de96b7618f48eb8fd3fda6cf7c157f6f72bfedf468f5faacedde"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "2e2c87aa25eca8b3da68bf655feed7d5e2935734f8aa61684119989827486e81"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "ac9cfe4d18bc5f933e8a22867351193fc3d9c73b237921094c794ed13d8e8197"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/command.json",
+    "bytes": 785,
+    "sha256": "b738575befed1ef10748a40e058c1775c4ecea60d5183b2648b0b231f7713449"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "0ec5e962b1f41f7fa38d59f2fbe68292c696d2cbb79c5253592cb13df7a7e980"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/out.csv",
+    "bytes": 6372,
+    "sha256": "677bb6a389d77a5b5982884a58e8d270ab699a86fcc0b7fdac04b93443ca4333"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-2-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "e1af7f9111a9a95214228d09e9d78ae1e8a82802fc2d03193fbc6c93e0f09919"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "f08c719884c7b1c342407e6615e91d2569074a4c9dee1c9768e3cc2a353c9d8d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "2e1d978eae8d305e8e9e8b79b596ec4355d273e84b68eb5131775a96b1e63b8a"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "8171134ec93001c11cf6551e056c711c5503c247a73dea2f1d2305915f31e8e1"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "d1427acae79a998ebdc30c964907adf2cd31c1d5aa99343e0896f6f62598ba07"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/command.json",
+    "bytes": 788,
+    "sha256": "6c7e25d256c1f6ebc8e34d3b0674a44730f2a13d0483df94dccd58a59da129af"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "771e8031b627acff69b7c71aec47c35d5e7f3e0db0765aff016ee08f5905552a"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "8255f0a93d10cd76df387142938eca3d88dcc6e341fe8a8beb66eec4b565b66e"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r1-3-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "c420199d6be4b5a27a94abc41f3102b9490c737b83872043a315589b8a51e79c"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "af142394bc101eff021fde8fc142c68aafa3138d0eae04050509aff9022fb8a5"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "874aa80d0453d3551631aac0a3f7592d94256652412d059a6c8eee3a3536af4b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "b0d49f858f211381a2bec8ff63d14b53d43b3f4244706f9eeb0150b6d489c362"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "a415aa0b90950f7813134d70c924bff7cd617d74b3672c045a6b12fa8a03affb"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/command.json",
+    "bytes": 788,
+    "sha256": "e6ea1b8d2de700f4643516a9d3639501753e099abcf522727a89437798af775f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "5ef674171857f8904d28b9006168cd477dbb15686f5157607a082ba797fe64d3"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "fa4cb2ff059f251e30c9cfe305660719aedcf7c32c9881d5fbf0d1e7403af766"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-0-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "6fe5c07c9993da33ed5ded5c3747c671b05bc3d1c152aa04dbe48a9a51162b6e"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1749,
+    "sha256": "fa3737ee9bf42a24121d29419837012773644d159601f245aa4a8fb3a72ccafd"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 137,
+    "sha256": "f7562bdd55b5cc0729aebc5e13ea6828d13fdc73a2d545f48264f2c11e55db26"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1112,
+    "sha256": "34ddc934e7e3187adb0eca0c02360ba42966c00473a3950e53be7743a6ef9fb8"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "63dfa1aed42b89c9141568c5577e092f1a5d8ac5d02f026b3a0a089377d314b9"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/command.json",
+    "bytes": 785,
+    "sha256": "922acbb8ed6af8217d29175a151f28f80c55586cdf78089c69cee042be09470b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "22d89cfd929c83591c106fabb7f259b72bfd691313b9a0eef24f94d969f88c40"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/out.csv",
+    "bytes": 6373,
+    "sha256": "31ef5f3d84fd253790a2aee6a65f4a2de51456ed767002c7eaf2effe514f1881"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-1-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "3e5a86a0a8aa27a7cf93f31610820143d64f04d1441f4bcfd328cdb63fa87293"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "b80c441d40339263fa64711cc99148d07ec3b80deba147b9fb0ca1e461e6d0c8"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "9fa6d95420dcdc1e69eb0359425459d3369cf450f771ac314554320b1dd04b64"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "cefc153ec8cdbf0153fff0f6e38542679c12b8368ee3777a0dc770c6483e8c52"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "b816395a47906d143a9659a14ab251f52adafb8d9f48b71a1b89557b68b9e4be"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/command.json",
+    "bytes": 785,
+    "sha256": "2799ff9f5ed068d25eb8e979419b08ec99d99b4ed137e6c3ea55bb96436f2b17"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "1558a3a50e36f4c16f4fa9a959c028524946f5b4ba99c470f2903a79ea28e03b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/out.csv",
+    "bytes": 6372,
+    "sha256": "3ffad831ccc17bd9aafa6a025555c74967c68a026526f5cbe6fb90db5f3c94cc"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-2-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "df7abf810591c4ec1aaf87e2d23952095818d2502d3a996c15c7d4a63fc96387"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "ed2096dc23a62e63398f2e8af2cd108be93023c364ba359c448a3e9dfb768cbd"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "e75c05896a682476dfcb7a645d7d3a0df89343058971924fffd547bf7fc1e858"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "1207bd2bb70982fa2d71f631d4513edba7a9c324117118a98458dda923281090"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "97d828e0dd320d57584bdfe3e4ae7ec9e3239178517f01e7338230223cbce27d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/command.json",
+    "bytes": 788,
+    "sha256": "67cb903cfee6b67a2a5d655fd7c959ec636ceb31b2df4d55cb1947b3c176e01a"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "b799b4c27b944a7416201c148b6d8ed92ec048e289322bbd2e3650b44c5c3919"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "553fdd6f31b522bd487daeb52da34c1c5c163723ed7e43eb51e2a8ca4b70c4cf"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r2-3-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "79a2a470aa64232b14b163c431be24f122d2ef47dbb0b916c48311d4c7bb75ec"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "9c3a12798261515f548e0e7809966430d073824c5eda008aaf88000ec0d29570"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "f2d3a3b098ef1dd5744d1918d47dc26b7a59b9758788a189e7c6dc63e09501b7"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "44e63d0aa3e9bf18dc1ad8d73e84dfeeb1359dfa8cd18d41b117824564b4b935"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "0d749caf29adf15e3aca0d1c20a85b4c6fd719e8e27c36ae7b95996121acea48"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/command.json",
+    "bytes": 788,
+    "sha256": "2404aefca4c6c9db5eede6ab46b56b10d4b40863cd45b81fc37b2f669bfd5a78"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "7b98dac1785b41581183915cc9438c97bd04521ee7add6a1495a6356d7e8f9a2"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "ec302dc47e92b60c4461ad5ffe01f0aab0c0d009c2e1c5bb7aaeea534985ea9e"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-0-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "2d352bb3342cd1ab351b30ed0771bb9b0e31d5d101046c1e9f6b8dd1984b21b3"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "65ed087be553dfa7628df5ee4c0d331f3a619d07b313db4a2b148df221af93c4"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "d02a1358dab3d24d4eec4426aa1a781c1dc04e018d391663619b6a7cf9cddbbe"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "a038ff164ee98f6b2f49713988210ddfdbd8484187dd7085d9c81b7e4244c6cc"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "42bd8892e93ab52f52814f95a071d19c6c1375a1b03ed07255e1070610d4fa55"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/command.json",
+    "bytes": 785,
+    "sha256": "10159d4049a092a4ee27fae16f52903de557178e93ae82d820be11c61ae23dc9"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "518504451bb8b1634b4a58aa992d31d291963016d9326a985690d0f8dcabf4d5"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/out.csv",
+    "bytes": 6372,
+    "sha256": "b3423c473562c0d7a33572e1a4411f1796e3235ce25609b666d41392e3ebfdda"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-1-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "1a3feaa4137950c35ce61fb85fbce00d06e33e61401d5483b07d96379e51fb46"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "5717291455ed4821c8dc2a669a5f75879b7db3122b89ff8c84b800a792dc19b4"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "2b1548958b214e4772ab7e2c271367b5dca151ebf37b0ab1a54cfef894dad234"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "150ff8fa695ee17e1dd1c21abcccca8b063dbfc1de82e6b457da42690f9600a2"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "67f5ffd50be3c9cd7db91c4e66c1315d893b1c32e90c143f28ec810bec068612"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/command.json",
+    "bytes": 785,
+    "sha256": "854c4cbbab3d176a64e5fb6c3a750604e91076c7d7a5683b772125e5b585adc3"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "ed7802218f0756248a4127ed151f9fc3a39e21c1bcb10d4b41a4b4b65f83e520"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/out.csv",
+    "bytes": 6372,
+    "sha256": "3c6405baa634042c294a8cc1984392cbf0cea2bf7373071973f688fef076af58"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-2-candidate/stdout.log",
+    "bytes": 764,
+    "sha256": "d214642143dd13fbb4b9fded2fd9e339d60d5ebe3690f7df9547e89db9c7e5bb"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1771,
+    "sha256": "9c51f30b74bba4b9ddb38e705e87dbcbc9902fc78ce9c260abac2358447461a2"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "eea02edec8e72daacfa6b9ea1d327e5125e35cc9bb811660a13a21209d65abdf"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "88aa50b0e2c97739c0e983d58640f49aaf363fd32c39a1f13ef156d211aab80e"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "c758333df0f8882a7cdeb5ebd2b597f584556767735861ccf249f9b3c6071c1b"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/command.json",
+    "bytes": 788,
+    "sha256": "df6f3e068f0f0302aa5baff6fcc799082711687fc8d24a7ddff92a48081120ea"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "c04f86a256ec243d39a6a67578004d5ff3620833cfda349bd6f002d18139946a"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/out.csv",
+    "bytes": 6372,
+    "sha256": "664841d5e59ce65eb940315456ca43e3cb865fcac8c46a9feb17e17c07184550"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "322a3f3d75eb3d1d97c20aed3994db1440cb522ee560d92e4ddf6afc49dc0c0d"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/same.flags",
+    "bytes": 4165,
+    "sha256": "f75076bc39560d847e4eb8486f8f0c9efddaa45afe95014c3e500c8a749fca39"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/stderr.log",
+    "bytes": 4966,
+    "sha256": "ed4f741dc7d5c76d06dccab804caf936556ba99019560666f68be7a9e0d2096f"
+  },
+  {
+    "path": "4/evidence/perf-small1080-r3-3-baseline/stdout.log",
+    "bytes": 764,
+    "sha256": "155cb56c08b7609d9e0c4a72606c3db6d80290d52fdfd33b27937d40cd7761d2"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "602c8c59654fcc1f17e47f0d0e7ff9a1a733c0ebe05982f184e81278f6b0e478"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "114b873399413a094a8c988330d4691c43e0763f6419e934b7e9ae8e46768765"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "8ec295e62836b240aca02808de141a2e6d135c0f6788516bbb5f383eefacdc63"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "e893275b57d094ec859ab3ff3ad5bc7b084b6231eccd5d34d7f5b5746f4fe9bb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/command.json",
+    "bytes": 784,
+    "sha256": "b98a4e159341193de6de37e4cde4127439e25ca210eb07fc80173809d48508c8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "594dc62d8e792f348a7dd9022763f257833bb0f4817c9975b4edb3c6d78d6c2c"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/out.csv",
+    "bytes": 6384,
+    "sha256": "b1a0dbed125c7504ae63c129552ed0865fbfa88bc202173ed01cd5ec889c1c91"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-0-baseline/stdout.log",
+    "bytes": 603,
+    "sha256": "4654e19672eb0c67acf6ebcb9bd0af9ab899f619e357c501cdff9092f609bbfb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "ef2335f55cb74abaeaa25e8bb6c4a1c9ff44d9704482e4682335e6d50060af16"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "cc4ad89de381fc677124878d853834a48a54409ba11534b99d1e3210838c2153"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "893273eee6fc72cd0b36f0d29a2e1499b75c9d1ff5821e9d3943f36a8c17893f"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "d51f86d53871a206b7b3b5960682bc232973a1527cea8dcd8fd4e00d6a13a3bb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/command.json",
+    "bytes": 781,
+    "sha256": "74ade8f131ea22486061d2ff3a00ba2f3027f1316d1ca93d051a1d587fec2832"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "1dc84148e04a6849402d640c0dec20bcd137f347275d66ef68478f0ac456f147"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "65273d16eea59be201a78218c7c900b8825287810192a7273e2cfbcc9ba72a95"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-1-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "cee18543b3c10c88fc8b6d32a5bb337b21c8514469776fb625e1c9fbd5d3f911"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "bdd9b6156bd703babf6107a97d4a4d7d9ae3dad87da400edc6f9078e1773540c"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "454c593dabe8abbc95db0efd4e9a0929dac100b70be657976363922facbf979e"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "0eada337fd72be499d284ddb198097d37878c44b2af333fc42b1e7743be5a830"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "93ed77e2e5e859a0f962bef36d25376324bb8a85dcd0dc8d7e37b2f2ca81f116"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/command.json",
+    "bytes": 781,
+    "sha256": "36c3fa290cc85aa3307b12c7d826e3f07aedef69a26db743962a1e6305680699"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "c24602ee4a946411718e951f7f28e42c8003e678018a0e276016f513fd85ce07"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "6f8deb953f3ac8d2e4ce8423a33237e45d6257f5e8fb9bc0cb57edc0b27cf276"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-2-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "fd471c450114b31e3ffcb5650435bdb44e9815d6bd9816dd5bec60e128680ead"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "028874bedd807b0cb22c8658c1a04e28485d09f3dce9906340546d551979c63d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "0dd617062948193ee5c31481d58f1a0ced18134d459b070281321d5c9b407d7a"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "7a6af88871b20b20a438ce14f7a3c88bd660c24ac37aba0f1290a9e2c6856b6d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "87aa4d25812fe0fa9efeb692f12c03ac7c2324a94f564d2d35b7a48e2b85ad3f"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/command.json",
+    "bytes": 784,
+    "sha256": "212a4cf0182c98ef8489af61c3fac0dfc5790d57ee20b4480e13574124d18bf9"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "af5fa5cf3835e6fd50b2d8d5f73679eaea3c8a9bea0ed28e3509738daec73c39"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/out.csv",
+    "bytes": 6384,
+    "sha256": "0ee4a1cf76852fd909114f4157b998cbd179e8fa473fe7178d7115d393eed684"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r1-3-baseline/stdout.log",
+    "bytes": 603,
+    "sha256": "1210b5d3a91fb140976787a19ff0f133a9a882173bf523d2a66a15cf9b538626"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "e3bd88fa66f5e23dfafbf51b9830024dff6d127c10c0137a6567896a25c03018"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "09115388a69a4987953d6b8bcd1555cc11870efb771cb55be0aeaade4d365c89"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "391afe2fc9904cbafe1685f1d9a7857f6534e46947fb83fe74d9cc1abbadcbc6"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "2ffa5445c4e5deb3e04869ae5f1b29c60c18a73d00aaaf1e06ed8daca950ab62"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/command.json",
+    "bytes": 784,
+    "sha256": "793454c3de30ca2a60147803bafa03f6670573b7d0591eb93e8e9ff6771d0739"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "6957da4e562a6df28f41e4e831d4d62ba25d662a4c4e89ba2377b7a4a74116e1"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/out.csv",
+    "bytes": 6383,
+    "sha256": "7bb65511ff71111bf35a2f73eed29b3105f3624af854d84fca1148b277ccca5d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-0-baseline/stdout.log",
+    "bytes": 602,
+    "sha256": "b5ea26f66f96ab72c6cf072e9fe6c01b359f9ccbfc0e94619767eb6745299b02"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "40c7380c279c37b6417cb3806733357e40191430832d4c9f9aa223f077396259"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "5129fe8b54fa0f923040a2a6e09146a253550a794f096b418d8d69a7dbbe1033"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "14d208adba8399c0ef7fea5e1025812da5d15686c26559c58d7b4fdf9ee659bb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "a3eb08a456a6fb602ba1f7a1f6be1f3a467d0cfaefcf95949c10d2beec6c9448"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/command.json",
+    "bytes": 781,
+    "sha256": "95b4fca0b023bfc3170a3af969cbf2df49eead7d5057f83105faed16071074b6"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "df47dc8c7fd90dac83df03fae531be803316d2bbf89203366047729ab7bdb501"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "fb5930aaeb269ee3959713513852adb2e2133a77650ee06b0be97bdc49313da5"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-1-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "9eae1b2960f29643a74131ca7275281228ed85a1741aaca042dfeb274344442e"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1747,
+    "sha256": "85ac2624b617258d007e3420954f00d8f152095580f7a6815147a0a84d5bdce2"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 137,
+    "sha256": "a4babb9116b7c83f76211e436688e6ad4609eb6e130e1b705b6cb6642154973b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1112,
+    "sha256": "396fa59728a572927d284ea5c0d69532aba6d9a024e9582cc4ef356baa82af47"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "8a0745a66c3210248fe76cb52d9fea81e1473f9302b08d03a05bef6b02c1bad0"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/command.json",
+    "bytes": 781,
+    "sha256": "c0b7ba6bc6b7bae18fe852468d1ce0ab28b6b2fc13567f824c3154e59cc4a5a2"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "11f0c959651cdda119891f6491e4ad655ecfe559da64028b9de17ba8bbe2f43d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "f16352b38d614f0ec09418636d8f4b7c57e3311bcd1e0f3c5429548c9ca963a6"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-2-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "218b8ba9e7d8dfe08274c199554bc75ca5631c9f25fc25ce7711ed06002c5864"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "ec5a1202c185ed77b6e7db5c22eabdf32a5e68e04069083d33d22e0ef723acc7"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "314c94d4f146c9242abedbdf50d51acb1669583deeb1ceaa2a47afb5c0cad181"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "a55b06379812f7df99d35a490bbb02e487ad5b6eb9aed2f6932e82929438920f"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "0420f03fd6ac6f00e57de14d5ef2d7580461224d9bef3c52bbd1622812083b77"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/command.json",
+    "bytes": 784,
+    "sha256": "dab9bee4091d927ee2899dca9285c28fcf950bf854dd904d4fcbb44588fe4664"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "1266f6e8a3c682ca2597d03dd37022a275d1865b1f79ed6407dc631701611c22"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/out.csv",
+    "bytes": 6384,
+    "sha256": "1059c143c71273f60cc05f11c8f871c36dfdc141857f0fa3b3222b4bb5cf8279"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r2-3-baseline/stdout.log",
+    "bytes": 603,
+    "sha256": "18d2985376f8492a0599514555adddd17b7a1900f790a84e248059ea36b03033"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1747,
+    "sha256": "cdda1718ca444f272de60a3ea56a6e151a7dc9dd3a7f98ed641fb1c1b788b0e6"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 144,
+    "sha256": "f1053ef3966e7db27244495ee3317d6d3d7a2b5785a8d893390442a4c01b0c8f"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1119,
+    "sha256": "91d57d6cbe998b5c064744996fd0fc3b839e2da869fe4a76d91d97e065c538a8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 67,
+    "sha256": "ab8fc4248a7d4ee6a67341ed4ad755bb853f3f4397cc59d504f93d3a1dab4c46"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/command.json",
+    "bytes": 784,
+    "sha256": "8a0b9667d8ab2de5adec8914c7547502da2bf2504cf818a02f242602eb830cad"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "7660e970556d8e3efd38a6c19bfdb3bbcc526ece423ac5c0eb8ea2cf088c59bb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/out.csv",
+    "bytes": 6384,
+    "sha256": "ce3fc9167d02095ea1333a9e7fdfa62d5700847d7c48e284d5ccea5a957da136"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-0-baseline/stdout.log",
+    "bytes": 603,
+    "sha256": "d952f3953c39053624c4c6b8e53cbc2feaf047b5ee302b4505a1b1f6d6941daf"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "99d82cd7919ccdad7d1c96f31bec64465efc752f4dad2868f517b744a39099b9"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "027b83a5524aa5c1b58e2db17e00cb8eedf657ed94e75626fc641747b2f57b61"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "4288da7af0399c48c577afad93cf618466c1c8acb41489ddaa8c28d18fa98101"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "10de4c14bbbdca5b0ec5bc0e68c3ddf28cccbf1c387049e6850d102c1d5513aa"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/command.json",
+    "bytes": 781,
+    "sha256": "25a2c4db97c14c82893a62e6a151291de784b8a74ca5b6dba4e3df325783b750"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "1668bdd4359faee69dfcfbfdad5f5048f15a5e98fa2fe542574e1bf9866dac26"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "060fa1988974b96bd029eadf59a0e720a3b976e6410d83c92bc1d2611c297fb2"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-1-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "fa8f2a363acf0575b5c0cb9f4223321062b29bc539564c901731dc85a2ee4d9f"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "a05a2e805850778dc3607fe8bef3f629ee923b51ab704ed43569e23f84348f2d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 138,
+    "sha256": "870d6d698e283678c1d811b0af269c4fd54d3e12662581a9f16bd7a56c146501"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1121,
+    "sha256": "dd85845e056d22c343b6f9b1c4d5221bbb14c5a7eec00b3fa732fbc2e0615fd9"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "9e1933c8f32f5bcc920bdff3a0e939d3a21adcc781cdae31f58ab921ce329196"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/command.json",
+    "bytes": 781,
+    "sha256": "aad0e5792dc7db91fbba3abd9f9cec96cdebbd125783d3aafd6389cac4f4c3bf"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/exit.json",
+    "bytes": 72,
+    "sha256": "fe1fbcf25f62f974ee5460566698984d242429df108d77b1853535fb96ea7e46"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/out.csv",
+    "bytes": 6384,
+    "sha256": "ed112318c8d9fbe1472c0802e5222488a0673691677e175e128f75ac41f6103d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-2-candidate/stdout.log",
+    "bytes": 603,
+    "sha256": "1a87b55834a06556da90c16e2e1f58c5efd69ac2c3027128e2f5281d5613ea7e"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/DLSS5-AMD/logs/native-game-oneshot.txt",
+    "bytes": 1769,
+    "sha256": "893922097bc9c0be4e1acc800d439ceb3dcc380dc01280dbef2942a1fbbde78b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/DLSS5-AMD/logs/native-hip-device.txt",
+    "bytes": 145,
+    "sha256": "7465c9ad971c72a23cbd0e9eeca9e6da807cd1cb16338290e945f3d0ac9dccf7"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/DLSS5-AMD/logs/native-hip.txt",
+    "bytes": 1128,
+    "sha256": "9d01fe95cec033f68bcd8c3d21601ba55f71f4e050adae3a285741074e24c66a"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/DLSS5-AMD/logs/native-submission-order.txt",
+    "bytes": 68,
+    "sha256": "e8d944555ec1204bb6f03e1c2fda7337fb19c43d7d769e0b2345891ca1c85d2d"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/DLSS5-AMD/native-game-flags.txt",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/command.json",
+    "bytes": 784,
+    "sha256": "3ec48c5531100b0e85cf9feb582726c8218eac39ea8510474ef2017d17b65c49"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/exit.json",
+    "bytes": 72,
+    "sha256": "26d5eb9fcebd849dc2595c0a914bbe3e9ad7c4678d15fe45311084d5794b5b89"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/out.csv",
+    "bytes": 6384,
+    "sha256": "ab56d217ec11ea11aec4181f4f924c471879904c89073e94265940d3ee69c221"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/raw-hashes.json",
+    "bytes": 329,
+    "sha256": "9dcd5c1b8d3d3c04d77adf3a9dd5de202fffdbafcafa7b0b4a9c89b04b5f59eb"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/same.flags",
+    "bytes": 4164,
+    "sha256": "ac6ee2849600506a6200e80f98a9a5e408cfd030daa8e5f8886d6ee0391c41d8"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/stderr.log",
+    "bytes": 2982,
+    "sha256": "79bfc18451dc6299e41fabde8bd91fd3902e299e3053e6c6780a33dede940c5b"
+  },
+  {
+    "path": "4/evidence/perf-small900-r3-3-baseline/stdout.log",
+    "bytes": 603,
+    "sha256": "7c586991fd89e81af6a25f43ac66e729243bd0eea43599483a54e61e8033d501"
+  }
+]
