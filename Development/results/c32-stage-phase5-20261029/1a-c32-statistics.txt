@@ -1,0 +1,131 @@
+{
+  "original1088": {
+    "baseline_stage_ms": 2.8206,
+    "candidate_stage_ms": 2.7901499999999992,
+    "delta_stage_ms": -0.030450000000000088,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.81066,
+        "candidate_ms": 2.78471,
+        "delta_ms": -0.025949999999999918
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.8244,
+        "candidate_ms": 2.7875199999999998,
+        "delta_ms": -0.036880000000000024
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.82674,
+        "candidate_ms": 2.7982199999999997,
+        "delta_ms": -0.028520000000000323
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_chain_w16": {
+        "baseline_ms": 0.6737666666666667,
+        "candidate_ms": 0.66712,
+        "delta_ms": -0.00664666666666669
+      },
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.16918333333333332,
+        "candidate_ms": 0.16826,
+        "delta_ms": -0.0009233333333333316
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.17101666666666668,
+        "candidate_ms": 0.16906999999999997,
+        "delta_ms": -0.0019466666666667076
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.16747,
+        "candidate_ms": 0.16798333333333335,
+        "delta_ms": 0.0005133333333333379
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.7265166666666666,
+        "candidate_ms": 0.7166733333333334,
+        "delta_ms": -0.009843333333333204
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.70284,
+        "candidate_ms": 0.694,
+        "delta_ms": -0.00884000000000007
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.18930666666666665,
+        "candidate_ms": 0.18655666666666668,
+        "delta_ms": -0.0027499999999999747
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.0205,
+        "candidate_ms": 0.02048666666666667,
+        "delta_ms": -1.3333333333330477e-05
+      }
+    }
+  },
+  "small1080": {
+    "baseline_stage_ms": 2.2475799999999997,
+    "candidate_stage_ms": 2.23425,
+    "delta_stage_ms": -0.01332999999999999,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.24172,
+        "candidate_ms": 2.23142,
+        "delta_ms": -0.010299999999999976
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.24802,
+        "candidate_ms": 2.2329499999999998,
+        "delta_ms": -0.015070000000000139
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.253,
+        "candidate_ms": 2.2383800000000003,
+        "delta_ms": -0.014619999999999855
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.17733666666666667,
+        "candidate_ms": 0.17612666666666668,
+        "delta_ms": -0.0012099999999999889
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.18085666666666667,
+        "candidate_ms": 0.17964666666666665,
+        "delta_ms": -0.0012100000000000166
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.17556333333333338,
+        "candidate_ms": 0.1756633333333333,
+        "delta_ms": 9.999999999993348e-05
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.7587800000000001,
+        "candidate_ms": 0.7535766666666666,
+        "delta_ms": -0.00520333333333356
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.7354666666666666,
+        "candidate_ms": 0.7310366666666667,
+        "delta_ms": -0.004429999999999934
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.19812666666666667,
+        "candidate_ms": 0.19683666666666666,
+        "delta_ms": -0.0012900000000000134
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.021449999999999997,
+        "candidate_ms": 0.02136333333333333,
+        "delta_ms": -8.666666666666545e-05
+      }
+    }
+  }
+}

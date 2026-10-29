@@ -1,0 +1,46 @@
+--- a/hip/wave_owned_c32.inc
++++ b/hip/wave_owned_c32.inc
+@@ -1,3 +1,6 @@
++#ifndef CW_OUTPROJ_HOIST
++#define CW_OUTPROJ_HOIST 0
++#endif
+ // small-wins-20260930 (from mochizuki-022 I/P): exact representation changes only; every arithmetic rounding kept, its half bits reused.
+ #ifndef CW_INPUT_HALF
+ #define CW_INPUT_HALF 0 /* bit0: post Hrtz value; bit1: mapped input (half/FP8 producers); bit2: Up H() value -- skip float((_Float16)v) */
+@@ -437,6 +440,14 @@
+   }
+   __builtin_amdgcn_sched_barrier(0);
+  }
++ cw_i2_pair proj_hoisted[2];float skip_hoisted[2][8];
++ if constexpr(CW_OUTPROJ_HOIST && W16>0){
++  const uint pl=__builtin_amdgcn_workitem_id_x(),pr=pl&15u,pg=pl>>4;
++  _Pragma("unroll") for(uint ci=0;ci<2;ci++){
++   proj_hoisted[ci]=cw_matrix16(w,3072+ci*512+(pg*16+pr)*16);
++   __builtin_memcpy(skip_hoisted[ci],w+8193+ci*16+pg*8,32);
++  }
++ }
+  _Pragma("clang loop unroll(disable)") for(uint qt=0;qt<4;qt++){
+   uint lane=__builtin_amdgcn_workitem_id_x();
+ #if CW_LAUNDER
+@@ -456,18 +467,18 @@
+   for(uint ci=0;ci<2;ci++){
+    f8 acc{};
+    if constexpr(W16>0){
+-    cw_i2_pair bp=cw_matrix16(w,3072+ci*512+(g*16+r)*16);
++    cw_i2_pair bp;if constexpr(CW_OUTPROJ_HOIST)bp=proj_hoisted[ci];else bp=cw_matrix16(w,3072+ci*512+(g*16+r)*16);
+     acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.lo,av[0],acc);
+     acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.hi,av[1],acc);
+    }else for(uint kt=0;kt<2;kt++){i2 b=matrix8(w,3072+(ci*16+r)*32+kt*16+g*8);acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,av[kt],acc);}
+    CW_Q8_DECL(a);
+ #if CW_RTZ_PAIR
+-   f8 summed;for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*w[8193+ci*16+g*8+e];summed[e]=acc[e]+prod;}
++   f8 summed;for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*((CW_OUTPROJ_HOIST&&W16>0)?skip_hoisted[ci][e]:w[8193+ci*16+g*8+e]);summed[e]=acc[e]+prod;}
+    h8 rounded=cw_rtz_half8(summed);
+    if constexpr(Finish||Post)__builtin_memcpy(residual+((qt*2+ci)*32+(g*16+r))*8,&rounded,16);
+    else for(uint e=0;e<8;e++)CW_Q8_SET(a,e,cw_output_value(float(rounded[e])));
+ #else
+-   for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*w[8193+ci*16+g*8+e],v=Hrtz(acc[e]+prod);if constexpr(Finish||Post)residual[((qt*2+ci)*32+(g*16+r))*8+e]=(_Float16)v;else CW_Q8_SET(a,e,cw_output_value(v));}
++   for(uint e=0;e<8;e++){float res=float(residual[((qt*2+ci)*32+(g*16+r))*8+e]),prod=res*((CW_OUTPROJ_HOIST&&W16>0)?skip_hoisted[ci][e]:w[8193+ci*16+g*8+e]),v=Hrtz(acc[e]+prod);if constexpr(Finish||Post)residual[((qt*2+ci)*32+(g*16+r))*8+e]=(_Float16)v;else CW_Q8_SET(a,e,cw_output_value(v));}
+ #endif
+    if constexpr(!Finish&&!Post)CW_Q8_END_SITE(a,6);
+    if constexpr(!Finish&&!Post)__builtin_memcpy(out+(win*64+qt*16+r)*32+ci*16+g*8,&a,8);

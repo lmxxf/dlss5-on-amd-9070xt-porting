@@ -1,0 +1,131 @@
+{
+  "original1088": {
+    "baseline_stage_ms": 2.8304233333333335,
+    "candidate_stage_ms": 2.862886666666667,
+    "delta_stage_ms": 0.03246333333333329,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.82002,
+        "candidate_ms": 2.86458,
+        "delta_ms": 0.044560000000000155
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.8296,
+        "candidate_ms": 2.8616099999999998,
+        "delta_ms": 0.03200999999999965
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.84165,
+        "candidate_ms": 2.86247,
+        "delta_ms": 0.02082000000000006
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_chain_w16": {
+        "baseline_ms": 0.67749,
+        "candidate_ms": 0.6924266666666666,
+        "delta_ms": 0.014936666666666598
+      },
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.17038,
+        "candidate_ms": 0.17393333333333336,
+        "delta_ms": 0.0035533333333333528
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.17079666666666668,
+        "candidate_ms": 0.17521333333333333,
+        "delta_ms": 0.004416666666666652
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.16812333333333332,
+        "candidate_ms": 0.17438999999999996,
+        "delta_ms": 0.006266666666666643
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.7284799999999999,
+        "candidate_ms": 0.7412566666666667,
+        "delta_ms": 0.01277666666666677
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.7044766666666668,
+        "candidate_ms": 0.6980766666666667,
+        "delta_ms": -0.006400000000000072
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.19003,
+        "candidate_ms": 0.1870666666666667,
+        "delta_ms": -0.002963333333333318
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.020646666666666667,
+        "candidate_ms": 0.020523333333333334,
+        "delta_ms": -0.00012333333333333293
+      }
+    }
+  },
+  "small1080": {
+    "baseline_stage_ms": 2.256543333333333,
+    "candidate_stage_ms": 2.27415,
+    "delta_stage_ms": 0.017606666666666698,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_ms": 2.25742,
+        "candidate_ms": 2.27661,
+        "delta_ms": 0.019189999999999596
+      },
+      {
+        "round": 2,
+        "baseline_ms": 2.25038,
+        "candidate_ms": 2.27431,
+        "delta_ms": 0.023930000000000007
+      },
+      {
+        "round": 3,
+        "baseline_ms": 2.26183,
+        "candidate_ms": 2.2715300000000003,
+        "delta_ms": 0.009700000000000486
+      }
+    ],
+    "kernels": {
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "baseline_ms": 0.17763000000000004,
+        "candidate_ms": 0.18214333333333332,
+        "delta_ms": 0.004513333333333286
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_b8d_w16": {
+        "baseline_ms": 0.18104666666666666,
+        "candidate_ms": 0.18628999999999998,
+        "delta_ms": 0.005243333333333322
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "baseline_ms": 0.17576000000000003,
+        "candidate_ms": 0.18167999999999998,
+        "delta_ms": 0.005919999999999953
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "baseline_ms": 0.7626333333333334,
+        "candidate_ms": 0.7756033333333333,
+        "delta_ms": 0.012969999999999926
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "baseline_ms": 0.7390633333333333,
+        "candidate_ms": 0.7307666666666668,
+        "delta_ms": -0.008296666666666508
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "baseline_ms": 0.19899666666666668,
+        "candidate_ms": 0.19636666666666666,
+        "delta_ms": -0.002630000000000021
+      },
+      "mh_fast:mh_pool_project_c32_b8_out8": {
+        "baseline_ms": 0.021413333333333336,
+        "candidate_ms": 0.0213,
+        "delta_ms": -0.00011333333333333681
+      }
+    }
+  }
+}

@@ -1,0 +1,192 @@
+--- a/1a/wave_owned_c32.inc
++++ b/1b/wave_owned_c32.inc
+@@ -1,3 +1,9 @@
++#ifndef CW_QT_BATCH_MASK
++#define CW_QT_BATCH_MASK 127
++#endif
++#ifndef CW_QT_BATCH
++#define CW_QT_BATCH 1
++#endif
+ #ifndef CW_OUTPROJ_HOIST
+ #define CW_OUTPROJ_HOIST 0
+ #endif
+@@ -235,6 +241,171 @@
+    }
+   }
+  }
++ if constexpr(CW_QT_BATCH==2 && W16==1 && CW_DIAG_ONLY && (CW_QT_BATCH_MASK&(1u<<(Up?6:cw_kind)))){
++ _Pragma("clang loop unroll(disable)") for(uint qb=0;qb<4;qb+=2){
++  const uint lane=__builtin_amdgcn_workitem_id_x(),r=lane&15u,g=lane>>4;
++  i2 inputs[2][2];f8 totals[2][2]{};h8 prefix_weights[2];float batch_gain[2][8];
++  if constexpr(Prefix)_Pragma("unroll") for(uint ci=0;ci<2;ci++)for(uint e=0;e<8;e++)prefix_weights[ci][e]=(_Float16)fw[(ci*16+r)*16+g*8+e];
++  if constexpr(!Chain)_Pragma("unroll") for(uint ci=0;ci<2;ci++)__builtin_memcpy(batch_gain[ci],fw+8704+ci*16+g*8,32);
++  _Pragma("unroll") for(uint b=0;b<2;b++){uint qt=qb+b;auto&input=inputs[b];auto&ffn=totals[b];
++  if constexpr(Chain){for(uint ci=0;ci<2;ci++)input[ci]=cw_input(in,win,qt,ci,width,height,sx,sy,prevw,px,py,r,g);}
++  else if constexpr(Prefix){
++#if CW_PREFIX_SPLIT
++   // B1 prefix split: fused_prefix_values ran on the g==0 half only (16 lanes idle) and then shipped values 8..15 with eight
++   // bpermutes. Here both halves run the same instruction stream on the same token r: the half-wave selects which Box-Muller
++   // pair it evaluates (g==1: a,c -> g0; g==0: b,d -> g1,g2), and g0 is the only value exchanged (one bpermute). Each value's
++   // operation sequence is identical to fused_prefix_values, so the features, and everything downstream, are bit-identical.
++   h8 a{};
++   {const float*rgba=reinterpret_cast<const float*>(in);uint p=win*64+qt*16+r,tile=p/64,x=(tile%(width/8))*8+p%8,y=(tile/(width/8))*8+(p%64)/8,rgbp=y*width+x;
++    uint h=production_pcg((x*0x8da6b343u)^(y*0xd8163841u)^(seed*0x9e3779b9u)^0x243f6a88u);
++    float u1=production_uniform(g?h*0xcaa5b80du+0x21dd796bu:h*0x2c9277b5u+0xac564b05u),u2=production_uniform(g?h*0x83232c31u+0x3463e0acu:h*0xfa6dc5f9u+0x4712a88eu);
++    float rr=__builtin_amdgcn_sqrtf(-2.f*(__builtin_amdgcn_logf(u1)*.6931471805599453f)),tt=(6.283185482025146f*u2)*.15915494309189535f;
++    cw_pv_t gc=cw_prefix_rtz(rr*__builtin_amdgcn_cosf(tt)),gs=cw_prefix_rtz(rr*__builtin_amdgcn_sinf(tt));
++    cw_pv_t g0=cw_prefix_shuffle(gc,r+16);
++    cw_pv_t red=cw_prefix_rtz(Hrtz(Hrtz(rgba[rgbp*4])-.5f)*.125f),green=cw_prefix_rtz(Hrtz(Hrtz(rgba[rgbp*4+1])-.5f)*.125f),blue=cw_prefix_rtz(Hrtz(Hrtz(rgba[rgbp*4+2])-.5f)*.125f);
++    cw_pv_t hr=red,hg=green,hb=blue;
++    if(temporal){uint q=(y*width+x)*4;hr=cw_prefix_rtz(Hrtz(Hrtz(history[q])-.5f)*.125f);hg=cw_prefix_rtz(Hrtz(Hrtz(history[q+1])-.5f)*.125f);hb=cw_prefix_rtz(Hrtz(Hrtz(history[q+2])-.5f)*.125f);}
++    const cw_pv_t lo[8]={gc,gs,hg,hb,g0,1,(cw_pv_t)dlss5_style_feature,1},hi[8]={red,green,1,1,blue,hr,1,0};
++    for(uint e=0;e<8;e++)a[e]=(_Float16)(g?hi[e]:lo[e]);}
++#else
++   float pv[16]{};if(g==0)fused_prefix_values(reinterpret_cast<const float*>(in),history,win*64+qt*16+r,width,seed,temporal,pv);
++   h8 a{};for(uint e=0;e<8;e++){float hi=__builtin_bit_cast(float,__builtin_amdgcn_ds_bpermute(r*4,__builtin_bit_cast(int,pv[8+e])));a[e]=(_Float16)(g?hi:pv[e]);}
++#endif
++   for(uint ci=0;ci<2;ci++){
++    h8 b=prefix_weights[ci];
++    f8 pre=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(b,a,f8{});h8 zero{};
++    pre=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(zero,zero,pre);
++    CW_Q8_DECL(packed);for(uint e=0;e<8;e++){float v=Hrtz(pre[e]);CW_Q8_SET(packed,e,v);ffn[ci][e]=cw_clampf(v,-448.f,448.f)*batch_gain[ci][e];}CW_Q8_END(packed);input[ci]=packed;
++   }
++  }
++  else if constexpr(Up){
++   uint ww=width+2*sx,tok=qt*16+r,lo=(tok/16)*4+(tok%8)/2;
++   int x=int((win%(ww/8))*8+tok%8)-int(sx),y=int((win/(ww/8))*8+tok/8)-int(sy);
++   bool valid=x>=0&&y>=0&&x<int(width)&&y<int(height);
++#if CW_HOIST_UP&2
++   if constexpr(Byte){
++   for(uint ci=0;ci<2;ci++){
++    const uint c0=ci*16+g*8;unsigned long long sk;float uw[8],fv[8];
++    __builtin_memcpy(&sk,__builtin_assume_aligned(skip+(valid?(uint(y)*width+uint(x))*32:0u)+c0,8),8);sk=valid?sk:0ull;
++    __builtin_memcpy(uw,upw+2048+c0,32);__builtin_memcpy(fv,batch_gain[ci],32);
++    CW_Q8_DECL(a);for(uint e=0;e<8;e++){
++     float t=H(cw_up_shuffle(up_totals[ci][e],lo+g*16));
++     float m=H(t+__builtin_amdgcn_cvt_f32_fp8(int((sk>>(8*e))&255u),0)*uw[e]);float v=valid?m:0.f;
++     CW_Q8_SET(a,e,v);ffn[ci][e]=cw_clampf((CW_INPUT_HALF&4u)?v:float((_Float16)v),-448.f,448.f)*fv[e];
++    }CW_Q8_END(a);input[ci]=a;
++   }
++   }else
++#endif
++   for(uint ci=0;ci<2;ci++){
++    unsigned long long sk=0;if constexpr(Byte){if(valid)__builtin_memcpy(&sk,__builtin_assume_aligned(skip+(uint(y)*width+uint(x))*32+ci*16+g*8,8),8);}
++    CW_Q8_DECL(a);for(uint e=0;e<8;e++){
++     uint c=ci*16+g*8+e;float v=0.f,t=H(cw_up_shuffle(up_totals[ci][e],lo+g*16));
++     if constexpr(Byte){if(valid)v=H(t+__builtin_amdgcn_cvt_f32_fp8(int((sk>>(8*e))&255u),0)*upw[2048+c]);}
++     else if(valid)v=H(t+cw_up_F(reinterpret_cast<const float*>(skip)[(uint(y)*width+uint(x))*32+c])*upw[2048+c]);
++     // Keep raw half-valued Up output for FFN residual; quantize only its matrix operand.
++     CW_Q8_SET(a,e,v);ffn[ci][e]=cw_clampf((CW_INPUT_HALF&4u)?v:float((_Float16)v),-448.f,448.f)*fw[8704+c];
++    }CW_Q8_END(a);input[ci]=a;
++   }
++  }
++  else{
++   uint ww=width+2*sx;int x=int((win%(ww/8))*8+(qt*16+r)%8)-int(sx),y=int((win/(ww/8))*8+(qt*16+r)/8)-int(sy);
++   bool valid=x>=0&&y>=0&&x<int(width)&&y<int(height);
++#if CW_VEC_INPUT
++   // The lane's 8 channels c=ci*16+g*8..+7 are contiguous in every source (f32 features, FP8 skip bytes, scales, FFN residual
++   // scale), 32-byte aligned (hipMalloc bases, channel offsets multiple of 8). Read them as whole rows (2x b128 / 1x b64)
++   // instead of 8 per-element loads each; the per-element arithmetic and its order are unchanged.
++   for(uint ci=0;ci<2;ci++){uint c0=ci*16+g*8;float src[8]{};
++    if(valid){
++     if constexpr(Post){uint p=uint(y)*width+uint(x),low=(uint(y)/2)*(width/2)+uint(x)/2;
++      float lo[8],s0[8],s1[8];unsigned long long sk;
++      if constexpr(InByte){unsigned long long lb;__builtin_memcpy(&lb,__builtin_assume_aligned(in+low*32+c0,8),8);for(uint e=0;e<8;e++)lo[e]=__builtin_amdgcn_cvt_f32_fp8(int((lb>>(8*e))&255u),0);}
++      else __builtin_memcpy(lo,__builtin_assume_aligned(reinterpret_cast<const float*>(in)+low*32+c0,32),32);
++      __builtin_memcpy(s0,__builtin_assume_aligned(scales+c0,32),32);__builtin_memcpy(s1,__builtin_assume_aligned(scales+32+c0,32),32);
++      __builtin_memcpy(&sk,__builtin_assume_aligned(skip+p*32+c0,8),8);
++      for(uint e=0;e<8;e++){float high=__builtin_amdgcn_cvt_f32_fp8(int((sk>>(8*e))&255u),0);src[e]=Hrtz(Hrtz(lo[e]*s0[e])+high*s1[e]);}
++     }else if constexpr(InByte){unsigned long long ib;__builtin_memcpy(&ib,__builtin_assume_aligned(in+(uint(y)*width+uint(x))*32+c0,8),8);for(uint e=0;e<8;e++)src[e]=__builtin_amdgcn_cvt_f32_fp8(int((ib>>(8*e))&255u),0);}
++     else __builtin_memcpy(src,__builtin_assume_aligned(reinterpret_cast<const float*>(in)+(uint(y)*width+uint(x))*32+c0,32),32);
++    }
++    float res[8];__builtin_memcpy(res,batch_gain[ci],32);
++    CW_Q8_DECL(a);for(uint e=0;e<8;e++){float v=src[e];CW_Q8_SET(a,e,v);ffn[ci][e]=cw_clampf((CW_INPUT_HALF&(Post?1u:2u))?v:float((_Float16)v),-448.f,448.f)*res[e];}CW_Q8_END(a);input[ci]=a;}
++#else
++   for(uint ci=0;ci<2;ci++){CW_Q8_DECL(a);for(uint e=0;e<8;e++){uint c=ci*16+g*8+e;float v=0.f;if(valid){if constexpr(Post){uint p=uint(y)*width+uint(x),low=(uint(y)/2)*(width/2)+uint(x)/2;float high=__builtin_amdgcn_cvt_f32_fp8(int(skip[p*32+c]),0);v=Hrtz(Hrtz(reinterpret_cast<const float*>(in)[low*32+c]*scales[c])+high*scales[32+c]);}else v=reinterpret_cast<const float*>(in)[(uint(y)*width+uint(x))*32+c];}CW_Q8_SET(a,e,v);ffn[ci][e]=cw_clampf(float((_Float16)v),-448.f,448.f)*fw[8704+c];}CW_Q8_END(a);input[ci]=a;}
++#endif
++  }
++
++  }
++  if constexpr(Chain)for(uint part=0;part<3;part++){
++   cw_i2_pair bp=cw_matrix16(fw,34944+part*512+(g*16+r)*16);
++   _Pragma("unroll") for(uint b=0;b<2;b++){
++    totals[b][0]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.lo,inputs[b][0],totals[b][0]);
++    totals[b][1]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.hi,inputs[b][1],totals[b][1]);
++   }
++  }
++#if CW_ROLL_HIDDEN
++  _Pragma("clang loop unroll(disable)")
++#endif
++  for(uint h2=0;h2<4;h2++){
++   i2 acts[2][2];
++   _Pragma("unroll") for(uint hp=0;hp<2;hp++){
++    uint ht=h2*2+hp;cw_i2_pair bp=cw_matrix16(fw+512,ht*512+(g*16+r)*16);
++    _Pragma("unroll") for(uint b=0;b<2;b++){
++     f8 expanded=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.lo,inputs[b][0],f8{});
++     expanded=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.hi,inputs[b][1],expanded);
++#if CW_FAST_NUM&4
++     CW_Q8_DECL(a);for(uint e=0;e<8;e+=2){using hh=_Float16 __attribute__((ext_vector_type(2)));hh v={(_Float16)expanded[e],(_Float16)expanded[e+1]};
++      hh g=__builtin_elementwise_min(__builtin_elementwise_max(v,hh{-4,-4}),hh{4,4});hh ag=__builtin_elementwise_abs(g);
++      hh q=ag*hh{(_Float16)-.055908203125f,(_Float16)-.055908203125f}+hh{(_Float16).447265625f,(_Float16).447265625f};hh p=g*q+hh{(_Float16).89453125f,(_Float16).89453125f};hh o=v*p;
++      CW_Q8_SET(a,e,float(o[0]));CW_Q8_SET(a,e+1,float(o[1]));}CW_Q8_END_SITE(a,1);
++#else
++     CW_Q8_DECL(a);for(uint e=0;e<8;e++){float v=expanded[e],g=cw_act_gate(v),q=__builtin_fmaf(absf(g),-.055908203125f,.447265625f),p=__builtin_fmaf(g,q,.89453125f);CW_Q8_SET(a,e,v*p);}CW_Q8_END_SITE(a,1);
++#endif
++
++     acts[b][hp]=a;
++    }
++   }
++   for(uint ci=0;ci<2;ci++){
++    cw_i2_pair cp=cw_matrix16(fw+4608,(ci*4+h2)*512+(g*16+r)*16);
++    _Pragma("unroll") for(uint b=0;b<2;b++){
++     totals[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(cp.lo,acts[b][0],totals[b][ci]);
++     totals[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(cp.hi,acts[b][1],totals[b][ci]);
++    }
++   }
++  }
++  i2 features[2][2];_Pragma("unroll") for(uint b=0;b<2;b++)for(uint ci=0;ci<2;ci++){
++   uint qt=qb+b;CW_Q8_DECL(a);
++#if CW_RTZ_PAIR
++   h8 rounded=cw_rtz_half8(totals[b][ci]);__builtin_memcpy(residual+((qt*2+ci)*32+(g*16+r))*8,&rounded,16);
++   for(uint e=0;e<8;e++)CW_Q8_SET(a,e,float(rounded[e]));
++#else
++   for(uint e=0;e<8;e++){float v=Hrtz(totals[b][ci][e]);residual[((qt*2+ci)*32+(g*16+r))*8+e]=(_Float16)v;CW_Q8_SET(a,e,v);}
++#endif
++   CW_Q8_END_SITE(a,2);features[b][ci]=a;
++  }
++  for(uint part=0;part<3;part++){
++   uint qlane=__builtin_amdgcn_workitem_id_x(),qr=qlane&15u,qg=qlane>>4;f8 qs[2][2]{};
++   for(uint ci=0;ci<2;ci++){
++    cw_i2_pair bp=cw_matrix16(w,(part*2+ci)*512+(qg*16+qr)*16);
++    _Pragma("unroll") for(uint b=0;b<2;b++){
++     if(part<2){qs[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.lo,features[b][0],qs[b][ci]);qs[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(bp.hi,features[b][1],qs[b][ci]);}
++     else{qs[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(features[b][0],bp.lo,qs[b][ci]);qs[b][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(features[b][1],bp.hi,qs[b][ci]);}
++    }
++   }
++   _Pragma("unroll") for(uint b=0;b<2;b++){uint qt=qb+b;auto&q=qs[b];
++   f8 sum{};if(part<2)for(uint ci=0;ci<2;ci++){h8 squares{},ones{};for(uint e=0;e<8;e++){squares[e]=(_Float16)(q[ci][e]*q[ci][e]);ones[e]=(_Float16)1.f;}sum=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,squares,sum);}
++#if CW_NORM_HOIST
++   float lane_rsq=part<2?__builtin_amdgcn_rsqf(maxf(sum[0],6.198883056640625e-5f)):0.f;
++   for(uint ci=0;ci<2;ci++){CW_Q8_DECL(a);for(uint e=0;e<8;e++){float v=q[ci][e];if(part<2)v*=lane_rsq*(part==0?w[8192]:1.f);
++#else
++   for(uint ci=0;ci<2;ci++){CW_Q8_DECL(a);for(uint e=0;e<8;e++){float v=q[ci][e];if(part<2)v*=__builtin_amdgcn_rsqf(maxf(sum[e],6.198883056640625e-5f))*(part==0?w[8192]:1.f);
++#endif
++CW_Q8_SET(a,e,v);}CW_Q8_END_SITE(a,3);
++    if(part==0){queries[qt*4+ci*2]=a[0];queries[qt*4+ci*2+1]=a[1];}else if(part==1){keys[qt*4+ci*2]=a[0];keys[qt*4+ci*2+1]=a[1];}else{values[qt*4+ci*2]=a[0];values[qt*4+ci*2+1]=a[1];}
++   }
++   }
++  }
++  __builtin_amdgcn_sched_barrier(0);
++ }
++ }else{
+ #if CW_ROLL_WINDOW
+  _Pragma("clang loop unroll(disable)")
+ #else
+@@ -439,6 +610,7 @@
+ #endif
+   }
+   __builtin_amdgcn_sched_barrier(0);
++ }
+  }
+  cw_i2_pair proj_hoisted[2];float skip_hoisted[2][8];
+  if constexpr(CW_OUTPROJ_HOIST && W16>0){

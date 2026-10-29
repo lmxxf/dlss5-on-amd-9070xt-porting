@@ -1,0 +1,17 @@
+{
+  "name": "C32 occupancy metadata comparison",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\occupancy.exe",
+      "sha256": "909a35663ce9760c91e2b8b7bb4796aa3fdf44bc1be011836099726e538a15ba"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "occupancy/query",
+      "exe": "D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\payload\\occupancy.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\baseline\\modules\\c32-wave1-fast.hsaco\" \"D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\1a\\modules\\c32-wave1-fast.hsaco\" \"D:\\DLSSNR-Lab\\c32-stage-phase5-20261029\\1b\\modules\\c32-wave1-fast.hsaco\"",
+      "env": {}
+    }
+  ]
+}

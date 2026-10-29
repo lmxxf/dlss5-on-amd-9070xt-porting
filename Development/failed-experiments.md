@@ -2782,3 +2782,8 @@ serial_norm 显式平方缓存：原编译器已复用，C64 fast 137函数及SP
 ## 2026-10-29 ACO hotspot Phase4 Step3：C128深预取/最小ISA移动均STOP
 
 新版ACO同机基线差约46%，有效设备实时钟确定Original C128 bi_bo约0.819ms/帧为一级热点。3A保持B4全复用，Contract前读至Expand前，仅目标函数改、242→248VGPR/同硬件分配桶/0spill；七档Gold同，Original单核三轮微正−0.521µs/次，但整网1088 mean+2.481µs/p99+15.682µs，Small尾部不稳，STOP。3B严格CFG/等待/EXEC/异步写检查后只把一条FW b64提前跨两条地址VALU，目标外全部字节不变、七档Gold同；单核不稳，Original900三轮mean全退，+4.544µs/p99+15.587µs，STOP。分别完成两档单核与四档3ABBA，不叠加、不刷轮、不改生产80/SHA。详results/aco-hotspot-phase4-20261029/step3-README.md。
+
+
+## 2026-10-29 C32 Phase5 刀1 STOP
+
+OutProj/scales跨4qt预读1A：147/148VGPR、4096LDS/0spill/最大驻留同、7Gold同、C32族Orig−30.45µs/Small−13.33µs；全网mean虽改善，Small900 p99+14.965µs，Orig1088 R3尾反例，STOP。双qt批处理1B保持K序共享权重；Prefix/Up超160资源拒绝，一次Prefix生命周期改写仍超，最终mask31热核151–156/0spill/7Gold同；4档mean各三轮全退，STOP。不把负候选混下刀、不加路由救微收益。详results/c32-stage-phase5-20261029/knife1-README.md。

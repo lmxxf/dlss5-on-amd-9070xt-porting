@@ -1,0 +1,10 @@
+{
+  "role": "1b",
+  "source_hip": "Development/results/c32-stage-phase5-20261029/work/1b-source",
+  "modules": {
+    "c32-wave1-fast.hsaco": "Development/results/c32-stage-phase5-20261029/work/1b-masked/gfx1201/c32-wave1-fast.hsaco",
+    "c32-wave1-fast-norm900.hsaco": "Development/results/c32-stage-phase5-20261029/work/1b-masked/gfx1201/c32-wave1-fast-norm900.hsaco"
+  },
+  "batch_mask": 31,
+  "excluded": "Prefix164/166 and Up172/189. One Prefix lifetime rewrite did not reduce peak; excluded without GPU test."
+}
