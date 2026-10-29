@@ -15,3 +15,12 @@ Step3尚未开始。3A需保持B与数学顺序，适配实际头号热点深预
 只在297仓操作；隔离M构建唯一例外路径 /home/lmxxf/work/dlss5-phase4-mochi-build。原M源码 /home/lmxxf/work/dlss5-mochi-008只读，旧d1185树只读，不动游戏/ZIP。远端R4根、run-jobs.ps1统一guard；startup_compile180秒但game watchdog15秒，strict serial。无push/amend/Coauthor。Step2/Step3完成各清理并独立commit，全部完成才final。
 
 更新：native-launch probe成功（两个模型、所有153/83 dispatch轮转覆盖，Gold同），已启动正式 step2-native.json，exec session63778。三轮N profile每轮918/498帧、每dispatch6观测，共18；N-control与M-control/profile均160。全网GPU在N-profile明确不可用（timing.csv -1，不解释成GPU负时间），单核GPU来自ext launch start/stop事件、无hipEventRecord外围计时，CPUwall量化扰动。analyze-step2.py已适配此采样/重构方法。初始三个Record事件版本全部保留无效，不能作热点排名。
+
+更新：Step2真正有效方法为prepare-profile-device.py的独立GPU实时钟小核（stamp.hip，s_sendmsg MSG_RTN_GET_REALTIME），运行时属性10017确认100000kHz。先前所有HIP短事件方案都因负值/总和不闭合而拒用，不采native-fenced排名。有效step2-device 12N上下文 +step2-native中的12M上下文，完整153/83与123/71，三轮采样18/dispatch，校正0.8µs邻接stamp开销，总和闭合0.7–1.0%。Step2已提交a8103346。选择C128 bi_bo为主靶（0.819ms，SP0.809近并列）。
+
+Step3 CPU：3A源码prefetch4个i2 Contract权重至Expand前，B4/T2/数学顺序保留，仅c128_wave2_bi_bo改变；VGPR242→248、SGPR26/LDS16384/private0/spill0，实际.kd资源编码全同（没有驻留下降）。全7档Gold42帧已过。
+3B prepare3b.py：完整CFG may-pending-write含回边，load v213:214从第293行提前至290行，跨v_add3/v_or3两独立地址VALU；clause14→13，memory issue顺序、wait计数和所有s_delay目标保持，旧位置下一VMEM保留隐式VALU完成屏障（LLVM23 InsertDelayAlu/FLAT语义）。未增/改寄存器。完整重新链接有46个非目标函数字节变化，未上机；目标函数roundtrip与生产逐字节同后，同尺寸注入原始ELF，全部136其他函数和metadata bytes不变。3b-resource-comparison.json/3b-safety-proof.json。全7档Gold42帧已过。
+
+当前终端step3-sequence.sh session86949：3B Gold已完成，正串行跑3A-kernel（Original306/Small166测量，3轮ABBA）、3A四档48slot性能，再3B同样kernel/perf。始终同一baseline模块，不叠加。脚本每role跑完自动collect并用analyze.py生成wall统计；还需手动python3 analyze3-kernel.py 3a/3b。不要重复启动。有赢才合并双架构80/SHA并重新评估，负则STOP/failed-experiments/保留归因/清理并Step3独立commit。最终README+WorkingPlan/DevHistory、锁版树/原M源码hash复核，清理全部临时大文件（保留必要payload），不得push/amend/Coauthor，不动游戏/ZIP。
+
+最终状态：Step1 4a260061、Step2 a8103346完成；Step3两候选全部闭环并均STOP。3A Original单核−0.521µs/次但整网1088+2.481µs/p99+15.682；3B单核不稳，整网900三轮均值全退+4.544µs/p99+15.587。每候选Gold42帧、4档48性能slot、2档24诊断slot均完成；共84/96/48。生产源码和80模块/SHA相对41c28059完全未变，原M源和d1185树未变。全部临时编译/反汇编/raw输出/失败二进制/隔离M构建树已清，payload保留复现输入/宿主/shader；锁和进程已确认释放。README/step3-README/WorkingPlan/DevHistory/failed-experiments已更新；等待最后git格式检查与Stage3独立commit。无待跑GPU/RTC作业。

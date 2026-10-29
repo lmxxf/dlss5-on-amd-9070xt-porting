@@ -1,0 +1,34 @@
+{
+  "kernel": "c128_wave2_bi_bo",
+  "old_function_line": 293,
+  "new_function_line": 290,
+  "load": "global_load_b64 v[213:214], v67, s[10:11] offset:256",
+  "destination_registers": [
+    "v213",
+    "v214"
+  ],
+  "address_registers": [
+    "s10",
+    "s11",
+    "v67"
+  ],
+  "cfg_nodes": 3289,
+  "dataflow_iterations": 3,
+  "no_conflicting_pending_write": true,
+  "no_operand_read_or_write_in_advance_interval": true,
+  "no_exec_or_lane_indirection_change": true,
+  "no_branch_or_label_crossed": true,
+  "backedges_included": true,
+  "all_delay_alu_target_instruction_ids_preserved": true,
+  "all_memory_issue_order_preserved": true,
+  "all_wait_count_instructions_unchanged": true,
+  "read_only_proof": "C128 non-Up body loads only const input/fw/aw. Host Body keeps input Tensor live and allocates distinct output; fw/aw immutable. No concurrent game/other GPU workload, normal Wave2 launch uses ordered stream.",
+  "register_allocation": "No rename/new registers; existing destination dead in moved interval, No operand reference in advance interval and no pending asynchronous writers. VMEM implicitly waits VA_VDST=0 (LLVM23 AMDGPUInsertDelayAlu::instructionWaitsForVALU, FLAT flag); next untouched VMEM in original hard clause retains the old implicit VALU completion boundary. SGPR address has no recent VALU definition., no pending async writers from any CFG predecessor.",
+  "clause_adjustment": {
+    "old": "s_clause 0xe",
+    "new_count": 13
+  },
+  "implicit_valu_wait_preserved_by_next_old_site_vmem": "global_load_b64 v[215:216], v68, s[10:11] offset:256",
+  "llvm_semantic_reference": "/home/lmxxf/work/llvm-src-23/llvm/lib/Target/AMDGPU/AMDGPUInsertDelayAlu.cpp:36; FLATInstructions.td isFLAT=1 for global operations",
+  "metadata_text_untouched": true
+}

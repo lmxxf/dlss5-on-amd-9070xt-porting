@@ -1,0 +1,682 @@
+{
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.6937409375,
+      "candidate_ms": 8.693725,
+      "delta_ms": -1.593749999884153e-05,
+      "delta_percent": -0.00018332154263500655,
+      "baseline_p99": 8.863315,
+      "candidate_p99": 8.854046,
+      "p99_delta_ms": -0.00926899999999975,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.6813621875,
+          "candidate": 8.68524625,
+          "delta_ms": 0.003884062500000951,
+          "p99_delta_ms": 0.01403399999999877,
+          "base_drift": -0.016959374999999
+        },
+        {
+          "round": 2,
+          "base": 8.699471875,
+          "candidate": 8.7073696875,
+          "delta_ms": 0.007897812499999546,
+          "p99_delta_ms": 0.026998999999999995,
+          "base_drift": -0.005378749999998433
+        },
+        {
+          "round": 3,
+          "base": 8.700388749999998,
+          "candidate": 8.6885590625,
+          "delta_ms": -0.011829687499998798,
+          "p99_delta_ms": -0.09311999999999898,
+          "base_drift": -0.0049200000000002575
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    },
+    "original960": {
+      "baseline_ms": 6.395573958333333,
+      "candidate_ms": 6.400117604166667,
+      "delta_ms": 0.004543645833333443,
+      "delta_percent": 0.07104359769638524,
+      "baseline_p99": 6.479845999999999,
+      "candidate_p99": 6.495433,
+      "p99_delta_ms": 0.015587000000000906,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.3939984375000005,
+          "candidate": 6.3970287500000005,
+          "delta_ms": 0.0030303124999999653,
+          "p99_delta_ms": 0.017673999999999523,
+          "base_drift": -0.007969375000000944
+        },
+        {
+          "round": 2,
+          "base": 6.394727812499999,
+          "candidate": 6.3968978125,
+          "delta_ms": 0.0021700000000004493,
+          "p99_delta_ms": -0.00558000000000014,
+          "base_drift": 9.062499999945572e-05
+        },
+        {
+          "round": 3,
+          "base": 6.397995625,
+          "candidate": 6.40642625,
+          "delta_ms": 0.008430624999999914,
+          "p99_delta_ms": 0.016372000000000497,
+          "base_drift": -0.004136250000001063
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "samples_per_arm": 960
+    },
+    "small1080": {
+      "baseline_ms": 5.4441853125,
+      "candidate_ms": 5.443945833333333,
+      "delta_ms": -0.0002394791666668894,
+      "delta_percent": -0.004398806302885472,
+      "baseline_p99": 5.569116999999999,
+      "candidate_p99": 5.591978999999999,
+      "p99_delta_ms": 0.022861999999999938,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.4428675,
+          "candidate": 5.443082187500001,
+          "delta_ms": 0.00021468750000064318,
+          "p99_delta_ms": 0.004849000000000991,
+          "base_drift": -0.002343750000000533
+        },
+        {
+          "round": 2,
+          "base": 5.442379999999999,
+          "candidate": 5.4477521875,
+          "delta_ms": 0.005372187500000791,
+          "p99_delta_ms": 0.07718399999999903,
+          "base_drift": 0.00508875000000053
+        },
+        {
+          "round": 3,
+          "base": 5.4473084375,
+          "candidate": 5.441003125,
+          "delta_ms": -0.006305312500000326,
+          "p99_delta_ms": -0.009232000000000795,
+          "base_drift": -0.0005481250000007876
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+      "samples_per_arm": 960
+    },
+    "small900": {
+      "baseline_ms": 4.194399166666667,
+      "candidate_ms": 4.191785729166666,
+      "delta_ms": -0.0026134375000008703,
+      "delta_percent": -0.0623077917993653,
+      "baseline_p99": 4.305892,
+      "candidate_p99": 4.306800999999999,
+      "p99_delta_ms": 0.0009089999999991605,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 4.1961625,
+          "candidate": 4.1914928125,
+          "delta_ms": -0.004669687499999853,
+          "p99_delta_ms": -0.0015750000000007702,
+          "base_drift": -0.0034112499999991996
+        },
+        {
+          "round": 2,
+          "base": 4.191905,
+          "candidate": 4.18676125,
+          "delta_ms": -0.0051437500000002245,
+          "p99_delta_ms": -0.03642900000000093,
+          "base_drift": -0.00224750000000018
+        },
+        {
+          "round": 3,
+          "base": 4.195130000000001,
+          "candidate": 4.197103125,
+          "delta_ms": 0.001973124999999243,
+          "p99_delta_ms": 0.016306000000000154,
+          "base_drift": -0.018566250000000117
+        }
+      ],
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-original1088-r1-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r1-0-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.689841874999999,
+      "p99": 8.785588,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r1-1-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.68629625,
+      "p99": 8.824905,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r1-2-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.68419625,
+      "p99": 8.775034,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r1-3-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.6728825,
+      "p99": 8.779513999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r2-0-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.70216125,
+      "p99": 8.861875,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r2-1-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.702163125,
+      "p99": 8.860064,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r2-2-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.712576250000001,
+      "p99": 8.869251,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r2-3-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.696782500000001,
+      "p99": 8.795903999999998,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r3-0-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.70284875,
+      "p99": 8.935849,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r3-1-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.687608125,
+      "p99": 8.797606,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r3-2-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.68951,
+      "p99": 8.838593,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original1088-r3-3-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.697928749999999,
+      "p99": 8.797623999999999,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original960-r1-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r1-0-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.3979831250000005,
+      "p99": 6.501766,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r1-1-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.3973450000000005,
+      "p99": 6.494389,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r1-2-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.3967125000000005,
+      "p99": 6.5053469999999995,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r1-3-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.39001375,
+      "p99": 6.46527,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r2-0-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.3946825,
+      "p99": 6.465423,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r2-1-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.396291875,
+      "p99": 6.461386,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r2-2-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.39750375,
+      "p99": 6.472417,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r2-3-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.3947731249999995,
+      "p99": 6.474556000000001,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r3-0-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.400063750000001,
+      "p99": 6.479551,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r3-1-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.417845,
+      "p99": 6.5144329999999995,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r3-2-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.3950075,
+      "p99": 6.4773369999999995,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-original960-r3-3-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.3959275,
+      "p99": 6.479540999999999,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-small1080-r1-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r1-0-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.444039375,
+      "p99": 5.561995,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r1-1-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.447483750000001,
+      "p99": 5.575092,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r1-2-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.438680625,
+      "p99": 5.539801,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r1-3-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.4416956249999995,
+      "p99": 5.534916,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r2-0-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.439835624999999,
+      "p99": 5.579248,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r2-1-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.446246875,
+      "p99": 5.610841,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r2-2-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.4492575,
+      "p99": 5.671017,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r2-3-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.444924374999999,
+      "p99": 5.556419,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r3-0-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.4475825,
+      "p99": 5.573066,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r3-1-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.444271875,
+      "p99": 5.568165,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r3-2-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.437734375,
+      "p99": 5.528647,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small1080-r3-3-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.447034374999999,
+      "p99": 5.549995,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small900-r1-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r1-0-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.197868124999999,
+      "p99": 4.312551999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r1-1-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.18945625,
+      "p99": 4.298895,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r1-2-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.193529375,
+      "p99": 4.302201999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r1-3-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.194456875,
+      "p99": 4.304269,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r2-0-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.193028750000001,
+      "p99": 4.297340999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r2-1-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.1844825,
+      "p99": 4.283886,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r2-2-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.18904,
+      "p99": 4.266813999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r2-3-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.190781250000001,
+      "p99": 4.321761,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-0-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r3-0-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.204413125,
+      "p99": 4.294461,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-1-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r3-1-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 4.199700625,
+      "p99": 4.331269,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-2-candidate",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r3-2-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 4.194505625,
+      "p99": 4.282928,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-3-baseline",
+      "source_path": "Development/results/aco-hotspot-phase4-20261029/3b/evidence/perf-small900-r3-3-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.185846875,
+      "p99": 4.284186,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    }
+  ]
+}

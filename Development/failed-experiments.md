@@ -2777,3 +2777,8 @@ B4保持、按两tile折叠expanded的普通C256各CPU实现仍spill（10/139/6�
 ## 2026-10-29 ISA Phase3 刀3 STOP
 
 serial_norm 显式平方缓存：原编译器已复用，C64 fast 137函数及SP全部代码/资源同；C512平方数仍64，compact W162104→2096条/188VGPR/0spill仅调度搬运改变。七档Gold同，四档3ABBA均值全部退步（Orig1088+10.295、Orig900+30.115、Small1080+13.538、Small900+1.672µs），STOP保生产。详results/isa-asm-phase3-20261029/knife3-README.md。
+
+
+## 2026-10-29 ACO hotspot Phase4 Step3：C128深预取/最小ISA移动均STOP
+
+新版ACO同机基线差约46%，有效设备实时钟确定Original C128 bi_bo约0.819ms/帧为一级热点。3A保持B4全复用，Contract前读至Expand前，仅目标函数改、242→248VGPR/同硬件分配桶/0spill；七档Gold同，Original单核三轮微正−0.521µs/次，但整网1088 mean+2.481µs/p99+15.682µs，Small尾部不稳，STOP。3B严格CFG/等待/EXEC/异步写检查后只把一条FW b64提前跨两条地址VALU，目标外全部字节不变、七档Gold同；单核不稳，Original900三轮mean全退，+4.544µs/p99+15.587µs，STOP。分别完成两档单核与四档3ABBA，不叠加、不刷轮、不改生产80/SHA。详results/aco-hotspot-phase4-20261029/step3-README.md。

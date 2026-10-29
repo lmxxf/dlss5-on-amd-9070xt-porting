@@ -1,0 +1,346 @@
+{
+  "baseline": {
+    "opcodes": {
+      "s_load_b128": 1,
+      "s_wait_kmcnt": 2,
+      "s_lshr_b32": 2,
+      "s_delay_alu": 409,
+      "s_mul_i32": 4,
+      "s_cmp_ge_u32": 3,
+      "s_cbranch_scc1": 2,
+      "s_cvt_f32_u32": 1,
+      "s_sub_co_i32": 5,
+      "s_load_b96": 1,
+      "v_and_b32_e32": 111,
+      "v_s_rcp_f32": 1,
+      "v_bfe_u32": 10,
+      "s_load_b256": 1,
+      "v_lshrrev_b32_e32": 48,
+      "v_lshlrev_b32_e32": 19,
+      "s_mul_f32": 1,
+      "v_or_b32_e32": 23,
+      "s_wait_alu": 41,
+      "s_cvt_u32_f32": 1,
+      "v_subrev_nc_u32_e32": 4,
+      "s_mul_hi_u32": 2,
+      "s_add_co_i32": 12,
+      "s_cselect_b32": 4,
+      "s_lshl_b32": 6,
+      "v_add_nc_u32_e32": 49,
+      "v_mul_lo_u32": 6,
+      "v_cmp_gt_i32_e64": 5,
+      "v_cmp_gt_i32_e32": 1,
+      "v_cmp_lt_i32_e64": 6,
+      "v_add_lshl_u32": 5,
+      "s_and_b32": 14,
+      "v_cndmask_b32_e64": 41,
+      "s_clause": 19,
+      "global_load_b64": 260,
+      "v_mov_b32_e32": 18,
+      "v_dual_mov_b32": 76,
+      "s_wait_loadcnt": 131,
+      "v_and_or_b32": 17,
+      "ds_store_2addr_b64": 4,
+      "s_wait_dscnt": 46,
+      "s_barrier_signal": 4,
+      "s_mov_b32": 12,
+      "s_barrier_wait": 4,
+      "v_lshl_add_u32": 1,
+      "ds_load_2addr_b64": 41,
+      "v_or3_b32": 3,
+      "v_add3_u32": 4,
+      "s_wait_loadcnt_dscnt": 23,
+      "v_wmma_f32_16x16x16_fp8_fp8": 326,
+      "v_med3_num_f32": 96,
+      "v_fma_f32": 256,
+      "v_dual_fmaak_f32": 19,
+      "s_setreg_imm32_b32": 100,
+      "v_cvt_pk_fp8_f32": 200,
+      "v_fmaak_f32": 26,
+      "v_lshl_or_b32": 5,
+      "s_cmp_lt_u32": 1,
+      "v_add_f32_e32": 242,
+      "v_dual_add_f32": 135,
+      "ds_store_b64": 12,
+      "v_add_co_u32": 14,
+      "v_add_co_ci_u32_e64": 14,
+      "global_load_b128": 12,
+      "v_cvt_f32_fp8_e32": 16,
+      "v_mul_f32_e32": 62,
+      "v_dual_mul_f32": 61,
+      "v_cvt_pkrtz_f16_f32": 8,
+      "v_cvt_f32_f16_e32": 16,
+      "s_cmp_eq_u32": 3,
+      "s_cbranch_scc0": 3,
+      "global_load_b32": 4,
+      "ds_bpermute_b32": 32,
+      "v_max_num_f32_e32": 14,
+      "v_rsq_f32_e32": 8,
+      "v_dual_max_num_f32": 2,
+      "s_mov_b64": 1,
+      "v_movrels_b32_e32": 4,
+      "v_perm_b32": 16,
+      "v_xor_b32_e32": 16,
+      "v_wmma_f32_16x16x16_f16": 4,
+      "v_rcp_f32_e32": 8,
+      "v_fma_mix_f32": 32,
+      "s_add_nc_u64": 1,
+      "v_cmp_le_u32_e32": 1,
+      "v_cmp_gt_u32_e64": 2,
+      "s_branch": 2,
+      "s_or_b32": 1,
+      "s_cmp_lg_u32": 1,
+      "v_cmp_le_u32_e64": 1,
+      "s_and_saveexec_b32": 1,
+      "s_cbranch_execz": 1,
+      "global_store_b64": 2,
+      "s_nop": 1,
+      "s_sendmsg": 1,
+      "s_endpgm": 1
+    },
+    "first_contract_loads": [
+      {
+        "line": 568,
+        "text": "global_load_b64 v[109:110], v111, s[10:11] offset:262144"
+      },
+      {
+        "line": 569,
+        "text": "global_load_b64 v[111:112], v111, s[10:11] offset:270336"
+      },
+      {
+        "line": 746,
+        "text": "global_load_b64 v[67:68], v69, s[10:11] offset:262400"
+      },
+      {
+        "line": 747,
+        "text": "global_load_b64 v[69:70], v69, s[10:11] offset:270592"
+      },
+      {
+        "line": 2769,
+        "text": "global_load_b128 v[99:102], v[54:55], off offset:262144"
+      }
+    ],
+    "first_loads": [
+      {
+        "line": 96,
+        "text": "global_load_b64 v[56:57], v3, s[8:9]"
+      },
+      {
+        "line": 97,
+        "text": "global_load_b64 v[58:59], v3, s[8:9] offset:16"
+      },
+      {
+        "line": 106,
+        "text": "global_load_b64 v[64:65], v3, s[8:9]"
+      },
+      {
+        "line": 107,
+        "text": "global_load_b64 v[66:67], v3, s[8:9] offset:16"
+      },
+      {
+        "line": 108,
+        "text": "global_load_b64 v[68:69], v1, s[8:9]"
+      },
+      {
+        "line": 109,
+        "text": "global_load_b64 v[70:71], v1, s[8:9] offset:16"
+      },
+      {
+        "line": 139,
+        "text": "global_load_b64 v[60:61], v4, s[8:9]"
+      },
+      {
+        "line": 140,
+        "text": "global_load_b64 v[62:63], v4, s[8:9] offset:16"
+      },
+      {
+        "line": 289,
+        "text": "global_load_b64 v[65:66], v66, s[10:11]"
+      },
+      {
+        "line": 293,
+        "text": "global_load_b64 v[213:214], v67, s[10:11] offset:256"
+      },
+      {
+        "line": 294,
+        "text": "global_load_b64 v[215:216], v68, s[10:11] offset:256"
+      },
+      {
+        "line": 295,
+        "text": "global_load_b64 v[217:218], v67, s[10:11] offset:512"
+      }
+    ]
+  },
+  "3a": {
+    "opcodes": {
+      "s_load_b128": 1,
+      "s_wait_kmcnt": 2,
+      "s_lshr_b32": 2,
+      "s_delay_alu": 408,
+      "s_mul_i32": 4,
+      "s_cmp_ge_u32": 3,
+      "s_cbranch_scc1": 2,
+      "s_cvt_f32_u32": 1,
+      "s_sub_co_i32": 5,
+      "s_load_b96": 1,
+      "v_and_b32_e32": 110,
+      "v_s_rcp_f32": 1,
+      "v_bfe_u32": 10,
+      "s_load_b256": 1,
+      "v_lshrrev_b32_e32": 48,
+      "v_lshlrev_b32_e32": 19,
+      "s_mul_f32": 1,
+      "v_or_b32_e32": 23,
+      "s_wait_alu": 41,
+      "s_cvt_u32_f32": 1,
+      "v_subrev_nc_u32_e32": 4,
+      "s_mul_hi_u32": 2,
+      "s_add_co_i32": 12,
+      "s_cselect_b32": 4,
+      "s_lshl_b32": 6,
+      "v_add_nc_u32_e32": 48,
+      "v_mul_lo_u32": 6,
+      "v_cmp_gt_i32_e64": 5,
+      "v_cmp_gt_i32_e32": 1,
+      "v_cmp_lt_i32_e64": 6,
+      "v_add_lshl_u32": 5,
+      "s_and_b32": 14,
+      "v_cndmask_b32_e64": 41,
+      "s_clause": 18,
+      "global_load_b64": 260,
+      "v_mov_b32_e32": 18,
+      "v_dual_mov_b32": 76,
+      "s_wait_loadcnt": 130,
+      "v_and_or_b32": 17,
+      "ds_store_2addr_b64": 4,
+      "s_wait_dscnt": 43,
+      "s_barrier_signal": 4,
+      "s_mov_b32": 12,
+      "s_barrier_wait": 4,
+      "v_lshl_add_u32": 1,
+      "v_lshl_or_b32": 5,
+      "ds_load_2addr_b64": 41,
+      "v_or3_b32": 3,
+      "v_add3_u32": 4,
+      "s_wait_loadcnt_dscnt": 26,
+      "v_wmma_f32_16x16x16_fp8_fp8": 326,
+      "v_med3_num_f32": 96,
+      "v_fma_f32": 256,
+      "v_dual_fmaak_f32": 18,
+      "s_setreg_imm32_b32": 100,
+      "v_cvt_pk_fp8_f32": 200,
+      "v_fmaak_f32": 28,
+      "s_cmp_lt_u32": 1,
+      "v_add_f32_e32": 240,
+      "v_dual_add_f32": 137,
+      "ds_store_b64": 12,
+      "v_add_co_u32": 14,
+      "v_add_co_ci_u32_e64": 14,
+      "global_load_b128": 12,
+      "v_cvt_f32_fp8_e32": 16,
+      "v_dual_mul_f32": 63,
+      "v_mul_f32_e32": 58,
+      "v_cvt_pkrtz_f16_f32": 8,
+      "v_cvt_f32_f16_e32": 16,
+      "s_cmp_eq_u32": 3,
+      "s_cbranch_scc0": 3,
+      "global_load_b32": 4,
+      "ds_bpermute_b32": 32,
+      "v_max_num_f32_e32": 14,
+      "v_rsq_f32_e32": 8,
+      "v_dual_max_num_f32": 2,
+      "s_mov_b64": 1,
+      "v_movrels_b32_e32": 4,
+      "v_perm_b32": 16,
+      "v_xor_b32_e32": 16,
+      "v_wmma_f32_16x16x16_f16": 4,
+      "v_rcp_f32_e32": 8,
+      "v_fma_mix_f32": 32,
+      "s_add_nc_u64": 1,
+      "v_cmp_le_u32_e32": 1,
+      "v_cmp_gt_u32_e64": 2,
+      "s_branch": 2,
+      "s_or_b32": 1,
+      "s_cmp_lg_u32": 1,
+      "v_cmp_le_u32_e64": 1,
+      "s_and_saveexec_b32": 1,
+      "s_cbranch_execz": 1,
+      "global_store_b64": 2,
+      "s_nop": 1,
+      "s_sendmsg": 1,
+      "s_endpgm": 1
+    },
+    "first_contract_loads": [
+      {
+        "line": 270,
+        "text": "global_load_b64 v[87:88], v67, s[10:11] offset:262144"
+      },
+      {
+        "line": 271,
+        "text": "global_load_b64 v[85:86], v67, s[10:11] offset:270336"
+      },
+      {
+        "line": 272,
+        "text": "global_load_b64 v[83:84], v68, s[10:11] offset:262400"
+      },
+      {
+        "line": 273,
+        "text": "global_load_b64 v[81:82], v68, s[10:11] offset:270592"
+      },
+      {
+        "line": 2764,
+        "text": "global_load_b128 v[99:102], v[54:55], off offset:262144"
+      }
+    ],
+    "first_loads": [
+      {
+        "line": 96,
+        "text": "global_load_b64 v[56:57], v3, s[8:9]"
+      },
+      {
+        "line": 97,
+        "text": "global_load_b64 v[58:59], v3, s[8:9] offset:16"
+      },
+      {
+        "line": 106,
+        "text": "global_load_b64 v[64:65], v3, s[8:9]"
+      },
+      {
+        "line": 107,
+        "text": "global_load_b64 v[66:67], v3, s[8:9] offset:16"
+      },
+      {
+        "line": 108,
+        "text": "global_load_b64 v[68:69], v1, s[8:9]"
+      },
+      {
+        "line": 109,
+        "text": "global_load_b64 v[70:71], v1, s[8:9] offset:16"
+      },
+      {
+        "line": 139,
+        "text": "global_load_b64 v[60:61], v4, s[8:9]"
+      },
+      {
+        "line": 140,
+        "text": "global_load_b64 v[62:63], v4, s[8:9] offset:16"
+      },
+      {
+        "line": 270,
+        "text": "global_load_b64 v[87:88], v67, s[10:11] offset:262144"
+      },
+      {
+        "line": 271,
+        "text": "global_load_b64 v[85:86], v67, s[10:11] offset:270336"
+      },
+      {
+        "line": 272,
+        "text": "global_load_b64 v[83:84], v68, s[10:11] offset:262400"
+      },
+      {
+        "line": 273,
+        "text": "global_load_b64 v[81:82], v68, s[10:11] offset:270592"
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "changed": [
+    "c128_wave2_bi_bo"
+  ],
+  "baseline": {
+    "code_sha256": "7e7e42a3ca3baa5227866d9a19fd4dda67794a4d56facd8e4e2853858a643ff2",
+    "vgpr": 242,
+    "sgpr": 26,
+    "lds": 16384,
+    "private": 0,
+    "vgpr_spill": 0,
+    "sgpr_spill": 0
+  },
+  "candidate": {
+    "code_sha256": "47cb9e64f70281237a43cf7a23218d17c9b959f8d1523c5d292a7d60e3dfaeeb",
+    "vgpr": 248,
+    "sgpr": 26,
+    "lds": 16384,
+    "private": 0,
+    "vgpr_spill": 0,
+    "sgpr_spill": 0
+  }
+}

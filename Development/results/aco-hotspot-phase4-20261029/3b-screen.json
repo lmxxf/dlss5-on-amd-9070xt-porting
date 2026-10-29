@@ -1,0 +1,70 @@
+{
+  "counts": {
+    "global_loads": 276,
+    "at_least_one": 14,
+    "pending_safe": 14,
+    "def_gap_safe": 14
+  },
+  "windows": [
+    {
+      "i": 286,
+      "max_cross": 2,
+      "load": "global_load_b64 v[213:214], v67, s[10:11] offset:256"
+    },
+    {
+      "i": 561,
+      "max_cross": 2,
+      "load": "global_load_b64 v[109:110], v111, s[10:11] offset:262144"
+    },
+    {
+      "i": 1571,
+      "max_cross": 2,
+      "load": "global_load_b64 v[34:35], v5, s[12:13]"
+    },
+    {
+      "i": 1954,
+      "max_cross": 2,
+      "load": "global_load_b64 v[46:47], v9, s[12:13]"
+    },
+    {
+      "i": 2339,
+      "max_cross": 2,
+      "load": "global_load_b64 v[46:47], v17, s[12:13]"
+    },
+    {
+      "i": 90,
+      "max_cross": 1,
+      "load": "global_load_b64 v[56:57], v3, s[8:9]"
+    },
+    {
+      "i": 100,
+      "max_cross": 1,
+      "load": "global_load_b64 v[64:65], v3, s[8:9]"
+    },
+    {
+      "i": 1191,
+      "max_cross": 1,
+      "load": "global_load_b64 v[0:1], v0, s[12:13]"
+    },
+    {
+      "i": 2730,
+      "max_cross": 1,
+      "load": "global_load_b128 v[99:102], v[54:55], off offset:262144"
+    },
+    {
+      "i": 133,
+      "max_cross": 0,
+      "load": "global_load_b64 v[60:61], v4, s[8:9]"
+    },
+    {
+      "i": 739,
+      "max_cross": 0,
+      "load": "global_load_b64 v[67:68], v69, s[10:11] offset:262400"
+    },
+    {
+      "i": 993,
+      "max_cross": 0,
+      "load": "global_load_b128 v[13:16], v[1:2], off offset:589824"
+    }
+  ]
+}

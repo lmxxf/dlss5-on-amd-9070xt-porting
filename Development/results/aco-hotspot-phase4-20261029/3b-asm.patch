@@ -1,0 +1,33 @@
+--- a/c64-wave2-fast.hsaco.s
++++ b/c64-wave2-fast.hsaco.s
+@@ -203514,28 +203514,28 @@
+ 	s_delay_alu instid0(VALU_DEP_3) | instskip(NEXT) | instid1(VALU_DEP_3)
+ 	v_lshlrev_b32_e32 v65, 3, v65
+ 	v_or_b32_e32 v66, v100, v0
+ 	v_lshlrev_b32_e32 v69, 7, v100
+ 	s_delay_alu instid0(VALU_DEP_3) | instskip(NEXT) | instid1(VALU_DEP_3)
+ 	v_and_b32_e32 v68, 0x78, v65
+ 	v_lshlrev_b32_e32 v65, 3, v66
+ 	s_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_2)
+ 	v_or3_b32 v66, v68, v89, v67
+ 	v_and_b32_e32 v70, 0x78, v65
+ 	v_add3_u32 v67, v68, v89, v67
+ 	global_load_b64 v[65:66], v66, s[10:11]
++	global_load_b64 v[213:214], v67, s[10:11] offset:256
+ 	v_add3_u32 v68, v70, v89, v69
+ 	v_or3_b32 v71, v70, v89, v69
+-	s_clause 0xe
+-	global_load_b64 v[213:214], v67, s[10:11] offset:256
++	s_clause 0xd
+ 	global_load_b64 v[215:216], v68, s[10:11] offset:256
+ 	global_load_b64 v[217:218], v67, s[10:11] offset:512
+ 	global_load_b64 v[219:220], v68, s[10:11] offset:512
+ 	global_load_b64 v[221:222], v67, s[10:11] offset:768
+ 	global_load_b64 v[223:224], v68, s[10:11] offset:768
+ 	global_load_b64 v[225:226], v67, s[10:11] offset:1024
+ 	global_load_b64 v[227:228], v68, s[10:11] offset:1024
+ 	global_load_b64 v[229:230], v67, s[10:11] offset:1280
+ 	global_load_b64 v[231:232], v68, s[10:11] offset:1280
+ 	global_load_b64 v[233:234], v67, s[10:11] offset:1536
+ 	global_load_b64 v[235:236], v68, s[10:11] offset:1536
+ 	global_load_b64 v[237:238], v67, s[10:11] offset:1792

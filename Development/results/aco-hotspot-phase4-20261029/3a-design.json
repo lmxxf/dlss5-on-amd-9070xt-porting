@@ -1,0 +1,11 @@
+{
+  "target": "c128_wave2_bi_bo",
+  "B": 4,
+  "T": 2,
+  "preload_words": 8,
+  "preload_bytes_per_lane": 32,
+  "scope": "Only C128 byte-in/out, non-Up, non-W16, full output, non-explicit-window specialization",
+  "waves_per_eu": "stock HIP_KERNEL_WPE=0 already unrestricted; no fictitious removed constraint",
+  "mathematics": "Same kt/ht/tile/ci/qi order and activation/rounding; only immutable contract weight loads advanced before expand",
+  "resource_policy": "0 spill/private required; register growth permitted for this residency/prefetch test; no extra LDS"
+}

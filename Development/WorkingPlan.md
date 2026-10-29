@@ -313,3 +313,12 @@ C128/C256峰值在FFN Expand/Contract共存阶段，静态live234/240而metadata
 ### 2026-10-29 ISA Phase3 四刀闭环
 
 1f780a34（成对打包/预取）、cb5a59d2（保持B复用折叠/预取）、98ba6985（serial_norm缓存）均按四档3ABBA或资源门STOP，生产数学和核代码未采用新改动。全部80双架构模块实际重编、ELF/函数代码/资源复核，更新容器SHA；正式addon/runtime/frame O2构建、七档Gold0bit-diff/invalid0、七档3ABBA及runtime烟测完成。最新1088纯NN三轮NMMN：HIP 8.321360ms、锁版Mochizuki d1185d2 7.864895ms，差0.456466ms（+5.80%）；旧0.478631198ms为跨批历史，不能归因本轮。完整逐轮/负结果/配方身份见results/isa-asm-phase3-20261029/README.md。临时大文件清理、保留隔离payload，不部署、不改ZIP、不push。
+
+
+### 2026-10-29 ACO hotspot Phase4 三阶段闭环
+
+Step1 4a260061：新版v0.0.8 ACO在32.0.31007.2048原样pipeline-binary导入，53SPV/NRP匹配，无版本白名单绕过。三档3NMMN：Original1088 HIP8.301703/ACO5.670747ms（+46.40%），Small1080 5.005096/3.430510（+45.90%），Small900 3.841217/2.607886（+47.29%）；旧d1185的5.8%不代表新版。Small同帧GPU PP为0.242/0.157ms，Frame残差另含interop/CPU，探针开销单列。
+
+Step2 a8103346：拒用负值/不闭合HIP短事件，改gfx1201硬件实时钟（100MHz设备属性、0.8µs邻接stamp校正），完整153/83业务dispatch，重构闭合0.7–1.0%。Original Top C1280.819/SP0.809/C32post0.728ms；Small C32post/prefix0.762/0.737ms。对手123/71 pass时间同列，未据此编造峰值利用率。
+
+Step3：C128 3A Contract深预取保持B4，VGPR242→248但硬件分配桶不变、0spill；单核微正但整网不稳，STOP。3B严格安全的一条b64移动，136其他函数及metadata全同，单核/整网无稳定收益，STOP。各七档Gold42帧与四档3ABBA完成，不叠加/刷轮、不改生产80/SHA。全部报告/源码/ISA证明/逐轮数据见results/aco-hotspot-phase4-20261029/README.md。临时大文件清理、锁释放，无游戏/ZIP修改、无push；不宣称接近硬件上限或.s唯一路径。

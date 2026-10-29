@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "group_segment": 16384,
+    "private_segment": 0,
+    "rsrc3": 2896,
+    "rsrc1": 3759079454,
+    "rsrc2": 132
+  },
+  "candidate": {
+    "group_segment": 16384,
+    "private_segment": 0,
+    "rsrc3": 2896,
+    "rsrc1": 3759079454,
+    "rsrc2": 132
+  },
+  "same_hardware_resource_encoding": true,
+  "conclusion": "242→248 logical VGPR count does not change encoded allocation/occupancy resources; deeper prefetch tested without a residency drop."
+}
