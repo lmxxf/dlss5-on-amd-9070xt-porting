@@ -1,0 +1,70 @@
+{
+  "original1088": {
+    "cpu_wall_fit_ticks_per_ms": 99381.26189565875,
+    "cpu_wall_fit_intercept_ms": 0.1356525349647845,
+    "cpu_wall_max_fit_error_ms": 0.20659685155311536,
+    "stamp_pair_overhead_ticks_median": 80.0,
+    "calibration": [
+      {
+        "repeats": "8",
+        "ticks": "6396936",
+        "gpu_ms": "61.7811",
+        "cpu_ms": "64.577"
+      },
+      {
+        "repeats": "32",
+        "ticks": "25659640",
+        "gpu_ms": "75.3076",
+        "cpu_ms": "258.123"
+      },
+      {
+        "repeats": "64",
+        "ticks": "51361296",
+        "gpu_ms": "75.5905",
+        "cpu_ms": "517.118"
+      },
+      {
+        "repeats": "128",
+        "ticks": "102772464",
+        "gpu_ms": "75.174",
+        "cpu_ms": "1034.22"
+      }
+    ],
+    "hip_event_long_interval_rejected": true,
+    "reason": "32/64/128 batches report ~75ms despite raw-clock and CPU wall scaling to >1s. Do not fit realtime unit against these saturated event values."
+  },
+  "small1080": {
+    "cpu_wall_fit_ticks_per_ms": 99499.92431816879,
+    "cpu_wall_fit_intercept_ms": 0.22749091086718362,
+    "cpu_wall_max_fit_error_ms": 0.2193367227277463,
+    "stamp_pair_overhead_ticks_median": 80.0,
+    "calibration": [
+      {
+        "repeats": "8",
+        "ticks": "3847236",
+        "gpu_ms": "37.0893",
+        "cpu_ms": "39.0587"
+      },
+      {
+        "repeats": "32",
+        "ticks": "15550860",
+        "gpu_ms": "80.2486",
+        "cpu_ms": "156.457"
+      },
+      {
+        "repeats": "64",
+        "ticks": "31103860",
+        "gpu_ms": "76.106",
+        "cpu_ms": "312.61"
+      },
+      {
+        "repeats": "128",
+        "ticks": "62257700",
+        "gpu_ms": "79.664",
+        "cpu_ms": "626.048"
+      }
+    ],
+    "hip_event_long_interval_rejected": true,
+    "reason": "32/64/128 batches report ~75ms despite raw-clock and CPU wall scaling to >1s. Do not fit realtime unit against these saturated event values."
+  }
+}

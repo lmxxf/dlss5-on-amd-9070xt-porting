@@ -1,0 +1,330 @@
+{
+  "original1088": {
+    "hip_top": [
+      {
+        "kernel": "c64_wave2:c128_wave2_bi_bo",
+        "mean_per_frame_ms": 0.8192911111111112,
+        "rounds": 3,
+        "rounds_ms": [
+          0.8145466666666665,
+          0.81986,
+          0.8234666666666668
+        ],
+        "share_percent": 10.222015202114935
+      },
+      {
+        "kernel": "sp:sp_run256_w16",
+        "mean_per_frame_ms": 0.8092288888888888,
+        "rounds": 3,
+        "rounds_ms": [
+          0.7987933333333332,
+          0.8092266666666665,
+          0.8196666666666665
+        ],
+        "share_percent": 10.096472294194056
+      },
+      {
+        "kernel": "c32_wave1:c32_wave1_post_b8_w16",
+        "mean_per_frame_ms": 0.7277377777777777,
+        "rounds": 3,
+        "rounds_ms": [
+          0.7269200000000001,
+          0.7273933333333332,
+          0.7288999999999999
+        ],
+        "share_percent": 9.079735550296874
+      },
+      {
+        "kernel": "c32_wave1:c32_wave1_prefix_b8d_w16",
+        "mean_per_frame_ms": 0.7044866666666666,
+        "rounds": 3,
+        "rounds_ms": [
+          0.7038533333333333,
+          0.7041666666666666,
+          0.70544
+        ],
+        "share_percent": 8.789639382987659
+      },
+      {
+        "kernel": "c32_wave1:c32_wave1_chain_w16",
+        "mean_per_frame_ms": 0.6758222222222222,
+        "rounds": 3,
+        "rounds_ms": [
+          0.6749533333333334,
+          0.6764399999999999,
+          0.6760733333333334
+        ],
+        "share_percent": 8.432002905675079
+      },
+      {
+        "kernel": "c64_wave2:c64_wave2_bi_bo",
+        "mean_per_frame_ms": 0.5584777777777779,
+        "rounds": 3,
+        "rounds_ms": [
+          0.5577333333333334,
+          0.5582400000000001,
+          0.5594600000000001
+        ],
+        "share_percent": 6.967936374588098
+      }
+    ],
+    "aco_top": [
+      {
+        "stage_kernel": "CCTinlayoutFusedPostBlockSwin1H/fswinimagepost32/C3",
+        "mean_per_frame_ms": 0.5308999999999999,
+        "rounds_ms": [
+          0.5305,
+          0.5311,
+          0.5311
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedPreBlockSwin1H/fswinimagepreds32nh/C3",
+        "mean_per_frame_ms": 0.49983333333333335,
+        "rounds_ms": [
+          0.4998,
+          0.5,
+          0.4997
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin1H/fswin32nh/C32",
+        "mean_per_frame_ms": 0.4759666666666667,
+        "rounds_ms": [
+          0.47600000000000003,
+          0.47620000000000007,
+          0.4757
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin8H/fswinpup256/C256",
+        "mean_per_frame_ms": 0.39996666666666664,
+        "rounds_ms": [
+          0.3964,
+          0.4,
+          0.4035
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin8H/fswinpds256/C256",
+        "mean_per_frame_ms": 0.38856666666666667,
+        "rounds_ms": [
+          0.3862,
+          0.38839999999999997,
+          0.3911
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin4H/fswinpup128/C128",
+        "mean_per_frame_ms": 0.3579333333333334,
+        "rounds_ms": [
+          0.3557,
+          0.3588,
+          0.3593
+        ]
+      }
+    ],
+    "probe": [
+      {
+        "round": 1,
+        "control_gpu_event_ms": 8.2148114375,
+        "control_cpu_ms": 8.332950625,
+        "profile_cpu_ms": 8.356375163398694,
+        "profile_gpu_event_ms": 7.911015577342048,
+        "profile_network_realtime_ms": 7.902757603485839,
+        "reconstructed_dispatch_sum_ms": 7.978913333333334,
+        "reconstruction_ratio": 1.0096366020152134,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      },
+      {
+        "round": 2,
+        "control_gpu_event_ms": 8.2524103125,
+        "control_cpu_ms": 8.370755625,
+        "profile_cpu_ms": 8.395288235294117,
+        "profile_gpu_event_ms": 7.957787821350762,
+        "profile_network_realtime_ms": 7.947622570806101,
+        "reconstructed_dispatch_sum_ms": 8.018613333333333,
+        "reconstruction_ratio": 1.0089323268555808,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      },
+      {
+        "round": 3,
+        "control_gpu_event_ms": 8.288668750000001,
+        "control_cpu_ms": 8.399454375,
+        "profile_cpu_ms": 8.426932788671024,
+        "profile_gpu_event_ms": 7.98549302832244,
+        "profile_network_realtime_ms": 7.978830806100218,
+        "reconstructed_dispatch_sum_ms": 8.047373333333333,
+        "reconstruction_ratio": 1.0085905477755852,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      }
+    ]
+  },
+  "small1080": {
+    "hip_top": [
+      {
+        "kernel": "c32_wave1:c32_wave1_post_b8_w16",
+        "mean_per_frame_ms": 0.76174,
+        "rounds": 3,
+        "rounds_ms": [
+          0.762,
+          0.7616999999999999,
+          0.76152
+        ],
+        "share_percent": 15.78258911757691
+      },
+      {
+        "kernel": "c32_wave1:c32_wave1_prefix_b8d_w16",
+        "mean_per_frame_ms": 0.7370533333333333,
+        "rounds": 3,
+        "rounds_ms": [
+          0.73792,
+          0.7365666666666666,
+          0.7366733333333334
+        ],
+        "share_percent": 15.271102893034964
+      },
+      {
+        "kernel": "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16",
+        "mean_per_frame_ms": 0.26390444444444444,
+        "rounds": 3,
+        "rounds_ms": [
+          0.2637133333333333,
+          0.26352,
+          0.26448000000000005
+        ],
+        "share_percent": 5.467870156443235
+      },
+      {
+        "kernel": "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16",
+        "mean_per_frame_ms": 0.2562955555555555,
+        "rounds": 3,
+        "rounds_ms": [
+          0.2539066666666666,
+          0.25766666666666665,
+          0.2573133333333333
+        ],
+        "share_percent": 5.3102206080741965
+      },
+      {
+        "kernel": "c64_wave2:c256_wave2_bi_bo_w16",
+        "mean_per_frame_ms": 0.24269333333333334,
+        "rounds": 3,
+        "rounds_ms": [
+          0.24239333333333335,
+          0.24153333333333335,
+          0.2441533333333334
+        ],
+        "share_percent": 5.028394414859576
+      },
+      {
+        "kernel": "vit_stream:vit_stream_qkv_frag_bin_w5f8_qkfrag",
+        "mean_per_frame_ms": 0.21256222222222224,
+        "rounds": 3,
+        "rounds_ms": [
+          0.21180000000000002,
+          0.21232000000000004,
+          0.21356666666666665
+        ],
+        "share_percent": 4.404104045018523
+      }
+    ],
+    "aco_top": [
+      {
+        "stage_kernel": "CCTinlayoutFusedPostBlockSwin1H/fswinimagepost32/C3",
+        "mean_per_frame_ms": 0.5556666666666666,
+        "rounds_ms": [
+          0.5556,
+          0.5556,
+          0.5558
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedPreBlockSwin1H/fswinimagepreds32nh/C3",
+        "mean_per_frame_ms": 0.5236333333333334,
+        "rounds_ms": [
+          0.5236000000000001,
+          0.5236000000000001,
+          0.5237
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin1H/fswin32nh/C32",
+        "mean_per_frame_ms": 0.24066666666666667,
+        "rounds_ms": [
+          0.2407,
+          0.2406,
+          0.2407
+        ]
+      },
+      {
+        "stage_kernel": "CCVit1DFfnExpand/gemmvact/C1024",
+        "mean_per_frame_ms": 0.2074666666666667,
+        "rounds_ms": [
+          0.207,
+          0.20700000000000005,
+          0.2084
+        ]
+      },
+      {
+        "stage_kernel": "CCVit1DFfnContract/gemmproj/C1024",
+        "mean_per_frame_ms": 0.20299999999999999,
+        "rounds_ms": [
+          0.2025,
+          0.2029,
+          0.2036
+        ]
+      },
+      {
+        "stage_kernel": "CCTinlayoutFusedSwin2H/fswinpds64/C64",
+        "mean_per_frame_ms": 0.1834,
+        "rounds_ms": [
+          0.18359999999999999,
+          0.18309999999999998,
+          0.1835
+        ]
+      }
+    ],
+    "probe": [
+      {
+        "round": 1,
+        "control_gpu_event_ms": 5.043103,
+        "control_cpu_ms": 5.16072375,
+        "profile_cpu_ms": 5.148098995983936,
+        "profile_gpu_event_ms": 5.028931385542169,
+        "profile_network_realtime_ms": 4.788478634538153,
+        "reconstructed_dispatch_sum_ms": 4.8227866666666666,
+        "reconstruction_ratio": 1.0071647040212433,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      },
+      {
+        "round": 2,
+        "control_gpu_event_ms": 5.0234911875,
+        "control_cpu_ms": 5.141833125,
+        "profile_cpu_ms": 5.158560843373494,
+        "profile_gpu_event_ms": 5.046004518072289,
+        "profile_network_realtime_ms": 4.789057269076305,
+        "reconstructed_dispatch_sum_ms": 4.827453333333334,
+        "reconstruction_ratio": 1.008017457737446,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      },
+      {
+        "round": 3,
+        "control_gpu_event_ms": 5.0462453125,
+        "control_cpu_ms": 5.176528125,
+        "profile_cpu_ms": 5.149745180722892,
+        "profile_gpu_event_ms": 5.0298329518072284,
+        "profile_network_realtime_ms": 4.792855983935743,
+        "reconstructed_dispatch_sum_ms": 4.829133333333333,
+        "reconstruction_ratio": 1.0075690464139089,
+        "clock_rate_khz": 100000,
+        "stamp_overhead_ms": 0.0008
+      }
+    ]
+  }
+}

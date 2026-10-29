@@ -1,0 +1,5 @@
+from pathlib import Path
+p=Path(__file__).parent;w=p/'work/profile'
+exec((p/'prepare-profile-single-initial.py').read_text(),{'__file__':str(p/'prepare-profile-single-initial.py')})
+f=w/'hip_reference_network.h';t=f.read_text();t=t.replace('api.Check(api.hipEventCreate(&audit_begin),"audit begin create");api.Check(api.hipEventCreate(&audit_end),"audit end create");','auto create_flags=reinterpret_cast<int(*)(Handle*,unsigned)>(GetProcAddress(api.dll,"hipEventCreateWithFlags"));if(!create_flags)throw std::runtime_error("event flags unavailable");api.Check(create_flags(&audit_begin,0x20000000u),"audit begin no fence");api.Check(create_flags(&audit_end,0x20000000u),"audit end no fence");')
+t=t.replace('float ms=-1;api.Check(api.hipEventElapsedTime(&ms,e.begin,e.end),"audit elapsed");','api.Check(api.hipEventSynchronize(e.end),"audit end complete");api.Check(api.hipEventSynchronize(e.begin),"audit begin complete");float ms=-1;api.Check(api.hipEventElapsedTime(&ms,e.begin,e.end),"audit elapsed");');f.write_text(t)
