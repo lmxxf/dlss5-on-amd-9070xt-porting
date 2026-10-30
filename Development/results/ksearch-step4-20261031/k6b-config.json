@@ -1,0 +1,28 @@
+{
+  "role": "k6b",
+  "modules": {},
+  "same_host": false,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6b-frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6b-frame-window.exe",
+  "base_frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+  "base_frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+  "env": {},
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6b-frame-standard.exe",
+      "sha256": "1ce6dc449dba870421c6b27e78ab56ae82172724835f7b1acc8af63b142b4bcf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6b-frame-window.exe",
+      "sha256": "6882cb17e9d542c4e77172fd5a0db24d5a964abfd2930c64ba4adbf4f4cadf6e"
+    }
+  ]
+}

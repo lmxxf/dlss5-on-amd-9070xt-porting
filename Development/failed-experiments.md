@@ -2807,3 +2807,24 @@ Post寄存器尾部h2成对交换145VGPR/0spill/七档Gold同，静态1510→148
 ## 2026-10-29 C32 Phase5 刀2 最终集成撤销
 
 资格Small1080三轮mean/p99均赢，但独立最终集成R1 mean−25.651µs/p99+65.243µs，稳定性反例成立；不按资格批美化最终结论，撤销mask1，恢复ba057a5d原生产头文件。原资格、最终反例均保留，之后原基线收口不是刷轮救候选。详results/c32-stage-phase5-20261029/2-final-revocation.json。
+
+
+## 2026-10-30～31 K-Search Phase 2～4 未采纳分支与作用域排除账单
+
+1. **分支 K3（`c32_wave1_post_b8_w16` 跨 `qt` 外提 `scales[64]`）｜性能负 / STOP**
+   - 改动与基线：基于 `8a9c60fd`，在 `hip/wave_owned_c32.inc` 中将 `Post && CW_VEC_INPUT` 下的 `scales` 读取外提到首个 `qt=0..3` 循环前（`148 -> 149 VGPR`，`0 spill`，静态指令 `1455 -> 1454`）。
+   - 正确性与时量：七档 42 帧 Gold `0 bit-diff`（`invalid=0`）；硬件实时钟 `original1088` `c32_wave1_post_b8_w16` `+0.960 µs`（`small1080` `-2.820 µs`）；四档 3 轮 Frame ABBA：`original1088` `+3.580 µs`、`original960` `+15.555 µs (p99 +253.601 µs)`、`small1080` `-2.000 µs`、`small900` `+0.012 µs`。
+   - 裁决与根因：`scales[64]` 仅 256B（2 条 cache line），`qt=1..3` 原本 100% 命中 L0 cache；外提拆散了 `qt` 循环内的 `s_clause` 合并加载并跨整个 FFN+QKV 循环额外保活 16 个 VGPR，判定 STOP。证据：`Development/results/ksearch-k2-k3-20261030/README.md`。
+
+2. **分支 K4（`sp_run256_w16` 开启 `W2_QKV_FUSE` 与 `W2_HOIST_LOADS=3`）｜性能负 / STOP**
+   - 改动与基线：基于 `8a9c60fd`，在 `swin-persistent-fast.hsaco`（COMGR）中测试 `W2_QKV_FUSE=12/4`（`kt` 展开，触发 `256 VGPR + 11~17 spill`）、`k4`（`W2_QKV_FUSE=28, W2_HOIST_LOADS=3`，禁用内层 `kt` 展开以保 `253 VGPR, 0 spill`，指令 `5246 -> 3923`）以及 `k4c`（`W2_QKV_FUSE=0, W2_HOIST_LOADS=3`，`184 VGPR, 0 spill`，指令 `5246 -> 5150`）。
+   - 正确性与时量：`k4` 与 `k4c` 七档 42 帧 Gold 均 `0 bit-diff`；3 轮 ABBA 硬件实时钟探针（`original1088`）显示 `k4` 的 `sp_run256_w16`（2 次调用）从 `829.880 µs` 退化至 `1086.293 µs`（`+256.413 µs`，0/3 轮，整网 `+214.120 µs`），`k4c` 的 `sp_run256_w16` `-0.033 µs`（1/3 轮，整网 `+7.563 µs`）。
+   - 裁决与根因：禁用 `kt` 展开虽消除 spill，但打断了跨 `kt` 迭代的 `s_clause` 全局加载预取深度且 253 VGPR 挤压了延迟隐藏空间；单开 `W2_HOIST_LOADS=3` 完全中性，判定 STOP。证据：`Development/results/ksearch-step3-20261030/README.md`。
+
+3. **作用域排除 1：`small1080`（`1920×1152` Small）开启 `SubmitPulse`（`k6b` vs `k6c3`）｜性能负 / 排除出 `PulseRejectMask`**
+   - 改动与实测：在 `k6b` 中对 `Small` 全档开启 `SubmitPulse`，`small900` 3/3 轮净快 `-72.361 µs (-1.76%, p99 -117.421 µs)`，但 `small1080` 3 轮 mean `+9.485 µs (+0.18%, 0/3 轮)`。
+   - 裁决与根因：`small1080` 全网仅 `5.36 ms` 且不走 `sp_run256` 持久核，中途 `hipEventRecord` 拆包在小步幅 1080p Small 下产生轻微拆包开销；因此生产 `PulseRejectMask` 精确放行 `small900`、`small720`、`smallwindow`，保持 `small1080` 不拆包。证据：`Development/results/ksearch-step4-20261031/README.md`。
+
+4. **作用域排除 2：`1920×1152`（`original1152` / `small1080`）开启 `w16_fb8` 及 `w16_fb8` 提前 `ffn8.reset()` 同址复用｜性能负 & 正确性边界**
+   - 改动与实测：在未开启 `SubmitPulse` 时，`original1088` 开启 `w16_fb8` 因整帧单批提交与 L2 驱逐相位变化慢 `+229 ~ +243 µs`（开启 `SubmitPulse` 后逆转为净快 `-25 ~ -47 µs`）；而在 `small1080`（`1920×1152`，`SubmitPulse=0`）上开启 `w16_fb8` 仍慢 `+24.97 ~ +54.01 µs`，`original1152` 上开启 `w16_fb8` 无额外净收益。此外，在 `w16_fb8` 路径下若提前调用 `ffn8.reset()` 使 `result` 与 `ffn8` 同址复用，由于 `ffn8`（`[16×32]` 瓦片）与 `result`（`[token×512]` 行主序）跨列分块工作组地址交错，在 `pure.exe` 241 帧连续纯 NN 压测中会偶发跨工作组覆写竞态。
+   - 裁决：`C512W16Fb8ShapeEligible()` 精确限定为 `(W==1600&&(H==960||H==1024))||(!small_active&&W==1920&&H==1088)`，排除 `1920×1152`；且保持 `if(!fb8&&!w16_fb8)ffn8.reset();` 使 `w16_fb8` 下 `ffn8` 与 `result` 严格异址。证据：`Development/results/ksearch-step3-20261030/README.md`、`Development/results/ksearch-step4-20261031/README.md`。

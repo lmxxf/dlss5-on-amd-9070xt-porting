@@ -1,0 +1,41 @@
+{
+  "role": "k6c1",
+  "modules": {
+    "c64-wave2-fast.hsaco": "Development/results/ksearch-step4-20261031/work/k5-out/gfx1201/c64-wave2-fast.hsaco",
+    "c64-wave2.hsaco": "Development/results/ksearch-step4-20261031/work/k5-out/gfx1201/c64-wave2.hsaco",
+    "vit-stream-fast.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/vit-stream-fast.hsaco",
+    "vit-stream.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/vit-stream.hsaco",
+    "c512-m32-deep.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/c512-m32-deep.hsaco",
+    "c512-m32-mh.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/c512-m32-mh.hsaco",
+    "deep_fast.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/deep_fast.hsaco",
+    "vit-wide-deep.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/vit-wide-deep.hsaco",
+    "multihead-fast-padded-wave.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/multihead-fast-padded-wave.hsaco",
+    "multihead-fast-padded-wave-packed.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/multihead-fast-padded-wave-packed.hsaco",
+    "deep_fast-packed-fast.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/deep_fast-packed-fast.hsaco",
+    "deep_fast-packed.hsaco": "Development/results/ksearch-step4-20261031/work/k2-out/gfx1201/deep_fast-packed.hsaco"
+  },
+  "same_host": false,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6c1-frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6c1-frame-window.exe",
+  "base_frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+  "base_frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+  "env": {},
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6c1-frame-standard.exe",
+      "sha256": "845b46e066b599b63b66c680ec116dae705ba49ab07d8755d62f8d92cd265558"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\k6c1-frame-window.exe",
+      "sha256": "56f78d404d40830691c9b0f22fd2a355590b73a582427d7578b5c03191d1e83e"
+    }
+  ]
+}

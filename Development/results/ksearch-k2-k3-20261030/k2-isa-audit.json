@@ -1,0 +1,1832 @@
+{
+  "gfx1201": {
+    "deep_fast-packed-fast.hsaco": {
+      "split_projection_frag_w16": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          603,
+          622
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4156,
+          4224
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          630,
+          642
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4288,
+          4328
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          447,
+          492
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3036,
+          3268
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          511,
+          513
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3348,
+          3376
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "deep_fast-packed.hsaco": {
+      "split_projection_frag_w16": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          659,
+          681
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4392,
+          4480
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          691,
+          701
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4532,
+          4584
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          502,
+          545
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3272,
+          3496
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          566,
+          566
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3584,
+          3604
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "multihead-fast-padded-wave-packed.hsaco": {
+      "mh_attention_project_frag_c512_w16": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          850,
+          819
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5308,
+          5140
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_bout": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          722,
+          691
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4632,
+          4516
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          884,
+          858
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5624,
+          5492
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_bout": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          756,
+          730
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4948,
+          4868
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          775,
+          880
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          8,
+          32
+        ],
+        "bytes": [
+          4664,
+          5588
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8_bout": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          724,
+          749
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          4412,
+          4936
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "vit-stream-fast.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          100
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          658,
+          658
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4508,
+          4508
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          447,
+          466
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3036,
+          3328
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          511,
+          470
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3348,
+          3356
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "vit-stream.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          100
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          722,
+          722
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4776,
+          4776
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          502,
+          528
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3272,
+          3576
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          566,
+          532
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3584,
+          3604
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "c512-m32-deep.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          100
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          722,
+          722
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4776,
+          4776
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          502,
+          528
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3272,
+          3576
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          566,
+          532
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3584,
+          3604
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "c512-m32-mh.hsaco": {
+      "mh_attention_project_frag_c512_w16": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          850,
+          819
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5308,
+          5140
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_bout": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          722,
+          691
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4632,
+          4516
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          884,
+          858
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5624,
+          5492
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_bout": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          756,
+          730
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4948,
+          4868
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          775,
+          880
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          8,
+          32
+        ],
+        "bytes": [
+          4664,
+          5588
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8_bout": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          724,
+          749
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          4412,
+          4936
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    }
+  },
+  "gfx1200": {
+    "deep_fast-packed-fast.hsaco": {
+      "split_projection_frag_w16": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          603,
+          622
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4156,
+          4224
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          630,
+          642
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4288,
+          4328
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          447,
+          492
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3036,
+          3268
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          511,
+          513
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3348,
+          3376
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "deep_fast-packed.hsaco": {
+      "split_projection_frag_w16": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          659,
+          681
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4392,
+          4480
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          97
+        ],
+        "sgpr": [
+          17,
+          17
+        ],
+        "insts": [
+          691,
+          701
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          34,
+          34
+        ],
+        "bytes": [
+          4532,
+          4584
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          502,
+          545
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3272,
+          3496
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          97
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          566,
+          566
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          2
+        ],
+        "bytes": [
+          3584,
+          3604
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "multihead-fast-padded-wave-packed.hsaco": {
+      "mh_attention_project_frag_c512_w16": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          850,
+          819
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5308,
+          5140
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_bout": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          722,
+          691
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4632,
+          4516
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          884,
+          858
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5624,
+          5492
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_bout": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          756,
+          730
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4948,
+          4868
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          775,
+          880
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          8,
+          32
+        ],
+        "bytes": [
+          4664,
+          5588
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8_bout": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          724,
+          749
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          4412,
+          4936
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "vit-stream-fast.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          100
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          658,
+          658
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4508,
+          4508
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          447,
+          466
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3036,
+          3328
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          511,
+          470
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3348,
+          3356
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "vit-stream.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          100,
+          100
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          722,
+          722
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4776,
+          4776
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          502,
+          528
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3272,
+          3576
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          98,
+          98
+        ],
+        "sgpr": [
+          15,
+          15
+        ],
+        "insts": [
+          566,
+          532
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3584,
+          3604
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "c512-m32-deep.hsaco": {
+      "split_projection_frag_w16_bskip": {
+        "vgpr": [
+          120,
+          120
+        ],
+        "sgpr": [
+          18,
+          18
+        ],
+        "insts": [
+          724,
+          724
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          64,
+          64
+        ],
+        "bytes": [
+          4856,
+          4856
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": false
+      },
+      "split_projection_frag_w16_nof32": {
+        "vgpr": [
+          118,
+          118
+        ],
+        "sgpr": [
+          15,
+          16
+        ],
+        "insts": [
+          487,
+          513
+        ],
+        "global_load": [
+          40,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3244,
+          3564
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "split_projection_frag_w16_nof32_bskip": {
+        "vgpr": [
+          118,
+          118
+        ],
+        "sgpr": [
+          17,
+          15
+        ],
+        "insts": [
+          549,
+          547
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          3548,
+          3712
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    },
+    "c512-m32-mh.hsaco": {
+      "mh_attention_project_frag_c512_w16": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          850,
+          819
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5308,
+          5140
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_bout": {
+        "vgpr": [
+          85,
+          77
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          722,
+          691
+        ],
+        "global_load": [
+          48,
+          48
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4632,
+          4516
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          884,
+          858
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          5624,
+          5492
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_bout": {
+        "vgpr": [
+          101,
+          93
+        ],
+        "sgpr": [
+          29,
+          29
+        ],
+        "insts": [
+          756,
+          730
+        ],
+        "global_load": [
+          60,
+          60
+        ],
+        "global_store": [
+          32,
+          32
+        ],
+        "bytes": [
+          4948,
+          4868
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          775,
+          880
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          8,
+          32
+        ],
+        "bytes": [
+          4664,
+          5588
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      },
+      "mh_attention_project_frag_c512_w16_u4_fb8_bout": {
+        "vgpr": [
+          94,
+          93
+        ],
+        "sgpr": [
+          21,
+          31
+        ],
+        "insts": [
+          724,
+          749
+        ],
+        "global_load": [
+          36,
+          60
+        ],
+        "global_store": [
+          4,
+          32
+        ],
+        "bytes": [
+          4412,
+          4936
+        ],
+        "spill": [
+          0,
+          0
+        ],
+        "changed": true
+      }
+    }
+  }
+}

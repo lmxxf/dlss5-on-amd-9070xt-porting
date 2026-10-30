@@ -863,3 +863,18 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 ### 2026-10-29 C32 Phase5B 收网
 
 修通finish→pool的跨文件Hrtz/FP8零边界，d510bb69独立7Gold42全同，四档合并mean/p99全赢；按Zero校准门进入组合。最终生产保留全档fast norm-hoist+OutProj外提+默认融合，七档Gold42帧0diff/invalid0，七档三轮ABBA mean/p99全部改善、mean各三轮均赢。 Original1152/1088 mean-101.146/-86.825µs，Small1080/900 -51.945/-62.368µs；C32+pool硬件时钟Orig/Small -92.903/-69.280µs。 双架构80模块实际重编、ELF/SHA/metadata核验及正式O2 addon/runtime/frame/pure、runtime-smoke完成。生产W16max158、全部private/spill0，旧7项非默认>160资源例外原样保留清单。 新版v008三轮NMMN Original1088 HIP8.214575/ACO5.685226ms（+44.49%）。 细节results/c32-stage-phase5b-20261029/README.md；已清理、锁释放，无游戏/ZIP/上游源码修改、无push。
+
+
+### 2026-10-31 K-Search Phase 2～5 生产收网（`k6c3` 封存新 `1.00×` 基线）
+
+定位并修复 `SubmitPulse` 门控（`PulseRejectMask`）遗漏 `Original 1088`（`1920×1088`）与 `Small` 家族（`small900`、`small720`、`smallwindow`）的瓶颈（K6），并证实开启 `SubmitPulse` 后非转置 `w16_fb8`（`split_projection_frag_w16_nof32_bskip` 省 `4.42 MB/帧` `ffn` 死写 + `mh_attention_project_frag_c512_w16_u4_fb8_bout` 93 VGPR，K2-Scope：`1600×960`、`1600×1024`、`Original 1920×1088`）在三档上全部释放纯正加速，结合 `c64/c128_wave2_up_lb_sh` 首 barrier 前 `qt` 循环折叠（砍 `-1,055/-977` 条指令）与 `c64_wave2` 全系压入 `189~191 VGPR`（8 waves/SIMD = 4 WGs/CU，K5）合入生产树。同时修复 `w16_fb8` 提前 `ffn8.reset()` 引发的多工作组同址读写竞态（保持 `if(!fb8&&!w16_fb8)ffn8.reset();` 异址分配）。
+
+- **七档 42 帧 Gold**：`0 bit-diff`（`invalid=0`），首尾帧 SHA256 与基线 100% 一致。
+- **七档 3 轮 4-slot Frame ABBA（每档 960 稳态帧/臂）**：
+  - Step 4 `k6c3` 7/7 档 mean/p99 全负、20/21 轮胜出：`smallwindow` **`-165.487 µs (-8.81%, p99 -195.606 µs, 3/3)`**、`small720` **`-140.450 µs (-4.75%, p99 -205.720 µs, 3/3)`**、`original1088` **`-119.504 µs (-1.39%, p99 -163.074 µs, 3/3)`**、`small900` **`-88.182 µs (-2.14%, p99 -146.996 µs, 3/3)`**、`original960` **`-24.890 µs (-0.39%, p99 -4.838 µs, 3/3)`**、`small1080` **`-9.783 µs (-0.18%, p99 -48.095 µs, 3/3)`**、`original1152` **`-2.302 µs (-0.03%, p99 -28.669 µs, 2/3)`**。
+  - Step 5 正式生产合入后（移除 `ffn8` 同址别名）复核：`smallwindow` **`-166.660 µs (-8.86%, p99 -211.988 µs, 3/3)`**、`original1088` **`-159.277 µs (-1.84%, p99 -180.595 µs, 3/3)`**、`small720` **`-136.781 µs (-4.64%, p99 -188.707 µs, 3/3)`**、`small900` **`-87.286 µs (-2.12%, p99 -169.082 µs, 3/3)`**、`original960` **`-24.445 µs (-0.38%, p99 -14.666 µs, 3/3)`**、`original1152` **`-4.633 µs (-0.05%, p99 -16.966 µs, 2/3)`**、`small1080` `+6.790 µs (+0.13%, 噪声带内)`。
+- **最新生产 `pure.exe` vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账（960 稳态帧/臂，全部 `raw_bitdiff=0`）**：
+  - `original1088`：HIP **`8.096690 ms`** vs ACO **`5.646863 ms`**（差 `2.449827 ms`，**`+43.38%`**，较 Phase5B `8.214575 ms / +44.49%` 净快 `-117.885 µs`）。
+  - `small1080`：HIP **`4.926222 ms`** vs ACO **`3.443128 ms`**（差 `1.483094 ms`，**`+43.07%`**，较 Phase5B `4.946637 ms / +43.36%` 净快 `-20.415 µs`）。
+  - `small900`：HIP **`3.789783 ms`** vs ACO **`2.635953 ms`**（差 `1.153830 ms`，**`+43.77%`**，较 Phase5B `3.795411 ms` 净快 `-5.628 µs`）。
+- **80 模块与正式宿主**：双架构 80 模块完整核验并更新 `hip/SHA256SUMS`（生产 C32 W16 max `158 VGPR`，C512 W16 max `97 VGPR`，`c64_wave2` max `191 VGPR`，全部生产与修改导出 `private=0, spill=0`）；正式 O2 `addon64`/`runtime`/`frame`/`pure` 与 `runtime-smoke`（`exit=0`）完成。K3（`c32_wave1_post` 外提 `scales`）与 K4（`sp_run256_w16` `W2_QKV_FUSE`）STOP 已入失败总账。详见 `Development/results/ksearch-step4-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。

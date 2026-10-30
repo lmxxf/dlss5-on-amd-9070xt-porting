@@ -1,0 +1,1430 @@
+{
+  "c128_wave2": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3559,
+      "global_load": 286,
+      "global_store": 4,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3559,
+      "global_load": 286,
+      "global_store": 4,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    }
+  },
+  "c128_wave2_bi": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3334,
+      "global_load": 276,
+      "global_store": 4,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3334,
+      "global_load": 276,
+      "global_store": 4,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    }
+  },
+  "c128_wave2_bi_bo": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3288,
+      "global_load": 276,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3288,
+      "global_load": 276,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    }
+  },
+  "c128_wave2_bi_ho": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3248,
+      "global_load": 276,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3248,
+      "global_load": 276,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    }
+  },
+  "c128_wave2_bo": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3514,
+      "global_load": 286,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 25,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3514,
+      "global_load": 286,
+      "global_store": 2,
+      "ds_load": 41,
+      "ds_store": 16,
+      "wmma": 330
+    }
+  },
+  "c128_wave2_up": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4586,
+      "global_load": 294,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 16,
+      "wmma": 334
+    },
+    "k5": {
+      "vgpr": 240,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3584,
+      "global_load": 282,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 13,
+      "wmma": 334
+    }
+  },
+  "c128_wave2_up_lb": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 27,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4627,
+      "global_load": 292,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 16,
+      "wmma": 334
+    },
+    "k5": {
+      "vgpr": 240,
+      "sgpr": 27,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3604,
+      "global_load": 280,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 13,
+      "wmma": 334
+    }
+  },
+  "c128_wave2_up_lb_sh": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 27,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4586,
+      "global_load": 284,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 16,
+      "wmma": 334
+    },
+    "k5": {
+      "vgpr": 240,
+      "sgpr": 27,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3609,
+      "global_load": 278,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 13,
+      "wmma": 334
+    }
+  },
+  "c128_wave2_up_sh": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4616,
+      "global_load": 286,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 16,
+      "wmma": 334
+    },
+    "k5": {
+      "vgpr": 240,
+      "sgpr": 26,
+      "lds": 16384,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3590,
+      "global_load": 280,
+      "global_store": 2,
+      "ds_load": 42,
+      "ds_store": 13,
+      "wmma": 334
+    }
+  },
+  "c256_attn_wave": {
+    "baseline": {
+      "vgpr": 136,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1197,
+      "global_load": 80,
+      "global_store": 4,
+      "ds_load": 73,
+      "ds_store": 10,
+      "wmma": 58
+    },
+    "k5": {
+      "vgpr": 136,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1197,
+      "global_load": 80,
+      "global_store": 4,
+      "ds_load": 73,
+      "ds_store": 10,
+      "wmma": 58
+    }
+  },
+  "c256_attn_wave_bo": {
+    "baseline": {
+      "vgpr": 136,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1149,
+      "global_load": 80,
+      "global_store": 2,
+      "ds_load": 73,
+      "ds_store": 10,
+      "wmma": 58
+    },
+    "k5": {
+      "vgpr": 136,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1149,
+      "global_load": 80,
+      "global_store": 2,
+      "ds_load": 73,
+      "ds_store": 10,
+      "wmma": 58
+    }
+  },
+  "c256_wave2": {
+    "baseline": {
+      "vgpr": 226,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4775,
+      "global_load": 526,
+      "global_store": 4,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 226,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4775,
+      "global_load": 526,
+      "global_store": 4,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bi": {
+    "baseline": {
+      "vgpr": 234,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4535,
+      "global_load": 516,
+      "global_store": 4,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 234,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4535,
+      "global_load": 516,
+      "global_store": 4,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bi_bo": {
+    "baseline": {
+      "vgpr": 234,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4497,
+      "global_load": 516,
+      "global_store": 2,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 234,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4497,
+      "global_load": 516,
+      "global_store": 2,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bi_bo_w16": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4325,
+      "global_load": 482,
+      "global_store": 2,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4325,
+      "global_load": 482,
+      "global_store": 2,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bi_w16": {
+    "baseline": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4372,
+      "global_load": 482,
+      "global_store": 4,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 242,
+      "sgpr": 26,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4372,
+      "global_load": 482,
+      "global_store": 4,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bo": {
+    "baseline": {
+      "vgpr": 226,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4735,
+      "global_load": 526,
+      "global_store": 2,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 226,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4735,
+      "global_load": 526,
+      "global_store": 2,
+      "ds_load": 145,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_bo_w16": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4558,
+      "global_load": 492,
+      "global_store": 2,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 238,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4558,
+      "global_load": 492,
+      "global_store": 2,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c256_wave2_w16": {
+    "baseline": {
+      "vgpr": 238,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4605,
+      "global_load": 492,
+      "global_store": 4,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    },
+    "k5": {
+      "vgpr": 238,
+      "sgpr": 25,
+      "lds": 32768,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4605,
+      "global_load": 492,
+      "global_store": 4,
+      "ds_load": 146,
+      "ds_store": 16,
+      "wmma": 618
+    }
+  },
+  "c64_wave2": {
+    "baseline": {
+      "vgpr": 198,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3226,
+      "global_load": 166,
+      "global_store": 4,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    },
+    "k5": {
+      "vgpr": 191,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3187,
+      "global_load": 166,
+      "global_store": 4,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    }
+  },
+  "c64_wave2_bi": {
+    "baseline": {
+      "vgpr": 199,
+      "sgpr": 26,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2996,
+      "global_load": 156,
+      "global_store": 4,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    },
+    "k5": {
+      "vgpr": 191,
+      "sgpr": 26,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2961,
+      "global_load": 156,
+      "global_store": 4,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    }
+  },
+  "c64_wave2_bi_bo": {
+    "baseline": {
+      "vgpr": 199,
+      "sgpr": 26,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2951,
+      "global_load": 156,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    },
+    "k5": {
+      "vgpr": 191,
+      "sgpr": 26,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2918,
+      "global_load": 156,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    }
+  },
+  "c64_wave2_bi_ho": {
+    "baseline": {
+      "vgpr": 199,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2910,
+      "global_load": 156,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    },
+    "k5": {
+      "vgpr": 191,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2878,
+      "global_load": 156,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    }
+  },
+  "c64_wave2_bo": {
+    "baseline": {
+      "vgpr": 198,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3180,
+      "global_load": 166,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    },
+    "k5": {
+      "vgpr": 191,
+      "sgpr": 25,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3144,
+      "global_load": 166,
+      "global_store": 2,
+      "ds_load": 21,
+      "ds_store": 16,
+      "wmma": 186
+    }
+  },
+  "c64_wave2_up": {
+    "baseline": {
+      "vgpr": 223,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4404,
+      "global_load": 198,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 16,
+      "wmma": 202
+    },
+    "k5": {
+      "vgpr": 189,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3345,
+      "global_load": 186,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 13,
+      "wmma": 202
+    }
+  },
+  "c64_wave2_up_lb": {
+    "baseline": {
+      "vgpr": 200,
+      "sgpr": 28,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4547,
+      "global_load": 190,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 16,
+      "wmma": 202
+    },
+    "k5": {
+      "vgpr": 189,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3461,
+      "global_load": 178,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 13,
+      "wmma": 202
+    }
+  },
+  "c64_wave2_up_lb_sh": {
+    "baseline": {
+      "vgpr": 197,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4526,
+      "global_load": 182,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 16,
+      "wmma": 202
+    },
+    "k5": {
+      "vgpr": 189,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3471,
+      "global_load": 176,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 13,
+      "wmma": 202
+    }
+  },
+  "c64_wave2_up_sh": {
+    "baseline": {
+      "vgpr": 219,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 4401,
+      "global_load": 190,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 16,
+      "wmma": 202
+    },
+    "k5": {
+      "vgpr": 189,
+      "sgpr": 27,
+      "lds": 8192,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3352,
+      "global_load": 184,
+      "global_store": 2,
+      "ds_load": 22,
+      "ds_store": 13,
+      "wmma": 202
+    }
+  },
+  "mh_ffn_fused_c256": {
+    "baseline": {
+      "vgpr": 102,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 884,
+      "global_load": 81,
+      "global_store": 8,
+      "ds_load": 16,
+      "ds_store": 33,
+      "wmma": 80
+    },
+    "k5": {
+      "vgpr": 102,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 884,
+      "global_load": 81,
+      "global_store": 8,
+      "ds_load": 16,
+      "ds_store": 33,
+      "wmma": 80
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_g128_qkv": {
+    "baseline": {
+      "vgpr": 96,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1627,
+      "global_load": 142,
+      "global_store": 5,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    },
+    "k5": {
+      "vgpr": 96,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1627,
+      "global_load": 142,
+      "global_store": 5,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_g128_qkv_bytein_fb": {
+    "baseline": {
+      "vgpr": 97,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1560,
+      "global_load": 156,
+      "global_store": 4,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 136
+    },
+    "k5": {
+      "vgpr": 97,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1560,
+      "global_load": 156,
+      "global_store": 4,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 136
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_g128_qkv_fb": {
+    "baseline": {
+      "vgpr": 97,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1595,
+      "global_load": 142,
+      "global_store": 4,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    },
+    "k5": {
+      "vgpr": 97,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1595,
+      "global_load": 142,
+      "global_store": 4,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_mapped_g128_qkv": {
+    "baseline": {
+      "vgpr": 93,
+      "sgpr": 23,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1886,
+      "global_load": 142,
+      "global_store": 18,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    },
+    "k5": {
+      "vgpr": 93,
+      "sgpr": 23,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1886,
+      "global_load": 142,
+      "global_store": 18,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_mapped_g128_qkv_bytein_fb": {
+    "baseline": {
+      "vgpr": 73,
+      "sgpr": 21,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1761,
+      "global_load": 86,
+      "global_store": 24,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 80
+    },
+    "k5": {
+      "vgpr": 73,
+      "sgpr": 21,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1761,
+      "global_load": 86,
+      "global_store": 24,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 80
+    }
+  },
+  "mh_ffn_fused_c256_frag_project_mapped_g128_qkv_fb": {
+    "baseline": {
+      "vgpr": 95,
+      "sgpr": 24,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1925,
+      "global_load": 142,
+      "global_store": 24,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    },
+    "k5": {
+      "vgpr": 95,
+      "sgpr": 24,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1925,
+      "global_load": 142,
+      "global_store": 24,
+      "ds_load": 98,
+      "ds_store": 52,
+      "wmma": 136
+    }
+  },
+  "mh_ffn_fused_c256_tiled": {
+    "baseline": {
+      "vgpr": 71,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 778,
+      "global_load": 65,
+      "global_store": 8,
+      "ds_load": 3,
+      "ds_store": 33,
+      "wmma": 8
+    },
+    "k5": {
+      "vgpr": 71,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 778,
+      "global_load": 65,
+      "global_store": 8,
+      "ds_load": 3,
+      "ds_store": 33,
+      "wmma": 8
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project": {
+    "baseline": {
+      "vgpr": 71,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 925,
+      "global_load": 90,
+      "global_store": 8,
+      "ds_load": 11,
+      "ds_store": 41,
+      "wmma": 24
+    },
+    "k5": {
+      "vgpr": 71,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 925,
+      "global_load": 90,
+      "global_store": 8,
+      "ds_load": 11,
+      "ds_store": 41,
+      "wmma": 24
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_g128": {
+    "baseline": {
+      "vgpr": 77,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1011,
+      "global_load": 122,
+      "global_store": 8,
+      "ds_load": 13,
+      "ds_store": 41,
+      "wmma": 28
+    },
+    "k5": {
+      "vgpr": 77,
+      "sgpr": 11,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1011,
+      "global_load": 122,
+      "global_store": 8,
+      "ds_load": 13,
+      "ds_store": 41,
+      "wmma": 28
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_g128_qkv": {
+    "baseline": {
+      "vgpr": 82,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1646,
+      "global_load": 166,
+      "global_store": 5,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 82,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1646,
+      "global_load": 166,
+      "global_store": 5,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_g128_qkv_bytein_fb": {
+    "baseline": {
+      "vgpr": 81,
+      "sgpr": 16,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1623,
+      "global_load": 165,
+      "global_store": 4,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 81,
+      "sgpr": 16,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1623,
+      "global_load": 165,
+      "global_store": 4,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 76
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_g128_qkv_fb": {
+    "baseline": {
+      "vgpr": 82,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1636,
+      "global_load": 166,
+      "global_store": 4,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 82,
+      "sgpr": 15,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1636,
+      "global_load": 166,
+      "global_store": 4,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_mapped": {
+    "baseline": {
+      "vgpr": 84,
+      "sgpr": 20,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1404,
+      "global_load": 93,
+      "global_store": 8,
+      "ds_load": 11,
+      "ds_store": 41,
+      "wmma": 24
+    },
+    "k5": {
+      "vgpr": 84,
+      "sgpr": 20,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1404,
+      "global_load": 93,
+      "global_store": 8,
+      "ds_load": 11,
+      "ds_store": 41,
+      "wmma": 24
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_mapped_g128": {
+    "baseline": {
+      "vgpr": 84,
+      "sgpr": 20,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1495,
+      "global_load": 125,
+      "global_store": 8,
+      "ds_load": 13,
+      "ds_store": 41,
+      "wmma": 28
+    },
+    "k5": {
+      "vgpr": 84,
+      "sgpr": 20,
+      "lds": 16448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1495,
+      "global_load": 125,
+      "global_store": 8,
+      "ds_load": 13,
+      "ds_store": 41,
+      "wmma": 28
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_mapped_g128_qkv": {
+    "baseline": {
+      "vgpr": 82,
+      "sgpr": 23,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1903,
+      "global_load": 166,
+      "global_store": 18,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 82,
+      "sgpr": 23,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1903,
+      "global_load": 166,
+      "global_store": 18,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_mapped_g128_qkv_bytein_fb": {
+    "baseline": {
+      "vgpr": 82,
+      "sgpr": 22,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1908,
+      "global_load": 165,
+      "global_store": 24,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 82,
+      "sgpr": 22,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1908,
+      "global_load": 165,
+      "global_store": 24,
+      "ds_load": 82,
+      "ds_store": 51,
+      "wmma": 76
+    }
+  },
+  "mh_ffn_fused_c256_tiled_project_mapped_g128_qkv_fb": {
+    "baseline": {
+      "vgpr": 82,
+      "sgpr": 24,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1937,
+      "global_load": 166,
+      "global_store": 24,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    },
+    "k5": {
+      "vgpr": 82,
+      "sgpr": 24,
+      "lds": 21568,
+      "priv": 0,
+      "spill": 0,
+      "insts": 1937,
+      "global_load": 166,
+      "global_store": 24,
+      "ds_load": 83,
+      "ds_store": 52,
+      "wmma": 76
+    }
+  },
+  "mh_pool_project_fused_c256": {
+    "baseline": {
+      "vgpr": 256,
+      "sgpr": 27,
+      "lds": 0,
+      "priv": 336,
+      "spill": 16,
+      "insts": 1396,
+      "global_load": 96,
+      "global_store": 8,
+      "ds_load": 0,
+      "ds_store": 0,
+      "wmma": 64
+    },
+    "k5": {
+      "vgpr": 256,
+      "sgpr": 27,
+      "lds": 0,
+      "priv": 336,
+      "spill": 16,
+      "insts": 1396,
+      "global_load": 96,
+      "global_store": 8,
+      "ds_load": 0,
+      "ds_store": 0,
+      "wmma": 64
+    }
+  },
+  "mh_pool_project_group_c256": {
+    "baseline": {
+      "vgpr": 98,
+      "sgpr": 21,
+      "lds": 8448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3027,
+      "global_load": 72,
+      "global_store": 32,
+      "ds_load": 2,
+      "ds_store": 16,
+      "wmma": 8
+    },
+    "k5": {
+      "vgpr": 98,
+      "sgpr": 21,
+      "lds": 8448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3027,
+      "global_load": 72,
+      "global_store": 32,
+      "ds_load": 2,
+      "ds_store": 16,
+      "wmma": 8
+    }
+  },
+  "mh_pool_project_group_c256_f8w16": {
+    "baseline": {
+      "vgpr": 88,
+      "sgpr": 21,
+      "lds": 4224,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3040,
+      "global_load": 68,
+      "global_store": 32,
+      "ds_load": 1,
+      "ds_store": 16,
+      "wmma": 8
+    },
+    "k5": {
+      "vgpr": 88,
+      "sgpr": 21,
+      "lds": 4224,
+      "priv": 0,
+      "spill": 0,
+      "insts": 3040,
+      "global_load": 68,
+      "global_store": 32,
+      "ds_load": 1,
+      "ds_store": 16,
+      "wmma": 8
+    }
+  },
+  "mh_pool_project_group_c256_out8": {
+    "baseline": {
+      "vgpr": 98,
+      "sgpr": 21,
+      "lds": 8448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2771,
+      "global_load": 72,
+      "global_store": 32,
+      "ds_load": 2,
+      "ds_store": 16,
+      "wmma": 8
+    },
+    "k5": {
+      "vgpr": 98,
+      "sgpr": 21,
+      "lds": 8448,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2771,
+      "global_load": 72,
+      "global_store": 32,
+      "ds_load": 2,
+      "ds_store": 16,
+      "wmma": 8
+    }
+  },
+  "mh_pool_project_group_c256_out8_f8w16": {
+    "baseline": {
+      "vgpr": 88,
+      "sgpr": 21,
+      "lds": 4224,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2782,
+      "global_load": 68,
+      "global_store": 32,
+      "ds_load": 1,
+      "ds_store": 16,
+      "wmma": 8
+    },
+    "k5": {
+      "vgpr": 88,
+      "sgpr": 21,
+      "lds": 4224,
+      "priv": 0,
+      "spill": 0,
+      "insts": 2782,
+      "global_load": 68,
+      "global_store": 32,
+      "ds_load": 1,
+      "ds_store": 16,
+      "wmma": 8
+    }
+  }
+}

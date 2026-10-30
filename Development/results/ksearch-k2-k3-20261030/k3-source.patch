@@ -1,0 +1,34 @@
+--- a/hip/wave_owned_c32.inc
++++ b/hip/wave_owned_c32.inc
+@@ -1,3 +1,6 @@
++#ifndef CW_POST_HOIST_SCALES
++#define CW_POST_HOIST_SCALES 0
++#endif
+ #ifndef CW_OUTPROJ_HOIST
+ #define CW_OUTPROJ_HOIST 0
+ #endif
+@@ -238,6 +241,15 @@
+    }
+   }
+  }
++ float post_s0[2][8], post_s1[2][8];
++ if constexpr(CW_POST_HOIST_SCALES && Post && CW_VEC_INPUT){
++  const uint g0=__builtin_amdgcn_workitem_id_x()>>4;
++  _Pragma("unroll") for(uint ci=0;ci<2;ci++){
++   const uint c0=ci*16+g0*8;
++   __builtin_memcpy(post_s0[ci],__builtin_assume_aligned(scales+c0,32),32);
++   __builtin_memcpy(post_s1[ci],__builtin_assume_aligned(scales+32+c0,32),32);
++  }
++ }
+ #if CW_ROLL_WINDOW
+  _Pragma("clang loop unroll(disable)")
+ #else
+@@ -322,7 +334,7 @@
+       float lo[8],s0[8],s1[8];unsigned long long sk;
+       if constexpr(InByte){unsigned long long lb;__builtin_memcpy(&lb,__builtin_assume_aligned(in+low*32+c0,8),8);for(uint e=0;e<8;e++)lo[e]=__builtin_amdgcn_cvt_f32_fp8(int((lb>>(8*e))&255u),0);}
+       else __builtin_memcpy(lo,__builtin_assume_aligned(reinterpret_cast<const float*>(in)+low*32+c0,32),32);
+-      __builtin_memcpy(s0,__builtin_assume_aligned(scales+c0,32),32);__builtin_memcpy(s1,__builtin_assume_aligned(scales+32+c0,32),32);
++      if constexpr(CW_POST_HOIST_SCALES){__builtin_memcpy(s0,post_s0[ci],32);__builtin_memcpy(s1,post_s1[ci],32);}else{__builtin_memcpy(s0,__builtin_assume_aligned(scales+c0,32),32);__builtin_memcpy(s1,__builtin_assume_aligned(scales+32+c0,32),32);}
+       __builtin_memcpy(&sk,__builtin_assume_aligned(skip+p*32+c0,8),8);
+       for(uint e=0;e<8;e++){float high=__builtin_amdgcn_cvt_f32_fp8(int((sk>>(8*e))&255u),0);src[e]=Hrtz(Hrtz(lo[e]*s0[e])+high*s1[e]);}
+      }else if constexpr(InByte){unsigned long long ib;__builtin_memcpy(&ib,__builtin_assume_aligned(in+(uint(y)*width+uint(x))*32+c0,8),8);for(uint e=0;e<8;e++)src[e]=__builtin_amdgcn_cvt_f32_fp8(int((ib>>(8*e))&255u),0);}

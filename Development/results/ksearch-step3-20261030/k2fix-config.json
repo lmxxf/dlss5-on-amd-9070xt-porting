@@ -1,0 +1,49 @@
+{
+  "role": "k2fix",
+  "modules": {
+    "vit-stream-fast.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/vit-stream-fast.hsaco",
+    "vit-stream.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/vit-stream.hsaco",
+    "c512-m32-deep.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/c512-m32-deep.hsaco",
+    "c512-m32-mh.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/c512-m32-mh.hsaco",
+    "deep_fast.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/deep_fast.hsaco",
+    "vit-wide-deep.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/vit-wide-deep.hsaco",
+    "multihead-fast-padded-wave.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/multihead-fast-padded-wave.hsaco",
+    "multihead-fast-padded-wave-packed.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/multihead-fast-padded-wave-packed.hsaco",
+    "deep_fast-packed-fast.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/deep_fast-packed-fast.hsaco",
+    "deep_fast-packed.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/deep_fast-packed.hsaco"
+  },
+  "same_host": false,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-profile.exe",
+  "env": {},
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\profile-base.exe",
+      "sha256": "ddb8fd36fd4cec229e0b1118aafffdb1418e8566caf28d390059a2e03a4b8358"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-frame-standard.exe",
+      "sha256": "944bc009e70a628ac31a77da9bd8cbf25adbc052e4f3d9471611ce5aeec06225"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-frame-window.exe",
+      "sha256": "99e756401515d67fad356e8f11155436d60b9bd8ef25092e41a81a11bd6df4ef"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\k2fix-profile.exe",
+      "sha256": "fadbfdc3502276f47ca08539b4b2fcb320d01dcb92676274ab4856cf6b91bb77"
+    }
+  ],
+  "base_frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+  "base_frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+  "base_profile_exe": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\profile-base.exe"
+}

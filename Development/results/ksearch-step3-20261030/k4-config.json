@@ -1,0 +1,26 @@
+{
+  "role": "k4",
+  "modules": {
+    "swin-persistent.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/swin-persistent-k4j.hsaco",
+    "swin-persistent-fast.hsaco": "Development/results/ksearch-step3-20261030/work/comgr-out/gfx1201/swin-persistent-fast-k4j.hsaco"
+  },
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\profile-base.exe",
+  "env": {},
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\payload\\profile-base.exe",
+      "sha256": "ddb8fd36fd4cec229e0b1118aafffdb1418e8566caf28d390059a2e03a4b8358"
+    }
+  ]
+}

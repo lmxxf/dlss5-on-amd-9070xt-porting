@@ -1,0 +1,14 @@
+=== k3 original1088 ===
+  total_ms            : 7973.990 -> 7976.537 us (delta   +2.547 us, 1/3 rounds)
+  c512_ffn_proj_ms    :  151.763 ->  151.473 us (delta   -0.290 us, 3/3 rounds)
+  c512_attn_proj_ms   :  174.230 ->  174.093 us (delta   -0.137 us, 2/3 rounds)
+  c512_pair_ms        :  325.993 ->  325.567 us (delta   -0.427 us, 2/3 rounds)
+  c32_post_ms         :  710.257 ->  711.217 us (delta   +0.960 us, 2/3 rounds)
+  c32_stage_ms        : 2745.267 -> 2744.227 us (delta   -1.040 us, 2/3 rounds)
+=== k3 small1080 ===
+  total_ms            : 4775.873 -> 4765.067 us (delta  -10.807 us, 2/3 rounds)
+  c512_ffn_proj_ms    :   41.337 ->   41.177 us (delta   -0.160 us, 2/3 rounds)
+  c512_attn_proj_ms   :   49.320 ->   49.253 us (delta   -0.067 us, 2/3 rounds)
+  c512_pair_ms        :   90.657 ->   90.430 us (delta   -0.227 us, 2/3 rounds)
+  c32_post_ms         :  744.510 ->  741.690 us (delta   -2.820 us, 3/3 rounds)
+  c32_stage_ms        : 2192.197 -> 2186.070 us (delta   -6.127 us, 3/3 rounds)

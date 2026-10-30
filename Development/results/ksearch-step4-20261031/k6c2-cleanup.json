@@ -1,0 +1,1407 @@
+{
+    "case":  "k6c2",
+    "removed":  [
+                    {
+                        "bytes":  366880,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead_fused_attention.hsaco"
+                    },
+                    {
+                        "bytes":  66504,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_wmma.hsaco"
+                    },
+                    {
+                        "bytes":  39472,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_fused_attention.hsaco"
+                    },
+                    {
+                        "bytes":  862272,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32-wave1.hsaco"
+                    },
+                    {
+                        "bytes":  66824,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-reference.hsaco"
+                    },
+                    {
+                        "bytes":  1736512,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c64-wave2.hsaco"
+                    },
+                    {
+                        "bytes":  46704,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\wave-pointwise.hsaco"
+                    },
+                    {
+                        "bytes":  734496,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\vit-stream-fast.hsaco"
+                    },
+                    {
+                        "bytes":  50904,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\boundary-fast.hsaco"
+                    },
+                    {
+                        "bytes":  77496,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\prefix_fast.hsaco"
+                    },
+                    {
+                        "bytes":  1846080,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c64-wave2-fast.hsaco"
+                    },
+                    {
+                        "bytes":  831808,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32-wave1-fast.hsaco"
+                    },
+                    {
+                        "bytes":  93264,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-wmma.hsaco"
+                    },
+                    {
+                        "bytes":  1296904,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\swin-persistent.hsaco"
+                    },
+                    {
+                        "bytes":  35784,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_prefix_reference.hsaco"
+                    },
+                    {
+                        "bytes":  12888,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multi-pass-skin.hsaco"
+                    },
+                    {
+                        "bytes":  723488,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\vit-stream.hsaco"
+                    },
+                    {
+                        "bytes":  29568,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_fast_attention.hsaco"
+                    },
+                    {
+                        "bytes":  31536,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_tiled.hsaco"
+                    },
+                    {
+                        "bytes":  49072,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-tiled.hsaco"
+                    },
+                    {
+                        "bytes":  648312,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c512-m32-deep.hsaco"
+                    },
+                    {
+                        "bytes":  1115720,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c512-m32-mh.hsaco"
+                    },
+                    {
+                        "bytes":  831808,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32-wave1-fast-norm900.hsaco"
+                    },
+                    {
+                        "bytes":  609656,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\deep_fast.hsaco"
+                    },
+                    {
+                        "bytes":  17832,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\boundary_reference.hsaco"
+                    },
+                    {
+                        "bytes":  38056,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_fast.hsaco"
+                    },
+                    {
+                        "bytes":  617520,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\vit-wide-deep.hsaco"
+                    },
+                    {
+                        "bytes":  1223032,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-fast-padded-wave.hsaco"
+                    },
+                    {
+                        "bytes":  82616,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\deep_wmma.hsaco"
+                    },
+                    {
+                        "bytes":  1465736,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\swin-persistent-fast.hsaco"
+                    },
+                    {
+                        "bytes":  286528,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_fused_ffn_attention.hsaco"
+                    },
+                    {
+                        "bytes":  14328,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multi-pass-predict.hsaco"
+                    },
+                    {
+                        "bytes":  867648,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32-wave1-rtz.hsaco"
+                    },
+                    {
+                        "bytes":  1279856,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-fast-padded-wave-packed.hsaco"
+                    },
+                    {
+                        "bytes":  219328,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\c32_fused_ffn_attention-packed.hsaco"
+                    },
+                    {
+                        "bytes":  708816,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\deep_fast-packed-fast.hsaco"
+                    },
+                    {
+                        "bytes":  104904,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-fast-packed.hsaco"
+                    },
+                    {
+                        "bytes":  712144,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\deep_fast-packed.hsaco"
+                    },
+                    {
+                        "bytes":  106952,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\multihead-fast.hsaco"
+                    },
+                    {
+                        "bytes":  70312,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\modules\\deep_reference.hsaco"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1152-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original1088-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-original960-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small900-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small720-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-small1080-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713451,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  3279360,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  1229847,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  3279360,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  1229847,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  3279360,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  1229847,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  3279360,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  1229847,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\gold-smallwindow-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r1-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r2-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small900-r3-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r1-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r2-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-small1080-r3-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r1-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r2-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original960-r3-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r1-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r2-3-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-0-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-0-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-0-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-0-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-0-baseline\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-1-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-1-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-1-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-1-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-1-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4718203,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-2-candidate\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-2-candidate\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-2-candidate\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-2-candidate\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-2-candidate\\out.ppm"
+                    },
+                    {
+                        "bytes":  4713963,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-3-baseline\\frame.exe"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-3-baseline\\out-first.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-3-baseline\\out-first.ppm"
+                    },
+                    {
+                        "bytes":  7464960,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-3-baseline\\out.f16"
+                    },
+                    {
+                        "bytes":  2799448,
+                        "path":  "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\k6c2\\perf-original1088-r3-3-baseline\\out.ppm"
+                    }
+                ],
+    "gpu_lock_present":  false,
+    "D_free_bytes":  231508017152
+}

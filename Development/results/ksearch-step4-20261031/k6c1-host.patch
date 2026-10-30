@@ -1,0 +1,88 @@
+--- Development/HIP/hip_reference_network.h	2026-10-29 17:20:42.272055086 +0800
++++ Development/results/ksearch-step4-20261031/work/k6c1-host/Development/HIP/hip_reference_network.h	2026-10-31 01:56:52.990587915 +0800
+@@ -116,7 +116,7 @@
+ #define HIP_VIT_W16 7 /* 2026-10-14: ViT expand (bit0=1) + compact contract (bit1=2) + compact projection (bit2=4) weights in FragmentPackedMatrixW16 layout (vit_expand_blocked_fp8_frag_bytein_w16, vit_stream_contract_frag_bout_compactw_w16, vit_stream_project_n64_bb_compactw_w16); 7 = all three W16, 0 = Frag8; NR_VIT_W16 / DLSS5_HIP_VIT_W16 overrides */
+ #endif
+ #ifndef HIP_VIT_INTER_BYTE
+-#define HIP_VIT_INTER_BYTE 15 /* 2026-10-14: bitmask for 1-byte E4M3 inter-kernel stream (bit0=1: ViT blocks 31..37->32..38; bit1=2: Down(8)/Down(14) c64/c128_hin_out8 -> Block 9/15 _bi; bit2=4: Down(30) c512_out8 -> vit_gather_b8 -> Block 31..38 -> vit_gather_b8 -> Up(39) _bin; bit3=8: Down(22) c256_out8 -> C512 Blocks 23..30 & Up(39) _byteout -> C512 Blocks 40..47); 15 = all enabled, 1 = ViT inter-block only, 0 = disabled; NR_VIT_INTER_BYTE / DLSS5_HIP_VIT_INTER_BYTE overrides */
++#define HIP_VIT_INTER_BYTE 31 /* 2026-10-14: bitmask for 1-byte E4M3 inter-kernel stream (bit0=1: ViT blocks 31..37->32..38; bit1=2: Down(8)/Down(14) c64/c128_hin_out8 -> Block 9/15 _bi; bit2=4: Down(30) c512_out8 -> vit_gather_b8 -> Block 31..38 -> vit_gather_b8 -> Up(39) _bin; bit3=8: Down(22) c256_out8 -> C512 Blocks 23..30 & Up(39) _byteout -> C512 Blocks 40..47); 15 = all enabled, 1 = ViT inter-block only, 0 = disabled; NR_VIT_INTER_BYTE / DLSS5_HIP_VIT_INTER_BYTE overrides */
+ #endif
+ #ifndef HIP_C32_RTZ_TALL
+ #define HIP_C32_RTZ_TALL 1 /* 2026-10-03: 1080 tier (1920x1152 / 1920x1088) loads c32-wave1-rtz.hsaco (same recipe + HIP_C32_RTZ_ISA 2, builtin Hrtz) under the c32_wave1 key when the file exists; 900/720/free geometry and missing file = c32-wave1.hsaco. Bit-exact (2^32 check); 900 kept old because one ABBA round was slower (results/ideas-yami-ikaruga-20261002) */
+@@ -766,6 +766,15 @@
+  static int C512W16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_W16");if(!v||!*v)return int(HIP_C512_W16);return std::atoi(v);}();return m;}
+  static int C512FfnW16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_FFN_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_FFN_W16");if(!v||!*v)return int(HIP_C512_FFN_W16);return std::atoi(v);}();return m;}
+  unsigned long long c512_w16_calls=0,c512_stock_calls=0,c512_ffn_w16_calls=0,c512_ffn_stock_calls=0;
++ bool c512_ffn_w16_cached_ok=false,c512_w16_fb8_cached_ok=false,c512_w16_ffn_cached_ok=false,c512_w16_mh_cached_ok=false;
++ void InitC512Cache(){
++  if(!c512_m32_active||!opt.fast_deep||!opt.fast_mh)return;
++  const int ffn_w16m=C512FfnW16Mode(),w16m=C512W16Mode();
++  c512_ffn_w16_cached_ok=ffn_w16m>0&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep",ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec":"split_ffn_one_w2f8_w16")&&HasFn("c512_m32_deep",ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec_bin":"split_ffn_one_w2f8_w16_bin");
++  c512_w16_fb8_cached_ok=w16m>=2&&(VitInterByteMode()&16)&&HasFn("deep_fast","split_projection_frag_w16_nof32")&&HasFn("deep_fast","split_projection_frag_w16_nof32_bskip")&&HasFn("mh_fast","mh_attention_project_frag_c512_w16_u4_fb8")&&HasFn("mh_fast","mh_attention_project_frag_c512_w16_u4_fb8_bout");
++  c512_w16_ffn_cached_ok=w16m>0&&HasFn("deep_fast","split_projection_frag_w16")&&HasFn("deep_fast","split_projection_frag_w16_bskip");
++  c512_w16_mh_cached_ok=w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")&&HasFn("mh_fast",w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout");
++ }
+  Tensor CompactC512Body(Tensor input,U w,U h,U ww,U hh,U sx,U sy,U block,bool raw,bool byte_in=false,bool byte_out=false){
+   U valid=w*h,n=(valid+15)&~15u;
+   auto compact=input;
+@@ -774,7 +783,7 @@
+   const bool fpf=!byte_in&&HIP_C512_FFN_PROJ_FUSE&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&!HIP_C512_PROJ_FB8&&HasFn("c512_m32_deep","split_ffn_proj_fused");
+   const int ffn_w16m=C512FfnW16Mode();
+   const char*ffn_w16_fn=byte_in?(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec_bin":"split_ffn_one_w2f8_w16_bin"):(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec":"split_ffn_one_w2f8_w16");
+-  const bool ffn_w16=!fpf&&ffn_w16m>0&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep",ffn_w16_fn);
++  const bool ffn_w16=!fpf&&(c512_ffn_w16_cached_ok||(ffn_w16m>0&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep",ffn_w16_fn)));
+   if(ffn_w16)++c512_ffn_w16_calls;else ++c512_ffn_stock_calls;
+   if(fpf)Run("c512_m32_deep","split_ffn_proj_fused",size_t(n)*512,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd")),PackedSplitProjectionFrag(Block(block,"ffwd-projection")),P(ffn),P(ffn8),n);
+   else if(ffn_w16)Run("c512_m32_deep",ffn_w16_fn,size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd"),true),P(contract8),n);
+@@ -785,9 +794,9 @@
+   Run("deep","split_ffn_fused_fp8_t8",size_t(n)*512,P(mixed),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(contract),P(contract8),n);}
+   mixed.reset();
+   const int w16m=C512W16Mode();
+-  const bool w16_fb8=w16m>=2&&(VitInterByteMode()&16)&&HasFn("deep_fast",byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32")&&HasFn("mh_fast",byte_out?"mh_attention_project_frag_c512_w16_u4_fb8_bout":"mh_attention_project_frag_c512_w16_u4_fb8");
+-  const bool w16_ffn=w16_fb8||(w16m>0&&HasFn("deep_fast",byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"));
+-  const bool w16_mh=w16_fb8||(w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")));
++  const bool w16_fb8=c512_w16_fb8_cached_ok||(w16m>=2&&(VitInterByteMode()&16)&&HasFn("deep_fast",byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32")&&HasFn("mh_fast",byte_out?"mh_attention_project_frag_c512_w16_u4_fb8_bout":"mh_attention_project_frag_c512_w16_u4_fb8"));
++  const bool w16_ffn=w16_fb8||c512_w16_ffn_cached_ok||(w16m>0&&HasFn("deep_fast",byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"));
++  const bool w16_mh=w16_fb8||c512_w16_mh_cached_ok||(w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")));
+   if(w16_ffn&&w16_mh){++c512_w16_calls;if(w16_fb8)++vit_inter_byte_calls;}else ++c512_stock_calls;
+   const bool fb8=!byte_in&&!byte_out&&!w16_mh&&HIP_C512_PROJ_FB8&&HasFn("deep_fast","split_projection_frag_nof32")&&HasFn("mh_fast","mh_attention_project_frag_c512_fb8");
+   if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
+@@ -795,9 +804,9 @@
+   auto av=New(size_t(n)*128);
+   void*att_w=PackedMhWeightQkvFrag(Block(block,"attention"),512,w16_mh);
+   Run("c512_m32_mh",w16_mh?"c512_qkv_attention_compact_w16":"c512_qkv_attention_compact",size_t(ww)*hh/64*16,P(ffn8),att_w,P(av),w,h,ww,hh,sx,sy);
+-  if(!fb8&&!w16_fb8)ffn8.reset();
++  void*ffn8_ptr=P(ffn8);if(!fb8)ffn8.reset();
+   auto result=HIP_C512_PAD16?NewPad16(valid,512,byte_out):New(size_t(valid)*512/(byte_out?4:1));
+-  Run("mh_fast",w16_fb8?(byte_out?"mh_attention_project_frag_c512_w16_u4_fb8_bout":"mh_attention_project_frag_c512_w16_u4_fb8"):fb8?"mh_attention_project_frag_c512_fb8":w16_mh?(byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")):"mh_attention_project_frag_c512",size_t(n)*512,P(av),(fb8||w16_fb8)?P(ffn8):P(ffn),att_w,P(result),n,U(raw?3:0),w,h,w,U(0),U(0));
++  Run("mh_fast",w16_fb8?(byte_out?"mh_attention_project_frag_c512_w16_u4_fb8_bout":"mh_attention_project_frag_c512_w16_u4_fb8"):fb8?"mh_attention_project_frag_c512_fb8":w16_mh?(byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")):"mh_attention_project_frag_c512",size_t(n)*512,P(av),(fb8||w16_fb8)?ffn8_ptr:P(ffn),att_w,P(result),n,U(raw?3:0),w,h,w,U(0),U(0));
+   Stage("block"+std::to_string(block),result);return result;
+  }
+ #include "swin_persistent_network.h"
+@@ -1015,7 +1024,7 @@
+ if(opt.fast_deep){const std::string deep_stem=opt.packed_weights?"deep_fast-packed":"deep_fast";Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+FastTwin(deep_stem)+".hsaco").c_str()),"deep fast module");modules["deep_fast"]=m;}
+ if(opt.fast_mh){const std::string mh_stem=opt.packed_weights?(opt.mh_wave?"multihead-fast-padded-wave-packed":"multihead-fast-packed"):(opt.mh_wave?"multihead-fast-padded-wave":"multihead-fast");Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+FastTwin(mh_stem)+".hsaco").c_str()),"MH fast module");modules["mh_fast"]=m;}
+  /* free geometry: the per-slot tile counters (PDL_SLOTS, one per 16 C64 tokens) cover processing surfaces up to 4.19M pixels; larger free sizes run without PDL */
+- PreflightPdl();
++ PreflightPdl();InitC512Cache();
+ if(opt.fast_prefix){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/prefix_fast.hsaco").c_str()),"prefix fast module");modules["prefix_fast"]=m;}
+ if(opt.fused_c32){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/c32_fused_attention.hsaco").c_str()),"fused attention module");modules["c32_fused"]=m;}
+ if(opt.fast_c32){const char*f[][2]={{"c32_fast_ffn","c32_fast.hsaco"},{"c32_fast_attention","c32_fast_attention.hsaco"},{"boundary_fast","boundary-fast.hsaco"}};for(auto&v:f){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.tiled){const char*t[][2]={{"c32_tiled","c32_tiled.hsaco"},{"mh_tiled","multihead-tiled.hsaco"}};for(auto&v:t){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/"+v[1]).c_str()),v[1]);modules[v[0]]=m;}}if(opt.wave){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/wave-pointwise.hsaco").c_str()),"wave module");modules["wave"]=m;}if(HIP_POOL64_BYTE_EDGE&&wave_owned_active&&opt.mh_byte_stream&&opt.mh_project_crop&&opt.mh_input_mapped&&opt.elide_identity_shift&&opt.grouped_mh_contract&&opt.packed_weights&&opt.mh_proj_diag_fb&&opt.pool32_h16w&&opt.fast_mh&&!opt.skip_blocks.count(5)&&!observer&&opt.dump_dir.empty()){
+@@ -1111,7 +1120,7 @@
+  void SetNoise(const std::vector<float>&noise){if(!opt.fast_prefix&&noise.size()!=50331648)throw std::runtime_error("noise size");api.Check(api.hipStreamSynchronize(stream),"set noise");ClearGraph();graph_warmed=false;device_noise=opt.fast_prefix?Tensor{}:Upload(noise.data(),noise.size()*4,true);}
+  private: void ConfigureSubmitPulse(bool platform_scope,bool driver_validated)noexcept{
+   pulse_platform_scope=platform_scope;pulse_driver_validated=driver_validated;
+-  const bool requested=opt.submit_pulse!=0&&!small_active;
++  const bool requested=opt.submit_pulse!=0;
+   if(requested&&PulseProfileCompatible()&&platform_scope){try{pulse_capabilities_ok=CheckPulseCapabilities();}catch(const std::exception&e){std::fprintf(stderr,"submit_pulse capabilities unavailable (%s); old NN remains attempted\n",e.what());}}
+   unsigned reject=PulseRejectMask();
+   bool active=pulse_lease.Configure(requested,!reject,1,0);
+@@ -1134,7 +1143,7 @@
+   return true;
+  }
+  bool PulseProfileCompatible()const noexcept{return opt.runtime==7&&opt.pooled&&opt.wmma&&opt.wave&&opt.fast_prefix&&opt.fast_c32&&opt.fast_mh&&opt.fast_deep&&opt.packed_weights&&opt.packed_c32&&opt.fp8_normalized&&opt.fp8_av&&opt.fp8_deep&&opt.raw_chain&&opt.prefix_inline&&opt.fused_qkv_norm&&opt.ffn_qkv&&opt.ffn_qkv_max_c==256&&opt.grouped_mh_contract&&opt.split_ffn_fused&&opt.split_mix_blocked&&opt.split_project_blocked&&opt.vit_qkv_fused&&opt.vit_attn_fused&&opt.vit_qkv_fp8&&opt.vit_contract_frag&&opt.vit_weight_mask==1&&opt.vit_pack_input&&opt.mh_project_crop&&opt.pool_project_group&&opt.wave_owned&&final_direct_compatible&&opt.dup_prefix.empty()&&opt.mh_byte_stream&&opt.mh_ffn_frag256&&opt.decoder_byte&&opt.c512_m32&&opt.vit_proj_n64&&opt.vit_stream==3&&opt.swin_run&&!opt.vit_byte_stream&&!opt.vit_half_stream&&!opt.vit_qkv_n4&&!opt.vit_split_k&&!opt.sparse_weights;}
+- unsigned PulseRejectMask(bool at_site=false)const noexcept{const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");return (small_active?4194304u:0u)|(pulse_frame_history?1u:0u)|(!pulse_platform_scope?131072u:0u)|(opt.submit_pulse==2&&!pulse_driver_validated?262144u:0u)|(!PulseProfileCompatible()||!pulse_capabilities_ok?524288u:0u)|(pulse_bridge_diagnostics?2097152u:0u)|(at_site&&!SwinRunActive()?1048576u:0u)|(opt.graph?2u:0u)|(opt.profile?4u:0u)|(opt.wall_profile?8u:0u)|(opt.experimental_temporal?16u:0u)|(opt.temporal_feature_tap?32u:0u)|(!opt.skip_blocks.empty()?64u:0u)|(multi_pass!=1?128u:0u)|(multi_pass==3&&multi_predict?256u:0u)|(multi_skin?512u:0u)|((ae&&*ae&&std::strcmp(ae,"0"))?1024u:0u)|(pdl_anyorder?2048u:0u)|(at_site&&!pulse_ordered_down_c256?65536u:0u)|(!opt.pool_project_group?32768u:0u)|(!fast_numeric?8192u:0u)|(!((W==1600&&H==960)||(W==1920&&H==1152))?16384u:0u);}
++ unsigned PulseRejectMask(bool at_site=false)const noexcept{const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");const bool shape_ok=small_active?((W==1920&&(H==1152||H==1088))||(W==1600&&H==1024)||(W==1344&&H==768)||(free_geometry&&W==896&&H==512)):((W==1600&&H==960)||(W==1920&&(H==1152||H==1088)));return (pulse_frame_history?1u:0u)|(!pulse_platform_scope?131072u:0u)|(opt.submit_pulse==2&&!pulse_driver_validated?262144u:0u)|(!PulseProfileCompatible()||!pulse_capabilities_ok?524288u:0u)|(pulse_bridge_diagnostics?2097152u:0u)|(at_site&&!small_active&&!SwinRunActive()?1048576u:0u)|(opt.graph?2u:0u)|(opt.profile?4u:0u)|(opt.wall_profile?8u:0u)|(opt.experimental_temporal?16u:0u)|(opt.temporal_feature_tap?32u:0u)|(!opt.skip_blocks.empty()?64u:0u)|(multi_pass!=1?128u:0u)|(multi_pass==3&&multi_predict?256u:0u)|(multi_skin?512u:0u)|((ae&&*ae&&std::strcmp(ae,"0"))?1024u:0u)|(pdl_anyorder?2048u:0u)|(at_site&&!pulse_ordered_down_c256?65536u:0u)|(!opt.pool_project_group?32768u:0u)|(!fast_numeric?8192u:0u)|(!shape_ok?16384u:0u);}
+  bool PulseEligible()const noexcept{return PulseRejectMask()==0;}
+  // Optional raster auxiliary output: two floats per processing pixel, FP32 logit
+  // followed by the selected module's Hrtz diagnostic value (identity in FAST1). Caller owns the device buffer until

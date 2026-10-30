@@ -1,0 +1,99 @@
+{
+  "name": "k4hi-comgr-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4h.hip",
+      "sha256": "841dfdac822e1f51e02b7e21a98ef22ce0ee8326d6b9bb448c27ee18568bc369"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4h.hip",
+      "sha256": "464a4869fa4f11f9d8a03f1404825ad239b7698b721af6701beb101f7777e905"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4i.hip",
+      "sha256": "13e2e2d5b0326e9ebeeafd68445b1cc5a91f14e1072982e1c5f9f4434e13b102"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4i.hip",
+      "sha256": "17ede167b7022b62dda33f17eeafc8f7258c50e86fe60fbc2ad2670e7ba3a83c"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/gfx1200-swin-persistent-k4h",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-k4h.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4h.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent-k4h",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-k4h.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4h.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1200-swin-persistent-fast-k4h",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast-k4h.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4h.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent-fast-k4h",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast-k4h.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4h.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1200-swin-persistent-k4i",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-k4i.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4i.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent-k4i",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-k4i.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-k4i.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1200-swin-persistent-fast-k4i",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast-k4i.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4i.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent-fast-k4i",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast-k4i.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-step3-20261030\\k4-generated\\swin-persistent-fast-k4i.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+=== k2 original1088 ===
+  total_ms            : 7903.450 -> 7869.017 us (delta  -34.433 us, 3/3 rounds)
+  c512_ffn_proj_ms    :  149.577 ->  133.317 us (delta  -16.260 us, 3/3 rounds)
+  c512_attn_proj_ms   :  171.533 ->  168.213 us (delta   -3.320 us, 3/3 rounds)
+  c512_pair_ms        :  321.110 ->  301.530 us (delta  -19.580 us, 3/3 rounds)
+  c32_post_ms         :  707.977 ->  706.097 us (delta   -1.880 us, 2/3 rounds)
+  c32_stage_ms        : 2734.757 -> 2732.630 us (delta   -2.127 us, 3/3 rounds)
+=== k2 small1080 ===
+  total_ms            : 4753.803 -> 4750.823 us (delta   -2.980 us, 2/3 rounds)
+  c512_ffn_proj_ms    :   41.363 ->   37.673 us (delta   -3.690 us, 3/3 rounds)
+  c512_attn_proj_ms   :   49.607 ->   47.097 us (delta   -2.510 us, 3/3 rounds)
+  c512_pair_ms        :   90.970 ->   84.770 us (delta   -6.200 us, 3/3 rounds)
+  c32_post_ms         :  740.887 ->  742.727 us (delta   +1.840 us, 1/3 rounds)
+  c32_stage_ms        : 2183.170 -> 2186.343 us (delta   +3.173 us, 1/3 rounds)

@@ -586,38 +586,17 @@ DEV void mh_attention_project_frag_c512_w16_body(const unsigned char*av8,const f
  const uint C=512;uint l=__builtin_amdgcn_workitem_id_x(),rc=l&15,g=l>>4,block=__builtin_amdgcn_workgroup_id_x(),first=block/8*16,col=block%8*64;if(first>=tokens)return;
  const unsigned char*wb=reinterpret_cast<const unsigned char*>(w)+size_t(3)*C*C*4;const uint skip=4*C*C+(C/32)*4096+C/32;
  typedef int w16_i4 __attribute__((ext_vector_type(4)));
- if constexpr(FB8){
-  const unsigned char*feat8=reinterpret_cast<const unsigned char*>(feature);
-  const uint p=first+rc;const bool live=p<tokens;const uint pp=live?p:first;
-  f8 acc[4];
-  _Pragma("unroll") for(uint n=0;n<4;n++){uint c0=col+n*16+g*8;i2 fb;__builtin_memcpy(&fb,feat8+((pp/16)*16+c0/32)*512+(pp%16)*32+c0%32,8);
-   float wv[8];__builtin_memcpy(wv,__builtin_assume_aligned(w+skip+c0,16),32);
-   _Pragma("unroll") for(uint e=0;e<8;e++){float fv=__builtin_amdgcn_cvt_f32_fp8(int((uint(fb[e/4])>>(8*(e%4)))&255u),0);float h=Hrtz(fv*wv[e]);__asm__ volatile("":"+v"(h));acc[n][e]=live?h:0.f;}}
-  const unsigned char*arow=av8+(live?p:first)*C+g*8;
-  _Pragma("unroll 4") for(uint k=0;k<C;k+=32){uint gs=k/32;
-   i2 a0,a1;__builtin_memcpy(&a0,arow+k,8);__builtin_memcpy(&a1,arow+k+16,8);
-   a0=live?a0:i2{};a1=live?a1:i2{};
-   _Pragma("unroll") for(uint n=0;n<4;n++){uint n0=col+n*16+rc;w16_i4 bw;__builtin_memcpy(&bw,wb+((n0/16)*16+gs)*512+(g*16+n0%16)*16,16);
-    i2 b0={bw[0],bw[1]},b1={bw[2],bw[3]};
-    acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b0,a0,acc[n]);
-    acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b1,a1,acc[n]);}}
-  if(!live)return;
-  uint dest_p=p;
-  if(cropw){uint x=p%workw,y=p/workw;if(x<sx||y<sy||x>=sx+cropw||y>=sy+croph)return;dest_p=(y-sy)*cropw+x-sx;}
-  _Pragma("unroll") for(uint n=0;n<4;n++){uint c0=col+n*16+g*8,dest=dest_p*C+c0;
-   if constexpr(ByteOut){
-    uint b8v[2]{};
-    _Pragma("unroll") for(uint e=0;e<8;e++){float a=acc[n][e],h=Hrtz(a),hi=post==4?a:h,hc=__builtin_amdgcn_fmed3f(hi+0.f,-448.f,448.f);uint b8=uint(__builtin_amdgcn_cvt_pk_fp8_f32(hc,0.f,0,false))&255u;b8v[e/4]|=b8<<(8*(e%4));}
-    __builtin_memcpy(__builtin_assume_aligned(reinterpret_cast<unsigned char*>(out)+dest,8),b8v,8);
-   }else{
-    float v[8];
-    _Pragma("unroll") for(uint e=0;e<8;e++){float a=acc[n][e],h=Hrtz(a),hi=post==4?a:h,hc=__builtin_amdgcn_fmed3f(hi+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(hc,0.f,0,false);float f=__builtin_amdgcn_cvt_f32_fp8(b8,0);v[e]=post==3?h:f;}
-    __builtin_memcpy(__builtin_assume_aligned(out+dest,16),v,32);}}
-  return;
- }
  f8 acc[4];
  {float ws[4];for(uint n=0;n<4;n++)ws[n]=w[skip+col+n*16+rc];
-  float fv[4][8];for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){uint p=first+g*8+e;uint pp=p<tokens?p:first;fv[n][e]=feature[pp*C+col+n*16+rc];}
+  float fv[4][8];
+  if constexpr(FB8){
+   const unsigned char*feat8=reinterpret_cast<const unsigned char*>(feature)+((first/16)*16+col/32)*512+rc;
+   uint roff=g*256;
+   for(uint e=0;e<8;e++){uint p=first+g*8+e;uint re=p<tokens?(roff+e*32):0u;
+    for(uint n=0;n<4;n++)fv[n][e]=__builtin_amdgcn_cvt_f32_fp8(int(feat8[re+(n>>1)*512+(n&1)*16]),0);}
+  }else{
+   for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){uint p=first+g*8+e;uint pp=p<tokens?p:first;fv[n][e]=feature[pp*C+col+n*16+rc];}
+  }
   for(uint n=0;n<4;n++)for(uint e=0;e<8;e++){uint p=first+g*8+e;float h=Hrtz(fv[n][e]*ws[n]);__asm__ volatile("":"+v"(h));acc[n][e]=p<tokens?h:0.f;}}
  const bool live=first+rc<tokens;
  const unsigned char*arow=av8+(live?first+rc:first)*C+g*8;
@@ -638,9 +617,11 @@ DEV void mh_attention_project_frag_c512_w16_body(const unsigned char*av8,const f
     acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a0,b0,acc[n]);
     acc[n]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(a1,b1,acc[n]);}}
  }
+ uint l_tail=__builtin_amdgcn_workitem_id_x();__asm__ volatile("":"+v"(l_tail));
+ uint rc_t=l_tail&15u,g_t=l_tail>>4;
  const uint valid_tokens=(cropw&&!sx&&!sy&&cropw==workw)?croph*workw:tokens;
- _Pragma("unroll") for(uint e=0;e<8;e++){uint p=first+g*8+e;if(p<valid_tokens){
-  _Pragma("unroll") for(uint n=0;n<4;n++){uint c=col+n*16+rc;float a=acc[n][e],h=Hrtz(a),hi=post==4?a:h,hc=__builtin_amdgcn_fmed3f(hi+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(hc,0.f,0,false);if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[p*C+c]=static_cast<unsigned char>(b8);else{float f=__builtin_amdgcn_cvt_f32_fp8(b8,0),v=post==3?h:f;out[p*C+c]=v;}}}}
+ _Pragma("unroll") for(uint e=0;e<8;e++){uint p=first+g_t*8+e;if(p<valid_tokens){
+  _Pragma("unroll") for(uint n=0;n<4;n++){uint c=col+n*16+rc_t;float a=acc[n][e],h=Hrtz(a),hi=post==4?a:h,hc=__builtin_amdgcn_fmed3f(hi+0.f,-448.f,448.f);int b8=__builtin_amdgcn_cvt_pk_fp8_f32(hc,0.f,0,false);if constexpr(ByteOut)reinterpret_cast<unsigned char*>(out)[p*C+c]=static_cast<unsigned char>(b8);else{float f=__builtin_amdgcn_cvt_f32_fp8(b8,0),v=post==3?h:f;out[p*C+c]=v;}}}}
 }
 FASTWAVE void mh_attention_project_frag_c512_w16(const unsigned char*av8,const float*feature,const float*w,float*out,uint tokens,uint post,uint cropw,uint croph,uint workw,uint sx,uint sy){mh_attention_project_frag_c512_w16_body<2>(av8,feature,w,out,tokens,post,cropw,croph,workw,sx,sy);}
 FASTWAVE void mh_attention_project_frag_c512_w16_u4(const unsigned char*av8,const float*feature,const float*w,float*out,uint tokens,uint post,uint cropw,uint croph,uint workw,uint sx,uint sy){mh_attention_project_frag_c512_w16_body<4>(av8,feature,w,out,tokens,post,cropw,croph,workw,sx,sy);}

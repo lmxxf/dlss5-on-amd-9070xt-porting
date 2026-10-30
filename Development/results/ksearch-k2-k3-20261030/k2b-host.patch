@@ -1,0 +1,28 @@
+--- a/Development/HIP/hip_reference_network.h
++++ b/Development/HIP/hip_reference_network.h
+@@ -770,7 +770,7 @@
+   U valid=w*h,n=(valid+15)&~15u;
+   auto compact=input;
+   if(n!=valid&&!(HIP_C512_PAD16&&input->capacity>=size_t(n)*512*(byte_in?1:4))){compact=New(size_t(n)*512);Run("mh","mh_shift_pack",size_t(n)*512,P(input),P(compact),valid,U(1),n,U(1),U(0),U(0),U(512),U(0));}
+-  auto mixed=New(size_t(n)*512),contract=New(size_t(n)*512),contract8=New(size_t(n)*128),ffn=New(size_t(n)*512),ffn8=New(size_t(n)*128);
++  auto contract8=New(size_t(n)*128),ffn8=New(size_t(n)*128);Tensor mixed,contract,ffn;
+   const bool fpf=!byte_in&&HIP_C512_FFN_PROJ_FUSE&&HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&!HIP_C512_PROJ_FB8&&HasFn("c512_m32_deep","split_ffn_proj_fused");
+   const int ffn_w16m=C512FfnW16Mode();
+   const char*ffn_w16_fn=byte_in?(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec_bin":"split_ffn_one_w2f8_w16_bin"):(ffn_w16m>=2?"split_ffn_one_w2f8_w16_tvec":"split_ffn_one_w2f8_w16");
+@@ -781,7 +781,7 @@
+   else if(HIP_C512_FFN_ONE&&HIP_C512_FFN_F8W&&HasFn("c512_m32_deep","split_ffn_one_w2f8"))Run("c512_m32_deep","split_ffn_one_w2f8",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixFp8(Block(block,"ffwd")),P(contract8),n);
+   else if(HIP_C512_FFN_ONE&&HasFn("c512_m32_deep","split_ffn_one_w2"))Run("c512_m32_deep","split_ffn_one_w2",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(contract8),n);
+   else if(HIP_C512_FFN_ONE&&HasFn("c512_m32_deep","split_ffn_one_m32"))Run("c512_m32_deep","split_ffn_one_m32",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(contract8),n);
+-  else{Run("c512_m32_deep","split_mix_blocked_h16w_m32",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(mixed),n);
++  else{mixed=New(size_t(n)*512);contract=New(size_t(n)*512);Run("c512_m32_deep","split_mix_blocked_h16w_m32",size_t((n+31)/32*32)*256,P(compact),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(mixed),n);
+   Run("deep","split_ffn_fused_fp8_t8",size_t(n)*512,P(mixed),PackedSplitFfnWeightMixHalf(Block(block,"ffwd")),P(contract),P(contract8),n);}
+   mixed.reset();
+   const int w16m=C512W16Mode();
+@@ -790,6 +790,7 @@
+   const bool w16_mh=w16_fb8||(w16m>0&&HasFn("c512_m32_mh","c512_qkv_attention_compact_w16")&&HasFn("mh_fast",byte_out?(w16m>=2?"mh_attention_project_frag_c512_w16_u4_bout":"mh_attention_project_frag_c512_w16_bout"):(w16m>=2?"mh_attention_project_frag_c512_w16_u4":"mh_attention_project_frag_c512_w16")));
+   if(w16_ffn&&w16_mh){++c512_w16_calls;if(w16_fb8)++vit_inter_byte_calls;}else ++c512_stock_calls;
+   const bool fb8=!byte_in&&!byte_out&&!w16_mh&&HIP_C512_PROJ_FB8&&HasFn("deep_fast","split_projection_frag_nof32")&&HasFn("mh_fast","mh_attention_project_frag_c512_fb8");
++  if(!w16_fb8&&!fb8)ffn=New(size_t(n)*512);
+   if(!fpf)Run("deep",w16_fb8?(byte_in?"split_projection_frag_w16_nof32_bskip":"split_projection_frag_w16_nof32"):fb8?"split_projection_frag_nof32":w16_ffn?(byte_in?"split_projection_frag_w16_bskip":"split_projection_frag_w16"):(byte_in?"split_projection_frag_bskip":"split_projection_frag"),size_t(n)*512,P(contract8),PackedSplitProjectionFrag(Block(block,"ffwd-projection"),w16_ffn),P(compact),P(ffn),P(ffn8),n);
+   compact.reset();contract.reset();contract8.reset();
+   auto av=New(size_t(n)*128);

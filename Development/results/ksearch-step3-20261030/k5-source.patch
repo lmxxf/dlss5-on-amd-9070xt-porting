@@ -1,0 +1,38 @@
+--- /home/lmxxf/work/ai-theorys-study/wechat/assets/297/hip/wave_owned_mh.inc	2026-10-14 19:02:30.760058747 +0800
++++ /home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-step3-20261030/work/k5-explore/hip/wave_owned_mh.inc	2026-10-31 00:09:04.660855077 +0800
+@@ -349,7 +349,7 @@
+    hp[ci][j]=(lo&0xffffu)|(hi<<16);}
+   float uw[2][8];
+   _Pragma("unroll") for(uint ci=0;ci<2;ci++)_Pragma("unroll") for(uint e=0;e<8;e++)uw[ci][e]=upw[IC*C+head*32+ci*16+gr*8+e];
+-  _Pragma("unroll") for(uint qt=0;qt<4;qt++){
++  _Pragma("clang loop unroll(disable)") for(uint qt=0;qt<4;qt++){
+    const uint tok=qt*16+rc,low=(tok/16)*4+(tok%8)/2;const int x=x0+int(tok%8),y=y0+int(tok/8);
+    const bool ok=x>=0&&y>=0&&x<int(width)&&y<int(height);const uint base=ok?(uint(y)*width+uint(x))*C:0u;
+    _Pragma("unroll") for(uint ci=0;ci<2;ci++){
+@@ -424,6 +424,8 @@
+  _Pragma("clang loop unroll(disable)") for(uint qb=0;qb<4;qb+=B){
+   f8 contract[B][2]{};
+   _Pragma("clang loop unroll(disable)") for(uint ht=0;ht<8;ht+=T){
++   uint ffn_head=head,ffn_rc=rc,ffn_gr=gr;
++   if constexpr(C==64){uint ffn_tid=__builtin_amdgcn_workitem_id_x();__asm__ volatile("":"+v"(ffn_tid));ffn_head=ffn_tid/32;ffn_rc=ffn_tid&15u;ffn_gr=(ffn_tid&31u)>>4;}
+    f8 expanded[B][T]{};
+    if constexpr(W16){
+     for(uint kt=0;kt<C/16;kt+=2){
+@@ -440,7 +442,7 @@
+     i2 inputs[B];
+     _Pragma("unroll") for(uint qi=0;qi<B;qi++)inputs[qi]=w2_load<C>(plane0,qb+qi,kt);
+     _Pragma("unroll") for(uint tile=0;tile<T;tile++){
+-     i2 b=w2_weight(fw,head*128+(ht+tile)*16+rc,C,kt*16);
++     i2 b=w2_weight(fw,ffn_head*128+(ht+tile)*16+ffn_rc,C,kt*16,ffn_gr);
+      _Pragma("unroll") for(uint qi=0;qi<B;qi++)expanded[qi][tile]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,inputs[qi],expanded[qi][tile]);
+     }
+    }
+@@ -465,7 +467,7 @@
+      for(uint e=0;e<8;e++){float a=expanded[qi][tile][e],g=clampf(a,-4.f,4.f),q=__builtin_fmaf(absf(g),-.055908203125f,.447265625f),poly=__builtin_fmaf(g,q,.89453125f);W2_Q8_SETF(packed,e,a,poly);}W2_Q8_END(packed);hidden[qi]=packed;
+     }
+     for(uint ci=0;ci<2;ci++){
+-     i2 b=w2_weight(fw+4*C*C,head*32+ci*16+rc,4*C,head*128+(ht+tile)*16);
++     i2 b=w2_weight(fw+4*C*C,ffn_head*32+ci*16+ffn_rc,4*C,ffn_head*128+(ht+tile)*16,ffn_gr);
+      _Pragma("unroll") for(uint qi=0;qi<B;qi++)contract[qi][ci]=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(b,hidden[qi],contract[qi][ci]);
+     }
+    }

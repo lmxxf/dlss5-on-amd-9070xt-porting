@@ -1,0 +1,1762 @@
+[
+  {
+    "module": "gfx1200/c512-m32-deep.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 118,
+        "candidate_vgpr": 118,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 118,
+        "candidate_vgpr": 118,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/c512-m32-mh.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/c64-wave2-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 223,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 200,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_ho",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 219,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 197,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/c64-wave2.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 222,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 203,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_ho",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 221,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 197,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/deep_fast-packed-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/deep_fast-packed.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/deep_fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/multihead-fast-padded-wave-packed.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/multihead-fast-padded-wave.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/swin-persistent-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_run64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 139,
+        "candidate_vgpr": 137,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_recover64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 208,
+        "candidate_vgpr": 200,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/swin-persistent.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_run64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 139,
+        "candidate_vgpr": 137,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_recover64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 208,
+        "candidate_vgpr": 200,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/vit-stream-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/vit-stream.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1200/vit-wide-deep.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/c512-m32-deep.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/c512-m32-mh.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/c64-wave2-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 223,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 200,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_ho",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 219,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 197,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/c64-wave2.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 198,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_bo",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 222,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 203,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_bi_ho",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 199,
+        "candidate_vgpr": 191,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 221,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c64_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 197,
+        "candidate_vgpr": 189,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "c128_wave2_up_lb_sh",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 238,
+        "candidate_vgpr": 240,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/deep_fast-packed-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/deep_fast-packed.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 100,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 97,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/deep_fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/multihead-fast-padded-wave-packed.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/multihead-fast-padded-wave.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/swin-persistent-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_run64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 139,
+        "candidate_vgpr": 137,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_recover64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 208,
+        "candidate_vgpr": 200,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/swin-persistent.hsaco",
+    "changed": [
+      {
+        "kernel": "mh_attention_project_frag_c512_w16",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 85,
+        "candidate_vgpr": 77,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 101,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "mh_attention_project_frag_c512_w16_u4_fb8_bout",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 94,
+        "candidate_vgpr": 93,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_run64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 139,
+        "candidate_vgpr": 137,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "sp_recover64",
+        "code_changed": true,
+        "metadata_changed": true,
+        "baseline_vgpr": 208,
+        "candidate_vgpr": 200,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/vit-stream-fast.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/vit-stream.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  },
+  {
+    "module": "gfx1201/vit-wide-deep.hsaco",
+    "changed": [
+      {
+        "kernel": "split_projection_frag_w16_nof32",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      },
+      {
+        "kernel": "split_projection_frag_w16_nof32_bskip",
+        "code_changed": true,
+        "metadata_changed": false,
+        "baseline_vgpr": 98,
+        "candidate_vgpr": 98,
+        "candidate_private": 0,
+        "candidate_spill": 0
+      }
+    ]
+  }
+]
