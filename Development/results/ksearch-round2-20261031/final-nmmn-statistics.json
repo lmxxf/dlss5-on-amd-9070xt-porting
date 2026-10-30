@@ -1,0 +1,447 @@
+{
+  "nmmn": {
+    "original1088": {
+      "hip_ms": 8.219009020833335,
+      "aco_ms": 5.681562500000001,
+      "gap_ms": 2.537446520833334,
+      "hip_slower_percent": 44.66106851474982,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 8.218209000000002,
+          "aco_ms": 5.6763593750000005,
+          "gap_ms": 2.541849625000001
+        },
+        {
+          "round": 2,
+          "hip_ms": 8.21248859375,
+          "aco_ms": 5.681865625,
+          "gap_ms": 2.5306229687500004
+        },
+        {
+          "round": 3,
+          "hip_ms": 8.22632946875,
+          "aco_ms": 5.6864625,
+          "gap_ms": 2.53986696875
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small1080": {
+      "hip_ms": 4.9441814270833335,
+      "aco_ms": 3.450338541666666,
+      "gap_ms": 1.4938428854166674,
+      "hip_slower_percent": 43.29554527408999,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 4.94897940625,
+          "aco_ms": 3.4501187499999997,
+          "gap_ms": 1.4988606562500006
+        },
+        {
+          "round": 2,
+          "hip_ms": 4.94171175,
+          "aco_ms": 3.450053125,
+          "gap_ms": 1.4916586249999995
+        },
+        {
+          "round": 3,
+          "hip_ms": 4.941853125,
+          "aco_ms": 3.4508437499999998,
+          "gap_ms": 1.491009375
+        }
+      ],
+      "steady_samples_per_arm": 960
+    },
+    "small900": {
+      "hip_ms": 3.7879327291666667,
+      "aco_ms": 2.6405020833333332,
+      "gap_ms": 1.1474306458333334,
+      "hip_slower_percent": 43.45501763001198,
+      "rounds": [
+        {
+          "round": 1,
+          "hip_ms": 3.7912569375,
+          "aco_ms": 2.6389781250000004,
+          "gap_ms": 1.1522788124999996
+        },
+        {
+          "round": 2,
+          "hip_ms": 3.7821363750000003,
+          "aco_ms": 2.64133125,
+          "gap_ms": 1.1408051250000004
+        },
+        {
+          "round": 3,
+          "hip_ms": 3.790404875,
+          "aco_ms": 2.641196875,
+          "gap_ms": 1.1492080000000002
+        }
+      ],
+      "steady_samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.229495750000002,
+      "cpu_ms": 8.339177500000002,
+      "p99_ms": 8.357966099999999,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.6776625,
+      "cpu_ms": 5.78646875,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.67505625,
+      "cpu_ms": 5.79549375,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.20692225,
+      "cpu_ms": 8.314451875,
+      "p99_ms": 8.309268,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.2055425625,
+      "cpu_ms": 8.314449374999999,
+      "p99_ms": 8.3362456,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.678437499999999,
+      "cpu_ms": 5.817475,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.6852937500000005,
+      "cpu_ms": 5.7966625,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.219434625000002,
+      "cpu_ms": 8.337926874999999,
+      "p99_ms": 8.3437046,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 8.2177650625,
+      "cpu_ms": 8.326325625,
+      "p99_ms": 8.3524154,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 5.68690625,
+      "cpu_ms": 5.81436875,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 5.686018750000001,
+      "cpu_ms": 5.811787499999999,
+      "p99_ms": null,
+      "raw_sha256": "331e7cc56e70c946501583a264e488339bdba32fff53d4c146f4f6a31ec814a2"
+    },
+    {
+      "profile": "original1088",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 8.234893875000001,
+      "cpu_ms": 8.347558750000001,
+      "p99_ms": 8.3742822,
+      "raw_sha256": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.9501631875,
+      "cpu_ms": 5.06556875,
+      "p99_ms": 5.1637824,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.4497124999999995,
+      "cpu_ms": 3.5483375,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.450525,
+      "cpu_ms": 3.55085625,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.9477956249999995,
+      "cpu_ms": 5.06953125,
+      "p99_ms": 5.1398345,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.945615125,
+      "cpu_ms": 5.06837125,
+      "p99_ms": 5.2074086,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.44978125,
+      "cpu_ms": 3.5501875,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.4503250000000003,
+      "cpu_ms": 3.5479062499999996,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.937808375,
+      "cpu_ms": 5.05953875,
+      "p99_ms": 5.105205000000001,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 4.936805375,
+      "cpu_ms": 5.0605225,
+      "p99_ms": 5.1467228,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 3.45008125,
+      "cpu_ms": 3.5491562500000002,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 3.4516062499999998,
+      "cpu_ms": 3.5514812499999997,
+      "p99_ms": null,
+      "raw_sha256": "b01f7d7c866dd4093914fc9d77db5a6ef7fb03a3ea1b88762dcd40156aecb9a4"
+    },
+    {
+      "profile": "small1080",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 4.946900875,
+      "cpu_ms": 5.06771125,
+      "p99_ms": 5.1667803999999995,
+      "raw_sha256": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.7907363750000003,
+      "cpu_ms": 3.911353750000001,
+      "p99_ms": 4.058058,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.6384125000000003,
+      "cpu_ms": 2.73651875,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.63954375,
+      "cpu_ms": 2.73943125,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 1,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.7917775,
+      "cpu_ms": 3.9000581249999997,
+      "p99_ms": 3.959416,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.7851485625000003,
+      "cpu_ms": 3.9180275,
+      "p99_ms": 4.039699799999999,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.6423625,
+      "cpu_ms": 2.7398875,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.6403,
+      "cpu_ms": 2.7380875,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 2,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.7791241875,
+      "cpu_ms": 3.90530125,
+      "p99_ms": 3.9505158999999996,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 0,
+      "kind": "N",
+      "gpu_ms": 3.7854066875,
+      "cpu_ms": 3.9108262499999995,
+      "p99_ms": 4.0443297000000005,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 1,
+      "kind": "M",
+      "gpu_ms": 2.64143125,
+      "cpu_ms": 2.740075,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 2,
+      "kind": "M",
+      "gpu_ms": 2.6409624999999997,
+      "cpu_ms": 2.7379937500000002,
+      "p99_ms": null,
+      "raw_sha256": "fcea0c628b3d2045d6d7441ea9c36728b799ef259bca95163f75ad2610343dc1"
+    },
+    {
+      "profile": "small900",
+      "round": 3,
+      "slot": 3,
+      "kind": "N",
+      "gpu_ms": 3.7954030625,
+      "cpu_ms": 3.90992125,
+      "p99_ms": 3.9737423999999995,
+      "raw_sha256": "39be1772fc6b2123a8b2ac6654a4ac0fd0509641f6332dc5ea6c26a5b51d41b2"
+    }
+  ]
+}

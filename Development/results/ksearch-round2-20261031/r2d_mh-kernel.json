@@ -1,0 +1,779 @@
+{
+  "name": "r2d_mh-kernel",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\backfeed-20261028\\frame-standard.exe",
+      "sha256": "323408442935367b9d7609e3989922c4fb55d51946befb176a2f67d01652d587"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\backfeed-20261028\\frame-smallwindow.exe",
+      "sha256": "480b6ca30d7729ad673b62fd20828be4c9a914922500303491ebc3bd971ee680"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\backfeed-20261028\\window.f16",
+      "sha256": "ea2082b9d883140b1b028296381a8dc66562ff4cf08141b8d000b9c9bbda9315"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\pure-profile-device-final.exe",
+      "sha256": "1a78e24348e5da333a61d0fd47b65f5b0ba241b50d9c78c0738d7638c9c4aa5d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco",
+      "sha256": "7aaf263f75410bd3cce68f3cb9fe32ec8c0e6b9da756b90134b14b938cb85a6e"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags",
+      "sha256": "86b2c5c72e03c7051e94e35d30394f98a6654e7cc4aa2a592938398486acb1c0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f",
+      "sha256": "3ef42d34cebd1bc847e5caa3a95b3c3b70f45c9eeed4e828a3e2f85615b49b68"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags",
+      "sha256": "149b642bf565f2e650a20ef69b316cba9bb4cb9a041331148520e44d9d89e23b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f",
+      "sha256": "b3d114c4779fc1f593162b36d22bbb5ae7777e22e7aec701f0f551916539b2ac"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-standard.exe",
+      "sha256": "0dba9384deeab5ab9d6e8a291d0ca4e0935c77ca0da799d7857b2d864f487b73"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\c32-stage-phase5b-20261029\\payload\\frame-window.exe",
+      "sha256": "f3de3083e6a3ea9dfc78e42c72451e59d76b1ad88b61b06fa0b5b2dc0cf59c47"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\boundary-fast.hsaco",
+      "sha256": "40fa66062eca6bbe654e480944783c27b9bd93970696e1ffca9bbc8773ca9700"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\boundary-fast.hsaco",
+      "sha256": "40fa66062eca6bbe654e480944783c27b9bd93970696e1ffca9bbc8773ca9700"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\boundary_reference.hsaco",
+      "sha256": "1b1a514743924d43542ed9ac30e4ca50ec6e84e62d2bafab1960aaf061e0adc8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\boundary_reference.hsaco",
+      "sha256": "1b1a514743924d43542ed9ac30e4ca50ec6e84e62d2bafab1960aaf061e0adc8"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32-wave1-fast-norm900.hsaco",
+      "sha256": "a6514ab8c2247ba8d2cd40c3da386b8d66a22e38313a6b8036d55ee9a76e7d50"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32-wave1-fast-norm900.hsaco",
+      "sha256": "a6514ab8c2247ba8d2cd40c3da386b8d66a22e38313a6b8036d55ee9a76e7d50"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32-wave1-fast.hsaco",
+      "sha256": "a0aef2ef0a413cbe0b376b1744f4efd7e50a2ada7e2cc147b7af945a9206cfd9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32-wave1-fast.hsaco",
+      "sha256": "a0aef2ef0a413cbe0b376b1744f4efd7e50a2ada7e2cc147b7af945a9206cfd9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32-wave1-rtz.hsaco",
+      "sha256": "7d90a636aca55b6d2e40749b3968a6816d16137e782730687e04c1a96820df87"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32-wave1-rtz.hsaco",
+      "sha256": "7d90a636aca55b6d2e40749b3968a6816d16137e782730687e04c1a96820df87"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32-wave1.hsaco",
+      "sha256": "483728744a71e8543c58b7b6afd60bc05ea6fadd887d3d6a2a57665f565d5a41"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32-wave1.hsaco",
+      "sha256": "483728744a71e8543c58b7b6afd60bc05ea6fadd887d3d6a2a57665f565d5a41"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_fast.hsaco",
+      "sha256": "a639601561123594f6d8b335f884f4e229338875f460213af1396bc2f28c90ec"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_fast.hsaco",
+      "sha256": "a639601561123594f6d8b335f884f4e229338875f460213af1396bc2f28c90ec"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_fast_attention.hsaco",
+      "sha256": "b3abd5620764f5a5ba4d86fb439e0a57688e346afdd5945f6f1d9067da6d032c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_fast_attention.hsaco",
+      "sha256": "b3abd5620764f5a5ba4d86fb439e0a57688e346afdd5945f6f1d9067da6d032c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_fused_attention.hsaco",
+      "sha256": "5091d35e5ac53e4a8d16de2f5fb1c8c057159c72d6605faeb5a5ca7daa65aacd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_fused_attention.hsaco",
+      "sha256": "5091d35e5ac53e4a8d16de2f5fb1c8c057159c72d6605faeb5a5ca7daa65aacd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_fused_ffn_attention-packed.hsaco",
+      "sha256": "c0634176bf9e0a79ffb0e28fb120df310a646d4dedcaad69c34f7185718d2155"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_fused_ffn_attention-packed.hsaco",
+      "sha256": "c0634176bf9e0a79ffb0e28fb120df310a646d4dedcaad69c34f7185718d2155"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_fused_ffn_attention.hsaco",
+      "sha256": "aedb066c95a76aa60fe67c91443c2cf8189c5e4f8e849356695cb5cd9fdc9870"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_fused_ffn_attention.hsaco",
+      "sha256": "aedb066c95a76aa60fe67c91443c2cf8189c5e4f8e849356695cb5cd9fdc9870"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_prefix_reference.hsaco",
+      "sha256": "65103d0c3930dd22d7ec40e282e38285d68169c9c8860df7d561a7c04fef7640"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_prefix_reference.hsaco",
+      "sha256": "65103d0c3930dd22d7ec40e282e38285d68169c9c8860df7d561a7c04fef7640"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_tiled.hsaco",
+      "sha256": "6e7db748fbd492cd566f208a1aa3b7e48a42a9c0d8b31022148469bb46d01e8f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_tiled.hsaco",
+      "sha256": "6e7db748fbd492cd566f208a1aa3b7e48a42a9c0d8b31022148469bb46d01e8f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c32_wmma.hsaco",
+      "sha256": "4d239ca134400ee2b42c60f99dc24202f9a4fd38c21a471c01a98217df04b294"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c32_wmma.hsaco",
+      "sha256": "4d239ca134400ee2b42c60f99dc24202f9a4fd38c21a471c01a98217df04b294"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c512-m32-deep.hsaco",
+      "sha256": "8373b898ac87c5b915bedf8e6d1a970b5dc00aaba65db3318f4c95806a06afcf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c512-m32-deep.hsaco",
+      "sha256": "8373b898ac87c5b915bedf8e6d1a970b5dc00aaba65db3318f4c95806a06afcf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c512-m32-mh.hsaco",
+      "sha256": "517295c644f034bb8a57b7a186046fe7924196dd19833d7b55e99ed1d71f40e1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c512-m32-mh.hsaco",
+      "sha256": "517295c644f034bb8a57b7a186046fe7924196dd19833d7b55e99ed1d71f40e1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c64-wave2-fast.hsaco",
+      "sha256": "5ddd00a20f9e0c3cf06a2fc78606586e6af1b82f9d6e6ab6487130170388949c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c64-wave2-fast.hsaco",
+      "sha256": "df8fa2b12b94f61dbcc6b0091728f93d90a50e874c5f7f9abc2d5644e261e5a0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\c64-wave2.hsaco",
+      "sha256": "1e79b0fd3eac1b3773a31793837f7ffb3624d300e5d997fa2a310e3e5dac2bf6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\c64-wave2.hsaco",
+      "sha256": "1e79b0fd3eac1b3773a31793837f7ffb3624d300e5d997fa2a310e3e5dac2bf6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\deep_fast-packed-fast.hsaco",
+      "sha256": "566d33d6358ea6f418ae2405bcd7dec114d9917bede3d9fdca27f46e12dbe47d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\deep_fast-packed-fast.hsaco",
+      "sha256": "566d33d6358ea6f418ae2405bcd7dec114d9917bede3d9fdca27f46e12dbe47d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\deep_fast-packed.hsaco",
+      "sha256": "d1249dd53c6e1ae2d3327cfa376c396fb3d70662b868131a27bf269e3e2027b5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\deep_fast-packed.hsaco",
+      "sha256": "d1249dd53c6e1ae2d3327cfa376c396fb3d70662b868131a27bf269e3e2027b5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\deep_fast.hsaco",
+      "sha256": "12be7ae04c112fc3e68694d8c994e4ee59c224875f7d47b5d5fcb0452d022cc3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\deep_fast.hsaco",
+      "sha256": "12be7ae04c112fc3e68694d8c994e4ee59c224875f7d47b5d5fcb0452d022cc3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\deep_reference.hsaco",
+      "sha256": "0d2e3e9658a8abc53be68b6fc108ce57594784d3ed56f237bedd9766d86db895"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\deep_reference.hsaco",
+      "sha256": "0d2e3e9658a8abc53be68b6fc108ce57594784d3ed56f237bedd9766d86db895"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\deep_wmma.hsaco",
+      "sha256": "b562c8986300b0517818ae54a46108e725e1ecc6c6b6c88a3b7fa14c749a5b2f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\deep_wmma.hsaco",
+      "sha256": "b562c8986300b0517818ae54a46108e725e1ecc6c6b6c88a3b7fa14c749a5b2f"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multi-pass-predict.hsaco",
+      "sha256": "133f0975e39e7e716e146dab15f05573d6767c8c1c99e01528f3c11509293900"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multi-pass-predict.hsaco",
+      "sha256": "133f0975e39e7e716e146dab15f05573d6767c8c1c99e01528f3c11509293900"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multi-pass-skin.hsaco",
+      "sha256": "5ff15f49135beef3bc68d744b9d33f615812ce293d13c0783c88b0a3d9aaa011"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multi-pass-skin.hsaco",
+      "sha256": "5ff15f49135beef3bc68d744b9d33f615812ce293d13c0783c88b0a3d9aaa011"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-fast-packed.hsaco",
+      "sha256": "31e258756683b9a60e455c1c315c7b22b9605d90ae784891073fb6c74ba8ead7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-fast-packed.hsaco",
+      "sha256": "31e258756683b9a60e455c1c315c7b22b9605d90ae784891073fb6c74ba8ead7"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-fast-padded-wave-packed.hsaco",
+      "sha256": "c1a62a8df5593ad75aede939f9d4105754fcfae35319538c1418c62210e1f8b1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-fast-padded-wave-packed.hsaco",
+      "sha256": "c1a62a8df5593ad75aede939f9d4105754fcfae35319538c1418c62210e1f8b1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-fast-padded-wave.hsaco",
+      "sha256": "b3a95acacbf38353aa65ec6bf4b34d15c263c9bebf8e470463cd5044eb1c5eaa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-fast-padded-wave.hsaco",
+      "sha256": "b3a95acacbf38353aa65ec6bf4b34d15c263c9bebf8e470463cd5044eb1c5eaa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-fast.hsaco",
+      "sha256": "3493fb0ede45f233a5d09472bd7a76d7532387f1fd6b0c835d46c20c0d196c9a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-fast.hsaco",
+      "sha256": "3493fb0ede45f233a5d09472bd7a76d7532387f1fd6b0c835d46c20c0d196c9a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-reference.hsaco",
+      "sha256": "1cfa639e9f37b7872c69d738c7332b58eaaf0539caf720cc29a844e770fc8cbe"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-reference.hsaco",
+      "sha256": "1cfa639e9f37b7872c69d738c7332b58eaaf0539caf720cc29a844e770fc8cbe"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-tiled.hsaco",
+      "sha256": "3799ae40ecec89796132bf6464a76faf1adfffe65df2f5e6406f47a86f67aa81"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-tiled.hsaco",
+      "sha256": "3799ae40ecec89796132bf6464a76faf1adfffe65df2f5e6406f47a86f67aa81"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead-wmma.hsaco",
+      "sha256": "bfc99774435fcf89985a795ea6e1c20de3335053097b40206839adf687d0e226"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead-wmma.hsaco",
+      "sha256": "bfc99774435fcf89985a795ea6e1c20de3335053097b40206839adf687d0e226"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\multihead_fused_attention.hsaco",
+      "sha256": "f7f23560d490868eacb161d7e49c958548faaa1d61384014ea0859b5e8cef1b9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\multihead_fused_attention.hsaco",
+      "sha256": "f7f23560d490868eacb161d7e49c958548faaa1d61384014ea0859b5e8cef1b9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\prefix_fast.hsaco",
+      "sha256": "81b3facda5a1512af3940d7a82c5a2f6f2e5cc7a0f2428194f4420fc8b68a57c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\prefix_fast.hsaco",
+      "sha256": "81b3facda5a1512af3940d7a82c5a2f6f2e5cc7a0f2428194f4420fc8b68a57c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\swin-persistent-fast.hsaco",
+      "sha256": "662ceac229a3bf7e609ccf5bb47d2d42ef9a249deff6915b2e7053ddda3a98f3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\swin-persistent-fast.hsaco",
+      "sha256": "870f5a6dbf8b079647c85521c0bed72c14cedd3774142a1353927d99efcc039d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\swin-persistent.hsaco",
+      "sha256": "e1393076db551889ab4ff930e324321e887fcea82f5832d888091571fc0f28cd"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\swin-persistent.hsaco",
+      "sha256": "652cbadb2670c313c87568ff1d69873b36d0ea3a084541158c4c6edd1c836bf0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\vit-stream-fast.hsaco",
+      "sha256": "99c9084865fe3d1de961723af30245595a8b7f07cec28e65aa1d0cc617060b6a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\vit-stream-fast.hsaco",
+      "sha256": "99c9084865fe3d1de961723af30245595a8b7f07cec28e65aa1d0cc617060b6a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\vit-stream.hsaco",
+      "sha256": "85ec029b48db95e7b549e043ca30a73533f092778102927d7304cce83cda53af"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\vit-stream.hsaco",
+      "sha256": "85ec029b48db95e7b549e043ca30a73533f092778102927d7304cce83cda53af"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\vit-wide-deep.hsaco",
+      "sha256": "e53230f25f75df526249855d6b0189d47616fc4f9cb1cdff962186be3deed886"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\vit-wide-deep.hsaco",
+      "sha256": "e53230f25f75df526249855d6b0189d47616fc4f9cb1cdff962186be3deed886"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\\wave-pointwise.hsaco",
+      "sha256": "5e65693da46044b697218194bb17ec8453952fa4a4a684c6ecc59df1cecf12aa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\\wave-pointwise.hsaco",
+      "sha256": "5e65693da46044b697218194bb17ec8453952fa4a4a684c6ecc59df1cecf12aa"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "sha256": "320e82766d3614d04cd2e97d47a95f85e02e20ee6caf12407e3175b21b3f2948"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-standard.exe",
+      "sha256": "665fd595f7c4dd1e53c334133edfd6a2688db37b45a432c5b5ec3438e74c693d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-window.exe",
+      "sha256": "1975e4035beaf4b156623eaa5d28245c90769ef2bed59aaafbd4912629205bb6"
+    }
+  ],
+  "jobs": [
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r1-0-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r1-1-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r1-2-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r1-3-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r2-0-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r2-1-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r2-2-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r2-3-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r3-0-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r3-1-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r3-2-candidate",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\history-trial-041a-20261006\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\original1088-processing.rgba32f\" \"{OUT}\" 80 304 1088",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "152",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-original1088-r3-3-baseline",
+      "profile": "original1088",
+      "round": 1,
+      "kind": "N",
+      "gold": "153ac018f5dd5744cff9157661c46c469d01db6018a97c93aec2b1e2e05647f1"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r1-0-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r1-1-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r1-2-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r1-3-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r2-0-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r2-1-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r2-2-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r2-3-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r3-0-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r3-1-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\r2d_mh\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r3-2-candidate",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4",
+      "required_stderr": [
+        "C32_POOL_FUSED calls=[1-9]\\d*"
+      ]
+    },
+    {
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\small-model-20261018\\assets\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\baseline\\modules\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080.flags\" \"D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\small1080-processing.rgba32f\" \"{OUT}\" 80 164 1152 small",
+      "env": {
+        "PHASE4_PROFILE": "1",
+        "PHASE4_DISPATCHES": "82",
+        "PHASE4_STAMP_MODULE": "D:\\DLSSNR-Lab\\aco-hotspot-phase4-20261029\\payload\\stamp.hsaco"
+      },
+      "startup_compile": true,
+      "label": "r2d_mh/kernel-small1080-r3-3-baseline",
+      "profile": "small1080",
+      "round": 1,
+      "kind": "N",
+      "gold": "b9a4a9473db27011e0a68f5ec6e0739d9a34b114cbc8badd680008f16c8835b4"
+    }
+  ]
+}

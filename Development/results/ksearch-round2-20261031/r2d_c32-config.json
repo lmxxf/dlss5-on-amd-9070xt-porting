@@ -1,0 +1,31 @@
+{
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+  "profiles": [
+    "small900",
+    "small1080",
+    "original960",
+    "original1088"
+  ],
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\payload\\r2-profile.exe",
+      "sha256": "320e82766d3614d04cd2e97d47a95f85e02e20ee6caf12407e3175b21b3f2948"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-standard.exe",
+      "sha256": "665fd595f7c4dd1e53c334133edfd6a2688db37b45a432c5b5ec3438e74c693d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-step4-20261031\\payload\\frame-window.exe",
+      "sha256": "1975e4035beaf4b156623eaa5d28245c90769ef2bed59aaafbd4912629205bb6"
+    }
+  ],
+  "role": "r2d_c32",
+  "modules": {
+    "c32-wave1-fast.hsaco": "Development/results/ksearch-round2-20261031/work/r2d/out/gfx1201/c32-wave1-fast.hsaco",
+    "c32-wave1-fast-norm900.hsaco": "Development/results/ksearch-round2-20261031/work/r2d/out/gfx1201/c32-wave1-fast-norm900.hsaco"
+  }
+}

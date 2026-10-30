@@ -2827,4 +2827,14 @@ Post寄存器尾部h2成对交换145VGPR/0spill/七档Gold同，静态1510→148
 
 4. **作用域排除 2：`1920×1152`（`original1152` / `small1080`）开启 `w16_fb8` 及 `w16_fb8` 提前 `ffn8.reset()` 同址复用｜性能负 & 正确性边界**
    - 改动与实测：在未开启 `SubmitPulse` 时，`original1088` 开启 `w16_fb8` 因整帧单批提交与 L2 驱逐相位变化慢 `+229 ~ +243 µs`（开启 `SubmitPulse` 后逆转为净快 `-25 ~ -47 µs`）；而在 `small1080`（`1920×1152`，`SubmitPulse=0`）上开启 `w16_fb8` 仍慢 `+24.97 ~ +54.01 µs`，`original1152` 上开启 `w16_fb8` 无额外净收益。此外，在 `w16_fb8` 路径下若提前调用 `ffn8.reset()` 使 `result` 与 `ffn8` 同址复用，由于 `ffn8`（`[16×32]` 瓦片）与 `result`（`[token×512]` 行主序）跨列分块工作组地址交错，在 `pure.exe` 241 帧连续纯 NN 压测中会偶发跨工作组覆写竞态。
-   - 裁决：`C512W16Fb8ShapeEligible()` 精确限定为 `(W==1600&&(H==960||H==1024))||(!small_active&&W==1920&&H==1088)`，排除 `1920×1152`；且保持 `if(!fb8&&!w16_fb8)ffn8.reset();` 使 `w16_fb8` 下 `ffn8` 与 `result` 严格异址。证据：`Development/results/ksearch-step3-20261030/README.md`、`Development/results/ksearch-step4-20261031/README.md`。
+   - 裁决：`C512W16Fb8ShapeEligible()` 精确限定为 `small_active?(W==1600&&H==1024):((W==1600&&H==960)||(W==1920&&H==1088))`（并加上 `fast_numeric && multi_pass==1 && !experimental_temporal && !observer && dump_dir.empty() && AE=0` 完整安全门禁），排除 `1920×1152`；且保持 `if(!fb8&&!w16_fb8)ffn8.reset();` 使 `w16_fb8` 下 `ffn8` 与 `result` 严格异址。证据：`Development/results/ksearch-step3-20261030/README.md`、`Development/results/ksearch-step4-20261031/README.md`、`Development/results/ksearch-round2-20261031/README.md`。
+
+5. **分支 R2-A（`vit_stream_qkv_frag_bin_w5f8_*` 局部改写 `r2a1` / `r2a2`）｜性能负 / STOP**
+   - 改动与基线：基于 `e7b234e7`，在 `hip/vit_stream.inc` 中测试 `r2a1`（Q/K 平方和归约循环显式 `unroll 8`）与 `r2a2`（W5 权重加载指针预计算外提），VGPR 保持 `112`、`0 spill`。
+   - 正确性与时量：七档 42 帧 Gold `0 bit-diff`；3 轮 ABBA 100MHz 硬件实时钟探针（`original1088 / small1080`）显示 `vit_qkv` 在 `r2a1` 下为 `+4.453 µs (0/3) / +0.700 µs (1/3)`，在 `r2a2` 下为 `+12.213 µs (0/3) / +3.433 µs (0/3)`。
+   - 裁决与根因：局部循环展开与指针预计算破坏了 COMGR 原本围绕 6 次 LDS 屏障的指令调度窗口，未改善 LDS 转发等待，判定 STOP。证据：`Development/results/ksearch-round2-20261031/README.md`。
+
+6. **分支 R2-B（`c128_wave2_bi_bo/ho` 压入 `<= 240 VGPR` 跨寄存器分配桶，`r2b`）｜性能中性偏负 / STOP（查明 16KiB LDS 驻留锁死）**
+   - 改动与基线：基于 `e7b234e7`，在 `hip/wave_owned_mh.inc` 的 `c128_wave2` 中通过在 `ht` 循环头重算 `ffn_tid` 并对 `upw` 指针做 `__builtin_amdgcn_readfirstlane` 标量化，将 `c128_wave2_bi_bo` 与 `c128_wave2_bi_ho` 从 `242 VGPR`（5 waves/SIMD 寄存器桶）压入 `240 VGPR`（6 waves/SIMD 寄存器桶），`0 spill`。
+   - 正确性与时量：七档 42 帧 Gold `0 bit-diff`；3 轮 ABBA 100MHz 硬件实时钟探针显示 `c128_wave2` 在 `original1088` 上为 `+0.637 µs`（`911.837 -> 912.473 µs`，0/3 轮，全网 `+13.837 µs`），在 `small1080` 上为 `+0.987 µs`（`264.383 -> 265.370 µs`，0/3 轮，全网 `+3.930 µs`）。
+   - 裁决与根因：`c128_wave2` 每 WG 含 4 waves 并固定占用 `16,384 B`（16 KiB）LDS；在 `gfx1201`（WGP 128 KiB LDS / 8 SIMD，或 CU 64 KiB LDS / 4 SIMD）上，LDS 硬上限本身就把最大驻留锁死在 `8 WGs/WGP = 4 waves/SIMD`！因此 VGPR 从 242（5 waves/SIMD）压到 240（6 waves/SIMD）后，实际有效驻留 `min(6, 4) == min(5, 4) == 4 waves/SIMD` 零提升，反而增加了循环内坐标重算 ALU，判定 STOP。证据：`Development/results/ksearch-round2-20261031/README.md`。

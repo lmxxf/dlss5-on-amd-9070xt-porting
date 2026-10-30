@@ -1,0 +1,76 @@
+{
+  "name": "r2-qkv-comgr-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p0.hip",
+      "sha256": "04fcc0ef9699c010bb4f585c3cbee8fdf1b280975ef4dd64be104ba298d56194"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p1.hip",
+      "sha256": "5e63d5b8be6c494dcedf9ee57e679576eef54e0eb416b2a1413d3034edbf58c3"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p2.hip",
+      "sha256": "e1cce215e57931545f49042f96d644704cbf7c185fe4a4084b16734bd386d635"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-r2a1.hip",
+      "sha256": "c51e9870841dc1fd35cbfc66ab9680ca185693379997fb4919bed7f54f58c4c4"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-r2a2.hip",
+      "sha256": "b4690efbfef280beda2c01d1d5d949d554547975226821f2d56598781ac8abff"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/gfx1201-qkv-p0",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\qkv-p0.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p0.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1201-qkv-p1",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\qkv-p1.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p1.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1201-qkv-p2",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\qkv-p2.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-p2.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1201-qkv-r2a1",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\qkv-r2a1.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-r2a1.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1201-qkv-r2a2",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\qkv-r2a2.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\qkv-gen\\qkv-r2a2.hip\" comgr gfx1201"
+    }
+  ]
+}

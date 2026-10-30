@@ -1,0 +1,55 @@
+{
+  "name": "r2d-swin-comgr-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent.hip",
+      "sha256": "ec019fd351b3cd6ee5f6abf5b65fa6c6a5f0b79e80ea9bb8d30b351d4eb8847b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent-fast.hip",
+      "sha256": "e51e0c6322ac1118b533887d6b71cd8a4953edc060871dfd0ff6ae2cbcf207da"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "r2d-swin-compile/compile-gfx1200-swin-persistent",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent.hip\" comgr gfx1200"
+    },
+    {
+      "label": "r2d-swin-compile/compile-gfx1201-swin-persistent",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent.hip\" comgr gfx1201"
+    },
+    {
+      "label": "r2d-swin-compile/compile-gfx1200-swin-persistent-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent-fast.hip\" comgr gfx1200"
+    },
+    {
+      "label": "r2d-swin-compile/compile-gfx1201-swin-persistent-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round2-20261031\\swin-generated\\swin-persistent-fast.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -878,3 +878,25 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
   - `small1080`：HIP **`4.926222 ms`** vs ACO **`3.443128 ms`**（差 `1.483094 ms`，**`+43.07%`**，较 Phase5B `4.946637 ms / +43.36%` 净快 `-20.415 µs`）。
   - `small900`：HIP **`3.789783 ms`** vs ACO **`2.635953 ms`**（差 `1.153830 ms`，**`+43.77%`**，较 Phase5B `3.795411 ms` 净快 `-5.628 µs`）。
 - **80 模块与正式宿主**：双架构 80 模块完整核验并更新 `hip/SHA256SUMS`（生产 C32 W16 max `158 VGPR`，C512 W16 max `97 VGPR`，`c64_wave2` max `191 VGPR`，全部生产与修改导出 `private=0, spill=0`）；正式 O2 `addon64`/`runtime`/`frame`/`pure` 与 `runtime-smoke`（`exit=0`）完成。K3（`c32_wave1_post` 外提 `scales`）与 K4（`sp_run256_w16` `W2_QKV_FUSE`）STOP 已入失败总账。详见 `Development/results/ksearch-step4-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。
+
+
+### 2026-10-31 K-Search Round 2：`2×2` 探针定位与 R2-D（C32/C64/C128/C256/SP Softmax `ones` WMMA 分母倒数 `8 -> 1` 外提）生产收网
+
+响应闇对 Round 1 评估报告的独立复核（`REVIEW-YAMI-ROUND1-20261031.md`），在 `e7b234e7` 基线上完成两组 `2×2` 破坏性敏感度探针（`probes-2x2-statistics.json`）：证实 C32 Box-Muller 噪声旁路（`Base - P0`）仅省 `+16.89 / +21.29 / +13.86 µs`，而 C32 Softmax 辅助算术与分母归约旁路（`Base - P1`）高达 **`+664.42 / +448.60 / +347.40 µs`**（全网最高敏感度靶点）。顺着 `P1` 审查 `hip/wave_owned_c32.inc:468` 与 `hip/wave_owned_mh.inc:692` 抓出并合入分支 **R2-D**：在 `wmma_f32_16x16x16_f16_w32_gfx12(ones, ...)` 中，因第一操作数 `ones` 为全 `1.0` 矩阵，同一 lane 的 `sums[0..7]` 100% 逐位恒等；将分母倒数外提为标量 `inv = norm_inverse(sums[0])` 与 `inv = w2_inverse(sums[0][0]+sums[1][0])` 后，全网 `c32-wave1*`、`c64-wave2*` 与 `swin-persistent*` 核内 Softmax `v_rcp_f32` 从 **`8 -> 1`（砍掉 87.5% 倒数超越函数，Original 全帧动态消除约 457 万条 `v_rcp_f32`）**。同时收窄 `C512W16Fb8ShapeEligible()` 宿主门禁（显式区分 `small_active` 并加上 `fast_numeric/multi_pass/AE/temporal/observer` 门禁），完成 `small1080` K5 隔离 ABBA（`k5_iso_s1080` 3/3 轮全胜 `-15.896 µs`）、同批交错 `8a9c60fd` vs 最新生产 HIP 三档 3 轮 ABBA `pure.exe` 纯 NN 测速以及 100MHz 硬件实时钟 152/82-dispatch 全网分解。
+
+- **七档 42 帧 Gold**：`0 bit-diff`（`invalid=0`），首尾帧 SHA256 与基线 100% 一致。
+- **增量四档 3 轮 Frame ABBA（`r2d_both` vs `e7b234e7`）**：`original1088` **`-22.802 µs (-0.27%, p99 -17.083 µs, 3/3)`**、`original960` **`-22.904 µs (-0.36%, p99 -51.789 µs, 3/3)`**、`small900` **`-7.459 µs (-0.18%, p99 -34.474 µs, 3/3)`**、`small1080` `+0.129 µs (p99 -5.326 µs, 2/3)`；100MHz 硬件实时钟对比 `e7b234e7` 全网净快 **`-25.207 µs`（`Orig1088`, 3/3）** 与 **`-16.137 µs`（`Small1080`, 3/3）**。
+- **最终生产载荷 vs `8a9c60fd` 七档 3 轮 4-slot Frame ABBA（84 slots，7/7 档 mean 全负，20/21 轮赢）**：
+  - `smallwindow`：**`-196.211 µs (-10.06%, p99 -228.470 µs, 3/3)`**
+  - `small720`：**`-178.174 µs (-5.94%, p99 -182.480 µs, 3/3)`**
+  - `original1088`：**`-137.372 µs (-1.60%, p99 -146.572 µs, 3/3)`**
+  - `small900`：**`-131.231 µs (-3.15%, p99 -188.030 µs, 3/3)`**
+  - `original960`：**`-33.746 µs (-0.53%, p99 -20.181 µs, 3/3)`**
+  - `original1152`：**`-22.804 µs (-0.25%, p99 -8.443 µs, 3/3)`**
+  - `small1080`：**`-4.385 µs (-0.08%, p99 +50.575 µs, 2/3)`**（且独立 `k5_iso_s1080` 3/3 轮 `-15.896 µs / p99 -26.979 µs`）
+- **同批交错 `8a9c60fd` vs 最新生产 HIP 三档 3 轮 ABBA `pure.exe` 纯 NN 测速（3/3 档全胜，9/9 轮全胜）**：
+  - `original1088`：`8.235997 -> 8.226979 ms`（**`-9.019 µs, 3/3 轮`**）；100MHz 硬件实时钟 152-dispatch 总和 `7917.90 -> 7847.36 µs`（**`-70.540 µs, 3/3 轮`**，其中 C512 `-35.02 µs`、C32 `-13.76 µs`、C64+C128 `-12.86 µs`、C256/SP `-8.09 µs`）。
+  - `small1080`：`4.951770 -> 4.945876 ms`（**`-5.893 µs, p99 -9.334 µs, 3/3 轮`**）；100MHz 硬件实时钟 82-dispatch 总和 `4757.59 -> 4740.66 µs`（**`-16.927 µs, 3/3 轮`**，其中 C32 `-10.42 µs`、C64+C128 `-5.52 µs`）。
+  - `small900`：`3.801556 -> 3.793241 ms`（**`-8.316 µs, p99 -10.109 µs, 3/3 轮`**）。
+- **最新生产 vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账**：`original1088` `8.219009 vs 5.681563 ms (+44.66%)`、`small1080` `4.944181 vs 3.450339 ms (+43.30%)`、`small900` `3.787933 vs 2.640502 ms (+43.46%)`。
+- **80 模块实物与正式宿主**：双架构 80 模块完整实物保留于 `Development/results/ksearch-round2-20261031/payload/HIP/` 并更新 `hip/SHA256SUMS`；正式 O2 `addon64`/`runtime`/`frame`/`pure`/`final-profile` 与 `runtime-smoke`（`exit=0`）完成。R2-A（`r2a1/r2a2`）与 R2-B（`r2b` `c128_wave2` 240 VGPR，查明 16KiB LDS 锁死 4 waves/SIMD）STOP 已入失败总账。详见 `Development/results/ksearch-round2-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。

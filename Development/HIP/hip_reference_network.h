@@ -767,7 +767,12 @@ class Network {friend class D3D12Bridge;
  static int C512FfnW16Mode(){static const int m=[]{const char*v=std::getenv("NR_C512_FFN_W16");if(!v||!*v)v=std::getenv("DLSS5_HIP_C512_FFN_W16");if(!v||!*v)return int(HIP_C512_FFN_W16);return std::atoi(v);}();return m;}
  unsigned long long c512_w16_calls=0,c512_stock_calls=0,c512_ffn_w16_calls=0,c512_ffn_stock_calls=0;
  bool c512_ffn_w16_cached_ok=false,c512_w16_fb8_cached_ok=false,c512_w16_ffn_cached_ok=false,c512_w16_mh_cached_ok=false;
- bool C512W16Fb8ShapeEligible()const noexcept{return (W==1600&&(H==960||H==1024))||(!small_active&&W==1920&&H==1088);}
+ bool C512W16Fb8ShapeEligible()const noexcept{
+  if(!fast_numeric||multi_pass!=1||opt.experimental_temporal||observer||!opt.dump_dir.empty())return false;
+  const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");
+  if(ae&&*ae&&std::strcmp(ae,"0"))return false;
+  return small_active?(W==1600&&H==1024):((W==1600&&H==960)||(W==1920&&H==1088));
+ }
  void InitC512Cache(){
   if(!c512_m32_active||!opt.fast_deep||!opt.fast_mh)return;
   const int ffn_w16m=C512FfnW16Mode(),w16m=C512W16Mode();
