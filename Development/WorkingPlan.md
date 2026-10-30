@@ -369,3 +369,25 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
   - `small900`：`3.801556 -> 3.793241 ms`（**`-8.316 µs, p99 -10.109 µs, 3/3 轮`**）。
 - **最新生产 vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账**：`original1088` `8.219009 vs 5.681563 ms (+44.66%)`、`small1080` `4.944181 vs 3.450339 ms (+43.30%)`、`small900` `3.787933 vs 2.640502 ms (+43.46%)`。
 - **80 模块实物与正式宿主**：双架构 80 模块完整实物保留于 `Development/results/ksearch-round2-20261031/payload/HIP/` 并更新 `hip/SHA256SUMS`；正式 O2 `addon64`/`runtime`/`frame`/`pure`/`final-profile` 与 `runtime-smoke`（`exit=0`）完成。R2-A（`r2a1/r2a2`）与 R2-B（`r2b` `c128_wave2` 240 VGPR，查明 16KiB LDS 锁死 4 waves/SIMD）STOP 已入失败总账。详见 `Development/results/ksearch-round2-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。
+
+
+### 2026-10-31 K-Search Round 3：C32 Softmax 窄 `2×2` 子机制探针与 R3-A（`CW_FMED3_CLAMP=1` 消除 31 条 `v_cmp_gt_f32_e64` + 31 条 `v_cndmask_b32_e64` 与 14~25 SGPR 膨胀）生产收网
+
+响应闇对 Round 2 评估报告的独立审查（`REVIEW-YAMI-ROUND2-20261031.md`），修正 RDNA4 硬件拓扑驻留表（`4 SIMD32/WGP`、`2 SIMD32/CU` 及单 wave WG 无 barrier 槽位限制），补齐非对称 `ones`-WMMA 原语实机验证（`r2d_primitive` 8 项断言 `0 bit-diff`）、11 组 62 文件全配置回归（`FAST0`、`AE=1/3`、`MODE1` 动态 history、F9 切换、free 几何 100% `0 bit-diff`）与 `C512W16Fb8ShapeEligible` 显式 history 门控（`!temporal_feature_tap_active && !pulse_frame_history && !native_post_output`），并在 `b1af6240` 上完成 C32 Softmax 窄 `2×2` 子机制拆分探针（`probes-sm-2x2-statistics.json`）：发现指数位映射/clamp + 概率 `cw_pack8` 量化子机制（`Base - P0`）高达 **`+518.32 / +340.03 / +245.24 µs`**（分母归约子机制 `Base - P1 = +261.75 / +113.30 / +82.62 µs`）。顺着 `P0` 审计 `c32-wave1-fast.hsaco` ISA 抓出并合入分支 **R3-A（`c32-wave1*` 全系开启 `CW_FMED3_CLAMP=1`）**：消除 LLVM 23 在 Softmax 32 次 `cw_clampf` 上生成的 31 条 `v_cmp_gt_f32_e64` + 31 条 `v_cndmask_b32_e64` + 16 条 `v_dual_max_num_f32`（统一合并为无条件码 `v_med3_num_f32`），每个生产 `c32_wave1_*_w16` 核静态指令再砍 **`-47 ~ -62` 条**、SGPR 从 **`42~58` 暴降至 `25~38`（减少 `14~25` 个 SGPR）**，Original1088 全帧动态消除 **2,649.5 万条** `v_cmp_gt_f32_e64 + v_cndmask_b32_e64`！
+
+- **七档 42 帧 Gold 与 11 组 62 文件多配置回归**：全部 100% `0 bit-diff`（`invalid=0`）。
+- **单刀 `R3-A` vs `b1af6240` 四档 3 轮 Frame ABBA（`r3a-statistics.json`）**：`small1080` **`-102.729 µs (-1.84%, p99 -479.706 µs, 3/3)`**、`original1088` **`-71.665 µs (-0.81%, p99 -53.318 µs, 3/3)`**、`original960` **`-71.646 µs (-1.10%, p99 -50.313 µs, 3/3)`**、`small900` **`-43.690 µs (-1.09%, 4.0133 -> 3.9696 ms 首次跌破 4.0ms, p99 -57.798 µs, 3/3)`**；100MHz 硬件实时钟对比 `b1af6240` 在 `Orig1088 / Small1080` 上 C32 阶段净快 **`-73.137 µs (3/3) / -70.277 µs (3/3)`**，全网净快 **`-63.953 µs (3/3) / -70.377 µs (3/3)`**。
+- **最终生产载荷 vs `8a9c60fd` 七档 3 轮 4-slot Frame ABBA（84 slots，7/7 档 mean 与 pooled p99 100% 全负，21/21 轮 mean 与 21/21 轮 p99 100% 全胜）**：
+  - `original1088`：**`-292.672 µs (-3.29%, p99 -221.811 µs, 3/3 mean, 3/3 p99)`**
+  - `original1152`：**`-245.174 µs (-2.66%, p99 -167.007 µs, 3/3 mean, 3/3 p99)`**
+  - `smallwindow`：**`-170.185 µs (-9.15%, p99 -169.186 µs, 3/3 mean, 3/3 p99)`**
+  - `small720`：**`-120.305 µs (-4.16%, p99 -225.340 µs, 3/3 mean, 3/3 p99)`**
+  - `original960`：**`-109.002 µs (-1.70%, p99 -86.257 µs, 3/3 mean, 3/3 p99)`**
+  - `small900`：**`-108.985 µs (-2.66%, p99 -149.887 µs, 3/3 mean, 3/3 p99)`**（`4.0907 -> 3.9818 ms`）
+  - `small1080`：**`-61.757 µs (-1.12%, p99 -55.697 µs, 3/3 mean, 3/3 p99)`**（彻底解决 `small1080` 尾延迟门！）
+- **同批交错 `8a9c60fd` vs 最新生产 HIP 三档 3 轮 ABBA `pure.exe` 纯 NN 测速（3/3 档 mean 与 p99 全部 3/3 轮全胜）**：
+  - `original1088`：`8.212547 -> 8.127218 ms`（**`-85.329 µs / -1.04%, p99 -63.941 µs, 3/3 轮`**）；100MHz 硬件实时钟 152-dispatch 总和 `7970.43 -> 7832.81 µs`（**`-137.620 µs, 3/3 轮`**，其中 C32 `-89.36 µs`、C512 `-33.73 µs`、C64+C128 `-8.49 µs`、C256/SP `-3.92 µs`）。
+  - `small1080`：`4.931139 -> 4.858531 ms`（**`-72.608 µs / -1.47%, p99 -50.211 µs, 3/3 轮`**）；100MHz 硬件实时钟 82-dispatch 总和 `4757.77 -> 4678.54 µs`（**`-79.223 µs, 3/3 轮`**，其中 C32 `-77.24 µs`、C64+C128 `-6.03 µs`）。
+  - `small900`：`3.789164 -> 3.722060 ms`（**`-67.103 µs / -1.77%, p99 -93.655 µs, 3/3 轮`**）。
+- **最新生产 vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账**：`original1088` `8.132934 vs 5.629724 ms (+44.46%)`、`small1080` `4.859123 vs 3.367579 ms (+44.29%)`、`small900` `3.740196 vs 2.572050 ms (+45.42%)`。
+- **80 模块实物与正式宿主**：双架构 80 模块完整实物保留于 `Development/results/ksearch-round3-20261031/payload/HIP/` 并更新 `hip/SHA256SUMS`；正式 O2 `addon64`/`runtime`/`frame`/`pure`/`final-profile` 与 `runtime-smoke`（`exit=0`）完成。R3-B（ViT QKV 单 wave W16 去 LDS 屏障慢 `+365.58 / +337.65 µs`）与 R3-C（`c128_wave2` 零循环开销压至 `238 VGPR` 近中性 `-0.87 / +3.74 µs`）STOP 已入失败总账。详见 `Development/results/ksearch-round3-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。

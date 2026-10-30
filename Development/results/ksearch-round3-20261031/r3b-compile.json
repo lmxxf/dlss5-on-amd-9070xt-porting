@@ -1,0 +1,37 @@
+{
+  "name": "r3b-comgr-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\qkv-r3b-fast.hip",
+      "sha256": "3c677c5c6f7b9a0545cdfcfc1129042492f347731d451d75c67bde633e5f860c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\qkv-r3b.hip",
+      "sha256": "28235b3c5caa14de9cb8118fca576062f9fc8a44b570b2ab4944d0f11c381bef"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/gfx1201-vit-stream-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream-fast.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\qkv-r3b-fast.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1201-vit-stream",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\vit-stream.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\qkv-r3b.hip\" comgr gfx1201"
+    }
+  ]
+}

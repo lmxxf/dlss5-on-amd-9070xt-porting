@@ -768,7 +768,7 @@ class Network {friend class D3D12Bridge;
  unsigned long long c512_w16_calls=0,c512_stock_calls=0,c512_ffn_w16_calls=0,c512_ffn_stock_calls=0;
  bool c512_ffn_w16_cached_ok=false,c512_w16_fb8_cached_ok=false,c512_w16_ffn_cached_ok=false,c512_w16_mh_cached_ok=false;
  bool C512W16Fb8ShapeEligible()const noexcept{
-  if(!fast_numeric||multi_pass!=1||opt.experimental_temporal||observer||!opt.dump_dir.empty())return false;
+  if(!fast_numeric||multi_pass!=1||opt.experimental_temporal||temporal_feature_tap_active||pulse_frame_history||native_post_output||observer||!opt.dump_dir.empty())return false;
   const char*ae=std::getenv("DLSS5_VIT_ADAPTIVE");
   if(ae&&*ae&&std::strcmp(ae,"0"))return false;
   return small_active?(W==1600&&H==1024):((W==1600&&H==960)||(W==1920&&H==1088));

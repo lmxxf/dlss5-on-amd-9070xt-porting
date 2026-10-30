@@ -1,0 +1,21 @@
+{
+  "name": "r2d-primitive-gold-v2",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r2d_primitive.exe",
+      "sha256": "b7261788cb85e2c13e55ceaf467e06b664dd8201810a2abce0ae4a46fe7145d1"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r2d_primitive.hsaco",
+      "sha256": "d54e0b1c38db73dc1083fc2f800b3e33f13386cea09472b3b8acc06529ab6777"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "r2d_primitive/run-v2",
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r2d_primitive.exe",
+      "env": {},
+      "arguments": "\"D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r2d_primitive.hsaco\" \"{OUT}\""
+    }
+  ]
+}

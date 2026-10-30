@@ -1,0 +1,31 @@
+{
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r3-profile.exe",
+  "profiles": [
+    "small900",
+    "small1080",
+    "original960",
+    "original1088"
+  ],
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\r3-profile.exe",
+      "sha256": "219aa4262983caf43dc6505d6b13a5b3926655466af600b323f992fb74a7f2bf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\frame-standard.exe",
+      "sha256": "3ca9dfa40f49251cf52be7a2e26363c37931e971e39508b723595db54157d956"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round3-20261031\\payload\\frame-window.exe",
+      "sha256": "faa6528c2137bdd516907101e9cc8279b1198e9c4c266ea7b5a8068721596291"
+    }
+  ],
+  "role": "r3b",
+  "modules": {
+    "vit-stream-fast.hsaco": "Development/results/ksearch-round3-20261031/work/r3b/compiled/vit-stream-fast.hsaco",
+    "vit-stream.hsaco": "Development/results/ksearch-round3-20261031/work/r3b/compiled/vit-stream.hsaco"
+  }
+}
