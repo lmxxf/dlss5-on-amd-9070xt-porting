@@ -1,0 +1,24 @@
+{
+  "name": "vit-integer-extract-fix",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix.hip",
+      "sha256": "0c2759dd9029a130c9f102318c415a7206442cc4a9483d721b51680bec916b76"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "vit-fix-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix.hip\" comgr gfx1201"
+    }
+  ]
+}

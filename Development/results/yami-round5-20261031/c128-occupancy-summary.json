@@ -1,0 +1,47 @@
+{
+  "observations": [
+    {
+      "arm": "stock",
+      "kernel": "c128_wave2_bi_bo",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 4
+    },
+    {
+      "arm": "stock",
+      "kernel": "c128_wave2_bi_ho",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 4
+    },
+    {
+      "arm": "one_plane",
+      "kernel": "c128_wave2_bi_bo",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 6
+    },
+    {
+      "arm": "one_plane",
+      "kernel": "c128_wave2_bi_ho",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 6
+    },
+    {
+      "arm": "padded_control",
+      "kernel": "c128_wave2_bi_bo",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 4
+    },
+    {
+      "arm": "padded_control",
+      "kernel": "c128_wave2_bi_ho",
+      "block_size": 128,
+      "dynamic_lds": 0,
+      "api_blocks_per_multiprocessor": 4
+    }
+  ],
+  "interpretation": "Driver API reports4->6blocks/MP; restoringLDSreservation16KiBwithidenticalnewcode/registersreturns4. Do not equate these units with waves/SIMD or measured dynamic occupancy."
+}

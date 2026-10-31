@@ -1,0 +1,50 @@
+{
+  "name": "round5-second-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix.hip",
+      "sha256": "0c2759dd9029a130c9f102318c415a7206442cc4a9483d721b51680bec916b76"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-base.hip",
+      "sha256": "2101ce95781fb324ddb9dc5c20db256697ba1df1afc0c8e22e3ec5b276ee50cc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-candidate.hip",
+      "sha256": "ff67c086796591dfd4429f3dee307bcdda03fcec16d851df684e657621cd580e"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "vit-fix-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix.hip\" comgr gfx1201"
+    },
+    {
+      "label": "c512-compile/base",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-base.hip\" comgr gfx1201"
+    },
+    {
+      "label": "c512-compile/candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-candidate.hip\" comgr gfx1201"
+    }
+  ]
+}

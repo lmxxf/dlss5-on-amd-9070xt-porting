@@ -1,0 +1,1 @@
+Original1088 same5-arm screen, fixed before data. Small1080 has no qualifying method; that does not determine Original because model weights/guard hit rates and P1 costs differ. One3-round mirrored10-slot screen with240discard80,require3/3meanimprovement+pooledp99improvement. No Small rerun.

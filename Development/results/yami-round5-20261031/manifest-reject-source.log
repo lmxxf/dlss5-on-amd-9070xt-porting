@@ -1,0 +1,7 @@
+Compile source not pinned: D:\DLSSNR-Lab\yami-round5-20261031\baseline-trace.hip
+At D:\DLSSNR-Lab\yami-round5-20261031\run-jobs.ps1:23 char:77
++ ... ned.ContainsKey($v.ToLower())){throw "Compile source not pinned: $v"}
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Compile source ...eline-trace.hip:String) [], RuntimeException
+    + FullyQualifiedErrorId : Compile source not pinned: D:\DLSSNR-Lab\yami-round5-20261031\baseline-trace.hip
+ 

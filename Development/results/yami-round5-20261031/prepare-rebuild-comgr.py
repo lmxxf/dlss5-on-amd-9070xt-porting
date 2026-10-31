@@ -1,0 +1,7 @@
+from pathlib import Path
+import importlib.util,json,hashlib
+p=Path(__file__).parent;sp=importlib.util.spec_from_file_location('rec','Development/tools/llvm-fork/compile-modules.py');rec=importlib.util.module_from_spec(sp);sp.loader.exec_module(rec);old={x[0]:x for x in rec.recipe(p/'r2d-both/source/hip')};new={x[0]:x for x in rec.recipe(p/'production-combined-norm900-c256/source/hip')};changed=[k for k in new if new[k][2]!=old[k][2]];mods=[k for k in changed if not new[k][1] and k not in ['deep_fast-packed-fast','c512-m32-mh']];r=r'D:\DLSSNR-Lab\yami-round5-20261031';cc=r'D:\DLSSNR-Lab\gap-phase5-20261023\rtc_compile-current.exe';files=[dict(path=cc,sha256='553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197')];jobs=[]
+for mod in mods:
+ name='rebuild-'+mod+'.hip';f=p/name;f.write_text(new[mod][2]);files.append(dict(path=r+'\\'+name,sha256=hashlib.sha256(f.read_bytes()).hexdigest()))
+ for arch in ['gfx1201','gfx1200']:jobs.append(dict(label='production-rebuild-comgr/'+arch+'/'+mod,exe=cc,cpu_compile=True,env={'RTC_EXTRA_OPTS':' '.join('-mllvm='+v for v in rec.effective_row_options(arch,mod,new[mod][5]))},arguments='"{OUT}\\'+mod+'.hsaco" "'+r+'\\'+name+'" comgr '+arch))
+(p/'production-rebuild-comgr.json').write_text(json.dumps(dict(name='production-rebuild-comgr',files=files,jobs=jobs),indent=2)+'\n');(p/'production-rebuild-plan.json').write_text(json.dumps(dict(all_changed_source_modules=changed,remaining_comgr_modules=mods,jobs=len(jobs)),indent=2)+'\n');print(mods,len(jobs))

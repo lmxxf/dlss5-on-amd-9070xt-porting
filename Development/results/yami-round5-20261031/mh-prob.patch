@@ -1,0 +1,25 @@
+--- hip/wave_owned_mh.inc	2026-10-31 08:03:03.751679631 +0800
++++ Development/results/yami-round5-20261031/mh-prob/source/hip/wave_owned_mh.inc	2026-10-31 12:33:42.118881747 +0800
+@@ -184,6 +184,13 @@
+ #ifndef W2_OVFL
+ #define W2_OVFL(v) (void)0
+ #endif
++// R5: probability-only bounded positive inputs. Retain fma-to-+0 products,
++// remove only saturation MODE writes from this conversion site.
++DEV i2 w2_pack8_probability(const float*t){
++ int lo=__builtin_amdgcn_cvt_pk_fp8_f32(t[0],t[1],0,false);
++ lo=__builtin_amdgcn_cvt_pk_fp8_f32(t[2],t[3],lo,true);
++ int hi=__builtin_amdgcn_cvt_pk_fp8_f32(t[4],t[5],0,false);
++ hi=__builtin_amdgcn_cvt_pk_fp8_f32(t[6],t[7],hi,true);return i2{lo,hi};}
+ DEV i2 w2_pack8(const float*t){W2_OVFL(1);int lo=__builtin_amdgcn_cvt_pk_fp8_f32(w2_z(t[0]),w2_z(t[1]),0,false);lo=__builtin_amdgcn_cvt_pk_fp8_f32(w2_z(t[2]),w2_z(t[3]),lo,true);
+  int hi=__builtin_amdgcn_cvt_pk_fp8_f32(w2_z(t[4]),w2_z(t[5]),0,false);hi=__builtin_amdgcn_cvt_pk_fp8_f32(w2_z(t[6]),w2_z(t[7]),hi,true);W2_OVFL(0);i2 a;a[0]=lo;a[1]=hi;return a;}
+ #define W2_Q8_DECL(A) i2 A;float A##_t[8]
+@@ -691,7 +698,7 @@
+   }
+   const float inv=w2_inverse(sums[0][0]+sums[1][0]);
+   i2 prob[4];
+-  _Pragma("unroll 4") for(uint key=0;key<4;key++){W2_Q8_DECL(a);for(uint e=0;e<8;e++){W2_Q8_SETF(a,e,float(exponent[key][e]),inv);}W2_Q8_END(a);prob[key]=a;}
++  _Pragma("unroll 4") for(uint key=0;key<4;key++){W2_Q8_DECL(a);for(uint e=0;e<8;e++){W2_Q8_SETF(a,e,float(exponent[key][e]),inv);}a=w2_pack8_probability(a_t);prob[key]=a;}
+   for(uint ci=0;ci<2;ci++){
+    f8 av{};
+    _Pragma("unroll 4") for(uint key=0;key<4;key++)av=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(qkv[2][key][ci],prob[key],av);

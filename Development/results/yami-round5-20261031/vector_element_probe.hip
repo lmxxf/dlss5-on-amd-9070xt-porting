@@ -1,0 +1,3 @@
+using uint=unsigned;using ushort=unsigned short;using h8=_Float16 __attribute__((ext_vector_type(8)));using u4=uint __attribute__((ext_vector_type(4)));
+extern "C" __attribute__((global)) void vector_element_probe(const uint*in,uint*out,uint n,const uint*gate){uint l=__builtin_amdgcn_workitem_id_x(),b=__builtin_amdgcn_workgroup_id_x(),idx=(b*32+l)*4;u4 raw={in[idx],in[idx+1],in[idx+2],in[idx+3]};h8 x=__builtin_bit_cast(h8,raw);uint*o=out+(b*32+l)*24;
+_Pragma("unroll") for(uint e=0;e<8;e++){o[e]=__builtin_bit_cast(ushort,x[e]);_Float16 tmp=x[e];o[8+e]=__builtin_bit_cast(ushort,tmp);o[16+e]=(raw[e/2]>>(16*(e%2)))&65535u;}}

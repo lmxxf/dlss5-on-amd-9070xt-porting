@@ -1,0 +1,11 @@
+--- Development/results/yami-round5-20261031/c512-base.hip
++++ Development/results/yami-round5-20261031/c512-prob.hip
+@@ -1717,7 +1717,7 @@
+   i2 prob[4];
+   _Pragma("unroll 4") for(uint key=0;key<4;key++){
+ #if C512_PAIR_PACK
+-   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
++   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=float(exponent[key][e])*inv;}prob[key]=c5c_pack8_pairs(pv);
+ #else
+    i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);c5c_bits(a,e,c5c_fp8(float(exponent[key][e])*inv));}prob[key]=a;
+ #endif

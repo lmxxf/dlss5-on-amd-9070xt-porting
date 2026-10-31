@@ -1,0 +1,55 @@
+{
+  "name": "production-comgr",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\production-deep_fast-packed-fast.hip",
+      "sha256": "4603354792ed5e6195b9278ff4d3ad34ca582ed28f018f96b1f2924f001d8531"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\production-c512-m32-mh.hip",
+      "sha256": "a611bb3e14df92f89fd89045d0f37d19a3d6c2c53d86c0e6cdc73c7dee8eaad4"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "production-comgr/gfx1201/deep_fast-packed-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\production-deep_fast-packed-fast.hip\" comgr gfx1201"
+    },
+    {
+      "label": "production-comgr/gfx1200/deep_fast-packed-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\production-deep_fast-packed-fast.hip\" comgr gfx1200"
+    },
+    {
+      "label": "production-comgr/gfx1201/c512-m32-mh",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\production-c512-m32-mh.hip\" comgr gfx1201"
+    },
+    {
+      "label": "production-comgr/gfx1200/c512-m32-mh",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\production-c512-m32-mh.hip\" comgr gfx1200"
+    }
+  ]
+}

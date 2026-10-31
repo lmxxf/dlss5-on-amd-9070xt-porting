@@ -1,0 +1,118 @@
+{
+  "c64-wave2": [
+    {
+      "name": "c256_wave2",
+      "vgpr_before": 224,
+      "vgpr_after": 221,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi",
+      "vgpr_before": 228,
+      "vgpr_after": 225,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bo",
+      "vgpr_before": 224,
+      "vgpr_after": 221,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_bo",
+      "vgpr_before": 228,
+      "vgpr_after": 225,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_w16",
+      "vgpr_before": 235,
+      "vgpr_after": 231,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_w16",
+      "vgpr_before": 242,
+      "vgpr_after": 238,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bo_w16",
+      "vgpr_before": 235,
+      "vgpr_after": 231,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_bo_w16",
+      "vgpr_before": 242,
+      "vgpr_after": 238,
+      "private": 0,
+      "lds": 16384
+    }
+  ],
+  "c64-wave2-fast": [
+    {
+      "name": "c256_wave2",
+      "vgpr_before": 224,
+      "vgpr_after": 221,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi",
+      "vgpr_before": 228,
+      "vgpr_after": 225,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bo",
+      "vgpr_before": 224,
+      "vgpr_after": 221,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_bo",
+      "vgpr_before": 228,
+      "vgpr_after": 225,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_w16",
+      "vgpr_before": 235,
+      "vgpr_after": 231,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_w16",
+      "vgpr_before": 242,
+      "vgpr_after": 238,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bo_w16",
+      "vgpr_before": 235,
+      "vgpr_after": 231,
+      "private": 0,
+      "lds": 16384
+    },
+    {
+      "name": "c256_wave2_bi_bo_w16",
+      "vgpr_before": 242,
+      "vgpr_after": 238,
+      "private": 0,
+      "lds": 16384
+    }
+  ]
+}

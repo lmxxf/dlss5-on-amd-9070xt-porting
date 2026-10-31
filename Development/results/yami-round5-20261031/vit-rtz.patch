@@ -1,0 +1,22 @@
+--- Development/results/yami-round4-review-20261031/baseline.hip
++++ Development/results/yami-round5-20261031/vit-rtz.hip
+@@ -309,10 +309,16 @@
+ #if HIP_VIT_ATTN_PROB_PAIR
+   f8 prob{};
+ #endif
++  uint pair_exp[4];
++  for(uint e=0;e<4;e++){
++   float af0=clampf(a[2*e]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);
++   float af1=clampf(a[2*e+1]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);
++   uint hpair;asm("v_cvt_pkrtz_f16_f32 %0, %1, %2":"=v"(hpair):"v"(af0),"v"(af1));pair_exp[e]=(hpair<<4)&0x3ff03ff0u;
++  }
++  x=__builtin_bit_cast(h8,pair_exp);
+   for(uint e=0;e<8;e++){
+-   float af=clampf(a[e]*from_half(0x2dbb)+1.708984375f,1.439453125f,1.9775390625f);
+-   uint hb=(bits(af)>>13)-0x1c000u;unsigned short u=(unsigned short)(((hb<<4)+0x4000u)&65535u);
+-   union{unsigned short u;_Float16 h;}cv;cv.u=u;x[e]=cv.h;
++   unsigned short u=static_cast<unsigned short>(pair_exp[e/2]>>(16*(e%2)));
++   union{unsigned short u;_Float16 h;}cv;cv.u=u;
+ #if HIP_VIT_ATTN_NATIVE_HALF
+    // Clamp/bit-map confines u to 0x1c20..0x3e90 (positive normal half).
+    // Exact widening; avoid the general software decoder's impossible cases.

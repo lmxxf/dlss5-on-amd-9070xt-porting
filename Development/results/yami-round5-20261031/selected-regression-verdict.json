@@ -1,0 +1,285 @@
+{
+  "configurations": 15,
+  "file_pairs_compared": 100,
+  "cases": [
+    {
+      "configuration": "fast0-original1088",
+      "source_case": "selected-regression",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "fast0-small1080",
+      "source_case": "selected-regression",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae1-original1088",
+      "source_case": "selected-regression",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae1-small1080",
+      "source_case": "selected-regression",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae3-original1088",
+      "source_case": "selected-regression",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae3-small1080",
+      "source_case": "selected-regression",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "mode1-original1088",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "history_states": [
+        {
+          "enabled": 1,
+          "use": 0,
+          "seed": 0
+        },
+        {
+          "enabled": 1,
+          "use": 0,
+          "seed": 0
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 1
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 2
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 3
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 4
+        }
+      ],
+      "scope": "MODE1 static fallback without valid depth/motion metadata"
+    },
+    {
+      "configuration": "mode1-small1080",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "history_states": [
+        {
+          "enabled": 1,
+          "use": 0,
+          "seed": 0
+        },
+        {
+          "enabled": 1,
+          "use": 0,
+          "seed": 0
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 1
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 2
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 3
+        },
+        {
+          "enabled": 1,
+          "use": 1,
+          "seed": 4
+        }
+      ],
+      "scope": "MODE1 static fallback without valid depth/motion metadata"
+    },
+    {
+      "configuration": "f9-switch-1080",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 12,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "free-small-896x512",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "free-orig-896x512",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "reuse-ae1-original1088",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        6,
+        0,
+        6
+      ]
+    },
+    {
+      "configuration": "reuse-ae1-small1080",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae3-original1088",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae3-small1080",
+      "source_case": "selected-regression-rest",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    }
+  ],
+  "history_reset_controls": {
+    "original1088": {
+      "fixed_seed": 0,
+      "continuous_use": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "reset_use": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "frame0_equal": true,
+      "later_different_frames": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "small1080": {
+      "fixed_seed": 0,
+      "continuous_use": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "reset_use": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "frame0_equal": true,
+      "later_different_frames": [
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "scope": "combined ViT perm fix + C512 probability clamp removal; no C32 guard or C256 single-plane in this run"
+}

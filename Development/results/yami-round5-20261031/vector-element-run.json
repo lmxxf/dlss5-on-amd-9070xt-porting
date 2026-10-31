@@ -1,0 +1,20 @@
+{
+  "name": "vector-element-isolation",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vector-element-compile\\probe.hsaco",
+      "sha256": "43505635b447a5c9629e42e4480c52c20a35cc7e5a5f3f7e7f54912a746d334a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit_probe2.exe",
+      "sha256": "45bc2ad8add44c76323dea1e703b6c1d97dbea8a31225353ecc30edd6d7737cb"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "vector-element-run",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit_probe2.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\vector-element-compile\\probe.hsaco\" vector_element_probe \"{OUT}\\vector.bin\" 0"
+    }
+  ]
+}

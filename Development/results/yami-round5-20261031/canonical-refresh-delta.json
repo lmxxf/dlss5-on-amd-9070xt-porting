@@ -1,0 +1,42 @@
+{
+  "base": [
+    "deep_fast.hsaco",
+    "deep_fast-packed.hsaco",
+    "vit-stream-fast.hsaco",
+    "c512-m32-deep.hsaco",
+    "vit-stream.hsaco",
+    "vit-wide-deep.hsaco"
+  ],
+  "norm": [
+    "deep_fast.hsaco",
+    "deep_fast-packed.hsaco",
+    "c32-wave1.hsaco",
+    "c32-wave1-rtz.hsaco",
+    "vit-stream-fast.hsaco",
+    "c512-m32-deep.hsaco",
+    "vit-stream.hsaco",
+    "vit-wide-deep.hsaco"
+  ],
+  "c256": [
+    "deep_fast.hsaco",
+    "deep_fast-packed.hsaco",
+    "vit-stream-fast.hsaco",
+    "c512-m32-deep.hsaco",
+    "vit-stream.hsaco",
+    "vit-wide-deep.hsaco",
+    "swin-persistent.hsaco",
+    "swin-persistent-fast.hsaco"
+  ],
+  "full": [
+    "deep_fast.hsaco",
+    "deep_fast-packed.hsaco",
+    "c32-wave1.hsaco",
+    "c32-wave1-rtz.hsaco",
+    "vit-stream-fast.hsaco",
+    "c512-m32-deep.hsaco",
+    "vit-stream.hsaco",
+    "vit-wide-deep.hsaco",
+    "swin-persistent.hsaco",
+    "swin-persistent-fast.hsaco"
+  ]
+}

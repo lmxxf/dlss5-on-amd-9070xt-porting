@@ -1,0 +1,434 @@
+{
+  "base_arm": "norm",
+  "candidate_arm": "full",
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.330851015624999,
+      "candidate_ms": 8.317682526041667,
+      "delta_ms": -0.013168489583332388,
+      "delta_percent": -0.15806896028549566,
+      "baseline_p99": 8.556265999999999,
+      "candidate_p99": 8.541327,
+      "p99_delta_ms": -0.01493899999999826,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.289230781250001,
+          "candidate": 8.288738437500001,
+          "delta_ms": -0.0004923437500004013,
+          "p99_delta_ms": 0.0019540000000013436,
+          "base_drift": 0.11660468749999886,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 8.34982375,
+          "candidate": 8.324002578125,
+          "delta_ms": -0.025821171875000104,
+          "p99_delta_ms": -0.030900000000000816,
+          "base_drift": -0.0005831250000003507,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 8.353498515625,
+          "candidate": 8.3403065625,
+          "delta_ms": -0.013191953125000211,
+          "p99_delta_ms": -0.03170200000000101,
+          "base_drift": 0.029047656250002163,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    "original1152": {
+      "baseline_ms": 8.829543411458333,
+      "candidate_ms": 8.826929010416668,
+      "delta_ms": -0.0026144010416651042,
+      "delta_percent": -0.029609696898624804,
+      "baseline_p99": 9.151576,
+      "candidate_p99": 9.207721000000001,
+      "p99_delta_ms": 0.05614500000000078,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.8388053125,
+          "candidate": 8.83395703125,
+          "delta_ms": -0.0048482812500001415,
+          "p99_delta_ms": 0.0996100000000002,
+          "base_drift": 0.015379062499999208,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 8.820922734375,
+          "candidate": 8.836048359375,
+          "delta_ms": 0.015125625000001364,
+          "p99_delta_ms": 0.1170100000000005,
+          "base_drift": 0.021675781249999915,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 8.8289021875,
+          "candidate": 8.810781640625,
+          "delta_ms": -0.018120546875000088,
+          "p99_delta_ms": -0.06973600000000069,
+          "base_drift": -0.0033765624999997357,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    "original960": {
+      "baseline_ms": 6.212950911458334,
+      "candidate_ms": 6.2299114583333335,
+      "delta_ms": 0.016960546874999594,
+      "delta_percent": 0.272986976988987,
+      "baseline_p99": 6.392461,
+      "candidate_p99": 6.427071000000001,
+      "p99_delta_ms": 0.034610000000000696,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.21281671875,
+          "candidate": 6.23081078125,
+          "delta_ms": 0.017994062499999686,
+          "p99_delta_ms": 0.007021000000000832,
+          "base_drift": 0.009451562500000676,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 6.2135028125,
+          "candidate": 6.209163359375,
+          "delta_ms": -0.004339453124999615,
+          "p99_delta_ms": -0.004953999999999681,
+          "base_drift": 0.00531218749999951,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 6.212533203125,
+          "candidate": 6.2497602343750005,
+          "delta_ms": 0.037227031250000486,
+          "p99_delta_ms": 0.0692080000000006,
+          "base_drift": 0.0026785937500006796,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    "small1080": {
+      "baseline_ms": 5.292267083333333,
+      "candidate_ms": 5.297256276041666,
+      "delta_ms": 0.004989192708332979,
+      "delta_percent": 0.09427326001829606,
+      "baseline_p99": 5.516781,
+      "candidate_p99": 5.510727,
+      "p99_delta_ms": -0.006053999999999782,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.29824625,
+          "candidate": 5.28024421875,
+          "delta_ms": -0.018002031249999995,
+          "p99_delta_ms": -0.014930999999998917,
+          "base_drift": -0.0041706250000004275,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 5.289848828125001,
+          "candidate": 5.309143671875001,
+          "delta_ms": 0.019294843750000013,
+          "p99_delta_ms": -0.011674000000000184,
+          "base_drift": -0.02202265625000077,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 5.288706171875,
+          "candidate": 5.3023809375,
+          "delta_ms": 0.013674765624999807,
+          "p99_delta_ms": 0.0006459999999997024,
+          "base_drift": 0.0180045312499999,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    "small720": {
+      "baseline_ms": 2.7367119791666665,
+      "candidate_ms": 2.7339367708333335,
+      "delta_ms": -0.0027752083333330013,
+      "delta_percent": -0.10140666443745339,
+      "baseline_p99": 2.864183,
+      "candidate_p99": 2.852766,
+      "p99_delta_ms": -0.011417000000000233,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 2.736360859375,
+          "candidate": 2.733412890625,
+          "delta_ms": -0.0029479687500000296,
+          "p99_delta_ms": 0.016202000000000272,
+          "base_drift": -0.0008176562499997431,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 2.7397391406250002,
+          "candidate": 2.73068484375,
+          "delta_ms": -0.009054296875000034,
+          "p99_delta_ms": -0.03360099999999999,
+          "base_drift": -0.012256718750000228,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 2.7340359375,
+          "candidate": 2.737712578125,
+          "delta_ms": 0.0036766406250001715,
+          "p99_delta_ms": -0.01394700000000082,
+          "base_drift": 0.012209687499999955,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    "small900": {
+      "baseline_ms": 3.9354883593750003,
+      "candidate_ms": 3.9369176041666667,
+      "delta_ms": 0.0014292447916663953,
+      "delta_percent": 0.036316834434590994,
+      "baseline_p99": 4.077105,
+      "candidate_p99": 4.0696,
+      "p99_delta_ms": -0.007505000000000095,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 3.925045625,
+          "candidate": 3.9344049999999995,
+          "delta_ms": 0.009359374999999392,
+          "p99_delta_ms": 0.042933999999999806,
+          "base_drift": 0.001911250000000475,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 3.93131171875,
+          "candidate": 3.934552343749999,
+          "delta_ms": 0.00324062499999922,
+          "p99_delta_ms": 0.024068999999999008,
+          "base_drift": -0.001460312500000338,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 3.950107734375,
+          "candidate": 3.94179546875,
+          "delta_ms": -0.00831226562499987,
+          "p99_delta_ms": -0.023334000000000188,
+          "base_drift": 0.01195578125000063,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    "smallwindow": {
+      "baseline_ms": 1.7019286458333334,
+      "candidate_ms": 1.700744375,
+      "delta_ms": -0.0011842708333333896,
+      "delta_percent": -0.06958404726500333,
+      "baseline_p99": 1.8278880000000002,
+      "candidate_p99": 1.828783,
+      "p99_delta_ms": 0.0008949999999998681,
+      "samples_per_arm": 3840,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 1.70445453125,
+          "candidate": 1.71617015625,
+          "delta_ms": 0.011715625000000118,
+          "p99_delta_ms": 0.006472999999999729,
+          "base_drift": 0.03580562500000006,
+          "base_slots": [
+            2,
+            7
+          ],
+          "candidate_slots": [
+            4,
+            5
+          ]
+        },
+        {
+          "round": 2,
+          "base": 1.6959903124999998,
+          "candidate": 1.6966167968749999,
+          "delta_ms": 0.0006264843750001248,
+          "p99_delta_ms": -0.008517000000000108,
+          "base_drift": 0.009267499999999762,
+          "base_slots": [
+            1,
+            8
+          ],
+          "candidate_slots": [
+            3,
+            6
+          ]
+        },
+        {
+          "round": 3,
+          "base": 1.7053410937499998,
+          "candidate": 1.6894461718750002,
+          "delta_ms": -0.015894921874999524,
+          "p99_delta_ms": 0.028476999999999864,
+          "base_drift": -0.02935156250000026,
+          "base_slots": [
+            0,
+            9
+          ],
+          "candidate_slots": [
+            2,
+            7
+          ]
+        }
+      ],
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    }
+  },
+  "design": "3rotated symmetric10-slot rounds;800discard160"
+}

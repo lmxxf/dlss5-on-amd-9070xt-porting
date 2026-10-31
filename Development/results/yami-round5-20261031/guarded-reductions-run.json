@@ -1,0 +1,67 @@
+{
+  "name": "guarded-reductions-run",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "sha256": "5663994f2bd7c365000c580fcd2478e39df5c6052aeabdfe6d7ae7571fd556be"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-compile\\probe.hsaco",
+      "sha256": "9ee4e11e9c08253e1e944a60e880e3b283ce5ef2923877781481ae5fa9bb41a6"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-llvm.hsaco",
+      "sha256": "f261108283bdaab0fbb84989d4e5f174fc9767b7c47c0d446a9b487c4c65a911"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "guarded-reductions-run/comgr-dotseq",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-compile\\probe.hsaco\" guarded_dotseq_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/comgr-dotpar",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-compile\\probe.hsaco\" guarded_dotpar_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/comgr-wmma2",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-compile\\probe.hsaco\" guarded_wmma2_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/comgr-wmma4",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-compile\\probe.hsaco\" guarded_wmma4_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/llvm23-dotseq",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-llvm.hsaco\" guarded_dotseq_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/llvm23-dotpar",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-llvm.hsaco\" guarded_dotpar_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/llvm23-wmma2",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-llvm.hsaco\" guarded_wmma2_probe",
+      "env": {}
+    },
+    {
+      "label": "guarded-reductions-run/llvm23-wmma4",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-reductions-llvm.hsaco\" guarded_wmma4_probe",
+      "env": {}
+    }
+  ]
+}

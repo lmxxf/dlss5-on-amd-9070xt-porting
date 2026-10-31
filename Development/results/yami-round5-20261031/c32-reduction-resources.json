@@ -1,0 +1,2004 @@
+{
+  "c32-dotpar": {
+    "c32-wave1-fast": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 164,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 159,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 159,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 153,
+        "private": 0
+      }
+    ],
+    "c32-wave1-fast-norm900": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 132,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 164,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 159,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 150,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 149,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 159,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 153,
+        "private": 0
+      }
+    ]
+  },
+  "c32-wmma2": {
+    "c32-wave1-fast": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 128,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 146,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 163,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 151,
+        "private": 0
+      }
+    ],
+    "c32-wave1-fast-norm900": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 128,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 146,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 163,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 151,
+        "private": 0
+      }
+    ]
+  },
+  "c32-wmma4": {
+    "c32-wave1-fast": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 128,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 146,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 163,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 151,
+        "private": 0
+      }
+    ],
+    "c32-wave1-fast-norm900": [
+      {
+        "name": "c32_wave1_chain",
+        "vgpr_before": 132,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped",
+        "vgpr_before": 129,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop",
+        "vgpr_before": 131,
+        "vgpr_after": 131,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix",
+        "vgpr_before": 130,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d",
+        "vgpr_before": 128,
+        "vgpr_after": 128,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8",
+        "vgpr_before": 131,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8",
+        "vgpr_before": 133,
+        "vgpr_after": 129,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features",
+        "vgpr_before": 132,
+        "vgpr_after": 130,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8",
+        "vgpr_before": 146,
+        "vgpr_after": 146,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up",
+        "vgpr_before": 163,
+        "vgpr_after": 163,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_chain_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_w16h",
+        "vgpr_before": 151,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_logit_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_b8d_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_prefix_b8d_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_mapped_b8_w16h",
+        "vgpr_before": 147,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_b8_w16h",
+        "vgpr_before": 149,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_logit_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_rgba_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_post_b8_features_w16h",
+        "vgpr_before": 148,
+        "vgpr_after": 148,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_b8_w16h",
+        "vgpr_before": 150,
+        "vgpr_after": 147,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_up_w16h",
+        "vgpr_before": 158,
+        "vgpr_after": 158,
+        "private": 0
+      },
+      {
+        "name": "c32_wave1_finish_dcrop_pool_b8d_w16",
+        "vgpr_before": 151,
+        "vgpr_after": 151,
+        "private": 0
+      }
+    ]
+  },
+  "c32-wmma-fused": {
+    "c32-wave1-fast": [],
+    "c32-wave1-fast-norm900": []
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "c64-wave2": [
+    {
+      "name": "c128_wave2",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 237,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bo",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 237,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi_bo",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi_ho",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    }
+  ],
+  "c64-wave2-fast": [
+    {
+      "name": "c128_wave2",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 237,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bo",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 237,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi_bo",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    },
+    {
+      "name": "c128_wave2_bi_ho",
+      "lds_before": 16384,
+      "lds_after": 8192,
+      "vgpr_before": 242,
+      "vgpr_after": 240,
+      "private": 0
+    }
+  ]
+}

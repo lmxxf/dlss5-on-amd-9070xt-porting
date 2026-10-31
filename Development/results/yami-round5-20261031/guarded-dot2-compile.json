@@ -1,0 +1,24 @@
+{
+  "name": "guarded-dot2-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-probe.hip",
+      "sha256": "eed64d328db8f78726d3522c621249e8532bb15a97ac2de4af73ca0033fc837f"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "guarded-dot2-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\probe.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-probe.hip\" comgr gfx1201"
+    }
+  ]
+}

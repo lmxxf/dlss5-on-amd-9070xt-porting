@@ -1,0 +1,16 @@
+--- hip/wave_owned_c32.inc
++++ Development/results/yami-round5-20261031/prob-direct/source/hip/wave_owned_c32.inc
+@@ -149,6 +149,13 @@
+ #if CW_PACK_CENSUS
+  cw_census<Site,Kind>(t);
+ #endif
++// Round5 isolated probability-only finite positive bounded path.
++ if constexpr(Site==4){
++  int lo=__builtin_amdgcn_cvt_pk_fp8_f32(t[0],t[1],0,false);
++  lo=__builtin_amdgcn_cvt_pk_fp8_f32(t[2],t[3],lo,true);
++  int hi=__builtin_amdgcn_cvt_pk_fp8_f32(t[4],t[5],0,false);
++  hi=__builtin_amdgcn_cvt_pk_fp8_f32(t[6],t[7],hi,true);return i2{lo,hi};
++ }
+ // Keep MODE and its four conversions indivisible: LLVM can hoist the FP8 intrinsics outside s_setreg.
+  if constexpr((CW_PACK_MODE_MASK&(1u<<Site))!=0){int lo,hi;
+   asm volatile("s_setreg_imm32_b32 hwreg(HW_REG_MODE, 23, 1), 1\n\t"

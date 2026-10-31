@@ -1,0 +1,75 @@
+--- Development/HIP/hip_reference_network.h
++++ Development/results/yami-round5-20261031/sp128/source/Development/HIP/hip_reference_network.h
+@@ -1053,6 +1053,7 @@
+  std::fprintf(stderr,"history_experiment requested=1 active=1 mode=MP1 metadata=UV_unjittered_assumed valid=%ux%u\n",W,opt.temporal_valid_height);
+ }
+ 
++if(R5Sp128()){SpGetPlan(W/8,H/8,128,10,4);SpGetPlan(W/8,H/8,128,57,4);HasFn("sp128fast","sp_init");HasFn("sp128fast","sp_run128");HasFn("sp128fast","sp_recover128");}
+ if(wave_owned_active)HasFn("c32_wave1","c32_wave1_post_b8_rgba");if(multi_predict||std::ifstream(opt.modules+"/multi-pass-predict.hsaco").good())EnsurePredictModule();InitVitVFragment();InitVitQKFragment();if(multi_pass>1)PrepareMultiPassFeeds();if(multi_skin)PrepareSkin();}catch(...){if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse ctor cleanup retained owner stream\n");throw;}if(pdl_flags){api.hipStreamSynchronize(stream);api.hipFree(pdl_flags);pdl_flags=nullptr;}for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);throw;}}
+  ~Network(){std::fprintf(stderr,"C32_POOL_FUSED calls=%llu\n",c32_pool_fused_calls);std::fprintf(stderr,"VIT_QKFRAG requested=%u available=%u producers=%llu consumers=%llu\n",unsigned(qkfrag_requested),unsigned(qkfrag_available),qkfrag_producer_calls,qkfrag_consumer_calls);std::fprintf(stderr,"VIT_VFRAG requested=%u available=%u explicit_ae0=%u producers=%llu consumers=%llu\n",unsigned(vfrag_requested),unsigned(vfrag_available),unsigned(vfrag_ae_off),vfrag_producer_calls,vfrag_consumer_calls);if(!pulse_lease.Close()){std::fprintf(stderr,"submit_pulse direct destructor retained owner stream; bridge must preclose\n");return;}std::fprintf(stderr,"submit_pulse resources create=%llu create_ok=%llu record=%llu record_ok=%llu destroy=%llu destroy_ok=%llu drain=%llu site_visits=%llu accepted=%llu reject_mask=%u lifetime_pdl_calls=%u\n",pulse_ops.create_calls,pulse_ops.create_ok,pulse_ops.record_calls,pulse_ops.record_ok,pulse_ops.destroy_calls,pulse_ops.destroy_ok,pulse_ops.drain_calls,pulse_site_visits,pulse_record_accepted,pulse_last_reject_mask,pdl_calls);{size_t wsum=0;for(auto&kv:weights)if(kv.second&&kv.second->owned)wsum+=kv.second->capacity;std::fprintf(stderr,"C512_W16_SUMMARY mode=%d w16_blocks=%llu stock_blocks=%llu ffn_mode=%d ffn_w16_blocks=%llu ffn_stock_blocks=%llu c32_mode=%d c32_w16_calls=%llu c32_stock_calls=%llu vit_mode=%d vit_w16_calls=%llu vit_stock_calls=%llu vit_contract_w16=%u vit_proj_w16=%u vit_inter_byte=%d vit_inter_byte_calls=%llu weights_count=%zu weights_bytes=%zu\n",C512W16Mode(),c512_w16_calls,c512_stock_calls,C512FfnW16Mode(),c512_ffn_w16_calls,c512_ffn_stock_calls,C32W16Mode(),c32_w16_calls,c32_stock_calls,VitW16Mode(),vit_w16_calls,vit_stock_calls,unsigned(compact_contract_w16),unsigned(compact_projection_w16),VitInterByteMode(),vit_inter_byte_calls,weights.size(),wsum);}api.hipSetDevice(int(opt.device));api.hipStreamSynchronize(stream);native_post_row.reset();experimental_history.reset();experimental_prefix.reset();experimental_raw.reset();experimental_logit.reset();experimental_weights.reset();experimental_sig.reset();experimental_recip.reset();temporal_features.reset();SpReport();pdl_keep.clear();if(pdl_flags){api.hipFree(pdl_flags);pdl_flags=nullptr;}if(opt.graph)std::printf("graph_stats builds=%u replays=%u\n",graph_builds,graph_replays);ClearGraph();for(auto&t:timings){api.hipEventDestroy(t.begin);api.hipEventDestroy(t.end);}adaptive_image_anchor.reset();adaptive_image_signature.reset();adaptive_image_delta.reset();adaptive_anchor_in.reset();adaptive_anchor_out.reset();adaptive_gain.reset();adaptive_stats.reset();adaptive_state.reset();device_noise.reset();gather_maps[0].clear();gather_maps[1].clear();weights.clear();inactive_model_weights.clear();inactive_model_gain.reset();inactive_model_post_row.reset();pool.clear();for(auto&m:modules)api.hipModuleUnload(m.second);api.hipStreamDestroy(stream);}
+  void PrintMemory(){size_t bytes=0,free=0,total=0;std::set<void*>seen;auto add=[&](const Tensor&t){if(t&&t->owned&&seen.insert(t->ptr).second)bytes+=t->capacity;};for(auto&t:pool)add(t);for(auto&w:weights)add(w.second);for(auto&maps:gather_maps)for(auto&m:maps)add(m.second);add(device_noise);api.Check(api.hipMemGetInfo(&free,&total),"memory stats");std::printf("memory owned_MiB=%.1f allocations=%zu device_free_MiB=%.1f total_MiB=%.1f\n",bytes/1048576.,seen.size(),free/1048576.,total/1048576.);}
+--- Development/HIP/swin_persistent_network.h
++++ Development/results/yami-round5-20261031/sp128/source/Development/HIP/swin_persistent_network.h
+@@ -1,5 +1,6 @@
+ #include "swin_persistent_types.h"
+ struct SpPlan {
++ std::string module_key="sp";
+  std::vector<SpLayer> layers;
+  std::vector<SpNode> nodes;
+  std::vector<U> offsets;
+@@ -27,6 +28,7 @@
+  return fallback;
+ }
+ static U SpShift(U block){if(block>=40)return Shift(block);static constexpr U masks[]={0,3,1,2};U first=block>=15?15:block>=9?9:5;return masks[(block-first)%4];}
++bool R5Sp128()const{const char*v=std::getenv("NR_R5_SP128");return v&&std::strcmp(v,"1")==0&&!small_active&&fast_numeric&&multi_pass==1&&W==1920&&(H==1088||H==1152);}
+ bool SpEnabled(U c,bool decoder){
+  if(!sp_disabled&&sp_error_host&&sp_error_host[0].load(std::memory_order_acquire)){
+  sp_disabled=true;const char*msg="DLSS5 Swin ready-queue timeout/error: GPU serial recovery used; persistent disabled for this instance.\n";
+@@ -35,12 +37,12 @@
+  U bit=c==64?1:c==128?2:c==256?4:0;
+  U sides=SpEnv("SP_SIDES",3);
+  return !small_active&&(!Sp1440Geometry(opt)||sp1440_ready)&&!sp_disabled&&wave_owned_active&&opt.pooled&&!opt.graph&&!observer&&opt.dump_dir.empty()&&
+-   (SpEnv("SP_CHANNELS",SwinRunCompatible(opt)?4u:0u)&bit)&&(sides&(decoder?2u:1u));
++   (SpEnv("SP_CHANNELS",(SwinRunCompatible(opt)?4u:0u)|(R5Sp128()?2u:0u))&bit)&&(sides&(decoder?2u:1u));
+ }
+ SpPlan &SpGetPlan(U w,U h,U c,U first,U layers){
+  auto key=std::make_tuple(w,h,c,first);auto it=sp_plans.find(key);
+  if(it!=sp_plans.end())return it->second;
+- SpPlan plan;plan.offsets.push_back(0);plan.next_ticket=SpEnv("SP_TICKET_START");
++ SpPlan plan;plan.module_key=(c==128&&R5Sp128())?"sp128fast":"sp";plan.offsets.push_back(0);plan.next_ticket=SpEnv("SP_TICKET_START");
+  if(layers>8)throw std::runtime_error("SP layer limit");
+  if(!sp_error_allocation){
+   int(*device_pointer)(void**,void*,unsigned)=nullptr;
+@@ -50,9 +52,9 @@
+   new(sp_error_host)std::atomic<U>(0);new(sp_error_host+1)std::atomic<U>(0);
+   api.Check(device_pointer(reinterpret_cast<void**>(&sp_error_device),sp_error_allocation,0),"SP mapped error device pointer");
+  }
+- if(!modules.count("sp")){Handle m{};api.Check(api.LoadModule(&m,(opt.modules+"/swin-persistent.hsaco").c_str()),"SP module");modules["sp"]=m;}
+- plan.w16=HIP_C256_FFN_W16&&c==256&&HasFn("sp","sp_run256_w16")&&HasFn("sp","sp_recover256_w16");
+- plan.pair_fn=HIP_SP_INIT_PAIR&&HasFn("sp","sp_init_pair");
++ if(!modules.count(plan.module_key)){Handle m{};const char*file=plan.module_key=="sp128fast"?"/swin-persistent-fast.hsaco":"/swin-persistent.hsaco";api.Check(api.LoadModule(&m,(opt.modules+file).c_str()),"SP module");modules[plan.module_key]=m;}
++ plan.w16=HIP_C256_FFN_W16&&c==256&&HasFn(plan.module_key,"sp_run256_w16")&&HasFn(plan.module_key,"sp_recover256_w16");
++ plan.pair_fn=HIP_SP_INIT_PAIR&&HasFn(plan.module_key,"sp_init_pair");
+  for(U i=0;i<layers;i++){
+   U b=first+i,shift=SpShift(b),sx=(shift&1)?4:0,sy=(shift&2)?4:0,ww=(w+sx+7)&~7u,hh=(h+sy+7)&~7u;
+   auto out=New(size_t(w)*h*c/4);
+@@ -124,15 +126,15 @@
+    U ql=SpEnv("SP_TICKET_LIMIT",std::numeric_limits<U>::max());if(ql<q.total)ql=q.total;if(q.next_ticket>ql-q.total)continue;partner=&q;break;}
+  if(plan.pre_inited&&plan.pre_base==plan.next_ticket){plan.pre_inited=false;}
+  else if(partner){U*s2=static_cast<U*>(P(partner->state));U t2=partner->total,b2=partner->next_ticket,f2=partner->first;void*pargs[]={&p,&s2,&t2,&b2,&f2};
+-  api.Check(api.hipModuleLaunchKernel(Fn("sp","sp_init_pair"),U((3*size_t(std::max(plan.total,t2))+255)/256),1,1,256,1,1,0,stream,pargs,nullptr),"SP init pair");
++  api.Check(api.hipModuleLaunchKernel(Fn(plan.module_key,"sp_init_pair"),U((3*size_t(std::max(plan.total,t2))+255)/256),1,1,256,1,1,0,stream,pargs,nullptr),"SP init pair");
+   partner->pre_inited=true;partner->pre_base=b2;}
+- else{plan.pre_inited=false;api.Check(api.hipModuleLaunchKernel(Fn("sp","sp_init"),U((3*size_t(plan.total)+255)/256),1,1,256,1,1,0,stream,args,nullptr),"SP init");}
++ else{plan.pre_inited=false;api.Check(api.hipModuleLaunchKernel(Fn(plan.module_key,"sp_init"),U((3*size_t(plan.total)+255)/256),1,1,256,1,1,0,stream,args,nullptr),"SP init");}
+  const char*sfx=plan.w16?"_w16":"";
+  std::string kernel="sp_run"+std::to_string(c)+sfx;
+  auto start=std::chrono::steady_clock::now();
+- api.Check(api.hipModuleLaunchKernel(Fn("sp",kernel),plan.total,1,1,c,1,1,0,stream,args,nullptr),"SP run");
++ api.Check(api.hipModuleLaunchKernel(Fn(plan.module_key,kernel),plan.total,1,1,c,1,1,0,stream,args,nullptr),"SP run");
+  std::string recovery="sp_recover"+std::to_string(c)+sfx;
+- api.Check(api.hipModuleLaunchKernel(Fn("sp",recovery),1,1,1,c,1,1,0,stream,args,nullptr),"SP bounded recovery");
++ api.Check(api.hipModuleLaunchKernel(Fn(plan.module_key,recovery),1,1,1,c,1,1,0,stream,args,nullptr),"SP bounded recovery");
+  plan.next_ticket+=plan.total;sp_runs++;sp_jobs+=plan.total;
+  if(SpEnv("SP_VALIDATE")||SpEnv("SP_TRACE")){
+   api.Check(api.hipStreamSynchronize(stream),"SP diagnostic completion");

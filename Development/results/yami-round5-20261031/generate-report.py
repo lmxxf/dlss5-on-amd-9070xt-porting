@@ -1,0 +1,37 @@
+from pathlib import Path
+import json,subprocess
+p=Path(__file__).parent
+cases=[('R2-D仅MH（首批）','r2d-statistics.json'),('R2-D仅MH（安静复核）','r2d-quiet-statistics.json'),('ViT perm修复','vit-fix-statistics.json'),('ViT原生RTZ','vit-rtz-statistics.json'),('C32概率intrinsic免MODE','prob-statistics.json'),('C512倒数复用','c512-den-statistics.json'),('C128持久阶段','sp128-statistics.json'),('ViT追加后缀集成','pair-statistics.json'),('ViT常量名称集成','pair-select-statistics.json'),('ViT句柄预绑定','pair-bind-statistics.json'),('ViT核内640分支','token-pair-statistics.json'),('通用句柄缓存','fn-cache-statistics.json'),('C64/C128/C256概率免MODE','mh-prob-statistics.json'),('C512概率去clamp','c512-prob-statistics.json'),('C512概率去clamp（独立长验证）','c512-prob-long-statistics.json'),('C512 Small1080集成','c512-scope-statistics.json'),('C512倒数增量（A=clamp-only）','c512-prob-den-statistics.json'),('C32保留汇编顺序免MODE（修正预检后）','prob-asm-verified-statistics.json')]
+lines=['# Round 5：无损候选实测、ViT故障定位与性能边界审查','', '基线：`b60e6a8c`。执行者：闇，单进程主攻，无子代理。所有试验在隔离目录进行。','', '本报告的数表由本目录 JSON 自动生成。负值表示候选耗时下降；不同批次绝对时间不相减。Gold指相对当前FAST1基线，不等于NVIDIA exact0.01。','', '## 1. 三个明确问题的处理','', 'ViT首帧差异已定位并修通：当前COMGR对half向量分量直接做`__builtin_bit_cast(ushort,x[e])`会读成元素0。最小GPU例子1024组×8元素，直接写法7168处错误；先复制到标量再bit_cast为0差异。没有发现af0/af1顺序颠倒。修复版从整数打包字中提取半字，七档各3帧、两臂合计42帧Gold全部通过。正确修复后的vfrag/qkfrag资源为57/56 VGPR（旧61/60），不是错误实现的55/54；普通attention仍68，全部private=0。','', '有效追踪显示score一致而浮点概率不同；早期half读回本身也用了有问题的分量bit_cast，因此那列“0差异”不能证明half向量正确。见`vector-element-verdict.json`、`first-divergence.json`。','', '修复版100MHz实时钟：Original1088 attention阶段-10.200µs、Small1080 -11.103µs，各3/3轮；完整Frame仍需独立过门，不能从两个计时域相减推宿主开销。整数提取和标量临时变量两种修复生成相同函数代码/metadata，未重复跑相同内核。','', 'Original三档的R2-D Both/MH-only已同批重测并补安静复核，结果见下表。安静复核MH-only比Both分别慢11.207 / 5.094 / 1.950µs；1088/1152各3/3轮均值回退。保持Both；960首批小正值未复现，不能据旧批宣布MH-only更好。','', '动态计数已直接修复Round4原脚本与ledger：内层4组key已展开，外层qt仍循环4次；每wave每qt消除48条lshr/xor，四qt注意力体为每wave192条；多wave工作组再按实际wave数累计。另修正SP启动网格为plan.total（1088为846），不是min(total,256)。这些是解析模型，不是性能计数器；C512/ViT不计入此处C32/MH/SP合计。','', '## 2. 完整Frame同批数据','', '普通批每slot240帧，丢80取160；每profile三轮ABBA、每臂960稳态样本。标记“独立长验证”的C512批为800帧丢160，每臂3840样本。C512倒数增量一行的A为clamp-only、B为clamp+倒数外提；不把其Δ直接当成相对b60的完整收益。','', '|候选|档位|A ms|B ms|Δmean µs|Δp99 µs|mean/p99赢轮|逐轮Δmean µs|','|---|---|---:|---:|---:|---:|---|---|']
+missing=[]
+for name,file in cases:
+ f=p/file
+ if not f.exists():missing.append(file);continue
+ for profile,t in json.loads(f.read_text())['tiers'].items():
+  rr=t['rounds'];mw=sum(r['delta_ms']<0 for r in rr);tw=sum(r['p99_delta_ms']<0 for r in rr)
+  lines.append(f"|{name}|{profile}|{t['baseline_ms']:.6f}|{t['candidate_ms']:.6f}|{t['delta_ms']*1000:+.3f}|{t['p99_delta_ms']*1000:+.3f}|{mw}/3，{tw}/3|"+' / '.join(f"{r['delta_ms']*1000:+.3f}"for r in rr)+'|')
+lines += ['', '表中token分支的Original960虽小正，但实际改动的qk640核未在该档执行，不把它算成该算法的收益。C128持久阶段保留边界数学，实际新C128任务队列运行且fallback=0；它能逐位一致，但稳态更慢，不能用较快的冷启动平均值冒充提速。','', '## 3. 集成与独立验证','', 'ViT原生RTZ在孤立替换批Small1080曾三轮mean/p99全胜，但真实集成的收益不稳定。追加后缀发生42→50字符、容量46→92的实际分配；常量名称、句柄预绑定均分别实测，没有据此猜测全部损失的原因。','']
+f=p/'pair-qualified-long-statistics.json'
+if f.exists():
+ t=json.loads(f.read_text());lines += [f"最终收窄版本只做一次预先写定的长验证：800帧/slot，丢160，每臂{t['samples_per_arm']}样本。均值{t['baseline_ms']:.6f}→{t['candidate_ms']:.6f}ms，Δmean {t['delta_us']:+.3f}µs，Δp99 {t['p99_delta_us']:+.3f}µs。",'', '|轮次|Δmean µs|Δp99 µs|A槽漂移 µs|','|---|---:|---:|---:|']
+ for r in t['rounds']:lines.append(f"|{r['round']}|{r['delta_us']:+.3f}|{r['p99_delta_us']:+.3f}|{r['base_drift_us']:+.3f}|")
+lines += ['', '这次长验证不替换、不删除之前的短批；未确认均值收益，不能晋升。实测新导出只在Small1080运行，另外六档调用数为0；关闭、缺导出、关闭QK-fragment的回退也通过。','', '### C512 概率 clamp 分支', '', '仅删除概率处clamp，保留AV及其他量化点。w16核在真实函数字节范围内1796→1764条静态指令、176→144条med3、15056→14672字节，188 VGPR/private0不变。Small1080短筛和一次预定长批均3/3轮mean/p99改善，长批mean -12.081µs、p99 -21.861µs。随后继续做真实shape集成，不把模块替换成绩直接当作主线成绩。', '', '集成保留113个旧函数字节与metadata（共同地址偏移1024），新增w16导出与获益版机器码一致；未改宿主重编SHA与正式基线一致。每帧资格限定Small1920×1152、gfx1201 RX9070XT、FAST1/MP1/显式AE0且无history/graph等；按旧逻辑名返回预热句柄，维持原网格。关闭开关或缺导出回退，真实调用计数与完整Frame另验。晋升阈值在测量前写入c512-scope-plan.md。', '', '## 4. 缓存×新核的四臂对照','', '四臂使用同一个新宿主和模块，A0关闭两项；这是内部机制对照，不是旧产品before/after。每臂960样本，三轮对称交错。','', '|臂|mean ms|Δmean vs A0 µs|Δp99 vs A0 µs|逐轮Δmean µs|','|---|---:|---:|---:|---|']
+f=p/'deep-four-statistics.json'
+if f.exists():
+ for name,t in json.loads(f.read_text()).items():lines.append(f"|{name}|{t['mean_ms']:.6f}|{t['delta_us']:+.3f}|{t['p99_delta_us']:+.3f}|"+' / '.join(f"{r['delta_us']:+.3f}"for r in t['rounds'])+'|')
+lines += ['', '## 5. 代码布局对照','', '观察到改动未执行的qk640核也伴随Original1088退步，故另做布局对照，未直接归因为I-cache。LLVM23重装配会规范化部分未使用编码位；实验恢复全部93个生产函数原始字节及原始描述符资源位，只修正相对入口偏移。零填充版.text/.rodata/.note与生产完全相同；填充版函数代码和metadata完全相同，Gold通过。','', '512/1024/1792字节均保留首筛；仅两个Small1080微小正值再做独立三轮确认：','', '|布局|Δmean µs|Δp99 µs|逐轮Δmean µs|','|---|---:|---:|---|']
+f=p/'layout-confirm-statistics.json'
+if f.exists():
+ for name,t in json.loads(f.read_text())['tiers'].items():lines.append(f"|{name}|{t['delta_ms']*1000:+.3f}|{t['p99_delta_ms']*1000:+.3f}|"+' / '.join(f"{r['delta_ms']*1000:+.3f}"for r in t['rounds'])+'|')
+lines += ['', '确认没有保住首筛正值，不采纳。此结果也不足以解释此前全部布局/装载扰动。','', '## 6. 原语、资源与可复核证据','', '- `rtz_exhaustive.cpp/.hip`：ViT区间4,513,793个位型，逆序配对覆盖两位置；输出逐索引stamp检查，避免未执行但读回零的假通过。实测pair_diff=0、coverage_diff=0，见rtz-exhaustive-run日志。','- `cpu-proof.json`在上一轮隔离目录；本轮保留最小向量分量复现、完整核追踪与两种修复的代码身份比较。','- `candidate-source-sha256.json`、各compile目录、各Gold/perf manifest和原始CSV保留。所有性能测试共用game-check、原子gpu.lock、磁盘≥100GB与15秒看门狗；编译允许180秒且仍持同一锁。','- 实测occupancy API：stock/fixed的qkfrag与vfrag均报告block32、dynamic LDS0时64 blocks/multiprocessor；这是API预测，不是动态驻留计数，不能宣称VGPR下降使实际占用率上升。', '- `layout/layout-proof.json`及`layout/descriptor-audit.json`记录函数字节、描述符和地址修改边界。','- 计数修复留有`c32-rolled-qt-isa.txt`（16条perm处于qt回边内）及`dynamic-correction.txt`。','', '## 7. 失败与解释边界','', 'prob-asm首批清单校验了旧目录而实际加载新目录，审计在统计分析前发现后将其标为未获正式资格，固定重跑全部Gold/ABBA一次；执行器增加实际模块目录和编译源参数必须在清单中的检查。原批保留，不用于晋升。\n\ntrace2误引用旧追踪源且记录步长不同，已作废并保留；trace3的half分量读回受同一bit_cast缺陷影响，不用于证明half数据。\n\nC512兼容性清单的FAST0/AE1分支曾错误继承FAST1专属C32_POOL_FUSED非零门；改为检查该测试真正要求的C512回退与逐位配对，新旧记录均保留。\n\nC512集成初始计数门误用包含Original预热的总C512计数，Small新路应为4×(N+1)，已用N=1/4独立探针验证8/20次；新清单重跑，旧中止批保留。\n\n关闭新功能的首个测试被benchmark的clear_flags清掉进程环境变量，实际上未关闭；改写测试flags后验证回退，旧失败未删。','', '所有收益判断来自同批交错数据；不以VGPR下降、指令减少、局部核加速替代完整Frame门。没有把旧Mochizuki数据当新版对照，也没有从历史纯NN绝对值扣出本轮收益。','', '## 8. 当前结论与未达成部分','']
+if missing:lines += ['**报告尚未完成：等待 '+', '.join(missing)+'。**','']
+else:lines += ['本轮具体问题均有实现、失败定位和实测记录。最终是否有新增主线采纳，以`final-decision.json`为准。','']
+lines += ['**没有得到“当前架构与0 bit-diff约束下的性能上限”证明。** 这些试验能否定具体实现，不能覆盖所有布局、跨层组合和编译调度；当前也没有与实测时间相接的下界。把本轮负实验写成全局上限，仍会重犯355规程指出的问题。','', '生产安装、发行ZIP与外部仓库未修改；没有push。最终锁与进程状态见`final-status.json`。']
+lines += ['', (p/'report-boundaries.md').read_text(), '', '## 11. 修正后的动态指令模型', '', '|档位|动态qt迭代/帧|R2-D省rcp（wave指令）|R3-A省cmp+cnd（wave指令）|R4-A省lshr+xor（wave指令）|','|---|---:|---:|---:|---:|']
+for name,t in json.loads((p/'dynamic-rcp-ledger.json').read_text()).items():
+ lines.append(f"|{name}|{t['total_dynamic_qt_iters']:,}|{t['r2d_wave_v_rcp_f32_saved']:,}|{t['r3a_c32_wave_cmp_cnd_saved']:,}|{t['r4a_c32_mh_wave_valu_saved']:,}|")
+lines += ['', '以上只覆盖模型中的C32/MH/SP注意力体；lane计数是wave数乘32，不是额外的wave指令。R4列计被消除的lshr/xor，不把它泛化为包括新增perm等所有opcode在内的净动态VALUs审计。历史Round4报告的×12表格不再作为正确口径，应以已修复脚本、ledger及本表为准。']
+if (p/'final-decision.json').exists():
+ decision=json.loads((p/'final-decision.json').read_text());lines[4:4]=[decision['summary_zh'], '']
+else:lines[4:4]=['**执行中：最终集成与组合实验尚未完成，当前文件为随证据生成的草稿。**','']
+(p/'DRAFT-ROUND5.md').write_text('\n'.join(lines)+'\n')

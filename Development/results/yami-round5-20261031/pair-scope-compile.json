@@ -1,0 +1,24 @@
+{
+  "name": "pair-scope",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\pair-scope.hip",
+      "sha256": "6716e315fed310b2a8aa387956f78948ba1e297e509db83f96aaed2a6bb7c232"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "pair-scope-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\pair-scope.hip\" comgr gfx1201"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+C256OnePlaneW16uses242VGPRandAPIcapacity2despiteLDS32->16KiB;nonW16uses228/API3. Tryphase-boundaryrcrefresh(outsideFFNhtloop)to shortenliverangeandcross<=240allocationthreshold. ThisisadaptedfromACTUALRound3r3c-configout-refresh_rc_onlysource,notthereportdescriptionofreadfirstlane. PreserveoriginalGold/perfdata;inspectresourcebeforeGPU.

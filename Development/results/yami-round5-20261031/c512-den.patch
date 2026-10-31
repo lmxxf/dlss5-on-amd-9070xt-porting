@@ -1,0 +1,19 @@
+--- Development/results/yami-round5-20261031/c512-base.hip
++++ Development/results/yami-round5-20261031/c512-candidate.hip
+@@ -1714,12 +1714,13 @@
+   _Pragma("unroll 2") for(uint side=0;side<2;side++){
+    _Pragma("unroll 2") for(uint h=0;h<2;h++)sums[side]=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,exponent[side+2*h],sums[side]);
+   }
++  const float den_inv=c5c_inv(sums[0][0]+sums[1][0]);
+   i2 prob[4];
+   _Pragma("unroll 4") for(uint key=0;key<4;key++){
+ #if C512_PAIR_PACK
+-   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
+-#else
+-   i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);c5c_bits(a,e,c5c_fp8(float(exponent[key][e])*inv));}prob[key]=a;
++   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=den_inv;pv[e]=c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
++#else
++   i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=den_inv;c5c_bits(a,e,c5c_fp8(float(exponent[key][e])*inv));}prob[key]=a;
+ #endif
+   }
+   _Pragma("unroll 2") for(uint ci=0;ci<2;ci++){

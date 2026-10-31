@@ -1,0 +1,24 @@
+{
+  "name": "c512-scope-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-scope.hip",
+      "sha256": "9f8be72f4b2b9f2a117317bb2dd1d572a058718ad4c6bee93628ccdd40154bf1"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "c512-scope-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\c512-scope.hip\" comgr gfx1201"
+    }
+  ]
+}

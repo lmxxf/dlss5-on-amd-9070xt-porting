@@ -4,10 +4,14 @@ Analytical dispatch & wave/lane dynamic instruction model for:
 - R2-D: Softmax ones-WMMA denominator reciprocal 8 -> 1 hoist (`v_rcp_f32_e32`)
 - R3-A: C32 `CW_FMED3_CLAMP=1` (`v_med3_num_f32` replacing 31 `v_cmp_gt_f32_e64` + 31 `v_cndmask_b32_e64` in Softmax)
 - R4-A: Softmax paired exponent bit-map merge (`__builtin_amdgcn_perm(bits(af1), bits(af0), 0x06050201u) & 0x7fe07fe0u`,
-  saving 32 `v_lshrrev_b32` + 16 `v_xor_b32` = 48 VALU instructions per wave per block in C32/C64/C128/C256/SP, and 48/47
-  instructions per wave per block in C512 compact attention).
+  saving 32 `v_lshrrev_b32` + 16 `v_xor_b32` = 48 VALU instructions per wave per qt iteration in C32/C64/C128/C256/SP).
+  C512 compact attention and ViT are not included in this ledger.
+  R4-A fields count eliminated lshr/xor instructions, not a census of all replacement/opcode deltas or total executed VALU.
 
-Model Scope & Audit Notes (Responding to Yami Round 3 Review P2-2):
+Model Scope & Audit Notes (Round 5 corrections included):
+- Kernel labels describe logical attention bodies, not a complete observed dispatch census. In original960,
+  the four C256 boundary layers use c256_attn_wave{,_bo} attention-only exports; their shared W2 Softmax
+  body still has eight waves per window and four qt iterations, so the counted arithmetic is unchanged.
 1. Analytical Model vs Hardware Performance Counter:
    - This script is an analytical launch-grid and loop-iteration model derived from `hip_reference_network.h` and
      `production_options.generated.h` (verified against runtime `SP_PLAN`, `C32_POOL_FUSED`, and `C512_W16_SUMMARY` logs),
@@ -20,7 +24,7 @@ Model Scope & Audit Notes (Responding to Yami Round 3 Review P2-2):
 3. Launch Grid vs Active Body Waves & Boundary Predication:
    - `sp_recover256_w16` is launched with `grid = 1` as an abort recovery guard and exits at line 115 (`if (!sp_load(p.state+2)) return;`);
      its body waves are `0`.
-   - For `sp_run256_w16`, the persistent launch grid is `min(total_tasks, 256)` workgroups, where each workgroup pops exactly 1 task
+   - For `sp_run256_w16`, the launch grid is `total_tasks` workgroups (SpStage passes plan.total), where each workgroup pops exactly 1 task
      from the queue of `total_tasks` (`846` tasks for `1920x1088` across 6 layers: `144*4 + 135*2 = 846`, matching runtime `SP_PLAN tasks=846`).
      Thus the number of executed layer-window bodies is exactly `total_tasks = 846` (`846 * 8 = 6,768` body waves per SP stage).
    - Within every active C32 (`c32_wave1_*`) and C64/C128/C256/SP (`c64/c128/c256_wave2_*`, `sp_run256_w16`) window body, `win < windows`
@@ -97,7 +101,7 @@ def build_schedule(W: int, H: int, small: bool):
                 rows.append({
                     "stage": "C256-SP", "blocks": "16..21", "kernel": "sp_run256_w16",
                     "w": w, "h": h, "shift": "3,1,2,0,3,1", "dispatches": 1, "layers": 6,
-                    "launched_wgs": min(sp_tasks, 256), "body_wgs": sp_tasks, "waves_per_wg": w_per_wg, "qt": 4,
+                    "launched_wgs": sp_tasks, "body_wgs": sp_tasks, "waves_per_wg": w_per_wg, "qt": 4,
                     "static_v_rcp_f32_e32_before": 8, "static_v_rcp_f32_e32_after": 1, "static_v_s_rcp_f32": 0
                 })
                 rows.append({
@@ -134,7 +138,7 @@ def build_schedule(W: int, H: int, small: bool):
                 rows.append({
                     "stage": "C256-SP", "blocks": "49..54", "kernel": "sp_run256_w16",
                     "w": ow, "h": oh, "shift": "3,1,2,0,3,1", "dispatches": 1, "layers": 6,
-                    "launched_wgs": min(sp_tasks, 256), "body_wgs": sp_tasks, "waves_per_wg": w_per_wg, "qt": 4,
+                    "launched_wgs": sp_tasks, "body_wgs": sp_tasks, "waves_per_wg": w_per_wg, "qt": 4,
                     "static_v_rcp_f32_e32_before": 8, "static_v_rcp_f32_e32_after": 1, "static_v_s_rcp_f32": 0
                 })
                 rows.append({
@@ -186,8 +190,8 @@ def build_schedule(W: int, H: int, small: bool):
         r["lane_rcp_saved"] = r["wave_rcp_saved"] * 32
         is_c32 = r["stage"] == "C32"
         r["wave_cmp_cnd_saved_r3a"] = r["dynamic_qt_iters"] * 62 if is_c32 else 0
-        # R4-A saves 8 v_lshrrev_b32 + 4 v_xor_b32 = 12 VALU instructions per qt iteration (48 per wave per 4-qt block)
-        r["wave_valu_saved_r4a"] = r["dynamic_qt_iters"] * 12
+        # Round5 correction: kt/key has four unrolled groups inside rolled qt. Save 48 per wave per qt, 192 per wave per four-qt body.
+        r["wave_valu_saved_r4a"] = r["dynamic_qt_iters"] * 48
     return rows
 
 def main():

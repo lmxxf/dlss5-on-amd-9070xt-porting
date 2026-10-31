@@ -1,0 +1,21 @@
+{
+  "name": "guarded-dot2-run",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-probe.exe",
+      "sha256": "0a28bc4a572c84abfd12f5bc62f43a107623f4aebeb2d013908e0a754f58aa10"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-compile\\probe.hsaco",
+      "sha256": "50031d75aadcc62ebaea394b0974c3d02fa18229f101913818b7a7468e8ef620"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "guarded-dot2-run",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-probe.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\guarded-dot2-compile\\probe.hsaco\"",
+      "env": {}
+    }
+  ]
+}

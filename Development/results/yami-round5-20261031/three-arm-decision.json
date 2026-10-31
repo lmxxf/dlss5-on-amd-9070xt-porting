@@ -1,0 +1,16 @@
+{
+  "clamp": {
+    "pass_gate": false,
+    "reasons": [
+      "small1080 not all3 mean/p99 wins",
+      "original1088 pooled mean not improved"
+    ]
+  },
+  "combined": {
+    "pass_gate": true,
+    "reasons": []
+  },
+  "increment_reasons": [],
+  "selected_for_further_correctness_validation": "combined",
+  "not_a_deployment_or_upper_bound_proof": true
+}

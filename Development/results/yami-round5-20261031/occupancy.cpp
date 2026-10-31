@@ -1,0 +1,3 @@
+#include "hip_api.h"
+using namespace hip_probe;
+int main(int argc,char**argv){try{if(argc<4)throw std::runtime_error("MODULE BLOCKSIZE KERNEL...");Api a(7);a.Check(a.hipInit(0),"init");a.Check(a.hipSetDevice(0),"device");Handle m{};a.Check(a.LoadModule(&m,argv[1]),"module");int(*occ)(int*,Handle,int,size_t){};a.Load(occ,"hipModuleOccupancyMaxActiveBlocksPerMultiprocessor");int bs=std::stoi(argv[2]);for(int i=3;i<argc;i++){Handle f{};a.Check(a.hipModuleGetFunction(&f,m,argv[i]),"fn");int blocks=-1;a.Check(occ(&blocks,f,bs,0),"occupancy");printf("OCC kernel=%s block_size=%d dynamic_lds=0 api_blocks_per_multiprocessor=%d\n",argv[i],bs,blocks);}a.hipModuleUnload(m);return 0;}catch(const std::exception&e){fprintf(stderr,"OCC_FAIL %s\n",e.what());return 1;}}

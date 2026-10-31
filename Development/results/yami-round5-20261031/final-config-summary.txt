@@ -1,0 +1,312 @@
+{
+  "arm": "minimal",
+  "configurations": 20,
+  "file_pairs_compared": 138,
+  "all_paired_bit_diff_zero": true,
+  "cases": [
+    {
+      "configuration": "ae1-original1088",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae1-small1080",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae3-original1088",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "ae3-small1080",
+      "file_pairs": 8,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "f9-switch-1080",
+      "file_pairs": 12,
+      "bit_diff": 0,
+      "distinct_frame_hashes": 4
+    },
+    {
+      "configuration": "f9-switch-900",
+      "file_pairs": 12,
+      "bit_diff": 0,
+      "distinct_frame_hashes": 4
+    },
+    {
+      "configuration": "fast0-original1088",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "fast0-original960",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "fast0-small1080",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "free-orig-896x512",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "free-small-896x512",
+      "file_pairs": 2,
+      "bit_diff": 0
+    },
+    {
+      "configuration": "mode1-original1088",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "history_states": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          4
+        ]
+      ],
+      "scope": "MODE1 static fallback; no valid motion/depth metadata"
+    },
+    {
+      "configuration": "mode1-original960",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "history_states": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          4
+        ]
+      ],
+      "scope": "MODE1 static fallback; no valid motion/depth metadata"
+    },
+    {
+      "configuration": "mode1-small1080",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "history_states": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          4
+        ]
+      ],
+      "scope": "MODE1 static fallback; no valid motion/depth metadata"
+    },
+    {
+      "configuration": "reuse-ae1-original1088",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        6,
+        0,
+        6
+      ]
+    },
+    {
+      "configuration": "reuse-ae1-original960",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae1-small1080",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae3-original1088",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae3-original960",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    },
+    {
+      "configuration": "reuse-ae3-small1080",
+      "file_pairs": 8,
+      "bit_diff": 0,
+      "adaptive_csv_identical": true,
+      "states": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "reasons": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        3
+      ]
+    }
+  ],
+  "history_harness_controls": "selected-regression-verdict.json"
+}

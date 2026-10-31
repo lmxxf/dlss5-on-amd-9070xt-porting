@@ -1,0 +1,27 @@
+--- hip/c512_qkv_attention_compact.inc	2026-10-31 08:03:05.782691715 +0800
++++ Development/results/yami-round5-20261031/c512-scope/source/hip/c512_qkv_attention_compact.inc	2026-10-31 12:43:36.744691027 +0800
+@@ -116,7 +116,7 @@
+ DEV void c5c_bits(i2&v,uint e,uint b){v[e/4]=int(uint(v[e/4])|((b&255u)<<(8*(e%4))));}
+ DEV i2 c5c_load(const unsigned char*p,uint row,uint col){i2 a;__builtin_memcpy(&a,p+row*32+col,8);return a;}
+ 
+-template<bool DebugNorm,bool W16=false>
++template<bool DebugNorm,bool W16=false,bool ProbUnclamped=false>
+ DEV void c5c_body(const unsigned char*in8,const float*w,unsigned char*out,uint validwidth,uint validheight,uint width,uint height,uint sx,uint sy){
+  constexpr uint C=512,NW=C512_COMPACT_WAVES,QT=4/NW;
+  uint tid=__builtin_amdgcn_workitem_id_x(),lane=tid&31u,row=lane&15u,half=lane>>4,wave=tid/32;
+@@ -311,7 +311,7 @@
+   i2 prob[4];
+   _Pragma("unroll 4") for(uint key=0;key<4;key++){
+ #if C512_PAIR_PACK
+-   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
++   f8 pv{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);pv[e]=ProbUnclamped?float(exponent[key][e])*inv:c5c_pair_plain_input(float(exponent[key][e])*inv);}prob[key]=c5c_pack8_pairs(pv);
+ #else
+    i2 a{};_Pragma("unroll 8") for(uint e=0;e<8;e++){float inv=c5c_inv(sums[0][e]+sums[1][e]);c5c_bits(a,e,c5c_fp8(float(exponent[key][e])*inv));}prob[key]=a;
+ #endif
+@@ -354,4 +354,6 @@
+ void c512_qkv_attention_compact(const unsigned char*in8,const float*w,unsigned char*out,uint validwidth,uint validheight,uint workwidth,uint workheight,uint sx,uint sy){c5c_body<false,false>(in8,w,out,validwidth,validheight,workwidth,workheight,sx,sy);}
+ KERNEL __attribute__((amdgpu_flat_work_group_size(C512_COMPACT_WAVES*32,C512_COMPACT_WAVES*32)))
+ void c512_qkv_attention_compact_w16(const unsigned char*in8,const float*w,unsigned char*out,uint validwidth,uint validheight,uint workwidth,uint workheight,uint sx,uint sy){c5c_body<false,true>(in8,w,out,validwidth,validheight,workwidth,workheight,sx,sy);}
++KERNEL __attribute__((amdgpu_flat_work_group_size(C512_COMPACT_WAVES*32,C512_COMPACT_WAVES*32)))
++void c512_qkv_attention_compact_w16_prob(const unsigned char*in8,const float*w,unsigned char*out,uint validwidth,uint validheight,uint workwidth,uint workheight,uint sx,uint sy){c5c_body<false,true,true>(in8,w,out,validwidth,validheight,workwidth,workheight,sx,sy);}
+ #endif

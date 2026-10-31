@@ -1,0 +1,1 @@
+@{lock_present=(Test-Path 'D:\DLSSNR-Lab\gpu.lock');free_bytes=(Get-PSDrive D).Free;own_processes=@(Get-CimInstance Win32_Process | Where-Object {$_.ExecutablePath -like 'D:\DLSSNR-Lab\yami-round4-review-20261031\*'} | Select-Object ProcessId,ExecutablePath)} | ConvertTo-Json -Depth 4

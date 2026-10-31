@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "small1080": {
+      "baseline_ms": 5.289500208333333,
+      "candidate_ms": 5.287525625,
+      "delta_ms": -0.001974583333333335,
+      "delta_percent": -0.03733024398453466,
+      "baseline_p99": 5.574738,
+      "candidate_p99": 5.528442999999999,
+      "p99_delta_ms": -0.04629500000000064,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.268154375,
+          "candidate": 5.26885375,
+          "delta_ms": 0.0006993749999999466,
+          "p99_delta_ms": -0.006429999999999936,
+          "base_drift": -0.007245000000000168
+        },
+        {
+          "round": 2,
+          "base": 5.29473625,
+          "candidate": 5.289441875,
+          "delta_ms": -0.005294375000000073,
+          "p99_delta_ms": -0.0866599999999993,
+          "base_drift": 0.04590125000000089
+        },
+        {
+          "round": 3,
+          "base": 5.30561,
+          "candidate": 5.304281250000001,
+          "delta_ms": -0.0013287499999989905,
+          "p99_delta_ms": -0.003917999999999644,
+          "base_drift": 0.014643750000000288
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-small1080-r1-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r1-0-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.2717768750000005,
+      "p99": 5.433554,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r1-1-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.255540000000001,
+      "p99": 5.4534329999999995,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r1-2-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.2821675,
+      "p99": 5.561532000000001,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r1-3-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.264531875,
+      "p99": 5.565369,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r2-0-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.271785625,
+      "p99": 5.541814,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r2-1-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.280020625000001,
+      "p99": 5.499043,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r2-2-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.298863125,
+      "p99": 5.493234,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r2-3-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.317686875000001,
+      "p99": 5.597225,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r3-0-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.298288124999999,
+      "p99": 5.53749,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r3-1-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.292213125000001,
+      "p99": 5.505552,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r3-2-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.316349375,
+      "p99": 5.56333,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-perf/evidence/perf-small1080-r3-3-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.312931874999999,
+      "p99": 5.570903,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    }
+  ]
+}

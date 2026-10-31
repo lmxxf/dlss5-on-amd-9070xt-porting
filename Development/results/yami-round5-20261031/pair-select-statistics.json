@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "small1080": {
+      "baseline_ms": 5.303978437499999,
+      "candidate_ms": 5.303147708333333,
+      "delta_ms": -0.0008307291666653782,
+      "delta_percent": -0.01566237827801409,
+      "baseline_p99": 5.528791999999999,
+      "candidate_p99": 5.541816,
+      "p99_delta_ms": 0.01302400000000059,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.2952975,
+          "candidate": 5.2827278125,
+          "delta_ms": -0.012569687500000093,
+          "p99_delta_ms": -0.02164199999999994,
+          "base_drift": 0.00830374999999961
+        },
+        {
+          "round": 2,
+          "base": 5.3062109375,
+          "candidate": 5.295728124999999,
+          "delta_ms": -0.01048281250000116,
+          "p99_delta_ms": -0.010405999999999693,
+          "base_drift": -0.009515624999999694
+        },
+        {
+          "round": 3,
+          "base": 5.310426875,
+          "candidate": 5.3309871875,
+          "delta_ms": 0.02056031249999979,
+          "p99_delta_ms": 0.0298689999999997,
+          "base_drift": 0.026818750000000335
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-small1080-r1-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r1-0-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.291145625,
+      "p99": 5.514844999999999,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r1-1-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.277379375,
+      "p99": 5.499163,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r1-2-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.2880762500000005,
+      "p99": 5.493321,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r1-3-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.299449375,
+      "p99": 5.524357,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r2-0-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.31096875,
+      "p99": 5.512017999999999,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r2-1-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.28590625,
+      "p99": 5.505407999999999,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r2-2-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.305549999999999,
+      "p99": 5.515426,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r2-3-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.301453125,
+      "p99": 5.528792,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-0-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r3-0-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.2970175,
+      "p99": 5.504767,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-1-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r3-1-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.341768125,
+      "p99": 5.549178,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-2-candidate",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r3-2-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.32020625,
+      "p99": 5.547871,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-3-baseline",
+      "source_path": "Development/results/yami-round5-20261031/pair-select-perf/evidence/perf-small1080-r3-3-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.32383625,
+      "p99": 5.565237,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    }
+  ]
+}

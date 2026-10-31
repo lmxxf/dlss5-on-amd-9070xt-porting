@@ -1,0 +1,24 @@
+{
+  "name": "vit-scalar-temp",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-scalar-temp.hip",
+      "sha256": "64610b8350ba137a69f3c90d5bd39e56d83740e08e09d8bb322bb0994dfc8f95"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "vit-scalar-temp-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-scalar-temp.hip\" comgr gfx1201"
+    }
+  ]
+}

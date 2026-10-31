@@ -1,0 +1,44 @@
+[
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout_vfrag",
+    "vgpr_before": 61,
+    "vgpr_after": 55,
+    "lds": 0,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout_vfrag",
+    "vgpr_before": 61,
+    "vgpr_after": 55,
+    "lds": 0,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout_qkfrag",
+    "vgpr_before": 60,
+    "vgpr_after": 54,
+    "lds": 0,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout_qkfrag",
+    "vgpr_before": 60,
+    "vgpr_after": 54,
+    "lds": 0,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout",
+    "vgpr_before": 68,
+    "vgpr_after": 67,
+    "lds": 0,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout",
+    "vgpr_before": 68,
+    "vgpr_after": 67,
+    "lds": 0,
+    "private": 0
+  }
+]

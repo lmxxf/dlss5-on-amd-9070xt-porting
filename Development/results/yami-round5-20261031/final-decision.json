@@ -1,0 +1,11 @@
+{
+  "selected": "minimal",
+  "performance_qualified": true,
+  "configuration_qualified": true,
+  "source_integrated": true,
+  "upper_bound_proven": false,
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "summary_zh": "**最终仅整合 gfx1201 的现有 norm900 分支：Original960 mean −25.601µs（−0.408%），pooled p99 −30.551µs，三轮 mean 与 p99 全胜。七档 Gold 与最终20组配置、138对输出文件全部0 bit-diff。其余较大组合未通过预登记门槛，没有整合。源码与双架构80个对象已核对并保存；未 commit、push 或部署到游戏。**"
+}

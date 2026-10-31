@@ -1,0 +1,462 @@
+{
+  "c64-wave2": {
+    "baseline_sha_exact": true,
+    "candidate_sha256": "dbf6ecca9616d8cb3e66ad8bda1195097e7868fa8207083e0cf330ebe90d43f5",
+    "changed": [
+      {
+        "name": "c64_wave2",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 21868,
+        "bytes_after": 21768
+      },
+      {
+        "name": "c64_wave2_bi",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 20256,
+        "bytes_after": 20156
+      },
+      {
+        "name": "c64_wave2_bo",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 21380,
+        "bytes_after": 21280
+      },
+      {
+        "name": "c64_wave2_bi_bo",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 19764,
+        "bytes_after": 19664
+      },
+      {
+        "name": "c128_wave2",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 24948,
+        "bytes_after": 24848
+      },
+      {
+        "name": "c128_wave2_bi",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 23336,
+        "bytes_after": 23236
+      },
+      {
+        "name": "c128_wave2_bo",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 24456,
+        "bytes_after": 24356
+      },
+      {
+        "name": "c128_wave2_bi_bo",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 22844,
+        "bytes_after": 22744
+      },
+      {
+        "name": "c256_wave2",
+        "vgpr_before": 226,
+        "vgpr_after": 226,
+        "private": 0,
+        "bytes_before": 33832,
+        "bytes_after": 33732
+      },
+      {
+        "name": "c256_wave2_bi",
+        "vgpr_before": 234,
+        "vgpr_after": 234,
+        "private": 0,
+        "bytes_before": 32132,
+        "bytes_after": 32032
+      },
+      {
+        "name": "c256_wave2_bo",
+        "vgpr_before": 226,
+        "vgpr_after": 226,
+        "private": 0,
+        "bytes_before": 33344,
+        "bytes_after": 33244
+      },
+      {
+        "name": "c256_wave2_bi_bo",
+        "vgpr_before": 234,
+        "vgpr_after": 234,
+        "private": 0,
+        "bytes_before": 31672,
+        "bytes_after": 31572
+      },
+      {
+        "name": "c256_wave2_w16",
+        "vgpr_before": 238,
+        "vgpr_after": 238,
+        "private": 0,
+        "bytes_before": 32576,
+        "bytes_after": 32476
+      },
+      {
+        "name": "c256_wave2_bi_w16",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 30912,
+        "bytes_after": 30812
+      },
+      {
+        "name": "c256_wave2_bo_w16",
+        "vgpr_before": 238,
+        "vgpr_after": 238,
+        "private": 0,
+        "bytes_before": 32072,
+        "bytes_after": 31972
+      },
+      {
+        "name": "c256_wave2_bi_bo_w16",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 30416,
+        "bytes_after": 30316
+      },
+      {
+        "name": "c64_wave2_up",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 22668,
+        "bytes_after": 22568
+      },
+      {
+        "name": "c128_wave2_up",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24844,
+        "bytes_after": 24744
+      },
+      {
+        "name": "c64_wave2_up_lb",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 23340,
+        "bytes_after": 23240
+      },
+      {
+        "name": "c128_wave2_up_lb",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24936,
+        "bytes_after": 24856
+      },
+      {
+        "name": "c64_wave2_bi_ho",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 19668,
+        "bytes_after": 19568
+      },
+      {
+        "name": "c128_wave2_bi_ho",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 22744,
+        "bytes_after": 22644
+      },
+      {
+        "name": "c64_wave2_up_sh",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 22716,
+        "bytes_after": 22616
+      },
+      {
+        "name": "c128_wave2_up_sh",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24908,
+        "bytes_after": 24808
+      },
+      {
+        "name": "c64_wave2_up_lb_sh",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 23400,
+        "bytes_after": 23300
+      },
+      {
+        "name": "c128_wave2_up_lb_sh",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24980,
+        "bytes_after": 24892
+      },
+      {
+        "name": "c256_attn_wave",
+        "vgpr_before": 136,
+        "vgpr_after": 136,
+        "private": 0,
+        "bytes_before": 8336,
+        "bytes_after": 8236
+      },
+      {
+        "name": "c256_attn_wave_bo",
+        "vgpr_before": 136,
+        "vgpr_after": 136,
+        "private": 0,
+        "bytes_before": 7840,
+        "bytes_after": 7740
+      }
+    ]
+  },
+  "c64-wave2-fast": {
+    "baseline_sha_exact": true,
+    "candidate_sha256": "bcfc3f67b601e0caab41e1b6d8fe98fe21df15e78f7acfde7ed3aec1cce5634b",
+    "changed": [
+      {
+        "name": "c64_wave2",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 21560,
+        "bytes_after": 21460
+      },
+      {
+        "name": "c64_wave2_bi",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 19948,
+        "bytes_after": 19848
+      },
+      {
+        "name": "c64_wave2_bo",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 21348,
+        "bytes_after": 21248
+      },
+      {
+        "name": "c64_wave2_bi_bo",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 19732,
+        "bytes_after": 19632
+      },
+      {
+        "name": "c128_wave2",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 24700,
+        "bytes_after": 24600
+      },
+      {
+        "name": "c128_wave2_bi",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 23092,
+        "bytes_after": 22992
+      },
+      {
+        "name": "c128_wave2_bo",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 24424,
+        "bytes_after": 24324
+      },
+      {
+        "name": "c128_wave2_bi_bo",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 22812,
+        "bytes_after": 22712
+      },
+      {
+        "name": "c256_wave2",
+        "vgpr_before": 226,
+        "vgpr_after": 226,
+        "private": 0,
+        "bytes_before": 33524,
+        "bytes_after": 33424
+      },
+      {
+        "name": "c256_wave2_bi",
+        "vgpr_before": 234,
+        "vgpr_after": 234,
+        "private": 0,
+        "bytes_before": 31836,
+        "bytes_after": 31736
+      },
+      {
+        "name": "c256_wave2_bo",
+        "vgpr_before": 226,
+        "vgpr_after": 226,
+        "private": 0,
+        "bytes_before": 33312,
+        "bytes_after": 33212
+      },
+      {
+        "name": "c256_wave2_bi_bo",
+        "vgpr_before": 234,
+        "vgpr_after": 234,
+        "private": 0,
+        "bytes_before": 31640,
+        "bytes_after": 31540
+      },
+      {
+        "name": "c256_wave2_w16",
+        "vgpr_before": 238,
+        "vgpr_after": 238,
+        "private": 0,
+        "bytes_before": 32324,
+        "bytes_after": 32224
+      },
+      {
+        "name": "c256_wave2_bi_w16",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 30668,
+        "bytes_after": 30568
+      },
+      {
+        "name": "c256_wave2_bo_w16",
+        "vgpr_before": 238,
+        "vgpr_after": 238,
+        "private": 0,
+        "bytes_before": 32040,
+        "bytes_after": 31940
+      },
+      {
+        "name": "c256_wave2_bi_bo_w16",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 30384,
+        "bytes_after": 30284
+      },
+      {
+        "name": "c64_wave2_up",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 22508,
+        "bytes_after": 22408
+      },
+      {
+        "name": "c128_wave2_up",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24684,
+        "bytes_after": 24584
+      },
+      {
+        "name": "c64_wave2_up_lb",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 23180,
+        "bytes_after": 23080
+      },
+      {
+        "name": "c128_wave2_up_lb",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24792,
+        "bytes_after": 24692
+      },
+      {
+        "name": "c64_wave2_bi_ho",
+        "vgpr_before": 191,
+        "vgpr_after": 191,
+        "private": 0,
+        "bytes_before": 19404,
+        "bytes_after": 19304
+      },
+      {
+        "name": "c128_wave2_bi_ho",
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0,
+        "bytes_before": 22480,
+        "bytes_after": 22380
+      },
+      {
+        "name": "c64_wave2_up_sh",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 22560,
+        "bytes_after": 22460
+      },
+      {
+        "name": "c128_wave2_up_sh",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24752,
+        "bytes_after": 24652
+      },
+      {
+        "name": "c64_wave2_up_lb_sh",
+        "vgpr_before": 189,
+        "vgpr_after": 189,
+        "private": 0,
+        "bytes_before": 23244,
+        "bytes_after": 23144
+      },
+      {
+        "name": "c128_wave2_up_lb_sh",
+        "vgpr_before": 240,
+        "vgpr_after": 240,
+        "private": 0,
+        "bytes_before": 24836,
+        "bytes_after": 24736
+      },
+      {
+        "name": "c256_attn_wave",
+        "vgpr_before": 136,
+        "vgpr_after": 136,
+        "private": 0,
+        "bytes_before": 8096,
+        "bytes_after": 7996
+      },
+      {
+        "name": "c256_attn_wave_bo",
+        "vgpr_before": 136,
+        "vgpr_after": 136,
+        "private": 0,
+        "bytes_before": 7808,
+        "bytes_after": 7708
+      }
+    ]
+  }
+}

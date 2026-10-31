@@ -1,0 +1,52 @@
+{
+  "selected": null,
+  "checks": {
+    "base": {
+      "qualified": false,
+      "reasons": [
+        "small1080: not all3 mean/p99 wins"
+      ],
+      "sum7_delta_us": -73.08015624999831
+    },
+    "norm": {
+      "qualified": false,
+      "reasons": [
+        "small1080: not all3 mean/p99 wins"
+      ],
+      "sum7_delta_us": -121.99513020833352
+    },
+    "c256": {
+      "qualified": false,
+      "reasons": [
+        "smallwindow: p99 >+1%",
+        "small1080: not all3 mean/p99 wins",
+        "original1088 mean3/3 or pooled p99 failed",
+        "increment base-to-c256 failed"
+      ],
+      "sum7_delta_us": -85.74734374999915
+    },
+    "full": {
+      "qualified": false,
+      "reasons": [
+        "small1080: not all3 mean/p99 wins",
+        "original1088 mean3/3 or pooled p99 failed",
+        "increment norm-to-full failed"
+      ],
+      "sum7_delta_us": -118.35851562499843
+    }
+  },
+  "conditional_checks": {
+    "base-to-norm": [],
+    "c256-to-full": [],
+    "base-to-c256": [
+      "smallwindow: mean >+0.5%",
+      "smallwindow: p99 >+1%",
+      "original1088: conditional mean3/3 or pooledp99 failed"
+    ],
+    "norm-to-full": [
+      "small1080: conditional mean3/3 or pooledp99 failed"
+    ]
+  },
+  "scope": "performance gate only; still requires final configuration/ABI/source-artifact verification",
+  "global_upper_bound_proven": false
+}

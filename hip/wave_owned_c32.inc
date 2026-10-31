@@ -1,3 +1,28 @@
+#ifndef CW_EXACT_DEN_SUM
+#define CW_EXACT_DEN_SUM 0
+#endif
+#if defined(__gfx1201__) && CW_EXACT_DEN_SUM
+// Only positive Swin exponent F16 lattice; exact guarded reassociation, otherwise originalWMMA.
+using cw_exact_u4=uint __attribute__((ext_vector_type(4)));
+DEV float cw_exact_exp_sum64(const h8*ex,uint&tier){
+ float z0=0.f,z1=0.f,z2=0.f,z3=0.f;const uint ones=0x3c003c00u;
+ cw_exact_u4 w0=__builtin_bit_cast(cw_exact_u4,ex[0]),w1=__builtin_bit_cast(cw_exact_u4,ex[1]),w2=__builtin_bit_cast(cw_exact_u4,ex[2]),w3=__builtin_bit_cast(cw_exact_u4,ex[3]);
+ _Pragma("unroll")for(uint j=0;j<4;j++){
+  asm("v_dot2_f32_f16 %0, %1, %2, %0":"+v"(z0):"v"(w0[j]),"s"(ones));
+  asm("v_dot2_f32_f16 %0, %1, %2, %0":"+v"(z1):"v"(w1[j]),"s"(ones));
+  asm("v_dot2_f32_f16 %0, %1, %2, %0":"+v"(z2):"v"(w2[j]),"s"(ones));
+  asm("v_dot2_f32_f16 %0, %1, %2, %0":"+v"(z3):"v"(w3[j]),"s"(ones));
+ }
+ float local=(z0+z1)+(z2+z3);uint lane=__builtin_amdgcn_workitem_id_x()&31u;
+ float other=__builtin_bit_cast(float,__builtin_amdgcn_ds_bpermute(int((lane^16u)*4u),__builtin_bit_cast(int,local)));float den=local+other;
+ if(__builtin_amdgcn_ballot_w32(!(den<32.f))==0u){tier=0;return den;}
+ uint mn=0xffffffffu;
+ _Pragma("unroll")for(uint k=0;k<4;k++){cw_exact_u4 w=__builtin_bit_cast(cw_exact_u4,ex[k]);_Pragma("unroll")for(uint j=0;j<4;j++)asm("v_pk_min_u16 %0, %0, %1":"+v"(mn):"v"(w[j]));}
+ uint a=mn&65535u,b=mn>>16,e=(a<b?a:b)>>10;float bound=__builtin_bit_cast(float,(e+4u+127u)<<23);
+ bool safe=e>=1u&&e<=18u&&den<bound;
+ tier=__builtin_amdgcn_ballot_w32(!safe)==0u?1u:2u;return den;
+}
+#endif
 #ifndef CW_OUTPROJ_HOIST
 #define CW_OUTPROJ_HOIST 0
 #endif
@@ -470,9 +495,16 @@ CW_Q8_SET(a,e,v);}CW_Q8_END_SITE(a,3);
    }
    ex[kt]=__builtin_bit_cast(h8,pk);
   }
+#if defined(__gfx1201__) && CW_EXACT_DEN_SUM
+  uint cw_den_tier;float cw_den64=cw_exact_exp_sum64(ex,cw_den_tier);
+  if(cw_den_tier==2u){f8 sums{};h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
+   _Pragma("unroll 4") for(uint kt=0;kt<4;kt++)sums=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,ex[kt],sums);cw_den64=sums[0];}
+  const float inv=norm_inverse(cw_den64);
+#else
   f8 sums{};h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
   _Pragma("unroll 4") for(uint kt=0;kt<4;kt++)sums=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,ex[kt],sums);
   const float inv=norm_inverse(sums[0]);
+#endif
   i2 prob[4];_Pragma("unroll 4") for(uint kt=0;kt<4;kt++){CW_Q8_DECL(a);for(uint e=0;e<8;e++)CW_Q8_SET(a,e,float(ex[kt][e])*inv);CW_Q8_END_SITE(a,4);prob[kt]=a;}
   i2 av[2];for(uint ci=0;ci<2;ci++){f8 acc{};_Pragma("unroll 4") for(uint kt=0;kt<4;kt++)acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12((i2{values[kt*4+ci*2],values[kt*4+ci*2+1]}),prob[kt],acc);CW_Q8_DECL(a);for(uint e=0;e<8;e++)CW_Q8_SET(a,e,acc[e]);CW_Q8_END_SITE(a,5);av[ci]=a;}
   for(uint ci=0;ci<2;ci++){

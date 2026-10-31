@@ -1,0 +1,31 @@
+{
+  "input": "deterministic signed E4M3 bytes; 32 heads,16 queries,640 keys",
+  "records": 40960,
+  "score_differences": 0,
+  "half_vector_readback_differences": 0,
+  "fp32_probability_differences": 284221,
+  "fp8_pack_differences": 81895,
+  "first_old_probability_bits": [
+    "0x3e440000",
+    "0x3e560000",
+    "0x3e7c0000",
+    "0x3e5c0000",
+    "0x3e480000",
+    "0x3e5e0000",
+    "0x3e2a0000",
+    "0x3e700000"
+  ],
+  "first_new_probability_bits": [
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000",
+    "0x3e440000"
+  ],
+  "interpretation": "Candidate direct half-vector component bit_cast reads element0. Integer packed-half extraction fix completed; seven-tier Gold passes. See vector-element-verdict.json and vit-fix-gold.",
+  "half_readback_caveat": "This diagnostic used direct bit_cast on h8 components; minimal vector-element-probe later proves that readback form itself repeats element0. The zero half-readback diff is NOT evidence of correct per-element half data. Score and scalar probability fields remain independently useful.",
+  "root_cause_evidence": "vector-element-verdict.json: direct component bit_cast7168 mismatches; scalar temporary0 mismatches; integer extraction workaround passes7 full-frame Gold profiles."
+}

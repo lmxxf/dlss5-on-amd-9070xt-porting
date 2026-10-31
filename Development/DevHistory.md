@@ -944,3 +944,15 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
   - `small900`：`3.790010 -> 3.683215 ms`（**`-106.795 µs / -2.82%, p99 -92.842 µs, 3/3 轮`**）。
 - **最新生产 vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账**：`original1088` `8.032311 vs 5.628856 ms (+42.70%)`、`small1080` `4.786000 vs 3.377634 ms (+41.70%)`、`small900` `3.674233 vs 2.571150 ms (+42.90%)`。
 - **80 模块实物与正式宿主**：双架构 80 模块完整实物保留于 `Development/results/ksearch-round4-20261031/payload/HIP/` 并更新 `hip/SHA256SUMS`；正式 O2 `addon64`/`runtime`/`frame`/`pure`/`final-profile` 与 `runtime-smoke`（`exit=0`）完成。详见 `Development/results/ksearch-round4-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。
+
+
+### 2026-10-31 闇 Round 5：独立实机追查与 norm900 无损分母归约
+
+完整报告：`Development/results/yami-round5-20261031/GAP-EVALUATION-ROUND5-20261031.md`。以 `b60e6a8c` 为基线，当前会话亲自执行，无子代理。
+
+- ViT 成对指数映射 Gold 失败已定位为 COMGR 对 half 向量分量左值直接 bit_cast 取错元素；整数半字提取修复通过七档 Gold。100MHz attention 阶段 Original1088/Small1080 分别快 10.200/11.103µs，但最终整帧门槛未稳定通过，未合入。
+- 当前基线 R2-D 安静交错复核支持保留 Both；MH-only 在 Original1088/1152 三轮均值均回退。直接修复 Round4 动态计数 kt/qt 因子12→48及 SP 网格；Original1088 R4 目标 lshr/xor 消除计数改为35,343,936，不能当作包含新增指令的净 VALU 计数。旧历史条目的8,835,984口径由此更正。
+- 实测推进 C32 四种带精确性保护的归约、C64/C128/C256 单 LDS 平面、C512 clamp/倒数、ViT 编译/宿主绑定等分支。四个较大最终组合均未通过预登记长批门槛，失败结果完整保留。LDS occupancy API 的 blocks/MP 不能当作 waves/SIMD 或动态驻留；旧 Round2 相关断言撤回。
+- **仅整合 gfx1201 现有 c32-wave1-fast-norm900 分支的 guarded 四路 dot2 分母归约**：独立三轮 ABBA、800帧丢160、每臂3840样本，Original960 mean 6.268203→6.242602ms（−25.601µs/−0.408%），p99 −30.551µs，三轮 mean/p99 全胜。保持原 host dispatch 门；其他标准档位执行代码不变。
+- 七档 Gold、最终20配置138对输出文件全部0 bit-diff。双架构80对象与当前源码/清单匹配；保存于该轮 `payload/HIP/`。六个正式宿主沿用 b60 并校验 SHA。补齐 C512 deep 分架构编译选项，避免重建偏离基线。
+- 远端最终核验1298文件无漂移、无遗留任务、gpu.lock 已释放。源码及 hip/SHA256SUMS 已在工作区整合，未 commit/push/游戏部署。**未证明当前架构的性能上限，不认可“所有无损收益已抠干”。**

@@ -1,0 +1,222 @@
+{
+  "64": {
+    "c64-wave2": [
+      {
+        "name": "c64_wave2",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 188,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bo",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 188,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi_bo",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi_ho",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      }
+    ],
+    "c64-wave2-fast": [
+      {
+        "name": "c64_wave2",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 188,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bo",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 188,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi_bo",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      },
+      {
+        "name": "c64_wave2_bi_ho",
+        "lds_before": 8192,
+        "lds_after": 4096,
+        "vgpr_before": 191,
+        "vgpr_after": 189,
+        "private": 0
+      }
+    ]
+  },
+  "256": {
+    "c64-wave2": [
+      {
+        "name": "c256_wave2",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 226,
+        "vgpr_after": 224,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 234,
+        "vgpr_after": 228,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bo",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 226,
+        "vgpr_after": 224,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_bo",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 234,
+        "vgpr_after": 228,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 238,
+        "vgpr_after": 235,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bo_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 238,
+        "vgpr_after": 235,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_bo_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0
+      }
+    ],
+    "c64-wave2-fast": [
+      {
+        "name": "c256_wave2",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 226,
+        "vgpr_after": 224,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 234,
+        "vgpr_after": 228,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bo",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 226,
+        "vgpr_after": 224,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_bo",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 234,
+        "vgpr_after": 228,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 238,
+        "vgpr_after": 235,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bo_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 238,
+        "vgpr_after": 235,
+        "private": 0
+      },
+      {
+        "name": "c256_wave2_bi_bo_w16",
+        "lds_before": 32768,
+        "lds_after": 16384,
+        "vgpr_before": 242,
+        "vgpr_after": 242,
+        "private": 0
+      }
+    ]
+  }
+}

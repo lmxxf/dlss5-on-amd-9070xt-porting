@@ -1,0 +1,32 @@
+{
+  "c32-wave1-fast": {
+    "whole_file_identical": false,
+    "text_identical": true,
+    "all_functions_identical": true,
+    "metadata_identical": true,
+    "differing_sections": [
+      ".dynsym",
+      ".gnu.hash",
+      ".hash",
+      ".dynstr",
+      ".strtab"
+    ],
+    "rodata_identical": true,
+    "data_identical": true
+  },
+  "c32-wave1-fast-norm900": {
+    "whole_file_identical": false,
+    "text_identical": true,
+    "all_functions_identical": true,
+    "metadata_identical": true,
+    "differing_sections": [
+      ".dynsym",
+      ".gnu.hash",
+      ".hash",
+      ".dynstr",
+      ".strtab"
+    ],
+    "rodata_identical": true,
+    "data_identical": true
+  }
+}

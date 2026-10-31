@@ -1,0 +1,37 @@
+{
+  "name": "trace-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline-trace.hip",
+      "sha256": "b91570b189ab8cd1029d42dcb3d85ae067b6c401484c5b2d01b21f0166154105"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\candidate-trace.hip",
+      "sha256": "db261bd18b8eb91f5a3ed335c7d7c8932131fd3f47bc831358b8a4bef6ca655e"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "trace-compile/baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\trace.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline-trace.hip\" comgr gfx1201"
+    },
+    {
+      "label": "trace-compile/candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\trace.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\candidate-trace.hip\" comgr gfx1201"
+    }
+  ]
+}

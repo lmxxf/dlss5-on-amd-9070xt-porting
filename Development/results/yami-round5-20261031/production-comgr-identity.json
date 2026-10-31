@@ -1,0 +1,26 @@
+[
+  {
+    "arch": "gfx1201",
+    "module": "deep_fast-packed-fast",
+    "reference": "Development/results/yami-round5-20261031/vit-fix-compile/deep_fast-packed-fast.hsaco",
+    "code_addresses_metadata_rodata_identical": true
+  },
+  {
+    "arch": "gfx1201",
+    "module": "c512-m32-mh",
+    "reference": "Development/results/yami-round5-20261031/c512-prob-compile/c512-m32-mh.hsaco",
+    "code_addresses_metadata_rodata_identical": true
+  },
+  {
+    "arch": "gfx1200",
+    "module": "deep_fast-packed-fast",
+    "reference": "Development/results/ksearch-round4-20261031/payload/HIP/gfx1200/deep_fast-packed-fast.hsaco",
+    "code_addresses_metadata_rodata_identical": true
+  },
+  {
+    "arch": "gfx1200",
+    "module": "c512-m32-mh",
+    "reference": "Development/results/ksearch-round4-20261031/payload/HIP/gfx1200/c512-m32-mh.hsaco",
+    "code_addresses_metadata_rodata_identical": true
+  }
+]

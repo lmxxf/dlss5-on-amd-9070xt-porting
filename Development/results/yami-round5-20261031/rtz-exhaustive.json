@@ -1,0 +1,33 @@
+{
+  "name": "rtz-exhaustive",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rtz_exhaustive.hip",
+      "sha256": "0e70ccf2473ff6ae6df1b31f1be9a9abfcae2752d649bd8c86c8eeec8ccea875"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rtz_exhaustive.exe",
+      "sha256": "227335e71c5438a7779f2050e529c8d092ddbd100cb300c9e988f9182aa00fb9"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "rtz-exhaustive-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\probe.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\rtz_exhaustive.hip\" comgr gfx1201"
+    },
+    {
+      "label": "rtz-exhaustive-run",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rtz_exhaustive.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\rtz-exhaustive-compile\\probe.hsaco\""
+    }
+  ]
+}

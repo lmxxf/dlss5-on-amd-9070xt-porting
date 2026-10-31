@@ -1,0 +1,2 @@
+using uint=unsigned;
+extern "C" __attribute__((global)) void rtz_exhaustive(uint*out){uint i=__builtin_amdgcn_workgroup_id_x()*256+__builtin_amdgcn_workitem_id_x();const uint lo=0x3fb84000u,hi=0x3ffd2000u,n=hi-lo+1;if(i>=n)return;uint a=lo+i,b=hi-i;float x=__builtin_bit_cast(float,a),y=__builtin_bit_cast(float,b);uint h;asm("v_cvt_pkrtz_f16_f32 %0, %1, %2":"=v"(h):"v"(x),"v"(y));uint cand=(h<<4)&0x3ff03ff0u;uint oa=((((a>>13)-0x1c000u)<<4)+0x4000u)&65535u,ob=((((b>>13)-0x1c000u)<<4)+0x4000u)&65535u;out[2*i]=cand^(oa|(ob<<16));out[2*i+1]=i^0xa53c19e7u;}

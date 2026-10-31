@@ -43,6 +43,12 @@ def recipe(hip):
         yield name, compiler, ''.join(chunks), defs, sources, [o[len('-mllvm='):] for o in opts.split() if o.startswith('-mllvm=')]
 
 
+def effective_row_options(target, name, options):
+    # Preserve the verified production payload: gfx1200 C512 deep uses max-ilp,
+    # while gfx1201 uses COMGR's default schedule. See Round5 compiler audit.
+    return [] if target == 'gfx1201' and name == 'c512-m32-deep' else options
+
+
 def main():
     p = argparse.ArgumentParser(__doc__)
     p.add_argument('--hip', type=Path, default=Path(__file__).resolve().parents[3] / 'hip')
@@ -75,7 +81,7 @@ def main():
             # COMGR always calls the translation unit probe.hip.
             src = directory / 'probe.hip'
             src.write_text(source)
-            tasks.append((target, name, src, defs, sources, ropts if a.row_opts else []))
+            tasks.append((target, name, src, defs, sources, effective_row_options(target, name, ropts) if a.row_opts else []))
 
     def compile_one(task):
         target, name, src, defs, sources, ropts = task

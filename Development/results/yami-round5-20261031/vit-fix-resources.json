@@ -1,0 +1,50 @@
+[
+  {
+    "name": "vit_attention_fused_400_bytein_bout_vfrag",
+    "baseline_vgpr": 61,
+    "fixed_vgpr": 57,
+    "private": 0,
+    "baseline_bytes": 1956,
+    "fixed_bytes": 1888
+  },
+  {
+    "name": "vit_attention_fused_640_bytein_bout_vfrag",
+    "baseline_vgpr": 61,
+    "fixed_vgpr": 57,
+    "private": 0,
+    "baseline_bytes": 1956,
+    "fixed_bytes": 1888
+  },
+  {
+    "name": "vit_attention_fused_400_bytein_bout_qkfrag",
+    "baseline_vgpr": 60,
+    "fixed_vgpr": 56,
+    "private": 0,
+    "baseline_bytes": 1876,
+    "fixed_bytes": 1808
+  },
+  {
+    "name": "vit_attention_fused_640_bytein_bout_qkfrag",
+    "baseline_vgpr": 60,
+    "fixed_vgpr": 56,
+    "private": 0,
+    "baseline_bytes": 1876,
+    "fixed_bytes": 1808
+  },
+  {
+    "name": "vit_attention_fused_400_bytein_bout",
+    "baseline_vgpr": 68,
+    "fixed_vgpr": 68,
+    "private": 0,
+    "baseline_bytes": 2272,
+    "fixed_bytes": 2176
+  },
+  {
+    "name": "vit_attention_fused_640_bytein_bout",
+    "baseline_vgpr": 68,
+    "fixed_vgpr": 68,
+    "private": 0,
+    "baseline_bytes": 2272,
+    "fixed_bytes": 2176
+  }
+]

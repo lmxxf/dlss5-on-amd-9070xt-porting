@@ -1,0 +1,24 @@
+{
+  "name": "vector-element-isolation",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vector_element_probe.hip",
+      "sha256": "7e398c063a364e17b4a48014d3f9b7417d0be05d8cb157fabd15bc832382c266"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "vector-element-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\probe.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\vector_element_probe.hip\" comgr gfx1201"
+    }
+  ]
+}

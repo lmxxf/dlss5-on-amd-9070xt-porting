@@ -1,0 +1,31 @@
+{
+  "all_changed_source_modules": [
+    "deep_fast",
+    "deep_fast-packed",
+    "c32-wave1",
+    "c32-wave1-rtz",
+    "c64-wave2",
+    "c32-wave1-fast",
+    "c32-wave1-fast-norm900",
+    "c64-wave2-fast",
+    "deep_fast-packed-fast",
+    "vit-stream-fast",
+    "c512-m32-mh",
+    "c512-m32-deep",
+    "vit-stream",
+    "vit-wide-deep",
+    "swin-persistent",
+    "swin-persistent-fast"
+  ],
+  "remaining_comgr_modules": [
+    "deep_fast",
+    "deep_fast-packed",
+    "vit-stream-fast",
+    "c512-m32-deep",
+    "vit-stream",
+    "vit-wide-deep",
+    "swin-persistent",
+    "swin-persistent-fast"
+  ],
+  "jobs": 16
+}

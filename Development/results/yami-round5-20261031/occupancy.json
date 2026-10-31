@@ -1,0 +1,29 @@
+{
+  "name": "occupancy-readonly",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\occupancy.exe",
+      "sha256": "75817efecdba62e60163afb1b8b68e90384e1b2ec7eda24b26160aab1db9e0c0"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\HIP\\gfx1201\\deep_fast-packed-fast.hsaco",
+      "sha256": "566d33d6358ea6f418ae2405bcd7dec114d9917bede3d9fdca27f46e12dbe47d"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix-compile\\deep_fast-packed-fast.hsaco",
+      "sha256": "ab028133cf9ab16cf2027d1d2731cda58ed5dbcf065217fd8edba831120f13c3"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "occupancy/stock",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\occupancy.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\HIP\\gfx1201\\deep_fast-packed-fast.hsaco\" 32 vit_attention_fused_640_bytein_bout_qkfrag vit_attention_fused_640_bytein_bout_vfrag"
+    },
+    {
+      "label": "occupancy/fixed",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\occupancy.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\vit-fix-compile\\deep_fast-packed-fast.hsaco\" 32 vit_attention_fused_640_bytein_bout_qkfrag vit_attention_fused_640_bytein_bout_vfrag"
+    }
+  ]
+}

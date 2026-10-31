@@ -1,0 +1,37 @@
+{
+  "name": "vit-pair",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round4-review-20261031\\baseline.hip",
+      "sha256": "2b718c667cbffc80cccba09876c29614a7c3ee73b429746a231e69e186bc71e5"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round4-review-20261031\\candidate.hip",
+      "sha256": "f787481a57e3615eef3abcd4cfab6c05e3656cbcec2cbc172c19f40b27e67d81"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/baseline",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round4-review-20261031\\baseline.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/candidate",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round4-review-20261031\\candidate.hip\" comgr gfx1201"
+    }
+  ]
+}

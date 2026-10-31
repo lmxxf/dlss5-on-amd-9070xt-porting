@@ -1,0 +1,47 @@
+[
+  {
+    "manifest": "mh-prob-gold",
+    "jobs": 14,
+    "module_directories": [
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline\\modules",
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\mh-prob\\modules"
+    ],
+    "pins_complete": true
+  },
+  {
+    "manifest": "mh-prob-perf",
+    "jobs": 48,
+    "module_directories": [
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline\\modules",
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\mh-prob\\modules"
+    ],
+    "pins_complete": true
+  },
+  {
+    "manifest": "prob-asm-verified-gold",
+    "jobs": 14,
+    "module_directories": [
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline\\modules",
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\prob-asm\\modules"
+    ],
+    "pins_complete": true
+  },
+  {
+    "manifest": "prob-asm-verified-perf",
+    "jobs": 48,
+    "module_directories": [
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline\\modules",
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\prob-asm\\modules"
+    ],
+    "pins_complete": true
+  },
+  {
+    "manifest": "r2d-quiet-confirm",
+    "jobs": 36,
+    "module_directories": [
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\baseline\\modules",
+      "D:\\DLSSNR-Lab\\yami-round5-20261031\\candidate\\modules"
+    ],
+    "pins_complete": true
+  }
+]

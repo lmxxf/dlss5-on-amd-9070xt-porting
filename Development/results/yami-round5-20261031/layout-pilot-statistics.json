@@ -1,0 +1,44 @@
+{
+  "layout1024original1088": {
+    "baseline_ms": 8.383188125,
+    "candidate_ms": 8.397921875,
+    "delta_us": 14.733749999999546,
+    "p99_delta_us": 16.615999999999076,
+    "rounds": 1
+  },
+  "layout1024small1080": {
+    "baseline_ms": 5.353666250000001,
+    "candidate_ms": 5.3529759375,
+    "delta_us": -0.6903125000006227,
+    "p99_delta_us": -3.762000000000043,
+    "rounds": 1
+  },
+  "layout1792original1088": {
+    "baseline_ms": 8.407651874999999,
+    "candidate_ms": 8.406440624999998,
+    "delta_us": -1.2112500000007742,
+    "p99_delta_us": 33.26099999999954,
+    "rounds": 1
+  },
+  "layout1792small1080": {
+    "baseline_ms": 5.35757,
+    "candidate_ms": 5.35170125,
+    "delta_us": -5.868750000000311,
+    "p99_delta_us": -53.415999999999464,
+    "rounds": 1
+  },
+  "layout512original1088": {
+    "baseline_ms": 8.356184375000002,
+    "candidate_ms": 8.3621109375,
+    "delta_us": 5.926562499999122,
+    "p99_delta_us": 42.07400000000128,
+    "rounds": 1
+  },
+  "layout512small1080": {
+    "baseline_ms": 5.3225159374999995,
+    "candidate_ms": 5.335936875,
+    "delta_us": 13.420937500000285,
+    "p99_delta_us": 24.9290000000002,
+    "rounds": 1
+  }
+}

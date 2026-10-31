@@ -1,0 +1,61 @@
+{
+  "name": "production-rebuild-rowopts",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-deep_fast.hip",
+      "sha256": "deffdde93230f9c167ab578e58bab11a364dec2ad5e3f7636b4e1d300fcccf07"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-deep_fast-packed.hip",
+      "sha256": "728fdc2b3c8bfe6611ddd5622ac4d50ed6e80b0fdb1f80230c155926dc09d49b"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-vit-stream-fast.hip",
+      "sha256": "ff52465c7e89b4091375110f6db409d61171b90e01994921f55cdec7690b5955"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-c512-m32-deep.hip",
+      "sha256": "246628128872a60e87caf70f4da72b37a4c0f3f4a3db331cb5afbc6c39501781"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-vit-stream.hip",
+      "sha256": "60eca503dcbc31e3dda2320677b00a980f759c626be43d384fc686c3b89f7be9"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-vit-wide-deep.hip",
+      "sha256": "238776e4b0fc4eefba143d18e7fbf557eab45fe3ca4c8be9f5d35b19c2bb5877"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-swin-persistent.hip",
+      "sha256": "0df5159ca84daa2bc37d1f94aa0421c8c50c85dee51ba54751ef335c53f1627c"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-swin-persistent-fast.hip",
+      "sha256": "7b5216bd0d7f43cc44d64ef5dd5bd8dc9f6be26af27691360cfa2feadc5fb332"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "production-rebuild-rowopts/gfx1201/c512-m32-deep",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": "-mllvm=-amdgpu-sched-strategy=max-ilp"
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-c512-m32-deep.hip\" comgr gfx1201"
+    },
+    {
+      "label": "production-rebuild-rowopts/gfx1200/c512-m32-deep",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": "-mllvm=-amdgpu-sched-strategy=max-ilp"
+      },
+      "arguments": "\"{OUT}\\c512-m32-deep.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\rebuild-c512-m32-deep.hip\" comgr gfx1200"
+    }
+  ]
+}

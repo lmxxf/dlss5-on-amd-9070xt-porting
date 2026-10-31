@@ -1,0 +1,76 @@
+{
+  "old_functions": 113,
+  "old_bytes_and_metadata_identical": true,
+  "old_address_deltas": [
+    1024
+  ],
+  "new_function": "c512_qkv_attention_compact_w16_prob",
+  "new_code_identical_to_measured_clamp_only_w16": true,
+  "new_metadata": {
+    ".args": [
+      {
+        ".address_space": "global",
+        ".offset": 0,
+        ".size": 8,
+        ".value_kind": "global_buffer"
+      },
+      {
+        ".address_space": "global",
+        ".offset": 8,
+        ".size": 8,
+        ".value_kind": "global_buffer"
+      },
+      {
+        ".address_space": "global",
+        ".offset": 16,
+        ".size": 8,
+        ".value_kind": "global_buffer"
+      },
+      {
+        ".offset": 24,
+        ".size": 4,
+        ".value_kind": "by_value"
+      },
+      {
+        ".offset": 28,
+        ".size": 4,
+        ".value_kind": "by_value"
+      },
+      {
+        ".offset": 32,
+        ".size": 4,
+        ".value_kind": "by_value"
+      },
+      {
+        ".offset": 36,
+        ".size": 4,
+        ".value_kind": "by_value"
+      },
+      {
+        ".offset": 40,
+        ".size": 4,
+        ".value_kind": "by_value"
+      },
+      {
+        ".offset": 44,
+        ".size": 4,
+        ".value_kind": "by_value"
+      }
+    ],
+    ".group_segment_fixed_size": 6144,
+    ".kernarg_segment_align": 8,
+    ".kernarg_segment_size": 48,
+    ".max_flat_workgroup_size": 64,
+    ".name": "c512_qkv_attention_compact_w16_prob",
+    ".private_segment_fixed_size": 0,
+    ".sgpr_count": 22,
+    ".sgpr_spill_count": 0,
+    ".symbol": "c512_qkv_attention_compact_w16_prob.kd",
+    ".uniform_work_group_size": 1,
+    ".uses_dynamic_stack": false,
+    ".vgpr_count": 188,
+    ".vgpr_spill_count": 0,
+    ".wavefront_size": 32,
+    ".workgroup_processor_mode": 1
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "vit-fix": [
+    {
+      "kernel": "vit_attention_fused_400_bytein_bout_vfrag",
+      "vgpr_old": 61,
+      "vgpr_new": 57,
+      "lds": 0,
+      "private": 0
+    },
+    {
+      "kernel": "vit_attention_fused_640_bytein_bout_vfrag",
+      "vgpr_old": 61,
+      "vgpr_new": 57,
+      "lds": 0,
+      "private": 0
+    },
+    {
+      "kernel": "vit_attention_fused_400_bytein_bout_qkfrag",
+      "vgpr_old": 60,
+      "vgpr_new": 56,
+      "lds": 0,
+      "private": 0
+    },
+    {
+      "kernel": "vit_attention_fused_640_bytein_bout_qkfrag",
+      "vgpr_old": 60,
+      "vgpr_new": 56,
+      "lds": 0,
+      "private": 0
+    },
+    {
+      "kernel": "vit_attention_fused_400_bytein_bout",
+      "vgpr_old": 68,
+      "vgpr_new": 68,
+      "lds": 0,
+      "private": 0
+    },
+    {
+      "kernel": "vit_attention_fused_640_bytein_bout",
+      "vgpr_old": 68,
+      "vgpr_new": 68,
+      "lds": 0,
+      "private": 0
+    }
+  ],
+  "c512-den": [
+    {
+      "kernel": "c512_qkv_attention_compact",
+      "vgpr_old": 189,
+      "vgpr_new": 189,
+      "lds": 6144,
+      "private": 0
+    },
+    {
+      "kernel": "c512_qkv_attention_compact_w16",
+      "vgpr_old": 188,
+      "vgpr_new": 188,
+      "lds": 6144,
+      "private": 0
+    }
+  ]
+}

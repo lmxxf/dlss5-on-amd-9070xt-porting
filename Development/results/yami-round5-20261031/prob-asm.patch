@@ -1,0 +1,17 @@
+--- hip/wave_owned_c32.inc
++++ Development/results/yami-round5-20261031/prob-asm/source/hip/wave_owned_c32.inc
+@@ -149,6 +149,14 @@
+ #if CW_PACK_CENSUS
+  cw_census<Site,Kind>(t);
+ #endif
++// Isolated probability site: preserve conversion order and constraints; remove only MODE writes.
++ if constexpr(Site==4){int lo,hi;
++  asm volatile("v_cvt_pk_fp8_f32 %0, %2, %3\n\t"
++               "v_cvt_pk_fp8_f32 %1, %6, %7\n\t"
++               "v_cvt_pk_fp8_f32 %0, %4, %5 op_sel:[0,0,1]\n\t"
++               "v_cvt_pk_fp8_f32 %1, %8, %9 op_sel:[0,0,1]"
++               : "=&v"(lo),"=&v"(hi) : "v"(t[0]),"v"(t[1]),"v"(t[2]),"v"(t[3]),"v"(t[4]),"v"(t[5]),"v"(t[6]),"v"(t[7]) : "memory");
++  return i2{lo,hi};}
+ // Keep MODE and its four conversions indivisible: LLVM can hoist the FP8 intrinsics outside s_setreg.
+  if constexpr((CW_PACK_MODE_MASK&(1u<<Site))!=0){int lo,hi;
+   asm volatile("s_setreg_imm32_b32 hwreg(HW_REG_MODE, 23, 1), 1\n\t"

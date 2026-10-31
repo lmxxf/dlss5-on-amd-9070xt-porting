@@ -12,8 +12,8 @@
     "r2d_lane_rcp_ops_saved": 164938368,
     "r3a_c32_wave_cmp_cnd_saved": 26588328,
     "r3a_c32_lane_cmp_cnd_saved": 850826496,
-    "r4a_c32_mh_wave_valu_saved": 8835984,
-    "r4a_c32_mh_lane_valu_saved": 282751488,
+    "r4a_c32_mh_wave_valu_saved": 35343936,
+    "r4a_c32_mh_lane_valu_saved": 1131005952,
     "schedule": [
       {
         "stage": "C32",
@@ -37,7 +37,7 @@
         "wave_rcp_saved": 228480,
         "lane_rcp_saved": 7311360,
         "wave_cmp_cnd_saved_r3a": 2023680,
-        "wave_valu_saved_r4a": 391680
+        "wave_valu_saved_r4a": 1566720
       },
       {
         "stage": "C32",
@@ -61,7 +61,7 @@
         "wave_rcp_saved": 228480,
         "lane_rcp_saved": 7311360,
         "wave_cmp_cnd_saved_r3a": 2023680,
-        "wave_valu_saved_r4a": 391680
+        "wave_valu_saved_r4a": 1566720
       },
       {
         "stage": "C32",
@@ -85,7 +85,7 @@
         "wave_rcp_saved": 233772,
         "lane_rcp_saved": 7480704,
         "wave_cmp_cnd_saved_r3a": 2070552,
-        "wave_valu_saved_r4a": 400752
+        "wave_valu_saved_r4a": 1603008
       },
       {
         "stage": "C32",
@@ -109,7 +109,7 @@
         "wave_rcp_saved": 230384,
         "lane_rcp_saved": 7372288,
         "wave_cmp_cnd_saved_r3a": 2040544,
-        "wave_valu_saved_r4a": 394944
+        "wave_valu_saved_r4a": 1579776
       },
       {
         "stage": "C32",
@@ -133,7 +133,7 @@
         "wave_rcp_saved": 231840,
         "lane_rcp_saved": 7418880,
         "wave_cmp_cnd_saved_r3a": 2053440,
-        "wave_valu_saved_r4a": 397440
+        "wave_valu_saved_r4a": 1589760
       },
       {
         "stage": "C64",
@@ -157,7 +157,7 @@
         "wave_rcp_saved": 114240,
         "lane_rcp_saved": 3655680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 195840
+        "wave_valu_saved_r4a": 783360
       },
       {
         "stage": "C64",
@@ -181,7 +181,7 @@
         "wave_rcp_saved": 119560,
         "lane_rcp_saved": 3825920,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 204960
+        "wave_valu_saved_r4a": 819840
       },
       {
         "stage": "C64",
@@ -205,7 +205,7 @@
         "wave_rcp_saved": 116144,
         "lane_rcp_saved": 3716608,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 199104
+        "wave_valu_saved_r4a": 796416
       },
       {
         "stage": "C64",
@@ -229,7 +229,7 @@
         "wave_rcp_saved": 117600,
         "lane_rcp_saved": 3763200,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 201600
+        "wave_valu_saved_r4a": 806400
       },
       {
         "stage": "C128",
@@ -253,7 +253,7 @@
         "wave_rcp_saved": 57120,
         "lane_rcp_saved": 1827840,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 97920
+        "wave_valu_saved_r4a": 391680
       },
       {
         "stage": "C128",
@@ -277,7 +277,7 @@
         "wave_rcp_saved": 62496,
         "lane_rcp_saved": 1999872,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 107136
+        "wave_valu_saved_r4a": 428544
       },
       {
         "stage": "C128",
@@ -301,7 +301,7 @@
         "wave_rcp_saved": 59024,
         "lane_rcp_saved": 1888768,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 101184
+        "wave_valu_saved_r4a": 404736
       },
       {
         "stage": "C128",
@@ -325,7 +325,7 @@
         "wave_rcp_saved": 60480,
         "lane_rcp_saved": 1935360,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 103680
+        "wave_valu_saved_r4a": 414720
       },
       {
         "stage": "C128",
@@ -349,7 +349,7 @@
         "wave_rcp_saved": 57120,
         "lane_rcp_saved": 1827840,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 97920
+        "wave_valu_saved_r4a": 391680
       },
       {
         "stage": "C128",
@@ -373,7 +373,7 @@
         "wave_rcp_saved": 62496,
         "lane_rcp_saved": 1999872,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 107136
+        "wave_valu_saved_r4a": 428544
       },
       {
         "stage": "C256",
@@ -397,7 +397,7 @@
         "wave_rcp_saved": 30240,
         "lane_rcp_saved": 967680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 51840
+        "wave_valu_saved_r4a": 207360
       },
       {
         "stage": "C256-SP",
@@ -408,7 +408,7 @@
         "shift": "3,1,2,0,3,1",
         "dispatches": 1,
         "layers": 6,
-        "launched_wgs": 256,
+        "launched_wgs": 846,
         "body_wgs": 846,
         "waves_per_wg": 8,
         "qt": 4,
@@ -421,7 +421,7 @@
         "wave_rcp_saved": 189504,
         "lane_rcp_saved": 6064128,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 324864
+        "wave_valu_saved_r4a": 1299456
       },
       {
         "stage": "C256-SP",
@@ -469,7 +469,7 @@
         "wave_rcp_saved": 30240,
         "lane_rcp_saved": 967680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 51840
+        "wave_valu_saved_r4a": 207360
       },
       {
         "stage": "C256",
@@ -493,7 +493,7 @@
         "wave_rcp_saved": 30240,
         "lane_rcp_saved": 967680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 51840
+        "wave_valu_saved_r4a": 207360
       },
       {
         "stage": "C256-SP",
@@ -504,7 +504,7 @@
         "shift": "3,1,2,0,3,1",
         "dispatches": 1,
         "layers": 6,
-        "launched_wgs": 256,
+        "launched_wgs": 846,
         "body_wgs": 846,
         "waves_per_wg": 8,
         "qt": 4,
@@ -517,7 +517,7 @@
         "wave_rcp_saved": 189504,
         "lane_rcp_saved": 6064128,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 324864
+        "wave_valu_saved_r4a": 1299456
       },
       {
         "stage": "C256-SP",
@@ -565,7 +565,7 @@
         "wave_rcp_saved": 30240,
         "lane_rcp_saved": 967680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 51840
+        "wave_valu_saved_r4a": 207360
       },
       {
         "stage": "C128",
@@ -589,7 +589,7 @@
         "wave_rcp_saved": 59024,
         "lane_rcp_saved": 1888768,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 101184
+        "wave_valu_saved_r4a": 404736
       },
       {
         "stage": "C128",
@@ -613,7 +613,7 @@
         "wave_rcp_saved": 60480,
         "lane_rcp_saved": 1935360,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 103680
+        "wave_valu_saved_r4a": 414720
       },
       {
         "stage": "C128",
@@ -637,7 +637,7 @@
         "wave_rcp_saved": 57120,
         "lane_rcp_saved": 1827840,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 97920
+        "wave_valu_saved_r4a": 391680
       },
       {
         "stage": "C128",
@@ -661,7 +661,7 @@
         "wave_rcp_saved": 62496,
         "lane_rcp_saved": 1999872,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 107136
+        "wave_valu_saved_r4a": 428544
       },
       {
         "stage": "C128",
@@ -685,7 +685,7 @@
         "wave_rcp_saved": 59024,
         "lane_rcp_saved": 1888768,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 101184
+        "wave_valu_saved_r4a": 404736
       },
       {
         "stage": "C128",
@@ -709,7 +709,7 @@
         "wave_rcp_saved": 60480,
         "lane_rcp_saved": 1935360,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 103680
+        "wave_valu_saved_r4a": 414720
       },
       {
         "stage": "C64",
@@ -733,7 +733,7 @@
         "wave_rcp_saved": 114240,
         "lane_rcp_saved": 3655680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 195840
+        "wave_valu_saved_r4a": 783360
       },
       {
         "stage": "C64",
@@ -757,7 +757,7 @@
         "wave_rcp_saved": 119560,
         "lane_rcp_saved": 3825920,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 204960
+        "wave_valu_saved_r4a": 819840
       },
       {
         "stage": "C64",
@@ -781,7 +781,7 @@
         "wave_rcp_saved": 116144,
         "lane_rcp_saved": 3716608,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 199104
+        "wave_valu_saved_r4a": 796416
       },
       {
         "stage": "C64",
@@ -805,7 +805,7 @@
         "wave_rcp_saved": 117600,
         "lane_rcp_saved": 3763200,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 201600
+        "wave_valu_saved_r4a": 806400
       },
       {
         "stage": "C32",
@@ -829,7 +829,7 @@
         "wave_rcp_saved": 228480,
         "lane_rcp_saved": 7311360,
         "wave_cmp_cnd_saved_r3a": 2023680,
-        "wave_valu_saved_r4a": 391680
+        "wave_valu_saved_r4a": 1566720
       },
       {
         "stage": "C32",
@@ -853,7 +853,7 @@
         "wave_rcp_saved": 233772,
         "lane_rcp_saved": 7480704,
         "wave_cmp_cnd_saved_r3a": 2070552,
-        "wave_valu_saved_r4a": 400752
+        "wave_valu_saved_r4a": 1603008
       },
       {
         "stage": "C32",
@@ -877,7 +877,7 @@
         "wave_rcp_saved": 230384,
         "lane_rcp_saved": 7372288,
         "wave_cmp_cnd_saved_r3a": 2040544,
-        "wave_valu_saved_r4a": 394944
+        "wave_valu_saved_r4a": 1579776
       },
       {
         "stage": "C32",
@@ -901,7 +901,7 @@
         "wave_rcp_saved": 231840,
         "lane_rcp_saved": 7418880,
         "wave_cmp_cnd_saved_r3a": 2053440,
-        "wave_valu_saved_r4a": 397440
+        "wave_valu_saved_r4a": 1589760
       },
       {
         "stage": "C32",
@@ -925,7 +925,7 @@
         "wave_rcp_saved": 924476,
         "lane_rcp_saved": 29583232,
         "wave_cmp_cnd_saved_r3a": 8188216,
-        "wave_valu_saved_r4a": 1584816
+        "wave_valu_saved_r4a": 6339264
       }
     ]
   },
@@ -942,8 +942,8 @@
     "r2d_lane_rcp_ops_saved": 174486144,
     "r3a_c32_wave_cmp_cnd_saved": 28141800,
     "r3a_c32_lane_cmp_cnd_saved": 900537600,
-    "r4a_c32_mh_wave_valu_saved": 9347472,
-    "r4a_c32_mh_lane_valu_saved": 299119104,
+    "r4a_c32_mh_wave_valu_saved": 37389888,
+    "r4a_c32_mh_lane_valu_saved": 1196476416,
     "schedule": null
   },
   "original960": {
@@ -959,8 +959,8 @@
     "r2d_lane_rcp_ops_saved": 121758336,
     "r3a_c32_wave_cmp_cnd_saved": 19582824,
     "r3a_c32_lane_cmp_cnd_saved": 626650368,
-    "r4a_c32_mh_wave_valu_saved": 6522768,
-    "r4a_c32_mh_lane_valu_saved": 208728576,
+    "r4a_c32_mh_wave_valu_saved": 26091072,
+    "r4a_c32_mh_lane_valu_saved": 834914304,
     "schedule": null
   },
   "small1080": {
@@ -976,8 +976,8 @@
     "r2d_lane_rcp_ops_saved": 98502656,
     "r3a_c32_wave_cmp_cnd_saved": 19475440,
     "r3a_c32_lane_cmp_cnd_saved": 623214080,
-    "r4a_c32_mh_wave_valu_saved": 5276928,
-    "r4a_c32_mh_lane_valu_saved": 168861696,
+    "r4a_c32_mh_wave_valu_saved": 21107712,
+    "r4a_c32_mh_lane_valu_saved": 675446784,
     "schedule": [
       {
         "stage": "C32",
@@ -1001,7 +1001,7 @@
         "wave_rcp_saved": 241920,
         "lane_rcp_saved": 7741440,
         "wave_cmp_cnd_saved_r3a": 2142720,
-        "wave_valu_saved_r4a": 414720
+        "wave_valu_saved_r4a": 1658880
       },
       {
         "stage": "C32",
@@ -1025,7 +1025,7 @@
         "wave_rcp_saved": 241920,
         "lane_rcp_saved": 7741440,
         "wave_cmp_cnd_saved_r3a": 2142720,
-        "wave_valu_saved_r4a": 414720
+        "wave_valu_saved_r4a": 1658880
       },
       {
         "stage": "C32",
@@ -1049,7 +1049,7 @@
         "wave_rcp_saved": 247324,
         "lane_rcp_saved": 7914368,
         "wave_cmp_cnd_saved_r3a": 2190584,
-        "wave_valu_saved_r4a": 423984
+        "wave_valu_saved_r4a": 1695936
       },
       {
         "stage": "C64",
@@ -1073,7 +1073,7 @@
         "wave_rcp_saved": 120960,
         "lane_rcp_saved": 3870720,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 207360
+        "wave_valu_saved_r4a": 829440
       },
       {
         "stage": "C64",
@@ -1097,7 +1097,7 @@
         "wave_rcp_saved": 126392,
         "lane_rcp_saved": 4044544,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 216672
+        "wave_valu_saved_r4a": 866688
       },
       {
         "stage": "C128",
@@ -1121,7 +1121,7 @@
         "wave_rcp_saved": 60480,
         "lane_rcp_saved": 1935360,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 103680
+        "wave_valu_saved_r4a": 414720
       },
       {
         "stage": "C128",
@@ -1145,7 +1145,7 @@
         "wave_rcp_saved": 65968,
         "lane_rcp_saved": 2110976,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 113088
+        "wave_valu_saved_r4a": 452352
       },
       {
         "stage": "C256",
@@ -1169,7 +1169,7 @@
         "wave_rcp_saved": 30240,
         "lane_rcp_saved": 967680,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 51840
+        "wave_valu_saved_r4a": 207360
       },
       {
         "stage": "C256",
@@ -1193,7 +1193,7 @@
         "wave_rcp_saved": 35840,
         "lane_rcp_saved": 1146880,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 61440
+        "wave_valu_saved_r4a": 245760
       },
       {
         "stage": "C256",
@@ -1217,7 +1217,7 @@
         "wave_rcp_saved": 32256,
         "lane_rcp_saved": 1032192,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 55296
+        "wave_valu_saved_r4a": 221184
       },
       {
         "stage": "C256",
@@ -1241,7 +1241,7 @@
         "wave_rcp_saved": 33600,
         "lane_rcp_saved": 1075200,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 57600
+        "wave_valu_saved_r4a": 230400
       },
       {
         "stage": "C128",
@@ -1265,7 +1265,7 @@
         "wave_rcp_saved": 62496,
         "lane_rcp_saved": 1999872,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 107136
+        "wave_valu_saved_r4a": 428544
       },
       {
         "stage": "C128",
@@ -1289,7 +1289,7 @@
         "wave_rcp_saved": 63840,
         "lane_rcp_saved": 2042880,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 109440
+        "wave_valu_saved_r4a": 437760
       },
       {
         "stage": "C64",
@@ -1313,7 +1313,7 @@
         "wave_rcp_saved": 122976,
         "lane_rcp_saved": 3935232,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 210816
+        "wave_valu_saved_r4a": 843264
       },
       {
         "stage": "C64",
@@ -1337,7 +1337,7 @@
         "wave_rcp_saved": 124320,
         "lane_rcp_saved": 3978240,
         "wave_cmp_cnd_saved_r3a": 0,
-        "wave_valu_saved_r4a": 213120
+        "wave_valu_saved_r4a": 852480
       },
       {
         "stage": "C32",
@@ -1361,7 +1361,7 @@
         "wave_rcp_saved": 243936,
         "lane_rcp_saved": 7805952,
         "wave_cmp_cnd_saved_r3a": 2160576,
-        "wave_valu_saved_r4a": 418176
+        "wave_valu_saved_r4a": 1672704
       },
       {
         "stage": "C32",
@@ -1385,7 +1385,7 @@
         "wave_rcp_saved": 245280,
         "lane_rcp_saved": 7848960,
         "wave_cmp_cnd_saved_r3a": 2172480,
-        "wave_valu_saved_r4a": 420480
+        "wave_valu_saved_r4a": 1681920
       },
       {
         "stage": "C32",
@@ -1409,7 +1409,7 @@
         "wave_rcp_saved": 978460,
         "lane_rcp_saved": 31310720,
         "wave_cmp_cnd_saved_r3a": 8666360,
-        "wave_valu_saved_r4a": 1677360
+        "wave_valu_saved_r4a": 6709440
       }
     ]
   },
@@ -1426,8 +1426,8 @@
     "r2d_lane_rcp_ops_saved": 73163776,
     "r3a_c32_wave_cmp_cnd_saved": 14447984,
     "r3a_c32_lane_cmp_cnd_saved": 462335488,
-    "r4a_c32_mh_wave_valu_saved": 3919488,
-    "r4a_c32_mh_lane_valu_saved": 125423616,
+    "r4a_c32_mh_wave_valu_saved": 15677952,
+    "r4a_c32_mh_lane_valu_saved": 501694464,
     "schedule": null
   },
   "small720": {
@@ -1443,8 +1443,8 @@
     "r2d_lane_rcp_ops_saved": 46355456,
     "r3a_c32_wave_cmp_cnd_saved": 9130864,
     "r3a_c32_lane_cmp_cnd_saved": 292187648,
-    "r4a_c32_mh_wave_valu_saved": 2483328,
-    "r4a_c32_mh_lane_valu_saved": 79466496,
+    "r4a_c32_mh_wave_valu_saved": 9933312,
+    "r4a_c32_mh_lane_valu_saved": 317865984,
     "schedule": null
   },
   "smallwindow": {
@@ -1460,8 +1460,8 @@
     "r2d_lane_rcp_ops_saved": 20873216,
     "r3a_c32_wave_cmp_cnd_saved": 4087536,
     "r3a_c32_lane_cmp_cnd_saved": 130801152,
-    "r4a_c32_mh_wave_valu_saved": 1118208,
-    "r4a_c32_mh_lane_valu_saved": 35782656,
+    "r4a_c32_mh_wave_valu_saved": 4472832,
+    "r4a_c32_mh_lane_valu_saved": 143130624,
     "schedule": null
   }
 }

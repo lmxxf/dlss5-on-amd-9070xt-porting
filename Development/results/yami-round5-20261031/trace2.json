@@ -1,0 +1,29 @@
+{
+  "name": "vit-first-difference",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit_probe2.exe",
+      "sha256": "45bc2ad8add44c76323dea1e703b6c1d97dbea8a31225353ecc30edd6d7737cb"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\trace2-compile\\baseline\\trace.hsaco",
+      "sha256": "07e6e6d2e5abda30eef72f073be02a24372124501ccc7d8919727a8a04d53dcc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\trace2-compile\\candidate\\trace.hsaco",
+      "sha256": "9f362b88eb1f68f38da714d6d8adb19c4b6b0a248d281c1937984d71936b4e7b"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "trace2/baseline",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit_probe2.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\trace2-compile\\baseline\\trace.hsaco\" vit_attention_fused_640_bytein_bout \"{OUT}\\trace.bin\" 1"
+    },
+    {
+      "label": "trace2/candidate",
+      "exe": "D:\\DLSSNR-Lab\\yami-round5-20261031\\vit_probe2.exe",
+      "arguments": "\"D:\\DLSSNR-Lab\\yami-round5-20261031\\trace2-compile\\candidate\\trace.hsaco\" vit_attention_fused_640_bytein_bout \"{OUT}\\trace.bin\" 1"
+    }
+  ]
+}

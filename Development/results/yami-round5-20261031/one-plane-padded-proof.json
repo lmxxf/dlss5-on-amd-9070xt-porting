@@ -1,0 +1,44 @@
+{
+  "source": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/yami-round5-20261031/one-plane-isolated/build/gfx1201/c64-wave2-fast.hsaco",
+  "output": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/yami-round5-20261031/one-plane-padded.hsaco",
+  "all_function_bytes_and_addresses_identical": true,
+  "text_section_identical": true,
+  "changes": [
+    {
+      "kernel": "c128_wave2",
+      "descriptor_offset": 140608,
+      "old": 8192,
+      "new": 16384,
+      "rsrc2_unchanged_and_matches_stock": true
+    },
+    {
+      "kernel": "c128_wave2_bi",
+      "descriptor_offset": 140672,
+      "old": 8192,
+      "new": 16384,
+      "rsrc2_unchanged_and_matches_stock": true
+    },
+    {
+      "kernel": "c128_wave2_bo",
+      "descriptor_offset": 140736,
+      "old": 8192,
+      "new": 16384,
+      "rsrc2_unchanged_and_matches_stock": true
+    },
+    {
+      "kernel": "c128_wave2_bi_bo",
+      "descriptor_offset": 140800,
+      "old": 8192,
+      "new": 16384,
+      "rsrc2_unchanged_and_matches_stock": true
+    },
+    {
+      "kernel": "c128_wave2_bi_ho",
+      "descriptor_offset": 141696,
+      "old": 8192,
+      "new": 16384,
+      "rsrc2_unchanged_and_matches_stock": true
+    }
+  ],
+  "only_metadata_and_descriptor_lds_size_changed": true
+}

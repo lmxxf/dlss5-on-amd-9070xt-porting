@@ -1,0 +1,38 @@
+[
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout_vfrag",
+    "vgpr_fix": 57,
+    "vgpr_rtz": 57,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout_vfrag",
+    "vgpr_fix": 57,
+    "vgpr_rtz": 57,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout_qkfrag",
+    "vgpr_fix": 56,
+    "vgpr_rtz": 56,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout_qkfrag",
+    "vgpr_fix": 56,
+    "vgpr_rtz": 56,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_400_bytein_bout",
+    "vgpr_fix": 68,
+    "vgpr_rtz": 68,
+    "private": 0
+  },
+  {
+    "kernel": "vit_attention_fused_640_bytein_bout",
+    "vgpr_fix": 68,
+    "vgpr_rtz": 68,
+    "private": 0
+  }
+]

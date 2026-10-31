@@ -1,0 +1,24 @@
+{
+  "name": "pair-append-export",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\yami-round5-20261031\\pair-final.hip",
+      "sha256": "bde7d315e1490b18e7f53da9299ea13ec456affdef6553a2ec86b87674df8a8e"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "pair-final-compile",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\deep_fast-packed-fast.hsaco\" \"D:\\DLSSNR-Lab\\yami-round5-20261031\\pair-final.hip\" comgr gfx1201"
+    }
+  ]
+}
