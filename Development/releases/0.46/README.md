@@ -1,6 +1,6 @@
 # 0.46 正式发行回执
 
-三包已交付于 `D:\給網友打包`。未上传网盘、未commit/push。
+三包已交付于 `D:\給網友打包`。公开镜像：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile](https://gofile.io/d/Iyyz2tLc)。
 
 |文件|字节数|SHA256|
 |---|---:|---|

@@ -20,11 +20,13 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 
 ## 0.46 · 2026-10-31
 
+下载：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile 镜像](https://gofile.io/d/Iyyz2tLc)（0.45 旧版：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS)；0.44 旧版：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP)）。
+
 以2f19eebc及本次发行文档快照为基础，采用Round5最终双架构80模块和已验证O2宿主。自0.45以来纳入Backfeed刀1的限定形状优化、C32 Phase 5B、K-Search Round1–4的已采纳无损路径，以及Round5仅norm900启用的带精确性保护四路dot2分母归约；失败候选不入包。保持Small 0.5x、MODE/AE和F9默认语义。0 bit-diff指各轮对应基线、已验证输入及配置，不表示跨模式或历史版本任意输出恒等，也未证明性能上限。
 
 离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
 
-三包与SHA回执：Development/releases/0.46/；双游戏备份安装回执：Development/results/game-install-20261031/。公开网盘尚未上传；0.45下载链接仍对应0.45。
+三包与SHA回执：[Development/releases/0.46/](Development/releases/0.46/README.md)；双游戏备份安装回执：[Development/results/game-install-20261031/](Development/results/game-install-20261031/README.md)。[完整说明与验证范围](CHANGELOG.zh-CN.md#046--2026-10-31)。
 
 
 **📖 使用与调参必看：[使用与参数配置完整说明（选包、custom-config.txt 写哪、F6～F9 热键、全部参数与抄作业配方）](使用与参数配置说明.md)**（底层全量字典见 [scripts/CONFIGURATION.zh-CN.md](scripts/CONFIGURATION.zh-CN.md)）。
@@ -270,6 +272,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy_fast.ps1 -Source <lab> -
 | 0.43 · [夸克](https://pan.quark.cn/s/3b19c0403e3f) · [Gofile 镜像](https://gofile.io/d/hz5cDOPF) | 10-17 | W16权重访问、跨核1B E4M3字节直连（消除全部8次`vit_pack_input`）、上下采样W16 FP8与MODE2/3资源环优化；已验固定配置逐位一致，80模块；**单帧耗时 1080 档 9.12 ms（最佳单槽 8.96 ms）、900 档 6.54 ms**。[完整说明](CHANGELOG.zh-CN.md)。 |
 | 0.44 · [夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP) | 10-18 | **默认改为 `310.9.16.0` 的 31 块 Small 模型（`0.5x`）**：**单帧耗时 1080 档 5.554 ms（−39.35%）、900 档 4.377 ms（−33.26%）**，常驻权重 147.6 MiB；接通 1080/900/720/free 几何、8 块 ViT AE 复用与 MODE1 时序（`0x3A23`）；F9 按 `0.5 → 1 → 2 → 3 → 0.5` 循环（含 `4764e4f1` 热修：同尺寸零 IO 切换、双模型权重常驻、RE9/鬼武者只读虚拟盘 F9 内存即时切换）。[完整说明](CHANGELOG.zh-CN.md)。 |
 | 0.45 · [夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS) | 10-24 | 紧凑字节路径（Small 900/720/free1088 各省 120MiB 活动权重与 8 次输入打包）、ViT V 片段 16B 连续布局、C512 成对 FP8 打包；Q/K 限定 Original900、Small900/1080（**Small 0.5x 单帧耗时：1080 档 5.487 ms、900 档 4.245 ms、720 档 2.990 ms**）。保持 0.5x 默认和 MODE/F9，负候选不入包。[说明](CHANGELOG.zh-CN.md)。 |
+| 0.46 · [夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile 镜像](https://gofile.io/d/Iyyz2tLc) | 10-31 | Backfeed 刀1（Small900/小窗 C256 全块融合）、C32 Phase 5B（finish→pool 融合与 norm-hoist）、K-Search Round 1–5（`SubmitPulse` 门控补齐、C512 非转置 `w16_fb8`、Softmax 分母倒数 `8→1`、C32 `CW_FMED3_CLAMP`、全网 Softmax `v_perm_b32` 成对位映射、`norm900` 带保护四路 `dot2` 分母归约）；**Small 0.5x 单帧耗时：1080 档 `5.311–5.363 ms`、900 档 `3.937–3.947 ms`、720 档 `2.742 ms`、小窗 `1.680 ms`；Original 1x：1088 档 `8.335–8.425 ms`（纯 NN `7.984 ms`）、960 档 `6.243 ms`**。[说明](CHANGELOG.zh-CN.md#046--2026-10-31)。 |
 
 
 ## 权重

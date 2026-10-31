@@ -960,4 +960,4 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 
 ### 2026-10-31 v0.46 三包与双游戏升级闭环
 
-2f19eebc加发行文档快照，Round5最终HIP80及指定O2宿主三包完成。132 shader PASS、RE包15秒smoke exit0、ZIP全文件SHA读回；0.45原包移history且核同回执，0.44保持。双游戏完整备份1502文件/2,688,647,060字节，169项原子替换与16配置逐字保持，两路15秒smoke exit0。首次165项门触发自动恢复，补架构清单与修正JSON预检后重做成功；失败保留。rollback语法通过，最终无锁。未commit/push/外部上传。详见Development/releases/0.46/README.md与Development/results/game-install-20261031/README.md。
+2f19eebc加发行文档快照，Round5最终HIP80及指定O2宿主三包完成。132 shader PASS、RE包15秒smoke exit0、ZIP全文件SHA读回；0.45原包移history且核同回执，0.44保持。双游戏完整备份1502文件/2,688,647,060字节，169项原子替换与16配置逐字保持，两路15秒smoke exit0。首次165项门触发自动恢复，补架构清单与修正JSON预检后重做成功；失败保留。rollback语法通过，最终无锁。详见Development/releases/0.46/README.md与Development/results/game-install-20261031/README.md。用户已提供 0.46 公开下载入口：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile](https://gofile.io/d/Iyyz2tLc)，README/CHANGELOG/releases/WorkingPlan已同步更新。

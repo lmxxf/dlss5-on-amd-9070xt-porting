@@ -440,8 +440,10 @@ Small权重与旧权重共存；80个双架构模块复用。F8切AE/EXACT；2x/
 
 ## 0.46 · 2026-10-31
 
+下载：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile 镜像](https://gofile.io/d/Iyyz2tLc)（三个完整包，双架构 80 模块 + 93 Small 权重资产；包名、完整 SHA 与校验回执见 [0.46 发行记录](Development/releases/0.46/README.md)）。
+
 以2f19eebc及本次发行文档快照为基础，采用Round5最终双架构80模块和已验证O2宿主。自0.45以来纳入Backfeed刀1的限定形状优化、C32 Phase 5B、K-Search Round1–4的已采纳无损路径，以及Round5仅norm900启用的带精确性保护四路dot2分母归约；失败候选不入包。保持Small 0.5x、MODE/AE和F9默认语义。0 bit-diff指各轮对应基线、已验证输入及配置，不表示跨模式或历史版本任意输出恒等，也未证明性能上限。
 
 离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
 
-三包与SHA回执：Development/releases/0.46/；双游戏备份安装回执：Development/results/game-install-20261031/。公开网盘尚未上传；0.45下载链接仍对应0.45。
+三包与SHA回执：[Development/releases/0.46/](Development/releases/0.46/README.md)；双游戏备份安装回执：[Development/results/game-install-20261031/](Development/results/game-install-20261031/README.md)。
