@@ -675,13 +675,14 @@ W2_REP_BEGIN(8)
     qkv[0][qt][ci],
 #endif
     scores);
-   h8 ex{};
-   for(uint e=0;e<8;e++){
-    uint row=qt*16+rc,k=key*16+gr*8+e;
-    float score=scores[e]+aw[4*C*C+head*4096+row*64+k],affine=clampf(score*.044921875f+1.30078125f,1.03125f,1.5693359375f);
-    uint ah=(bits(affine)>>13)-0x1c000u;unsigned short hb=static_cast<unsigned short>(((ah<<5)+0x8000u)&65535u);ex[e]=__builtin_bit_cast(_Float16,hb);
+   uint pk[4];
+   _Pragma("unroll") for(uint e=0;e<4;e++){
+    uint row=qt*16+rc,k=key*16+gr*8+2*e;
+    float s0=scores[2*e]+aw[4*C*C+head*4096+row*64+k],s1=scores[2*e+1]+aw[4*C*C+head*4096+row*64+k+1];
+    float af0=clampf(s0*.044921875f+1.30078125f,1.03125f,1.5693359375f),af1=clampf(s1*.044921875f+1.30078125f,1.03125f,1.5693359375f);
+    pk[e]=__builtin_amdgcn_perm(bits(af1),bits(af0),0x06050201u)&0x7fe07fe0u;
    }
-   exponent[key]=ex;
+   exponent[key]=__builtin_bit_cast(h8,pk);
   }
   h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
   f8 sums[2]{};

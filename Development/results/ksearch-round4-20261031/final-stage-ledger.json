@@ -1,0 +1,518 @@
+{
+  "original1088": {
+    "trace_evidence_dir": "Development/results/ksearch-round4-20261031/final-kernel/evidence/kernel-original1088-r*-*",
+    "aco_reference_file": "Development/results/aco-hotspot-phase4-20261029/step2-hotspot-breakdown.json",
+    "families": {
+      "1_c32_family": {
+        "hip_8a9c60fd_rtc_us": 2726.7433333333333,
+        "hip_round4_rtc_us": 2580.706666666667,
+        "hip_rtc_delta_us": -146.0366666666664,
+        "aco_step2_query_us": 2005.8666666666666,
+        "stage_diff_round4_minus_aco_us": 574.8400000000004
+      },
+      "2_c256_family": {
+        "hip_8a9c60fd_rtc_us": 1225.0766666666668,
+        "hip_round4_rtc_us": 1215.4333333333334,
+        "hip_rtc_delta_us": -9.64333333333343,
+        "aco_step2_query_us": 788.5333333333333,
+        "stage_diff_round4_minus_aco_us": 426.9000000000001
+      },
+      "3_c64_c128_family": {
+        "hip_8a9c60fd_rtc_us": 1975.3400000000001,
+        "hip_round4_rtc_us": 1944.3566666666668,
+        "hip_rtc_delta_us": -30.98333333333335,
+        "aco_step2_query_us": 1323.5,
+        "stage_diff_round4_minus_aco_us": 620.8566666666668
+      },
+      "4_c512_family": {
+        "hip_8a9c60fd_rtc_us": 1032.0600000000002,
+        "hip_round4_rtc_us": 997.2266666666668,
+        "hip_rtc_delta_us": -34.83333333333337,
+        "aco_step2_query_us": 718.1333333333334,
+        "stage_diff_round4_minus_aco_us": 279.09333333333336
+      },
+      "5_vit_family": {
+        "hip_8a9c60fd_rtc_us": 1002.6866666666667,
+        "hip_round4_rtc_us": 1003.2633333333333,
+        "hip_rtc_delta_us": 0.5766666666665969,
+        "aco_step2_query_us": 774.9333333333334,
+        "stage_diff_round4_minus_aco_us": 228.32999999999993
+      }
+    },
+    "sum_of_stages_us": {
+      "hip_8a9c60fd_rtc_sum_us": 7961.906666666668,
+      "hip_round4_rtc_sum_us": 7740.986666666668,
+      "hip_rtc_sum_delta_us": -220.92000000000007,
+      "aco_step2_sum_us": 5610.966666666667,
+      "stage_sum_diff_us": 2130.0200000000004
+    },
+    "whole_network_nmmn_event_us": {
+      "hip_round4_nmmn_us": 8032.3111145833345,
+      "aco_round4_nmmn_us": 5628.856250000001,
+      "nmmn_gap_us": 2403.454864583334
+    },
+    "unexplained_remainder_and_clock_domain_diff_us": {
+      "hip_nmmn_minus_rtc_sum_us": 291.32444791666694,
+      "aco_nmmn_minus_step2_sum_us": 17.889583333333576,
+      "total_gap_minus_stage_sum_diff_us": 273.43486458333336
+    },
+    "per_kernel_mapping": {
+      "c32_wave1:c32_wave1_chain_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 652.14,
+        "cand_round4_us": 614.2899999999998,
+        "delta_us": -37.850000000000136
+      },
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 164.60333333333332,
+        "cand_round4_us": 155.49333333333334,
+        "delta_us": -9.109999999999985
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_pool_b8d_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 180.45,
+        "cand_round4_us": 172.39666666666668,
+        "delta_us": -8.053333333333313
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 163.27666666666664,
+        "cand_round4_us": 154.68,
+        "delta_us": -8.596666666666636
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 705.3566666666668,
+        "cand_round4_us": 668.3966666666666,
+        "delta_us": -36.96000000000015
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 678.0133333333333,
+        "cand_round4_us": 641.0433333333334,
+        "delta_us": -36.969999999999914
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 182.90333333333334,
+        "cand_round4_us": 174.4066666666667,
+        "delta_us": -8.496666666666641
+      },
+      "c512_m32_deep:split_ffn_one_w2f8_w16_bin": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 288.1066666666667,
+        "cand_round4_us": 287.57666666666665,
+        "delta_us": -0.5300000000000296
+      },
+      "c512_m32_mh:c512_qkv_attention_compact_w16": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 390.8033333333334,
+        "cand_round4_us": 388.37000000000006,
+        "delta_us": -2.433333333333337
+      },
+      "c64_wave2:c128_wave2_bi_bo": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 826.7600000000001,
+        "cand_round4_us": 817.39,
+        "delta_us": -9.370000000000118
+      },
+      "c64_wave2:c128_wave2_bi_ho": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 85.73333333333333,
+        "cand_round4_us": 84.90333333333334,
+        "delta_us": -0.8299999999999983
+      },
+      "c64_wave2:c128_wave2_up_lb_sh": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 100.14,
+        "cand_round4_us": 98.05999999999999,
+        "delta_us": -2.0800000000000125
+      },
+      "c64_wave2:c256_wave2_bi_bo_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 254.57000000000002,
+        "cand_round4_us": 254.87333333333333,
+        "delta_us": 0.30333333333331325
+      },
+      "c64_wave2:c256_wave2_bi_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 82.32666666666665,
+        "cand_round4_us": 81.63,
+        "delta_us": -0.6966666666666583
+      },
+      "c64_wave2:c64_wave2_bi": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 115.17666666666666,
+        "cand_round4_us": 111.99666666666667,
+        "delta_us": -3.1799999999999926
+      },
+      "c64_wave2:c64_wave2_bi_bo": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 558.2233333333334,
+        "cand_round4_us": 546.5633333333334,
+        "delta_us": -11.659999999999968
+      },
+      "c64_wave2:c64_wave2_bi_ho": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 111.39333333333333,
+        "cand_round4_us": 109.71666666666667,
+        "delta_us": -1.6766666666666623
+      },
+      "c64_wave2:c64_wave2_up_lb_sh": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 134.17,
+        "cand_round4_us": 131.89333333333332,
+        "delta_us": -2.276666666666671
+      },
+      "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 35.903333333333336,
+        "cand_round4_us": 35.81,
+        "delta_us": -0.09333333333333371
+      },
+      "deep_fast:split_projection_frag_w16_nof32_bskip": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 143.40999999999997,
+        "cand_round4_us": 135.88666666666666,
+        "delta_us": -7.523333333333312
+      },
+      "deep_fast:vit_attention_fused_640_bytein_bout_vfrag": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 176.19666666666666,
+        "cand_round4_us": 176.63333333333333,
+        "delta_us": 0.4366666666666674
+      },
+      "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 262.15666666666664,
+        "cand_round4_us": 261.8066666666667,
+        "delta_us": -0.3499999999999659
+      },
+      "deep_fast:vit_gather_b8": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 16.53666666666667,
+        "cand_round4_us": 16.636666666666663,
+        "delta_us": 0.09999999999999432
+      },
+      "mh_fast:mh_attention_project_frag_c512_w16_u4_fb8": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 12.13,
+        "cand_round4_us": 10.833333333333334,
+        "delta_us": -1.2966666666666669
+      },
+      "mh_fast:mh_attention_project_frag_c512_w16_u4_fb8_bout": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 181.18,
+        "cand_round4_us": 158.12,
+        "delta_us": -23.060000000000002
+      },
+      "mh_fast:mh_pool_project_group_c128_hin_out8_f8w16": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 16.116666666666664,
+        "cand_round4_us": 16.070000000000004,
+        "delta_us": -0.04666666666665975
+      },
+      "mh_fast:mh_pool_project_group_c256_out8_f8w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 14.546666666666669,
+        "cand_round4_us": 14.616666666666667,
+        "delta_us": 0.06999999999999851
+      },
+      "mh_fast:mh_pool_project_group_c512_out8_f8w16": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 16.43,
+        "cand_round4_us": 16.44,
+        "delta_us": 0.010000000000001563
+      },
+      "mh_fast:mh_pool_project_group_c64_hin_out8_f8w16": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 27.626666666666665,
+        "cand_round4_us": 27.763333333333332,
+        "delta_us": 0.13666666666666671
+      },
+      "sp:sp_init": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 3.5366666666666666,
+        "cand_round4_us": 3.5566666666666666,
+        "delta_us": 0.020000000000000018
+      },
+      "sp:sp_recover256_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 6.416666666666667,
+        "cand_round4_us": 6.44,
+        "delta_us": 0.023333333333333428
+      },
+      "sp:sp_run256_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 827.7766666666668,
+        "cand_round4_us": 818.5066666666667,
+        "delta_us": -9.270000000000095
+      },
+      "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 255.49000000000004,
+        "cand_round4_us": 255.77,
+        "delta_us": 0.2799999999999727
+      },
+      "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 82.59333333333333,
+        "cand_round4_us": 82.73666666666665,
+        "delta_us": 0.14333333333331666
+      },
+      "vit_stream:vit_stream_qkv_frag_bin_w5f8_vfrag": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 209.7133333333333,
+        "cand_round4_us": 209.68,
+        "delta_us": -0.03333333333330302
+      }
+    }
+  },
+  "small1080": {
+    "trace_evidence_dir": "Development/results/ksearch-round4-20261031/final-kernel/evidence/kernel-small1080-r*-*",
+    "aco_reference_file": "Development/results/aco-hotspot-phase4-20261029/step2-hotspot-breakdown.json",
+    "families": {
+      "1_c32_family": {
+        "hip_8a9c60fd_rtc_us": 2174.69,
+        "hip_round4_rtc_us": 2053.4133333333334,
+        "hip_rtc_delta_us": -121.27666666666664,
+        "aco_step2_query_us": 1612.3000000000002,
+        "stage_diff_round4_minus_aco_us": 441.11333333333323
+      },
+      "2_c256_family": {
+        "hip_8a9c60fd_rtc_us": 384.5566666666667,
+        "hip_round4_rtc_us": 382.41,
+        "hip_rtc_delta_us": -2.146666666666647,
+        "aco_step2_query_us": 236.33333333333331,
+        "stage_diff_round4_minus_aco_us": 146.0766666666667
+      },
+      "3_c64_c128_family": {
+        "hip_8a9c60fd_rtc_us": 912.7966666666667,
+        "hip_round4_rtc_us": 894.3766666666667,
+        "hip_rtc_delta_us": -18.420000000000073,
+        "aco_step2_query_us": 598.8,
+        "stage_diff_round4_minus_aco_us": 295.5766666666667
+      },
+      "4_c512_family": {
+        "hip_8a9c60fd_rtc_us": 287.1533333333333,
+        "hip_round4_rtc_us": 285.1533333333333,
+        "hip_rtc_delta_us": -2.0,
+        "aco_step2_query_us": 192.73333333333335,
+        "stage_diff_round4_minus_aco_us": 92.41999999999996
+      },
+      "5_vit_family": {
+        "hip_8a9c60fd_rtc_us": 995.3633333333332,
+        "hip_round4_rtc_us": 997.0466666666666,
+        "hip_rtc_delta_us": 1.683333333333394,
+        "aco_step2_query_us": 767.9,
+        "stage_diff_round4_minus_aco_us": 229.14666666666665
+      }
+    },
+    "sum_of_stages_us": {
+      "hip_8a9c60fd_rtc_sum_us": 4754.56,
+      "hip_round4_rtc_sum_us": 4612.4,
+      "hip_rtc_sum_delta_us": -142.16000000000076,
+      "aco_step2_sum_us": 3408.0666666666666,
+      "stage_sum_diff_us": 1204.333333333333
+    },
+    "whole_network_nmmn_event_us": {
+      "hip_round4_nmmn_us": 4785.9996249999995,
+      "aco_round4_nmmn_us": 3377.6343749999996,
+      "nmmn_gap_us": 1408.36525
+    },
+    "unexplained_remainder_and_clock_domain_diff_us": {
+      "hip_nmmn_minus_rtc_sum_us": 173.59962499999983,
+      "aco_nmmn_minus_step2_sum_us": -30.43229166666697,
+      "total_gap_minus_stage_sum_diff_us": 204.03191666666703
+    },
+    "per_kernel_mapping": {
+      "c32_wave1:c32_wave1_finish_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 171.67333333333335,
+        "cand_round4_us": 161.89999999999998,
+        "delta_us": -9.773333333333369
+      },
+      "c32_wave1:c32_wave1_finish_dcrop_pool_b8d_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 188.4733333333333,
+        "cand_round4_us": 179.41333333333336,
+        "delta_us": -9.059999999999945
+      },
+      "c32_wave1:c32_wave1_mapped_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 170.53333333333333,
+        "cand_round4_us": 160.91666666666666,
+        "delta_us": -9.616666666666674
+      },
+      "c32_wave1:c32_wave1_post_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 738.52,
+        "cand_round4_us": 698.2733333333333,
+        "delta_us": -40.24666666666667
+      },
+      "c32_wave1:c32_wave1_prefix_b8d_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 712.3266666666667,
+        "cand_round4_us": 670.2633333333333,
+        "delta_us": -42.06333333333339
+      },
+      "c32_wave1:c32_wave1_up_b8_w16": {
+        "family": "1_c32_family",
+        "base_8a9c60fd_us": 193.16333333333333,
+        "cand_round4_us": 182.64666666666665,
+        "delta_us": -10.51666666666668
+      },
+      "c512_m32_deep:split_ffn_one_w2f8_w16_bin": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 77.75333333333333,
+        "cand_round4_us": 77.11666666666667,
+        "delta_us": -0.6366666666666561
+      },
+      "c512_m32_mh:c512_qkv_attention_compact_w16": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 101.95333333333335,
+        "cand_round4_us": 101.07666666666667,
+        "delta_us": -0.8766666666666794
+      },
+      "c64_wave2:c128_wave2_bi_bo": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 173.46000000000004,
+        "cand_round4_us": 170.51333333333332,
+        "delta_us": -2.946666666666715
+      },
+      "c64_wave2:c128_wave2_bi_ho": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 90.53,
+        "cand_round4_us": 88.44666666666667,
+        "delta_us": -2.0833333333333286
+      },
+      "c64_wave2:c128_wave2_up_lb_sh": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 104.27000000000001,
+        "cand_round4_us": 101.67333333333333,
+        "delta_us": -2.5966666666666782
+      },
+      "c64_wave2:c256_wave2_bi_bo_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 243.38666666666666,
+        "cand_round4_us": 242.69333333333336,
+        "delta_us": -0.6933333333332996
+      },
+      "c64_wave2:c256_wave2_bi_w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 87.30666666666669,
+        "cand_round4_us": 85.97666666666666,
+        "delta_us": -1.3300000000000267
+      },
+      "c64_wave2:c64_wave2_bi": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 121.11666666666665,
+        "cand_round4_us": 118.89666666666669,
+        "delta_us": -2.2199999999999562
+      },
+      "c64_wave2:c64_wave2_bi_bo": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 115.62333333333333,
+        "cand_round4_us": 113.43333333333334,
+        "delta_us": -2.1899999999999977
+      },
+      "c64_wave2:c64_wave2_bi_ho": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 118.57000000000001,
+        "cand_round4_us": 115.30333333333333,
+        "delta_us": -3.26666666666668
+      },
+      "c64_wave2:c64_wave2_up_lb_sh": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 141.49333333333337,
+        "cand_round4_us": 138.48333333333332,
+        "delta_us": -3.0100000000000477
+      },
+      "deep_fast:decoder_project2x_h16w_byteout_w_bin_f8w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 37.93000000000001,
+        "cand_round4_us": 37.940000000000005,
+        "delta_us": 0.00999999999999801
+      },
+      "deep_fast:split_projection_frag_w16_bskip": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 41.556666666666665,
+        "cand_round4_us": 41.36,
+        "delta_us": -0.19666666666666544
+      },
+      "deep_fast:vit_attention_fused_640_bytein_bout_qkfrag": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 163.35666666666668,
+        "cand_round4_us": 163.17333333333335,
+        "delta_us": -0.18333333333333712
+      },
+      "deep_fast:vit_expand_blocked_fp8_frag_bytein_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 262.7466666666666,
+        "cand_round4_us": 263.3133333333333,
+        "delta_us": 0.5666666666666629
+      },
+      "deep_fast:vit_gather_b8": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 16.246666666666663,
+        "cand_round4_us": 16.19666666666667,
+        "delta_us": -0.049999999999993605
+      },
+      "mh_fast:mh_attention_project_frag_c512_w16_u4": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 12.796666666666667,
+        "cand_round4_us": 12.99,
+        "delta_us": 0.19333333333333336
+      },
+      "mh_fast:mh_attention_project_frag_c512_w16_u4_bout": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 36.57,
+        "cand_round4_us": 36.519999999999996,
+        "delta_us": -0.05000000000000426
+      },
+      "mh_fast:mh_pool_project_group_c128_hin_out8_f8w16": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 18.373333333333335,
+        "cand_round4_us": 18.34,
+        "delta_us": -0.03333333333333499
+      },
+      "mh_fast:mh_pool_project_group_c256_out8_f8w16": {
+        "family": "2_c256_family",
+        "base_8a9c60fd_us": 15.933333333333334,
+        "cand_round4_us": 15.8,
+        "delta_us": -0.13333333333333286
+      },
+      "mh_fast:mh_pool_project_group_c512_out8_f8w16": {
+        "family": "4_c512_family",
+        "base_8a9c60fd_us": 16.52333333333333,
+        "cand_round4_us": 16.089999999999996,
+        "delta_us": -0.43333333333333357
+      },
+      "mh_fast:mh_pool_project_group_c64_hin_out8_f8w16": {
+        "family": "3_c64_c128_family",
+        "base_8a9c60fd_us": 29.36,
+        "cand_round4_us": 29.28666666666667,
+        "delta_us": -0.07333333333333059
+      },
+      "vit_stream:vit_stream_contract_frag_bstream_bout_compactw_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 257.8566666666666,
+        "cand_round4_us": 258.7933333333333,
+        "delta_us": 0.9366666666666674
+      },
+      "vit_stream:vit_stream_project_n64_bb_bout_compactw_w16": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 82.52666666666667,
+        "cand_round4_us": 83.21333333333335,
+        "delta_us": 0.6866666666666816
+      },
+      "vit_stream:vit_stream_qkv_frag_bin_w5f8_qkfrag": {
+        "family": "5_vit_family",
+        "base_8a9c60fd_us": 212.63000000000002,
+        "cand_round4_us": 212.35666666666665,
+        "delta_us": -0.27333333333336896
+      }
+    }
+  }
+}

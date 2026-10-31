@@ -2843,3 +2843,8 @@ Post寄存器尾部h2成对交换145VGPR/0spill/七档Gold同，静态1510→148
    - 改动与基线：基于 `b1af6240`，顺着 ViT QKV `P0 = +33.09 µs` 探针线索，将 `vit_stream_qkv_frag_bin_w5f8_*` 改为 `launch_bounds(32)` 单 wave 直接从全局内存读取 W16 权重（彻底消除 16KB LDS 与 6 次跨 wave barrier，`108 VGPR, 0 spill`）。
    - 正确性与时量：七档 42 帧 Gold `0 bit-diff`；3 轮 ABBA 100MHz 硬件实时钟探针（`original1088 / small1080`）显示 `vit_qkv` 从 `209.097 / 212.183 µs` 暴退至 `574.673 / 549.830 µs`（**`+365.577 µs / +337.647 µs`**，0/3 轮，整网退步 `+370.957 / +323.750 µs`）。
    - 裁决与根因：原 W5 方案虽然付出 16KB LDS 与 6 次 barrier 同步代价，但让 5 个 token 块共享同一次全局权重加载；改为单 wave 直接读取后，全局 QKV 权重读取流量放大 5 倍，严重打爆 L2/VRAM 带宽，判定 STOP（ViT QKV 局部尝试 `3/3` 满额剪枝）。证据：`Development/results/ksearch-round3-20261031/README.md`。
+
+8. **Round 4 成分消融：`R3-A + K5` 新基线下单独禁用 R2-D 的子集变体（`A0_NoR2D`、`A1_R2D_C32`、`A2_R2D_MH` vs `A3_R2D_Both`）｜不如完整 `R2D_Both + R4-A` 组合**
+   - 改动与基线：回应 Round 3 审单 P2-5，在 `1005424b`（已固定开启 `R3-A` `CW_FMED3_CLAMP=1` + `K5`）上，同批交错测试 `A0_NoR2D`、`A1_R2D_C32`、`A2_R2D_MH`、`A3_R2D_Both` 四臂 3 轮 8-slot 镜像帧实验（`small1080` 与 `original1088`）。
+   - 正确性与时量：全部 `0 bit-diff`；在 `small1080` 上，当 `R3-A` 消除了 C32 Softmax 31 对 `cmp_gt_e64 + cndmask_e64` 与 14~25 个 SGPR 阻塞后，相对 `A0_NoR2D`（`5.430046 ms` / p99 `5.767799 ms`），`A1_R2D_C32` 快 `-17.57 µs`、`A2_R2D_MH` 快 `-4.89 µs`，而完整 `A3_R2D_Both` 最快（`5.407441 ms`，净快 `-22.61 µs`，p99 `-34.52 µs`）；在 `original1088` 上四臂均落在 `8.596 ~ 8.625 ms` 的窄带内，且叠加 `R4-A` 后全网七档进一步实现 `original1088` `-464.79 µs`、`small1080` `-136.19 µs` 21/21 轮全胜。
+   - 裁决：不拆分按 shape 关闭 R2-D 子集，全网统一保留 `R2D_Both + R3-A + R4-A` 完整生产组合。证据：`Development/results/ksearch-round4-20261031/r3a_r2d_4arm-statistics.json`、`Development/results/ksearch-round4-20261031/README.md`。

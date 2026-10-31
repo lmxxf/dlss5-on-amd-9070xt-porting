@@ -1,0 +1,21 @@
+{
+  "name": "r3a_r4a_primitive",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r3a_r4a_primitive.exe",
+      "sha256": "e6d51d3725b5c4d4ca342cc6ba5de238ec5ad0cc48bc7ed3e06a6fdcb7e2be67"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r3a_r4a_primitive.hsaco",
+      "sha256": "0e4bef2443ccea967acbec2e0738be6e2ed4bd1942a73076cbbbf459760c3886"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "r3a_r4a_primitive/run",
+      "exe": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r3a_r4a_primitive.exe",
+      "env": {},
+      "arguments": "\"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r3a_r4a_primitive.hsaco\" \"{OUT}\""
+    }
+  ]
+}

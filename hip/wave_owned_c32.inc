@@ -461,7 +461,14 @@ CW_Q8_SET(a,e,v);}CW_Q8_END_SITE(a,3);
   h8 ex[4];
   _Pragma("unroll 4") for(uint kt=0;kt<4;kt++){
    f8 acc{};for(uint ci=0;ci<2;ci++)acc=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12((i2{keys[kt*4+ci*2],keys[kt*4+ci*2+1]}),q[ci],acc);
-   h8 a{};for(uint e=0;e<8;e++){uint row=qt*16+r,k=kt*16+g*8+e;float score=acc[e]+w[4096+row*64+k],affine=cw_clampf(score*.044921875f+1.30078125f,1.03125f,1.5693359375f);uint ah=(bits(affine)>>13)-0x1c000u;ushort hb=static_cast<ushort>(((ah<<5)+0x8000u)&65535u);a[e]=__builtin_bit_cast(_Float16,hb);}ex[kt]=a;
+   uint pk[4];
+   _Pragma("unroll") for(uint e=0;e<4;e++){
+    uint row=qt*16+r,k=kt*16+g*8+2*e;
+    float s0=acc[2*e]+w[4096+row*64+k],s1=acc[2*e+1]+w[4096+row*64+k+1];
+    float af0=cw_clampf(s0*.044921875f+1.30078125f,1.03125f,1.5693359375f),af1=cw_clampf(s1*.044921875f+1.30078125f,1.03125f,1.5693359375f);
+    pk[e]=__builtin_amdgcn_perm(bits(af1),bits(af0),0x06050201u)&0x7fe07fe0u;
+   }
+   ex[kt]=__builtin_bit_cast(h8,pk);
   }
   f8 sums{};h8 ones{};for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
   _Pragma("unroll 4") for(uint kt=0;kt<4;kt++)sums=__builtin_amdgcn_wmma_f32_16x16x16_f16_w32_gfx12(ones,ex[kt],sums);

@@ -1,0 +1,1189 @@
+{
+  "tiers": {
+    "original1088": {
+      "baseline_ms": 8.889822916666667,
+      "candidate_ms": 8.425033020833334,
+      "delta_ms": -0.4647898958333325,
+      "delta_percent": -5.228336944282019,
+      "baseline_p99": 9.234767,
+      "candidate_p99": 8.812788,
+      "p99_delta_ms": -0.4219790000000003,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 8.8943059375,
+          "candidate": 8.410069687500002,
+          "delta_ms": -0.4842362499999986,
+          "p99_delta_ms": -0.4847350000000006,
+          "base_drift": 0.014395624999998802
+        },
+        {
+          "round": 2,
+          "base": 8.870474687500002,
+          "candidate": 8.4294596875,
+          "delta_ms": -0.44101500000000193,
+          "p99_delta_ms": -0.4268420000000006,
+          "base_drift": 0.016676874999999924
+        },
+        {
+          "round": 3,
+          "base": 8.904688125,
+          "candidate": 8.435569687500001,
+          "delta_ms": -0.4691184374999988,
+          "p99_delta_ms": -0.38423499999999855,
+          "base_drift": 0.021858749999999816
+        }
+      ],
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab",
+      "samples_per_arm": 960
+    },
+    "original1152": {
+      "baseline_ms": 9.296164479166666,
+      "candidate_ms": 8.944675729166667,
+      "delta_ms": -0.3514887499999997,
+      "delta_percent": -3.7810082942025147,
+      "baseline_p99": 9.622723,
+      "candidate_p99": 9.363593999999999,
+      "p99_delta_ms": -0.2591290000000015,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 9.28190625,
+          "candidate": 8.958795,
+          "delta_ms": -0.3231112500000002,
+          "p99_delta_ms": -0.2943909999999992,
+          "base_drift": 0.011302499999999327
+        },
+        {
+          "round": 2,
+          "base": 9.30168625,
+          "candidate": 8.900888125,
+          "delta_ms": -0.40079812499999967,
+          "p99_delta_ms": -0.2748539999999995,
+          "base_drift": -0.026767500000000055
+        },
+        {
+          "round": 3,
+          "base": 9.3049009375,
+          "candidate": 8.9743440625,
+          "delta_ms": -0.3305568749999992,
+          "p99_delta_ms": -0.21223099999999917,
+          "base_drift": -0.010651875000000643
+        }
+      ],
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a",
+      "samples_per_arm": 960
+    },
+    "original960": {
+      "baseline_ms": 6.4586258333333335,
+      "candidate_ms": 6.257845,
+      "delta_ms": -0.20078083333333385,
+      "delta_percent": -3.1087237210289054,
+      "baseline_p99": 6.640105,
+      "candidate_p99": 6.428456000000001,
+      "p99_delta_ms": -0.21164899999999953,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 6.462002812500001,
+          "candidate": 6.2776553125,
+          "delta_ms": -0.18434750000000033,
+          "p99_delta_ms": -0.21599599999999963,
+          "base_drift": 0.034138124999998354
+        },
+        {
+          "round": 2,
+          "base": 6.465597812499999,
+          "candidate": 6.251961875,
+          "delta_ms": -0.21363593749999854,
+          "p99_delta_ms": -0.21336200000000005,
+          "base_drift": -0.017791875000002122
+        },
+        {
+          "round": 3,
+          "base": 6.4482768749999995,
+          "candidate": 6.243917812499999,
+          "delta_ms": -0.20435906250000002,
+          "p99_delta_ms": -0.18600500000000064,
+          "base_drift": 0.00826249999999984
+        }
+      ],
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475",
+      "samples_per_arm": 960
+    },
+    "small1080": {
+      "baseline_ms": 5.499239895833333,
+      "candidate_ms": 5.363050937500001,
+      "delta_ms": -0.13618895833333244,
+      "delta_percent": -2.476505133673479,
+      "baseline_p99": 5.795097,
+      "candidate_p99": 5.614514,
+      "p99_delta_ms": -0.18058300000000038,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 5.5281728125,
+          "candidate": 5.3971828125000005,
+          "delta_ms": -0.13098999999999972,
+          "p99_delta_ms": -0.16795600000000022,
+          "base_drift": -0.09812437500000026
+        },
+        {
+          "round": 2,
+          "base": 5.4724956250000005,
+          "candidate": 5.3640765625,
+          "delta_ms": -0.10841906250000033,
+          "p99_delta_ms": -0.11352799999999963,
+          "base_drift": 0.04116500000000034
+        },
+        {
+          "round": 3,
+          "base": 5.49705125,
+          "candidate": 5.3278934375,
+          "delta_ms": -0.16915781249999995,
+          "p99_delta_ms": -0.20236199999999993,
+          "base_drift": 0.008446249999999544
+        }
+      ],
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8",
+      "samples_per_arm": 960
+    },
+    "small720": {
+      "baseline_ms": 2.921773541666666,
+      "candidate_ms": 2.7421138541666665,
+      "delta_ms": -0.1796596874999996,
+      "delta_percent": -6.148994264542362,
+      "baseline_p99": 3.2119429999999998,
+      "candidate_p99": 2.902523,
+      "p99_delta_ms": -0.3094199999999998,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 2.9202159375,
+          "candidate": 2.747118125,
+          "delta_ms": -0.1730978125,
+          "p99_delta_ms": -0.269555,
+          "base_drift": 0.017519375000000448
+        },
+        {
+          "round": 2,
+          "base": 2.917904375,
+          "candidate": 2.7396765625,
+          "delta_ms": -0.17822781249999986,
+          "p99_delta_ms": -0.33238999999999974,
+          "base_drift": -0.002671250000000125
+        },
+        {
+          "round": 3,
+          "base": 2.9272003124999997,
+          "candidate": 2.739546875,
+          "delta_ms": -0.18765343749999985,
+          "p99_delta_ms": -0.3883430000000003,
+          "base_drift": 0.026006874999999763
+        }
+      ],
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8",
+      "samples_per_arm": 960
+    },
+    "small900": {
+      "baseline_ms": 4.1271946875,
+      "candidate_ms": 3.946627708333333,
+      "delta_ms": -0.18056697916666709,
+      "delta_percent": -4.375053585757627,
+      "baseline_p99": 4.379282,
+      "candidate_p99": 4.092115,
+      "p99_delta_ms": -0.28716700000000017,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 4.1193462499999995,
+          "candidate": 3.9449509375000007,
+          "delta_ms": -0.17439531249999884,
+          "p99_delta_ms": -0.2920600000000002,
+          "base_drift": -0.00974375000000105
+        },
+        {
+          "round": 2,
+          "base": 4.1400140625,
+          "candidate": 3.9519234374999996,
+          "delta_ms": -0.18809062500000007,
+          "p99_delta_ms": -0.2998099999999999,
+          "base_drift": -0.03567687500000005
+        },
+        {
+          "round": 3,
+          "base": 4.12222375,
+          "candidate": 3.9430087499999997,
+          "delta_ms": -0.17921500000000012,
+          "p99_delta_ms": -0.25542199999999937,
+          "base_drift": 0.009914999999999452
+        }
+      ],
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2",
+      "samples_per_arm": 960
+    },
+    "smallwindow": {
+      "baseline_ms": 1.860955625,
+      "candidate_ms": 1.67969875,
+      "delta_ms": -0.18125687499999987,
+      "delta_percent": -9.73998909834295,
+      "baseline_p99": 1.94022,
+      "candidate_p99": 1.795302,
+      "p99_delta_ms": -0.1449180000000001,
+      "rounds": [
+        {
+          "round": 1,
+          "base": 1.8621031250000002,
+          "candidate": 1.6769012499999998,
+          "delta_ms": -0.1852018750000004,
+          "p99_delta_ms": -0.15152199999999993,
+          "base_drift": 0.009077500000000516
+        },
+        {
+          "round": 2,
+          "base": 1.8590021874999998,
+          "candidate": 1.6797790624999998,
+          "delta_ms": -0.17922312500000004,
+          "p99_delta_ms": -0.138212,
+          "base_drift": -0.0026218750000002178
+        },
+        {
+          "round": 3,
+          "base": 1.8617615625,
+          "candidate": 1.6824159375,
+          "delta_ms": -0.17934562499999984,
+          "p99_delta_ms": -0.149953,
+          "base_drift": 0.002804374999999748
+        }
+      ],
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de",
+      "samples_per_arm": 960
+    }
+  },
+  "slots": [
+    {
+      "name": "perf-original1088-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r1-0-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.887108125000001,
+      "p99": 9.201542,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r1-1-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.422925625000001,
+      "p99": 8.789734,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r1-2-candidate",
+      "height": "original1088",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.39721375,
+      "p99": 8.583768000000001,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r1-3-baseline",
+      "height": "original1088",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.90150375,
+      "p99": 9.247755,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r2-0-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.86213625,
+      "p99": 9.231866,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r2-1-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.4171075,
+      "p99": 8.780522,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r2-2-candidate",
+      "height": "original1088",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.441811875,
+      "p99": 8.864803,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r2-3-baseline",
+      "height": "original1088",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.878813125,
+      "p99": 9.222769,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r3-0-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 8.89375875,
+      "p99": 9.241171,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r3-1-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.38878,
+      "p99": 8.663582,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r3-2-candidate",
+      "height": "original1088",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.482359375000001,
+      "p99": 8.881603,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1088-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1088-r3-3-baseline",
+      "height": "original1088",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 8.9156175,
+      "p99": 9.177481,
+      "raw_sha": "8a45a97480bfa91a8f07b76980275e46262173cb924c65d9d310289ea98546ab"
+    },
+    {
+      "name": "perf-original1152-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r1-0-baseline",
+      "height": "original1152",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.276255,
+      "p99": 9.597722000000001,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r1-1-candidate",
+      "height": "original1152",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.944949375,
+      "p99": 9.310049,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r1-2-candidate",
+      "height": "original1152",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.972640625,
+      "p99": 9.302757999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r1-3-baseline",
+      "height": "original1152",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.2875575,
+      "p99": 9.575527,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r2-0-baseline",
+      "height": "original1152",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.31507,
+      "p99": 9.624170999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r2-1-candidate",
+      "height": "original1152",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.943104375,
+      "p99": 9.347346,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r2-2-candidate",
+      "height": "original1152",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.858671874999999,
+      "p99": 9.30913,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r2-3-baseline",
+      "height": "original1152",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.2883025,
+      "p99": 9.620717999999998,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r3-0-baseline",
+      "height": "original1152",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 9.310226875,
+      "p99": 9.631292,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r3-1-candidate",
+      "height": "original1152",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 8.990434375,
+      "p99": 9.423447,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r3-2-candidate",
+      "height": "original1152",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 8.95825375,
+      "p99": 9.379166999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original1152-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original1152-r3-3-baseline",
+      "height": "original1152",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 9.299574999999999,
+      "p99": 9.624659999999999,
+      "raw_sha": "0900e489a397302b93074a878c694b9c3e7c3400cfe2dfdd3cc727abe1050f4a"
+    },
+    {
+      "name": "perf-original960-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r1-0-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.4449337500000015,
+      "p99": 6.64574,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r1-1-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.27187375,
+      "p99": 6.4337860000000004,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r1-2-candidate",
+      "height": "original960",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.2834368750000005,
+      "p99": 6.427023,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r1-3-baseline",
+      "height": "original960",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.479071875,
+      "p99": 6.6410149999999994,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r2-0-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.474493750000001,
+      "p99": 6.633204,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r2-1-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.24038625,
+      "p99": 6.388043,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r2-2-candidate",
+      "height": "original960",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.2635375,
+      "p99": 6.42409,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r2-3-baseline",
+      "height": "original960",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.4567018749999985,
+      "p99": 6.6315100000000005,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r3-0-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 6.444145625,
+      "p99": 6.612013,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r3-1-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 6.23915,
+      "p99": 6.405708,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r3-2-candidate",
+      "height": "original960",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 6.248685625,
+      "p99": 6.4400059999999995,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-original960-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-original960-r3-3-baseline",
+      "height": "original960",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 6.452408125,
+      "p99": 6.624639,
+      "raw_sha": "5fe1ace60adb68d6e8f0dff8fdf72379c934587e3b4876a33c81e945103ad475"
+    },
+    {
+      "name": "perf-small1080-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r1-0-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.577235,
+      "p99": 5.890156,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r1-1-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.4016456250000005,
+      "p99": 5.696829,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r1-2-candidate",
+      "height": "small1080",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.39272,
+      "p99": 5.676913,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r1-3-baseline",
+      "height": "small1080",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.479110625,
+      "p99": 5.706848,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r2-0-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.451913125,
+      "p99": 5.658081,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r2-1-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.388412499999999,
+      "p99": 5.5325619999999995,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r2-2-candidate",
+      "height": "small1080",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.339740625,
+      "p99": 5.543991,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r2-3-baseline",
+      "height": "small1080",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.493078125,
+      "p99": 5.651686,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r3-0-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 5.492828125,
+      "p99": 5.696261,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r3-1-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 5.338758125,
+      "p99": 5.481448,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r3-2-candidate",
+      "height": "small1080",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 5.31702875,
+      "p99": 5.487389,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small1080-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small1080-r3-3-baseline",
+      "height": "small1080",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 5.5012743749999995,
+      "p99": 5.650892,
+      "raw_sha": "65d71486636715598ee1994166d5186a52d5f53230dbd7f8f03e514e3ec8fcb8"
+    },
+    {
+      "name": "perf-small720-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r1-0-baseline",
+      "height": "small720",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.9114562499999996,
+      "p99": 3.091454,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r1-1-candidate",
+      "height": "small720",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.7456118750000003,
+      "p99": 2.930116,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r1-2-candidate",
+      "height": "small720",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.748624375,
+      "p99": 2.885767,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r1-3-baseline",
+      "height": "small720",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.928975625,
+      "p99": 3.1978709999999997,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r2-0-baseline",
+      "height": "small720",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.91924,
+      "p99": 3.1831509999999996,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r2-1-candidate",
+      "height": "small720",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.7402068749999997,
+      "p99": 2.8770569999999998,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r2-2-candidate",
+      "height": "small720",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.73914625,
+      "p99": 2.838822,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r2-3-baseline",
+      "height": "small720",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.9165687499999997,
+      "p99": 3.17875,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r3-0-baseline",
+      "height": "small720",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 2.914196875,
+      "p99": 3.256352,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r3-1-candidate",
+      "height": "small720",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 2.7396556249999997,
+      "p99": 2.858123,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r3-2-candidate",
+      "height": "small720",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 2.7394381250000004,
+      "p99": 2.8778819999999996,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small720-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small720-r3-3-baseline",
+      "height": "small720",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 2.94020375,
+      "p99": 3.215956,
+      "raw_sha": "cb14850b0d3118d366107e70f7e630588cce8f3fc5703f32f96b006b11ca66f8"
+    },
+    {
+      "name": "perf-small900-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r1-0-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.1242181250000005,
+      "p99": 4.34516,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r1-1-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.940788125,
+      "p99": 4.021312,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r1-2-candidate",
+      "height": "small900",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 3.94911375,
+      "p99": 4.049619,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r1-3-baseline",
+      "height": "small900",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.1144743749999995,
+      "p99": 4.3128280000000006,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r2-0-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.1578525,
+      "p99": 4.4100019999999995,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r2-1-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.9478356249999997,
+      "p99": 4.092862,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r2-2-candidate",
+      "height": "small900",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 3.9560112500000004,
+      "p99": 4.109856,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r2-3-baseline",
+      "height": "small900",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.122175625,
+      "p99": 4.374339,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r3-0-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 4.11726625,
+      "p99": 4.315732,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r3-1-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 3.94942,
+      "p99": 4.091647999999999,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r3-2-candidate",
+      "height": "small900",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 3.9365975,
+      "p99": 4.0837710000000005,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-small900-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-small900-r3-3-baseline",
+      "height": "small900",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 4.12718125,
+      "p99": 4.336713,
+      "raw_sha": "d34685052d820fc24d77b7f35011e6b7aa3dc839fea08febb91d2f66dffea7c2"
+    },
+    {
+      "name": "perf-smallwindow-r1-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r1-0-baseline",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.8575643749999997,
+      "p99": 1.920105,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r1-1-candidate",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.6770787499999997,
+      "p99": 1.7736619999999998,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r1-2-candidate",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.67672375,
+      "p99": 1.777054,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r1-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r1-3-baseline",
+      "height": "smallwindow",
+      "round": 1,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.8666418750000002,
+      "p99": 1.9499279999999999,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r2-0-baseline",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.860313125,
+      "p99": 1.934459,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r2-1-candidate",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.6796287499999998,
+      "p99": 1.75278,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r2-2-candidate",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.679929375,
+      "p99": 1.790743,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r2-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r2-3-baseline",
+      "height": "smallwindow",
+      "round": 2,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.8576912499999998,
+      "p99": 1.922056,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-0-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r3-0-baseline",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 0,
+      "role": "baseline",
+      "mean": 1.8603593750000003,
+      "p99": 1.930196,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-1-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r3-1-candidate",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 1,
+      "role": "candidate",
+      "mean": 1.6795825,
+      "p99": 1.793001,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-2-candidate",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r3-2-candidate",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 2,
+      "role": "candidate",
+      "mean": 1.6852493750000002,
+      "p99": 1.787515,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    },
+    {
+      "name": "perf-smallwindow-r3-3-baseline",
+      "source_path": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/final/evidence/perf-smallwindow-r3-3-baseline",
+      "height": "smallwindow",
+      "round": 3,
+      "slot": 3,
+      "role": "baseline",
+      "mean": 1.86316375,
+      "p99": 1.951843,
+      "raw_sha": "2d89ecb26dbbaf7cec1abae3fdbbeb1da753a32e077170ad0e329c326363b9de"
+    }
+  ]
+}

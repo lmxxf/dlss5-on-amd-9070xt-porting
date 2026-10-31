@@ -294,15 +294,14 @@ DEV void c5c_body(const unsigned char*in8,const float*w,unsigned char*out,uint v
     i2 k=c5c_load(packed,64+key*16+row,kt*16+half*8);
     scores=__builtin_amdgcn_wmma_f32_16x16x16_fp8_fp8_w32_gfx12(k,q,scores);
    }
-   h8 ex{};
-   _Pragma("unroll 8") for(uint e=0;e<8;e++){
-    uint q=first+row,k=key*16+half*8+e;
-    float score=scores[e]+w[4*C*C+head*4096+q*64+k];
-    float affine=c5c_clamp(score*.044921875f+1.30078125f,1.03125f,1.5693359375f);
-    uint ah=(bits(affine)>>13)-0x1c000u;
-    unsigned short hb=static_cast<unsigned short>(((ah<<5)+0x8000u)&65535u);ex[e]=__builtin_bit_cast(_Float16,hb);
+   uint pk[4];
+   _Pragma("unroll") for(uint e=0;e<4;e++){
+    uint q=first+row,k=key*16+half*8+2*e;
+    float s0=scores[2*e]+w[4*C*C+head*4096+q*64+k],s1=scores[2*e+1]+w[4*C*C+head*4096+q*64+k+1];
+    float af0=__builtin_amdgcn_fmed3f(s0*.044921875f+1.30078125f,1.03125f,1.5693359375f),af1=__builtin_amdgcn_fmed3f(s1*.044921875f+1.30078125f,1.03125f,1.5693359375f);
+    pk[e]=__builtin_amdgcn_perm(bits(af1),bits(af0),0x06050201u)&0x7fe07fe0u;
    }
-   exponent[key]=ex;
+   exponent[key]=__builtin_bit_cast(h8,pk);
   }
   h8 ones{};_Pragma("unroll 8") for(uint e=0;e<8;e++)ones[e]=(_Float16)1.f;
   f8 sums[2]{};

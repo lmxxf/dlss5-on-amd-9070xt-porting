@@ -1,0 +1,77 @@
+{
+  "name": "r4a-comgr-compile",
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "sha256": "553385a0ba6465f332208cfd5830224e255db9973101050f760e3117e5575197"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent.hip",
+      "sha256": "4b853380302ad74095421eda91b6c4de8c8093835f40101bcbc0fae538b8d57a"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent-fast.hip",
+      "sha256": "47bfef231c8380049d4be680b8a781cacb5dd5f3b45b7fc3df1adfd055b8dcbc"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-c512-m32-mh.hip",
+      "sha256": "2101ce95781fb324ddb9dc5c20db256697ba1df1afc0c8e22e3ec5b276ee50cc"
+    }
+  ],
+  "jobs": [
+    {
+      "label": "compile/gfx1200-swin-persistent",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1200-swin-persistent-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent-fast.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-swin-persistent-fast",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\swin-persistent-fast.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-swin-persistent-fast.hip\" comgr gfx1201"
+    },
+    {
+      "label": "compile/gfx1200-c512-m32-mh",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-c512-m32-mh.hip\" comgr gfx1200"
+    },
+    {
+      "label": "compile/gfx1201-c512-m32-mh",
+      "exe": "D:\\DLSSNR-Lab\\gap-phase5-20261023\\rtc_compile-current.exe",
+      "cpu_compile": true,
+      "env": {
+        "RTC_EXTRA_OPTS": ""
+      },
+      "arguments": "\"{OUT}\\c512-m32-mh.hsaco\" \"D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\r4a-c512-m32-mh.hip\" comgr gfx1201"
+    }
+  ]
+}

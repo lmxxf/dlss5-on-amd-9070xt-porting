@@ -1,0 +1,38 @@
+{
+  "same_host": true,
+  "frame_exe": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\frame-standard.exe",
+  "frame_window_exe": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\frame-window.exe",
+  "profile_exe": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\final-profile.exe",
+  "profiles": [
+    "small900",
+    "small1080",
+    "original960",
+    "original1088"
+  ],
+  "files": [
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\final-profile.exe",
+      "sha256": "219aa4262983caf43dc6505d6b13a5b3926655466af600b323f992fb74a7f2bf"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\frame-standard.exe",
+      "sha256": "3ca9dfa40f49251cf52be7a2e26363c37931e971e39508b723595db54157d956"
+    },
+    {
+      "path": "D:\\DLSSNR-Lab\\ksearch-round4-20261031\\payload\\frame-window.exe",
+      "sha256": "faa6528c2137bdd516907101e9cc8279b1198e9c4c266ea7b5a8068721596291"
+    }
+  ],
+  "role": "r4a",
+  "modules": {
+    "c32-wave1.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c32-wave1.hsaco",
+    "c32-wave1-rtz.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c32-wave1-rtz.hsaco",
+    "c32-wave1-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c32-wave1-fast.hsaco",
+    "c32-wave1-fast-norm900.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c32-wave1-fast-norm900.hsaco",
+    "c64-wave2.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c64-wave2.hsaco",
+    "c64-wave2-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c64-wave2-fast.hsaco",
+    "swin-persistent.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-swin-persistent.hsaco",
+    "swin-persistent-fast.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-swin-persistent-fast.hsaco",
+    "c512-m32-mh.hsaco": "/home/lmxxf/work/ai-theorys-study/wechat/assets/297/Development/results/ksearch-round4-20261031/payload/r4a-gfx1201-c512-m32-mh.hsaco"
+  }
+}
