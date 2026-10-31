@@ -413,3 +413,11 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
   - `small900`：`3.790010 -> 3.683215 ms`（**`-106.795 µs / -2.82%, p99 -92.842 µs, 3/3 轮`**）。
 - **最新生产 vs 新版 `v0.0.8 ACO` 三档 3 轮 NMMN 纯 NN 对账**：`original1088` `8.032311 vs 5.628856 ms (+42.70%)`、`small1080` `4.786000 vs 3.377634 ms (+41.70%)`、`small900` `3.674233 vs 2.571150 ms (+42.90%)`。
 - **80 模块实物与正式宿主**：双架构 80 模块完整实物保留于 `Development/results/ksearch-round4-20261031/payload/HIP/` 并更新 `hip/SHA256SUMS`；正式 O2 `addon64`/`runtime`/`frame`/`pure`/`final-profile` 与 `runtime-smoke`（`exit=0`）完成。详见 `Development/results/ksearch-round4-20261031/README.md`；临时大文件已清理、`gpu.lock` 已释放，未修改游戏/0.45 ZIP/上游源码，未 push。
+
+## 0.46 · 2026-10-31
+
+以2f19eebc及本次发行文档快照为基础，采用Round5最终双架构80模块和已验证O2宿主。自0.45以来纳入Backfeed刀1的限定形状优化、C32 Phase 5B、K-Search Round1–4的已采纳无损路径，以及Round5仅norm900启用的带精确性保护四路dot2分母归约；失败候选不入包。保持Small 0.5x、MODE/AE和F9默认语义。0 bit-diff指各轮对应基线、已验证输入及配置，不表示跨模式或历史版本任意输出恒等，也未证明性能上限。
+
+离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
+
+三包与SHA回执：Development/releases/0.46/；双游戏备份安装回执：Development/results/game-install-20261031/。公开网盘尚未上传；0.45下载链接仍对应0.45。

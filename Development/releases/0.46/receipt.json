@@ -1,0 +1,41 @@
+{
+  "git_base_commit": "2f19eebc",
+  "packages": [
+    {
+      "name": "Magpie-DLSS5-AMD-0.46",
+      "bytes": 491574372,
+      "sha256": "d99cd557a3470d5cc26dda08d9490d4069e33c8f38e4df70ac7146011f360fbe",
+      "files": 877,
+      "verified": true
+    },
+    {
+      "name": "OptiScaler-DLSS5-AMD-0.46",
+      "bytes": 521772408,
+      "sha256": "ead95c097b2e3f399bd39bfe5565e524e8cea2a0ca939a4a751910d94148de94",
+      "files": 695,
+      "verified": true
+    },
+    {
+      "name": "OptiScaler-REFramework-DLSS5-AMD-0.46",
+      "bytes": 533065995,
+      "sha256": "d96108c350782ec1670fbf77031259987cccfeebdd55f2c1dd023befcc02dc2f",
+      "files": 705,
+      "verified": true
+    }
+  ],
+  "source_archive_sha256": "23918d6a6f5f6450c505decd5518b6ec597189220a42d2bceb27de5121a377ec",
+  "installed_files": 169,
+  "history045_preserved": true,
+  "status": "COMPLETE",
+  "runtime_smoke_limit_seconds": 15,
+  "history044_unchanged": true,
+  "protected_configs": 16,
+  "shader_checks_total": 132,
+  "utc": "2026-10-31T13:12:05.0143542Z",
+  "no_personal_config_shipped": true,
+  "source_dirty": true,
+  "defaults_verified": true,
+  "version": "0.46",
+  "full_zip_file_sha_readback": true,
+  "modules_per_package": 80
+}

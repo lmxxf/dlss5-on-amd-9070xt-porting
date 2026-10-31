@@ -435,3 +435,11 @@ Download: [Quark](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile mirror](https:
 - **Release contents**: three host packages retain the existing configuration defaults and dual-model assets, with 40 HIP modules per architecture. Source attachments describe the shipped host, kernels and configuration; experiment outputs are evidence, not alternative install files. Final package hashes and installation receipts are recorded separately in the release directory.
 
 Evidence: [Small compact paths](Development/results/gap-phase4-20261023/knife2/README.md), [C512 packing](Development/results/gap-phase5-20261023/knife1/README.md), [V-fragment eligibility](Development/results/gap-phase5-20261023/knife2/README.md), [limited Q/K layout](Development/results/gap-phase6-20261023/knife1/README.md), [excluded final candidates](Development/results/gap-phase6-20261023/knife2/README.md).
+
+## 0.46 · 2026-10-31
+
+Based on 2f19eebc plus the release-document snapshot. Ships the validated Round5 dual-architecture 80 modules and O2 hosts. Since 0.45: accepted shape-limited Backfeed knife1, C32 Phase5B, accepted K-Search Rounds1–4, and Round5 guarded four-accumulator dot2 denominator reduction in norm900 only. Rejected candidates are excluded. Small0.5x, MODE/AE and F9 defaults remain. Bit-exact evidence applies to the tested inputs/configurations against each round's baseline; no universal cross-mode equivalence or performance ceiling is claimed.
+
+Offline single-frame times across validation batches (not game FPS): Small0.5x 1080:5.311–5.363ms, 900:3.937–3.947ms, 720:2.742ms, window:1.680ms; Original1x 1088:8.335–8.425ms (pure NN7.984ms), 1152:8.859–8.945ms, 960:6.243ms. Round5 same-batch Original960 mean−25.60µs/p99−30.55µs, all three rounds improved; final20 configurations/138 file pairs bit-identical. These ranges are not a same-batch guarantee across all seven tiers.
+
+Receipts: Development/releases/0.46/ and Development/results/game-install-20261031/. Public mirrors have not been updated; existing0.45 links remain0.45.

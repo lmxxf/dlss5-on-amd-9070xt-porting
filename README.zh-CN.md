@@ -18,7 +18,14 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 | **Magpie**（便携） | 任何游戏，不需要游戏支持超分 | Magpie 抓游戏窗口；网络接在效果组的 FSR3_SR 一项里，之后 FSR4 放大到全屏（可选 XeSS 帧生成） |
 | **OptiScaler-REFramework**（只给 RE9） | 《生化危机 9》，常规路线切不开它的命令提交 | TheAutomatic 改的 OptiScaler 宿主 + 我们的 `LmxxfNrRuntime.dll`（成对使用，别和常规包混装） |
 
-**当前版本：0.45（2026-10-24）。** 下载：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS)（0.44 旧版：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP)）。保持 Small 0.5x 默认、MODE/AE 和 F9 语义，补齐紧凑字节路径，改进 V 片段布局与 C512 成对打包；Q/K 新布局仅在三个已验处理形状启用（**Small 0.5x 单帧耗时：1080 档 `5.487 ms`、900 档 `4.245 ms`、720 档 `2.990 ms`；Original 1x：900 档 `6.408 ms`、1088 档 `8.794 ms`**）。[完整说明与验证范围](CHANGELOG.zh-CN.md#045--2026-10-24)。
+## 0.46 · 2026-10-31
+
+以2f19eebc及本次发行文档快照为基础，采用Round5最终双架构80模块和已验证O2宿主。自0.45以来纳入Backfeed刀1的限定形状优化、C32 Phase 5B、K-Search Round1–4的已采纳无损路径，以及Round5仅norm900启用的带精确性保护四路dot2分母归约；失败候选不入包。保持Small 0.5x、MODE/AE和F9默认语义。0 bit-diff指各轮对应基线、已验证输入及配置，不表示跨模式或历史版本任意输出恒等，也未证明性能上限。
+
+离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
+
+三包与SHA回执：Development/releases/0.46/；双游戏备份安装回执：Development/results/game-install-20261031/。公开网盘尚未上传；0.45下载链接仍对应0.45。
+
 
 **📖 使用与调参必看：[使用与参数配置完整说明（选包、custom-config.txt 写哪、F6～F9 热键、全部参数与抄作业配方）](使用与参数配置说明.md)**（底层全量字典见 [scripts/CONFIGURATION.zh-CN.md](scripts/CONFIGURATION.zh-CN.md)）。
 

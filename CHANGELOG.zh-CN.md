@@ -437,3 +437,11 @@ Small权重与旧权重共存；80个双架构模块复用。F8切AE/EXACT；2x/
 - **发行内容**：三种宿主包保持原配置默认值和双模型资产，每架构 40 个 HIP 模块。源码附件对应发行宿主、内核和配置；实验产物仅作证据，不是另一个安装版本。最终包 SHA 与安装回执由发行目录单独记录。
 
 证据：[Small 紧凑路径](Development/results/gap-phase4-20261023/knife2/README.md)、[C512 打包](Development/results/gap-phase5-20261023/knife1/README.md)、[V-fragment 资格](Development/results/gap-phase5-20261023/knife2/README.md)、[限定 Q/K 布局](Development/results/gap-phase6-20261023/knife1/README.md)、[最后一轮未采纳候选](Development/results/gap-phase6-20261023/knife2/README.md)。
+
+## 0.46 · 2026-10-31
+
+以2f19eebc及本次发行文档快照为基础，采用Round5最终双架构80模块和已验证O2宿主。自0.45以来纳入Backfeed刀1的限定形状优化、C32 Phase 5B、K-Search Round1–4的已采纳无损路径，以及Round5仅norm900启用的带精确性保护四路dot2分母归约；失败候选不入包。保持Small 0.5x、MODE/AE和F9默认语义。0 bit-diff指各轮对应基线、已验证输入及配置，不表示跨模式或历史版本任意输出恒等，也未证明性能上限。
+
+离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
+
+三包与SHA回执：Development/releases/0.46/；双游戏备份安装回执：Development/results/game-install-20261031/。公开网盘尚未上传；0.45下载链接仍对应0.45。

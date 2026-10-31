@@ -956,3 +956,8 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 - **仅整合 gfx1201 现有 c32-wave1-fast-norm900 分支的 guarded 四路 dot2 分母归约**：独立三轮 ABBA、800帧丢160、每臂3840样本，Original960 mean 6.268203→6.242602ms（−25.601µs/−0.408%），p99 −30.551µs，三轮 mean/p99 全胜。保持原 host dispatch 门；其他标准档位执行代码不变。
 - 七档 Gold、最终20配置138对输出文件全部0 bit-diff。双架构80对象与当前源码/清单匹配；保存于该轮 `payload/HIP/`。六个正式宿主沿用 b60 并校验 SHA。补齐 C512 deep 分架构编译选项，避免重建偏离基线。
 - 远端最终核验1298文件无漂移、无遗留任务、gpu.lock 已释放。源码及 hip/SHA256SUMS 已在工作区整合，未 commit/push/游戏部署。**未证明当前架构的性能上限，不认可“所有无损收益已抠干”。**
+
+
+### 2026-10-31 v0.46 三包与双游戏升级闭环
+
+2f19eebc加发行文档快照，Round5最终HIP80及指定O2宿主三包完成。132 shader PASS、RE包15秒smoke exit0、ZIP全文件SHA读回；0.45原包移history且核同回执，0.44保持。双游戏完整备份1502文件/2,688,647,060字节，169项原子替换与16配置逐字保持，两路15秒smoke exit0。首次165项门触发自动恢复，补架构清单与修正JSON预检后重做成功；失败保留。rollback语法通过，最终无锁。未commit/push/外部上传。详见Development/releases/0.46/README.md与Development/results/game-install-20261031/README.md。
