@@ -1,0 +1,56 @@
+pid=27892 tick=111344390 event=initialization_started detail=background; game output unchanged
+pid=27892 tick=111344406 event=flags_applied detail=148 layers=1 env_kept=0
+pid=27892 tick=111344406 event=build_mode detail=tiled verification; separate assets; reset-history only
+pid=27892 tick=111344406 event=temporal_config detail=temporal=1 motion=1624x916 render=1623x913
+pid=27892 tick=111344437 event=frame_create_step detail=encode removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=inputs-checked removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=output-created removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=srvs removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=uav removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=rootsig-serialized removed=00000000
+pid=27892 tick=111344437 event=codec_step detail=rootsig removed=00000000
+pid=27892 tick=111344453 event=codec_step detail=compiled removed=00000000
+pid=27892 tick=111344468 event=frame_create_step detail=input=1623x913 network=1600x900 viewport=0,0,1600,900 output=1623x913 removed=00000000
+pid=27892 tick=111344468 event=frame_create_step detail=input removed=00000000
+pid=27892 tick=111344578 event=frame_create_step detail=network removed=00000000
+pid=27892 tick=111345328 event=frame_create_step detail=neural removed=00000000
+pid=27892 tick=111345343 event=frame_create_step detail=decode removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=inputs-checked removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=output-created removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=srvs removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=uav removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=rootsig-serialized removed=00000000
+pid=27892 tick=111345343 event=codec_step detail=rootsig removed=00000000
+pid=27892 tick=111345390 event=codec_step detail=compiled removed=00000000
+pid=27892 tick=111345406 event=frame_create_step detail=ready removed=00000000
+pid=27892 tick=111345406 event=ready detail=await explicit PID/request-id; history_reset=1; not temporal acceptance
+pid=27892 tick=111345843 event=input_rejected detail=black RGB; no neural write; new request required
+pid=27892 tick=111345921 event=strength detail=auto exe=PBZ.exe -> 1,1
+pid=13152 tick=111457500 event=initialization_started detail=background; game output unchanged
+pid=13152 tick=111457500 event=flags_applied detail=148 layers=3 env_kept=0
+pid=13152 tick=111457500 event=build_mode detail=tiled verification; separate assets; reset-history only
+pid=13152 tick=111457500 event=temporal_config detail=temporal=1 motion=1624x916 render=1623x913
+pid=13152 tick=111457546 event=frame_create_step detail=encode removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=inputs-checked removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=output-created removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=srvs removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=uav removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=rootsig-serialized removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=rootsig removed=00000000
+pid=13152 tick=111457546 event=codec_step detail=compiled removed=00000000
+pid=13152 tick=111457546 event=frame_create_step detail=input=1623x913 network=1600x900 viewport=0,0,1600,900 output=1623x913 removed=00000000
+pid=13152 tick=111457546 event=frame_create_step detail=input removed=00000000
+pid=13152 tick=111457625 event=frame_create_step detail=network removed=00000000
+pid=13152 tick=111457859 event=frame_create_step detail=neural removed=00000000
+pid=13152 tick=111457859 event=frame_create_step detail=decode removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=inputs-checked removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=output-created removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=srvs removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=uav removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=rootsig-serialized removed=00000000
+pid=13152 tick=111457859 event=codec_step detail=rootsig removed=00000000
+pid=13152 tick=111457875 event=codec_step detail=compiled removed=00000000
+pid=13152 tick=111457875 event=frame_create_step detail=ready removed=00000000
+pid=13152 tick=111457875 event=ready detail=await explicit PID/request-id; history_reset=1; not temporal acceptance
+pid=13152 tick=111457953 event=input_rejected detail=black RGB; no neural write; new request required
+pid=13152 tick=111457984 event=strength detail=auto exe=PBZ.exe -> 1,1

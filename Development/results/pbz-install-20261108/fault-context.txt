@@ -1,0 +1,47 @@
+pid=27892 code=c0000005 ip=0000000001c74800 access=8 address=1c74800 rcx=7ff882754010 rdx=68fcfe10 r8=d139e340 r9=4b5fac690
+  00007fffa5a78a60 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+118a60
+  00007ff8b1c76e06 C:\WINDOWS\SYSTEM32\ntdll.dll+c6e06
+  00007ff8b1c765a5 C:\WINDOWS\SYSTEM32\ntdll.dll+c65a5
+  00007ff8b1d1a42e C:\WINDOWS\SYSTEM32\ntdll.dll+16a42e
+  0000000001c74800 +1c74800
+pid=13152 code=c0000005 ip=0000000001c74800 access=8 address=1c74800 rcx=7ff8a7df4010 rdx=62fb8d50 r8=124e9e340 r9=62ff2058
+  00007fffb60f8a60 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+118a60
+  00007ff8b1c76e06 C:\WINDOWS\SYSTEM32\ntdll.dll+c6e06
+  00007ff8b1c765a5 C:\WINDOWS\SYSTEM32\ntdll.dll+c65a5
+  00007ff8b1d1a42e C:\WINDOWS\SYSTEM32\ntdll.dll+16a42e
+  0000000001c74800 +1c74800
+pid=30308 code=c0000005 ip=0000000001c74800 access=8 address=1c74800 rcx=7ff8a7df4010 rdx=6310d2a0 r8=124dee340 r9=631357b8
+  00007fffa3cc8a60 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+118a60
+  00007ff8b1c76e06 C:\WINDOWS\SYSTEM32\ntdll.dll+c6e06
+  00007ff8b1c765a5 C:\WINDOWS\SYSTEM32\ntdll.dll+c65a5
+  00007ff8b1d1a42e C:\WINDOWS\SYSTEM32\ntdll.dll+16a42e
+  0000000001c74800 +1c74800
+pid=11512 code=c0000005 ip=0000000001c74800 access=8 address=1c74800 rcx=7ff8a7df4010 rdx=63609b80 r8=124f2e340 r9=0
+FAULT_CONTEXT rsp=124f2dcf8 rax=7fffac946b30 rbx=124f2dfb0 rsi=636099d0 rdi=124f2e074 rbp=24a601cc0
+FAULT_STACK slot=0 value=7fffa3dae98e C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+1fe98e
+FAULT_STACK slot=1 value=7ff8b176dac0 C:\WINDOWS\System32\msvcrt.dll+9dac0
+FAULT_STACK slot=8 value=7ff816277ece C:\WINDOWS\SYSTEM32\D3D12Core.dll+207ece
+FAULT_STACK slot=22 value=7fffb60ee25c C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\ReShade64.dll+12e25c
+FAULT_STACK slot=31 value=7fffa3db1300 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+201300
+FAULT_STACK slot=34 value=7fffa3ce1ce9 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+131ce9
+FAULT_STACK slot=36 value=7ff8b1701b65 C:\WINDOWS\System32\msvcrt.dll+31b65
+FAULT_STACK slot=42 value=7fffa3cd1334 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+121334
+FAULT_STACK slot=44 value=7fffa3cc86c9 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+1186c9
+FAULT_STACK slot=48 value=7fffa3cb6716 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+106716
+FAULT_STACK slot=62 value=7fffa3ccb6ff C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+11b6ff
+FAULT_STACK slot=95 value=7fffa3db5680 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+205680
+FAULT_STACK slot=100 value=7ff8b1bef3fe C:\WINDOWS\SYSTEM32\ntdll.dll+3f3fe
+FAULT_STACK slot=103 value=7fffa3db5680 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+205680
+FAULT_STACK slot=109 value=7ff8b1d282b0 C:\WINDOWS\SYSTEM32\ntdll.dll+1782b0
+FAULT_STACK slot=121 value=7fffa3db5680 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+205680
+FAULT_STACK slot=125 value=7ff8aef0c008 C:\WINDOWS\System32\KERNELBASE.dll+1ac008
+FAULT_STACK slot=177 value=7fffa3db5680 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+205680
+FAULT_STACK slot=184 value=7ff8b1c05591 C:\WINDOWS\SYSTEM32\ntdll.dll+55591
+FAULT_STACK slot=186 value=7ff8af7b366b C:\WINDOWS\System32\msvcp_win.dll+1366b
+FAULT_STACK slot=192 value=7ff8160a9be4 C:\WINDOWS\SYSTEM32\D3D12Core.dll+39be4
+FAULT_STACK slot=195 value=7fffa3db55e0 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+2055e0
+  00007fffa3cc8ac3 C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\dlss5-amd.addon64+118ac3
+  00007ff8b1c76e06 C:\WINDOWS\SYSTEM32\ntdll.dll+c6e06
+  00007ff8b1c765a5 C:\WINDOWS\SYSTEM32\ntdll.dll+c65a5
+  00007ff8b1d1a42e C:\WINDOWS\SYSTEM32\ntdll.dll+16a42e
+  0000000001c74800 +1c74800

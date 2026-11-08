@@ -175,15 +175,15 @@ static uint32_t destroy_context(void**context,const void*allocation_callbacks){
    to amd_fidelityfx_upscaler_dx12.dll. Stellar Blade's host dispatches through the shim's export (and the shim reaches the provider
    without going through the provider's export symbol), Cyberpunk 2077's host calls the provider export directly. Hook both; a call that
    entered through the shim is passed straight through at the provider layer (thread-local depth). The layer that observed the call
-   supplies the trampoline used for the deferred replay (global `original`). */
+   supplies a per-job trampoline for deferred replay. Provider contexts and shim wrappers are not interchangeable. */
 static Dispatch original_shim{},original_sr{};static thread_local unsigned shim_depth=0;
 static uint32_t dispatch_core(void**context,const Header*h,Dispatch orig);
 static uint32_t dispatch_shim(void**context,const Header*h){++shim_depth;uint32_t r=dispatch_core(context,h,original_shim);--shim_depth;return r;}
 static uint32_t dispatch_sr(void**context,const Header*h){if(shim_depth)return original_sr(context,h);return dispatch_core(context,h,original_sr);}
 static uint32_t dispatch_core(void**context,const Header*h,Dispatch orig){
- original=orig;
+
  {static std::atomic<unsigned>seen{};unsigned k=seen.fetch_add(1);if(k<8)if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu kind=ffx_dispatch_entry n=%u type=%08x context=%p\n",GetCurrentProcessId(),k,h?unsigned(h->type):0u,context);fclose(f);}}
- if(!h||(h->type&0x00ffffffu)!=0x00010001u)return original(context,h);
+ if(!h||(h->type&0x00ffffffu)!=0x00010001u)return orig(context,h);
  /* Select the first upscaler context until it is destroyed (including its size-error notice). A following FSR4 (even when its output
     also fits 1080p) must not replace the input stage's motion, pending work or status text. */
  if(fit_small_input()){
@@ -195,12 +195,12 @@ static uint32_t dispatch_core(void**context,const Header*h,Dispatch orig){
       chosen one resets the count on every chosen dispatch, so the FSR4-follower case keeps its pin). */
    if(foreign_dispatches.fetch_add(1)+1>=120){fit_context.compare_exchange_strong(chosen,nullptr);foreign_dispatches.store(0);
     if(FILE*f=_wfopen(NativeLabPath(L"logs\\native-submission-order.txt").c_str(),L"ab")){fprintf(f,"pid=%lu kind=fit_context_reassigned old=%p new=%p\n",GetCurrentProcessId(),chosen,context);fclose(f);}}
-   else return original(context,h);
+   else return orig(context,h);
   }else foreign_dispatches.store(0);
   ResourcePayload candidate{};SIZE_T bytes=0;
   if(context&&ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const char*>(h)+312,&candidate,sizeof candidate,&bytes)&&bytes==sizeof candidate&&candidate.resource){
    void**expected=nullptr;fit_context.compare_exchange_strong(expected,context);
-   if(fit_context.load()!=context)return original(context,h);
+   if(fit_context.load()!=context)return orig(context,h);
   }
  }
  // Existing FFX x64 ABI: commandList follows the16-byte header. Payload only.
@@ -209,19 +209,19 @@ static uint32_t dispatch_core(void**context,const Header*h,Dispatch orig){
  unsigned n=++frames;log("ffx_begin",got==sizeof(list)?list:nullptr,nullptr,n);
 #ifdef NATIVE_ORDER_NEURAL
  if(NativePreUpscale::Enabled()){
-  if(NativePreUpscale::Replaying())return original(context,h);
+  if(NativePreUpscale::Replaying())return orig(context,h);
   if(NativePreUpscale::Mode()==1&&neural_oneshot.Bypassed()){
    if(n<5||n%100==0)log("ffx_passthrough_f6",list,nullptr,n);
-   return original(context,h);
+   return orig(context,h);
   }
   ID3D12GraphicsCommandList*native=nullptr;
   if(list&&SUCCEEDED(static_cast<IUnknown*>(list)->QueryInterface(UnwrappedObject,reinterpret_cast<void**>(&native)))&&native){
    install_native_barriers(list);
-   const bool captured=NativePreUpscale::Capture(context,h,native,n);native->Release();
+   const bool captured=NativePreUpscale::Capture(context,h,native,n,orig);native->Release();
    if(captured)return 0;
   }
   /* Unsupported descriptors run the original FSR unchanged, never the old post-upscale network. */
-  return original(context,h);
+  return orig(context,h);
  }
 #endif
  ResourcePayload output{};ID3D12Resource*frame_motion=nullptr;bool frame_reset=false;
@@ -259,7 +259,7 @@ static uint32_t dispatch_core(void**context,const Header*h,Dispatch orig){
   }
  }
  if(output.resource)install_native_barriers(list);
- auto result=original(context,h);log("ffx_end",list,nullptr,result);
+ auto result=orig(context,h);log("ffx_end",list,nullptr,result);
 #ifdef NATIVE_ORDER_NEURAL
  /* on-screen notice (native_text_overlay.h): why the picture is not changing -- the input is not 1920x1080 (the network only knows that
     size; the hook never arms), the network is still initializing, or its initialization failed (developer mode off, wrong driver...) */

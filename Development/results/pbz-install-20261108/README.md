@@ -1,0 +1,9 @@
+# PBZ 0.46 installation and mixed FFX entry fix
+
+Installed 696 manifest-verified files beside platform/steam/PBZ.exe. No existing destination files were overwritten by the initial installation. See receipt.json and install.ps1. Runtime game acceptance remains pending.
+
+Four user-observed crashes: async default, synchronous pre-upscale, FSR4 upgrade disabled, then diagnostic build. Same execute AV at 0x1c74800. FSR4=false confirmed in OptiScaler runtime log. The game's crash files use KZ1 encoding rather than ordinary MDMP; no usable minidump stack was obtained.
+
+Diagnostic addon 11cdfef3 captured original RSP and module-mapped stack words. Slot 0 is addon+0x1fe98e; disassembly shows the return address immediately after Process's indirect call through global `original`. This is stack-word evidence, not an unwound full call stack. Both shim/provider hooks and two alternating contexts appear in submission logs. Shim ffxDispatch dereferences a wrapper's provider table before tailcalling; its contract differs from the provider export. Existing code overwrote global `original` on every entry, including unrelated/context-filtered calls, while deferred jobs saved context but not entry provenance.
+
+Fix: Capture receives the current entry trampoline explicitly, stores it in Job, and Process replays through that saved pointer. All immediate dispatch_core calls use its local orig parameter instead of the shared pointer. No kernel, weights, network math, or config changed by the fix. Normal O2 HIP build and git diff --check passed. Installed addon SHA256 c762cf36d2a12bceca8750fbcc42fa0e1f8a2aecb2084bbcaf3f259a4e0c7347, backed up diagnostic and current logs in D:\DLSSNR-Lab\pbz-install-20261108\entry-fix. Installation/readback succeeded and lock released. Gameplay confirmation is still required; async0/FSR4false trial settings currently remain.

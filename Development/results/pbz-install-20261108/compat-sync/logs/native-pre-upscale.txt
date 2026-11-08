@@ -1,0 +1,28 @@
+frame=1 render=1623x913 upscale=2432x1368 phase=0 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=1 render=1623x913 upscale=2432x1368 phase=0 processed=0 replay=0 history_reset=1 event=captured: experimental no-following-consumer contract
+async=auto exe=PBZ.exe -> asynchronous
+frame=1 render=1623x913 upscale=2432x1368 phase=0 processed=0 replay=0 history_reset=1 event=auto: tail-of-list dispatch confirmed; staying on the pre-upscale route
+frame=1 render=1623x913 upscale=2432x1368 phase=0 processed=0 replay=0 history_reset=1 event=inputs: color fmt=26 1623x913 motion fmt=34 depth fmt=19 exposure=no reactive=no tc=no output fmt=10 mvscale=1623,913 jitter=-0.25,0.166667 pre_exposure=1 flags=0x0
+frame=1 render=1623x913 upscale=2432x1368 phase=1 processed=0 replay=0 history_reset=1 event=before original FFX replay
+frame=1 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=after original FFX replay
+frame=1 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=replayed
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=captured: experimental no-following-consumer contract
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=inputs: color fmt=26 1623x913 motion fmt=34 depth fmt=19 exposure=yes reactive=no tc=no output fmt=10 mvscale=1623,913 jitter=0.25,-0.388889 pre_exposure=1 flags=0x0
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=before original FFX replay
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=after original FFX replay
+frame=2 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=replayed
+frame=3 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=3 render=1623x913 upscale=2432x1368 phase=2 processed=0 replay=0 history_reset=1 event=captured: experimental no-following-consumer contract
+frame=3 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=before original FFX replay
+frame=3 render=1623x913 upscale=2432x1368 phase=4 processed=1 replay=0 history_reset=1 event=after original FFX replay
+frame=3 render=1623x913 upscale=2432x1368 phase=4 processed=1 replay=0 history_reset=1 event=replayed
+frame=4 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=4 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=captured: experimental no-following-consumer contract
+frame=4 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=before original FFX replay
+frame=4 render=1623x913 upscale=2432x1368 phase=4 processed=1 replay=0 history_reset=1 event=after original FFX replay
+frame=4 render=1623x913 upscale=2432x1368 phase=4 processed=1 replay=0 history_reset=1 event=replayed
+frame=5 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=6 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=7 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=capture descriptor read
+frame=8 render=1623x913 upscale=2432x1368 phase=4 processed=0 replay=0 history_reset=1 event=capture descriptor read

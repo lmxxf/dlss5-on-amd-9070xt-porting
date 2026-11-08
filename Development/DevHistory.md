@@ -961,3 +961,12 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 ### 2026-10-31 v0.46 三包与双游戏升级闭环
 
 2f19eebc加发行文档快照，Round5最终HIP80及指定O2宿主三包完成。132 shader PASS、RE包15秒smoke exit0、ZIP全文件SHA读回；0.45原包移history且核同回执，0.44保持。双游戏完整备份1502文件/2,688,647,060字节，169项原子替换与16配置逐字保持，两路15秒smoke exit0。首次165项门触发自动恢复，补架构清单与修正JSON预检后重做成功；失败保留。rollback语法通过，最终无锁。详见Development/releases/0.46/README.md与Development/results/game-install-20261031/README.md。用户已提供 0.46 公开下载入口：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile](https://gofile.io/d/Iyyz2tLc)，README/CHANGELOG/releases/WorkingPlan已同步更新。
+
+
+### 2026-11-08 PBZ 新游戏安装 0.46 常规包
+
+按用户授权，定位实际约499MB主程序 `PBZ\platform\steam\PBZ.exe`，外层 `PBZ\steam\PBZ.exe` 约1MB。游戏带独立FSR upscaler/loader库。安装前game-check空闲、实验进程检查、C/D余量及原子gpu.lock通过；正式OptiScaler 0.46 ZIP SHA与发行回执一致，源清单与安装后696文件逐SHA核验通过。目标目录没有与包重名的原文件，原游戏exe SHA保持4415933C…E423；默认MP0.5/AE1/MODE0/PRE_UPSCALE auto，未改存档与游戏画质配置。独立回滚脚本在 `D:\DLSSNR-Lab\pbz-install-20261108\rollback.ps1`。实际安装exit0、锁释放；未启动游戏，尚未验证实际钩子命中、画质或FPS。脚本及回执见 `results/pbz-install-20261108/`。
+
+### 2026-11-08 PBZ连续崩溃与FFX入口配对修复待实玩
+
+用户四次报告闪退；同步前置及关闭FSR4升级均未避开同一0x1c74800执行AV。诊断版记录原RSP，首栈字定位Process回放的global original间接调用；shim/provider双入口与两个context交替已见日志。原代码每次dispatch覆盖全局入口，但Job仅保存context，延后回放可能错配shim/provider合同。现Capture显式传入并保存逐Job trampoline，Process用该指针回放，dispatch_core直接透传也改用局部orig。正式O2 HIP编译及diff检查通过，PBZ装入c762cf36…c7347并读回，旧诊断版/日志保留entry-fix备份，锁已释放。未改内核/权重/网络数学，尚待用户实玩确认；async0/FSR4false排查设置暂保。证据见results/pbz-install-20261108/README.md与fault-context.txt，未commit/push/改发行ZIP。

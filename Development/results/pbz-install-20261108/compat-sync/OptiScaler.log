@@ -1,0 +1,132 @@
+[22:46:29.796638] [W] OptiScaler v0.9.4-final (7534ad0) loaded
+[22:46:29.796796] [W] ---------------------------------
+[22:46:29.796841] [W] OptiScaler is freely downloadable from
+[22:46:29.796859] [W] GitHub : https://github.com/optiscaler/OptiScaler/releases
+[22:46:29.796880] [W] Nexus  : https://www.nexusmods.com/site/mods/986
+[22:46:29.796899] [W] If you paid for these files, you've been scammed!
+[22:46:29.796922] [W] DO NOT USE IN MULTIPLAYER GAMES
+[22:46:29.796940] [I] 
+[22:46:29.796962] [I] LogLevel: 2
+[22:46:29.796982] [I] 
+[22:46:29.797038] [I] Windows version: Windows 11 (10.0.26340)
+[22:46:29.798128] [I] Config parameters:
+[22:46:29.798162] [I] Upscalers.Dx12Upscaler: fsr31
+[22:46:29.798174] [I] FrameGen.FGInput: nofg
+[22:46:29.798182] [I] FrameGen.FGOutput: nofg
+[22:46:29.798192] [I] Log.LogLevel: 2
+[22:46:29.798200] [I] Log.LogToFile: true
+[22:46:29.798207] [I] Spoofing.Dxgi: false
+[22:46:29.798215] [I] Inputs.EnableFfxInputs: false
+[22:46:29.798223] [I] Plugins.LoadReShade: true
+[22:46:29.798233] [I] 
+[22:46:29.798243] [I] Setting DllPath to C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam
+[22:46:29.798253] [I] 
+[22:46:29.798320] [I] 
+[22:46:29.798346] [W] IsRunningOnWine Wine not detected
+[22:46:29.798354] [I] 
+[22:46:29.798362] [I] Check for DLSS files
+[22:46:29.804502] [I] 
+[22:46:29.804572] [I] Not running on Nvidia, disabling DLSS
+[22:46:29.804578] [I] 
+[22:46:29.804704] [I] CheckQuirks Game's Exe: PBZ.exe
+[22:46:29.804710] [I] CheckQuirks Game Name: Phantom Blade Zero
+[22:46:29.804715] [I] CheckQuirks Game Version: CL-302256_JKS-17280
+[22:46:29.804719] [I] CheckQuirks Game Engine: Other
+[22:46:29.804800] [I] 
+[22:46:29.805742] [I] CheckWorkingMode OptiScaler working as dxgi.dll, system dll loaded
+[22:46:29.805818] [W] Config::CheckUpscalerFiles nvngx.dll not found!
+[22:46:29.806540] [I] Config::CheckUpscalerFiles libxess.dll found in game folder
+[22:46:29.996729] [I] CheckWorkingMode Loading ReShade64.dll, result: 7FFFB6330000
+[22:46:29.996816] [I] 
+[22:46:29.997334] [W] Util::LoadProxyLibrary Can't find amd_fidelityfx_loader_dx12.dll, returning nullptr!
+[22:46:29.998099] [I] Util::LoadProxyLibrary amd_fidelityfx_dx12.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_dx12.dll
+[22:46:29.998122] [I] FfxApiProxy::InitFfxDx12 Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_dx12.dll
+[22:46:29.998180] [I] 
+[22:46:29.999618] [I] Util::LoadProxyLibrary amd_fidelityfx_upscaler_dx12.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_upscaler_dx12.dll
+[22:46:30.001877] [I] FfxApiProxy::InitFfxDx12_SR Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_upscaler_dx12.dll
+[22:46:30.001902] [I] FfxApiProxy::InitFfxDx12_SR LoadResult: true
+[22:46:30.001911] [I] 
+[22:46:30.003517] [I] Util::LoadProxyLibrary amd_fidelityfx_framegeneration_dx12.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_framegeneration_dx12.dll
+[22:46:30.003539] [I] FfxApiProxy::InitFfxDx12_FG Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\amd_fidelityfx_framegeneration_dx12.dll
+[22:46:30.003550] [I] FfxApiProxy::InitFfxDx12_FG LoadResult: true
+[22:46:30.003564] [I] 
+[22:46:30.004022] [W] Util::LoadProxyLibrary Can't find amd_fidelityfx_denoiser_dx12.dll, returning nullptr!
+[22:46:30.004045] [I] FfxApiProxy::InitFfxDx12_Denoiser LoadResult: false
+[22:46:30.004053] [I] 
+[22:46:30.004557] [W] Util::LoadProxyLibrary Can't find amd_fidelityfx_radiancecache_dx12.dll, returning nullptr!
+[22:46:30.004576] [I] FfxApiProxy::InitFfxDx12_Radiance LoadResult: false
+[22:46:30.004584] [I] FfxApiProxy::InitFfxDx12 LoadResult: true
+[22:46:30.004593] [I] 
+[22:46:30.005038] [W] Util::LoadProxyLibrary Can't find amd_fidelityfx_denoiser_dx12.dll, returning nullptr!
+[22:46:30.005053] [I] FfxApiProxy::InitFfxDx12_Denoiser LoadResult: false
+[22:46:30.005097] [I] 
+[22:46:30.005584] [W] Util::LoadProxyLibrary Can't find amd_fidelityfx_radiancecache_dx12.dll, returning nullptr!
+[22:46:30.005601] [I] FfxApiProxy::InitFfxDx12_Radiance LoadResult: false
+[22:46:30.011435] [I] Util::LoadProxyLibrary libxess.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess.dll
+[22:46:30.011460] [I] XeSSProxy::InitXeSS Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess.dll
+[22:46:30.011709] [I] XeSSProxy::InitXeSS LoadResult: true
+[22:46:30.012235] [I] Util::LoadProxyLibrary libxess_dx11.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess_dx11.dll
+[22:46:30.012248] [I] XeSSProxy::InitXeSSDx11 Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess_dx11.dll
+[22:46:30.012377] [I] XeSSProxy::InitXeSSDx11 LoadResult: true
+[22:46:30.014651] [I] Util::LoadProxyLibrary libxess_fg.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess_fg.dll
+[22:46:30.014675] [I] XeFGProxy::InitXeFG Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxess_fg.dll
+[22:46:30.014684] [I] 
+[22:46:30.014699] [I] XeFGProxy::HookXeFG LoadResult: true
+[22:46:30.015562] [I] Util::LoadProxyLibrary libxell.dll loaded from Opti dll path: C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxell.dll
+[22:46:30.015576] [I] XeLLProxy::InitXeLL Loaded from C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\libxell.dll
+[22:46:30.015580] [I] 
+[22:46:30.015592] [I] XeLLProxy::HookXeLL LoadResult: true
+[22:46:30.015598] [I] NVNGXProxy::InitNVNGX 
+[22:46:30.015873] [W] Util::LoadProxyLibrary Can't find _nvngx.dll, returning nullptr!
+[22:46:30.016098] [W] Util::LoadProxyLibrary Can't find nvngx.dll, returning nullptr!
+[22:46:30.016104] [I] Util::NvngxPath trying to load nvngx from registry path!
+[22:46:30.016137] [I] 
+[22:46:30.022069] [I] InitFSR4Update amdxc64.dll loaded
+[22:46:30.022117] [I] OverrideNvapiDll not set, setting it to: true
+[22:46:30.022128] [I] 
+[22:46:30.022153] [I] HookFSR2ExeInputs Trying to hook FSR2 methods
+[22:46:30.022244] [I] HookFSR3ExeInputs Trying to hook FSR3 methods
+[22:46:30.022288] [I] 
+[22:46:30.022296] [I] Init done
+[22:46:30.022304] [I] ---------------------------------------------
+[22:46:30.022312] [I] 
+[22:46:30.076574] [I] LibraryLoadHooks::LoadLibraryCheckW Calling CreateDxgiFactory methods for overlay!
+[22:46:30.582039] [I] `anonymous-namespace'::RunVersionCheck OptiScaler is up to date (current 0.9.4)
+[22:46:34.164367] [W] DxgiSpoofing::AttachToAdapter DxgiSpoofing and DxgiVRAM is disabled, skipping hooking
+[22:46:34.219209] [I] hkD3D12CreateDevice Adapter Desc: AMD Radeon RX 9070 XT
+[22:46:35.253551] [I] hkD3D12CreateDevice Adapter Desc: AMD Radeon RX 9070 XT
+[22:46:35.393229] [I] hkD3D12CreateDevice Adapter Desc: Intel(R) Graphics
+[22:46:35.533282] [I] LibraryLoadHooks::LoadLibraryCheckW C:\WINDOWS\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_25f000c85b470fa6\dxgi.dll call, returning this dll!
+[22:46:35.553466] [I] LibraryLoadHooks::LoadLibraryCheckW C:\WINDOWS\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_25f000c85b470fa6\dxgi.dll call, returning this dll!
+[22:46:36.221369] [I] hkD3D12CreateDevice Adapter Desc: Microsoft Basic Render Driver
+[22:46:36.894041] [I] LibraryLoadHooks::LoadLibraryCheckW dxgi.dll call, returning this dll!
+[22:46:36.909703] [I] hkD3D12CreateDevice Adapter Desc: AMD Radeon RX 9070 XT
+[22:46:37.267497] [I] NVSDK_NGX_D3D12_Init_with_ProjectID InProjectId: 0F71CA1E-5CA1-E42A-AC1E-5CA1E0A11E55
+[22:46:37.267518] [I] NVSDK_NGX_D3D12_Init_with_ProjectID InEngineType: 0
+[22:46:37.267524] [I] NVSDK_NGX_D3D12_Init_with_ProjectID InEngineVersion: 0.9.4
+[22:46:37.269527] [I] NVSDK_NGX_D3D12_Init_Ext AppId: 4919
+[22:46:37.269537] [I] NVSDK_NGX_D3D12_Init_Ext SDK: 15
+[22:46:37.269542] [I] NVSDK_NGX_D3D12_Init_Ext InApplicationDataPath C:\Program Files (x86)\Steam\steamapps\common\PBZ\platform\steam\
+[22:46:37.270628] [W] hk_xessD3D12BuildPipelines 
+[22:46:37.270708] [I] XeSSProxy::Version XeSS Version: v2.0.2
+[22:46:37.274901] [I] CheckForGPU Adapter: AMD Radeon RX 9070 XT, VRAM: 16191.46875 MB
+[22:46:37.275462] [I] CheckForGPU Adapter: Intel(R) Graphics, VRAM: 128 MB
+[22:46:37.276394] [I] CheckForGPU RDNA4: true, RDNA3: false, Fsr4Update: true
+[22:46:37.276407] [I] hkAmdExtD3DCreateInterface IAmdExtFfxApi queried, returning custom AmdExtFfxApi
+[22:46:37.276649] [W] Util::LoadProxyLibrary Can't find amdxcffx64.dll, returning nullptr!
+[22:46:37.280271] [I] AmdExtFfxApi::UpdateFfxApiProvider amdxcffx64 loaded from C:\WINDOWS\System32\DriverStore\FileRepository\u0205306.inf_amd64_ed4bdb51fc506ec7\B026676\amdxcffx64.dll
+[22:46:39.331361] [I] UpdateFfxApiProviderEx for: Upscaling, result: 0X0
+[22:46:39.346454] [I] hkAmdExtD3DCreateInterface IAmdExtFfxApi queried, returning custom AmdExtFfxApi
+[22:46:39.373790] [I] UpdateFfxApiProviderEx for: FG, result: 0X0
+[22:46:39.381985] [I] hkAmdExtD3DCreateInterface IAmdExtFfxApi queried, returning custom AmdExtFfxApi
+[22:46:39.382026] [E] UpdateFfxApiProviderEx for: SwapchainDX12, result: 0X80004002
+[22:46:39.399585] [I] hkAmdExtD3DCreateInterface IAmdExtFfxApi queried, returning custom AmdExtFfxApi
+[22:46:39.399631] [E] UpdateFfxApiProviderEx for: SwapchainDX12, result: 0X80004002
+[22:46:39.405386] [W] FGHooks::CreateSwapChainForHwnd Can't init FG Feature or invalid FGOutput setting!
+[22:46:41.067741] [I] WrappedIDXGISwapChain4::WrappedIDXGISwapChain4 1 created, real: CC1B110, refCount: 1
+[22:46:43.876319] [I] CreateRenderTargetDx12 done!
+[22:46:44.184178] [I] LibraryLoadHooks::LoadLibraryCheckW C:\WINDOWS\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_25f000c85b470fa6\dxgi.dll call, returning this dll!
+[22:46:44.245478] [I] LibraryLoadHooks::LoadLibraryCheckW C:\WINDOWS\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_25f000c85b470fa6\dxgi.dll call, returning this dll!
+[22:54:04.241561] [I] hkAmdExtD3DCreateInterface IAmdExtFfxApi queried, returning custom AmdExtFfxApi
+[22:54:04.241623] [I] UpdateFfxApiProviderEx for: Upscaling, result: 0X0
+[22:54:06.034908] [I] hkD3D11CreateDevice Adapter Desc: AMD Radeon RX 9070 XT

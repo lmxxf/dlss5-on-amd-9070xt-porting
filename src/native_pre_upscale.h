@@ -107,7 +107,7 @@ template<class BarrierFunction>inline bool FixPrivateBarriers(ID3D12GraphicsComm
 }
 struct Guard{bool old;Guard():old(ReplayFlag()){ReplayFlag()=true;}~Guard(){ReplayFlag()=old;}};
 struct Job{
- Description desc{};void*context{};ID3D12GraphicsCommandList*list{};ID3D12Device*record_device{};unsigned frame{};
+ Description desc{};void*context{};Dispatch replay_dispatch{};ID3D12GraphicsCommandList*list{};ID3D12Device*record_device{};unsigned frame{};
  D3D12_RESOURCE_STATES states[7]{};bool uncertain{};unsigned following_work{};
  ~Job(){for(auto&r:desc.resources)if(r.resource)static_cast<ID3D12Resource*>(r.resource)->Release();if(list)list->Release();if(record_device)record_device->Release();}
 };
@@ -133,8 +133,8 @@ inline bool Reverse(D3D12_RESOURCE_STATES s,uint32_t&out){
  default:{const D3D12_RESOURCE_STATES read=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE|D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE|D3D12_RESOURCE_STATE_COPY_SOURCE|D3D12_RESOURCE_STATE_DEPTH_READ|D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER|D3D12_RESOURCE_STATE_INDEX_BUFFER|D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT;
   if(s==0||(s&~read))return false;out=0;if(s&D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)out|=4;if(s&D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)out|=8;if(s&D3D12_RESOURCE_STATE_COPY_SOURCE)out|=16;if(!out)out=4;return true;}}
 }
-inline bool Capture(void**context,const Header*h,ID3D12GraphicsCommandList*native,unsigned frame){
- if(Fatal().load()||!Enabled()||Replaying()||!original||!native||native->GetType()!=D3D12_COMMAND_LIST_TYPE_DIRECT)return false;
+inline bool Capture(void**context,const Header*h,ID3D12GraphicsCommandList*native,unsigned frame,Dispatch replay_dispatch){
+ if(Fatal().load()||!Enabled()||Replaying()||!replay_dispatch||!native||native->GetType()!=D3D12_COMMAND_LIST_TYPE_DIRECT)return false;
  // Return false so the caller records the original FFX dispatch in its own list.
  if(Mode()==1&&neural_oneshot.Bypassed())return false;
  Description d{};void*ctx=nullptr;
@@ -155,7 +155,7 @@ inline bool Capture(void**context,const Header*h,ID3D12GraphicsCommandList*nativ
   for(unsigned k=0;k<i;k++)if(d.resources[k].resource==d.resources[i].resource&&states[k]!=states[i])return false;
  }
  std::lock_guard<std::mutex>lock(Mutex());if(Jobs().count(native))return false;
- auto j=std::make_unique<Job>();j->desc=d;j->context=ctx;j->list=native;j->frame=frame;native->AddRef();
+ auto j=std::make_unique<Job>();j->desc=d;j->context=ctx;j->replay_dispatch=replay_dispatch;j->list=native;j->frame=frame;native->AddRef();
  for(unsigned i=0;i<7;i++){j->states[i]=states[i];if(d.resources[i].resource)static_cast<ID3D12Resource*>(d.resources[i].resource)->AddRef();}
  if(FAILED(static_cast<ID3D12GraphicsCommandList*>(d.command_list)->GetDevice(IID_PPV_ARGS(&j->record_device))))return false;
  Jobs().emplace(native,std::move(j));PendingJobs().store(true,std::memory_order_release);if(frame<5)Log(frame,d,"captured: experimental no-following-consumer contract");return true;
@@ -267,7 +267,7 @@ inline bool Process(ID3D12CommandQueue*q,Job&j){
    for(unsigned i=0;i<7;i++)if(j.desc.resources[i].resource){bool duplicate=false;for(unsigned k=0;k<i;k++)duplicate|=j.desc.resources[k].resource==j.desc.resources[i].resource;if(!duplicate)Transition(c,static_cast<ID3D12Resource*>(j.desc.resources[i].resource),j.states[i],replay_states[i]);}
    d.command_list=c;Guard guard;if(j.frame<5)Log(j.frame,d,"before original FFX replay");
    if(processed){PrivateBarrierResource()=fed;PrivateBarrierState()=D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;}
-   result=original(&j.context,&d.header);
+   result=j.replay_dispatch(&j.context,&d.header);
    if(processed){PrivateBarrierResource()=nullptr;Transition(c,fed,PrivateBarrierState(),D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);}
    if(j.frame<5)Log(j.frame,d,"after original FFX replay",processed,result);
    for(unsigned i=0;i<7;i++)if(j.desc.resources[i].resource){bool duplicate=false;for(unsigned k=0;k<i;k++)duplicate|=j.desc.resources[k].resource==j.desc.resources[i].resource;if(!duplicate)Transition(c,static_cast<ID3D12Resource*>(j.desc.resources[i].resource),replay_states[i],j.states[i]);}
