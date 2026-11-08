@@ -452,4 +452,4 @@ Fix Phantom Blade Zero crashing when rendering starts after shader compilation. 
 
 The RX 9070 XT user confirmed entering the game. Subsequent logs reached 18,300 FSR calls with `processed=1 / replay=0`. Confirmation retained `Fsr4Update=false` and `DLSS5_PRE_UPSCALE_ASYNC=0`; their necessity has not been independently established. Install beside `PBZ\platform\steam\PBZ.exe`. PBZ instructions and optional compatibility files are included. Generic defaults, all 80 HIP modules, weights and shaders remain from 0.46. No new FPS or blanket bit-equivalence claim.
 
-OP full package only. [Receipt and SHA](Development/releases/0.46.1/README.md). Public mirror links are pending.
+OP full package only. [Receipt and SHA](Development/releases/0.46.1/README.md). Download: [Quark](https://pan.quark.cn/s/78a7de295d1f).

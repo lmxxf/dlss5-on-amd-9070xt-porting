@@ -975,3 +975,5 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 ### 2026-11-08 0.46.1 OP完整包与PBZ实玩确认
 
 用户确认入口配对修复版能进入《影之刃零》；随后只读日志至18300次FSR调用，processed1/replay0。修复及诊断证据提交5f30cc5d。按用户仅OP要求，以0.46锁SHA完整ZIP制作0.46.1常规完整包，525149494B、SHA2b7e8f4e…e1ffcc，700文件流式读回通过；690个原文件含内核/模型/着色器/通用配置保持。附PBZ路径/可选已验ASYNC0与FSR4false配置、匹配源码tar。未改正在运行的游戏、不跑GPU、不重做其它两包、不上传/push。成品D:\給網友打包\OptiScaler-DLSS5-AMD-0.46.1.zip，详releases/0.46.1/README.md；公开镜像待用户给。
+
+2026-11-08补记：用户提供0.46.1 OP包[夸克公开下载](https://pan.quark.cn/s/78a7de295d1f)，已同步中英文README/CHANGELOG、发行回执和WorkingPlan；未独立下载核验网盘文件，原ZIP及SHA不变。

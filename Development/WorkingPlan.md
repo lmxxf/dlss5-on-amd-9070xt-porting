@@ -425,4 +425,4 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 
 ### 2026-11-08 PBZ / OP 0.46.1
 
-FFX混合入口配对修复已提交5f30cc5d，用户确认修复版能进入《影之刃零》，运行日志至18300次FSR调用/processed1/replay0。只打OP常规完整包，保留0.46通用默认；附本次实玩成功的async0/FSR4false可选PBZ配置。发行回执见releases/0.46.1；公开镜像待用户提供。
+FFX混合入口配对修复已提交5f30cc5d，用户确认修复版能进入《影之刃零》，运行日志至18300次FSR调用/processed1/replay0。只打OP常规完整包，保留0.46通用默认；附本次实玩成功的async0/FSR4false可选PBZ配置。发行回执见releases/0.46.1；用户已提供[夸克公开下载](https://pan.quark.cn/s/78a7de295d1f)，未独立下载核验。

@@ -454,4 +454,4 @@ Small权重与旧权重共存；80个双架构模块复用。F8切AE/EXACT；2x/
 
 RX 9070 XT 用户确认能进入游戏，随后日志记录到 18,300 次 FSR 调用且有 `processed=1 / replay=0`。本次保留 `Fsr4Update=false` 与 `DLSS5_PRE_UPSCALE_ASYNC=0`，尚未单独证明这两项是否必需。安装位置为 `PBZ\platform\steam\`；包内附 PBZ 说明与可选兼容配置。通用默认配置、80 个 HIP 模块、权重与着色器保持 0.46 原样，不声明新增 FPS 或全模式逐位验证。
 
-只制作 OP 完整包；发布记录与 SHA 见 [0.46.1](Development/releases/0.46.1/README.md)。网盘入口尚未提供。
+只制作 OP 完整包；发布记录与 SHA 见 [0.46.1](Development/releases/0.46.1/README.md)。下载：[夸克网盘](https://pan.quark.cn/s/78a7de295d1f)。
