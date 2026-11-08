@@ -970,3 +970,8 @@ bc8cb62a权重共享/双qt均STOP；3b7d0a03资格Small1080 norm-hoist曾赢（m
 ### 2026-11-08 PBZ连续崩溃与FFX入口配对修复待实玩
 
 用户四次报告闪退；同步前置及关闭FSR4升级均未避开同一0x1c74800执行AV。诊断版记录原RSP，首栈字定位Process回放的global original间接调用；shim/provider双入口与两个context交替已见日志。原代码每次dispatch覆盖全局入口，但Job仅保存context，延后回放可能错配shim/provider合同。现Capture显式传入并保存逐Job trampoline，Process用该指针回放，dispatch_core直接透传也改用局部orig。正式O2 HIP编译及diff检查通过，PBZ装入c762cf36…c7347并读回，旧诊断版/日志保留entry-fix备份，锁已释放。未改内核/权重/网络数学，尚待用户实玩确认；async0/FSR4false排查设置暂保。证据见results/pbz-install-20261108/README.md与fault-context.txt，未commit/push/改发行ZIP。
+
+
+### 2026-11-08 0.46.1 OP完整包与PBZ实玩确认
+
+用户确认入口配对修复版能进入《影之刃零》；随后只读日志至18300次FSR调用，processed1/replay0。修复及诊断证据提交5f30cc5d。按用户仅OP要求，以0.46锁SHA完整ZIP制作0.46.1常规完整包，525149494B、SHA2b7e8f4e…e1ffcc，700文件流式读回通过；690个原文件含内核/模型/着色器/通用配置保持。附PBZ路径/可选已验ASYNC0与FSR4false配置、匹配源码tar。未改正在运行的游戏、不跑GPU、不重做其它两包、不上传/push。成品D:\給網友打包\OptiScaler-DLSS5-AMD-0.46.1.zip，详releases/0.46.1/README.md；公开镜像待用户给。

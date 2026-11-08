@@ -1,0 +1,25 @@
+DLSS5 AMD 0.46.1 ——《影之刃零》
+
+将常规完整包解压到真正的主程序旁：
+PBZ\platform\steam\
+不是外层 PBZ\steam\，也不是 ProjectPBZ\Binaries\Win64\。
+
+0.46.1 修复 shim/provider 混合调用时延后回放使用错误入口的问题。
+9070 XT 用户已确认修复版能进入游戏；未做长时间稳定性或画质/FPS验收。
+
+本次成功进入游戏使用了以下兼容配置：
+1. OptiScaler.ini 中 Fsr4Update=false
+2. DLSS5-AMD\custom-config.txt 中增加 DLSS5_PRE_UPSCALE_ASYNC=0
+这两项排查设置在修复后保留，尚未证明必须开启。
+为复用已确认可进入游戏的设置，可以将 PBZ-兼容配置\OptiScaler.ini
+复制到主程序旁覆盖本包 OptiScaler.ini；custom-config.txt 请只合并上述一行，保留自己的其它设置。
+通用包默认设置保持 0.46 原样；本包不包含玩家 custom/native 文件。
+
+默认 Small 0.5x；F6 开关对比，F8 切换 AE/EXACT，F9 切模型/遍数。
+OptiScaler 菜单默认 Insert。没有 Insert 可在 OptiScaler.ini 中
+把 ShortcutKey=auto 改为 ShortcutKey=0x79（F10），保存后重启游戏。
+
+已安装0.46的用户至少需要更新 dlss5-amd.addon64，复制旧0.46到新目录不会包含修复。
+不需要重编HIP算子、修改模型权重或替换原游戏exe。
+
+对应源码：sources/addon-source-0.46.1.tar.gz，git 5f30cc5d。

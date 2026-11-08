@@ -447,3 +447,11 @@ Small权重与旧权重共存；80个双架构模块复用。F8切AE/EXACT；2x/
 离线单帧耗时（不同验证批次范围，非游戏FPS）：Small 0.5x：1080档5.311–5.363ms、900档3.937–3.947ms、720档2.742ms、小窗1.680ms；Original 1x：1088档8.335–8.425ms（纯NN7.984ms）、1152档8.859–8.945ms、960档6.243ms。Round5同批Original960 mean下降25.60µs、p99下降30.55µs，三轮全胜；最终20配置138对文件0 bit-diff。数据不构成所有七档的同批区间保证。
 
 三包与SHA回执：[Development/releases/0.46/](Development/releases/0.46/README.md)；双游戏备份安装回执：[Development/results/game-install-20261031/](Development/results/game-install-20261031/README.md)。
+
+## 0.46.1 · 2026-11-08（仅 OptiScaler 常规包）
+
+修复《影之刃零》在编译着色器后进入渲染时的闪退：shim/provider 两个 FFX 入口交替调用，全局回放函数可能与已经排队的 context 错配。现在每个任务保存捕获时的入口，立即透传也使用当前调用自己的入口。修复提交 `5f30cc5d`。
+
+RX 9070 XT 用户确认能进入游戏，随后日志记录到 18,300 次 FSR 调用且有 `processed=1 / replay=0`。本次保留 `Fsr4Update=false` 与 `DLSS5_PRE_UPSCALE_ASYNC=0`，尚未单独证明这两项是否必需。安装位置为 `PBZ\platform\steam\`；包内附 PBZ 说明与可选兼容配置。通用默认配置、80 个 HIP 模块、权重与着色器保持 0.46 原样，不声明新增 FPS 或全模式逐位验证。
+
+只制作 OP 完整包；发布记录与 SHA 见 [0.46.1](Development/releases/0.46.1/README.md)。网盘入口尚未提供。

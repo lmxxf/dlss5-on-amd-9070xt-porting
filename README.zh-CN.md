@@ -18,6 +18,14 @@ DLSS 5（DLSSNR）跑在 AMD RX 9070 XT / RDNA 4 上。
 | **Magpie**（便携） | 任何游戏，不需要游戏支持超分 | Magpie 抓游戏窗口；网络接在效果组的 FSR3_SR 一项里，之后 FSR4 放大到全屏（可选 XeSS 帧生成） |
 | **OptiScaler-REFramework**（只给 RE9） | 《生化危机 9》，常规路线切不开它的命令提交 | TheAutomatic 改的 OptiScaler 宿主 + 我们的 `LmxxfNrRuntime.dll`（成对使用，别和常规包混装） |
 
+## 0.46.1 · 2026-11-08（仅 OptiScaler 常规包）
+
+修复《影之刃零》在编译着色器后进入渲染时的闪退：shim/provider 两个 FFX 入口交替调用，全局回放函数可能与已经排队的 context 错配。现在每个任务保存捕获时的入口，立即透传也使用当前调用自己的入口。修复提交 `5f30cc5d`。
+
+RX 9070 XT 用户确认能进入游戏，随后日志记录到 18,300 次 FSR 调用且有 `processed=1 / replay=0`。本次保留 `Fsr4Update=false` 与 `DLSS5_PRE_UPSCALE_ASYNC=0`，尚未单独证明这两项是否必需。安装位置为 `PBZ\platform\steam\`；包内附 PBZ 说明与可选兼容配置。通用默认配置、80 个 HIP 模块、权重与着色器保持 0.46 原样，不声明新增 FPS 或全模式逐位验证。
+
+只制作 OP 完整包；发布记录与 SHA 见 [0.46.1](Development/releases/0.46.1/README.md)。网盘入口尚未提供。
+
 ## 0.46 · 2026-10-31
 
 下载：[夸克](https://pan.quark.cn/s/8b734826ba17) · [Gofile 镜像](https://gofile.io/d/Iyyz2tLc)（0.45 旧版：[夸克](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile 镜像](https://gofile.io/d/hmrcTjuS)；0.44 旧版：[夸克](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile 镜像](https://gofile.io/d/YCNT57JP)）。

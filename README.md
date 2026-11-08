@@ -20,6 +20,14 @@ the host upscaler (FSR) takes it to the display resolution.** Three packages, th
 | **Magpie** (portable) | any game, no upscaler support needed | Magpie captures the game window; the network runs in the FSR3_SR slot of its effect group, then FSR4 fills the screen (optional XeSS frame generation) |
 | **OptiScaler-REFramework** (RE9 only) | Resident Evil Requiem, whose command submission the regular route cannot split | TheAutomatic's modified OptiScaler host + our `LmxxfNrRuntime.dll` (matched pair; do not mix with the regular packages) |
 
+## 0.46.1 · 2026-11-08 (OptiScaler regular package only)
+
+Fix Phantom Blade Zero crashing when rendering starts after shader compilation. Alternating FFX shim/provider calls could overwrite a shared replay entry while a deferred job retained a context from the other entry. Jobs now retain their capture-time trampoline; immediate forwarding uses the local entry. Fix commit: `5f30cc5d`.
+
+The RX 9070 XT user confirmed entering the game. Subsequent logs reached 18,300 FSR calls with `processed=1 / replay=0`. Confirmation retained `Fsr4Update=false` and `DLSS5_PRE_UPSCALE_ASYNC=0`; their necessity has not been independently established. Install beside `PBZ\platform\steam\PBZ.exe`. PBZ instructions and optional compatibility files are included. Generic defaults, all 80 HIP modules, weights and shaders remain from 0.46. No new FPS or blanket bit-equivalence claim.
+
+OP full package only. [Receipt and SHA](Development/releases/0.46.1/README.md). Public mirror links are pending.
+
 ## 0.46 · 2026-10-31
 
 Download: [Quark](https://pan.quark.cn/s/8b734826ba17) · [Gofile mirror](https://gofile.io/d/Iyyz2tLc) (0.45: [Quark](https://pan.quark.cn/s/0ccb3eff675b) · [Gofile mirror](https://gofile.io/d/hmrcTjuS); 0.44: [Quark](https://pan.quark.cn/s/ea87c0ffd257) · [Gofile mirror](https://gofile.io/d/YCNT57JP)).

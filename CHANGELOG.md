@@ -445,3 +445,11 @@ Based on 2f19eebc plus the release-document snapshot. Ships the validated Round5
 Offline single-frame times across validation batches (not game FPS): Small0.5x 1080:5.311–5.363ms, 900:3.937–3.947ms, 720:2.742ms, window:1.680ms; Original1x 1088:8.335–8.425ms (pure NN7.984ms), 1152:8.859–8.945ms, 960:6.243ms. Round5 same-batch Original960 mean−25.60µs/p99−30.55µs, all three rounds improved; final20 configurations/138 file pairs bit-identical. These ranges are not a same-batch guarantee across all seven tiers.
 
 Receipts: [Development/releases/0.46/](Development/releases/0.46/README.md) and [Development/results/game-install-20261031/](Development/results/game-install-20261031/README.md).
+
+## 0.46.1 · 2026-11-08 (OptiScaler regular package only)
+
+Fix Phantom Blade Zero crashing when rendering starts after shader compilation. Alternating FFX shim/provider calls could overwrite a shared replay entry while a deferred job retained a context from the other entry. Jobs now retain their capture-time trampoline; immediate forwarding uses the local entry. Fix commit: `5f30cc5d`.
+
+The RX 9070 XT user confirmed entering the game. Subsequent logs reached 18,300 FSR calls with `processed=1 / replay=0`. Confirmation retained `Fsr4Update=false` and `DLSS5_PRE_UPSCALE_ASYNC=0`; their necessity has not been independently established. Install beside `PBZ\platform\steam\PBZ.exe`. PBZ instructions and optional compatibility files are included. Generic defaults, all 80 HIP modules, weights and shaders remain from 0.46. No new FPS or blanket bit-equivalence claim.
+
+OP full package only. [Receipt and SHA](Development/releases/0.46.1/README.md). Public mirror links are pending.
